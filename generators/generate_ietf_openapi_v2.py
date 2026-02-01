@@ -18,6 +18,7 @@ class IETFToOpenAPI:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.groupings_cache = {}
         self.processed_modules = []
+        self.total_paths = 0
 
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
         """Find the end position of balanced braces"""
@@ -650,6 +651,7 @@ class IETFToOpenAPI:
 
             print(f"  ✓ Generated {output_file}")
             self.processed_modules.append(module_name)
+            self.total_paths += len(paths)
             return True
 
         except Exception as e:
@@ -685,6 +687,7 @@ class IETFToOpenAPI:
         # Create manifest
         manifest = {
             'total_modules': len(self.processed_modules),
+            'total_paths': self.total_paths,
             'modules': sorted(self.processed_modules),
             'generator': 'generate_ietf_openapi_v2.py',
             'timestamp': '2026-01-30'
