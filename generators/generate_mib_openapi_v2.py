@@ -20,6 +20,66 @@ class MIBToOpenAPI:
         self.groupings_cache = {}
         self.processed_modules = []
 
+    def create_example_data(self, schema: Dict[str, Any], property_name: str = "") -> Any:
+        """Generate realistic example data based on schema and property name"""
+        if not schema:
+            return "example-value"
+        
+        schema_type = schema.get('type', 'string')
+        
+        # Handle arrays
+        if schema_type == 'array':
+            items_schema = schema.get('items', {})
+            return [self.create_example_data(items_schema, property_name)]
+        
+        # Handle objects
+        if schema_type == 'object':
+            example_obj = {}
+            properties = schema.get('properties', {})
+            for prop_name, prop_schema in properties.items():
+                example_obj[prop_name] = self.create_example_data(prop_schema, prop_name)
+            return example_obj
+        
+        # Context-aware examples based on property name
+        name_lower = property_name.lower()
+        
+        if schema_type == 'boolean':
+            return True
+        
+        if schema_type == 'integer' or schema_type == 'number':
+            # Check for specific MIB counter/gauge types
+            if 'counter' in name_lower or 'octets' in name_lower or 'packets' in name_lower:
+                return 1234567890
+            if 'mtu' in name_lower:
+                return 1500
+            if 'speed' in name_lower:
+                return 1000000000  # 1 Gbps in bits/sec
+            if 'index' in name_lower or 'ifindex' in name_lower:
+                return 1
+            if 'admin' in name_lower or 'oper' in name_lower:
+                return 1  # up(1)
+            return schema.get('minimum', 0)
+        
+        # String type with context awareness
+        if 'mac' in name_lower or 'phys' in name_lower and 'address' in name_lower:
+            return "00:11:22:33:44:55"
+        if 'ip' in name_lower or 'addr' in name_lower:
+            if 'ipv6' in name_lower:
+                return "2001:db8::1"
+            return "192.168.1.1"
+        if 'interface' in name_lower or 'ifname' in name_lower or 'descr' in name_lower:
+            return "GigabitEthernet1/0/1"
+        if 'type' in name_lower:
+            return "ethernetCsmacd(6)"
+        if 'status' in name_lower or 'state' in name_lower:
+            return "up(1)"
+        if 'name' in name_lower:
+            return "interface-1"
+        if 'oid' in name_lower:
+            return "1.3.6.1.2.1.1"
+        
+        return "example-string"
+
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
         """Find the end position of balanced braces"""
         if start_pos >= len(text) or text[start_pos] != '{':
@@ -251,6 +311,10 @@ class MIBToOpenAPI:
 
             # Add GET operation for this container
             if container_path not in paths:
+                # Generate example from schema
+                container_schema = self.parse_container_or_grouping(container_content, container_name, False)
+                example_data = self.create_example_data(container_schema, container_name)
+                
                 paths[container_path] = {
                     "get": {
                         "summary": f"Get {container_name} data",
@@ -263,6 +327,9 @@ class MIBToOpenAPI:
                                     "application/yang-data+json": {
                                         "schema": {
                                             "$ref": f"#/components/schemas/{module_name}_{container_name}"
+                                        },
+                                        "example": {
+                                            f"{module_name}:{container_name}": example_data
                                         }
                                     }
                                 }
@@ -305,6 +372,10 @@ class MIBToOpenAPI:
 
             # Collection path (GET)
             if list_path not in paths:
+                # Generate example from schema
+                list_schema = self.parse_container_or_grouping(list_content, list_name, True)
+                example_item = self.create_example_data(list_schema.get('items', {}), list_name)
+                
                 paths[list_path] = {
                     "get": {
                         "summary": f"Get {list_name} list",
@@ -320,6 +391,9 @@ class MIBToOpenAPI:
                                             "items": {
                                                 "$ref": f"#/components/schemas/{module_name}_{list_name}"
                                             }
+                                        },
+                                        "example": {
+                                            f"{module_name}:{list_name}": [example_item]
                                         }
                                     }
                                 }
@@ -331,6 +405,10 @@ class MIBToOpenAPI:
             # Individual item path (GET)
             item_path = f"{list_path}={{{key_params}}}"
             if item_path not in paths:
+                # Generate example from schema (reuse from above)
+                list_schema = self.parse_container_or_grouping(list_content, list_name, True)
+                example_item = self.create_example_data(list_schema.get('items', {}), list_name)
+                
                 paths[item_path] = {
                     "get": {
                         "summary": f"Get {list_name} entry",
@@ -341,7 +419,8 @@ class MIBToOpenAPI:
                                 "name": key_params,
                                 "in": "path",
                                 "required": True,
-                                "schema": {"type": "string"}
+                                "schema": {"type": "string"},
+                                "example": "1"
                             }
                         ],
                         "responses": {
@@ -351,6 +430,9 @@ class MIBToOpenAPI:
                                     "application/yang-data+json": {
                                         "schema": {
                                             "$ref": f"#/components/schemas/{module_name}_{list_name}"
+                                        },
+                                        "example": {
+                                            f"{module_name}:{list_name}": example_item
                                         }
                                     }
                                 }
