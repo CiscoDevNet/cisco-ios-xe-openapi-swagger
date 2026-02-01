@@ -29,7 +29,16 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGlobalConfig"
+                  "type": "object",
+                  "description": "The amount of time in minutes a row in cHsrpGrpTable can\n          remain in a state other than active before being timed out.",
+                  "properties": {
+                    "cHsrpConfigTimeout": {
+                      "type": "integer",
+                      "description": "The amount of time in minutes a row in cHsrpGrpTable can\n          remain in a state other than active before being timed out.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-HSRP-MIB:cHsrpGlobalConfig": {
@@ -55,7 +64,216 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGrpTable"
+                  "type": "object",
+                  "description": "A table containing information on each HSRP group\n        for each interface.",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cHsrpGrpNumber": {
+                      "type": "integer",
+                      "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpAuth": {
+                      "type": "string",
+                      "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cHsrpGrpPriority": {
+                      "type": "integer",
+                      "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpPreempt": {
+                      "type": "boolean",
+                      "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                    },
+                    "cHsrpGrpPreemptDelay": {
+                      "type": "integer",
+                      "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpUseConfiguredTimers": {
+                      "type": "boolean",
+                      "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                    },
+                    "cHsrpGrpConfiguredHelloTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpConfiguredHoldTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHelloTime": {
+                      "type": "integer",
+                      "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHoldTime": {
+                      "type": "integer",
+                      "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpVirtualIpAddr": {
+                      "type": "string",
+                      "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpUseConfigVirtualIpAddr": {
+                      "type": "boolean",
+                      "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                    },
+                    "cHsrpGrpActiveRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently active router for this group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently standby router for this\n            group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyState": {
+                      "type": "string",
+                      "description": "The current HSRP state of this group on this interface.",
+                      "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                    },
+                    "cHsrpGrpVirtualMacAddr": {
+                      "type": "string",
+                      "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                      "x-yang-type": "yang:mac-address"
+                    },
+                    "cHsrpGrpEntryRowStatus": {
+                      "type": "string",
+                      "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cHsrpGrpIpNone": {
+                      "type": "boolean",
+                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                    },
+                    "cHsrpGrpEntry": {
+                      "type": "array",
+                      "description": "cHsrpGrpEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ifIndex": {
+                            "type": "string",
+                            "description": "ifIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "cHsrpGrpNumber": {
+                            "type": "integer",
+                            "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpAuth": {
+                            "type": "string",
+                            "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "cHsrpGrpPriority": {
+                            "type": "integer",
+                            "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpPreempt": {
+                            "type": "boolean",
+                            "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                          },
+                          "cHsrpGrpPreemptDelay": {
+                            "type": "integer",
+                            "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpUseConfiguredTimers": {
+                            "type": "boolean",
+                            "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                          },
+                          "cHsrpGrpConfiguredHelloTime": {
+                            "type": "integer",
+                            "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpConfiguredHoldTime": {
+                            "type": "integer",
+                            "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpLearnedHelloTime": {
+                            "type": "integer",
+                            "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpLearnedHoldTime": {
+                            "type": "integer",
+                            "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cHsrpGrpVirtualIpAddr": {
+                            "type": "string",
+                            "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                            "format": "inet:ipv4-address"
+                          },
+                          "cHsrpGrpUseConfigVirtualIpAddr": {
+                            "type": "boolean",
+                            "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                          },
+                          "cHsrpGrpActiveRouter": {
+                            "type": "string",
+                            "description": "Ip Address of the currently active router for this group.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "cHsrpGrpStandbyRouter": {
+                            "type": "string",
+                            "description": "Ip Address of the currently standby router for this\n            group.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "cHsrpGrpStandbyState": {
+                            "type": "string",
+                            "description": "The current HSRP state of this group on this interface.",
+                            "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                          },
+                          "cHsrpGrpVirtualMacAddr": {
+                            "type": "string",
+                            "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                            "x-yang-type": "yang:mac-address"
+                          },
+                          "cHsrpGrpEntryRowStatus": {
+                            "type": "string",
+                            "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "cHsrpGrpIpNone": {
+                            "type": "boolean",
+                            "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-HSRP-MIB:cHsrpGrpTable": {
@@ -77,7 +295,30 @@
                     "cHsrpGrpStandbyState": "up(1)",
                     "cHsrpGrpVirtualMacAddr": "00:11:22:33:44:55",
                     "cHsrpGrpEntryRowStatus": "up(1)",
-                    "cHsrpGrpIpNone": true
+                    "cHsrpGrpIpNone": true,
+                    "cHsrpGrpEntry": [
+                      {
+                        "ifIndex": "example-string",
+                        "cHsrpGrpNumber": 0,
+                        "cHsrpGrpAuth": "example-string",
+                        "cHsrpGrpPriority": 0,
+                        "cHsrpGrpPreempt": true,
+                        "cHsrpGrpPreemptDelay": 0,
+                        "cHsrpGrpUseConfiguredTimers": true,
+                        "cHsrpGrpConfiguredHelloTime": 0,
+                        "cHsrpGrpConfiguredHoldTime": 0,
+                        "cHsrpGrpLearnedHelloTime": 0,
+                        "cHsrpGrpLearnedHoldTime": 0,
+                        "cHsrpGrpVirtualIpAddr": "192.168.1.1",
+                        "cHsrpGrpUseConfigVirtualIpAddr": true,
+                        "cHsrpGrpActiveRouter": "example-string",
+                        "cHsrpGrpStandbyRouter": "example-string",
+                        "cHsrpGrpStandbyState": "up(1)",
+                        "cHsrpGrpVirtualMacAddr": "00:11:22:33:44:55",
+                        "cHsrpGrpEntryRowStatus": "up(1)",
+                        "cHsrpGrpIpNone": true
+                      }
+                    ]
                   }
                 }
               }
@@ -100,8 +341,110 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cHsrpGrpEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGrpEntry"
+                    "type": "object",
+                    "properties": {
+                      "ifIndex": {
+                        "type": "string",
+                        "description": "ifIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cHsrpGrpNumber": {
+                        "type": "integer",
+                        "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpAuth": {
+                        "type": "string",
+                        "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cHsrpGrpPriority": {
+                        "type": "integer",
+                        "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpPreempt": {
+                        "type": "boolean",
+                        "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                      },
+                      "cHsrpGrpPreemptDelay": {
+                        "type": "integer",
+                        "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpUseConfiguredTimers": {
+                        "type": "boolean",
+                        "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                      },
+                      "cHsrpGrpConfiguredHelloTime": {
+                        "type": "integer",
+                        "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpConfiguredHoldTime": {
+                        "type": "integer",
+                        "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpLearnedHelloTime": {
+                        "type": "integer",
+                        "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpLearnedHoldTime": {
+                        "type": "integer",
+                        "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpVirtualIpAddr": {
+                        "type": "string",
+                        "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpUseConfigVirtualIpAddr": {
+                        "type": "boolean",
+                        "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                      },
+                      "cHsrpGrpActiveRouter": {
+                        "type": "string",
+                        "description": "Ip Address of the currently active router for this group.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpStandbyRouter": {
+                        "type": "string",
+                        "description": "Ip Address of the currently standby router for this\n            group.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpStandbyState": {
+                        "type": "string",
+                        "description": "The current HSRP state of this group on this interface.",
+                        "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                      },
+                      "cHsrpGrpVirtualMacAddr": {
+                        "type": "string",
+                        "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                        "x-yang-type": "yang:mac-address"
+                      },
+                      "cHsrpGrpEntryRowStatus": {
+                        "type": "string",
+                        "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cHsrpGrpIpNone": {
+                        "type": "boolean",
+                        "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -159,7 +502,107 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGrpEntry"
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cHsrpGrpNumber": {
+                      "type": "integer",
+                      "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpAuth": {
+                      "type": "string",
+                      "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cHsrpGrpPriority": {
+                      "type": "integer",
+                      "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpPreempt": {
+                      "type": "boolean",
+                      "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                    },
+                    "cHsrpGrpPreemptDelay": {
+                      "type": "integer",
+                      "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpUseConfiguredTimers": {
+                      "type": "boolean",
+                      "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                    },
+                    "cHsrpGrpConfiguredHelloTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpConfiguredHoldTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHelloTime": {
+                      "type": "integer",
+                      "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHoldTime": {
+                      "type": "integer",
+                      "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpVirtualIpAddr": {
+                      "type": "string",
+                      "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpUseConfigVirtualIpAddr": {
+                      "type": "boolean",
+                      "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                    },
+                    "cHsrpGrpActiveRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently active router for this group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently standby router for this\n            group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyState": {
+                      "type": "string",
+                      "description": "The current HSRP state of this group on this interface.",
+                      "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                    },
+                    "cHsrpGrpVirtualMacAddr": {
+                      "type": "string",
+                      "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                      "x-yang-type": "yang:mac-address"
+                    },
+                    "cHsrpGrpEntryRowStatus": {
+                      "type": "string",
+                      "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cHsrpGrpIpNone": {
+                      "type": "boolean",
+                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-HSRP-MIB:cHsrpGrpEntry": {
@@ -204,8 +647,110 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cHsrpGrpEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGrpEntry"
+                    "type": "object",
+                    "properties": {
+                      "ifIndex": {
+                        "type": "string",
+                        "description": "ifIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cHsrpGrpNumber": {
+                        "type": "integer",
+                        "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpAuth": {
+                        "type": "string",
+                        "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cHsrpGrpPriority": {
+                        "type": "integer",
+                        "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpPreempt": {
+                        "type": "boolean",
+                        "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                      },
+                      "cHsrpGrpPreemptDelay": {
+                        "type": "integer",
+                        "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpUseConfiguredTimers": {
+                        "type": "boolean",
+                        "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                      },
+                      "cHsrpGrpConfiguredHelloTime": {
+                        "type": "integer",
+                        "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpConfiguredHoldTime": {
+                        "type": "integer",
+                        "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpLearnedHelloTime": {
+                        "type": "integer",
+                        "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpLearnedHoldTime": {
+                        "type": "integer",
+                        "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cHsrpGrpVirtualIpAddr": {
+                        "type": "string",
+                        "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpUseConfigVirtualIpAddr": {
+                        "type": "boolean",
+                        "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                      },
+                      "cHsrpGrpActiveRouter": {
+                        "type": "string",
+                        "description": "Ip Address of the currently active router for this group.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpStandbyRouter": {
+                        "type": "string",
+                        "description": "Ip Address of the currently standby router for this\n            group.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cHsrpGrpStandbyState": {
+                        "type": "string",
+                        "description": "The current HSRP state of this group on this interface.",
+                        "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                      },
+                      "cHsrpGrpVirtualMacAddr": {
+                        "type": "string",
+                        "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                        "x-yang-type": "yang:mac-address"
+                      },
+                      "cHsrpGrpEntryRowStatus": {
+                        "type": "string",
+                        "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cHsrpGrpIpNone": {
+                        "type": "boolean",
+                        "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -263,7 +808,107 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-HSRP-MIB_cHsrpGrpEntry"
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cHsrpGrpNumber": {
+                      "type": "integer",
+                      "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpAuth": {
+                      "type": "string",
+                      "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cHsrpGrpPriority": {
+                      "type": "integer",
+                      "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpPreempt": {
+                      "type": "boolean",
+                      "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                    },
+                    "cHsrpGrpPreemptDelay": {
+                      "type": "integer",
+                      "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpUseConfiguredTimers": {
+                      "type": "boolean",
+                      "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                    },
+                    "cHsrpGrpConfiguredHelloTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpConfiguredHoldTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHelloTime": {
+                      "type": "integer",
+                      "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHoldTime": {
+                      "type": "integer",
+                      "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpVirtualIpAddr": {
+                      "type": "string",
+                      "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpUseConfigVirtualIpAddr": {
+                      "type": "boolean",
+                      "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                    },
+                    "cHsrpGrpActiveRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently active router for this group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently standby router for this\n            group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyState": {
+                      "type": "string",
+                      "description": "The current HSRP state of this group on this interface.",
+                      "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                    },
+                    "cHsrpGrpVirtualMacAddr": {
+                      "type": "string",
+                      "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                      "x-yang-type": "yang:mac-address"
+                    },
+                    "cHsrpGrpEntryRowStatus": {
+                      "type": "string",
+                      "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cHsrpGrpIpNone": {
+                      "type": "boolean",
+                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-HSRP-MIB:cHsrpGrpEntry": {
@@ -405,6 +1050,114 @@
             "type": "boolean",
             "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
           },
+          "cHsrpGrpEntry": {
+            "type": "array",
+            "description": "cHsrpGrpEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "ifIndex": {
+                  "type": "string",
+                  "description": "ifIndex",
+                  "x-yang-type": "leafref"
+                },
+                "cHsrpGrpNumber": {
+                  "type": "integer",
+                  "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpAuth": {
+                  "type": "string",
+                  "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "cHsrpGrpPriority": {
+                  "type": "integer",
+                  "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpPreempt": {
+                  "type": "boolean",
+                  "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                },
+                "cHsrpGrpPreemptDelay": {
+                  "type": "integer",
+                  "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpUseConfiguredTimers": {
+                  "type": "boolean",
+                  "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                },
+                "cHsrpGrpConfiguredHelloTime": {
+                  "type": "integer",
+                  "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpConfiguredHoldTime": {
+                  "type": "integer",
+                  "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpLearnedHelloTime": {
+                  "type": "integer",
+                  "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpLearnedHoldTime": {
+                  "type": "integer",
+                  "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cHsrpGrpVirtualIpAddr": {
+                  "type": "string",
+                  "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                  "format": "inet:ipv4-address"
+                },
+                "cHsrpGrpUseConfigVirtualIpAddr": {
+                  "type": "boolean",
+                  "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                },
+                "cHsrpGrpActiveRouter": {
+                  "type": "string",
+                  "description": "Ip Address of the currently active router for this group.",
+                  "format": "inet:ipv4-address"
+                },
+                "cHsrpGrpStandbyRouter": {
+                  "type": "string",
+                  "description": "Ip Address of the currently standby router for this\n            group.",
+                  "format": "inet:ipv4-address"
+                },
+                "cHsrpGrpStandbyState": {
+                  "type": "string",
+                  "description": "The current HSRP state of this group on this interface.",
+                  "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                },
+                "cHsrpGrpVirtualMacAddr": {
+                  "type": "string",
+                  "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                  "x-yang-type": "yang:mac-address"
+                },
+                "cHsrpGrpEntryRowStatus": {
+                  "type": "string",
+                  "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "cHsrpGrpIpNone": {
+                  "type": "boolean",
+                  "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                }
+              }
+            }
+          },
           "cHsrpGlobalConfig": {
             "type": "object",
             "description": "The amount of time in minutes a row in cHsrpGrpTable can\n          remain in a state other than active before being timed out.",
@@ -518,6 +1271,114 @@
               "cHsrpGrpIpNone": {
                 "type": "boolean",
                 "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+              },
+              "cHsrpGrpEntry": {
+                "type": "array",
+                "description": "cHsrpGrpEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cHsrpGrpNumber": {
+                      "type": "integer",
+                      "description": "This object along with the ifIndex of a particular interface\n            uniquely identifies an HSRP group.\n            \n            Group numbers 0,1 and 2 are the only valid group numbers\n            for TokenRing interfaces. For other media types, numbers\n            range from 0 to 255. Each interface has its own set of group\n            numbers. There's no relationship between the groups\n            configured on different interfaces. Using a group number\n            on one interface doesn't preclude using the same group\n            number on a different interface. For example, there can be\n            a group 1 on an Ethernet and a group 1 on Token Ring. More\n            details can be found from RFC 2281.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpAuth": {
+                      "type": "string",
+                      "description": "This is an unencrypted authentication string which is\n            carried in all HSRP messages. An authentication string\n            mismatch prevents a router interface from learning the\n            designated IP address or HSRP timer values from\n            other HSRP-enabled routers with the same group number.\n            \n            The function of this object is not to supply any sort of\n            security-like authentication but rather to confirm that\n            what's happening is what's intended. In other words, this\n            is meant for sanity checking only.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cHsrpGrpPriority": {
+                      "type": "integer",
+                      "description": "The cHsrpGrpPriority helps to select the active and the\n            standby routers. The router with the highest priority is\n            selected as the active router. In the priority range of 0\n            to 255, 0 is the lowest priority and 255 is the highest\n            priority.\n            \n            If two (or more) routers in a group have the same priority,\n            the one with the highest ip address of the interface is the\n            active router. When the active router fails to send a Hello\n            message within a configurable period of time, the standby\n            router with the highest priority becomes the active\n            router.\n            \n            A router with highest priority will only attempt to\n            overthrow a lower priority active router if it is\n            configured to preempt.  But, if there is more than one\n            router which is not active, the highest priority non-active\n            router becomes the standby router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpPreempt": {
+                      "type": "boolean",
+                      "description": "This object, if TRUE, indicates that the current router\n            should attempt to overthrow a lower priority active router\n            and attempt to become the active router. If this object is\n            FALSE, the router will become the active router only if\n            there is no such router (or if an active router fails)."
+                    },
+                    "cHsrpGrpPreemptDelay": {
+                      "type": "integer",
+                      "description": "This delay is the time difference between a router power\n            up and the time it can actually start preempting the\n            currently active router.\n            \n            When a router first comes up, it doesn't have a complete\n            routing table. If it's configured to preempt, then it will\n            become the Active router, but it will not be able to\n            provide adequate routing services. The solution to this is\n            to allow for a configurable delay before the router\n            actually preempts the currently active router.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpUseConfiguredTimers": {
+                      "type": "boolean",
+                      "description": "HSRP routers learn a group's Hellotime or Holdtime from\n            hello messages.\n            \n            The Hellotime is used to determine the frequency of\n            generating hello messages when this router becomes the\n            active or standby router. The Holdtime is the interval\n            between the receipt of a Hello message and the presumption\n            that the sending router has failed.\n            \n            If this object is TRUE, the cHsrpGrpConfiguredHelloTime and\n            cHsrpGrpConfiguredHoldTime will be used. If it is FALSE,\n            the Hellotime and Holdtime values are learned."
+                    },
+                    "cHsrpGrpConfiguredHelloTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHelloTime is used when this router is an\n            active router. Otherwise, the Hellotime learned from the\n            current active router is used. All routers on a particular\n            LAN segment must use the same Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpConfiguredHoldTime": {
+                      "type": "integer",
+                      "description": "If cHsrpGrpUseConfiguredTimers is true,\n            cHsrpGrpConfiguredHoldTime is used when this router is an\n            active router. Otherwise, the Holdtime learned from the\n            current active router is used. All routers on a particular\n            LAN segment should use the same Holdtime. Also, the\n            Holdtime should be at least three times the value of the\n            Hellotime and must be greater than the Hellotime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHelloTime": {
+                      "type": "integer",
+                      "description": "If the Hellotime is not configured on a router, it can be\n            learned from the Hello messages from active router,\n            provided the Hello message is authenticated. If the\n            Hellotime is not learned from a Hello message from the\n            active router and it is not manually configured, a default\n            value of 3 seconds is recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpLearnedHoldTime": {
+                      "type": "integer",
+                      "description": "If the Holdtime is not configured on a router, it can be\n            learned from the Hello message from the active router.\n            Holdtime should be learned only if the Hello message is\n            authenticated. If the Holdtime is not learned and it is\n            not manually configured, a default value of 10 seconds is \n            recommended.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cHsrpGrpVirtualIpAddr": {
+                      "type": "string",
+                      "description": "This is the primary virtual IP address used by this\n            group.  If this address is configured (i.e a non zero ip\n            address), this value is used. Otherwise, the agent will\n            attempt to discover the virtual address through a discovery\n            process (which scans the hello messages).",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpUseConfigVirtualIpAddr": {
+                      "type": "boolean",
+                      "description": "If this object is TRUE, cHsrpGrpVirtualIpAddr was a\n            configured one. Otherwise, it indicates that \n            cHsrpGrpVirtualIpAddr was a learned one."
+                    },
+                    "cHsrpGrpActiveRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently active router for this group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyRouter": {
+                      "type": "string",
+                      "description": "Ip Address of the currently standby router for this\n            group.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cHsrpGrpStandbyState": {
+                      "type": "string",
+                      "description": "The current HSRP state of this group on this interface.",
+                      "x-yang-type": "CISCO-HSRP-MIB:HsrpState"
+                    },
+                    "cHsrpGrpVirtualMacAddr": {
+                      "type": "string",
+                      "description": "Mac Addresses used are as specified in RFC 2281. For\n            ethernet and fddi interfaces, a MAC address will be in the\n            range 00:00:0c:07:ac:00 through 00:00:0c:07:ac:ff. The last\n            octet is the hexadecimal equivalent of cHsrpGrpNumber\n            (0-255).\n            \n            Some Ethernet and FDDI interfaces allow a unicast MAC\n            address for each HSRP group. Certain Ethernet\n            chipsets(LANCE Ethernet, VGANYLAN and QUICC Ethernet) only\n            support a single Unicast Mac Address. In this case, only\n            one HSRP group is allowed.\n            \n            For TokenRing interfaces, the following three MAC \n            addresses are permitted (functional addresses):\n                         C0:00:00:01:00:00\n                         C0:00:00:02:00:00\n                         C0:00:00:04:00:00.",
+                      "x-yang-type": "yang:mac-address"
+                    },
+                    "cHsrpGrpEntryRowStatus": {
+                      "type": "string",
+                      "description": "The control that allows modification, creation, and\n            deletion of entries.  For detailed rules see the\n            DESCRIPTION for cHsrpGrpEntry.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cHsrpGrpIpNone": {
+                      "type": "boolean",
+                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                    }
+                  }
+                }
               }
             }
           }

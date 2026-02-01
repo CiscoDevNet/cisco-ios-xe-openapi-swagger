@@ -29,7 +29,22 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfig"
+                  "type": "object",
+                  "description": "nlmConfig",
+                  "properties": {
+                    "nlmConfigGlobalEntryLimit": {
+                      "type": "integer",
+                      "description": "The maximum number of notification entries that may be held\n          in nlmLogTable for all nlmLogNames added together.  A particular\n          setting does not guarantee that much data can be held.\n          \n          If an application changes the limit while there are\n          Notifications in the log, the oldest Notifications MUST be\n          discarded to bring the log down to the new limit - thus the\n          value of nlmConfigGlobalEntryLimit MUST take precedence over\n          the values of nlmConfigGlobalAgeOut and nlmConfigLogEntryLimit,\n          even if the Notification being discarded has been present for\n          fewer minutes than the value of nlmConfigGlobalAgeOut, or if\n          the named log has fewer entries than that specified in\n          nlmConfigLogEntryLimit.\n          \n          A value of 0 means no limit.\n          \n          Please be aware that contention between multiple managers\n          trying to set this object to different values MAY affect the\n          reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmConfigGlobalAgeOut": {
+                      "type": "integer",
+                      "description": "The number of minutes a Notification SHOULD be kept in a log\n          before it is automatically removed.\n          \n          If an application changes the value of nlmConfigGlobalAgeOut,\n          Notifications older than the new time MAY be discarded to meet the\n          new time.\n          \n          A value of 0 means no age out.\n          \n          Please be aware that contention between multiple managers\n          trying to set this object to different values MAY affect the\n          reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmConfig": {
@@ -56,7 +71,22 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmStats"
+                  "type": "object",
+                  "description": "The number of Notifications put into the nlmLogTable.  This\n          counts a Notification once for each log entry, so a Notification\n           put into multiple logs is counted multiple times.",
+                  "properties": {
+                    "nlmStatsGlobalNotificationsLogged": {
+                      "type": "integer",
+                      "description": "The number of Notifications put into the nlmLogTable.  This\n          counts a Notification once for each log entry, so a Notification\n           put into multiple logs is counted multiple times.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmStatsGlobalNotificationsBumped": {
+                      "type": "integer",
+                      "description": "The number of log entries discarded to make room for a new entry\n          due to lack of resources or the value of nlmConfigGlobalEntryLimit\n          or nlmConfigLogEntryLimit.  This does not include entries discarded\n          due to the value of nlmConfigGlobalAgeOut.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmStats": {
@@ -83,7 +113,88 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfigLogTable"
+                  "type": "object",
+                  "description": "A table of logging control entries.",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogFilterName": {
+                      "type": "string",
+                      "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogEntryLimit": {
+                      "type": "integer",
+                      "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmConfigLogAdminStatus": {
+                      "type": "string",
+                      "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                    },
+                    "nlmConfigLogOperStatus": {
+                      "type": "string",
+                      "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                    },
+                    "nlmConfigLogStorageType": {
+                      "type": "string",
+                      "description": "The storage type of this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "nlmConfigLogEntryStatus": {
+                      "type": "string",
+                      "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "nlmConfigLogEntry": {
+                      "type": "array",
+                      "description": "A logging control entry.  Depending on the entry's storage type\n          entries may be supplied by the system or created and deleted by\n          applications using nlmConfigLogEntryStatus.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "nlmLogName": {
+                            "type": "string",
+                            "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "nlmConfigLogFilterName": {
+                            "type": "string",
+                            "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "nlmConfigLogEntryLimit": {
+                            "type": "integer",
+                            "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "nlmConfigLogAdminStatus": {
+                            "type": "string",
+                            "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                          },
+                          "nlmConfigLogOperStatus": {
+                            "type": "string",
+                            "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                          },
+                          "nlmConfigLogStorageType": {
+                            "type": "string",
+                            "description": "The storage type of this conceptual row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          },
+                          "nlmConfigLogEntryStatus": {
+                            "type": "string",
+                            "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmConfigLogTable": {
@@ -93,7 +204,18 @@
                     "nlmConfigLogAdminStatus": "up(1)",
                     "nlmConfigLogOperStatus": "up(1)",
                     "nlmConfigLogStorageType": "ethernetCsmacd(6)",
-                    "nlmConfigLogEntryStatus": "up(1)"
+                    "nlmConfigLogEntryStatus": "up(1)",
+                    "nlmConfigLogEntry": [
+                      {
+                        "nlmLogName": "interface-1",
+                        "nlmConfigLogFilterName": "interface-1",
+                        "nlmConfigLogEntryLimit": 0,
+                        "nlmConfigLogAdminStatus": "up(1)",
+                        "nlmConfigLogOperStatus": "up(1)",
+                        "nlmConfigLogStorageType": "ethernetCsmacd(6)",
+                        "nlmConfigLogEntryStatus": "up(1)"
+                      }
+                    ]
                   }
                 }
               }
@@ -116,8 +238,46 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A logging control entry.  Depending on the entry's storage type\n          entries may be supplied by the system or created and deleted by\n          applications using nlmConfigLogEntryStatus.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfigLogEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmConfigLogFilterName": {
+                        "type": "string",
+                        "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmConfigLogEntryLimit": {
+                        "type": "integer",
+                        "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmConfigLogAdminStatus": {
+                        "type": "string",
+                        "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                      },
+                      "nlmConfigLogOperStatus": {
+                        "type": "string",
+                        "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                      },
+                      "nlmConfigLogStorageType": {
+                        "type": "string",
+                        "description": "The storage type of this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "nlmConfigLogEntryStatus": {
+                        "type": "string",
+                        "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -163,7 +323,43 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfigLogEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogFilterName": {
+                      "type": "string",
+                      "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogEntryLimit": {
+                      "type": "integer",
+                      "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmConfigLogAdminStatus": {
+                      "type": "string",
+                      "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                    },
+                    "nlmConfigLogOperStatus": {
+                      "type": "string",
+                      "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                    },
+                    "nlmConfigLogStorageType": {
+                      "type": "string",
+                      "description": "The storage type of this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "nlmConfigLogEntryStatus": {
+                      "type": "string",
+                      "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmConfigLogEntry": {
@@ -195,7 +391,122 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogTable"
+                  "type": "object",
+                  "description": "nlmLogTable",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "nlmLogDateAndTime": {
+                      "type": "string",
+                      "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    },
+                    "nlmLogEngineID": {
+                      "type": "string",
+                      "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogEngineTAddress": {
+                      "type": "string",
+                      "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "nlmLogEngineTDomain": {
+                      "type": "string",
+                      "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "nlmLogContextEngineID": {
+                      "type": "string",
+                      "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogContextName": {
+                      "type": "string",
+                      "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmLogNotificationID": {
+                      "type": "string",
+                      "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogEntry": {
+                      "type": "array",
+                      "description": "nlmLogEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "nlmLogName": {
+                            "type": "string",
+                            "description": "nlmLogName",
+                            "x-yang-type": "leafref"
+                          },
+                          "nlmLogIndex": {
+                            "type": "integer",
+                            "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "nlmLogTime": {
+                            "type": "string",
+                            "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                            "x-yang-type": "yang:timestamp"
+                          },
+                          "nlmLogDateAndTime": {
+                            "type": "string",
+                            "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                            "x-yang-type": "snmpv2-tc:DateAndTime"
+                          },
+                          "nlmLogEngineID": {
+                            "type": "string",
+                            "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                            "x-yang-type": "snmp-framework:SnmpEngineID"
+                          },
+                          "nlmLogEngineTAddress": {
+                            "type": "string",
+                            "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                            "x-yang-type": "snmpv2-tc:TAddress"
+                          },
+                          "nlmLogEngineTDomain": {
+                            "type": "string",
+                            "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                            "x-yang-type": "snmpv2-tc:TDomain"
+                          },
+                          "nlmLogContextEngineID": {
+                            "type": "string",
+                            "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                            "x-yang-type": "snmp-framework:SnmpEngineID"
+                          },
+                          "nlmLogContextName": {
+                            "type": "string",
+                            "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "nlmLogNotificationID": {
+                            "type": "string",
+                            "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                            "x-yang-type": "yang:object-identifier-128"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogTable": {
@@ -208,7 +519,21 @@
                     "nlmLogEngineTDomain": "example-string",
                     "nlmLogContextEngineID": "example-string",
                     "nlmLogContextName": "interface-1",
-                    "nlmLogNotificationID": "example-string"
+                    "nlmLogNotificationID": "example-string",
+                    "nlmLogEntry": [
+                      {
+                        "nlmLogName": "interface-1",
+                        "nlmLogIndex": 1,
+                        "nlmLogTime": "example-string",
+                        "nlmLogDateAndTime": "example-string",
+                        "nlmLogEngineID": "example-string",
+                        "nlmLogEngineTAddress": "192.168.1.1",
+                        "nlmLogEngineTDomain": "example-string",
+                        "nlmLogContextEngineID": "example-string",
+                        "nlmLogContextName": "interface-1",
+                        "nlmLogNotificationID": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -231,8 +556,63 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "nlmLogEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "nlmLogName",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "nlmLogDateAndTime": {
+                        "type": "string",
+                        "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                        "x-yang-type": "snmpv2-tc:DateAndTime"
+                      },
+                      "nlmLogEngineID": {
+                        "type": "string",
+                        "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                        "x-yang-type": "snmp-framework:SnmpEngineID"
+                      },
+                      "nlmLogEngineTAddress": {
+                        "type": "string",
+                        "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                        "x-yang-type": "snmpv2-tc:TAddress"
+                      },
+                      "nlmLogEngineTDomain": {
+                        "type": "string",
+                        "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                        "x-yang-type": "snmpv2-tc:TDomain"
+                      },
+                      "nlmLogContextEngineID": {
+                        "type": "string",
+                        "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                        "x-yang-type": "snmp-framework:SnmpEngineID"
+                      },
+                      "nlmLogContextName": {
+                        "type": "string",
+                        "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmLogNotificationID": {
+                        "type": "string",
+                        "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -281,7 +661,60 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "nlmLogDateAndTime": {
+                      "type": "string",
+                      "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    },
+                    "nlmLogEngineID": {
+                      "type": "string",
+                      "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogEngineTAddress": {
+                      "type": "string",
+                      "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "nlmLogEngineTDomain": {
+                      "type": "string",
+                      "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "nlmLogContextEngineID": {
+                      "type": "string",
+                      "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogContextName": {
+                      "type": "string",
+                      "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmLogNotificationID": {
+                      "type": "string",
+                      "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogEntry": {
@@ -316,7 +749,166 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogVariableTable"
+                  "type": "object",
+                  "description": "A table of variables to go with Notification log entries.",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "string",
+                      "description": "nlmLogIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogVariableIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableID": {
+                      "type": "string",
+                      "description": "The variable's object identifier.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableValueType": {
+                      "type": "string",
+                      "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                    },
+                    "nlmLogVariableCounter32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableUnsigned32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableTimeTicksVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "nlmLogVariableInteger32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'integer32'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "nlmLogVariableOctetStringVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'octetString'.",
+                      "format": "binary"
+                    },
+                    "nlmLogVariableIpAddressVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "nlmLogVariableOidVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'objectId'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableCounter64Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter64'.",
+                      "minimum": 0
+                    },
+                    "nlmLogVariableOpaqueVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'opaque'.",
+                      "format": "binary"
+                    },
+                    "nlmLogVariableEntry": {
+                      "type": "array",
+                      "description": "A Notification log entry variable.\n          \n          Entries appear in this table when there are variables in\n          the varbind list of a Notification in nlmLogTable.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "nlmLogName": {
+                            "type": "string",
+                            "description": "nlmLogName",
+                            "x-yang-type": "leafref"
+                          },
+                          "nlmLogIndex": {
+                            "type": "string",
+                            "description": "nlmLogIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "nlmLogVariableIndex": {
+                            "type": "integer",
+                            "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "nlmLogVariableID": {
+                            "type": "string",
+                            "description": "The variable's object identifier.",
+                            "x-yang-type": "yang:object-identifier-128"
+                          },
+                          "nlmLogVariableValueType": {
+                            "type": "string",
+                            "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                          },
+                          "nlmLogVariableCounter32Val": {
+                            "type": "integer",
+                            "description": "The value when nlmLogVariableType is 'counter32'.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "nlmLogVariableUnsigned32Val": {
+                            "type": "integer",
+                            "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "nlmLogVariableTimeTicksVal": {
+                            "type": "string",
+                            "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                            "x-yang-type": "yang:timeticks"
+                          },
+                          "nlmLogVariableInteger32Val": {
+                            "type": "integer",
+                            "description": "The value when nlmLogVariableType is 'integer32'.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "nlmLogVariableOctetStringVal": {
+                            "type": "string",
+                            "description": "The value when nlmLogVariableType is 'octetString'.",
+                            "format": "binary"
+                          },
+                          "nlmLogVariableIpAddressVal": {
+                            "type": "string",
+                            "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "nlmLogVariableOidVal": {
+                            "type": "string",
+                            "description": "The value when nlmLogVariableType is 'objectId'.",
+                            "x-yang-type": "yang:object-identifier-128"
+                          },
+                          "nlmLogVariableCounter64Val": {
+                            "type": "integer",
+                            "description": "The value when nlmLogVariableType is 'counter64'.",
+                            "minimum": 0
+                          },
+                          "nlmLogVariableOpaqueVal": {
+                            "type": "string",
+                            "description": "The value when nlmLogVariableType is 'opaque'.",
+                            "format": "binary"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogVariableTable": {
@@ -333,7 +925,25 @@
                     "nlmLogVariableIpAddressVal": "192.168.1.1",
                     "nlmLogVariableOidVal": "1.3.6.1.2.1.1",
                     "nlmLogVariableCounter64Val": 1234567890,
-                    "nlmLogVariableOpaqueVal": "example-string"
+                    "nlmLogVariableOpaqueVal": "example-string",
+                    "nlmLogVariableEntry": [
+                      {
+                        "nlmLogName": "interface-1",
+                        "nlmLogIndex": "example-string",
+                        "nlmLogVariableIndex": 1,
+                        "nlmLogVariableID": "example-string",
+                        "nlmLogVariableValueType": "ethernetCsmacd(6)",
+                        "nlmLogVariableCounter32Val": 1234567890,
+                        "nlmLogVariableUnsigned32Val": 0,
+                        "nlmLogVariableTimeTicksVal": "example-string",
+                        "nlmLogVariableInteger32Val": -2147483648,
+                        "nlmLogVariableOctetStringVal": "example-string",
+                        "nlmLogVariableIpAddressVal": "192.168.1.1",
+                        "nlmLogVariableOidVal": "1.3.6.1.2.1.1",
+                        "nlmLogVariableCounter64Val": 1234567890,
+                        "nlmLogVariableOpaqueVal": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -356,8 +966,85 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A Notification log entry variable.\n          \n          Entries appear in this table when there are variables in\n          the varbind list of a Notification in nlmLogTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogVariableEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "nlmLogName",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogIndex": {
+                        "type": "string",
+                        "description": "nlmLogIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogVariableIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableID": {
+                        "type": "string",
+                        "description": "The variable's object identifier.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "nlmLogVariableValueType": {
+                        "type": "string",
+                        "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                      },
+                      "nlmLogVariableCounter32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'counter32'.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableUnsigned32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableTimeTicksVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "nlmLogVariableInteger32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'integer32'.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "nlmLogVariableOctetStringVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'octetString'.",
+                        "format": "binary"
+                      },
+                      "nlmLogVariableIpAddressVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "nlmLogVariableOidVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'objectId'.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "nlmLogVariableCounter64Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'counter64'.",
+                        "minimum": 0
+                      },
+                      "nlmLogVariableOpaqueVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'opaque'.",
+                        "format": "binary"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -410,7 +1097,82 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogVariableEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "string",
+                      "description": "nlmLogIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogVariableIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableID": {
+                      "type": "string",
+                      "description": "The variable's object identifier.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableValueType": {
+                      "type": "string",
+                      "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                    },
+                    "nlmLogVariableCounter32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableUnsigned32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableTimeTicksVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "nlmLogVariableInteger32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'integer32'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "nlmLogVariableOctetStringVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'octetString'.",
+                      "format": "binary"
+                    },
+                    "nlmLogVariableIpAddressVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "nlmLogVariableOidVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'objectId'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableCounter64Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter64'.",
+                      "minimum": 0
+                    },
+                    "nlmLogVariableOpaqueVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'opaque'.",
+                      "format": "binary"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogVariableEntry": {
@@ -450,8 +1212,46 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A logging control entry.  Depending on the entry's storage type\n          entries may be supplied by the system or created and deleted by\n          applications using nlmConfigLogEntryStatus.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfigLogEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmConfigLogFilterName": {
+                        "type": "string",
+                        "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmConfigLogEntryLimit": {
+                        "type": "integer",
+                        "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmConfigLogAdminStatus": {
+                        "type": "string",
+                        "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                      },
+                      "nlmConfigLogOperStatus": {
+                        "type": "string",
+                        "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                      },
+                      "nlmConfigLogStorageType": {
+                        "type": "string",
+                        "description": "The storage type of this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "nlmConfigLogEntryStatus": {
+                        "type": "string",
+                        "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -497,7 +1297,43 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmConfigLogEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogFilterName": {
+                      "type": "string",
+                      "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogEntryLimit": {
+                      "type": "integer",
+                      "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmConfigLogAdminStatus": {
+                      "type": "string",
+                      "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                    },
+                    "nlmConfigLogOperStatus": {
+                      "type": "string",
+                      "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                    },
+                    "nlmConfigLogStorageType": {
+                      "type": "string",
+                      "description": "The storage type of this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "nlmConfigLogEntryStatus": {
+                      "type": "string",
+                      "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmConfigLogEntry": {
@@ -530,8 +1366,63 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "nlmLogEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "nlmLogName",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "nlmLogDateAndTime": {
+                        "type": "string",
+                        "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                        "x-yang-type": "snmpv2-tc:DateAndTime"
+                      },
+                      "nlmLogEngineID": {
+                        "type": "string",
+                        "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                        "x-yang-type": "snmp-framework:SnmpEngineID"
+                      },
+                      "nlmLogEngineTAddress": {
+                        "type": "string",
+                        "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                        "x-yang-type": "snmpv2-tc:TAddress"
+                      },
+                      "nlmLogEngineTDomain": {
+                        "type": "string",
+                        "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                        "x-yang-type": "snmpv2-tc:TDomain"
+                      },
+                      "nlmLogContextEngineID": {
+                        "type": "string",
+                        "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                        "x-yang-type": "snmp-framework:SnmpEngineID"
+                      },
+                      "nlmLogContextName": {
+                        "type": "string",
+                        "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "nlmLogNotificationID": {
+                        "type": "string",
+                        "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -580,7 +1471,60 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "nlmLogDateAndTime": {
+                      "type": "string",
+                      "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    },
+                    "nlmLogEngineID": {
+                      "type": "string",
+                      "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogEngineTAddress": {
+                      "type": "string",
+                      "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "nlmLogEngineTDomain": {
+                      "type": "string",
+                      "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "nlmLogContextEngineID": {
+                      "type": "string",
+                      "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogContextName": {
+                      "type": "string",
+                      "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmLogNotificationID": {
+                      "type": "string",
+                      "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogEntry": {
@@ -616,8 +1560,85 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A Notification log entry variable.\n          \n          Entries appear in this table when there are variables in\n          the varbind list of a Notification in nlmLogTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogVariableEntry"
+                    "type": "object",
+                    "properties": {
+                      "nlmLogName": {
+                        "type": "string",
+                        "description": "nlmLogName",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogIndex": {
+                        "type": "string",
+                        "description": "nlmLogIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "nlmLogVariableIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableID": {
+                        "type": "string",
+                        "description": "The variable's object identifier.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "nlmLogVariableValueType": {
+                        "type": "string",
+                        "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                      },
+                      "nlmLogVariableCounter32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'counter32'.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableUnsigned32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "nlmLogVariableTimeTicksVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "nlmLogVariableInteger32Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'integer32'.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "nlmLogVariableOctetStringVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'octetString'.",
+                        "format": "binary"
+                      },
+                      "nlmLogVariableIpAddressVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "nlmLogVariableOidVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'objectId'.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "nlmLogVariableCounter64Val": {
+                        "type": "integer",
+                        "description": "The value when nlmLogVariableType is 'counter64'.",
+                        "minimum": 0
+                      },
+                      "nlmLogVariableOpaqueVal": {
+                        "type": "string",
+                        "description": "The value when nlmLogVariableType is 'opaque'.",
+                        "format": "binary"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -670,7 +1691,82 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NOTIFICATION-LOG-MIB_nlmLogVariableEntry"
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "string",
+                      "description": "nlmLogIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogVariableIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableID": {
+                      "type": "string",
+                      "description": "The variable's object identifier.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableValueType": {
+                      "type": "string",
+                      "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                    },
+                    "nlmLogVariableCounter32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableUnsigned32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableTimeTicksVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "nlmLogVariableInteger32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'integer32'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "nlmLogVariableOctetStringVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'octetString'.",
+                      "format": "binary"
+                    },
+                    "nlmLogVariableIpAddressVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "nlmLogVariableOidVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'objectId'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableCounter64Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter64'.",
+                      "minimum": 0
+                    },
+                    "nlmLogVariableOpaqueVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'opaque'.",
+                      "format": "binary"
+                    }
+                  }
                 },
                 "example": {
                   "NOTIFICATION-LOG-MIB:nlmLogVariableEntry": {
@@ -869,6 +1965,194 @@
             "description": "The value when nlmLogVariableType is 'opaque'.",
             "format": "binary"
           },
+          "nlmConfigLogEntry": {
+            "type": "array",
+            "description": "A logging control entry.  Depending on the entry's storage type\n          entries may be supplied by the system or created and deleted by\n          applications using nlmConfigLogEntryStatus.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "nlmLogName": {
+                  "type": "string",
+                  "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "nlmConfigLogFilterName": {
+                  "type": "string",
+                  "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "nlmConfigLogEntryLimit": {
+                  "type": "integer",
+                  "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "nlmConfigLogAdminStatus": {
+                  "type": "string",
+                  "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                },
+                "nlmConfigLogOperStatus": {
+                  "type": "string",
+                  "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                },
+                "nlmConfigLogStorageType": {
+                  "type": "string",
+                  "description": "The storage type of this conceptual row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                },
+                "nlmConfigLogEntryStatus": {
+                  "type": "string",
+                  "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
+          "nlmLogEntry": {
+            "type": "array",
+            "description": "nlmLogEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "nlmLogName": {
+                  "type": "string",
+                  "description": "nlmLogName",
+                  "x-yang-type": "leafref"
+                },
+                "nlmLogIndex": {
+                  "type": "integer",
+                  "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "nlmLogTime": {
+                  "type": "string",
+                  "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                  "x-yang-type": "yang:timestamp"
+                },
+                "nlmLogDateAndTime": {
+                  "type": "string",
+                  "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                  "x-yang-type": "snmpv2-tc:DateAndTime"
+                },
+                "nlmLogEngineID": {
+                  "type": "string",
+                  "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                  "x-yang-type": "snmp-framework:SnmpEngineID"
+                },
+                "nlmLogEngineTAddress": {
+                  "type": "string",
+                  "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                  "x-yang-type": "snmpv2-tc:TAddress"
+                },
+                "nlmLogEngineTDomain": {
+                  "type": "string",
+                  "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                  "x-yang-type": "snmpv2-tc:TDomain"
+                },
+                "nlmLogContextEngineID": {
+                  "type": "string",
+                  "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                  "x-yang-type": "snmp-framework:SnmpEngineID"
+                },
+                "nlmLogContextName": {
+                  "type": "string",
+                  "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "nlmLogNotificationID": {
+                  "type": "string",
+                  "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                  "x-yang-type": "yang:object-identifier-128"
+                }
+              }
+            }
+          },
+          "nlmLogVariableEntry": {
+            "type": "array",
+            "description": "A Notification log entry variable.\n          \n          Entries appear in this table when there are variables in\n          the varbind list of a Notification in nlmLogTable.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "nlmLogName": {
+                  "type": "string",
+                  "description": "nlmLogName",
+                  "x-yang-type": "leafref"
+                },
+                "nlmLogIndex": {
+                  "type": "string",
+                  "description": "nlmLogIndex",
+                  "x-yang-type": "leafref"
+                },
+                "nlmLogVariableIndex": {
+                  "type": "integer",
+                  "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "nlmLogVariableID": {
+                  "type": "string",
+                  "description": "The variable's object identifier.",
+                  "x-yang-type": "yang:object-identifier-128"
+                },
+                "nlmLogVariableValueType": {
+                  "type": "string",
+                  "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                },
+                "nlmLogVariableCounter32Val": {
+                  "type": "integer",
+                  "description": "The value when nlmLogVariableType is 'counter32'.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "nlmLogVariableUnsigned32Val": {
+                  "type": "integer",
+                  "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "nlmLogVariableTimeTicksVal": {
+                  "type": "string",
+                  "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                  "x-yang-type": "yang:timeticks"
+                },
+                "nlmLogVariableInteger32Val": {
+                  "type": "integer",
+                  "description": "The value when nlmLogVariableType is 'integer32'.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "nlmLogVariableOctetStringVal": {
+                  "type": "string",
+                  "description": "The value when nlmLogVariableType is 'octetString'.",
+                  "format": "binary"
+                },
+                "nlmLogVariableIpAddressVal": {
+                  "type": "string",
+                  "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                  "format": "inet:ipv4-address"
+                },
+                "nlmLogVariableOidVal": {
+                  "type": "string",
+                  "description": "The value when nlmLogVariableType is 'objectId'.",
+                  "x-yang-type": "yang:object-identifier-128"
+                },
+                "nlmLogVariableCounter64Val": {
+                  "type": "integer",
+                  "description": "The value when nlmLogVariableType is 'counter64'.",
+                  "minimum": 0
+                },
+                "nlmLogVariableOpaqueVal": {
+                  "type": "string",
+                  "description": "The value when nlmLogVariableType is 'opaque'.",
+                  "format": "binary"
+                }
+              }
+            }
+          },
           "nlmConfig": {
             "type": "object",
             "description": "nlmConfig",
@@ -942,6 +2226,50 @@
                 "type": "string",
                 "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "nlmConfigLogEntry": {
+                "type": "array",
+                "description": "A logging control entry.  Depending on the entry's storage type\n          entries may be supplied by the system or created and deleted by\n          applications using nlmConfigLogEntryStatus.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "The name of the log.\n            \n            An implementation may allow multiple named logs, up to some\n            implementation-specific limit (which may be none).  A\n            zero-length log name is reserved for creation and deletion by\n            the managed system, and MUST be used as the default log name by\n            systems that do not support named logs.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogFilterName": {
+                      "type": "string",
+                      "description": "A value of snmpNotifyFilterProfileName as used as an index\n            into the snmpNotifyFilterTable in the SNMP Notification MIB,\n            specifying the locally or remotely originated Notifications\n            to be filtered out and not logged in this log.\n            \n            A zero-length value or a name that does not identify an\n            existing entry in snmpNotifyFilterTable indicate no\n            Notifications are to be logged in this log.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmConfigLogEntryLimit": {
+                      "type": "integer",
+                      "description": "The maximum number of notification entries that can be held in\n            nlmLogTable for this named log.  A particular setting does not\n            guarantee that that much data can be held.\n            \n            If an application changes the limit while there are\n            Notifications in the log, the oldest Notifications are discarded\n            to bring the log down to the new limit.\n            \n            A value of 0 indicates no limit.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmConfigLogAdminStatus": {
+                      "type": "string",
+                      "description": "Control to enable or disable the log without otherwise\n            disturbing the log's entry.\n            \n            Please be aware that contention between multiple managers\n            trying to set this object to different values MAY affect the\n            reliability and completeness of data seen by each manager."
+                    },
+                    "nlmConfigLogOperStatus": {
+                      "type": "string",
+                      "description": "The operational status of this log:\n            \n            disabled  administratively disabled\n            \n            operational    administratively enabled and working\n            \n            noFilter  administratively enabled but either\n                      nlmConfigLogFilterName is zero length\n                      or does not name an existing entry in\n                      snmpNotifyFilterTable"
+                    },
+                    "nlmConfigLogStorageType": {
+                      "type": "string",
+                      "description": "The storage type of this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "nlmConfigLogEntryStatus": {
+                      "type": "string",
+                      "description": "Control for creating and deleting entries.  Entries may be\n            modified while active.\n            \n            For non-null-named logs, the managed system records the security\n            credentials from the request that sets nlmConfigLogStatus\n            to 'active' and uses that identity to apply access control to\n            the objects in the Notification to decide if that Notification\n            may be logged.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           },
@@ -999,6 +2327,67 @@
                 "type": "string",
                 "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
                 "x-yang-type": "yang:object-identifier-128"
+              },
+              "nlmLogEntry": {
+                "type": "array",
+                "description": "nlmLogEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing entries within the named log.  When it reaches the\n            maximum value, an extremely unlikely event, the agent wraps the\n            value back to 1.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the entry was placed in the log. If\n            the entry occurred before the most recent management system\n            initialization this object value MUST be set to zero.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "nlmLogDateAndTime": {
+                      "type": "string",
+                      "description": "The local date and time when the entry was logged, instantiated\n            only by systems that have date and time capability.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    },
+                    "nlmLogEngineID": {
+                      "type": "string",
+                      "description": "The identification of the SNMP engine at which the Notification\n            originated.\n            \n            If the log can contain Notifications from only one engine\n            or the Trap is in SNMPv1 format, this object is a zero-length\n            string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogEngineTAddress": {
+                      "type": "string",
+                      "description": "The transport service address of the SNMP engine from which the\n            Notification was received, formatted according to the corresponding\n            value of nlmLogEngineTDomain. This is used to identify the source\n            of an SNMPv1 trap, since an nlmLogEngineId cannot be extracted\n            from the SNMPv1 trap pdu.\n            \n            This object MUST always be instantiated, even if the log\n            can contain Notifications from only one engine.\n            \n            Please be aware that the nlmLogEngineTAddress may not uniquely\n            identify the SNMP engine from which the Notification was received.\n            For example, if an SNMP engine uses DHCP or NAT to obtain\n            ip addresses, the address it uses may be shared with other\n            network devices, and hence will not uniquely identify the\n            SNMP engine.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "nlmLogEngineTDomain": {
+                      "type": "string",
+                      "description": "Indicates the kind of transport service by which a Notification\n            was received from an SNMP engine. nlmLogEngineTAddress contains\n            the transport service address of the SNMP engine from which\n            this Notification was received.\n            \n            Possible values for this object are presently found in the\n            Transport Mappings for SNMPv2 document (RFC 1906 [8]).",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "nlmLogContextEngineID": {
+                      "type": "string",
+                      "description": "If the Notification was received in a protocol which has a\n            contextEngineID element like SNMPv3, this object has that value.\n            Otherwise its value is a zero-length string.",
+                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                    },
+                    "nlmLogContextName": {
+                      "type": "string",
+                      "description": "The name of the SNMP MIB context from which the Notification came.\n            For SNMPv1 Traps this is the community string from the Trap.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "nlmLogNotificationID": {
+                      "type": "string",
+                      "description": "The NOTIFICATION-TYPE object identifier of the Notification that\n            occurred.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1078,6 +2467,89 @@
                 "type": "string",
                 "description": "The value when nlmLogVariableType is 'opaque'.",
                 "format": "binary"
+              },
+              "nlmLogVariableEntry": {
+                "type": "array",
+                "description": "A Notification log entry variable.\n          \n          Entries appear in this table when there are variables in\n          the varbind list of a Notification in nlmLogTable.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "nlmLogName": {
+                      "type": "string",
+                      "description": "nlmLogName",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogIndex": {
+                      "type": "string",
+                      "description": "nlmLogIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "nlmLogVariableIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer, starting at 1 for a given\n            nlmLogIndex, for indexing variables within the logged\n            Notification.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableID": {
+                      "type": "string",
+                      "description": "The variable's object identifier.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableValueType": {
+                      "type": "string",
+                      "description": "The type of the value.  One and only one of the value\n            objects that follow must be instantiated, based on this type."
+                    },
+                    "nlmLogVariableCounter32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableUnsigned32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'unsigned32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "nlmLogVariableTimeTicksVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'timeTicks'.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "nlmLogVariableInteger32Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'integer32'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "nlmLogVariableOctetStringVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'octetString'.",
+                      "format": "binary"
+                    },
+                    "nlmLogVariableIpAddressVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'ipAddress'.\n            Although this seems to be unfriendly for IPv6, we\n            have to recognize that there are a number of older\n            MIBs that do contain an IPv4 format address, known\n            as IpAddress.\n            \n            IPv6 addresses are represented using TAddress or\n            InetAddress, and so the underlying datatype is\n            OCTET STRING, and their value would be stored in\n            the nlmLogVariableOctetStringVal column.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "nlmLogVariableOidVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'objectId'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "nlmLogVariableCounter64Val": {
+                      "type": "integer",
+                      "description": "The value when nlmLogVariableType is 'counter64'.",
+                      "minimum": 0
+                    },
+                    "nlmLogVariableOpaqueVal": {
+                      "type": "string",
+                      "description": "The value when nlmLogVariableType is 'opaque'.",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
           }

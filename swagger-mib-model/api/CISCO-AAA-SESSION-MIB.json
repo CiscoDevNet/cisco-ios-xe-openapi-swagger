@@ -29,7 +29,22 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActive"
+                  "type": "object",
+                  "description": "Number of entries currently in casnActiveTable",
+                  "properties": {
+                    "casnActiveTableEntries": {
+                      "type": "integer",
+                      "description": "Number of entries currently in casnActiveTable",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnActiveTableHighWaterMark": {
+                      "type": "integer",
+                      "description": "Maximum number of entries present in casnActiveTable\n          since last system re-initialization.\n          \n          This corresponds to the maximum value reported by\n          casnActiveTableEntries.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-AAA-SESSION-MIB:casnActive": {
@@ -56,7 +71,22 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnGeneral"
+                  "type": "object",
+                  "description": "Total number of sessions since last system\n          re-initialization.\n          \n          This value includes all sessions currently in the\n          casnActiveTable and all previous sessions whether\n          terminated via casnDisconnect or via other\n          mechanisms.",
+                  "properties": {
+                    "casnTotalSessions": {
+                      "type": "integer",
+                      "description": "Total number of sessions since last system\n          re-initialization.\n          \n          This value includes all sessions currently in the\n          casnActiveTable and all previous sessions whether\n          terminated via casnDisconnect or via other\n          mechanisms.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnDisconnectedSessions": {
+                      "type": "integer",
+                      "description": "Total number of sessions which have been disconnected using\n          casnDisconnect since last system re-initialization.\n          \n          This value includes any sessions still in the\n          casnActiveTable with a casnDisconnect value of true(1) and\n          all previous sessions which terminated as a result of\n          setting casnDisconnect.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-AAA-SESSION-MIB:casnGeneral": {
@@ -83,7 +113,100 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActiveTable"
+                  "type": "object",
+                  "description": "This table contains entries for active AAA accounting\n        sessions in the system.",
+                  "properties": {
+                    "casnSessionId": {
+                      "type": "string",
+                      "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                    },
+                    "casnUserId": {
+                      "type": "string",
+                      "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "casnIpAddr": {
+                      "type": "string",
+                      "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                      "format": "inet:ipv4-address"
+                    },
+                    "casnIdleTime": {
+                      "type": "integer",
+                      "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnDisconnect": {
+                      "type": "boolean",
+                      "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                    },
+                    "casnCallTrackerId": {
+                      "type": "string",
+                      "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                    },
+                    "casnNasPort": {
+                      "type": "string",
+                      "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                      "x-yang-type": "snmpv2-tc:RowPointer"
+                    },
+                    "casnVaiIfIndex": {
+                      "type": "string",
+                      "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "casnActiveEntry": {
+                      "type": "array",
+                      "description": "The information regarding a single accounting session.\n          \n          Entries are created when a new accounting session\n          is begun.\n          \n          Entries are removed when the accounting session\n          is ended.\n          \n          Initiating termination of a session with the object\n          casnDisconnect will cause removal of the entry when\n          the session completes termination.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "casnSessionId": {
+                            "type": "string",
+                            "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                            "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                          },
+                          "casnUserId": {
+                            "type": "string",
+                            "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "casnIpAddr": {
+                            "type": "string",
+                            "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                            "format": "inet:ipv4-address"
+                          },
+                          "casnIdleTime": {
+                            "type": "integer",
+                            "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "casnDisconnect": {
+                            "type": "boolean",
+                            "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                          },
+                          "casnCallTrackerId": {
+                            "type": "string",
+                            "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                            "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                          },
+                          "casnNasPort": {
+                            "type": "string",
+                            "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                            "x-yang-type": "snmpv2-tc:RowPointer"
+                          },
+                          "casnVaiIfIndex": {
+                            "type": "string",
+                            "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                            "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-AAA-SESSION-MIB:casnActiveTable": {
@@ -94,7 +217,19 @@
                     "casnDisconnect": true,
                     "casnCallTrackerId": "example-string",
                     "casnNasPort": "example-string",
-                    "casnVaiIfIndex": "example-string"
+                    "casnVaiIfIndex": "example-string",
+                    "casnActiveEntry": [
+                      {
+                        "casnSessionId": "example-string",
+                        "casnUserId": "example-string",
+                        "casnIpAddr": "192.168.1.1",
+                        "casnIdleTime": 0,
+                        "casnDisconnect": true,
+                        "casnCallTrackerId": "example-string",
+                        "casnNasPort": "example-string",
+                        "casnVaiIfIndex": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -117,8 +252,52 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The information regarding a single accounting session.\n          \n          Entries are created when a new accounting session\n          is begun.\n          \n          Entries are removed when the accounting session\n          is ended.\n          \n          Initiating termination of a session with the object\n          casnDisconnect will cause removal of the entry when\n          the session completes termination.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActiveEntry"
+                    "type": "object",
+                    "properties": {
+                      "casnSessionId": {
+                        "type": "string",
+                        "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                        "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                      },
+                      "casnUserId": {
+                        "type": "string",
+                        "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "casnIpAddr": {
+                        "type": "string",
+                        "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                        "format": "inet:ipv4-address"
+                      },
+                      "casnIdleTime": {
+                        "type": "integer",
+                        "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "casnDisconnect": {
+                        "type": "boolean",
+                        "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                      },
+                      "casnCallTrackerId": {
+                        "type": "string",
+                        "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                        "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                      },
+                      "casnNasPort": {
+                        "type": "string",
+                        "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                        "x-yang-type": "snmpv2-tc:RowPointer"
+                      },
+                      "casnVaiIfIndex": {
+                        "type": "string",
+                        "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -165,7 +344,49 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActiveEntry"
+                  "type": "object",
+                  "properties": {
+                    "casnSessionId": {
+                      "type": "string",
+                      "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                    },
+                    "casnUserId": {
+                      "type": "string",
+                      "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "casnIpAddr": {
+                      "type": "string",
+                      "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                      "format": "inet:ipv4-address"
+                    },
+                    "casnIdleTime": {
+                      "type": "integer",
+                      "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnDisconnect": {
+                      "type": "boolean",
+                      "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                    },
+                    "casnCallTrackerId": {
+                      "type": "string",
+                      "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                    },
+                    "casnNasPort": {
+                      "type": "string",
+                      "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                      "x-yang-type": "snmpv2-tc:RowPointer"
+                    },
+                    "casnVaiIfIndex": {
+                      "type": "string",
+                      "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-AAA-SESSION-MIB:casnActiveEntry": {
@@ -199,8 +420,52 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The information regarding a single accounting session.\n          \n          Entries are created when a new accounting session\n          is begun.\n          \n          Entries are removed when the accounting session\n          is ended.\n          \n          Initiating termination of a session with the object\n          casnDisconnect will cause removal of the entry when\n          the session completes termination.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActiveEntry"
+                    "type": "object",
+                    "properties": {
+                      "casnSessionId": {
+                        "type": "string",
+                        "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                        "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                      },
+                      "casnUserId": {
+                        "type": "string",
+                        "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "casnIpAddr": {
+                        "type": "string",
+                        "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                        "format": "inet:ipv4-address"
+                      },
+                      "casnIdleTime": {
+                        "type": "integer",
+                        "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "casnDisconnect": {
+                        "type": "boolean",
+                        "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                      },
+                      "casnCallTrackerId": {
+                        "type": "string",
+                        "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                        "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                      },
+                      "casnNasPort": {
+                        "type": "string",
+                        "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                        "x-yang-type": "snmpv2-tc:RowPointer"
+                      },
+                      "casnVaiIfIndex": {
+                        "type": "string",
+                        "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -247,7 +512,49 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-AAA-SESSION-MIB_casnActiveEntry"
+                  "type": "object",
+                  "properties": {
+                    "casnSessionId": {
+                      "type": "string",
+                      "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                    },
+                    "casnUserId": {
+                      "type": "string",
+                      "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "casnIpAddr": {
+                      "type": "string",
+                      "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                      "format": "inet:ipv4-address"
+                    },
+                    "casnIdleTime": {
+                      "type": "integer",
+                      "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnDisconnect": {
+                      "type": "boolean",
+                      "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                    },
+                    "casnCallTrackerId": {
+                      "type": "string",
+                      "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                    },
+                    "casnNasPort": {
+                      "type": "string",
+                      "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                      "x-yang-type": "snmpv2-tc:RowPointer"
+                    },
+                    "casnVaiIfIndex": {
+                      "type": "string",
+                      "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-AAA-SESSION-MIB:casnActiveEntry": {
@@ -338,6 +645,56 @@
             "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
             "x-yang-type": "if-mib:InterfaceIndexOrZero"
           },
+          "casnActiveEntry": {
+            "type": "array",
+            "description": "The information regarding a single accounting session.\n          \n          Entries are created when a new accounting session\n          is begun.\n          \n          Entries are removed when the accounting session\n          is ended.\n          \n          Initiating termination of a session with the object\n          casnDisconnect will cause removal of the entry when\n          the session completes termination.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "casnSessionId": {
+                  "type": "string",
+                  "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                  "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                },
+                "casnUserId": {
+                  "type": "string",
+                  "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "casnIpAddr": {
+                  "type": "string",
+                  "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                  "format": "inet:ipv4-address"
+                },
+                "casnIdleTime": {
+                  "type": "integer",
+                  "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "casnDisconnect": {
+                  "type": "boolean",
+                  "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                },
+                "casnCallTrackerId": {
+                  "type": "string",
+                  "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                  "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                },
+                "casnNasPort": {
+                  "type": "string",
+                  "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                  "x-yang-type": "snmpv2-tc:RowPointer"
+                },
+                "casnVaiIfIndex": {
+                  "type": "string",
+                  "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                  "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                }
+              }
+            }
+          },
           "casnActive": {
             "type": "object",
             "description": "Number of entries currently in casnActiveTable",
@@ -417,6 +774,56 @@
                 "type": "string",
                 "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
                 "x-yang-type": "if-mib:InterfaceIndexOrZero"
+              },
+              "casnActiveEntry": {
+                "type": "array",
+                "description": "The information regarding a single accounting session.\n          \n          Entries are created when a new accounting session\n          is begun.\n          \n          Entries are removed when the accounting session\n          is ended.\n          \n          Initiating termination of a session with the object\n          casnDisconnect will cause removal of the entry when\n          the session completes termination.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "casnSessionId": {
+                      "type": "string",
+                      "description": "This is the session identification used by the\n            accounting protocol.\n            \n            This value is unique to a session within the system,\n            even if multiple accounting protocols are in use.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 44, Acct-Session-Id\n               TACACS+: attribute 'task_id'",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CasnSessionId"
+                    },
+                    "casnUserId": {
+                      "type": "string",
+                      "description": "The User login ID or zero length string if unavailable.\n            \n            The value of this object corresponds to these\n            accounting protocol attributes.\n               RADIUS:  attribute 1, User-Name\n               TACACS+: attribute 'user'",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "casnIpAddr": {
+                      "type": "string",
+                      "description": "The IP address of the session or 0.0.0.0 if not\n            applicable or unavailable.\n            \n            RADIUS:  attribute 8, Framed-IP-Address\n            TACACS+: attribute 'addr'",
+                      "format": "inet:ipv4-address"
+                    },
+                    "casnIdleTime": {
+                      "type": "integer",
+                      "description": "The elapsed time that this session has been idle.\n            \n            This is the time since the last user-level data has been\n            received or transmitted. Protocol level handshaking\n            associated with the call is considered to be idle for\n            this object.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "casnDisconnect": {
+                      "type": "boolean",
+                      "description": "This object is used to terminate this session.\n            \n            Setting the value to true(1) will initiate termination\n            of this session.\n            \n            The entry will be removed once the session has completed\n            termination.\n            \n            Once this object has been set to true(1), the session\n            termination process can not be cancelled by setting the\n            value false(2)."
+                    },
+                    "casnCallTrackerId": {
+                      "type": "string",
+                      "description": "The value of this object is the entry index in the\n            CISCO-CALL-TRACKER-MIB cctActiveTable of the call\n            corresponding to this accounting session.\n            \n            Using the value of this object to query the\n            cctActiveTable will provide more detailed data regarding\n            the session represented by this casnActiveEntry.",
+                      "x-yang-type": "CISCO-AAA-SESSION-MIB:CctCallId"
+                    },
+                    "casnNasPort": {
+                      "type": "string",
+                      "description": "The value of this object identifies a particular\n            conceptual row associated with the session identified by\n            casnSessionId.  The conceptual row that this object points\n            to represents a port that is used to transport a session.\n            \n            If the port transporting the session cannot be determined,\n            the value of this object will be zeroDotZero.\n            \n            For example, suppose a session is established using an ATM\n            PVC.  If the ifIndex of the ATM interface is 7, and the \n            VPI/VCI values of the PVC are 1, 100 respectively, then\n            the value of this object might be as follows:\n            \n                   casnNasPort.15 = atmVclAdminStatus.7.1.100\n                               ^                      ^ ^  ^\n                               |                      | |  |\n               casnSessionId --+                      | |  |\n                     ifIndex -------------------------+ |  |\n                   atmVclVpi ---------------------------+  |\n                   atmVclVci ------------------------------+\n            \n            where atmVclAdminStatus is the first accessible object\n            of the atmVclTable of the ATM-MIB.",
+                      "x-yang-type": "snmpv2-tc:RowPointer"
+                    },
+                    "casnVaiIfIndex": {
+                      "type": "string",
+                      "description": "The ifIndex of the Virtual Access Interface (VAI)\n            that is associated with the PPP session.\n            \n            This interface may not be represented in the IF-MIB in\n            which case the value of this object will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    }
+                  }
+                }
               }
             }
           }

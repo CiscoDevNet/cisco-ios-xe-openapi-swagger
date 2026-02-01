@@ -29,7 +29,22 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsObjects"
+                  "type": "object",
+                  "description": "cpwVcMplsObjects",
+                  "properties": {
+                    "cpwVcMplsOutboundIndexNext": {
+                      "type": "integer",
+                      "description": "This object contains an appropriate value to \n          be used for cpwVcMplsOutboundIndex when creating \n          entries in the cpwVcMplsOutboundTable. The value \n          0 indicates that no unassigned entries are \n          available. To obtain the cpwVcMplsOutboundIndex \n          value for a new entry, the manager issues a \n          management protocol retrieval operation to obtain \n          the current value of this object.  After each \n          retrieval, the agent should modify the value to \n          the next unassigned index, however the agent MUST \n          NOT assume such retrieval will be done for each  \n          row created.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundIndexNext": {
+                      "type": "integer",
+                      "description": "This object contains an appropriate value to \n          be used for cpwVcMplsInboundIndex when creating \n          entries in the cpwVcMplsInboundTable. The value \n          0 indicates that no unassigned entries are \n          available. To obtain the cpwVcMplsInboundIndex \n          value for a new entry, the manager issues a \n          management protocol retrieval operation to obtain \n          the current value of this object.  After each \n          retrieval, the agent should modify the value to \n          the next unassigned index, however the agent MUST \n          NOT assume such retrieval will be done for each  \n          row created.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsObjects": {
@@ -56,7 +71,112 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTable"
+                  "type": "object",
+                  "description": "This table specifies information for VC to be carried over  \n        MPLS PSN.",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsMplsType": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                    },
+                    "cpwVcMplsExpBitsMode": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                    },
+                    "cpwVcMplsExpBits": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsTtl": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsLocalLdpID": {
+                      "type": "string",
+                      "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsLocalLdpEntityID": {
+                      "type": "integer",
+                      "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsPeerLdpID": {
+                      "type": "string",
+                      "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "cpwVcMplsEntry": {
+                      "type": "array",
+                      "description": "A row in this table represents parameters specific to MPLS  \n          PSN for a pseudo wire connection (VC). The row is created  \n          automatically by the local agent if the cpwVcPsnType is  \n          MPLS. It is indexed by cpwVcIndex, which uniquely  \n          identifying a singular connection.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cpwVcIndex": {
+                            "type": "string",
+                            "description": "cpwVcIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "cpwVcMplsMplsType": {
+                            "type": "string",
+                            "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                          },
+                          "cpwVcMplsExpBitsMode": {
+                            "type": "string",
+                            "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                          },
+                          "cpwVcMplsExpBits": {
+                            "type": "integer",
+                            "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsTtl": {
+                            "type": "integer",
+                            "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsLocalLdpID": {
+                            "type": "string",
+                            "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                            "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                          },
+                          "cpwVcMplsLocalLdpEntityID": {
+                            "type": "integer",
+                            "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsPeerLdpID": {
+                            "type": "string",
+                            "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                            "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                          },
+                          "cpwVcMplsStorageType": {
+                            "type": "string",
+                            "description": "This variable indicates the storage type for this row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsTable": {
@@ -68,7 +188,20 @@
                     "cpwVcMplsLocalLdpID": "example-string",
                     "cpwVcMplsLocalLdpEntityID": 0,
                     "cpwVcMplsPeerLdpID": "example-string",
-                    "cpwVcMplsStorageType": "ethernetCsmacd(6)"
+                    "cpwVcMplsStorageType": "ethernetCsmacd(6)",
+                    "cpwVcMplsEntry": [
+                      {
+                        "cpwVcIndex": "example-string",
+                        "cpwVcMplsMplsType": "ethernetCsmacd(6)",
+                        "cpwVcMplsExpBitsMode": "example-string",
+                        "cpwVcMplsExpBits": 0,
+                        "cpwVcMplsTtl": 0,
+                        "cpwVcMplsLocalLdpID": "example-string",
+                        "cpwVcMplsLocalLdpEntityID": 0,
+                        "cpwVcMplsPeerLdpID": "example-string",
+                        "cpwVcMplsStorageType": "ethernetCsmacd(6)"
+                      }
+                    ]
                   }
                 }
               }
@@ -91,8 +224,58 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A row in this table represents parameters specific to MPLS  \n          PSN for a pseudo wire connection (VC). The row is created  \n          automatically by the local agent if the cpwVcPsnType is  \n          MPLS. It is indexed by cpwVcIndex, which uniquely  \n          identifying a singular connection.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsMplsType": {
+                        "type": "string",
+                        "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                      },
+                      "cpwVcMplsExpBitsMode": {
+                        "type": "string",
+                        "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                      },
+                      "cpwVcMplsExpBits": {
+                        "type": "integer",
+                        "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsTtl": {
+                        "type": "integer",
+                        "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsLocalLdpID": {
+                        "type": "string",
+                        "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                        "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                      },
+                      "cpwVcMplsLocalLdpEntityID": {
+                        "type": "integer",
+                        "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsPeerLdpID": {
+                        "type": "string",
+                        "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                        "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                      },
+                      "cpwVcMplsStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -140,7 +323,55 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsMplsType": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                    },
+                    "cpwVcMplsExpBitsMode": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                    },
+                    "cpwVcMplsExpBits": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsTtl": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsLocalLdpID": {
+                      "type": "string",
+                      "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsLocalLdpEntityID": {
+                      "type": "integer",
+                      "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsPeerLdpID": {
+                      "type": "string",
+                      "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsEntry": {
@@ -174,7 +405,124 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsOutboundTable"
+                  "type": "object",
+                  "description": "This table associates VCs using MPLS PSN with the outbound \n        MPLS tunnels (i.e. toward the PSN) or the physical  \n        interface in case of VC only.",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsOutboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsOutboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsOutboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this object.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "cpwVcMplsOutboundEntry": {
+                      "type": "array",
+                      "description": "cpwVcMplsOutboundEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cpwVcIndex": {
+                            "type": "string",
+                            "description": "cpwVcIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "cpwVcMplsOutboundIndex": {
+                            "type": "integer",
+                            "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsOutboundLsrXcIndex": {
+                            "type": "integer",
+                            "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsOutboundTunnelIndex": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                          },
+                          "cpwVcMplsOutboundTunnelInstance": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                          },
+                          "cpwVcMplsOutboundTunnelLclLSR": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsOutboundTunnelPeerLSR": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsOutboundIfIndex": {
+                            "type": "string",
+                            "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                            "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                          },
+                          "cpwVcMplsOutboundRowStatus": {
+                            "type": "string",
+                            "description": "For creating, modifying, and deleting this row.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "cpwVcMplsOutboundStorageType": {
+                            "type": "string",
+                            "description": "This variable indicates the storage type for this object.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsOutboundTable": {
@@ -187,7 +535,21 @@
                     "cpwVcMplsOutboundTunnelPeerLSR": "example-string",
                     "cpwVcMplsOutboundIfIndex": "example-string",
                     "cpwVcMplsOutboundRowStatus": "up(1)",
-                    "cpwVcMplsOutboundStorageType": "ethernetCsmacd(6)"
+                    "cpwVcMplsOutboundStorageType": "ethernetCsmacd(6)",
+                    "cpwVcMplsOutboundEntry": [
+                      {
+                        "cpwVcIndex": "example-string",
+                        "cpwVcMplsOutboundIndex": 1,
+                        "cpwVcMplsOutboundLsrXcIndex": 1,
+                        "cpwVcMplsOutboundTunnelIndex": "example-string",
+                        "cpwVcMplsOutboundTunnelInstance": "example-string",
+                        "cpwVcMplsOutboundTunnelLclLSR": "example-string",
+                        "cpwVcMplsOutboundTunnelPeerLSR": "example-string",
+                        "cpwVcMplsOutboundIfIndex": "example-string",
+                        "cpwVcMplsOutboundRowStatus": "up(1)",
+                        "cpwVcMplsOutboundStorageType": "ethernetCsmacd(6)"
+                      }
+                    ]
                   }
                 }
               }
@@ -210,8 +572,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsOutboundEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsOutboundEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsOutboundIndex": {
+                        "type": "integer",
+                        "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsOutboundLsrXcIndex": {
+                        "type": "integer",
+                        "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsOutboundTunnelIndex": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsOutboundTunnelInstance": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsOutboundTunnelLclLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsOutboundTunnelPeerLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsOutboundIfIndex": {
+                        "type": "string",
+                        "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsOutboundRowStatus": {
+                        "type": "string",
+                        "description": "For creating, modifying, and deleting this row.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cpwVcMplsOutboundStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this object.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -260,7 +678,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsOutboundEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsOutboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsOutboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsOutboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this object.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsOutboundEntry": {
@@ -295,7 +767,124 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsInboundTable"
+                  "type": "object",
+                  "description": "This table associates VCs using MPLS PSN with the inbound \n        MPLS tunnels (i.e. for packets coming from the PSN),  \n        if such association is desired (mainly for security  \n        reasons).",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsInboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsInboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsInboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsInboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsInboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "cpwVcMplsInboundEntry": {
+                      "type": "array",
+                      "description": "cpwVcMplsInboundEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cpwVcIndex": {
+                            "type": "string",
+                            "description": "cpwVcIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "cpwVcMplsInboundIndex": {
+                            "type": "integer",
+                            "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsInboundLsrXcIndex": {
+                            "type": "integer",
+                            "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsInboundTunnelIndex": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                          },
+                          "cpwVcMplsInboundTunnelInstance": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                          },
+                          "cpwVcMplsInboundTunnelLclLSR": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsInboundTunnelPeerLSR": {
+                            "type": "string",
+                            "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsInboundIfIndex": {
+                            "type": "string",
+                            "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                            "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                          },
+                          "cpwVcMplsInboundRowStatus": {
+                            "type": "string",
+                            "description": "For creating, modifying, and deleting this row.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "cpwVcMplsInboundStorageType": {
+                            "type": "string",
+                            "description": "This variable indicates the storage type for this row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsInboundTable": {
@@ -308,7 +897,21 @@
                     "cpwVcMplsInboundTunnelPeerLSR": "example-string",
                     "cpwVcMplsInboundIfIndex": "example-string",
                     "cpwVcMplsInboundRowStatus": "up(1)",
-                    "cpwVcMplsInboundStorageType": "ethernetCsmacd(6)"
+                    "cpwVcMplsInboundStorageType": "ethernetCsmacd(6)",
+                    "cpwVcMplsInboundEntry": [
+                      {
+                        "cpwVcIndex": "example-string",
+                        "cpwVcMplsInboundIndex": 1,
+                        "cpwVcMplsInboundLsrXcIndex": 1,
+                        "cpwVcMplsInboundTunnelIndex": "example-string",
+                        "cpwVcMplsInboundTunnelInstance": "example-string",
+                        "cpwVcMplsInboundTunnelLclLSR": "example-string",
+                        "cpwVcMplsInboundTunnelPeerLSR": "example-string",
+                        "cpwVcMplsInboundIfIndex": "example-string",
+                        "cpwVcMplsInboundRowStatus": "up(1)",
+                        "cpwVcMplsInboundStorageType": "ethernetCsmacd(6)"
+                      }
+                    ]
                   }
                 }
               }
@@ -331,8 +934,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsInboundEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsInboundEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsInboundIndex": {
+                        "type": "integer",
+                        "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsInboundLsrXcIndex": {
+                        "type": "integer",
+                        "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsInboundTunnelIndex": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsInboundTunnelInstance": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsInboundTunnelLclLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsInboundTunnelPeerLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsInboundIfIndex": {
+                        "type": "string",
+                        "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsInboundRowStatus": {
+                        "type": "string",
+                        "description": "For creating, modifying, and deleting this row.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cpwVcMplsInboundStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -381,7 +1040,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsInboundEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsInboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsInboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsInboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsInboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsInboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsInboundEntry": {
@@ -416,14 +1129,75 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsNonTeMappingTable"
+                  "type": "object",
+                  "description": "This table maps an inbound/outbound Tunnel to a VC in non- \n        TE applications.",
+                  "properties": {
+                    "cpwVcMplsNonTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                      "type": "integer",
+                      "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsNonTeMappingIfIndex": {
+                      "type": "string",
+                      "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsNonTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    },
+                    "cpwVcMplsNonTeMappingEntry": {
+                      "type": "array",
+                      "description": "cpwVcMplsNonTeMappingEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cpwVcMplsNonTeMappingTunnelDirection": {
+                            "type": "string",
+                            "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                          },
+                          "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                            "type": "integer",
+                            "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cpwVcMplsNonTeMappingIfIndex": {
+                            "type": "string",
+                            "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                            "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                          },
+                          "cpwVcMplsNonTeMappingVcIndex": {
+                            "type": "string",
+                            "description": "The value that represent the VC in the cpwVcTable.",
+                            "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsNonTeMappingTable": {
                     "cpwVcMplsNonTeMappingTunnelDirection": "example-string",
                     "cpwVcMplsNonTeMappingXcTunnelIndex": 1,
                     "cpwVcMplsNonTeMappingIfIndex": "example-string",
-                    "cpwVcMplsNonTeMappingVcIndex": "example-string"
+                    "cpwVcMplsNonTeMappingVcIndex": "example-string",
+                    "cpwVcMplsNonTeMappingEntry": [
+                      {
+                        "cpwVcMplsNonTeMappingTunnelDirection": "example-string",
+                        "cpwVcMplsNonTeMappingXcTunnelIndex": 1,
+                        "cpwVcMplsNonTeMappingIfIndex": "example-string",
+                        "cpwVcMplsNonTeMappingVcIndex": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -446,8 +1220,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsNonTeMappingEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsNonTeMappingEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcMplsNonTeMappingTunnelDirection": {
+                        "type": "string",
+                        "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                      },
+                      "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                        "type": "integer",
+                        "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsNonTeMappingIfIndex": {
+                        "type": "string",
+                        "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsNonTeMappingVcIndex": {
+                        "type": "string",
+                        "description": "The value that represent the VC in the cpwVcTable.",
+                        "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -490,7 +1288,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsNonTeMappingEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsNonTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                      "type": "integer",
+                      "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsNonTeMappingIfIndex": {
+                      "type": "string",
+                      "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsNonTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsNonTeMappingEntry": {
@@ -519,7 +1339,78 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTeMappingTable"
+                  "type": "object",
+                  "description": "This table maps an inbound/outbound Tunnel to a VC in  \n        MPLS-TE applications.",
+                  "properties": {
+                    "cpwVcMplsTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsTeMappingTunnelIndex": {
+                      "type": "string",
+                      "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelInstance": {
+                      "type": "string",
+                      "description": "Identifies an instance of the MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                      "type": "string",
+                      "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                      "type": "string",
+                      "description": "Identifies the local LSR.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    },
+                    "cpwVcMplsTeMappingEntry": {
+                      "type": "array",
+                      "description": "cpwVcMplsTeMappingEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cpwVcMplsTeMappingTunnelDirection": {
+                            "type": "string",
+                            "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                          },
+                          "cpwVcMplsTeMappingTunnelIndex": {
+                            "type": "string",
+                            "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                            "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                          },
+                          "cpwVcMplsTeMappingTunnelInstance": {
+                            "type": "string",
+                            "description": "Identifies an instance of the MPLS-TE tunnel.",
+                            "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                          },
+                          "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                            "type": "string",
+                            "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                            "type": "string",
+                            "description": "Identifies the local LSR.",
+                            "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                          },
+                          "cpwVcMplsTeMappingVcIndex": {
+                            "type": "string",
+                            "description": "The value that represent the VC in the cpwVcTable.",
+                            "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsTeMappingTable": {
@@ -528,7 +1419,17 @@
                     "cpwVcMplsTeMappingTunnelInstance": "example-string",
                     "cpwVcMplsTeMappingTunnelPeerLsrID": "example-string",
                     "cpwVcMplsTeMappingTunnelLocalLsrID": "example-string",
-                    "cpwVcMplsTeMappingVcIndex": "example-string"
+                    "cpwVcMplsTeMappingVcIndex": "example-string",
+                    "cpwVcMplsTeMappingEntry": [
+                      {
+                        "cpwVcMplsTeMappingTunnelDirection": "example-string",
+                        "cpwVcMplsTeMappingTunnelIndex": "example-string",
+                        "cpwVcMplsTeMappingTunnelInstance": "example-string",
+                        "cpwVcMplsTeMappingTunnelPeerLsrID": "example-string",
+                        "cpwVcMplsTeMappingTunnelLocalLsrID": "example-string",
+                        "cpwVcMplsTeMappingVcIndex": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -551,8 +1452,41 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsTeMappingEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTeMappingEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcMplsTeMappingTunnelDirection": {
+                        "type": "string",
+                        "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                      },
+                      "cpwVcMplsTeMappingTunnelIndex": {
+                        "type": "string",
+                        "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsTeMappingTunnelInstance": {
+                        "type": "string",
+                        "description": "Identifies an instance of the MPLS-TE tunnel.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                        "type": "string",
+                        "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                        "type": "string",
+                        "description": "Identifies the local LSR.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsTeMappingVcIndex": {
+                        "type": "string",
+                        "description": "The value that represent the VC in the cpwVcTable.",
+                        "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -597,7 +1531,38 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTeMappingEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsTeMappingTunnelIndex": {
+                      "type": "string",
+                      "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelInstance": {
+                      "type": "string",
+                      "description": "Identifies an instance of the MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                      "type": "string",
+                      "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                      "type": "string",
+                      "description": "Identifies the local LSR.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsTeMappingEntry": {
@@ -629,8 +1594,58 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A row in this table represents parameters specific to MPLS  \n          PSN for a pseudo wire connection (VC). The row is created  \n          automatically by the local agent if the cpwVcPsnType is  \n          MPLS. It is indexed by cpwVcIndex, which uniquely  \n          identifying a singular connection.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsMplsType": {
+                        "type": "string",
+                        "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                      },
+                      "cpwVcMplsExpBitsMode": {
+                        "type": "string",
+                        "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                      },
+                      "cpwVcMplsExpBits": {
+                        "type": "integer",
+                        "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsTtl": {
+                        "type": "integer",
+                        "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsLocalLdpID": {
+                        "type": "string",
+                        "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                        "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                      },
+                      "cpwVcMplsLocalLdpEntityID": {
+                        "type": "integer",
+                        "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsPeerLdpID": {
+                        "type": "string",
+                        "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                        "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                      },
+                      "cpwVcMplsStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -678,7 +1693,55 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsMplsType": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                    },
+                    "cpwVcMplsExpBitsMode": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                    },
+                    "cpwVcMplsExpBits": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsTtl": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsLocalLdpID": {
+                      "type": "string",
+                      "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsLocalLdpEntityID": {
+                      "type": "integer",
+                      "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsPeerLdpID": {
+                      "type": "string",
+                      "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsEntry": {
@@ -713,8 +1776,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsOutboundEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsOutboundEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsOutboundIndex": {
+                        "type": "integer",
+                        "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsOutboundLsrXcIndex": {
+                        "type": "integer",
+                        "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsOutboundTunnelIndex": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsOutboundTunnelInstance": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsOutboundTunnelLclLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsOutboundTunnelPeerLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsOutboundIfIndex": {
+                        "type": "string",
+                        "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsOutboundRowStatus": {
+                        "type": "string",
+                        "description": "For creating, modifying, and deleting this row.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cpwVcMplsOutboundStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this object.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -763,7 +1882,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsOutboundEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsOutboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsOutboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsOutboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this object.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsOutboundEntry": {
@@ -799,8 +1972,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsInboundEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsInboundEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcIndex": {
+                        "type": "string",
+                        "description": "cpwVcIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cpwVcMplsInboundIndex": {
+                        "type": "integer",
+                        "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsInboundLsrXcIndex": {
+                        "type": "integer",
+                        "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsInboundTunnelIndex": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsInboundTunnelInstance": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsInboundTunnelLclLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsInboundTunnelPeerLSR": {
+                        "type": "string",
+                        "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsInboundIfIndex": {
+                        "type": "string",
+                        "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsInboundRowStatus": {
+                        "type": "string",
+                        "description": "For creating, modifying, and deleting this row.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cpwVcMplsInboundStorageType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -849,7 +2078,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsInboundEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsInboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsInboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsInboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsInboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsInboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsInboundEntry": {
@@ -885,8 +2168,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsNonTeMappingEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsNonTeMappingEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcMplsNonTeMappingTunnelDirection": {
+                        "type": "string",
+                        "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                      },
+                      "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                        "type": "integer",
+                        "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cpwVcMplsNonTeMappingIfIndex": {
+                        "type": "string",
+                        "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cpwVcMplsNonTeMappingVcIndex": {
+                        "type": "string",
+                        "description": "The value that represent the VC in the cpwVcTable.",
+                        "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -929,7 +2236,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsNonTeMappingEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsNonTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                      "type": "integer",
+                      "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsNonTeMappingIfIndex": {
+                      "type": "string",
+                      "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsNonTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsNonTeMappingEntry": {
@@ -959,8 +2288,41 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cpwVcMplsTeMappingEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTeMappingEntry"
+                    "type": "object",
+                    "properties": {
+                      "cpwVcMplsTeMappingTunnelDirection": {
+                        "type": "string",
+                        "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                      },
+                      "cpwVcMplsTeMappingTunnelIndex": {
+                        "type": "string",
+                        "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                        "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                      },
+                      "cpwVcMplsTeMappingTunnelInstance": {
+                        "type": "string",
+                        "description": "Identifies an instance of the MPLS-TE tunnel.",
+                        "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                      },
+                      "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                        "type": "string",
+                        "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                        "type": "string",
+                        "description": "Identifies the local LSR.",
+                        "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                      },
+                      "cpwVcMplsTeMappingVcIndex": {
+                        "type": "string",
+                        "description": "The value that represent the VC in the cpwVcTable.",
+                        "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -1005,7 +2367,38 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-PW-MPLS-MIB_cpwVcMplsTeMappingEntry"
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsTeMappingTunnelIndex": {
+                      "type": "string",
+                      "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelInstance": {
+                      "type": "string",
+                      "description": "Identifies an instance of the MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                      "type": "string",
+                      "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                      "type": "string",
+                      "description": "Identifies the local LSR.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-PW-MPLS-MIB:cpwVcMplsTeMappingEntry": {
@@ -1231,6 +2624,255 @@
             "description": "The value that represent the VC in the cpwVcTable.",
             "x-yang-type": "cisco-ietf:CpwVcIndexType"
           },
+          "cpwVcMplsEntry": {
+            "type": "array",
+            "description": "A row in this table represents parameters specific to MPLS  \n          PSN for a pseudo wire connection (VC). The row is created  \n          automatically by the local agent if the cpwVcPsnType is  \n          MPLS. It is indexed by cpwVcIndex, which uniquely  \n          identifying a singular connection.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpwVcIndex": {
+                  "type": "string",
+                  "description": "cpwVcIndex",
+                  "x-yang-type": "leafref"
+                },
+                "cpwVcMplsMplsType": {
+                  "type": "string",
+                  "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                },
+                "cpwVcMplsExpBitsMode": {
+                  "type": "string",
+                  "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                },
+                "cpwVcMplsExpBits": {
+                  "type": "integer",
+                  "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsTtl": {
+                  "type": "integer",
+                  "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsLocalLdpID": {
+                  "type": "string",
+                  "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                  "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                },
+                "cpwVcMplsLocalLdpEntityID": {
+                  "type": "integer",
+                  "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsPeerLdpID": {
+                  "type": "string",
+                  "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                  "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                },
+                "cpwVcMplsStorageType": {
+                  "type": "string",
+                  "description": "This variable indicates the storage type for this row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                }
+              }
+            }
+          },
+          "cpwVcMplsOutboundEntry": {
+            "type": "array",
+            "description": "cpwVcMplsOutboundEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpwVcIndex": {
+                  "type": "string",
+                  "description": "cpwVcIndex",
+                  "x-yang-type": "leafref"
+                },
+                "cpwVcMplsOutboundIndex": {
+                  "type": "integer",
+                  "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsOutboundLsrXcIndex": {
+                  "type": "integer",
+                  "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsOutboundTunnelIndex": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                },
+                "cpwVcMplsOutboundTunnelInstance": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                },
+                "cpwVcMplsOutboundTunnelLclLSR": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsOutboundTunnelPeerLSR": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsOutboundIfIndex": {
+                  "type": "string",
+                  "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                  "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                },
+                "cpwVcMplsOutboundRowStatus": {
+                  "type": "string",
+                  "description": "For creating, modifying, and deleting this row.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "cpwVcMplsOutboundStorageType": {
+                  "type": "string",
+                  "description": "This variable indicates the storage type for this object.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                }
+              }
+            }
+          },
+          "cpwVcMplsInboundEntry": {
+            "type": "array",
+            "description": "cpwVcMplsInboundEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpwVcIndex": {
+                  "type": "string",
+                  "description": "cpwVcIndex",
+                  "x-yang-type": "leafref"
+                },
+                "cpwVcMplsInboundIndex": {
+                  "type": "integer",
+                  "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsInboundLsrXcIndex": {
+                  "type": "integer",
+                  "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsInboundTunnelIndex": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                },
+                "cpwVcMplsInboundTunnelInstance": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                },
+                "cpwVcMplsInboundTunnelLclLSR": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsInboundTunnelPeerLSR": {
+                  "type": "string",
+                  "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsInboundIfIndex": {
+                  "type": "string",
+                  "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                  "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                },
+                "cpwVcMplsInboundRowStatus": {
+                  "type": "string",
+                  "description": "For creating, modifying, and deleting this row.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "cpwVcMplsInboundStorageType": {
+                  "type": "string",
+                  "description": "This variable indicates the storage type for this row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                }
+              }
+            }
+          },
+          "cpwVcMplsNonTeMappingEntry": {
+            "type": "array",
+            "description": "cpwVcMplsNonTeMappingEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpwVcMplsNonTeMappingTunnelDirection": {
+                  "type": "string",
+                  "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                },
+                "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                  "type": "integer",
+                  "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cpwVcMplsNonTeMappingIfIndex": {
+                  "type": "string",
+                  "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                  "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                },
+                "cpwVcMplsNonTeMappingVcIndex": {
+                  "type": "string",
+                  "description": "The value that represent the VC in the cpwVcTable.",
+                  "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                }
+              }
+            }
+          },
+          "cpwVcMplsTeMappingEntry": {
+            "type": "array",
+            "description": "cpwVcMplsTeMappingEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpwVcMplsTeMappingTunnelDirection": {
+                  "type": "string",
+                  "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                },
+                "cpwVcMplsTeMappingTunnelIndex": {
+                  "type": "string",
+                  "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                  "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                },
+                "cpwVcMplsTeMappingTunnelInstance": {
+                  "type": "string",
+                  "description": "Identifies an instance of the MPLS-TE tunnel.",
+                  "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                },
+                "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                  "type": "string",
+                  "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                  "type": "string",
+                  "description": "Identifies the local LSR.",
+                  "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                },
+                "cpwVcMplsTeMappingVcIndex": {
+                  "type": "string",
+                  "description": "The value that represent the VC in the cpwVcTable.",
+                  "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                }
+              }
+            }
+          },
           "cpwVcMplsObjects": {
             "type": "object",
             "description": "cpwVcMplsObjects",
@@ -1298,6 +2940,62 @@
                 "type": "string",
                 "description": "This variable indicates the storage type for this row.",
                 "x-yang-type": "snmpv2-tc:StorageType"
+              },
+              "cpwVcMplsEntry": {
+                "type": "array",
+                "description": "A row in this table represents parameters specific to MPLS  \n          PSN for a pseudo wire connection (VC). The row is created  \n          automatically by the local agent if the cpwVcPsnType is  \n          MPLS. It is indexed by cpwVcIndex, which uniquely  \n          identifying a singular connection.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsMplsType": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the outer tunnel types, if \n            exists. mplsTe is used if the outer tunnel was set-up by  \n            MPLS-TE, and mplsNonTe is used the outer tunnel was set up \n            by LDP or manually. Combination of mplsTe and mplsNonTe  \n            may exist in case of outer tunnel protection. \n            vcOnly is used if there is no outer tunnel label. vcOnly  \n            cannot be combined with mplsNonTe or mplsTe."
+                    },
+                    "cpwVcMplsExpBitsMode": {
+                      "type": "string",
+                      "description": "Set by the operator to indicate the way the VC shim label \n            EXP bits are to be determined. The value of outerTunnel(1) \n            is used where there is an outer tunnel - cpwVcMplsMplsType  \n            is mplsTe or mplsNonTe. Note that in this case there is no \n            need to mark the VC label with the EXP bits since the VC  \n            label is not visible to the intermediate nodes. \n            If there is no outer tunnel, specifiedValue(2) indicate  \n            that the value is specified by cpwVcMplsExpBits, and  \n            serviceDependant(3) indicate that the EXP bits are setup  \n            based on a rule specified in the emulated service specific  \n            tables, for example when the EXP bits are a function of  \n            802.1p marking for Ethernet emulated service."
+                    },
+                    "cpwVcMplsExpBits": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the MPLS EXP bits to be  \n            used on the VC shim label if cpwVcMplsExpBitsMode is   \n            specifiedValue(2), zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsTtl": {
+                      "type": "integer",
+                      "description": "Set by the operator to indicate the VC TTL bits to be used \n            on the VC shim label.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsLocalLdpID": {
+                      "type": "string",
+                      "description": "The local LDP identifier of the LDP entity creating \n            this VC in the local node. As the VC labels are always \n            set from the per platform label space, the last two octets  \n            in the LDP ID MUST be always both zeros.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsLocalLdpEntityID": {
+                      "type": "integer",
+                      "description": "The local LDP Entity index of the LDP entity to be used  \n            for this VC on the local node. Should be set to all zeros  \n            if not used.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsPeerLdpID": {
+                      "type": "string",
+                      "description": "The peer LDP identifier as identified from the LDP  \n            session. Should be zero if not relevant or not known yet.",
+                      "x-yang-type": "mpls-tc:MplsLdpIdentifier"
+                    },
+                    "cpwVcMplsStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1356,6 +3054,68 @@
                 "type": "string",
                 "description": "This variable indicates the storage type for this object.",
                 "x-yang-type": "snmpv2-tc:StorageType"
+              },
+              "cpwVcMplsOutboundEntry": {
+                "type": "array",
+                "description": "cpwVcMplsOutboundEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsOutboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved  \n            using cpwVcMplsOutboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "This object will be set by the operator. If the outer \n            label is defined in the MPL-LSR-MIB, i.e. set by LDP \n            or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsOutboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsOutboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsOutboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds \n            the ifIndex of the outbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsOutboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsOutboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this object.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1414,6 +3174,68 @@
                 "type": "string",
                 "description": "This variable indicates the storage type for this row.",
                 "x-yang-type": "snmpv2-tc:StorageType"
+              },
+              "cpwVcMplsInboundEntry": {
+                "type": "array",
+                "description": "cpwVcMplsInboundEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cpwVcIndex": {
+                      "type": "string",
+                      "description": "cpwVcIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cpwVcMplsInboundIndex": {
+                      "type": "integer",
+                      "description": "Arbitrary index for enabling multiple rows per VC in \n            this table. Next available free index can be retrieved \n            using cpwVcMplsInboundIndexNext.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundLsrXcIndex": {
+                      "type": "integer",
+                      "description": "If the outer label is defined in the MPL-LSR-MIB, i.e. set  \n            by LDP or manually, this object points to the XC index  \n            of the outer tunnel. Otherwise, it is set to zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsInboundTunnelIndex": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsInboundTunnelInstance": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsInboundTunnelLclLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundTunnelPeerLSR": {
+                      "type": "string",
+                      "description": "Part of set of indexes for outbound tunnel in the case of  \n            MPLS-TE outer tunnel, otherwise set to zero.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsInboundIfIndex": {
+                      "type": "string",
+                      "description": "In case of VC only (no outer tunnel), this object holds the \n            ifIndex of the inbound port, otherwise set to zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsInboundRowStatus": {
+                      "type": "string",
+                      "description": "For creating, modifying, and deleting this row.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cpwVcMplsInboundStorageType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1440,6 +3262,36 @@
                 "type": "string",
                 "description": "The value that represent the VC in the cpwVcTable.",
                 "x-yang-type": "cisco-ietf:CpwVcIndexType"
+              },
+              "cpwVcMplsNonTeMappingEntry": {
+                "type": "array",
+                "description": "cpwVcMplsNonTeMappingEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsNonTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsNonTeMappingXcTunnelIndex": {
+                      "type": "integer",
+                      "description": "Index for the conceptual XC row identifying Tunnel to VC  \n            mappings when the outer tunnel is created by the MPLS-LSR- \n            MIB, Zero otherwise.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cpwVcMplsNonTeMappingIfIndex": {
+                      "type": "string",
+                      "description": "Identify the port on which the VC is carried for VC only  \n            case.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cpwVcMplsNonTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1475,6 +3327,45 @@
                 "type": "string",
                 "description": "The value that represent the VC in the cpwVcTable.",
                 "x-yang-type": "cisco-ietf:CpwVcIndexType"
+              },
+              "cpwVcMplsTeMappingEntry": {
+                "type": "array",
+                "description": "cpwVcMplsTeMappingEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cpwVcMplsTeMappingTunnelDirection": {
+                      "type": "string",
+                      "description": "Identifies if the row represent an outbound or inbound  \n            mapping."
+                    },
+                    "cpwVcMplsTeMappingTunnelIndex": {
+                      "type": "string",
+                      "description": "Primary index for the conceptual row identifying the  \n            MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelInstance": {
+                      "type": "string",
+                      "description": "Identifies an instance of the MPLS-TE tunnel.",
+                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
+                    },
+                    "cpwVcMplsTeMappingTunnelPeerLsrID": {
+                      "type": "string",
+                      "description": "Identifies an Peer LSR when the outer tunnel is MPLS-TE  \n            based.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingTunnelLocalLsrID": {
+                      "type": "string",
+                      "description": "Identifies the local LSR.",
+                      "x-yang-type": "mpls-tc:MplsLsrIdentifier"
+                    },
+                    "cpwVcMplsTeMappingVcIndex": {
+                      "type": "string",
+                      "description": "The value that represent the VC in the cpwVcTable.",
+                      "x-yang-type": "cisco-ietf:CpwVcIndexType"
+                    }
+                  }
+                }
               }
             }
           }

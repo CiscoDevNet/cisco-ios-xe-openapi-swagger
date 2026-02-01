@@ -29,7 +29,26 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ciscoEntityQfp"
+                  "type": "object",
+                  "description": "ciscoEntityQfp",
+                  "properties": {
+                    "ceqfpFiveSecondUtilAlgo": {
+                      "type": "string",
+                      "description": "This objects represents the method used to calculate 5 Second\n          interval utilization data. The enumerated values are described\n          below.\n          \n          unknown       (1) - The calculation method is unknown\n          fiveSecSample (2) - The value is calculated based on the last\n                              5 second sampling period of utilization\n                              data."
+                    },
+                    "ceqfpOneMinuteUtilAlgo": {
+                      "type": "string",
+                      "description": "This objects represents the method used to calculate 1 Minute\n          interval utilization data. The enumerated values are described\n          below.\n          \n          unknown    (1) - The calculation method is unknown\n          fiveSecSMA (2) - The value is calculated using Simple Moving  \n                           Average of last 12 five seconds utilization\n                           data."
+                    },
+                    "ceqfpFiveMinutesUtilAlgo": {
+                      "type": "string",
+                      "description": "This objects represents the method used to calculate 5 Minutes\n          interval utilization data. The enumerated values are described\n          below.\n          \n          unknown    (1) - The calculation method is unknown\n          fiveSecSMA (2) - The value is calculated using Simple Moving  \n                           Average of last 60 five seconds utilization\n                           data."
+                    },
+                    "ceqfpSixtyMinutesUtilAlgo": {
+                      "type": "string",
+                      "description": "This objects represents the method used to calculate 60 Minutes\n          interval utilization data. The enumerated values are described\n          below.\n          \n          unknown    (1) - The calculation method is unknown\n          fiveSecSMA (1) - The value is calculated using Simple Moving  \n                           Average of last 720 five seconds utilization\n                           data."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ciscoEntityQfp": {
@@ -58,7 +77,20 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ciscoEntityQfpNotif"
+                  "type": "object",
+                  "description": "ciscoEntityQfpNotif",
+                  "properties": {
+                    "ceqfpMemoryResThreshNotifEnabled": {
+                      "type": "boolean",
+                      "description": "This object controls memory resource rising and falling\n          threshold notification.\n          \n          When this object contains a value 'true', then generation of\n          memory resource threshold notification is enabled. If this\n          object contains a value 'false', then generation of memory\n          resource threshold notification is disabled."
+                    },
+                    "ceqfpThroughputNotifEnabled": {
+                      "type": "integer",
+                      "description": "This object controls throughput rate notification.\n          \n          When this object contains a value 'true', then generation of\n          ceqfpThroughputNotif is enabled. If this object contains a value\n          'false', then generation of ceqfpThroughputNotif is disabled.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ciscoEntityQfpNotif": {
@@ -85,7 +117,68 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpSystemTable"
+                  "type": "object",
+                  "description": "This table maintains the QFP system information for each QFP\n        physical entity.\n        \n        An agent creates a conceptual row to this table corresponding\n        to a QFP physical entity upon detection of a physical entity\n        supporting the QFP system information.\n        \n        An agent destroys a conceptual row from this table       \n        corresponding to a QFP physical entity upon removal\n        of the QFP host physical entity.",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpSystemTrafficDirection": {
+                      "type": "string",
+                      "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                    },
+                    "ceqfpSystemState": {
+                      "type": "string",
+                      "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                    },
+                    "ceqfpNumberSystemLoads": {
+                      "type": "integer",
+                      "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpSystemLastLoadTime": {
+                      "type": "string",
+                      "description": "This object represents the QFP last load time.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    },
+                    "ceqfpSystemEntry": {
+                      "type": "array",
+                      "description": "A conceptual row in the ceqfpSystemTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entPhysicalIndex": {
+                            "type": "string",
+                            "description": "entPhysicalIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "ceqfpSystemTrafficDirection": {
+                            "type": "string",
+                            "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                          },
+                          "ceqfpSystemState": {
+                            "type": "string",
+                            "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                          },
+                          "ceqfpNumberSystemLoads": {
+                            "type": "integer",
+                            "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpSystemLastLoadTime": {
+                            "type": "string",
+                            "description": "This object represents the QFP last load time.",
+                            "x-yang-type": "snmpv2-tc:DateAndTime"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpSystemTable": {
@@ -93,7 +186,16 @@
                     "ceqfpSystemTrafficDirection": "example-string",
                     "ceqfpSystemState": "up(1)",
                     "ceqfpNumberSystemLoads": 0,
-                    "ceqfpSystemLastLoadTime": "example-string"
+                    "ceqfpSystemLastLoadTime": "example-string",
+                    "ceqfpSystemEntry": [
+                      {
+                        "entPhysicalIndex": "example-string",
+                        "ceqfpSystemTrafficDirection": "example-string",
+                        "ceqfpSystemState": "up(1)",
+                        "ceqfpNumberSystemLoads": 0,
+                        "ceqfpSystemLastLoadTime": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -116,8 +218,36 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpSystemTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpSystemEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpSystemTrafficDirection": {
+                        "type": "string",
+                        "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                      },
+                      "ceqfpSystemState": {
+                        "type": "string",
+                        "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                      },
+                      "ceqfpNumberSystemLoads": {
+                        "type": "integer",
+                        "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpSystemLastLoadTime": {
+                        "type": "string",
+                        "description": "This object represents the QFP last load time.",
+                        "x-yang-type": "snmpv2-tc:DateAndTime"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -161,7 +291,33 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpSystemEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpSystemTrafficDirection": {
+                      "type": "string",
+                      "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                    },
+                    "ceqfpSystemState": {
+                      "type": "string",
+                      "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                    },
+                    "ceqfpNumberSystemLoads": {
+                      "type": "integer",
+                      "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpSystemLastLoadTime": {
+                      "type": "string",
+                      "description": "This object represents the QFP last load time.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpSystemEntry": {
@@ -191,7 +347,172 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpUtilizationTable"
+                  "type": "object",
+                  "description": "ceqfpUtilizationTable",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpUtilTimeInterval": {
+                      "type": "string",
+                      "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                    },
+                    "ceqfpUtilInputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilProcessingLoad": {
+                      "type": "integer",
+                      "description": "This object represents the QFP processing load during this\n            interval.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpUtilizationEntry": {
+                      "type": "array",
+                      "description": "ceqfpUtilizationEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entPhysicalIndex": {
+                            "type": "string",
+                            "description": "entPhysicalIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "ceqfpUtilTimeInterval": {
+                            "type": "string",
+                            "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                          },
+                          "ceqfpUtilInputPriorityPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilInputPriorityBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilInputNonPriorityPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilInputNonPriorityBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilInputTotalPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilInputTotalBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilOutputPriorityPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilOutputPriorityBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilOutputNonPriorityPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilOutputNonPriorityBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilOutputTotalPktRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                          },
+                          "ceqfpUtilOutputTotalBitRate": {
+                            "type": "string",
+                            "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                          },
+                          "ceqfpUtilProcessingLoad": {
+                            "type": "integer",
+                            "description": "This object represents the QFP processing load during this\n            interval.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpUtilizationTable": {
@@ -209,7 +530,26 @@
                     "ceqfpUtilOutputNonPriorityBitRate": "example-string",
                     "ceqfpUtilOutputTotalPktRate": "example-string",
                     "ceqfpUtilOutputTotalBitRate": "example-string",
-                    "ceqfpUtilProcessingLoad": 0
+                    "ceqfpUtilProcessingLoad": 0,
+                    "ceqfpUtilizationEntry": [
+                      {
+                        "entPhysicalIndex": "example-string",
+                        "ceqfpUtilTimeInterval": "example-string",
+                        "ceqfpUtilInputPriorityPktRate": "example-string",
+                        "ceqfpUtilInputPriorityBitRate": "example-string",
+                        "ceqfpUtilInputNonPriorityPktRate": "example-string",
+                        "ceqfpUtilInputNonPriorityBitRate": "example-string",
+                        "ceqfpUtilInputTotalPktRate": "example-string",
+                        "ceqfpUtilInputTotalBitRate": "example-string",
+                        "ceqfpUtilOutputPriorityPktRate": "example-string",
+                        "ceqfpUtilOutputPriorityBitRate": "example-string",
+                        "ceqfpUtilOutputNonPriorityPktRate": "example-string",
+                        "ceqfpUtilOutputNonPriorityBitRate": "example-string",
+                        "ceqfpUtilOutputTotalPktRate": "example-string",
+                        "ceqfpUtilOutputTotalBitRate": "example-string",
+                        "ceqfpUtilProcessingLoad": 0
+                      }
+                    ]
                   }
                 }
               }
@@ -232,8 +572,88 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "ceqfpUtilizationEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpUtilizationEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpUtilTimeInterval": {
+                        "type": "string",
+                        "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                      },
+                      "ceqfpUtilInputPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilInputNonPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputNonPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilInputTotalPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputTotalBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputNonPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputNonPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputTotalPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputTotalBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilProcessingLoad": {
+                        "type": "integer",
+                        "description": "This object represents the QFP processing load during this\n            interval.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -287,7 +707,85 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpUtilizationEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpUtilTimeInterval": {
+                      "type": "string",
+                      "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                    },
+                    "ceqfpUtilInputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilProcessingLoad": {
+                      "type": "integer",
+                      "description": "This object represents the QFP processing load during this\n            interval.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpUtilizationEntry": {
@@ -327,7 +825,200 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpMemoryResourceTable"
+                  "type": "object",
+                  "description": "ceqfpMemoryResourceTable",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpMemoryResType": {
+                      "type": "string",
+                      "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                    },
+                    "ceqfpMemoryResTotal": {
+                      "type": "integer",
+                      "description": "This object represents total memory available on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResInUse": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFree": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object represents lowest free water mark on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResRisingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFallingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResTotalOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResTotal": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResInUseOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResInUse": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResFreeOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResFree": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResourceEntry": {
+                      "type": "array",
+                      "description": "A conceptual row in the ceqfpMemoryResourceTable. There\n          is an entry in this table for each QFP entity by a value \n          of entPhysicalIndex and the supported memory resource type \n          by a value of ceqfpMemoryResType.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entPhysicalIndex": {
+                            "type": "string",
+                            "description": "entPhysicalIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "ceqfpMemoryResType": {
+                            "type": "string",
+                            "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                            "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                          },
+                          "ceqfpMemoryResTotal": {
+                            "type": "integer",
+                            "description": "This object represents total memory available on this memory\n            resource.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResInUse": {
+                            "type": "integer",
+                            "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResFree": {
+                            "type": "integer",
+                            "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResLowFreeWatermark": {
+                            "type": "integer",
+                            "description": "This object represents lowest free water mark on this memory\n            resource.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResRisingThreshold": {
+                            "type": "integer",
+                            "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResFallingThreshold": {
+                            "type": "integer",
+                            "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryResTotalOvrflw": {
+                            "type": "integer",
+                            "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryHCResTotal": {
+                            "type": "integer",
+                            "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                            "minimum": 0
+                          },
+                          "ceqfpMemoryResInUseOvrflw": {
+                            "type": "integer",
+                            "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryHCResInUse": {
+                            "type": "integer",
+                            "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                            "minimum": 0
+                          },
+                          "ceqfpMemoryResFreeOvrflw": {
+                            "type": "integer",
+                            "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryHCResFree": {
+                            "type": "integer",
+                            "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                            "minimum": 0
+                          },
+                          "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                            "type": "integer",
+                            "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ceqfpMemoryHCResLowFreeWatermark": {
+                            "type": "integer",
+                            "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpMemoryResourceTable": {
@@ -346,7 +1037,27 @@
                     "ceqfpMemoryResFreeOvrflw": 0,
                     "ceqfpMemoryHCResFree": 0,
                     "ceqfpMemoryResLowFreeWatermarkOvrflw": 0,
-                    "ceqfpMemoryHCResLowFreeWatermark": 0
+                    "ceqfpMemoryHCResLowFreeWatermark": 0,
+                    "ceqfpMemoryResourceEntry": [
+                      {
+                        "entPhysicalIndex": "example-string",
+                        "ceqfpMemoryResType": "ethernetCsmacd(6)",
+                        "ceqfpMemoryResTotal": 0,
+                        "ceqfpMemoryResInUse": 0,
+                        "ceqfpMemoryResFree": 0,
+                        "ceqfpMemoryResLowFreeWatermark": 0,
+                        "ceqfpMemoryResRisingThreshold": 0,
+                        "ceqfpMemoryResFallingThreshold": 0,
+                        "ceqfpMemoryResTotalOvrflw": 0,
+                        "ceqfpMemoryHCResTotal": 0,
+                        "ceqfpMemoryResInUseOvrflw": 0,
+                        "ceqfpMemoryHCResInUse": 0,
+                        "ceqfpMemoryResFreeOvrflw": 0,
+                        "ceqfpMemoryHCResFree": 0,
+                        "ceqfpMemoryResLowFreeWatermarkOvrflw": 0,
+                        "ceqfpMemoryHCResLowFreeWatermark": 0
+                      }
+                    ]
                   }
                 }
               }
@@ -369,8 +1080,102 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpMemoryResourceTable. There\n          is an entry in this table for each QFP entity by a value \n          of entPhysicalIndex and the supported memory resource type \n          by a value of ceqfpMemoryResType.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpMemoryResourceEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpMemoryResType": {
+                        "type": "string",
+                        "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                      },
+                      "ceqfpMemoryResTotal": {
+                        "type": "integer",
+                        "description": "This object represents total memory available on this memory\n            resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResInUse": {
+                        "type": "integer",
+                        "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResFree": {
+                        "type": "integer",
+                        "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResLowFreeWatermark": {
+                        "type": "integer",
+                        "description": "This object represents lowest free water mark on this memory\n            resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResRisingThreshold": {
+                        "type": "integer",
+                        "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResFallingThreshold": {
+                        "type": "integer",
+                        "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResTotalOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResTotal": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResInUseOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResInUse": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResFreeOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResFree": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResLowFreeWatermark": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -425,7 +1230,99 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpMemoryResourceEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpMemoryResType": {
+                      "type": "string",
+                      "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                    },
+                    "ceqfpMemoryResTotal": {
+                      "type": "integer",
+                      "description": "This object represents total memory available on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResInUse": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFree": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object represents lowest free water mark on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResRisingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFallingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResTotalOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResTotal": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResInUseOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResInUse": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResFreeOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResFree": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpMemoryResourceEntry": {
@@ -466,7 +1363,82 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpThroughputTable"
+                  "type": "object",
+                  "description": "ceqfpThroughputTable",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpThroughputLicensedBW": {
+                      "type": "integer",
+                      "description": "This object represents the bandwidth for installed\n            throughput license.",
+                      "minimum": 0
+                    },
+                    "ceqfpThroughputLevel": {
+                      "type": "string",
+                      "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                    },
+                    "ceqfpThroughputInterval": {
+                      "type": "integer",
+                      "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputThreshold": {
+                      "type": "integer",
+                      "description": "The object represents the configured throughput threshold.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputAvgRate": {
+                      "type": "integer",
+                      "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                      "minimum": 0
+                    },
+                    "ceqfpThroughputEntry": {
+                      "type": "array",
+                      "description": "A conceptual row in the ceqfpThroughputTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entPhysicalIndex": {
+                            "type": "string",
+                            "description": "entPhysicalIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "ceqfpThroughputLicensedBW": {
+                            "type": "integer",
+                            "description": "This object represents the bandwidth for installed\n            throughput license.",
+                            "minimum": 0
+                          },
+                          "ceqfpThroughputLevel": {
+                            "type": "string",
+                            "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                          },
+                          "ceqfpThroughputInterval": {
+                            "type": "integer",
+                            "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "ceqfpThroughputThreshold": {
+                            "type": "integer",
+                            "description": "The object represents the configured throughput threshold.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "ceqfpThroughputAvgRate": {
+                            "type": "integer",
+                            "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpThroughputTable": {
@@ -475,7 +1447,17 @@
                     "ceqfpThroughputLevel": "example-string",
                     "ceqfpThroughputInterval": -2147483648,
                     "ceqfpThroughputThreshold": -2147483648,
-                    "ceqfpThroughputAvgRate": 0
+                    "ceqfpThroughputAvgRate": 0,
+                    "ceqfpThroughputEntry": [
+                      {
+                        "entPhysicalIndex": "example-string",
+                        "ceqfpThroughputLicensedBW": 0,
+                        "ceqfpThroughputLevel": "example-string",
+                        "ceqfpThroughputInterval": -2147483648,
+                        "ceqfpThroughputThreshold": -2147483648,
+                        "ceqfpThroughputAvgRate": 0
+                      }
+                    ]
                   }
                 }
               }
@@ -498,8 +1480,43 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpThroughputTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpThroughputEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpThroughputLicensedBW": {
+                        "type": "integer",
+                        "description": "This object represents the bandwidth for installed\n            throughput license.",
+                        "minimum": 0
+                      },
+                      "ceqfpThroughputLevel": {
+                        "type": "string",
+                        "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                      },
+                      "ceqfpThroughputInterval": {
+                        "type": "integer",
+                        "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "ceqfpThroughputThreshold": {
+                        "type": "integer",
+                        "description": "The object represents the configured throughput threshold.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "ceqfpThroughputAvgRate": {
+                        "type": "integer",
+                        "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -544,7 +1561,40 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpThroughputEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpThroughputLicensedBW": {
+                      "type": "integer",
+                      "description": "This object represents the bandwidth for installed\n            throughput license.",
+                      "minimum": 0
+                    },
+                    "ceqfpThroughputLevel": {
+                      "type": "string",
+                      "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                    },
+                    "ceqfpThroughputInterval": {
+                      "type": "integer",
+                      "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputThreshold": {
+                      "type": "integer",
+                      "description": "The object represents the configured throughput threshold.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputAvgRate": {
+                      "type": "integer",
+                      "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpThroughputEntry": {
@@ -576,8 +1626,36 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpSystemTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpSystemEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpSystemTrafficDirection": {
+                        "type": "string",
+                        "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                      },
+                      "ceqfpSystemState": {
+                        "type": "string",
+                        "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                      },
+                      "ceqfpNumberSystemLoads": {
+                        "type": "integer",
+                        "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpSystemLastLoadTime": {
+                        "type": "string",
+                        "description": "This object represents the QFP last load time.",
+                        "x-yang-type": "snmpv2-tc:DateAndTime"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -621,7 +1699,33 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpSystemEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpSystemTrafficDirection": {
+                      "type": "string",
+                      "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                    },
+                    "ceqfpSystemState": {
+                      "type": "string",
+                      "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                    },
+                    "ceqfpNumberSystemLoads": {
+                      "type": "integer",
+                      "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpSystemLastLoadTime": {
+                      "type": "string",
+                      "description": "This object represents the QFP last load time.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpSystemEntry": {
@@ -652,8 +1756,88 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "ceqfpUtilizationEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpUtilizationEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpUtilTimeInterval": {
+                        "type": "string",
+                        "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                      },
+                      "ceqfpUtilInputPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilInputNonPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputNonPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilInputTotalPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilInputTotalBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputNonPriorityPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputNonPriorityBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilOutputTotalPktRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                      },
+                      "ceqfpUtilOutputTotalBitRate": {
+                        "type": "string",
+                        "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                      },
+                      "ceqfpUtilProcessingLoad": {
+                        "type": "integer",
+                        "description": "This object represents the QFP processing load during this\n            interval.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -707,7 +1891,85 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpUtilizationEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpUtilTimeInterval": {
+                      "type": "string",
+                      "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                    },
+                    "ceqfpUtilInputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilProcessingLoad": {
+                      "type": "integer",
+                      "description": "This object represents the QFP processing load during this\n            interval.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpUtilizationEntry": {
@@ -748,8 +2010,102 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpMemoryResourceTable. There\n          is an entry in this table for each QFP entity by a value \n          of entPhysicalIndex and the supported memory resource type \n          by a value of ceqfpMemoryResType.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpMemoryResourceEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpMemoryResType": {
+                        "type": "string",
+                        "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                        "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                      },
+                      "ceqfpMemoryResTotal": {
+                        "type": "integer",
+                        "description": "This object represents total memory available on this memory\n            resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResInUse": {
+                        "type": "integer",
+                        "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResFree": {
+                        "type": "integer",
+                        "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResLowFreeWatermark": {
+                        "type": "integer",
+                        "description": "This object represents lowest free water mark on this memory\n            resource.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResRisingThreshold": {
+                        "type": "integer",
+                        "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResFallingThreshold": {
+                        "type": "integer",
+                        "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryResTotalOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResTotal": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResInUseOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResInUse": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResFreeOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResFree": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                        "minimum": 0
+                      },
+                      "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                        "type": "integer",
+                        "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ceqfpMemoryHCResLowFreeWatermark": {
+                        "type": "integer",
+                        "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -804,7 +2160,99 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpMemoryResourceEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpMemoryResType": {
+                      "type": "string",
+                      "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                    },
+                    "ceqfpMemoryResTotal": {
+                      "type": "integer",
+                      "description": "This object represents total memory available on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResInUse": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFree": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object represents lowest free water mark on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResRisingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFallingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResTotalOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResTotal": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResInUseOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResInUse": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResFreeOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResFree": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpMemoryResourceEntry": {
@@ -846,8 +2294,43 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A conceptual row in the ceqfpThroughputTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpThroughputEntry"
+                    "type": "object",
+                    "properties": {
+                      "entPhysicalIndex": {
+                        "type": "string",
+                        "description": "entPhysicalIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "ceqfpThroughputLicensedBW": {
+                        "type": "integer",
+                        "description": "This object represents the bandwidth for installed\n            throughput license.",
+                        "minimum": 0
+                      },
+                      "ceqfpThroughputLevel": {
+                        "type": "string",
+                        "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                      },
+                      "ceqfpThroughputInterval": {
+                        "type": "integer",
+                        "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "ceqfpThroughputThreshold": {
+                        "type": "integer",
+                        "description": "The object represents the configured throughput threshold.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "ceqfpThroughputAvgRate": {
+                        "type": "integer",
+                        "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -892,7 +2375,40 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-ENTITY-QFP-MIB_ceqfpThroughputEntry"
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpThroughputLicensedBW": {
+                      "type": "integer",
+                      "description": "This object represents the bandwidth for installed\n            throughput license.",
+                      "minimum": 0
+                    },
+                    "ceqfpThroughputLevel": {
+                      "type": "string",
+                      "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                    },
+                    "ceqfpThroughputInterval": {
+                      "type": "integer",
+                      "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputThreshold": {
+                      "type": "integer",
+                      "description": "The object represents the configured throughput threshold.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputAvgRate": {
+                      "type": "integer",
+                      "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-ENTITY-QFP-MIB:ceqfpThroughputEntry": {
@@ -1149,6 +2665,267 @@
             "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
             "minimum": 0
           },
+          "ceqfpSystemEntry": {
+            "type": "array",
+            "description": "A conceptual row in the ceqfpSystemTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "entPhysicalIndex": {
+                  "type": "string",
+                  "description": "entPhysicalIndex",
+                  "x-yang-type": "leafref"
+                },
+                "ceqfpSystemTrafficDirection": {
+                  "type": "string",
+                  "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                },
+                "ceqfpSystemState": {
+                  "type": "string",
+                  "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                },
+                "ceqfpNumberSystemLoads": {
+                  "type": "integer",
+                  "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpSystemLastLoadTime": {
+                  "type": "string",
+                  "description": "This object represents the QFP last load time.",
+                  "x-yang-type": "snmpv2-tc:DateAndTime"
+                }
+              }
+            }
+          },
+          "ceqfpUtilizationEntry": {
+            "type": "array",
+            "description": "ceqfpUtilizationEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "entPhysicalIndex": {
+                  "type": "string",
+                  "description": "entPhysicalIndex",
+                  "x-yang-type": "leafref"
+                },
+                "ceqfpUtilTimeInterval": {
+                  "type": "string",
+                  "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                },
+                "ceqfpUtilInputPriorityPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilInputPriorityBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilInputNonPriorityPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilInputNonPriorityBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilInputTotalPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilInputTotalBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilOutputPriorityPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilOutputPriorityBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilOutputNonPriorityPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilOutputNonPriorityBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilOutputTotalPktRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                },
+                "ceqfpUtilOutputTotalBitRate": {
+                  "type": "string",
+                  "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                },
+                "ceqfpUtilProcessingLoad": {
+                  "type": "integer",
+                  "description": "This object represents the QFP processing load during this\n            interval.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                }
+              }
+            }
+          },
+          "ceqfpMemoryResourceEntry": {
+            "type": "array",
+            "description": "A conceptual row in the ceqfpMemoryResourceTable. There\n          is an entry in this table for each QFP entity by a value \n          of entPhysicalIndex and the supported memory resource type \n          by a value of ceqfpMemoryResType.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "entPhysicalIndex": {
+                  "type": "string",
+                  "description": "entPhysicalIndex",
+                  "x-yang-type": "leafref"
+                },
+                "ceqfpMemoryResType": {
+                  "type": "string",
+                  "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                  "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                },
+                "ceqfpMemoryResTotal": {
+                  "type": "integer",
+                  "description": "This object represents total memory available on this memory\n            resource.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResInUse": {
+                  "type": "integer",
+                  "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResFree": {
+                  "type": "integer",
+                  "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResLowFreeWatermark": {
+                  "type": "integer",
+                  "description": "This object represents lowest free water mark on this memory\n            resource.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResRisingThreshold": {
+                  "type": "integer",
+                  "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResFallingThreshold": {
+                  "type": "integer",
+                  "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryResTotalOvrflw": {
+                  "type": "integer",
+                  "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryHCResTotal": {
+                  "type": "integer",
+                  "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                  "minimum": 0
+                },
+                "ceqfpMemoryResInUseOvrflw": {
+                  "type": "integer",
+                  "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryHCResInUse": {
+                  "type": "integer",
+                  "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                  "minimum": 0
+                },
+                "ceqfpMemoryResFreeOvrflw": {
+                  "type": "integer",
+                  "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryHCResFree": {
+                  "type": "integer",
+                  "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                  "minimum": 0
+                },
+                "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                  "type": "integer",
+                  "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ceqfpMemoryHCResLowFreeWatermark": {
+                  "type": "integer",
+                  "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "ceqfpThroughputEntry": {
+            "type": "array",
+            "description": "A conceptual row in the ceqfpThroughputTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "entPhysicalIndex": {
+                  "type": "string",
+                  "description": "entPhysicalIndex",
+                  "x-yang-type": "leafref"
+                },
+                "ceqfpThroughputLicensedBW": {
+                  "type": "integer",
+                  "description": "This object represents the bandwidth for installed\n            throughput license.",
+                  "minimum": 0
+                },
+                "ceqfpThroughputLevel": {
+                  "type": "string",
+                  "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                },
+                "ceqfpThroughputInterval": {
+                  "type": "integer",
+                  "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "ceqfpThroughputThreshold": {
+                  "type": "integer",
+                  "description": "The object represents the configured throughput threshold.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "ceqfpThroughputAvgRate": {
+                  "type": "integer",
+                  "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                  "minimum": 0
+                }
+              }
+            }
+          },
           "ciscoEntityQfp": {
             "type": "object",
             "description": "ciscoEntityQfp",
@@ -1214,6 +2991,40 @@
                 "type": "string",
                 "description": "This object represents the QFP last load time.",
                 "x-yang-type": "snmpv2-tc:DateAndTime"
+              },
+              "ceqfpSystemEntry": {
+                "type": "array",
+                "description": "A conceptual row in the ceqfpSystemTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpSystemTrafficDirection": {
+                      "type": "string",
+                      "description": "This object represents the traffic direction that this QFP is\n            assigned to process. The enumerated values are described below.\n            \n            none (1)    - The QFP is not assigned to processes any traffic\n                          yet\n            ingress (2) - The QFP processes inbound traffic\n            egress (3)  - The QFP processes outbound traffic\n            both (4)    - The QFP processes both inbound and outbound\n                          traffic"
+                    },
+                    "ceqfpSystemState": {
+                      "type": "string",
+                      "description": "This object represents the current QFP state. The enumerated\n            values are described below.\n            \n            unknown (1)    - The state of the QFP is unknown\n            reset (2)      - The QFP is reset\n            init (3)       - The QFP is being initialized\n            active (4)     - The QFP is active in a system with redundant\n                             QFP\n            activeSolo (5) - The QFP is active and there is no redundant\n                             QFP in the system\n            standby (6)    - The QFP is standby in a redundant system.\n            hotStandby (7) - The QFP is standby and synchronized with\n                             active, so that a switchover in this state\n                             will preserve state of the active. Stateful \n                             datapath features are synchronized between the\n                             active QFP and standby QFP"
+                    },
+                    "ceqfpNumberSystemLoads": {
+                      "type": "integer",
+                      "description": "This object represents the number of times the QFP is loaded,\n            since the QFP host is up.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpSystemLastLoadTime": {
+                      "type": "string",
+                      "description": "This object represents the QFP last load time.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1296,6 +3107,92 @@
                 "description": "This object represents the QFP processing load during this\n            interval.",
                 "minimum": 0,
                 "maximum": 4294967295
+              },
+              "ceqfpUtilizationEntry": {
+                "type": "array",
+                "description": "ceqfpUtilizationEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpUtilTimeInterval": {
+                      "type": "string",
+                      "description": "This object identifies the time interval for which the\n            utilization statistics being collected. The interval \n            values can be 5 second, 1 minute, etc. as specified in \n            the CiscoQfpTimeInterval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpTimeInterval"
+                    },
+                    "ceqfpUtilInputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel priority bit rate\n            during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilInputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total packet rate\n            during this interval, which includes both priority and\n            non-priority input packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilInputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP input channel total bit rate\n            during this interval, which includes both priority and\n            non-priority input bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority packet\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel priority bit\n            rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            packet rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputNonPriorityBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel non-priority\n            bit rate during this interval.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilOutputTotalPktRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total packet rate\n            during this interval, which includes both priority and\n            non-priority output packet rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpPacketRate"
+                    },
+                    "ceqfpUtilOutputTotalBitRate": {
+                      "type": "string",
+                      "description": "This object represents the QFP output channel total bit rate\n            during this interval, which includes both priority and\n            non-priority bit rate.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpBitRate"
+                    },
+                    "ceqfpUtilProcessingLoad": {
+                      "type": "integer",
+                      "description": "This object represents the QFP processing load during this\n            interval.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
+                }
               }
             }
           },
@@ -1392,6 +3289,106 @@
                 "type": "integer",
                 "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
                 "minimum": 0
+              },
+              "ceqfpMemoryResourceEntry": {
+                "type": "array",
+                "description": "A conceptual row in the ceqfpMemoryResourceTable. There\n          is an entry in this table for each QFP entity by a value \n          of entPhysicalIndex and the supported memory resource type \n          by a value of ceqfpMemoryResType.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpMemoryResType": {
+                      "type": "string",
+                      "description": "This object indicates the type of the memory resource used by\n            the QFP. This object is one of the indices to uniquely identify\n            the QFP memory resource type.",
+                      "x-yang-type": "CISCO-ENTITY-QFP-MIB:CiscoQfpMemoryResource"
+                    },
+                    "ceqfpMemoryResTotal": {
+                      "type": "integer",
+                      "description": "This object represents total memory available on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResInUse": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently under use\n            on this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFree": {
+                      "type": "integer",
+                      "description": "This object represents the memory which is currently free on\n            this memory resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object represents lowest free water mark on this memory\n            resource.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResRisingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the rising threshold value for this\n            memory resource. A value of zero means that the rising\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to lower than or\n            equal to ceqfpMemoryResFallingThreshold.\n            \n            A rising (ceqfpMemoryResRisingThreshNotif) notification\n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or greater than this\n            value.\n            \n            After a rising notification is generated, another such \n            notification will not be generated until the \n            ceqfpMemoryResInUse falls below this value and reaches \n            the ceqfpMemoryResFallingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResFallingThreshold": {
+                      "type": "integer",
+                      "description": "This object represents the falling threshold value for this\n            memory resource. A value of zero means that the falling\n            threshold is not supported for this memory resource.\n            \n            The value of this object can not be set to higher than or\n            equal to ceqfpMemoryResRisingThreshold.\n            \n            A falling (ceqfpMemoryResRisingThreshNotif) notification \n            will be generated, whenever the memory resource usage\n            (ceqfpMemoryHCResInUse) is equal to or lesser than this value.\n            \n            After a falling notification is generated, another \n            such notification will not be generated until the \n            ceqfpMemoryResInUse rises above this value and reaches \n            the ceqfpMemoryResRisingThreshold.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryResTotalOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResTotal.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResTotal": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResTotal.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResInUseOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResInUse.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResInUse": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryInRes.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResFreeOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of ceqfpMemoryResFree.\n            This object needs to be supported only when the value of\n            ceqfpMemoryResFree exceeds 32-bit, otherwise this object value\n            would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResFree": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of ceqfpMemoryResFree.",
+                      "minimum": 0
+                    },
+                    "ceqfpMemoryResLowFreeWatermarkOvrflw": {
+                      "type": "integer",
+                      "description": "This object represents the upper 32-bit of\n            ceqfpMemoryResLowFreeWatermark. This object needs to be\n            supported only when the value of ceqfpMemoryResLowFreeWatermark\n            exceeds 32-bit, otherwise this object value would be set to 0.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ceqfpMemoryHCResLowFreeWatermark": {
+                      "type": "integer",
+                      "description": "This object is a 64-bit version of\n            ceqfpMemoryResLowFreeWatermark.",
+                      "minimum": 0
+                    }
+                  }
+                }
               }
             }
           },
@@ -1429,6 +3426,47 @@
                 "type": "integer",
                 "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
                 "minimum": 0
+              },
+              "ceqfpThroughputEntry": {
+                "type": "array",
+                "description": "A conceptual row in the ceqfpThroughputTable. There is an entry\n          in this table for each QFP entity, as defined by a value of\n          entPhysicalIndex.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entPhysicalIndex": {
+                      "type": "string",
+                      "description": "entPhysicalIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ceqfpThroughputLicensedBW": {
+                      "type": "integer",
+                      "description": "This object represents the bandwidth for installed\n            throughput license.",
+                      "minimum": 0
+                    },
+                    "ceqfpThroughputLevel": {
+                      "type": "string",
+                      "description": "This object represents the current throughput level for\n            installed throughput license.\n            \n                            normal  (1) - Throughput usage is normal\n                            warning (2) - Throughput usage has crossed the\n                                          configured threshold limit\n                            exceed  (3) - Throughput usage has exceeded the\n                                          total licensed bandwidth"
+                    },
+                    "ceqfpThroughputInterval": {
+                      "type": "integer",
+                      "description": "The object represents the configured time interval at which the\n            ceqfpThroughputLevel is checked.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputThreshold": {
+                      "type": "integer",
+                      "description": "The object represents the configured throughput threshold.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ceqfpThroughputAvgRate": {
+                      "type": "integer",
+                      "description": "The object represents the average throughput rate in the\n            interval ceqfpThroughputInterval.",
+                      "minimum": 0
+                    }
+                  }
+                }
               }
             }
           }

@@ -29,7 +29,65 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpSystem"
+                  "type": "object",
+                  "description": "Two-bit code warning of an impending leap second to\n          be inserted in the NTP timescale. This object can be\n          set only when the cntpSysStratum has a value of 1.",
+                  "properties": {
+                    "cntpSysLeap": {
+                      "type": "string",
+                      "description": "Two-bit code warning of an impending leap second to\n          be inserted in the NTP timescale. This object can be\n          set only when the cntpSysStratum has a value of 1.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                    },
+                    "cntpSysStratum": {
+                      "type": "string",
+                      "description": "The stratum of the local clock. If the value is set\n          to 1, i.e., this is a primary reference, then the\n          Primary-Clock procedure described in Section 3.4.6,\n          in RFC-1305 is invoked.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                    },
+                    "cntpSysPrecision": {
+                      "type": "integer",
+                      "description": "Signed integer indicating the precision\n          of the system clock, in seconds to the nearest\n          power of two.  The value must be rounded to the\n          next larger power of two; for instance, a 50-Hz\n          (20 ms) or 60-Hz (16.67 ms) power-frequency clock\n          would be assigned the value -5 (31.25 ms), while a\n          1000-Hz (1 ms) crystal-controlled clock would be\n          assigned the value -9 (1.95 ms).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpSysRootDelay": {
+                      "type": "string",
+                      "description": "A signed fixed-point number indicating the total\n          round-trip delay in seconds, to the primary reference\n          source at the root of the synchronization subnet.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpSysRootDispersion": {
+                      "type": "string",
+                      "description": "The maximum error in seconds, relative to the\n          primary reference source at the root of the\n          synchronization subnet.  Only positive values greater\n          than zero are possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpSysRefId": {
+                      "type": "string",
+                      "description": "The reference identifier of the local clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                    },
+                    "cntpSysRefTime": {
+                      "type": "string",
+                      "description": "The local time when the local clock was last\n          updated.  If the local clock has never been\n          synchronized, the value is zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpSysPoll": {
+                      "type": "string",
+                      "description": "The interval at which the NTP server polls other NTP\n          servers to synchronize its clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpSysPeer": {
+                      "type": "string",
+                      "description": "The current synchronization source.  This will\n          contain the unique association identifier\n          cntpPeersAssocId of the corresponding peer entry in\n          the cntpPeersVarTable of the peer acting as the\n          synchronization source.  If there is no peer, the\n          value will be 0.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                    },
+                    "cntpSysClock": {
+                      "type": "string",
+                      "description": "The current local time.  Local time is derived from\n          the hardware clock of the particular machine and\n          increments at intervals depending on the design used.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpSysSrvStatus": {
+                      "type": "string",
+                      "description": "Current state of the NTP server with values coded as follows:\n          1: server status is unknown\n          2: server is not running\n          3: server is not synchronized to any time source\n          4: server is synchronized to its own local clock\n          5: server is synchronized to a local hardware refclock (e.g. GPS)\n          6: server is synchronized to a remote NTP server"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpSystem": {
@@ -65,7 +123,340 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpPeersVarTable"
+                  "type": "object",
+                  "description": "This table provides information on the peers with\n        which the local NTP server has associations.  The\n        peers are also NTP servers but running on different\n        hosts.",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                    },
+                    "cntpPeersConfigured": {
+                      "type": "boolean",
+                      "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                    },
+                    "cntpPeersPeerAddress": {
+                      "type": "string",
+                      "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersPeerPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersHostAddress": {
+                      "type": "string",
+                      "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersHostPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersLeap": {
+                      "type": "string",
+                      "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                    },
+                    "cntpPeersMode": {
+                      "type": "string",
+                      "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                    },
+                    "cntpPeersStratum": {
+                      "type": "string",
+                      "description": "The stratum of the peer clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                    },
+                    "cntpPeersPeerPoll": {
+                      "type": "string",
+                      "description": "The interval at which the peer polls the local host.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersHostPoll": {
+                      "type": "string",
+                      "description": "The interval at which the local host polls the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersPrecision": {
+                      "type": "integer",
+                      "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersRootDelay": {
+                      "type": "string",
+                      "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersRootDispersion": {
+                      "type": "string",
+                      "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersRefId": {
+                      "type": "string",
+                      "description": "The reference identifier of the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                    },
+                    "cntpPeersRefTime": {
+                      "type": "string",
+                      "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersOrgTime": {
+                      "type": "string",
+                      "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersReceiveTime": {
+                      "type": "string",
+                      "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersTransmitTime": {
+                      "type": "string",
+                      "description": "The local time at which the NTP message departed the\n            sender.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersUpdateTime": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersReach": {
+                      "type": "integer",
+                      "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersTimer": {
+                      "type": "integer",
+                      "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersOffset": {
+                      "type": "string",
+                      "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDelay": {
+                      "type": "string",
+                      "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDispersion": {
+                      "type": "string",
+                      "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersFilterValidEntries": {
+                      "type": "integer",
+                      "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersEntryStatus": {
+                      "type": "string",
+                      "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cntpPeersUpdateTimeRev1": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersPrefPeer": {
+                      "type": "boolean",
+                      "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                    },
+                    "cntpPeersPeerType": {
+                      "type": "string",
+                      "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "cntpPeersPeerName": {
+                      "type": "string",
+                      "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "cntpPeersVarEntry": {
+                      "type": "array",
+                      "description": "cntpPeersVarEntry",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cntpPeersAssocId": {
+                            "type": "string",
+                            "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                          },
+                          "cntpPeersConfigured": {
+                            "type": "boolean",
+                            "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                          },
+                          "cntpPeersPeerAddress": {
+                            "type": "string",
+                            "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "cntpPeersPeerPort": {
+                            "type": "integer",
+                            "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersHostAddress": {
+                            "type": "string",
+                            "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "cntpPeersHostPort": {
+                            "type": "integer",
+                            "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersLeap": {
+                            "type": "string",
+                            "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                          },
+                          "cntpPeersMode": {
+                            "type": "string",
+                            "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                          },
+                          "cntpPeersStratum": {
+                            "type": "string",
+                            "description": "The stratum of the peer clock.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                          },
+                          "cntpPeersPeerPoll": {
+                            "type": "string",
+                            "description": "The interval at which the peer polls the local host.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                          },
+                          "cntpPeersHostPoll": {
+                            "type": "string",
+                            "description": "The interval at which the local host polls the peer.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                          },
+                          "cntpPeersPrecision": {
+                            "type": "integer",
+                            "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersRootDelay": {
+                            "type": "string",
+                            "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                          },
+                          "cntpPeersRootDispersion": {
+                            "type": "string",
+                            "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                          },
+                          "cntpPeersRefId": {
+                            "type": "string",
+                            "description": "The reference identifier of the peer.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                          },
+                          "cntpPeersRefTime": {
+                            "type": "string",
+                            "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                          },
+                          "cntpPeersOrgTime": {
+                            "type": "string",
+                            "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                          },
+                          "cntpPeersReceiveTime": {
+                            "type": "string",
+                            "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                          },
+                          "cntpPeersTransmitTime": {
+                            "type": "string",
+                            "description": "The local time at which the NTP message departed the\n            sender.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                          },
+                          "cntpPeersUpdateTime": {
+                            "type": "integer",
+                            "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersReach": {
+                            "type": "integer",
+                            "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersTimer": {
+                            "type": "integer",
+                            "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpPeersOffset": {
+                            "type": "string",
+                            "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                          },
+                          "cntpPeersDelay": {
+                            "type": "string",
+                            "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                          },
+                          "cntpPeersDispersion": {
+                            "type": "string",
+                            "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                          },
+                          "cntpPeersFilterValidEntries": {
+                            "type": "integer",
+                            "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cntpPeersEntryStatus": {
+                            "type": "string",
+                            "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "cntpPeersUpdateTimeRev1": {
+                            "type": "integer",
+                            "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cntpPeersPrefPeer": {
+                            "type": "boolean",
+                            "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                          },
+                          "cntpPeersPeerType": {
+                            "type": "string",
+                            "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                            "x-yang-type": "inet-address:InetAddressType"
+                          },
+                          "cntpPeersPeerName": {
+                            "type": "string",
+                            "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                            "x-yang-type": "inet-address:InetAddress"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpPeersVarTable": {
@@ -99,7 +490,42 @@
                     "cntpPeersUpdateTimeRev1": 0,
                     "cntpPeersPrefPeer": true,
                     "cntpPeersPeerType": "ethernetCsmacd(6)",
-                    "cntpPeersPeerName": "interface-1"
+                    "cntpPeersPeerName": "interface-1",
+                    "cntpPeersVarEntry": [
+                      {
+                        "cntpPeersAssocId": "example-string",
+                        "cntpPeersConfigured": true,
+                        "cntpPeersPeerAddress": "192.168.1.1",
+                        "cntpPeersPeerPort": -2147483648,
+                        "cntpPeersHostAddress": "192.168.1.1",
+                        "cntpPeersHostPort": -2147483648,
+                        "cntpPeersLeap": "example-string",
+                        "cntpPeersMode": "example-string",
+                        "cntpPeersStratum": "example-string",
+                        "cntpPeersPeerPoll": "example-string",
+                        "cntpPeersHostPoll": "example-string",
+                        "cntpPeersPrecision": -2147483648,
+                        "cntpPeersRootDelay": "example-string",
+                        "cntpPeersRootDispersion": "example-string",
+                        "cntpPeersRefId": "example-string",
+                        "cntpPeersRefTime": "example-string",
+                        "cntpPeersOrgTime": "example-string",
+                        "cntpPeersReceiveTime": "example-string",
+                        "cntpPeersTransmitTime": "example-string",
+                        "cntpPeersUpdateTime": -2147483648,
+                        "cntpPeersReach": -2147483648,
+                        "cntpPeersTimer": -2147483648,
+                        "cntpPeersOffset": "example-string",
+                        "cntpPeersDelay": "example-string",
+                        "cntpPeersDispersion": "example-string",
+                        "cntpPeersFilterValidEntries": 0,
+                        "cntpPeersEntryStatus": "up(1)",
+                        "cntpPeersUpdateTimeRev1": 0,
+                        "cntpPeersPrefPeer": true,
+                        "cntpPeersPeerType": "ethernetCsmacd(6)",
+                        "cntpPeersPeerName": "interface-1"
+                      }
+                    ]
                   }
                 }
               }
@@ -122,8 +548,172 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cntpPeersVarEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpPeersVarEntry"
+                    "type": "object",
+                    "properties": {
+                      "cntpPeersAssocId": {
+                        "type": "string",
+                        "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                      },
+                      "cntpPeersConfigured": {
+                        "type": "boolean",
+                        "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                      },
+                      "cntpPeersPeerAddress": {
+                        "type": "string",
+                        "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cntpPeersPeerPort": {
+                        "type": "integer",
+                        "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersHostAddress": {
+                        "type": "string",
+                        "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cntpPeersHostPort": {
+                        "type": "integer",
+                        "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersLeap": {
+                        "type": "string",
+                        "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                      },
+                      "cntpPeersMode": {
+                        "type": "string",
+                        "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                      },
+                      "cntpPeersStratum": {
+                        "type": "string",
+                        "description": "The stratum of the peer clock.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                      },
+                      "cntpPeersPeerPoll": {
+                        "type": "string",
+                        "description": "The interval at which the peer polls the local host.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                      },
+                      "cntpPeersHostPoll": {
+                        "type": "string",
+                        "description": "The interval at which the local host polls the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                      },
+                      "cntpPeersPrecision": {
+                        "type": "integer",
+                        "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersRootDelay": {
+                        "type": "string",
+                        "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersRootDispersion": {
+                        "type": "string",
+                        "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      },
+                      "cntpPeersRefId": {
+                        "type": "string",
+                        "description": "The reference identifier of the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                      },
+                      "cntpPeersRefTime": {
+                        "type": "string",
+                        "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersOrgTime": {
+                        "type": "string",
+                        "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersReceiveTime": {
+                        "type": "string",
+                        "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersTransmitTime": {
+                        "type": "string",
+                        "description": "The local time at which the NTP message departed the\n            sender.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersUpdateTime": {
+                        "type": "integer",
+                        "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersReach": {
+                        "type": "integer",
+                        "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersTimer": {
+                        "type": "integer",
+                        "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersOffset": {
+                        "type": "string",
+                        "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersDelay": {
+                        "type": "string",
+                        "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersDispersion": {
+                        "type": "string",
+                        "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      },
+                      "cntpPeersFilterValidEntries": {
+                        "type": "integer",
+                        "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cntpPeersEntryStatus": {
+                        "type": "string",
+                        "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cntpPeersUpdateTimeRev1": {
+                        "type": "integer",
+                        "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cntpPeersPrefPeer": {
+                        "type": "boolean",
+                        "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                      },
+                      "cntpPeersPeerType": {
+                        "type": "string",
+                        "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "cntpPeersPeerName": {
+                        "type": "string",
+                        "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -193,7 +783,169 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpPeersVarEntry"
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                    },
+                    "cntpPeersConfigured": {
+                      "type": "boolean",
+                      "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                    },
+                    "cntpPeersPeerAddress": {
+                      "type": "string",
+                      "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersPeerPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersHostAddress": {
+                      "type": "string",
+                      "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersHostPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersLeap": {
+                      "type": "string",
+                      "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                    },
+                    "cntpPeersMode": {
+                      "type": "string",
+                      "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                    },
+                    "cntpPeersStratum": {
+                      "type": "string",
+                      "description": "The stratum of the peer clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                    },
+                    "cntpPeersPeerPoll": {
+                      "type": "string",
+                      "description": "The interval at which the peer polls the local host.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersHostPoll": {
+                      "type": "string",
+                      "description": "The interval at which the local host polls the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersPrecision": {
+                      "type": "integer",
+                      "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersRootDelay": {
+                      "type": "string",
+                      "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersRootDispersion": {
+                      "type": "string",
+                      "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersRefId": {
+                      "type": "string",
+                      "description": "The reference identifier of the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                    },
+                    "cntpPeersRefTime": {
+                      "type": "string",
+                      "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersOrgTime": {
+                      "type": "string",
+                      "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersReceiveTime": {
+                      "type": "string",
+                      "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersTransmitTime": {
+                      "type": "string",
+                      "description": "The local time at which the NTP message departed the\n            sender.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersUpdateTime": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersReach": {
+                      "type": "integer",
+                      "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersTimer": {
+                      "type": "integer",
+                      "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersOffset": {
+                      "type": "string",
+                      "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDelay": {
+                      "type": "string",
+                      "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDispersion": {
+                      "type": "string",
+                      "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersFilterValidEntries": {
+                      "type": "integer",
+                      "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersEntryStatus": {
+                      "type": "string",
+                      "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cntpPeersUpdateTimeRev1": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersPrefPeer": {
+                      "type": "boolean",
+                      "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                    },
+                    "cntpPeersPeerType": {
+                      "type": "string",
+                      "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "cntpPeersPeerName": {
+                      "type": "string",
+                      "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpPeersVarEntry": {
@@ -249,7 +1001,72 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpFilterRegisterTable"
+                  "type": "object",
+                  "description": "cntpFilterRegisterTable",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "cntpPeersAssocId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cntpFilterIndex": {
+                      "type": "integer",
+                      "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpFilterPeersOffset": {
+                      "type": "string",
+                      "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDelay": {
+                      "type": "string",
+                      "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDispersion": {
+                      "type": "string",
+                      "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpFilterRegisterEntry": {
+                      "type": "array",
+                      "description": "Each entry corresponds to one stage of the shift\n          register, i.e., one reading of the variables clock\n          delay, clock offset and clock dispersion.\n          \n          Entries are automatically created whenever a peer is\n          configured and deleted when the peer is removed.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cntpPeersAssocId": {
+                            "type": "string",
+                            "description": "cntpPeersAssocId",
+                            "x-yang-type": "leafref"
+                          },
+                          "cntpFilterIndex": {
+                            "type": "integer",
+                            "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cntpFilterPeersOffset": {
+                            "type": "string",
+                            "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                          },
+                          "cntpFilterPeersDelay": {
+                            "type": "string",
+                            "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                          },
+                          "cntpFilterPeersDispersion": {
+                            "type": "string",
+                            "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                            "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpFilterRegisterTable": {
@@ -257,7 +1074,16 @@
                     "cntpFilterIndex": 1,
                     "cntpFilterPeersOffset": "example-string",
                     "cntpFilterPeersDelay": "example-string",
-                    "cntpFilterPeersDispersion": "example-string"
+                    "cntpFilterPeersDispersion": "example-string",
+                    "cntpFilterRegisterEntry": [
+                      {
+                        "cntpPeersAssocId": "example-string",
+                        "cntpFilterIndex": 1,
+                        "cntpFilterPeersOffset": "example-string",
+                        "cntpFilterPeersDelay": "example-string",
+                        "cntpFilterPeersDispersion": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -280,8 +1106,38 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each entry corresponds to one stage of the shift\n          register, i.e., one reading of the variables clock\n          delay, clock offset and clock dispersion.\n          \n          Entries are automatically created whenever a peer is\n          configured and deleted when the peer is removed.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpFilterRegisterEntry"
+                    "type": "object",
+                    "properties": {
+                      "cntpPeersAssocId": {
+                        "type": "string",
+                        "description": "cntpPeersAssocId",
+                        "x-yang-type": "leafref"
+                      },
+                      "cntpFilterIndex": {
+                        "type": "integer",
+                        "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpFilterPeersOffset": {
+                        "type": "string",
+                        "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpFilterPeersDelay": {
+                        "type": "string",
+                        "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpFilterPeersDispersion": {
+                        "type": "string",
+                        "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -325,7 +1181,35 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpFilterRegisterEntry"
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "cntpPeersAssocId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cntpFilterIndex": {
+                      "type": "integer",
+                      "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpFilterPeersOffset": {
+                      "type": "string",
+                      "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDelay": {
+                      "type": "string",
+                      "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDispersion": {
+                      "type": "string",
+                      "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpFilterRegisterEntry": {
@@ -356,8 +1240,172 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "cntpPeersVarEntry",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpPeersVarEntry"
+                    "type": "object",
+                    "properties": {
+                      "cntpPeersAssocId": {
+                        "type": "string",
+                        "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                      },
+                      "cntpPeersConfigured": {
+                        "type": "boolean",
+                        "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                      },
+                      "cntpPeersPeerAddress": {
+                        "type": "string",
+                        "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cntpPeersPeerPort": {
+                        "type": "integer",
+                        "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersHostAddress": {
+                        "type": "string",
+                        "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "cntpPeersHostPort": {
+                        "type": "integer",
+                        "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersLeap": {
+                        "type": "string",
+                        "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                      },
+                      "cntpPeersMode": {
+                        "type": "string",
+                        "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                      },
+                      "cntpPeersStratum": {
+                        "type": "string",
+                        "description": "The stratum of the peer clock.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                      },
+                      "cntpPeersPeerPoll": {
+                        "type": "string",
+                        "description": "The interval at which the peer polls the local host.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                      },
+                      "cntpPeersHostPoll": {
+                        "type": "string",
+                        "description": "The interval at which the local host polls the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                      },
+                      "cntpPeersPrecision": {
+                        "type": "integer",
+                        "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersRootDelay": {
+                        "type": "string",
+                        "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersRootDispersion": {
+                        "type": "string",
+                        "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      },
+                      "cntpPeersRefId": {
+                        "type": "string",
+                        "description": "The reference identifier of the peer.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                      },
+                      "cntpPeersRefTime": {
+                        "type": "string",
+                        "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersOrgTime": {
+                        "type": "string",
+                        "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersReceiveTime": {
+                        "type": "string",
+                        "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersTransmitTime": {
+                        "type": "string",
+                        "description": "The local time at which the NTP message departed the\n            sender.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                      },
+                      "cntpPeersUpdateTime": {
+                        "type": "integer",
+                        "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersReach": {
+                        "type": "integer",
+                        "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersTimer": {
+                        "type": "integer",
+                        "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpPeersOffset": {
+                        "type": "string",
+                        "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersDelay": {
+                        "type": "string",
+                        "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpPeersDispersion": {
+                        "type": "string",
+                        "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      },
+                      "cntpPeersFilterValidEntries": {
+                        "type": "integer",
+                        "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cntpPeersEntryStatus": {
+                        "type": "string",
+                        "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "cntpPeersUpdateTimeRev1": {
+                        "type": "integer",
+                        "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cntpPeersPrefPeer": {
+                        "type": "boolean",
+                        "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                      },
+                      "cntpPeersPeerType": {
+                        "type": "string",
+                        "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "cntpPeersPeerName": {
+                        "type": "string",
+                        "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -427,7 +1475,169 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpPeersVarEntry"
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                    },
+                    "cntpPeersConfigured": {
+                      "type": "boolean",
+                      "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                    },
+                    "cntpPeersPeerAddress": {
+                      "type": "string",
+                      "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersPeerPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersHostAddress": {
+                      "type": "string",
+                      "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersHostPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersLeap": {
+                      "type": "string",
+                      "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                    },
+                    "cntpPeersMode": {
+                      "type": "string",
+                      "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                    },
+                    "cntpPeersStratum": {
+                      "type": "string",
+                      "description": "The stratum of the peer clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                    },
+                    "cntpPeersPeerPoll": {
+                      "type": "string",
+                      "description": "The interval at which the peer polls the local host.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersHostPoll": {
+                      "type": "string",
+                      "description": "The interval at which the local host polls the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersPrecision": {
+                      "type": "integer",
+                      "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersRootDelay": {
+                      "type": "string",
+                      "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersRootDispersion": {
+                      "type": "string",
+                      "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersRefId": {
+                      "type": "string",
+                      "description": "The reference identifier of the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                    },
+                    "cntpPeersRefTime": {
+                      "type": "string",
+                      "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersOrgTime": {
+                      "type": "string",
+                      "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersReceiveTime": {
+                      "type": "string",
+                      "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersTransmitTime": {
+                      "type": "string",
+                      "description": "The local time at which the NTP message departed the\n            sender.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersUpdateTime": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersReach": {
+                      "type": "integer",
+                      "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersTimer": {
+                      "type": "integer",
+                      "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersOffset": {
+                      "type": "string",
+                      "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDelay": {
+                      "type": "string",
+                      "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDispersion": {
+                      "type": "string",
+                      "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersFilterValidEntries": {
+                      "type": "integer",
+                      "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersEntryStatus": {
+                      "type": "string",
+                      "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cntpPeersUpdateTimeRev1": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersPrefPeer": {
+                      "type": "boolean",
+                      "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                    },
+                    "cntpPeersPeerType": {
+                      "type": "string",
+                      "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "cntpPeersPeerName": {
+                      "type": "string",
+                      "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpPeersVarEntry": {
@@ -484,8 +1694,38 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each entry corresponds to one stage of the shift\n          register, i.e., one reading of the variables clock\n          delay, clock offset and clock dispersion.\n          \n          Entries are automatically created whenever a peer is\n          configured and deleted when the peer is removed.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpFilterRegisterEntry"
+                    "type": "object",
+                    "properties": {
+                      "cntpPeersAssocId": {
+                        "type": "string",
+                        "description": "cntpPeersAssocId",
+                        "x-yang-type": "leafref"
+                      },
+                      "cntpFilterIndex": {
+                        "type": "integer",
+                        "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cntpFilterPeersOffset": {
+                        "type": "string",
+                        "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpFilterPeersDelay": {
+                        "type": "string",
+                        "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                      },
+                      "cntpFilterPeersDispersion": {
+                        "type": "string",
+                        "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                        "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -529,7 +1769,35 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-NTP-MIB_cntpFilterRegisterEntry"
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "cntpPeersAssocId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cntpFilterIndex": {
+                      "type": "integer",
+                      "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpFilterPeersOffset": {
+                      "type": "string",
+                      "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDelay": {
+                      "type": "string",
+                      "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDispersion": {
+                      "type": "string",
+                      "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-NTP-MIB:cntpFilterRegisterEntry": {
@@ -789,6 +2057,212 @@
             "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
             "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
           },
+          "cntpPeersVarEntry": {
+            "type": "array",
+            "description": "cntpPeersVarEntry",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cntpPeersAssocId": {
+                  "type": "string",
+                  "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                },
+                "cntpPeersConfigured": {
+                  "type": "boolean",
+                  "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                },
+                "cntpPeersPeerAddress": {
+                  "type": "string",
+                  "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                  "format": "inet:ipv4-address"
+                },
+                "cntpPeersPeerPort": {
+                  "type": "integer",
+                  "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersHostAddress": {
+                  "type": "string",
+                  "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                  "format": "inet:ipv4-address"
+                },
+                "cntpPeersHostPort": {
+                  "type": "integer",
+                  "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersLeap": {
+                  "type": "string",
+                  "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                },
+                "cntpPeersMode": {
+                  "type": "string",
+                  "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                },
+                "cntpPeersStratum": {
+                  "type": "string",
+                  "description": "The stratum of the peer clock.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                },
+                "cntpPeersPeerPoll": {
+                  "type": "string",
+                  "description": "The interval at which the peer polls the local host.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                },
+                "cntpPeersHostPoll": {
+                  "type": "string",
+                  "description": "The interval at which the local host polls the peer.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                },
+                "cntpPeersPrecision": {
+                  "type": "integer",
+                  "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersRootDelay": {
+                  "type": "string",
+                  "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                },
+                "cntpPeersRootDispersion": {
+                  "type": "string",
+                  "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                },
+                "cntpPeersRefId": {
+                  "type": "string",
+                  "description": "The reference identifier of the peer.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                },
+                "cntpPeersRefTime": {
+                  "type": "string",
+                  "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                },
+                "cntpPeersOrgTime": {
+                  "type": "string",
+                  "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                },
+                "cntpPeersReceiveTime": {
+                  "type": "string",
+                  "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                },
+                "cntpPeersTransmitTime": {
+                  "type": "string",
+                  "description": "The local time at which the NTP message departed the\n            sender.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                },
+                "cntpPeersUpdateTime": {
+                  "type": "integer",
+                  "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersReach": {
+                  "type": "integer",
+                  "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersTimer": {
+                  "type": "integer",
+                  "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpPeersOffset": {
+                  "type": "string",
+                  "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                },
+                "cntpPeersDelay": {
+                  "type": "string",
+                  "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                },
+                "cntpPeersDispersion": {
+                  "type": "string",
+                  "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                },
+                "cntpPeersFilterValidEntries": {
+                  "type": "integer",
+                  "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cntpPeersEntryStatus": {
+                  "type": "string",
+                  "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "cntpPeersUpdateTimeRev1": {
+                  "type": "integer",
+                  "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cntpPeersPrefPeer": {
+                  "type": "boolean",
+                  "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                },
+                "cntpPeersPeerType": {
+                  "type": "string",
+                  "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                  "x-yang-type": "inet-address:InetAddressType"
+                },
+                "cntpPeersPeerName": {
+                  "type": "string",
+                  "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                  "x-yang-type": "inet-address:InetAddress"
+                }
+              }
+            }
+          },
+          "cntpFilterRegisterEntry": {
+            "type": "array",
+            "description": "Each entry corresponds to one stage of the shift\n          register, i.e., one reading of the variables clock\n          delay, clock offset and clock dispersion.\n          \n          Entries are automatically created whenever a peer is\n          configured and deleted when the peer is removed.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cntpPeersAssocId": {
+                  "type": "string",
+                  "description": "cntpPeersAssocId",
+                  "x-yang-type": "leafref"
+                },
+                "cntpFilterIndex": {
+                  "type": "integer",
+                  "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cntpFilterPeersOffset": {
+                  "type": "string",
+                  "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                },
+                "cntpFilterPeersDelay": {
+                  "type": "string",
+                  "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                },
+                "cntpFilterPeersDispersion": {
+                  "type": "string",
+                  "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                  "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                }
+              }
+            }
+          },
           "cntpSystem": {
             "type": "object",
             "description": "Two-bit code warning of an impending leap second to\n          be inserted in the NTP timescale. This object can be\n          set only when the cntpSysStratum has a value of 1.",
@@ -1013,6 +2487,176 @@
                 "type": "string",
                 "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
                 "x-yang-type": "inet-address:InetAddress"
+              },
+              "cntpPeersVarEntry": {
+                "type": "array",
+                "description": "cntpPeersVarEntry",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "An integer value greater than 0 that uniquely\n            identifies a peer with which the local NTP server\n            is associated.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPAssocIdentifier"
+                    },
+                    "cntpPeersConfigured": {
+                      "type": "boolean",
+                      "description": "This is a bit indicating that the association\n            was created from configuration information and\n            should not be de-associated even if the peer\n            becomes unreachable."
+                    },
+                    "cntpPeersPeerAddress": {
+                      "type": "string",
+                      "description": "The IP address of the peer.  When creating a new\n            association, a value should be set either for this\n            object or the corresponding instance of \n            cntpPeersPeerName, before the row is made active.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersPeerPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the peer receives NTP\n            messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersHostAddress": {
+                      "type": "string",
+                      "description": "The IP address of the local host.  Multi-homing can\n            be supported using this object.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "cntpPeersHostPort": {
+                      "type": "integer",
+                      "description": "The UDP port number on which the local host receives\n            NTP messages.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersLeap": {
+                      "type": "string",
+                      "description": "Two-bit code warning of an impending leap\n            second to be inserted in the NTP timescale of\n            the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPLeapIndicator"
+                    },
+                    "cntpPeersMode": {
+                      "type": "string",
+                      "description": "The association mode of the NTP server, with values\n            coded as follows,\n            0, unspecified\n            1, symmetric active - A host operating in this mode\n                    sends periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            2, symmetric passive - This type of association is\n                    ordinarily created upon arrival of a message\n                    from a peer operating in the symmetric active\n                    mode and persists only as long as the peer is\n                    reachable and operating at a stratum level\n                    less than or equal to the host; otherwise, the\n                    association is dissolved.  However, the\n                    association will always persist until at least\n                    one message has been sent in reply.  By\n                    operating in this mode the host announces its\n                    willingness to synchronize and be synchronized\n                    by the peer\n            3, client -  A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of its peer.  By\n                    operating in this mode the host, usually a LAN\n                    workstation, announces its willingness to be\n                    synchronized by, but not to synchronize the peer\n            4, server - This type of association is ordinarily\n                    created upon arrival of a client request message\n                    and exists only in order to reply to that\n                    request, after which the association is\n                    dissolved.  By operating in this mode the host,\n                    usually a LAN time server, announces its\n                    willingness to synchronize, but not to be\n                    synchronized by the peer\n            5, broadcast - A host operating in this mode sends\n                    periodic messages regardless of the\n                    reachability state or stratum of the peers.\n                    By operating in this mode the host, usually a\n                    LAN time server operating on a high-speed\n                    broadcast medium, announces its willingness to\n                    synchronize all of the peers, but not to be\n                    synchronized by any of them\n            6, reserved for NTP control messages\n            7, reserved for private use.\n            \n            When creating a new peer association, if no value\n            is specified for this object, it defaults to\n            symmetricActive(1)."
+                    },
+                    "cntpPeersStratum": {
+                      "type": "string",
+                      "description": "The stratum of the peer clock.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPStratum"
+                    },
+                    "cntpPeersPeerPoll": {
+                      "type": "string",
+                      "description": "The interval at which the peer polls the local host.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersHostPoll": {
+                      "type": "string",
+                      "description": "The interval at which the local host polls the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPPollInterval"
+                    },
+                    "cntpPeersPrecision": {
+                      "type": "integer",
+                      "description": "Signed integer indicating the precision of the peer\n            clock, in seconds to the nearest power of two.  The\n            value must be rounded to the next larger power of\n            two; for instance, a 50-Hz (20 ms) or 60-Hz\n            (16.67 ms) power-frequency clock would be assigned\n            the value -5 (31.25 ms), while a 1000-Hz (1 ms)\n            crystal-controlled clock would be assigned the value\n            -9 (1.95 ms).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersRootDelay": {
+                      "type": "string",
+                      "description": "A signed fixed-point number indicating the total\n            round-trip delay in seconds, from the peer to the\n            primary reference source at the root of the\n            synchronization subnet.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersRootDispersion": {
+                      "type": "string",
+                      "description": "The maximum error in seconds, of the peer clock\n            relative to the primary reference source at the root\n            of the synchronization subnet.  Only positive values\n            greater than zero are possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersRefId": {
+                      "type": "string",
+                      "description": "The reference identifier of the peer.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPRefId"
+                    },
+                    "cntpPeersRefTime": {
+                      "type": "string",
+                      "description": "The local time at the peer when its clock was last\n            updated.  If the peer clock has never been\n            synchronized, the value is zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersOrgTime": {
+                      "type": "string",
+                      "description": "The local time at the peer, when its latest\n            NTP message was sent.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersReceiveTime": {
+                      "type": "string",
+                      "description": "The local time, when the latest NTP message from\n            the peer arrived.  If the peer becomes unreachable\n            the value is set to zero.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersTransmitTime": {
+                      "type": "string",
+                      "description": "The local time at which the NTP message departed the\n            sender.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPTimeStamp"
+                    },
+                    "cntpPeersUpdateTime": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersReach": {
+                      "type": "integer",
+                      "description": "A shift register of used to determine the\n            reachability status of the peer, with bits entering\n            from the least significant (rightmost) end.  A peer is\n            considered reachable if at least one bit in this\n            register is set to one i.e, if the value of this\n            object is non-zero.\n            The data in the shift register would be populated by\n            the NTP protocol procedures.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersTimer": {
+                      "type": "integer",
+                      "description": "The interval in seconds, between transmitted NTP\n            messages from the local host to the peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpPeersOffset": {
+                      "type": "string",
+                      "description": "The estimated offset of the peer clock relative to\n            the local clock, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDelay": {
+                      "type": "string",
+                      "description": "The estimated round-trip delay of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpPeersDispersion": {
+                      "type": "string",
+                      "description": "The estimated maximum error of the peer clock\n            relative to the local clock over the network path\n            between them, in seconds.  The host determines the\n            value of this object using the NTP clock-filter\n            algorithm.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    },
+                    "cntpPeersFilterValidEntries": {
+                      "type": "integer",
+                      "description": "The number of valid entries for a peer in the\n            Filter Register Table. Since, the Filter Register\n            Table is optional, this object will have a value 0\n            if the Filter Register Table is not implemented.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersEntryStatus": {
+                      "type": "string",
+                      "description": "The status object for this row. When a management\n            station is creating a new row, it should set the\n            value for cntpPeersPeerAddress at least, before the\n            row can be made active(1).",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "cntpPeersUpdateTimeRev1": {
+                      "type": "integer",
+                      "description": "The local time, when the most recent NTP message was\n            received from the peer that was used to calculate the\n            skew dispersion.  This represents only the 32-bit\n            integer part of the NTPTimestamp.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cntpPeersPrefPeer": {
+                      "type": "boolean",
+                      "description": "This object specifies whether this peer is the\n            preferred one over the others. By default, when\n            the value of this object is 'false', NTP chooses \n            the peer with which to synchronize the time on \n            the local system. If this object is set\n            to 'true', NTP will choose the corresponding\n            peer to synchronize the time with. If multiple\n            entries have this object set to 'true', NTP will\n            choose the first one to be set. This object is\n            a means to override the selection of the peer by\n            NTP."
+                    },
+                    "cntpPeersPeerType": {
+                      "type": "string",
+                      "description": "Represents the type of the corresponding instance\n            of cntpPeersPeerName object.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "cntpPeersPeerName": {
+                      "type": "string",
+                      "description": "The address of the peer. When creating a new\n            association, a value must be set for either this\n            object or the corresponding instance of\n            cntpPeersPeerAddress object, before the row\n            is made active.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1045,6 +2689,42 @@
                 "type": "string",
                 "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
                 "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+              },
+              "cntpFilterRegisterEntry": {
+                "type": "array",
+                "description": "Each entry corresponds to one stage of the shift\n          register, i.e., one reading of the variables clock\n          delay, clock offset and clock dispersion.\n          \n          Entries are automatically created whenever a peer is\n          configured and deleted when the peer is removed.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cntpPeersAssocId": {
+                      "type": "string",
+                      "description": "cntpPeersAssocId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cntpFilterIndex": {
+                      "type": "integer",
+                      "description": "An integer value in the specified range that is used\n            to index into the table.  The size of the table is\n            fixed at 8.  Each entry identifies a particular\n            reading of the clock filter variables in the shift\n            register.\n            \n            Entries are added starting at index 1.  The index\n            wraps back to 1 when it reaches 8.  When the index\n            wraps back, the new entries will overwrite the old\n            entries effectively deleting the old entry.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cntpFilterPeersOffset": {
+                      "type": "string",
+                      "description": "The offset of the peer clock relative to the\n            local clock in seconds.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDelay": {
+                      "type": "string",
+                      "description": "Round-trip delay of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  This variable can take on both positive and\n            negative values, depending on clock precision and\n            skew-error accumulation.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPSignedTimeValue"
+                    },
+                    "cntpFilterPeersDispersion": {
+                      "type": "string",
+                      "description": "The maximum error of the peer clock relative to the\n            local clock over the network path between them, in\n            seconds.  Only positive values greater than zero are\n            possible.",
+                      "x-yang-type": "CISCO-NTP-MIB:NTPUnsignedTimeValue"
+                    }
+                  }
+                }
               }
             }
           }

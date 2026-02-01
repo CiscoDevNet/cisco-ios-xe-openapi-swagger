@@ -29,7 +29,51 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_system"
+                  "type": "object",
+                  "description": "A textual description of the entity.  This value should\n          include the full name and version identification of\n          the system's hardware type, software operating-system,\n          and networking software.",
+                  "properties": {
+                    "sysDescr": {
+                      "type": "string",
+                      "description": "A textual description of the entity.  This value should\n          include the full name and version identification of\n          the system's hardware type, software operating-system,\n          and networking software.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysObjectID": {
+                      "type": "string",
+                      "description": "The vendor's authoritative identification of the\n          network management subsystem contained in the entity.\n          This value is allocated within the SMI enterprises\n          subtree (1.3.6.1.4.1) and provides an easy and\n          unambiguous means for determining `what kind of box' is\n          being managed.  For example, if vendor `Flintstones,\n          Inc.' was assigned the subtree 1.3.6.1.4.1.424242,\n          it could assign the identifier 1.3.6.1.4.1.424242.1.1\n          to its `Fred Router'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "sysUpTime": {
+                      "type": "string",
+                      "description": "The time (in hundredths of a second) since the\n          network management portion of the system was last\n          re-initialized.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "sysContact": {
+                      "type": "string",
+                      "description": "The textual identification of the contact person for\n          this managed node, together with information on how\n          to contact this person.  If no contact information is\n          known, the value is the zero-length string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysName": {
+                      "type": "string",
+                      "description": "An administratively-assigned name for this managed\n          node.  By convention, this is the node's fully-qualified\n          domain name.  If the name is unknown, the value is\n          the zero-length string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysLocation": {
+                      "type": "string",
+                      "description": "The physical location of this node (e.g., 'telephone\n          closet, 3rd floor').  If the location is unknown, the\n          value is the zero-length string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysServices": {
+                      "type": "integer",
+                      "description": "A value which indicates the set of services that this\n          entity may potentially offer.  The value is a sum.\n          This sum initially takes the value zero. Then, for\n          each layer, L, in the range 1 through 7, that this node\n          performs transactions for, 2 raised to (L - 1) is added\n          to the sum.  For example, a node which performs only\n          routing functions would have a value of 4 (2^(3-1)).\n          In contrast, a node which is a host offering application\n          services would have a value of 72 (2^(4-1) + 2^(7-1)).\n          Note that in the context of the Internet suite of\n          protocols, values should be calculated accordingly:\n          \n               layer      functionality\n                 1        physical (e.g., repeaters)\n                 2        datalink/subnetwork (e.g., bridges)\n                 3        internet (e.g., supports the IP)\n                 4        end-to-end  (e.g., supports the TCP)\n                 7        applications (e.g., supports the SMTP)\n          \n          For systems including OSI protocols, layers 5 and 6\n          may also be counted.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "sysORLastChange": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time of the most recent\n          change in state or value of any instance of sysORID.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:system": {
@@ -62,7 +106,188 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_snmp"
+                  "type": "object",
+                  "description": "The total number of messages delivered to the SNMP\n          entity from the transport service.",
+                  "properties": {
+                    "snmpInPkts": {
+                      "type": "integer",
+                      "description": "The total number of messages delivered to the SNMP\n          entity from the transport service.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutPkts": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Messages which were\n          passed from the SNMP protocol entity to the\n          transport service.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInBadVersions": {
+                      "type": "integer",
+                      "description": "The total number of SNMP messages which were delivered\n          to the SNMP entity and were for an unsupported SNMP\n          version.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInBadCommunityNames": {
+                      "type": "integer",
+                      "description": "The total number of community-based SNMP messages (for\n          example,  SNMPv1) delivered to the SNMP entity which\n          used an SNMP community name not known to said entity.\n          Also, implementations which authenticate community-based\n          SNMP messages using check(s) in addition to matching\n          the community name (for example, by also checking\n          whether the message originated from a transport address\n          allowed to use a specified community name) MAY include\n          in this value the number of messages which failed the\n          additional check(s).  It is strongly RECOMMENDED that\n          the documentation for any security model which is used\n          to authenticate community-based SNMP messages specify\n          the precise conditions that contribute to this value.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInBadCommunityUses": {
+                      "type": "integer",
+                      "description": "The total number of community-based SNMP messages (for\n          example, SNMPv1) delivered to the SNMP entity which\n          represented an SNMP operation that was not allowed for\n          the SNMP community named in the message.  The precise\n          conditions under which this counter is incremented\n          (if at all) depend on how the SNMP entity implements\n          its access control mechanism and how its applications\n          interact with that access control mechanism.  It is\n          strongly RECOMMENDED that the documentation for any\n          access control mechanism which is used to control access\n          to and visibility of MIB instrumentation specify the\n          precise conditions that contribute to this value.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInASNParseErrs": {
+                      "type": "integer",
+                      "description": "The total number of ASN.1 or BER errors encountered by\n          the SNMP entity when decoding received SNMP messages.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInTooBigs": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were\n          delivered to the SNMP protocol entity and for\n          which the value of the error-status field was\n          `tooBig'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInNoSuchNames": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were\n          delivered to the SNMP protocol entity and for\n          which the value of the error-status field was\n          `noSuchName'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInBadValues": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were\n          delivered to the SNMP protocol entity and for\n          which the value of the error-status field was\n          `badValue'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInReadOnlys": {
+                      "type": "integer",
+                      "description": "The total number valid SNMP PDUs which were delivered\n          to the SNMP protocol entity and for which the value\n          of the error-status field was `readOnly'.  It should\n          be noted that it is a protocol error to generate an\n          SNMP PDU which contains the value `readOnly' in the\n          error-status field, as such this object is provided\n          as a means of detecting incorrect implementations of\n          the SNMP.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInGenErrs": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were delivered\n          to the SNMP protocol entity and for which the value\n          of the error-status field was `genErr'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInTotalReqVars": {
+                      "type": "integer",
+                      "description": "The total number of MIB objects which have been\n          retrieved successfully by the SNMP protocol entity\n          as the result of receiving valid SNMP Get-Request\n          and Get-Next PDUs.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInTotalSetVars": {
+                      "type": "integer",
+                      "description": "The total number of MIB objects which have been\n          altered successfully by the SNMP protocol entity as\n          the result of receiving valid SNMP Set-Request PDUs.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInGetRequests": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Request PDUs which\n          have been accepted and processed by the SNMP\n          protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInGetNexts": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Next PDUs which have been\n          accepted and processed by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInSetRequests": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Set-Request PDUs which\n          have been accepted and processed by the SNMP protocol\n          entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInGetResponses": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Response PDUs which\n          have been accepted and processed by the SNMP protocol\n          entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpInTraps": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Trap PDUs which have been\n          accepted and processed by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutTooBigs": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were generated\n          by the SNMP protocol entity and for which the value\n          of the error-status field was `tooBig.'",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutNoSuchNames": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were generated\n          by the SNMP protocol entity and for which the value\n          of the error-status was `noSuchName'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutBadValues": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were generated\n          by the SNMP protocol entity and for which the value\n          of the error-status field was `badValue'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutGenErrs": {
+                      "type": "integer",
+                      "description": "The total number of SNMP PDUs which were generated\n          by the SNMP protocol entity and for which the value\n          of the error-status field was `genErr'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutGetRequests": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Request PDUs which\n          have been generated by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutGetNexts": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Next PDUs which have\n          been generated by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutSetRequests": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Set-Request PDUs which\n          have been generated by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutGetResponses": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Get-Response PDUs which\n          have been generated by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpOutTraps": {
+                      "type": "integer",
+                      "description": "The total number of SNMP Trap PDUs which have\n          been generated by the SNMP protocol entity.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpEnableAuthenTraps": {
+                      "type": "string",
+                      "description": "Indicates whether the SNMP entity is permitted to\n          generate authenticationFailure traps.  The value of this\n          object overrides any configuration information; as such,\n          it provides a means whereby all authenticationFailure\n          traps may be disabled.\n          \n          Note that it is strongly recommended that this object\n          be stored in non-volatile memory so that it remains\n          constant across re-initializations of the network\n          management system."
+                    },
+                    "snmpSilentDrops": {
+                      "type": "integer",
+                      "description": "The total number of Confirmed Class PDUs (such as\n          GetRequest-PDUs, GetNextRequest-PDUs,\n          GetBulkRequest-PDUs, SetRequest-PDUs, and\n          InformRequest-PDUs) delivered to the SNMP entity which\n          were silently dropped because the size of a reply\n          containing an alternate Response Class PDU (such as a\n          Response-PDU) with an empty variable-bindings field\n          was greater than either a local constraint or the\n          maximum message size associated with the originator of\n          the request.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpProxyDrops": {
+                      "type": "integer",
+                      "description": "The total number of Confirmed Class PDUs\n          (such as GetRequest-PDUs, GetNextRequest-PDUs,\n          GetBulkRequest-PDUs, SetRequest-PDUs, and\n          InformRequest-PDUs) delivered to the SNMP entity which\n          were silently dropped because the transmission of\n          the (possibly translated) message to a proxy target\n          failed in a manner (other than a time-out) such that\n          no Response Class PDU (such as a Response-PDU) could\n          be returned.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:snmp": {
@@ -117,7 +342,15 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_snmpSet"
+                  "type": "object",
+                  "description": "snmpSet",
+                  "properties": {
+                    "snmpSetSerialNo": {
+                      "type": "string",
+                      "description": "An advisory lock used to allow several cooperating\n          command generator applications to coordinate their\n          use of the SNMP set operation.\n          \n          This object is used for coarse-grain coordination.\n          To achieve fine-grain coordination, one or more similar\n          objects might be defined within each MIB group, as\n          appropriate.",
+                      "x-yang-type": "snmpv2-tc:TestAndIncr"
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:snmpSet": {
@@ -143,14 +376,77 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_sysORTable"
+                  "type": "object",
+                  "description": "The (conceptual) table listing the capabilities of\n        the local SNMP application acting as a command\n        responder with respect to various MIB modules.\n        SNMP entities having dynamically-configurable support\n        of MIB modules will have a dynamically-varying number\n        of conceptual rows.",
+                  "properties": {
+                    "sysORIndex": {
+                      "type": "integer",
+                      "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "sysORID": {
+                      "type": "string",
+                      "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "sysORDescr": {
+                      "type": "string",
+                      "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysORUpTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "sysOREntry": {
+                      "type": "array",
+                      "description": "An entry (conceptual row) in the sysORTable.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "sysORIndex": {
+                            "type": "integer",
+                            "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "sysORID": {
+                            "type": "string",
+                            "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                            "x-yang-type": "yang:object-identifier-128"
+                          },
+                          "sysORDescr": {
+                            "type": "string",
+                            "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "sysORUpTime": {
+                            "type": "string",
+                            "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                            "x-yang-type": "yang:timestamp"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:sysORTable": {
                     "sysORIndex": 1,
                     "sysORID": "example-string",
                     "sysORDescr": "GigabitEthernet1/0/1",
-                    "sysORUpTime": "example-string"
+                    "sysORUpTime": "example-string",
+                    "sysOREntry": [
+                      {
+                        "sysORIndex": 1,
+                        "sysORID": "example-string",
+                        "sysORDescr": "GigabitEthernet1/0/1",
+                        "sysORUpTime": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -173,8 +469,33 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) in the sysORTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMPv2-MIB_sysOREntry"
+                    "type": "object",
+                    "properties": {
+                      "sysORIndex": {
+                        "type": "integer",
+                        "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "sysORID": {
+                        "type": "string",
+                        "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "sysORDescr": {
+                        "type": "string",
+                        "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "sysORUpTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                        "x-yang-type": "yang:timestamp"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -217,7 +538,30 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_sysOREntry"
+                  "type": "object",
+                  "properties": {
+                    "sysORIndex": {
+                      "type": "integer",
+                      "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "sysORID": {
+                      "type": "string",
+                      "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "sysORDescr": {
+                      "type": "string",
+                      "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysORUpTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:sysOREntry": {
@@ -247,8 +591,33 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) in the sysORTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMPv2-MIB_sysOREntry"
+                    "type": "object",
+                    "properties": {
+                      "sysORIndex": {
+                        "type": "integer",
+                        "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "sysORID": {
+                        "type": "string",
+                        "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                        "x-yang-type": "yang:object-identifier-128"
+                      },
+                      "sysORDescr": {
+                        "type": "string",
+                        "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "sysORUpTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                        "x-yang-type": "yang:timestamp"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -291,7 +660,30 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMPv2-MIB_sysOREntry"
+                  "type": "object",
+                  "properties": {
+                    "sysORIndex": {
+                      "type": "integer",
+                      "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "sysORID": {
+                      "type": "string",
+                      "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "sysORDescr": {
+                      "type": "string",
+                      "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysORUpTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
                 },
                 "example": {
                   "SNMPv2-MIB:sysOREntry": {
@@ -559,6 +951,37 @@
             "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
             "x-yang-type": "yang:timestamp"
           },
+          "sysOREntry": {
+            "type": "array",
+            "description": "An entry (conceptual row) in the sysORTable.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "sysORIndex": {
+                  "type": "integer",
+                  "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "sysORID": {
+                  "type": "string",
+                  "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                  "x-yang-type": "yang:object-identifier-128"
+                },
+                "sysORDescr": {
+                  "type": "string",
+                  "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "sysORUpTime": {
+                  "type": "string",
+                  "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                  "x-yang-type": "yang:timestamp"
+                }
+              }
+            }
+          },
           "system": {
             "type": "object",
             "description": "A textual description of the entity.  This value should\n          include the full name and version identification of\n          the system's hardware type, software operating-system,\n          and networking software.",
@@ -825,6 +1248,37 @@
                 "type": "string",
                 "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
                 "x-yang-type": "yang:timestamp"
+              },
+              "sysOREntry": {
+                "type": "array",
+                "description": "An entry (conceptual row) in the sysORTable.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sysORIndex": {
+                      "type": "integer",
+                      "description": "The auxiliary variable used for identifying instances\n            of the columnar objects in the sysORTable.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "sysORID": {
+                      "type": "string",
+                      "description": "An authoritative identification of a capabilities\n            statement with respect to various MIB modules supported\n            by the local SNMP application acting as a command\n            responder.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "sysORDescr": {
+                      "type": "string",
+                      "description": "A textual description of the capabilities identified\n            by the corresponding instance of sysORID.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "sysORUpTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time this conceptual\n            row was last instantiated.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
+                }
               }
             }
           }

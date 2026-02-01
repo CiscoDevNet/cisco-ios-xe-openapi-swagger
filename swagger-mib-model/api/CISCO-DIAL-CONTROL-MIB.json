@@ -29,7 +29,14 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cPeerGlobalConfiguration"
+                  "type": "object",
+                  "description": "cPeerGlobalConfiguration",
+                  "properties": {
+                    "cPeerSearchType": {
+                      "type": "string",
+                      "description": "Specifies the peer search preference based on the\n          type of peers in an universal/integrated port\n          platform.\n          \n          none      - both voice and data peers are searched\n                     in same preference.\n          datavoice - search data peers first. If no data peers\n                     are found, the voice peers are searched.\n          voicedata - search voice peers first. If no voice peers\n                     are found, the data peers are searched."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cPeerGlobalConfiguration": {
@@ -55,7 +62,218 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryTable"
+                  "type": "object",
+                  "description": "A table containing information about specific\n        calls to a specific destination.",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistorySetupTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryPeerAddress": {
+                      "type": "string",
+                      "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerSubAddress": {
+                      "type": "string",
+                      "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerId": {
+                      "type": "integer",
+                      "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryPeerIfIndex": {
+                      "type": "integer",
+                      "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryLogicalIfIndex": {
+                      "type": "string",
+                      "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cCallHistoryDisconnectCause": {
+                      "type": "string",
+                      "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                      "format": "binary"
+                    },
+                    "cCallHistoryDisconnectText": {
+                      "type": "string",
+                      "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryConnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was connected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryDisconnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was disconnected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryCallOrigin": {
+                      "type": "string",
+                      "description": "The call origin."
+                    },
+                    "cCallHistoryChargedUnits": {
+                      "type": "string",
+                      "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryInfoType": {
+                      "type": "string",
+                      "description": "The information type for this call."
+                    },
+                    "cCallHistoryTransmitPackets": {
+                      "type": "string",
+                      "description": "The number of packets which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryTransmitBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceivePackets": {
+                      "type": "string",
+                      "description": "The number of packets which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceiveBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReleaseSource": {
+                      "type": "string",
+                      "description": "Originator of the call release."
+                    },
+                    "cCallHistoryReleaseSrc": {
+                      "type": "string",
+                      "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                    },
+                    "cCallHistoryEntry": {
+                      "type": "array",
+                      "description": "The information regarding a single Connection.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cCallHistoryIndex": {
+                            "type": "integer",
+                            "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cCallHistorySetupTime": {
+                            "type": "string",
+                            "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                            "x-yang-type": "yang:timestamp"
+                          },
+                          "cCallHistoryPeerAddress": {
+                            "type": "string",
+                            "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "cCallHistoryPeerSubAddress": {
+                            "type": "string",
+                            "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "cCallHistoryPeerId": {
+                            "type": "integer",
+                            "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cCallHistoryPeerIfIndex": {
+                            "type": "integer",
+                            "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "cCallHistoryLogicalIfIndex": {
+                            "type": "string",
+                            "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                            "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                          },
+                          "cCallHistoryDisconnectCause": {
+                            "type": "string",
+                            "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                            "format": "binary"
+                          },
+                          "cCallHistoryDisconnectText": {
+                            "type": "string",
+                            "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                            "x-yang-type": "snmpv2-tc:DisplayString"
+                          },
+                          "cCallHistoryConnectTime": {
+                            "type": "string",
+                            "description": "The value of sysUpTime when the call was connected.",
+                            "x-yang-type": "yang:timestamp"
+                          },
+                          "cCallHistoryDisconnectTime": {
+                            "type": "string",
+                            "description": "The value of sysUpTime when the call was disconnected.",
+                            "x-yang-type": "yang:timestamp"
+                          },
+                          "cCallHistoryCallOrigin": {
+                            "type": "string",
+                            "description": "The call origin."
+                          },
+                          "cCallHistoryChargedUnits": {
+                            "type": "string",
+                            "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                            "x-yang-type": "dial-control:AbsoluteCounter32"
+                          },
+                          "cCallHistoryInfoType": {
+                            "type": "string",
+                            "description": "The information type for this call."
+                          },
+                          "cCallHistoryTransmitPackets": {
+                            "type": "string",
+                            "description": "The number of packets which were transmitted while this\n            call was active.",
+                            "x-yang-type": "dial-control:AbsoluteCounter32"
+                          },
+                          "cCallHistoryTransmitBytes": {
+                            "type": "string",
+                            "description": "The number of bytes which were transmitted while this\n            call was active.",
+                            "x-yang-type": "dial-control:AbsoluteCounter32"
+                          },
+                          "cCallHistoryReceivePackets": {
+                            "type": "string",
+                            "description": "The number of packets which were received while this\n            call was active.",
+                            "x-yang-type": "dial-control:AbsoluteCounter32"
+                          },
+                          "cCallHistoryReceiveBytes": {
+                            "type": "string",
+                            "description": "The number of bytes which were received while this\n            call was active.",
+                            "x-yang-type": "dial-control:AbsoluteCounter32"
+                          },
+                          "cCallHistoryReleaseSource": {
+                            "type": "string",
+                            "description": "Originator of the call release."
+                          },
+                          "cCallHistoryReleaseSrc": {
+                            "type": "string",
+                            "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryTable": {
@@ -78,7 +296,31 @@
                     "cCallHistoryReceivePackets": "example-string",
                     "cCallHistoryReceiveBytes": "example-string",
                     "cCallHistoryReleaseSource": "example-string",
-                    "cCallHistoryReleaseSrc": "example-string"
+                    "cCallHistoryReleaseSrc": "example-string",
+                    "cCallHistoryEntry": [
+                      {
+                        "cCallHistoryIndex": 1,
+                        "cCallHistorySetupTime": "example-string",
+                        "cCallHistoryPeerAddress": "192.168.1.1",
+                        "cCallHistoryPeerSubAddress": "192.168.1.1",
+                        "cCallHistoryPeerId": -2147483648,
+                        "cCallHistoryPeerIfIndex": 1,
+                        "cCallHistoryLogicalIfIndex": "example-string",
+                        "cCallHistoryDisconnectCause": "example-string",
+                        "cCallHistoryDisconnectText": "example-string",
+                        "cCallHistoryConnectTime": "example-string",
+                        "cCallHistoryDisconnectTime": "example-string",
+                        "cCallHistoryCallOrigin": "example-string",
+                        "cCallHistoryChargedUnits": "example-string",
+                        "cCallHistoryInfoType": "ethernetCsmacd(6)",
+                        "cCallHistoryTransmitPackets": "example-string",
+                        "cCallHistoryTransmitBytes": "example-string",
+                        "cCallHistoryReceivePackets": "example-string",
+                        "cCallHistoryReceiveBytes": "example-string",
+                        "cCallHistoryReleaseSource": "example-string",
+                        "cCallHistoryReleaseSrc": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -101,8 +343,111 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The information regarding a single Connection.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryEntry"
+                    "type": "object",
+                    "properties": {
+                      "cCallHistoryIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cCallHistorySetupTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryPeerAddress": {
+                        "type": "string",
+                        "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryPeerSubAddress": {
+                        "type": "string",
+                        "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryPeerId": {
+                        "type": "integer",
+                        "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cCallHistoryPeerIfIndex": {
+                        "type": "integer",
+                        "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cCallHistoryLogicalIfIndex": {
+                        "type": "string",
+                        "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cCallHistoryDisconnectCause": {
+                        "type": "string",
+                        "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                        "format": "binary"
+                      },
+                      "cCallHistoryDisconnectText": {
+                        "type": "string",
+                        "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryConnectTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call was connected.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryDisconnectTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call was disconnected.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryCallOrigin": {
+                        "type": "string",
+                        "description": "The call origin."
+                      },
+                      "cCallHistoryChargedUnits": {
+                        "type": "string",
+                        "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryInfoType": {
+                        "type": "string",
+                        "description": "The information type for this call."
+                      },
+                      "cCallHistoryTransmitPackets": {
+                        "type": "string",
+                        "description": "The number of packets which were transmitted while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryTransmitBytes": {
+                        "type": "string",
+                        "description": "The number of bytes which were transmitted while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReceivePackets": {
+                        "type": "string",
+                        "description": "The number of packets which were received while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReceiveBytes": {
+                        "type": "string",
+                        "description": "The number of bytes which were received while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReleaseSource": {
+                        "type": "string",
+                        "description": "Originator of the call release."
+                      },
+                      "cCallHistoryReleaseSrc": {
+                        "type": "string",
+                        "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -161,7 +506,108 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryEntry"
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistorySetupTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryPeerAddress": {
+                      "type": "string",
+                      "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerSubAddress": {
+                      "type": "string",
+                      "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerId": {
+                      "type": "integer",
+                      "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryPeerIfIndex": {
+                      "type": "integer",
+                      "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryLogicalIfIndex": {
+                      "type": "string",
+                      "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cCallHistoryDisconnectCause": {
+                      "type": "string",
+                      "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                      "format": "binary"
+                    },
+                    "cCallHistoryDisconnectText": {
+                      "type": "string",
+                      "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryConnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was connected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryDisconnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was disconnected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryCallOrigin": {
+                      "type": "string",
+                      "description": "The call origin."
+                    },
+                    "cCallHistoryChargedUnits": {
+                      "type": "string",
+                      "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryInfoType": {
+                      "type": "string",
+                      "description": "The information type for this call."
+                    },
+                    "cCallHistoryTransmitPackets": {
+                      "type": "string",
+                      "description": "The number of packets which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryTransmitBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceivePackets": {
+                      "type": "string",
+                      "description": "The number of packets which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceiveBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReleaseSource": {
+                      "type": "string",
+                      "description": "Originator of the call release."
+                    },
+                    "cCallHistoryReleaseSrc": {
+                      "type": "string",
+                      "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryEntry": {
@@ -206,13 +652,65 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryIecTable"
+                  "type": "object",
+                  "description": "This table contains information about Internal Error\n        Code(s) (IEC) which caused the call to fail.",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "string",
+                      "description": "cCallHistoryIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cCallHistoryIecIndex": {
+                      "type": "integer",
+                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistoryIec": {
+                      "type": "string",
+                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "cCallHistoryIecEntry": {
+                      "type": "array",
+                      "description": "The IEC information regarding a single call.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cCallHistoryIndex": {
+                            "type": "string",
+                            "description": "cCallHistoryIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "cCallHistoryIecIndex": {
+                            "type": "integer",
+                            "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cCallHistoryIec": {
+                            "type": "string",
+                            "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryIecTable": {
                     "cCallHistoryIndex": "example-string",
                     "cCallHistoryIecIndex": 1,
-                    "cCallHistoryIec": "example-string"
+                    "cCallHistoryIec": "example-string",
+                    "cCallHistoryIecEntry": [
+                      {
+                        "cCallHistoryIndex": "example-string",
+                        "cCallHistoryIecIndex": 1,
+                        "cCallHistoryIec": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -235,8 +733,28 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The IEC information regarding a single call.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryIecEntry"
+                    "type": "object",
+                    "properties": {
+                      "cCallHistoryIndex": {
+                        "type": "string",
+                        "description": "cCallHistoryIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cCallHistoryIecIndex": {
+                        "type": "integer",
+                        "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cCallHistoryIec": {
+                        "type": "string",
+                        "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -278,7 +796,25 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryIecEntry"
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "string",
+                      "description": "cCallHistoryIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cCallHistoryIecIndex": {
+                      "type": "integer",
+                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistoryIec": {
+                      "type": "string",
+                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry": {
@@ -307,8 +843,111 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The information regarding a single Connection.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryEntry"
+                    "type": "object",
+                    "properties": {
+                      "cCallHistoryIndex": {
+                        "type": "integer",
+                        "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cCallHistorySetupTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryPeerAddress": {
+                        "type": "string",
+                        "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryPeerSubAddress": {
+                        "type": "string",
+                        "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryPeerId": {
+                        "type": "integer",
+                        "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cCallHistoryPeerIfIndex": {
+                        "type": "integer",
+                        "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "cCallHistoryLogicalIfIndex": {
+                        "type": "string",
+                        "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                        "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                      },
+                      "cCallHistoryDisconnectCause": {
+                        "type": "string",
+                        "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                        "format": "binary"
+                      },
+                      "cCallHistoryDisconnectText": {
+                        "type": "string",
+                        "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                        "x-yang-type": "snmpv2-tc:DisplayString"
+                      },
+                      "cCallHistoryConnectTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call was connected.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryDisconnectTime": {
+                        "type": "string",
+                        "description": "The value of sysUpTime when the call was disconnected.",
+                        "x-yang-type": "yang:timestamp"
+                      },
+                      "cCallHistoryCallOrigin": {
+                        "type": "string",
+                        "description": "The call origin."
+                      },
+                      "cCallHistoryChargedUnits": {
+                        "type": "string",
+                        "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryInfoType": {
+                        "type": "string",
+                        "description": "The information type for this call."
+                      },
+                      "cCallHistoryTransmitPackets": {
+                        "type": "string",
+                        "description": "The number of packets which were transmitted while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryTransmitBytes": {
+                        "type": "string",
+                        "description": "The number of bytes which were transmitted while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReceivePackets": {
+                        "type": "string",
+                        "description": "The number of packets which were received while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReceiveBytes": {
+                        "type": "string",
+                        "description": "The number of bytes which were received while this\n            call was active.",
+                        "x-yang-type": "dial-control:AbsoluteCounter32"
+                      },
+                      "cCallHistoryReleaseSource": {
+                        "type": "string",
+                        "description": "Originator of the call release."
+                      },
+                      "cCallHistoryReleaseSrc": {
+                        "type": "string",
+                        "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -367,7 +1006,108 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryEntry"
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistorySetupTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryPeerAddress": {
+                      "type": "string",
+                      "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerSubAddress": {
+                      "type": "string",
+                      "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerId": {
+                      "type": "integer",
+                      "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryPeerIfIndex": {
+                      "type": "integer",
+                      "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryLogicalIfIndex": {
+                      "type": "string",
+                      "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cCallHistoryDisconnectCause": {
+                      "type": "string",
+                      "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                      "format": "binary"
+                    },
+                    "cCallHistoryDisconnectText": {
+                      "type": "string",
+                      "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryConnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was connected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryDisconnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was disconnected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryCallOrigin": {
+                      "type": "string",
+                      "description": "The call origin."
+                    },
+                    "cCallHistoryChargedUnits": {
+                      "type": "string",
+                      "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryInfoType": {
+                      "type": "string",
+                      "description": "The information type for this call."
+                    },
+                    "cCallHistoryTransmitPackets": {
+                      "type": "string",
+                      "description": "The number of packets which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryTransmitBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceivePackets": {
+                      "type": "string",
+                      "description": "The number of packets which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceiveBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReleaseSource": {
+                      "type": "string",
+                      "description": "Originator of the call release."
+                    },
+                    "cCallHistoryReleaseSrc": {
+                      "type": "string",
+                      "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryEntry": {
@@ -413,8 +1153,28 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The IEC information regarding a single call.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryIecEntry"
+                    "type": "object",
+                    "properties": {
+                      "cCallHistoryIndex": {
+                        "type": "string",
+                        "description": "cCallHistoryIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "cCallHistoryIecIndex": {
+                        "type": "integer",
+                        "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cCallHistoryIec": {
+                        "type": "string",
+                        "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -456,7 +1216,25 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-DIAL-CONTROL-MIB_cCallHistoryIecEntry"
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "string",
+                      "description": "cCallHistoryIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cCallHistoryIecIndex": {
+                      "type": "integer",
+                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistoryIec": {
+                      "type": "string",
+                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry": {
@@ -591,6 +1369,141 @@
             "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
             "x-yang-type": "snmp-framework:SnmpAdminString"
           },
+          "cCallHistoryEntry": {
+            "type": "array",
+            "description": "The information regarding a single Connection.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cCallHistoryIndex": {
+                  "type": "integer",
+                  "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cCallHistorySetupTime": {
+                  "type": "string",
+                  "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                  "x-yang-type": "yang:timestamp"
+                },
+                "cCallHistoryPeerAddress": {
+                  "type": "string",
+                  "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "cCallHistoryPeerSubAddress": {
+                  "type": "string",
+                  "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "cCallHistoryPeerId": {
+                  "type": "integer",
+                  "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cCallHistoryPeerIfIndex": {
+                  "type": "integer",
+                  "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "cCallHistoryLogicalIfIndex": {
+                  "type": "string",
+                  "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                  "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                },
+                "cCallHistoryDisconnectCause": {
+                  "type": "string",
+                  "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                  "format": "binary"
+                },
+                "cCallHistoryDisconnectText": {
+                  "type": "string",
+                  "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                  "x-yang-type": "snmpv2-tc:DisplayString"
+                },
+                "cCallHistoryConnectTime": {
+                  "type": "string",
+                  "description": "The value of sysUpTime when the call was connected.",
+                  "x-yang-type": "yang:timestamp"
+                },
+                "cCallHistoryDisconnectTime": {
+                  "type": "string",
+                  "description": "The value of sysUpTime when the call was disconnected.",
+                  "x-yang-type": "yang:timestamp"
+                },
+                "cCallHistoryCallOrigin": {
+                  "type": "string",
+                  "description": "The call origin."
+                },
+                "cCallHistoryChargedUnits": {
+                  "type": "string",
+                  "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                  "x-yang-type": "dial-control:AbsoluteCounter32"
+                },
+                "cCallHistoryInfoType": {
+                  "type": "string",
+                  "description": "The information type for this call."
+                },
+                "cCallHistoryTransmitPackets": {
+                  "type": "string",
+                  "description": "The number of packets which were transmitted while this\n            call was active.",
+                  "x-yang-type": "dial-control:AbsoluteCounter32"
+                },
+                "cCallHistoryTransmitBytes": {
+                  "type": "string",
+                  "description": "The number of bytes which were transmitted while this\n            call was active.",
+                  "x-yang-type": "dial-control:AbsoluteCounter32"
+                },
+                "cCallHistoryReceivePackets": {
+                  "type": "string",
+                  "description": "The number of packets which were received while this\n            call was active.",
+                  "x-yang-type": "dial-control:AbsoluteCounter32"
+                },
+                "cCallHistoryReceiveBytes": {
+                  "type": "string",
+                  "description": "The number of bytes which were received while this\n            call was active.",
+                  "x-yang-type": "dial-control:AbsoluteCounter32"
+                },
+                "cCallHistoryReleaseSource": {
+                  "type": "string",
+                  "description": "Originator of the call release."
+                },
+                "cCallHistoryReleaseSrc": {
+                  "type": "string",
+                  "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                }
+              }
+            }
+          },
+          "cCallHistoryIecEntry": {
+            "type": "array",
+            "description": "The IEC information regarding a single call.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cCallHistoryIndex": {
+                  "type": "string",
+                  "description": "cCallHistoryIndex",
+                  "x-yang-type": "leafref"
+                },
+                "cCallHistoryIecIndex": {
+                  "type": "integer",
+                  "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "cCallHistoryIec": {
+                  "type": "string",
+                  "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                }
+              }
+            }
+          },
           "cPeerGlobalConfiguration": {
             "type": "object",
             "description": "cPeerGlobalConfiguration",
@@ -703,6 +1616,115 @@
               "cCallHistoryReleaseSrc": {
                 "type": "string",
                 "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+              },
+              "cCallHistoryEntry": {
+                "type": "array",
+                "description": "The information regarding a single Connection.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "integer",
+                      "description": "A monotonically increasing integer for the sole purpose of\n            indexing call disconnection events.  When it reaches the \n            maximum value, an extremely unlikely event, the agent wraps \n            the value back to 1 and may flush existing entries.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistorySetupTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call setup was started.\n            This will be useful for an NMS to sort the call history\n            entry with call setup time. Also, this object\n            can be useful in finding large delays between the time the\n            call was started and the time the call was connected.\n            For ISDN media, this will be the time when the setup\n            message was received from or sent to the network.\n            The value of this object is the same as callActiveSetupTime\n            in the callActiveTable",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryPeerAddress": {
+                      "type": "string",
+                      "description": "The number this call was connected to. If the number is\n            not available, then it will have a length of zero.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerSubAddress": {
+                      "type": "string",
+                      "description": "The subaddress this call was connected to. If the subaddress\n            is undefined or not available, this will be a zero length\n            string.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryPeerId": {
+                      "type": "integer",
+                      "description": "This is the Id value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryPeerIfIndex": {
+                      "type": "integer",
+                      "description": "This is the ifIndex value of the peer table entry\n            to which this call was made. If a peer table entry\n            for this call does not exist, the value of this object\n            will be zero.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "cCallHistoryLogicalIfIndex": {
+                      "type": "string",
+                      "description": "This is the ifIndex value of the logical interface through\n            which this call was made. For ISDN media, this would be\n            the ifIndex of the B channel which was used for this call.\n            If the ifIndex value is unknown, the value of this object \n            will be zero. For an IP call, the value will be zero.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "cCallHistoryDisconnectCause": {
+                      "type": "string",
+                      "description": "The encoded network cause value associated with this call.\n            \n            The value of this object will depend on the interface type\n            as well as on the protocol and protocol version being\n            used on this interface. Some references for possible cause\n            values are given below.",
+                      "format": "binary"
+                    },
+                    "cCallHistoryDisconnectText": {
+                      "type": "string",
+                      "description": "ASCII text describing the reason for call termination.\n            \n            This object exists because it would be impossible for\n            a management station to store all possible cause values\n            for all types of interfaces. It should be used only if\n            a management station is unable to decode the value of\n            dialCtlPeerStatsLastDisconnectCause.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "cCallHistoryConnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was connected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryDisconnectTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime when the call was disconnected.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cCallHistoryCallOrigin": {
+                      "type": "string",
+                      "description": "The call origin."
+                    },
+                    "cCallHistoryChargedUnits": {
+                      "type": "string",
+                      "description": "The number of charged units for this connection.\n            For incoming calls or if charging information is\n            not supplied by the switch, the value of this object\n            will be zero.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryInfoType": {
+                      "type": "string",
+                      "description": "The information type for this call."
+                    },
+                    "cCallHistoryTransmitPackets": {
+                      "type": "string",
+                      "description": "The number of packets which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryTransmitBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were transmitted while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceivePackets": {
+                      "type": "string",
+                      "description": "The number of packets which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReceiveBytes": {
+                      "type": "string",
+                      "description": "The number of bytes which were received while this\n            call was active.",
+                      "x-yang-type": "dial-control:AbsoluteCounter32"
+                    },
+                    "cCallHistoryReleaseSource": {
+                      "type": "string",
+                      "description": "Originator of the call release."
+                    },
+                    "cCallHistoryReleaseSrc": {
+                      "type": "string",
+                      "description": "Originator of the call release. Indicates the source of \n            the call release as follows : \n            1) callingPartyInPstn : Calling party in PSTN.\n            2) callingPartyInVoip : Calling party in VoIP.\n            3) calledPartyInPstn : Called party in PSTN.\n            4) calledPartyInVoip : Called party in VoIP.\n            5) internalReleaseInPotsLeg : Due to an internal error \n               in Telephony call leg.\n            6) internalReleaseInVoipLeg : Due to an internal error\n               in VoIP call leg.\n            7) internalCallControlApp : Due to an internal error\n               in Session Application or Tcl or VXML script originated\n               release. \n            8) internalReleaseInVoipAAA : Due to an internal error\n               in VoIP AAA module.\n            9) consoleCommand : Due to CLI or MML.\n            10) externalRadiusServer : Call failed during authorization\n                , authentication or due to receipt of POD from the \n                RADIUS server.\n            11) externalNmsApp : Due to SNMP request to clear \n                the call.\n            12) externalCallControlAgent : External Call Control Agent\n                initiated clear.\n            13) gatekeeper : Gatekeeper initiated clear due to receipt\n                of Admission Reject, Disengage Request message.\n            14) externalGKTMPServer : External GKTMP server initiated\n                clear due to receipt of Admission Reject message from\n                the gatekeeper, triggered by RESPONSE.ARJ message from\n                the GKTMP server."
+                    }
+                  }
+                }
               }
             }
           },
@@ -725,6 +1747,32 @@
                 "type": "string",
                 "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
                 "x-yang-type": "snmp-framework:SnmpAdminString"
+              },
+              "cCallHistoryIecEntry": {
+                "type": "array",
+                "description": "The IEC information regarding a single call.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "string",
+                      "description": "cCallHistoryIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cCallHistoryIecIndex": {
+                      "type": "integer",
+                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistoryIec": {
+                      "type": "string",
+                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    }
+                  }
+                }
               }
             }
           }

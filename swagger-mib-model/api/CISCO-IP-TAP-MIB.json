@@ -29,7 +29,14 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamEncodePacket"
+                  "type": "object",
+                  "description": "citapStreamEncodePacket",
+                  "properties": {
+                    "citapStreamCapabilities": {
+                      "type": "string",
+                      "description": "This object displays what types of intercept streams can be\n          configured on this type of device. This may be dependent on\n          hardware capabilities, software capabilities. The following\n          fields may be supported:\n              tapEnable:   set if table entries with\n                           cTap2StreamInterceptEnable set to 'false'\n                           are used to pre-screen packets for intercept;\n                           otherwise these entries are ignored.\n              interface:   SNMP ifIndex Value may be used to select\n                           interception of all data crossing an\n                           interface or set of interfaces.\n              ipV4:        IPv4 Address or prefix may be used to select\n                           traffic to be intercepted.\n              ipV6:        IPv6 Address or prefix may be used to select\n                           traffic to be intercepted.\n              l4Port:      TCP/UDP Ports may be used to select traffic\n                           to be intercepted.\n              dscp:        DSCP (Differentiated Services Code Point) may\n                           be used to select traffic to be intercepted.\n              voip:        packets belonging to a voice session may\n                           be intercepted using source IPv4 address and\n                           source UDP port."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IP-TAP-MIB:citapStreamEncodePacket": {
@@ -55,7 +62,210 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamTable"
+                  "type": "object",
+                  "description": "citapStreamTable",
+                  "properties": {
+                    "cTap2MediationContentId": {
+                      "type": "string",
+                      "description": "cTap2MediationContentId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cTap2StreamIndex": {
+                      "type": "string",
+                      "description": "cTap2StreamIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "citapStreamInterface": {
+                      "type": "integer",
+                      "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamAddrType": {
+                      "type": "string",
+                      "description": "The type of address, used in packet selection.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "citapStreamDestinationAddress": {
+                      "type": "string",
+                      "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamDestinationLength": {
+                      "type": "string",
+                      "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamSourceAddress": {
+                      "type": "string",
+                      "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamSourceLength": {
+                      "type": "string",
+                      "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamTosByte": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamTosByteMask": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamFlowId": {
+                      "type": "integer",
+                      "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamProtocol": {
+                      "type": "integer",
+                      "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamDestL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamDestL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamVRF": {
+                      "type": "string",
+                      "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "citapStreamStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "citapStreamEntry": {
+                      "type": "array",
+                      "description": "A stream entry indicates a single data stream to be\n          intercepted to a Mediation Device. Many selected data\n          streams may go to the same application interface, and many\n          application interfaces are supported.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cTap2MediationContentId": {
+                            "type": "string",
+                            "description": "cTap2MediationContentId",
+                            "x-yang-type": "leafref"
+                          },
+                          "cTap2StreamIndex": {
+                            "type": "string",
+                            "description": "cTap2StreamIndex",
+                            "x-yang-type": "leafref"
+                          },
+                          "citapStreamInterface": {
+                            "type": "integer",
+                            "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "citapStreamAddrType": {
+                            "type": "string",
+                            "description": "The type of address, used in packet selection.",
+                            "x-yang-type": "inet-address:InetAddressType"
+                          },
+                          "citapStreamDestinationAddress": {
+                            "type": "string",
+                            "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                            "x-yang-type": "inet-address:InetAddress"
+                          },
+                          "citapStreamDestinationLength": {
+                            "type": "string",
+                            "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                            "x-yang-type": "inet-address:InetAddressPrefixLength"
+                          },
+                          "citapStreamSourceAddress": {
+                            "type": "string",
+                            "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                            "x-yang-type": "inet-address:InetAddress"
+                          },
+                          "citapStreamSourceLength": {
+                            "type": "string",
+                            "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                            "x-yang-type": "inet-address:InetAddressPrefixLength"
+                          },
+                          "citapStreamTosByte": {
+                            "type": "integer",
+                            "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "citapStreamTosByteMask": {
+                            "type": "integer",
+                            "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "citapStreamFlowId": {
+                            "type": "integer",
+                            "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "citapStreamProtocol": {
+                            "type": "integer",
+                            "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "citapStreamDestL4PortMin": {
+                            "type": "string",
+                            "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                            "format": "inet:port-number"
+                          },
+                          "citapStreamDestL4PortMax": {
+                            "type": "string",
+                            "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                            "format": "inet:port-number"
+                          },
+                          "citapStreamSourceL4PortMin": {
+                            "type": "string",
+                            "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                            "format": "inet:port-number"
+                          },
+                          "citapStreamSourceL4PortMax": {
+                            "type": "string",
+                            "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                            "format": "inet:port-number"
+                          },
+                          "citapStreamVRF": {
+                            "type": "string",
+                            "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "citapStreamStatus": {
+                            "type": "string",
+                            "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IP-TAP-MIB:citapStreamTable": {
@@ -76,7 +286,29 @@
                     "citapStreamSourceL4PortMin": "example-string",
                     "citapStreamSourceL4PortMax": "example-string",
                     "citapStreamVRF": "example-string",
-                    "citapStreamStatus": "up(1)"
+                    "citapStreamStatus": "up(1)",
+                    "citapStreamEntry": [
+                      {
+                        "cTap2MediationContentId": "example-string",
+                        "cTap2StreamIndex": "example-string",
+                        "citapStreamInterface": -2147483648,
+                        "citapStreamAddrType": "192.168.1.1",
+                        "citapStreamDestinationAddress": "192.168.1.1",
+                        "citapStreamDestinationLength": "example-string",
+                        "citapStreamSourceAddress": "192.168.1.1",
+                        "citapStreamSourceLength": "example-string",
+                        "citapStreamTosByte": -2147483648,
+                        "citapStreamTosByteMask": -2147483648,
+                        "citapStreamFlowId": -2147483648,
+                        "citapStreamProtocol": -2147483648,
+                        "citapStreamDestL4PortMin": "example-string",
+                        "citapStreamDestL4PortMax": "example-string",
+                        "citapStreamSourceL4PortMin": "example-string",
+                        "citapStreamSourceL4PortMax": "example-string",
+                        "citapStreamVRF": "example-string",
+                        "citapStreamStatus": "up(1)"
+                      }
+                    ]
                   }
                 }
               }
@@ -99,8 +331,107 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A stream entry indicates a single data stream to be\n          intercepted to a Mediation Device. Many selected data\n          streams may go to the same application interface, and many\n          application interfaces are supported.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamEntry"
+                    "type": "object",
+                    "properties": {
+                      "cTap2MediationContentId": {
+                        "type": "string",
+                        "description": "cTap2MediationContentId",
+                        "x-yang-type": "leafref"
+                      },
+                      "cTap2StreamIndex": {
+                        "type": "string",
+                        "description": "cTap2StreamIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "citapStreamInterface": {
+                        "type": "integer",
+                        "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamAddrType": {
+                        "type": "string",
+                        "description": "The type of address, used in packet selection.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "citapStreamDestinationAddress": {
+                        "type": "string",
+                        "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "citapStreamDestinationLength": {
+                        "type": "string",
+                        "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddressPrefixLength"
+                      },
+                      "citapStreamSourceAddress": {
+                        "type": "string",
+                        "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "citapStreamSourceLength": {
+                        "type": "string",
+                        "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddressPrefixLength"
+                      },
+                      "citapStreamTosByte": {
+                        "type": "integer",
+                        "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamTosByteMask": {
+                        "type": "integer",
+                        "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamFlowId": {
+                        "type": "integer",
+                        "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamProtocol": {
+                        "type": "integer",
+                        "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamDestL4PortMin": {
+                        "type": "string",
+                        "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamDestL4PortMax": {
+                        "type": "string",
+                        "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamSourceL4PortMin": {
+                        "type": "string",
+                        "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamSourceL4PortMax": {
+                        "type": "string",
+                        "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamVRF": {
+                        "type": "string",
+                        "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "citapStreamStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -157,7 +488,104 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamEntry"
+                  "type": "object",
+                  "properties": {
+                    "cTap2MediationContentId": {
+                      "type": "string",
+                      "description": "cTap2MediationContentId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cTap2StreamIndex": {
+                      "type": "string",
+                      "description": "cTap2StreamIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "citapStreamInterface": {
+                      "type": "integer",
+                      "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamAddrType": {
+                      "type": "string",
+                      "description": "The type of address, used in packet selection.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "citapStreamDestinationAddress": {
+                      "type": "string",
+                      "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamDestinationLength": {
+                      "type": "string",
+                      "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamSourceAddress": {
+                      "type": "string",
+                      "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamSourceLength": {
+                      "type": "string",
+                      "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamTosByte": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamTosByteMask": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamFlowId": {
+                      "type": "integer",
+                      "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamProtocol": {
+                      "type": "integer",
+                      "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamDestL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamDestL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamVRF": {
+                      "type": "string",
+                      "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "citapStreamStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IP-TAP-MIB:citapStreamEntry": {
@@ -201,8 +629,107 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A stream entry indicates a single data stream to be\n          intercepted to a Mediation Device. Many selected data\n          streams may go to the same application interface, and many\n          application interfaces are supported.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamEntry"
+                    "type": "object",
+                    "properties": {
+                      "cTap2MediationContentId": {
+                        "type": "string",
+                        "description": "cTap2MediationContentId",
+                        "x-yang-type": "leafref"
+                      },
+                      "cTap2StreamIndex": {
+                        "type": "string",
+                        "description": "cTap2StreamIndex",
+                        "x-yang-type": "leafref"
+                      },
+                      "citapStreamInterface": {
+                        "type": "integer",
+                        "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamAddrType": {
+                        "type": "string",
+                        "description": "The type of address, used in packet selection.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "citapStreamDestinationAddress": {
+                        "type": "string",
+                        "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "citapStreamDestinationLength": {
+                        "type": "string",
+                        "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddressPrefixLength"
+                      },
+                      "citapStreamSourceAddress": {
+                        "type": "string",
+                        "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "citapStreamSourceLength": {
+                        "type": "string",
+                        "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                        "x-yang-type": "inet-address:InetAddressPrefixLength"
+                      },
+                      "citapStreamTosByte": {
+                        "type": "integer",
+                        "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamTosByteMask": {
+                        "type": "integer",
+                        "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamFlowId": {
+                        "type": "integer",
+                        "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamProtocol": {
+                        "type": "integer",
+                        "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "citapStreamDestL4PortMin": {
+                        "type": "string",
+                        "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamDestL4PortMax": {
+                        "type": "string",
+                        "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamSourceL4PortMin": {
+                        "type": "string",
+                        "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamSourceL4PortMax": {
+                        "type": "string",
+                        "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                        "format": "inet:port-number"
+                      },
+                      "citapStreamVRF": {
+                        "type": "string",
+                        "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "citapStreamStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -259,7 +786,104 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IP-TAP-MIB_citapStreamEntry"
+                  "type": "object",
+                  "properties": {
+                    "cTap2MediationContentId": {
+                      "type": "string",
+                      "description": "cTap2MediationContentId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cTap2StreamIndex": {
+                      "type": "string",
+                      "description": "cTap2StreamIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "citapStreamInterface": {
+                      "type": "integer",
+                      "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamAddrType": {
+                      "type": "string",
+                      "description": "The type of address, used in packet selection.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "citapStreamDestinationAddress": {
+                      "type": "string",
+                      "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamDestinationLength": {
+                      "type": "string",
+                      "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamSourceAddress": {
+                      "type": "string",
+                      "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamSourceLength": {
+                      "type": "string",
+                      "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamTosByte": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamTosByteMask": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamFlowId": {
+                      "type": "integer",
+                      "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamProtocol": {
+                      "type": "integer",
+                      "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamDestL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamDestL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamVRF": {
+                      "type": "string",
+                      "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "citapStreamStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IP-TAP-MIB:citapStreamEntry": {
@@ -395,6 +1019,111 @@
             "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
             "x-yang-type": "snmpv2-tc:RowStatus"
           },
+          "citapStreamEntry": {
+            "type": "array",
+            "description": "A stream entry indicates a single data stream to be\n          intercepted to a Mediation Device. Many selected data\n          streams may go to the same application interface, and many\n          application interfaces are supported.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "cTap2MediationContentId": {
+                  "type": "string",
+                  "description": "cTap2MediationContentId",
+                  "x-yang-type": "leafref"
+                },
+                "cTap2StreamIndex": {
+                  "type": "string",
+                  "description": "cTap2StreamIndex",
+                  "x-yang-type": "leafref"
+                },
+                "citapStreamInterface": {
+                  "type": "integer",
+                  "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "citapStreamAddrType": {
+                  "type": "string",
+                  "description": "The type of address, used in packet selection.",
+                  "x-yang-type": "inet-address:InetAddressType"
+                },
+                "citapStreamDestinationAddress": {
+                  "type": "string",
+                  "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                  "x-yang-type": "inet-address:InetAddress"
+                },
+                "citapStreamDestinationLength": {
+                  "type": "string",
+                  "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                  "x-yang-type": "inet-address:InetAddressPrefixLength"
+                },
+                "citapStreamSourceAddress": {
+                  "type": "string",
+                  "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                  "x-yang-type": "inet-address:InetAddress"
+                },
+                "citapStreamSourceLength": {
+                  "type": "string",
+                  "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                  "x-yang-type": "inet-address:InetAddressPrefixLength"
+                },
+                "citapStreamTosByte": {
+                  "type": "integer",
+                  "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "citapStreamTosByteMask": {
+                  "type": "integer",
+                  "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "citapStreamFlowId": {
+                  "type": "integer",
+                  "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "citapStreamProtocol": {
+                  "type": "integer",
+                  "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "citapStreamDestL4PortMin": {
+                  "type": "string",
+                  "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                  "format": "inet:port-number"
+                },
+                "citapStreamDestL4PortMax": {
+                  "type": "string",
+                  "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                  "format": "inet:port-number"
+                },
+                "citapStreamSourceL4PortMin": {
+                  "type": "string",
+                  "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                  "format": "inet:port-number"
+                },
+                "citapStreamSourceL4PortMax": {
+                  "type": "string",
+                  "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                  "format": "inet:port-number"
+                },
+                "citapStreamVRF": {
+                  "type": "string",
+                  "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "citapStreamStatus": {
+                  "type": "string",
+                  "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
           "citapStreamEncodePacket": {
             "type": "object",
             "description": "citapStreamEncodePacket",
@@ -503,6 +1232,111 @@
                 "type": "string",
                 "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "citapStreamEntry": {
+                "type": "array",
+                "description": "A stream entry indicates a single data stream to be\n          intercepted to a Mediation Device. Many selected data\n          streams may go to the same application interface, and many\n          application interfaces are supported.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "cTap2MediationContentId": {
+                      "type": "string",
+                      "description": "cTap2MediationContentId",
+                      "x-yang-type": "leafref"
+                    },
+                    "cTap2StreamIndex": {
+                      "type": "string",
+                      "description": "cTap2StreamIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "citapStreamInterface": {
+                      "type": "integer",
+                      "description": "The ifIndex value of the interface over which traffic to be\n            intercepted is received or transmitted. The interface may be\n            physical or virtual. If this is the only parameter specified,\n            and it is other than -2, -1 or 0, all traffic on the selected\n            interface will be chosen.\n            \n            \n            If the value is zero, matching traffic may be received or\n            transmitted on any interface.  Additional selection parameters\n            must be selected to limit the scope of traffic intercepted.\n            This is most useful on non-routing platforms or on intercepts\n            placed elsewhere than a subscriber interface.\n            \n            \n            If the value is -1, one or both of\n            citapStreamDestinationAddress and citapStreamSourceAddress\n            must be specified with prefix length greater than zero.\n            Matching traffic on the interface pointed to by ipRouteIfIndex\n            or ipCidrRouteIfIndex values associated with those values is\n            intercepted, whichever is specified to be more focused than a\n            default route.  If routing changes, either by operator action\n            or by routing protocol events, the interface will change with\n            it. This is primarily intended for use on subscriber interfaces\n            and other places where routing is guaranteed to be\n            symmetrical.\n            \n            \n            In both of these cases, it is possible to have the same packet\n            selected for intersection on both its ingress and egress\n            interface.  Nonetheless, only one instance of the packet is\n            sent to the Mediation Device.\n            \n            \n            If the value is -2, packets belonging to a Voice over IP (VoIP)\n            session identified by citapStreamSourceAddress, \n            citapStreamSourceLen and citapStreamSourceL4PortMin may be \n            intercepted, as a specific voice session can be identified \n            with source IP address and udp port number. Other selection \n            parameters may be not considered, even if they are set by \n            the Mediation Device.\n            \n            \n            This value must be set when creating a stream entry, either to\n            select an interface, to select all interfaces, or to select the\n            interface that routing chooses. Some platforms may not\n            implement the entire range of options.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamAddrType": {
+                      "type": "string",
+                      "description": "The type of address, used in packet selection.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "citapStreamDestinationAddress": {
+                      "type": "string",
+                      "description": "The Destination address or prefix used in packet selection.\n            This address will be of the type specified in\n            citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamDestinationLength": {
+                      "type": "string",
+                      "description": "The length of the Destination Prefix. A value of zero causes\n            all addresses to match.  This prefix length will be consistent\n            with the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamSourceAddress": {
+                      "type": "string",
+                      "description": "The Source Address used in packet selection. This address will\n            be of the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "citapStreamSourceLength": {
+                      "type": "string",
+                      "description": "The length of the Source Prefix. A value of zero causes all\n            addresses to match. This prefix length will be consistent with\n            the type specified in citapStreamAddrType.",
+                      "x-yang-type": "inet-address:InetAddressPrefixLength"
+                    },
+                    "citapStreamTosByte": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte, when masked with\n            citapStreamTosByteMask, of traffic to be intercepted.  If\n            citapStreamTosByte&(~citapStreamTosByteMask)!=0,\n            configuration is rejected.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamTosByteMask": {
+                      "type": "integer",
+                      "description": "The value of the TOS byte in an IPv4 or IPv6 header is ANDed\n            with citapStreamTosByteMask and compared with\n            citapStreamTosByte.  If the values are equal, the comparison\n            is equal. If the mask is zero and the TosByte value is zero,\n            the result is to always accept.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamFlowId": {
+                      "type": "integer",
+                      "description": "The flow identifier in an IPv6 header. -1 indicates that the\n            Flow Id is unused.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamProtocol": {
+                      "type": "integer",
+                      "description": "The IP protocol to match against the IPv4 protocol number or\n            the IPv6 Next- Header number in the packet. -1 means 'any IP\n            protocol'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "citapStreamDestL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamDestL4PortMax.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamDestL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamDestL4PortMin.\n            \n            \n            If both citapStreamDestL4PortMin and citapStreamDestL4PortMax\n            are at their default values, the port number is effectively\n            unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMin": {
+                      "type": "string",
+                      "description": "The minimum value that the layer-4 destination port number in\n            the packet must have in order to match.  This value must be\n            equal to or less than the value specified for this entry in\n            citapStreamSourceL4PortMax.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamSourceL4PortMax": {
+                      "type": "string",
+                      "description": "The maximum value that the layer-4 destination port number in\n            the packet must have in order to match this classifier entry.\n            This value must be equal to or greater than the value specified\n            for this entry in citapStreamSourceL4PortMin.\n            \n            \n            If both citapStreamSourceL4PortMin and\n            citapStreamSourceL4PortMax are at their default values, the\n            port number is effectively unused.",
+                      "format": "inet:port-number"
+                    },
+                    "citapStreamVRF": {
+                      "type": "string",
+                      "description": "An ASCII string, which is the name of a Virtual Routing\n            and Forwarding (VRF) table comprising the routing context\n            of a Virtual Private Network. The interface or set of \n            interfaces on which the packet might be found should be \n            selected from the set of interfaces in the VRF table. \n            A string length of zero implies that global routing table\n            be used for selection of interfaces on which the packet\n            might be found.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "citapStreamStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row. This object manages\n            creation, modification, and deletion of rows in this table.\n            When any rows must be changed, citapStreamStatus must be first \n            set to 'notInService'.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           }

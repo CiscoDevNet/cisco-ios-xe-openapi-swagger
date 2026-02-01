@@ -230,6 +230,24 @@ class MIBToOpenAPI:
 
             pos = leaf_end + 1 if leaf_end != -1 else pos + leaf_match.end()
 
+        # Find nested lists first (they should be properties of the container)
+        pos = 0
+        while True:
+            list_match = re.search(r'\n\s+list\s+(\S+)\s*\{', content[pos:])
+            if not list_match:
+                break
+
+            list_name = list_match.group(1)
+            list_start = pos + list_match.end() - 1
+            list_end = self.find_balanced_braces(content, list_start)
+
+            if list_end != -1:
+                list_content = content[list_start + 1:list_end]
+                # Parse as list and add to properties
+                properties_target[list_name] = self.parse_container_or_grouping(list_content, list_name, True)
+
+            pos = list_end + 1 if list_end != -1 else pos + list_match.end()
+
         # Find nested containers (limit depth)
         pos = 0
         depth_limit = 3
@@ -325,9 +343,7 @@ class MIBToOpenAPI:
                                 "description": "Success",
                                 "content": {
                                     "application/yang-data+json": {
-                                        "schema": {
-                                            "$ref": f"#/components/schemas/{module_name}_{container_name}"
-                                        },
+                                        "schema": container_schema,
                                         "example": {
                                             f"{module_name}:{container_name}": example_data
                                         }
@@ -386,12 +402,7 @@ class MIBToOpenAPI:
                                 "description": "Success",
                                 "content": {
                                     "application/yang-data+json": {
-                                        "schema": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": f"#/components/schemas/{module_name}_{list_name}"
-                                            }
-                                        },
+                                        "schema": list_schema,
                                         "example": {
                                             f"{module_name}:{list_name}": [example_item]
                                         }
@@ -408,6 +419,7 @@ class MIBToOpenAPI:
                 # Generate example from schema (reuse from above)
                 list_schema = self.parse_container_or_grouping(list_content, list_name, True)
                 example_item = self.create_example_data(list_schema.get('items', {}), list_name)
+                item_schema = list_schema.get('items', {"type": "object"})
                 
                 paths[item_path] = {
                     "get": {
@@ -428,9 +440,7 @@ class MIBToOpenAPI:
                                 "description": "Success",
                                 "content": {
                                     "application/yang-data+json": {
-                                        "schema": {
-                                            "$ref": f"#/components/schemas/{module_name}_{list_name}"
-                                        },
+                                        "schema": item_schema,
                                         "example": {
                                             f"{module_name}:{list_name}": example_item
                                         }
@@ -601,7 +611,7 @@ This YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on I
                 output_file = self.output_dir / f"{mib_file.stem}.json"
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(openapi_spec, f, indent=2)
-                print(f"  ✓ Generated: {output_file.name} ({len(openapi_spec['paths'])} paths)")
+                print(f"  + Generated: {output_file.name} ({len(openapi_spec['paths'])} paths)")
                 processed_count += 1
             else:
                 skipped_count += 1
@@ -633,6 +643,12 @@ This YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on I
 
 def main():
     """Main entry point"""
+    import sys
+    if sys.platform == 'win32':
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    
     script_dir = Path(__file__).parent
     yang_dir = script_dir.parent / 'references' / '17181-YANG-modules' / 'MIBS'
     output_dir = script_dir.parent / 'swagger-mib-model' / 'api'
@@ -640,7 +656,7 @@ def main():
     converter = MIBToOpenAPI(str(yang_dir), str(output_dir))
     modules = converter.process_all_mibs()
 
-    print(f"\n✓ Successfully generated {len(modules)} MIB OpenAPI specifications")
+    print(f"\n+ Successfully generated {len(modules)} MIB OpenAPI specifications")
     print(f"  Output directory: {output_dir}")
 
 

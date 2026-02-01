@@ -29,7 +29,24 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdScalarObjects"
+                  "type": "object",
+                  "description": "The global administrative status of BFD in this router.\n          The value 'enabled' denotes that the BFD Process is \n          active on at least one interface; 'disabled' disables  \n          it on all interfaces.",
+                  "properties": {
+                    "ciscoBfdAdminStatus": {
+                      "type": "string",
+                      "description": "The global administrative status of BFD in this router.\n          The value 'enabled' denotes that the BFD Process is \n          active on at least one interface; 'disabled' disables  \n          it on all interfaces."
+                    },
+                    "ciscoBfdVersionNumber": {
+                      "type": "integer",
+                      "description": "The current version number of the BFD protocol.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessNotificationsEnable": {
+                      "type": "boolean",
+                      "description": "If this object is set to true(1), then it enables\n          the emission of ciscoBfdSessUp and ciscoBfdSessDown \n          notifications; otherwise these notifications are not \n          emitted."
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdScalarObjects": {
@@ -57,7 +74,262 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessTable"
+                  "type": "object",
+                  "description": "The BFD Session Table describes the BFD sessions.",
+                  "properties": {
+                    "ciscoBfdSessIndex": {
+                      "type": "string",
+                      "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessApplicationId": {
+                      "type": "integer",
+                      "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "integer",
+                      "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessRemoteDiscr": {
+                      "type": "integer",
+                      "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessUdpPort": {
+                      "type": "string",
+                      "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                      "format": "inet:port-number"
+                    },
+                    "ciscoBfdSessState": {
+                      "type": "string",
+                      "description": "The perceived state of the BFD session."
+                    },
+                    "ciscoBfdSessRemoteHeardFlag": {
+                      "type": "boolean",
+                      "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                    },
+                    "ciscoBfdSessDiag": {
+                      "type": "string",
+                      "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                    },
+                    "ciscoBfdSessOperMode": {
+                      "type": "string",
+                      "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                    },
+                    "ciscoBfdSessDemandModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                    },
+                    "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                    },
+                    "ciscoBfdSessControlPlanIndepFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "ciscoBfdSessDesiredMinTxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinEchoRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessDetectMult": {
+                      "type": "integer",
+                      "description": "This object specifies the Detect time multiplier.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessStorType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "ciscoBfdSessRowStatus": {
+                      "type": "string",
+                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "ciscoBfdSessAuthPresFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                    },
+                    "ciscoBfdSessAuthenticationType": {
+                      "type": "string",
+                      "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                    },
+                    "ciscoBfdSessVersionNumber": {
+                      "type": "integer",
+                      "description": "The version number of the BFD protocol that this session is\n            running in.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessType": {
+                      "type": "string",
+                      "description": "The type of this BFD session."
+                    },
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                      "x-yang-type": "if-mib:InterfaceIndex"
+                    },
+                    "ciscoBfdSessEntry": {
+                      "type": "array",
+                      "description": "The BFD Session Entry describes BFD session.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ciscoBfdSessIndex": {
+                            "type": "string",
+                            "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                          },
+                          "ciscoBfdSessApplicationId": {
+                            "type": "integer",
+                            "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ciscoBfdSessDiscriminator": {
+                            "type": "integer",
+                            "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ciscoBfdSessRemoteDiscr": {
+                            "type": "integer",
+                            "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ciscoBfdSessUdpPort": {
+                            "type": "string",
+                            "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                            "format": "inet:port-number"
+                          },
+                          "ciscoBfdSessState": {
+                            "type": "string",
+                            "description": "The perceived state of the BFD session."
+                          },
+                          "ciscoBfdSessRemoteHeardFlag": {
+                            "type": "boolean",
+                            "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                          },
+                          "ciscoBfdSessDiag": {
+                            "type": "string",
+                            "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                          },
+                          "ciscoBfdSessOperMode": {
+                            "type": "string",
+                            "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                          },
+                          "ciscoBfdSessDemandModeDesiredFlag": {
+                            "type": "boolean",
+                            "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                          },
+                          "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                            "type": "boolean",
+                            "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                          },
+                          "ciscoBfdSessControlPlanIndepFlag": {
+                            "type": "boolean",
+                            "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                          },
+                          "ciscoBfdSessAddrType": {
+                            "type": "string",
+                            "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                            "x-yang-type": "inet-address:InetAddressType"
+                          },
+                          "ciscoBfdSessAddr": {
+                            "type": "string",
+                            "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                            "x-yang-type": "inet-address:InetAddress"
+                          },
+                          "ciscoBfdSessDesiredMinTxInterval": {
+                            "type": "string",
+                            "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                          },
+                          "ciscoBfdSessReqMinRxInterval": {
+                            "type": "string",
+                            "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                          },
+                          "ciscoBfdSessReqMinEchoRxInterval": {
+                            "type": "string",
+                            "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                          },
+                          "ciscoBfdSessDetectMult": {
+                            "type": "integer",
+                            "description": "This object specifies the Detect time multiplier.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ciscoBfdSessStorType": {
+                            "type": "string",
+                            "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          },
+                          "ciscoBfdSessRowStatus": {
+                            "type": "string",
+                            "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "ciscoBfdSessAuthPresFlag": {
+                            "type": "boolean",
+                            "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                          },
+                          "ciscoBfdSessAuthenticationType": {
+                            "type": "string",
+                            "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                          },
+                          "ciscoBfdSessVersionNumber": {
+                            "type": "integer",
+                            "description": "The version number of the BFD protocol that this session is\n            running in.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "ciscoBfdSessType": {
+                            "type": "string",
+                            "description": "The type of this BFD session."
+                          },
+                          "ciscoBfdSessInterface": {
+                            "type": "string",
+                            "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                            "x-yang-type": "if-mib:InterfaceIndex"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessTable": {
@@ -85,7 +357,36 @@
                     "ciscoBfdSessAuthenticationType": "ethernetCsmacd(6)",
                     "ciscoBfdSessVersionNumber": 0,
                     "ciscoBfdSessType": "ethernetCsmacd(6)",
-                    "ciscoBfdSessInterface": "GigabitEthernet1/0/1"
+                    "ciscoBfdSessInterface": "GigabitEthernet1/0/1",
+                    "ciscoBfdSessEntry": [
+                      {
+                        "ciscoBfdSessIndex": "example-string",
+                        "ciscoBfdSessApplicationId": 0,
+                        "ciscoBfdSessDiscriminator": 0,
+                        "ciscoBfdSessRemoteDiscr": 0,
+                        "ciscoBfdSessUdpPort": "example-string",
+                        "ciscoBfdSessState": "up(1)",
+                        "ciscoBfdSessRemoteHeardFlag": true,
+                        "ciscoBfdSessDiag": "example-string",
+                        "ciscoBfdSessOperMode": "example-string",
+                        "ciscoBfdSessDemandModeDesiredFlag": true,
+                        "ciscoBfdSessEchoFuncModeDesiredFlag": true,
+                        "ciscoBfdSessControlPlanIndepFlag": true,
+                        "ciscoBfdSessAddrType": "192.168.1.1",
+                        "ciscoBfdSessAddr": "192.168.1.1",
+                        "ciscoBfdSessDesiredMinTxInterval": "example-string",
+                        "ciscoBfdSessReqMinRxInterval": "example-string",
+                        "ciscoBfdSessReqMinEchoRxInterval": "example-string",
+                        "ciscoBfdSessDetectMult": 0,
+                        "ciscoBfdSessStorType": "ethernetCsmacd(6)",
+                        "ciscoBfdSessRowStatus": "up(1)",
+                        "ciscoBfdSessAuthPresFlag": true,
+                        "ciscoBfdSessAuthenticationType": "ethernetCsmacd(6)",
+                        "ciscoBfdSessVersionNumber": 0,
+                        "ciscoBfdSessType": "ethernetCsmacd(6)",
+                        "ciscoBfdSessInterface": "GigabitEthernet1/0/1"
+                      }
+                    ]
                   }
                 }
               }
@@ -108,8 +409,133 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The BFD Session Entry describes BFD session.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessIndex": {
+                        "type": "string",
+                        "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      },
+                      "ciscoBfdSessApplicationId": {
+                        "type": "integer",
+                        "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "integer",
+                        "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessRemoteDiscr": {
+                        "type": "integer",
+                        "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessUdpPort": {
+                        "type": "string",
+                        "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                        "format": "inet:port-number"
+                      },
+                      "ciscoBfdSessState": {
+                        "type": "string",
+                        "description": "The perceived state of the BFD session."
+                      },
+                      "ciscoBfdSessRemoteHeardFlag": {
+                        "type": "boolean",
+                        "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                      },
+                      "ciscoBfdSessDiag": {
+                        "type": "string",
+                        "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                      },
+                      "ciscoBfdSessOperMode": {
+                        "type": "string",
+                        "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                      },
+                      "ciscoBfdSessDemandModeDesiredFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                      },
+                      "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                      },
+                      "ciscoBfdSessControlPlanIndepFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "ciscoBfdSessDesiredMinTxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessReqMinRxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessReqMinEchoRxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessDetectMult": {
+                        "type": "integer",
+                        "description": "This object specifies the Detect time multiplier.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessStorType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "ciscoBfdSessRowStatus": {
+                        "type": "string",
+                        "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "ciscoBfdSessAuthPresFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                      },
+                      "ciscoBfdSessAuthenticationType": {
+                        "type": "string",
+                        "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                      },
+                      "ciscoBfdSessVersionNumber": {
+                        "type": "integer",
+                        "description": "The version number of the BFD protocol that this session is\n            running in.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessType": {
+                        "type": "string",
+                        "description": "The type of this BFD session."
+                      },
+                      "ciscoBfdSessInterface": {
+                        "type": "string",
+                        "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                        "x-yang-type": "if-mib:InterfaceIndex"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -173,7 +599,130 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessIndex": {
+                      "type": "string",
+                      "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessApplicationId": {
+                      "type": "integer",
+                      "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "integer",
+                      "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessRemoteDiscr": {
+                      "type": "integer",
+                      "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessUdpPort": {
+                      "type": "string",
+                      "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                      "format": "inet:port-number"
+                    },
+                    "ciscoBfdSessState": {
+                      "type": "string",
+                      "description": "The perceived state of the BFD session."
+                    },
+                    "ciscoBfdSessRemoteHeardFlag": {
+                      "type": "boolean",
+                      "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                    },
+                    "ciscoBfdSessDiag": {
+                      "type": "string",
+                      "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                    },
+                    "ciscoBfdSessOperMode": {
+                      "type": "string",
+                      "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                    },
+                    "ciscoBfdSessDemandModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                    },
+                    "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                    },
+                    "ciscoBfdSessControlPlanIndepFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "ciscoBfdSessDesiredMinTxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinEchoRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessDetectMult": {
+                      "type": "integer",
+                      "description": "This object specifies the Detect time multiplier.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessStorType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "ciscoBfdSessRowStatus": {
+                      "type": "string",
+                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "ciscoBfdSessAuthPresFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                    },
+                    "ciscoBfdSessAuthenticationType": {
+                      "type": "string",
+                      "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                    },
+                    "ciscoBfdSessVersionNumber": {
+                      "type": "integer",
+                      "description": "The version number of the BFD protocol that this session is\n            running in.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessType": {
+                      "type": "string",
+                      "description": "The type of this BFD session."
+                    },
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                      "x-yang-type": "if-mib:InterfaceIndex"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessEntry": {
@@ -223,7 +772,70 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessMapTable"
+                  "type": "object",
+                  "description": "The BFD Session Mapping Table maps the complex\n        indexing of the BFD sessions to the flat \n        CiscoBfdSessIndexTC used in the ciscoBfdSessTable.",
+                  "properties": {
+                    "ciscoBfdSessApplicationId": {
+                      "type": "string",
+                      "description": "ciscoBfdSessApplicationId",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessMapBfdIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessMapEntry": {
+                      "type": "array",
+                      "description": "The BFD Session Entry describes BFD session\n          that is mapped to this index.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ciscoBfdSessApplicationId": {
+                            "type": "string",
+                            "description": "ciscoBfdSessApplicationId",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessDiscriminator": {
+                            "type": "string",
+                            "description": "ciscoBfdSessDiscriminator",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessAddrType": {
+                            "type": "string",
+                            "description": "ciscoBfdSessAddrType",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessAddr": {
+                            "type": "string",
+                            "description": "ciscoBfdSessAddr",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessMapBfdIndex": {
+                            "type": "string",
+                            "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessMapTable": {
@@ -231,7 +843,16 @@
                     "ciscoBfdSessDiscriminator": "example-string",
                     "ciscoBfdSessAddrType": "192.168.1.1",
                     "ciscoBfdSessAddr": "192.168.1.1",
-                    "ciscoBfdSessMapBfdIndex": "example-string"
+                    "ciscoBfdSessMapBfdIndex": "example-string",
+                    "ciscoBfdSessMapEntry": [
+                      {
+                        "ciscoBfdSessApplicationId": "example-string",
+                        "ciscoBfdSessDiscriminator": "example-string",
+                        "ciscoBfdSessAddrType": "192.168.1.1",
+                        "ciscoBfdSessAddr": "192.168.1.1",
+                        "ciscoBfdSessMapBfdIndex": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -254,8 +875,37 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The BFD Session Entry describes BFD session\n          that is mapped to this index.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessApplicationId": {
+                        "type": "string",
+                        "description": "ciscoBfdSessApplicationId",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "string",
+                        "description": "ciscoBfdSessDiscriminator",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddrType",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddr",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessMapBfdIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -299,7 +949,34 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessApplicationId": {
+                      "type": "string",
+                      "description": "ciscoBfdSessApplicationId",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessMapBfdIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessMapEntry": {
@@ -329,12 +1006,51 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessDiscMapTable"
+                  "type": "object",
+                  "description": "The BFD Session Discriminator Mapping Table maps a\n        local discriminator value to associated BFD sessions'\n        CiscoBfdSessIndexTC used in the ciscoBfdSessTable.",
+                  "properties": {
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessDiscMapEntry": {
+                      "type": "array",
+                      "description": "Each row contains a mapping between a local discriminator\n          value to an entry in ciscoBfdSessTable.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ciscoBfdSessDiscriminator": {
+                            "type": "string",
+                            "description": "ciscoBfdSessDiscriminator",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessDiscMapIndex": {
+                            "type": "string",
+                            "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessDiscMapTable": {
                     "ciscoBfdSessDiscriminator": "example-string",
-                    "ciscoBfdSessDiscMapIndex": "example-string"
+                    "ciscoBfdSessDiscMapIndex": "example-string",
+                    "ciscoBfdSessDiscMapEntry": [
+                      {
+                        "ciscoBfdSessDiscriminator": "example-string",
+                        "ciscoBfdSessDiscMapIndex": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -357,8 +1073,22 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each row contains a mapping between a local discriminator\n          value to an entry in ciscoBfdSessTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessDiscMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "string",
+                        "description": "ciscoBfdSessDiscriminator",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessDiscMapIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -399,7 +1129,19 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessDiscMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessDiscMapEntry": {
@@ -426,14 +1168,75 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessIpMapTable"
+                  "type": "object",
+                  "description": "The BFD Session IP Mapping Table maps given\n        ciscoBfdSessInterface, ciscoBfdSessAddrType, and\n        ciscoBbfdSessAddr to an associated BFD sessions'\n        CiscoBfdSessIndexTC used in the ciscoBfdSessTable.\n        This table SHOULD contains those BFD sessions are\n        of IP type: singleHop(1) and multiHop(2).",
+                  "properties": {
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "ciscoBfdSessInterface",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessIpMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessIpMapEntry": {
+                      "type": "array",
+                      "description": "Each row contains a mapping between ciscoBfdSessInterface,\n          ciscoBfdSessAddrType and ciscoBfdSessAddr values to an \n          entry in ciscoBfdSessTable.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ciscoBfdSessInterface": {
+                            "type": "string",
+                            "description": "ciscoBfdSessInterface",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessAddrType": {
+                            "type": "string",
+                            "description": "ciscoBfdSessAddrType",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessAddr": {
+                            "type": "string",
+                            "description": "ciscoBfdSessAddr",
+                            "x-yang-type": "leafref"
+                          },
+                          "ciscoBfdSessIpMapIndex": {
+                            "type": "string",
+                            "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                            "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessIpMapTable": {
                     "ciscoBfdSessInterface": "GigabitEthernet1/0/1",
                     "ciscoBfdSessAddrType": "192.168.1.1",
                     "ciscoBfdSessAddr": "192.168.1.1",
-                    "ciscoBfdSessIpMapIndex": "192.168.1.1"
+                    "ciscoBfdSessIpMapIndex": "192.168.1.1",
+                    "ciscoBfdSessIpMapEntry": [
+                      {
+                        "ciscoBfdSessInterface": "GigabitEthernet1/0/1",
+                        "ciscoBfdSessAddrType": "192.168.1.1",
+                        "ciscoBfdSessAddr": "192.168.1.1",
+                        "ciscoBfdSessIpMapIndex": "192.168.1.1"
+                      }
+                    ]
                   }
                 }
               }
@@ -456,8 +1259,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each row contains a mapping between ciscoBfdSessInterface,\n          ciscoBfdSessAddrType and ciscoBfdSessAddr values to an \n          entry in ciscoBfdSessTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessIpMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessInterface": {
+                        "type": "string",
+                        "description": "ciscoBfdSessInterface",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddrType",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddr",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessIpMapIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -500,7 +1327,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessIpMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "ciscoBfdSessInterface",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessIpMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessIpMapEntry": {
@@ -530,8 +1379,133 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The BFD Session Entry describes BFD session.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessIndex": {
+                        "type": "string",
+                        "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      },
+                      "ciscoBfdSessApplicationId": {
+                        "type": "integer",
+                        "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "integer",
+                        "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessRemoteDiscr": {
+                        "type": "integer",
+                        "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessUdpPort": {
+                        "type": "string",
+                        "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                        "format": "inet:port-number"
+                      },
+                      "ciscoBfdSessState": {
+                        "type": "string",
+                        "description": "The perceived state of the BFD session."
+                      },
+                      "ciscoBfdSessRemoteHeardFlag": {
+                        "type": "boolean",
+                        "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                      },
+                      "ciscoBfdSessDiag": {
+                        "type": "string",
+                        "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                      },
+                      "ciscoBfdSessOperMode": {
+                        "type": "string",
+                        "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                      },
+                      "ciscoBfdSessDemandModeDesiredFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                      },
+                      "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                      },
+                      "ciscoBfdSessControlPlanIndepFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                        "x-yang-type": "inet-address:InetAddressType"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                        "x-yang-type": "inet-address:InetAddress"
+                      },
+                      "ciscoBfdSessDesiredMinTxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessReqMinRxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessReqMinEchoRxInterval": {
+                        "type": "string",
+                        "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                      },
+                      "ciscoBfdSessDetectMult": {
+                        "type": "integer",
+                        "description": "This object specifies the Detect time multiplier.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessStorType": {
+                        "type": "string",
+                        "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "ciscoBfdSessRowStatus": {
+                        "type": "string",
+                        "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "ciscoBfdSessAuthPresFlag": {
+                        "type": "boolean",
+                        "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                      },
+                      "ciscoBfdSessAuthenticationType": {
+                        "type": "string",
+                        "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                      },
+                      "ciscoBfdSessVersionNumber": {
+                        "type": "integer",
+                        "description": "The version number of the BFD protocol that this session is\n            running in.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "ciscoBfdSessType": {
+                        "type": "string",
+                        "description": "The type of this BFD session."
+                      },
+                      "ciscoBfdSessInterface": {
+                        "type": "string",
+                        "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                        "x-yang-type": "if-mib:InterfaceIndex"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -595,7 +1569,130 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessIndex": {
+                      "type": "string",
+                      "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessApplicationId": {
+                      "type": "integer",
+                      "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "integer",
+                      "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessRemoteDiscr": {
+                      "type": "integer",
+                      "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessUdpPort": {
+                      "type": "string",
+                      "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                      "format": "inet:port-number"
+                    },
+                    "ciscoBfdSessState": {
+                      "type": "string",
+                      "description": "The perceived state of the BFD session."
+                    },
+                    "ciscoBfdSessRemoteHeardFlag": {
+                      "type": "boolean",
+                      "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                    },
+                    "ciscoBfdSessDiag": {
+                      "type": "string",
+                      "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                    },
+                    "ciscoBfdSessOperMode": {
+                      "type": "string",
+                      "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                    },
+                    "ciscoBfdSessDemandModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                    },
+                    "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                    },
+                    "ciscoBfdSessControlPlanIndepFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "ciscoBfdSessDesiredMinTxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinEchoRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessDetectMult": {
+                      "type": "integer",
+                      "description": "This object specifies the Detect time multiplier.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessStorType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "ciscoBfdSessRowStatus": {
+                      "type": "string",
+                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "ciscoBfdSessAuthPresFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                    },
+                    "ciscoBfdSessAuthenticationType": {
+                      "type": "string",
+                      "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                    },
+                    "ciscoBfdSessVersionNumber": {
+                      "type": "integer",
+                      "description": "The version number of the BFD protocol that this session is\n            running in.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessType": {
+                      "type": "string",
+                      "description": "The type of this BFD session."
+                    },
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                      "x-yang-type": "if-mib:InterfaceIndex"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessEntry": {
@@ -646,8 +1743,37 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The BFD Session Entry describes BFD session\n          that is mapped to this index.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessApplicationId": {
+                        "type": "string",
+                        "description": "ciscoBfdSessApplicationId",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "string",
+                        "description": "ciscoBfdSessDiscriminator",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddrType",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddr",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessMapBfdIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -691,7 +1817,34 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessApplicationId": {
+                      "type": "string",
+                      "description": "ciscoBfdSessApplicationId",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessMapBfdIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessMapEntry": {
@@ -722,8 +1875,22 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each row contains a mapping between a local discriminator\n          value to an entry in ciscoBfdSessTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessDiscMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessDiscriminator": {
+                        "type": "string",
+                        "description": "ciscoBfdSessDiscriminator",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessDiscMapIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -764,7 +1931,19 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessDiscMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessDiscMapEntry": {
@@ -792,8 +1971,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Each row contains a mapping between ciscoBfdSessInterface,\n          ciscoBfdSessAddrType and ciscoBfdSessAddr values to an \n          entry in ciscoBfdSessTable.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessIpMapEntry"
+                    "type": "object",
+                    "properties": {
+                      "ciscoBfdSessInterface": {
+                        "type": "string",
+                        "description": "ciscoBfdSessInterface",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddrType": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddrType",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessAddr": {
+                        "type": "string",
+                        "description": "ciscoBfdSessAddr",
+                        "x-yang-type": "leafref"
+                      },
+                      "ciscoBfdSessIpMapIndex": {
+                        "type": "string",
+                        "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                        "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -836,7 +2039,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CISCO-IETF-BFD-MIB_ciscoBfdSessIpMapEntry"
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "ciscoBfdSessInterface",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessIpMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
                 },
                 "example": {
                   "CISCO-IETF-BFD-MIB:ciscoBfdSessIpMapEntry": {
@@ -1007,6 +2232,222 @@
             "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
             "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
           },
+          "ciscoBfdSessEntry": {
+            "type": "array",
+            "description": "The BFD Session Entry describes BFD session.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "ciscoBfdSessIndex": {
+                  "type": "string",
+                  "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                },
+                "ciscoBfdSessApplicationId": {
+                  "type": "integer",
+                  "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ciscoBfdSessDiscriminator": {
+                  "type": "integer",
+                  "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ciscoBfdSessRemoteDiscr": {
+                  "type": "integer",
+                  "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ciscoBfdSessUdpPort": {
+                  "type": "string",
+                  "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                  "format": "inet:port-number"
+                },
+                "ciscoBfdSessState": {
+                  "type": "string",
+                  "description": "The perceived state of the BFD session."
+                },
+                "ciscoBfdSessRemoteHeardFlag": {
+                  "type": "boolean",
+                  "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                },
+                "ciscoBfdSessDiag": {
+                  "type": "string",
+                  "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                },
+                "ciscoBfdSessOperMode": {
+                  "type": "string",
+                  "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                },
+                "ciscoBfdSessDemandModeDesiredFlag": {
+                  "type": "boolean",
+                  "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                },
+                "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                  "type": "boolean",
+                  "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                },
+                "ciscoBfdSessControlPlanIndepFlag": {
+                  "type": "boolean",
+                  "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                },
+                "ciscoBfdSessAddrType": {
+                  "type": "string",
+                  "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                  "x-yang-type": "inet-address:InetAddressType"
+                },
+                "ciscoBfdSessAddr": {
+                  "type": "string",
+                  "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                  "x-yang-type": "inet-address:InetAddress"
+                },
+                "ciscoBfdSessDesiredMinTxInterval": {
+                  "type": "string",
+                  "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                },
+                "ciscoBfdSessReqMinRxInterval": {
+                  "type": "string",
+                  "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                },
+                "ciscoBfdSessReqMinEchoRxInterval": {
+                  "type": "string",
+                  "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                },
+                "ciscoBfdSessDetectMult": {
+                  "type": "integer",
+                  "description": "This object specifies the Detect time multiplier.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ciscoBfdSessStorType": {
+                  "type": "string",
+                  "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                },
+                "ciscoBfdSessRowStatus": {
+                  "type": "string",
+                  "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "ciscoBfdSessAuthPresFlag": {
+                  "type": "boolean",
+                  "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                },
+                "ciscoBfdSessAuthenticationType": {
+                  "type": "string",
+                  "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                },
+                "ciscoBfdSessVersionNumber": {
+                  "type": "integer",
+                  "description": "The version number of the BFD protocol that this session is\n            running in.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "ciscoBfdSessType": {
+                  "type": "string",
+                  "description": "The type of this BFD session."
+                },
+                "ciscoBfdSessInterface": {
+                  "type": "string",
+                  "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                  "x-yang-type": "if-mib:InterfaceIndex"
+                }
+              }
+            }
+          },
+          "ciscoBfdSessMapEntry": {
+            "type": "array",
+            "description": "The BFD Session Entry describes BFD session\n          that is mapped to this index.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "ciscoBfdSessApplicationId": {
+                  "type": "string",
+                  "description": "ciscoBfdSessApplicationId",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessDiscriminator": {
+                  "type": "string",
+                  "description": "ciscoBfdSessDiscriminator",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessAddrType": {
+                  "type": "string",
+                  "description": "ciscoBfdSessAddrType",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessAddr": {
+                  "type": "string",
+                  "description": "ciscoBfdSessAddr",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessMapBfdIndex": {
+                  "type": "string",
+                  "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                }
+              }
+            }
+          },
+          "ciscoBfdSessDiscMapEntry": {
+            "type": "array",
+            "description": "Each row contains a mapping between a local discriminator\n          value to an entry in ciscoBfdSessTable.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "ciscoBfdSessDiscriminator": {
+                  "type": "string",
+                  "description": "ciscoBfdSessDiscriminator",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessDiscMapIndex": {
+                  "type": "string",
+                  "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                }
+              }
+            }
+          },
+          "ciscoBfdSessIpMapEntry": {
+            "type": "array",
+            "description": "Each row contains a mapping between ciscoBfdSessInterface,\n          ciscoBfdSessAddrType and ciscoBfdSessAddr values to an \n          entry in ciscoBfdSessTable.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "ciscoBfdSessInterface": {
+                  "type": "string",
+                  "description": "ciscoBfdSessInterface",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessAddrType": {
+                  "type": "string",
+                  "description": "ciscoBfdSessAddrType",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessAddr": {
+                  "type": "string",
+                  "description": "ciscoBfdSessAddr",
+                  "x-yang-type": "leafref"
+                },
+                "ciscoBfdSessIpMapIndex": {
+                  "type": "string",
+                  "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                  "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                }
+              }
+            }
+          },
           "ciscoBfdScalarObjects": {
             "type": "object",
             "description": "The global administrative status of BFD in this router.\n          The value 'enabled' denotes that the BFD Process is \n          active on at least one interface; 'disabled' disables  \n          it on all interfaces.",
@@ -1151,6 +2592,137 @@
                 "type": "string",
                 "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
                 "x-yang-type": "if-mib:InterfaceIndex"
+              },
+              "ciscoBfdSessEntry": {
+                "type": "array",
+                "description": "The BFD Session Entry describes BFD session.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessIndex": {
+                      "type": "string",
+                      "description": "This object contains an index used to represent a\n            unique BFD session on this device.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    },
+                    "ciscoBfdSessApplicationId": {
+                      "type": "integer",
+                      "description": "This object contains an index used to indicate\n            a local application which owns or maintains this \n            BFD session. For instance, the MPLS VPN process may \n            maintain a subset of the total number of BFD \n            sessions.  This application ID provides a convenient \n            way to segregate sessions by the applications which \n            maintain them.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "integer",
+                      "description": "This object specifies the local discriminator for this BFD\n            session, used to uniquely identify it.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessRemoteDiscr": {
+                      "type": "integer",
+                      "description": "This object specifies the session discriminator chosen\n            by the remote system for this BFD session.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessUdpPort": {
+                      "type": "string",
+                      "description": "The destination UDP Port for BFD. The default value is\n            the well-known value for this port. BFD State failing(5)\n            is only applicable if this BFD session is running\n            version 0",
+                      "format": "inet:port-number"
+                    },
+                    "ciscoBfdSessState": {
+                      "type": "string",
+                      "description": "The perceived state of the BFD session."
+                    },
+                    "ciscoBfdSessRemoteHeardFlag": {
+                      "type": "boolean",
+                      "description": "This object specifies status of BFD packet reception from\n            the remote system. Specifically, it is set to true(1) if \n            the local system is actively receiving BFD packets from the  \n            remote system, and is set to false(0) if the local system  \n            has not received BFD packets recently (within the detection  \n            time) or if the local system is attempting to tear down \n            the BFD session."
+                    },
+                    "ciscoBfdSessDiag": {
+                      "type": "string",
+                      "description": "A diagnostic code specifying the local system's reason\n            for the last transition of the session from up(1)  \n            to some other state.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdDiag"
+                    },
+                    "ciscoBfdSessOperMode": {
+                      "type": "string",
+                      "description": "This object specifies current operating mode that BFD\n            session is operating in."
+                    },
+                    "ciscoBfdSessDemandModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Demand mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Demand mode or false(0) if not"
+                    },
+                    "ciscoBfdSessEchoFuncModeDesiredFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Echo mode. Specifically, it is set  \n            to true(1) if the local system wishes to use  \n            Echo mode or false(0) if not"
+                    },
+                    "ciscoBfdSessControlPlanIndepFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            ability to continue to function through a disruption of  \n            the control plane. Specifically, it is set  \n            to true(1) if the local system BFD implementation is \n            independent of the control plane. Otherwise, the  \n            value is set to false(0)"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "This object specifies IP address type of the neighboring IP\n            address which is being monitored with this BFD session.\n            \n            Only values unknown(0), ipv4(1) or ipv6(2) \n            have to be supported.  \n            \n            A value of unknown(0) is allowed only when  \n            the outgoing interface is of type point-to-point, or \n            when the BFD session is not associated with a specific  \n            interface. \n            \n            If any other unsupported values are attempted in a set \n            operation, the agent MUST return an inconsistentValue  \n            error.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "This object specifies the neighboring IP address which is\n            being monitored with this BFD session.\n            It can also be used to enabled BFD on a specific  \n            interface. The value is set to zero when BFD session is not  \n            associated with a specific interface.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "ciscoBfdSessDesiredMinTxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, that the local system would like to use when \n                 transmitting BFD Control packets.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received  BFD Control packets the  \n            local system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessReqMinEchoRxInterval": {
+                      "type": "string",
+                      "description": "This object specifies the minimum interval, in\n            microseconds, between received BFD Echo packets that this \n            system is capable of supporting.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdInterval"
+                    },
+                    "ciscoBfdSessDetectMult": {
+                      "type": "integer",
+                      "description": "This object specifies the Detect time multiplier.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessStorType": {
+                      "type": "string",
+                      "description": "This variable indicates the storage type for this\n            object. Conceptual rows having the value  \n            'permanent' need not allow write-access to any  \n            columnar objects in the row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "ciscoBfdSessRowStatus": {
+                      "type": "string",
+                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table. When a row in this \n            table has a row in the active(1) state, no  \n            objects in this row can be modified except the \n            ciscoBfdSessRowStatus and ciscoBfdSessStorageType.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "ciscoBfdSessAuthPresFlag": {
+                      "type": "boolean",
+                      "description": "This object indicates that the local system's\n            desire to use Authentication. Specifically, it is set  \n            to true(1) if the local system wishes the session  \n            to be authenticated or false(0) if not"
+                    },
+                    "ciscoBfdSessAuthenticationType": {
+                      "type": "string",
+                      "description": "The Authentication Type used for this BFD session. This\n            field is valid only when the Authentication Present bit is set"
+                    },
+                    "ciscoBfdSessVersionNumber": {
+                      "type": "integer",
+                      "description": "The version number of the BFD protocol that this session is\n            running in.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoBfdSessType": {
+                      "type": "string",
+                      "description": "The type of this BFD session."
+                    },
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "This object contains an interface index used to indicate\n            the interface which this BFD session is running on.",
+                      "x-yang-type": "if-mib:InterfaceIndex"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1182,6 +2754,41 @@
                 "type": "string",
                 "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
                 "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+              },
+              "ciscoBfdSessMapEntry": {
+                "type": "array",
+                "description": "The BFD Session Entry describes BFD session\n          that is mapped to this index.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessApplicationId": {
+                      "type": "string",
+                      "description": "ciscoBfdSessApplicationId",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessMapBfdIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to\n            by the indices of this row. In essence, a mapping is \n            provided between these indices and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1198,6 +2805,26 @@
                 "type": "string",
                 "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
                 "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+              },
+              "ciscoBfdSessDiscMapEntry": {
+                "type": "array",
+                "description": "Each row contains a mapping between a local discriminator\n          value to an entry in ciscoBfdSessTable.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessDiscriminator": {
+                      "type": "string",
+                      "description": "ciscoBfdSessDiscriminator",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessDiscMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the index of this row. In essence, a mapping is \n            provided between this index and the ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1224,6 +2851,36 @@
                 "type": "string",
                 "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
                 "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+              },
+              "ciscoBfdSessIpMapEntry": {
+                "type": "array",
+                "description": "Each row contains a mapping between ciscoBfdSessInterface,\n          ciscoBfdSessAddrType and ciscoBfdSessAddr values to an \n          entry in ciscoBfdSessTable.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoBfdSessInterface": {
+                      "type": "string",
+                      "description": "ciscoBfdSessInterface",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddrType": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddrType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessAddr": {
+                      "type": "string",
+                      "description": "ciscoBfdSessAddr",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoBfdSessIpMapIndex": {
+                      "type": "string",
+                      "description": "This object indicates the CiscoBfdSessIndexTC referred to by\n            the indices of this row. In essence, a mapping is \n            provided between these indices and an entry in ciscoBfdSessTable.",
+                      "x-yang-type": "CISCO-IETF-BFD-MIB:CiscoBfdSessIndexTC"
+                    }
+                  }
+                }
               }
             }
           }

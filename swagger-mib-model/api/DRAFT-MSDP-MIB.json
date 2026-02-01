@@ -29,7 +29,31 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdp"
+                  "type": "object",
+                  "description": "The state of MSDP on this MSDP speaker - globally\n          enabled or disabled.",
+                  "properties": {
+                    "msdpEnabled": {
+                      "type": "boolean",
+                      "description": "The state of MSDP on this MSDP speaker - globally\n          enabled or disabled."
+                    },
+                    "msdpCacheLifetime": {
+                      "type": "string",
+                      "description": "The lifetime given to SA cache entries when created\n          or refreshed.  A value of 0 means no SA caching is\n          done by this MSDP speaker.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpNumSACacheEntries": {
+                      "type": "integer",
+                      "description": "The total number of entries in the SA Cache table.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSAHoldDownPeriod": {
+                      "type": "integer",
+                      "description": "The number of seconds in the MSDP SA Hold-down\n          period",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdp": {
@@ -58,14 +82,75 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpRequestsTable"
+                  "type": "object",
+                  "description": "The (conceptual) table listing group ranges and MSDP\n        peers used when deciding where to send an SA Request\n        message when required.  If SA Caching is enabled, this\n        table may be empty.",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpRequestsEntry": {
+                      "type": "array",
+                      "description": "An entry (conceptual row) representing a group range\n          used when deciding where to send an SA Request\n          message.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "msdpRequestsGroupAddress": {
+                            "type": "string",
+                            "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpRequestsGroupMask": {
+                            "type": "string",
+                            "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpRequestsPeer": {
+                            "type": "string",
+                            "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpRequestsStatus": {
+                            "type": "string",
+                            "description": "The status of this row, by which new rows may be\n            added to the table.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpRequestsTable": {
                     "msdpRequestsGroupAddress": "192.168.1.1",
                     "msdpRequestsGroupMask": "example-string",
                     "msdpRequestsPeer": "example-string",
-                    "msdpRequestsStatus": "up(1)"
+                    "msdpRequestsStatus": "up(1)",
+                    "msdpRequestsEntry": [
+                      {
+                        "msdpRequestsGroupAddress": "192.168.1.1",
+                        "msdpRequestsGroupMask": "example-string",
+                        "msdpRequestsPeer": "example-string",
+                        "msdpRequestsStatus": "up(1)"
+                      }
+                    ]
                   }
                 }
               }
@@ -88,8 +173,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing a group range\n          used when deciding where to send an SA Request\n          message.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpRequestsEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpRequestsGroupAddress": {
+                        "type": "string",
+                        "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsGroupMask": {
+                        "type": "string",
+                        "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsPeer": {
+                        "type": "string",
+                        "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsStatus": {
+                        "type": "string",
+                        "description": "The status of this row, by which new rows may be\n            added to the table.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -132,7 +241,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpRequestsEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpRequestsEntry": {
@@ -161,7 +292,380 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpPeerTable"
+                  "type": "object",
+                  "description": "The (conceptual) table listing the MSDP speaker's\n        peers.",
+                  "properties": {
+                    "msdpPeerRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote MSDP peer.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerState": {
+                      "type": "string",
+                      "description": "The state of the MSDP TCP connection with this peer."
+                    },
+                    "msdpPeerRPFFailures": {
+                      "type": "integer",
+                      "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTransitions": {
+                      "type": "integer",
+                      "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTime": {
+                      "type": "integer",
+                      "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInMessageElapsedTime": {
+                      "type": "integer",
+                      "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLocalAddress": {
+                      "type": "string",
+                      "description": "The local IP address of this entry's MSDP\n            connection.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerSAAdvPeriod": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerConnectRetryInterval": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the ConnectRetry timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerHoldTimeConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerKeepAliveConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerDataTtl": {
+                      "type": "integer",
+                      "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerProcessRequestsFrom": {
+                      "type": "boolean",
+                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                    },
+                    "msdpPeerStatus": {
+                      "type": "string",
+                      "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpPeerRemotePort": {
+                      "type": "integer",
+                      "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerLocalPort": {
+                      "type": "integer",
+                      "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerEncapsulationState": {
+                      "type": "string",
+                      "description": "The status of the encapsulation negotiation state\n            machine."
+                    },
+                    "msdpPeerEncapsulationType": {
+                      "type": "string",
+                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                    },
+                    "msdpPeerConnectionAttempts": {
+                      "type": "integer",
+                      "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLastError": {
+                      "type": "string",
+                      "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                      "format": "binary"
+                    },
+                    "msdpPeerEntry": {
+                      "type": "array",
+                      "description": "An entry (conceptual row) representing an MSDP peer.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "msdpPeerRemoteAddress": {
+                            "type": "string",
+                            "description": "The address of the remote MSDP peer.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpPeerState": {
+                            "type": "string",
+                            "description": "The state of the MSDP TCP connection with this peer."
+                          },
+                          "msdpPeerRPFFailures": {
+                            "type": "integer",
+                            "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInSAs": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutSAs": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInSARequests": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutSARequests": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInSAResponses": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutSAResponses": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInControlMessages": {
+                            "type": "integer",
+                            "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutControlMessages": {
+                            "type": "integer",
+                            "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInDataPackets": {
+                            "type": "integer",
+                            "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutDataPackets": {
+                            "type": "integer",
+                            "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerFsmEstablishedTransitions": {
+                            "type": "integer",
+                            "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerFsmEstablishedTime": {
+                            "type": "integer",
+                            "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInMessageElapsedTime": {
+                            "type": "integer",
+                            "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerLocalAddress": {
+                            "type": "string",
+                            "description": "The local IP address of this entry's MSDP\n            connection.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpPeerSAAdvPeriod": {
+                            "type": "integer",
+                            "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerConnectRetryInterval": {
+                            "type": "integer",
+                            "description": "Time interval in seconds for the ConnectRetry timer.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerHoldTimeConfigured": {
+                            "type": "integer",
+                            "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerKeepAliveConfigured": {
+                            "type": "integer",
+                            "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerDataTtl": {
+                            "type": "integer",
+                            "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerProcessRequestsFrom": {
+                            "type": "boolean",
+                            "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                          },
+                          "msdpPeerStatus": {
+                            "type": "string",
+                            "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          },
+                          "msdpPeerRemotePort": {
+                            "type": "integer",
+                            "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerLocalPort": {
+                            "type": "integer",
+                            "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "msdpPeerEncapsulationState": {
+                            "type": "string",
+                            "description": "The status of the encapsulation negotiation state\n            machine."
+                          },
+                          "msdpPeerEncapsulationType": {
+                            "type": "string",
+                            "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                          },
+                          "msdpPeerConnectionAttempts": {
+                            "type": "integer",
+                            "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerInNotifications": {
+                            "type": "integer",
+                            "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerOutNotifications": {
+                            "type": "integer",
+                            "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpPeerLastError": {
+                            "type": "string",
+                            "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                            "format": "binary"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpPeerTable": {
@@ -196,7 +700,43 @@
                     "msdpPeerConnectionAttempts": 0,
                     "msdpPeerInNotifications": 0,
                     "msdpPeerOutNotifications": 0,
-                    "msdpPeerLastError": "example-string"
+                    "msdpPeerLastError": "example-string",
+                    "msdpPeerEntry": [
+                      {
+                        "msdpPeerRemoteAddress": "192.168.1.1",
+                        "msdpPeerState": "up(1)",
+                        "msdpPeerRPFFailures": 0,
+                        "msdpPeerInSAs": 0,
+                        "msdpPeerOutSAs": 0,
+                        "msdpPeerInSARequests": 0,
+                        "msdpPeerOutSARequests": 0,
+                        "msdpPeerInSAResponses": 0,
+                        "msdpPeerOutSAResponses": 0,
+                        "msdpPeerInControlMessages": 0,
+                        "msdpPeerOutControlMessages": 0,
+                        "msdpPeerInDataPackets": 1234567890,
+                        "msdpPeerOutDataPackets": 1234567890,
+                        "msdpPeerFsmEstablishedTransitions": 0,
+                        "msdpPeerFsmEstablishedTime": 0,
+                        "msdpPeerInMessageElapsedTime": 0,
+                        "msdpPeerLocalAddress": "192.168.1.1",
+                        "msdpPeerSAAdvPeriod": -2147483648,
+                        "msdpPeerConnectRetryInterval": -2147483648,
+                        "msdpPeerHoldTimeConfigured": -2147483648,
+                        "msdpPeerKeepAliveConfigured": -2147483648,
+                        "msdpPeerDataTtl": -2147483648,
+                        "msdpPeerProcessRequestsFrom": true,
+                        "msdpPeerStatus": "up(1)",
+                        "msdpPeerRemotePort": -2147483648,
+                        "msdpPeerLocalPort": -2147483648,
+                        "msdpPeerEncapsulationState": "up(1)",
+                        "msdpPeerEncapsulationType": "ethernetCsmacd(6)",
+                        "msdpPeerConnectionAttempts": 0,
+                        "msdpPeerInNotifications": 0,
+                        "msdpPeerOutNotifications": 0,
+                        "msdpPeerLastError": "example-string"
+                      }
+                    ]
                   }
                 }
               }
@@ -219,8 +759,192 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing an MSDP peer.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpPeerEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpPeerRemoteAddress": {
+                        "type": "string",
+                        "description": "The address of the remote MSDP peer.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpPeerState": {
+                        "type": "string",
+                        "description": "The state of the MSDP TCP connection with this peer."
+                      },
+                      "msdpPeerRPFFailures": {
+                        "type": "integer",
+                        "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSARequests": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSARequests": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSAResponses": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSAResponses": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInControlMessages": {
+                        "type": "integer",
+                        "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutControlMessages": {
+                        "type": "integer",
+                        "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInDataPackets": {
+                        "type": "integer",
+                        "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutDataPackets": {
+                        "type": "integer",
+                        "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerFsmEstablishedTransitions": {
+                        "type": "integer",
+                        "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerFsmEstablishedTime": {
+                        "type": "integer",
+                        "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInMessageElapsedTime": {
+                        "type": "integer",
+                        "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerLocalAddress": {
+                        "type": "string",
+                        "description": "The local IP address of this entry's MSDP\n            connection.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpPeerSAAdvPeriod": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerConnectRetryInterval": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the ConnectRetry timer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerHoldTimeConfigured": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerKeepAliveConfigured": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerDataTtl": {
+                        "type": "integer",
+                        "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerProcessRequestsFrom": {
+                        "type": "boolean",
+                        "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                      },
+                      "msdpPeerStatus": {
+                        "type": "string",
+                        "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "msdpPeerRemotePort": {
+                        "type": "integer",
+                        "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerLocalPort": {
+                        "type": "integer",
+                        "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerEncapsulationState": {
+                        "type": "string",
+                        "description": "The status of the encapsulation negotiation state\n            machine."
+                      },
+                      "msdpPeerEncapsulationType": {
+                        "type": "string",
+                        "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                      },
+                      "msdpPeerConnectionAttempts": {
+                        "type": "integer",
+                        "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInNotifications": {
+                        "type": "integer",
+                        "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutNotifications": {
+                        "type": "integer",
+                        "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerLastError": {
+                        "type": "string",
+                        "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                        "format": "binary"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -291,7 +1015,189 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpPeerEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpPeerRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote MSDP peer.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerState": {
+                      "type": "string",
+                      "description": "The state of the MSDP TCP connection with this peer."
+                    },
+                    "msdpPeerRPFFailures": {
+                      "type": "integer",
+                      "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTransitions": {
+                      "type": "integer",
+                      "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTime": {
+                      "type": "integer",
+                      "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInMessageElapsedTime": {
+                      "type": "integer",
+                      "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLocalAddress": {
+                      "type": "string",
+                      "description": "The local IP address of this entry's MSDP\n            connection.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerSAAdvPeriod": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerConnectRetryInterval": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the ConnectRetry timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerHoldTimeConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerKeepAliveConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerDataTtl": {
+                      "type": "integer",
+                      "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerProcessRequestsFrom": {
+                      "type": "boolean",
+                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                    },
+                    "msdpPeerStatus": {
+                      "type": "string",
+                      "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpPeerRemotePort": {
+                      "type": "integer",
+                      "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerLocalPort": {
+                      "type": "integer",
+                      "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerEncapsulationState": {
+                      "type": "string",
+                      "description": "The status of the encapsulation negotiation state\n            machine."
+                    },
+                    "msdpPeerEncapsulationType": {
+                      "type": "string",
+                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                    },
+                    "msdpPeerConnectionAttempts": {
+                      "type": "integer",
+                      "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLastError": {
+                      "type": "string",
+                      "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                      "format": "binary"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpPeerEntry": {
@@ -348,7 +1254,124 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpSACacheTable"
+                  "type": "object",
+                  "description": "The (conceptual) table listing the MSDP SA\n        advertisements currently in the MSDP speaker's cache.",
+                  "properties": {
+                    "msdpSACacheGroupAddr": {
+                      "type": "string",
+                      "description": "The group address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheSourceAddr": {
+                      "type": "string",
+                      "description": "The source address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheOriginRP": {
+                      "type": "string",
+                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACachePeerLearnedFrom": {
+                      "type": "string",
+                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheRPFPeer": {
+                      "type": "string",
+                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheInDataPackets": {
+                      "type": "integer",
+                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheUpTime": {
+                      "type": "string",
+                      "description": "The time since this entry was placed in the SA\n            cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheExpiryTime": {
+                      "type": "string",
+                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheStatus": {
+                      "type": "string",
+                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpSACacheEntry": {
+                      "type": "array",
+                      "description": "An entry (conceptual row) representing an MSDP SA\n          advert.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "msdpSACacheGroupAddr": {
+                            "type": "string",
+                            "description": "The group address of the SA Cache entry.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpSACacheSourceAddr": {
+                            "type": "string",
+                            "description": "The source address of the SA Cache entry.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpSACacheOriginRP": {
+                            "type": "string",
+                            "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpSACachePeerLearnedFrom": {
+                            "type": "string",
+                            "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpSACacheRPFPeer": {
+                            "type": "string",
+                            "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                            "format": "inet:ipv4-address"
+                          },
+                          "msdpSACacheInSAs": {
+                            "type": "integer",
+                            "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpSACacheInDataPackets": {
+                            "type": "integer",
+                            "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "msdpSACacheUpTime": {
+                            "type": "string",
+                            "description": "The time since this entry was placed in the SA\n            cache.",
+                            "x-yang-type": "yang:timeticks"
+                          },
+                          "msdpSACacheExpiryTime": {
+                            "type": "string",
+                            "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                            "x-yang-type": "yang:timeticks"
+                          },
+                          "msdpSACacheStatus": {
+                            "type": "string",
+                            "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpSACacheTable": {
@@ -361,7 +1384,21 @@
                     "msdpSACacheInDataPackets": 1234567890,
                     "msdpSACacheUpTime": "example-string",
                     "msdpSACacheExpiryTime": "example-string",
-                    "msdpSACacheStatus": "up(1)"
+                    "msdpSACacheStatus": "up(1)",
+                    "msdpSACacheEntry": [
+                      {
+                        "msdpSACacheGroupAddr": "192.168.1.1",
+                        "msdpSACacheSourceAddr": "192.168.1.1",
+                        "msdpSACacheOriginRP": "example-string",
+                        "msdpSACachePeerLearnedFrom": "example-string",
+                        "msdpSACacheRPFPeer": "example-string",
+                        "msdpSACacheInSAs": 0,
+                        "msdpSACacheInDataPackets": 1234567890,
+                        "msdpSACacheUpTime": "example-string",
+                        "msdpSACacheExpiryTime": "example-string",
+                        "msdpSACacheStatus": "up(1)"
+                      }
+                    ]
                   }
                 }
               }
@@ -384,8 +1421,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing an MSDP SA\n          advert.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpSACacheEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpSACacheGroupAddr": {
+                        "type": "string",
+                        "description": "The group address of the SA Cache entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheSourceAddr": {
+                        "type": "string",
+                        "description": "The source address of the SA Cache entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheOriginRP": {
+                        "type": "string",
+                        "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACachePeerLearnedFrom": {
+                        "type": "string",
+                        "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheRPFPeer": {
+                        "type": "string",
+                        "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheInSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpSACacheInDataPackets": {
+                        "type": "integer",
+                        "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpSACacheUpTime": {
+                        "type": "string",
+                        "description": "The time since this entry was placed in the SA\n            cache.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "msdpSACacheExpiryTime": {
+                        "type": "string",
+                        "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "msdpSACacheStatus": {
+                        "type": "string",
+                        "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -434,7 +1527,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpSACacheEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpSACacheGroupAddr": {
+                      "type": "string",
+                      "description": "The group address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheSourceAddr": {
+                      "type": "string",
+                      "description": "The source address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheOriginRP": {
+                      "type": "string",
+                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACachePeerLearnedFrom": {
+                      "type": "string",
+                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheRPFPeer": {
+                      "type": "string",
+                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheInDataPackets": {
+                      "type": "integer",
+                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheUpTime": {
+                      "type": "string",
+                      "description": "The time since this entry was placed in the SA\n            cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheExpiryTime": {
+                      "type": "string",
+                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheStatus": {
+                      "type": "string",
+                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpSACacheEntry": {
@@ -470,8 +1617,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing a group range\n          used when deciding where to send an SA Request\n          message.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpRequestsEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpRequestsGroupAddress": {
+                        "type": "string",
+                        "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsGroupMask": {
+                        "type": "string",
+                        "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsPeer": {
+                        "type": "string",
+                        "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpRequestsStatus": {
+                        "type": "string",
+                        "description": "The status of this row, by which new rows may be\n            added to the table.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -514,7 +1685,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpRequestsEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpRequestsEntry": {
@@ -544,8 +1737,192 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing an MSDP peer.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpPeerEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpPeerRemoteAddress": {
+                        "type": "string",
+                        "description": "The address of the remote MSDP peer.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpPeerState": {
+                        "type": "string",
+                        "description": "The state of the MSDP TCP connection with this peer."
+                      },
+                      "msdpPeerRPFFailures": {
+                        "type": "integer",
+                        "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSARequests": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSARequests": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInSAResponses": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutSAResponses": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInControlMessages": {
+                        "type": "integer",
+                        "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutControlMessages": {
+                        "type": "integer",
+                        "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInDataPackets": {
+                        "type": "integer",
+                        "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutDataPackets": {
+                        "type": "integer",
+                        "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerFsmEstablishedTransitions": {
+                        "type": "integer",
+                        "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerFsmEstablishedTime": {
+                        "type": "integer",
+                        "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInMessageElapsedTime": {
+                        "type": "integer",
+                        "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerLocalAddress": {
+                        "type": "string",
+                        "description": "The local IP address of this entry's MSDP\n            connection.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpPeerSAAdvPeriod": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerConnectRetryInterval": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the ConnectRetry timer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerHoldTimeConfigured": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerKeepAliveConfigured": {
+                        "type": "integer",
+                        "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerDataTtl": {
+                        "type": "integer",
+                        "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerProcessRequestsFrom": {
+                        "type": "boolean",
+                        "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                      },
+                      "msdpPeerStatus": {
+                        "type": "string",
+                        "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      },
+                      "msdpPeerRemotePort": {
+                        "type": "integer",
+                        "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerLocalPort": {
+                        "type": "integer",
+                        "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "msdpPeerEncapsulationState": {
+                        "type": "string",
+                        "description": "The status of the encapsulation negotiation state\n            machine."
+                      },
+                      "msdpPeerEncapsulationType": {
+                        "type": "string",
+                        "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                      },
+                      "msdpPeerConnectionAttempts": {
+                        "type": "integer",
+                        "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerInNotifications": {
+                        "type": "integer",
+                        "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerOutNotifications": {
+                        "type": "integer",
+                        "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpPeerLastError": {
+                        "type": "string",
+                        "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                        "format": "binary"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -616,7 +1993,189 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpPeerEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpPeerRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote MSDP peer.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerState": {
+                      "type": "string",
+                      "description": "The state of the MSDP TCP connection with this peer."
+                    },
+                    "msdpPeerRPFFailures": {
+                      "type": "integer",
+                      "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTransitions": {
+                      "type": "integer",
+                      "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTime": {
+                      "type": "integer",
+                      "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInMessageElapsedTime": {
+                      "type": "integer",
+                      "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLocalAddress": {
+                      "type": "string",
+                      "description": "The local IP address of this entry's MSDP\n            connection.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerSAAdvPeriod": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerConnectRetryInterval": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the ConnectRetry timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerHoldTimeConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerKeepAliveConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerDataTtl": {
+                      "type": "integer",
+                      "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerProcessRequestsFrom": {
+                      "type": "boolean",
+                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                    },
+                    "msdpPeerStatus": {
+                      "type": "string",
+                      "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpPeerRemotePort": {
+                      "type": "integer",
+                      "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerLocalPort": {
+                      "type": "integer",
+                      "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerEncapsulationState": {
+                      "type": "string",
+                      "description": "The status of the encapsulation negotiation state\n            machine."
+                    },
+                    "msdpPeerEncapsulationType": {
+                      "type": "string",
+                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                    },
+                    "msdpPeerConnectionAttempts": {
+                      "type": "integer",
+                      "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLastError": {
+                      "type": "string",
+                      "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                      "format": "binary"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpPeerEntry": {
@@ -674,8 +2233,64 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "An entry (conceptual row) representing an MSDP SA\n          advert.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpSACacheEntry"
+                    "type": "object",
+                    "properties": {
+                      "msdpSACacheGroupAddr": {
+                        "type": "string",
+                        "description": "The group address of the SA Cache entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheSourceAddr": {
+                        "type": "string",
+                        "description": "The source address of the SA Cache entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheOriginRP": {
+                        "type": "string",
+                        "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACachePeerLearnedFrom": {
+                        "type": "string",
+                        "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheRPFPeer": {
+                        "type": "string",
+                        "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                        "format": "inet:ipv4-address"
+                      },
+                      "msdpSACacheInSAs": {
+                        "type": "integer",
+                        "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpSACacheInDataPackets": {
+                        "type": "integer",
+                        "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "msdpSACacheUpTime": {
+                        "type": "string",
+                        "description": "The time since this entry was placed in the SA\n            cache.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "msdpSACacheExpiryTime": {
+                        "type": "string",
+                        "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                        "x-yang-type": "yang:timeticks"
+                      },
+                      "msdpSACacheStatus": {
+                        "type": "string",
+                        "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -724,7 +2339,61 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DRAFT-MSDP-MIB_msdpSACacheEntry"
+                  "type": "object",
+                  "properties": {
+                    "msdpSACacheGroupAddr": {
+                      "type": "string",
+                      "description": "The group address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheSourceAddr": {
+                      "type": "string",
+                      "description": "The source address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheOriginRP": {
+                      "type": "string",
+                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACachePeerLearnedFrom": {
+                      "type": "string",
+                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheRPFPeer": {
+                      "type": "string",
+                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheInDataPackets": {
+                      "type": "integer",
+                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheUpTime": {
+                      "type": "string",
+                      "description": "The time since this entry was placed in the SA\n            cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheExpiryTime": {
+                      "type": "string",
+                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheStatus": {
+                      "type": "string",
+                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "DRAFT-MSDP-MIB:msdpSACacheEntry": {
@@ -1026,6 +2695,288 @@
             "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
             "x-yang-type": "snmpv2-tc:RowStatus"
           },
+          "msdpRequestsEntry": {
+            "type": "array",
+            "description": "An entry (conceptual row) representing a group range\n          used when deciding where to send an SA Request\n          message.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "msdpRequestsGroupAddress": {
+                  "type": "string",
+                  "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpRequestsGroupMask": {
+                  "type": "string",
+                  "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpRequestsPeer": {
+                  "type": "string",
+                  "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpRequestsStatus": {
+                  "type": "string",
+                  "description": "The status of this row, by which new rows may be\n            added to the table.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
+          "msdpPeerEntry": {
+            "type": "array",
+            "description": "An entry (conceptual row) representing an MSDP peer.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "msdpPeerRemoteAddress": {
+                  "type": "string",
+                  "description": "The address of the remote MSDP peer.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpPeerState": {
+                  "type": "string",
+                  "description": "The state of the MSDP TCP connection with this peer."
+                },
+                "msdpPeerRPFFailures": {
+                  "type": "integer",
+                  "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInSAs": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutSAs": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInSARequests": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutSARequests": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInSAResponses": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutSAResponses": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInControlMessages": {
+                  "type": "integer",
+                  "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutControlMessages": {
+                  "type": "integer",
+                  "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInDataPackets": {
+                  "type": "integer",
+                  "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutDataPackets": {
+                  "type": "integer",
+                  "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerFsmEstablishedTransitions": {
+                  "type": "integer",
+                  "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerFsmEstablishedTime": {
+                  "type": "integer",
+                  "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInMessageElapsedTime": {
+                  "type": "integer",
+                  "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerLocalAddress": {
+                  "type": "string",
+                  "description": "The local IP address of this entry's MSDP\n            connection.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpPeerSAAdvPeriod": {
+                  "type": "integer",
+                  "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerConnectRetryInterval": {
+                  "type": "integer",
+                  "description": "Time interval in seconds for the ConnectRetry timer.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerHoldTimeConfigured": {
+                  "type": "integer",
+                  "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerKeepAliveConfigured": {
+                  "type": "integer",
+                  "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerDataTtl": {
+                  "type": "integer",
+                  "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerProcessRequestsFrom": {
+                  "type": "boolean",
+                  "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                },
+                "msdpPeerStatus": {
+                  "type": "string",
+                  "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                },
+                "msdpPeerRemotePort": {
+                  "type": "integer",
+                  "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerLocalPort": {
+                  "type": "integer",
+                  "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "msdpPeerEncapsulationState": {
+                  "type": "string",
+                  "description": "The status of the encapsulation negotiation state\n            machine."
+                },
+                "msdpPeerEncapsulationType": {
+                  "type": "string",
+                  "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                },
+                "msdpPeerConnectionAttempts": {
+                  "type": "integer",
+                  "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerInNotifications": {
+                  "type": "integer",
+                  "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerOutNotifications": {
+                  "type": "integer",
+                  "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpPeerLastError": {
+                  "type": "string",
+                  "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "msdpSACacheEntry": {
+            "type": "array",
+            "description": "An entry (conceptual row) representing an MSDP SA\n          advert.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "msdpSACacheGroupAddr": {
+                  "type": "string",
+                  "description": "The group address of the SA Cache entry.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpSACacheSourceAddr": {
+                  "type": "string",
+                  "description": "The source address of the SA Cache entry.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpSACacheOriginRP": {
+                  "type": "string",
+                  "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpSACachePeerLearnedFrom": {
+                  "type": "string",
+                  "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpSACacheRPFPeer": {
+                  "type": "string",
+                  "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                  "format": "inet:ipv4-address"
+                },
+                "msdpSACacheInSAs": {
+                  "type": "integer",
+                  "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpSACacheInDataPackets": {
+                  "type": "integer",
+                  "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "msdpSACacheUpTime": {
+                  "type": "string",
+                  "description": "The time since this entry was placed in the SA\n            cache.",
+                  "x-yang-type": "yang:timeticks"
+                },
+                "msdpSACacheExpiryTime": {
+                  "type": "string",
+                  "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                  "x-yang-type": "yang:timeticks"
+                },
+                "msdpSACacheStatus": {
+                  "type": "string",
+                  "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
           "msdp": {
             "type": "object",
             "description": "The state of MSDP on this MSDP speaker - globally\n          enabled or disabled.",
@@ -1076,6 +3027,36 @@
                 "type": "string",
                 "description": "The status of this row, by which new rows may be\n            added to the table.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "msdpRequestsEntry": {
+                "type": "array",
+                "description": "An entry (conceptual row) representing a group range\n          used when deciding where to send an SA Request\n          message.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1262,6 +3243,196 @@
                 "type": "string",
                 "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
                 "format": "binary"
+              },
+              "msdpPeerEntry": {
+                "type": "array",
+                "description": "An entry (conceptual row) representing an MSDP peer.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "msdpPeerRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote MSDP peer.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerState": {
+                      "type": "string",
+                      "description": "The state of the MSDP TCP connection with this peer."
+                    },
+                    "msdpPeerRPFFailures": {
+                      "type": "integer",
+                      "description": "The number of RPF failures on SA messages received\n            from this peer.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSARequests": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutSAResponses": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutControlMessages": {
+                      "type": "integer",
+                      "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutDataPackets": {
+                      "type": "integer",
+                      "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTransitions": {
+                      "type": "integer",
+                      "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerFsmEstablishedTime": {
+                      "type": "integer",
+                      "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInMessageElapsedTime": {
+                      "type": "integer",
+                      "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLocalAddress": {
+                      "type": "string",
+                      "description": "The local IP address of this entry's MSDP\n            connection.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpPeerSAAdvPeriod": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerConnectRetryInterval": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the ConnectRetry timer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerHoldTimeConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerKeepAliveConfigured": {
+                      "type": "integer",
+                      "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerDataTtl": {
+                      "type": "integer",
+                      "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerProcessRequestsFrom": {
+                      "type": "boolean",
+                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
+                    },
+                    "msdpPeerStatus": {
+                      "type": "string",
+                      "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "msdpPeerRemotePort": {
+                      "type": "integer",
+                      "description": "The remote port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerLocalPort": {
+                      "type": "integer",
+                      "description": "The local port for the TCP connection between the\n            MSDP peers.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "msdpPeerEncapsulationState": {
+                      "type": "string",
+                      "description": "The status of the encapsulation negotiation state\n            machine."
+                    },
+                    "msdpPeerEncapsulationType": {
+                      "type": "string",
+                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
+                    },
+                    "msdpPeerConnectionAttempts": {
+                      "type": "integer",
+                      "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerInNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerOutNotifications": {
+                      "type": "integer",
+                      "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpPeerLastError": {
+                      "type": "string",
+                      "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
+                      "format": "binary"
+                    }
+                  }
+                }
               }
             }
           },
@@ -1320,6 +3491,68 @@
                 "type": "string",
                 "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "msdpSACacheEntry": {
+                "type": "array",
+                "description": "An entry (conceptual row) representing an MSDP SA\n          advert.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "msdpSACacheGroupAddr": {
+                      "type": "string",
+                      "description": "The group address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheSourceAddr": {
+                      "type": "string",
+                      "description": "The source address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheOriginRP": {
+                      "type": "string",
+                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACachePeerLearnedFrom": {
+                      "type": "string",
+                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheRPFPeer": {
+                      "type": "string",
+                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheInDataPackets": {
+                      "type": "integer",
+                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheUpTime": {
+                      "type": "string",
+                      "description": "The time since this entry was placed in the SA\n            cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheExpiryTime": {
+                      "type": "string",
+                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheStatus": {
+                      "type": "string",
+                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           }

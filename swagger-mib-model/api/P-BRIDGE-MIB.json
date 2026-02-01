@@ -29,7 +29,23 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dExtBase"
+                  "type": "object",
+                  "description": "dot1dExtBase",
+                  "properties": {
+                    "dot1dDeviceCapabilities": {
+                      "type": "string",
+                      "description": "Indicates the optional parts of IEEE 802.1D and 802.1Q\n          that are implemented by this device and are manageable\n          through this MIB.  Capabilities that are allowed on a\n          per-port basis are indicated in dot1dPortCapabilities.\n          \n          dot1dExtendedFilteringServices(0),\n                                -- can perform filtering of\n                                -- individual multicast addresses\n                                -- controlled by GMRP.\n          dot1dTrafficClasses(1),\n                                -- can map user priority to\n                                -- multiple traffic classes.\n          dot1qStaticEntryIndividualPort(2),\n                                -- dot1qStaticUnicastReceivePort &\n                                -- dot1qStaticMulticastReceivePort\n                                -- can represent non-zero entries.\n          dot1qIVLCapable(3),   -- Independent VLAN Learning (IVL).\n          dot1qSVLCapable(4),   -- Shared VLAN Learning (SVL).\n          dot1qHybridCapable(5),\n                                -- both IVL & SVL simultaneously.\n          dot1qConfigurablePvidTagging(6),\n                                -- whether the implementation\n                                -- supports the ability to\n                                -- override the default PVID\n                                -- setting and its egress status\n                                -- (VLAN-Tagged or Untagged) on\n                                -- each port.\n          dot1dLocalVlanCapable(7)\n                                -- can support multiple local\n                                -- bridges, outside of the scope\n                                -- of 802.1Q defined VLANs."
+                    },
+                    "dot1dTrafficClassesEnabled": {
+                      "type": "boolean",
+                      "description": "The value true(1) indicates that Traffic Classes are\n          enabled on this bridge.  When false(2), the bridge\n          operates with a single priority level for all traffic.\n          \n          The value of this object MUST be retained across\n          reinitializations of the management system."
+                    },
+                    "dot1dGmrpStatus": {
+                      "type": "string",
+                      "description": "The administrative status requested by management for\n          GMRP.  The value enabled(1) indicates that GMRP should\n          be enabled on this device, in all VLANs, on all ports\n          for which it has not been specifically disabled.  When\n          disabled(2), GMRP is disabled, in all VLANs and on all\n          ports, and all GMRP packets will be forwarded\n          transparently.  This object affects both Applicant and\n          Registrar state machines.  A transition from disabled(2)\n          to enabled(1) will cause a reset of all GMRP state\n          machines on all ports.\n          \n          The value of this object MUST be retained across\n          reinitializations of the management system.",
+                      "x-yang-type": "P-BRIDGE-MIB:EnabledStatus"
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dExtBase": {
@@ -57,14 +73,75 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpHCPortTable"
+                  "type": "object",
+                  "description": "A table that contains information about every high-\n        capacity port that is associated with this transparent\n        bridge.",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpHCPortInFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortOutFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortInDiscards": {
+                      "type": "integer",
+                      "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortEntry": {
+                      "type": "array",
+                      "description": "Statistics information for each high-capacity port of a\n          transparent bridge.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dot1dTpPort": {
+                            "type": "string",
+                            "description": "dot1dTpPort",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dTpHCPortInFrames": {
+                            "type": "integer",
+                            "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                            "minimum": 0
+                          },
+                          "dot1dTpHCPortOutFrames": {
+                            "type": "integer",
+                            "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                            "minimum": 0
+                          },
+                          "dot1dTpHCPortInDiscards": {
+                            "type": "integer",
+                            "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpHCPortTable": {
                     "dot1dTpPort": "example-string",
                     "dot1dTpHCPortInFrames": 0,
                     "dot1dTpHCPortOutFrames": 0,
-                    "dot1dTpHCPortInDiscards": 0
+                    "dot1dTpHCPortInDiscards": 0,
+                    "dot1dTpHCPortEntry": [
+                      {
+                        "dot1dTpPort": "example-string",
+                        "dot1dTpHCPortInFrames": 0,
+                        "dot1dTpHCPortOutFrames": 0,
+                        "dot1dTpHCPortInDiscards": 0
+                      }
+                    ]
                   }
                 }
               }
@@ -87,8 +164,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Statistics information for each high-capacity port of a\n          transparent bridge.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpHCPortEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dTpPort": {
+                        "type": "string",
+                        "description": "dot1dTpPort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTpHCPortInFrames": {
+                        "type": "integer",
+                        "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                        "minimum": 0
+                      },
+                      "dot1dTpHCPortOutFrames": {
+                        "type": "integer",
+                        "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                        "minimum": 0
+                      },
+                      "dot1dTpHCPortInDiscards": {
+                        "type": "integer",
+                        "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -131,7 +232,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpHCPortEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpHCPortInFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortOutFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortInDiscards": {
+                      "type": "integer",
+                      "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpHCPortEntry": {
@@ -160,14 +283,81 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpPortOverflowTable"
+                  "type": "object",
+                  "description": "dot1dTpPortOverflowTable",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpPortInOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortOutOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortInOverflowDiscards": {
+                      "type": "integer",
+                      "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortOverflowEntry": {
+                      "type": "array",
+                      "description": "The most significant bits of statistics counters for a high-\n          capacity interface of a transparent bridge.  Each object is\n          associated with a corresponding object in dot1dTpPortTable\n          that indicates the least significant bits of the counter.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dot1dTpPort": {
+                            "type": "string",
+                            "description": "dot1dTpPort",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dTpPortInOverflowFrames": {
+                            "type": "integer",
+                            "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "dot1dTpPortOutOverflowFrames": {
+                            "type": "integer",
+                            "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "dot1dTpPortInOverflowDiscards": {
+                            "type": "integer",
+                            "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpPortOverflowTable": {
                     "dot1dTpPort": "example-string",
                     "dot1dTpPortInOverflowFrames": 0,
                     "dot1dTpPortOutOverflowFrames": 0,
-                    "dot1dTpPortInOverflowDiscards": 0
+                    "dot1dTpPortInOverflowDiscards": 0,
+                    "dot1dTpPortOverflowEntry": [
+                      {
+                        "dot1dTpPort": "example-string",
+                        "dot1dTpPortInOverflowFrames": 0,
+                        "dot1dTpPortOutOverflowFrames": 0,
+                        "dot1dTpPortInOverflowDiscards": 0
+                      }
+                    ]
                   }
                 }
               }
@@ -190,8 +380,35 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The most significant bits of statistics counters for a high-\n          capacity interface of a transparent bridge.  Each object is\n          associated with a corresponding object in dot1dTpPortTable\n          that indicates the least significant bits of the counter.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpPortOverflowEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dTpPort": {
+                        "type": "string",
+                        "description": "dot1dTpPort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTpPortInOverflowFrames": {
+                        "type": "integer",
+                        "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "dot1dTpPortOutOverflowFrames": {
+                        "type": "integer",
+                        "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "dot1dTpPortInOverflowDiscards": {
+                        "type": "integer",
+                        "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -234,7 +451,32 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpPortOverflowEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpPortInOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortOutOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortInOverflowDiscards": {
+                      "type": "integer",
+                      "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpPortOverflowEntry": {
@@ -263,13 +505,67 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dUserPriorityRegenTable"
+                  "type": "object",
+                  "description": "A list of Regenerated User Priorities for each received\n        User Priority on each port of a bridge.  The Regenerated\n        User Priority value may be used to index the Traffic\n        Class Table for each input port.  This only has effect\n        on media that support native User Priority.  The default\n        values for Regenerated User Priorities are the same as\n        the User Priorities.",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dUserPriority": {
+                      "type": "integer",
+                      "description": "The User Priority for a frame received on this port.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "integer",
+                      "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dUserPriorityRegenEntry": {
+                      "type": "array",
+                      "description": "A mapping of incoming User Priority to a Regenerated\n          User Priority.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dot1dBasePort": {
+                            "type": "string",
+                            "description": "dot1dBasePort",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dUserPriority": {
+                            "type": "integer",
+                            "description": "The User Priority for a frame received on this port.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "dot1dRegenUserPriority": {
+                            "type": "integer",
+                            "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dUserPriorityRegenTable": {
                     "dot1dBasePort": "example-string",
                     "dot1dUserPriority": -2147483648,
-                    "dot1dRegenUserPriority": -2147483648
+                    "dot1dRegenUserPriority": -2147483648,
+                    "dot1dUserPriorityRegenEntry": [
+                      {
+                        "dot1dBasePort": "example-string",
+                        "dot1dUserPriority": -2147483648,
+                        "dot1dRegenUserPriority": -2147483648
+                      }
+                    ]
                   }
                 }
               }
@@ -292,8 +588,29 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A mapping of incoming User Priority to a Regenerated\n          User Priority.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dUserPriorityRegenEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dUserPriority": {
+                        "type": "integer",
+                        "description": "The User Priority for a frame received on this port.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "dot1dRegenUserPriority": {
+                        "type": "integer",
+                        "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -335,7 +652,26 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dUserPriorityRegenEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dUserPriority": {
+                      "type": "integer",
+                      "description": "The User Priority for a frame received on this port.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "integer",
+                      "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dUserPriorityRegenEntry": {
@@ -363,13 +699,67 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTrafficClassTable"
+                  "type": "object",
+                  "description": "A table mapping evaluated User Priority to Traffic\n        Class, for forwarding by the bridge.  Traffic class is a\n        number in the range (0..(dot1dPortNumTrafficClasses-1)).",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTrafficClassPriority": {
+                      "type": "integer",
+                      "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dTrafficClass": {
+                      "type": "integer",
+                      "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dTrafficClassEntry": {
+                      "type": "array",
+                      "description": "User Priority to Traffic Class mapping.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dot1dBasePort": {
+                            "type": "string",
+                            "description": "dot1dBasePort",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dTrafficClassPriority": {
+                            "type": "integer",
+                            "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "dot1dTrafficClass": {
+                            "type": "integer",
+                            "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTrafficClassTable": {
                     "dot1dBasePort": "example-string",
                     "dot1dTrafficClassPriority": -2147483648,
-                    "dot1dTrafficClass": -2147483648
+                    "dot1dTrafficClass": -2147483648,
+                    "dot1dTrafficClassEntry": [
+                      {
+                        "dot1dBasePort": "example-string",
+                        "dot1dTrafficClassPriority": -2147483648,
+                        "dot1dTrafficClass": -2147483648
+                      }
+                    ]
                   }
                 }
               }
@@ -392,8 +782,29 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "User Priority to Traffic Class mapping.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTrafficClassEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTrafficClassPriority": {
+                        "type": "integer",
+                        "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "dot1dTrafficClass": {
+                        "type": "integer",
+                        "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -435,7 +846,26 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTrafficClassEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTrafficClassPriority": {
+                      "type": "integer",
+                      "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dTrafficClass": {
+                      "type": "integer",
+                      "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTrafficClassEntry": {
@@ -463,13 +893,65 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dPortOutboundAccessPriorityTable"
+                  "type": "object",
+                  "description": "A table mapping Regenerated User Priority to Outbound\n        Access Priority.  This is a fixed mapping for all port\n        types, with two options for 802.5 Token Ring.",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "string",
+                      "description": "dot1dRegenUserPriority",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dPortOutboundAccessPriority": {
+                      "type": "integer",
+                      "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dPortOutboundAccessPriorityEntry": {
+                      "type": "array",
+                      "description": "Regenerated User Priority to Outbound Access Priority\n          mapping.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "dot1dBasePort": {
+                            "type": "string",
+                            "description": "dot1dBasePort",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dRegenUserPriority": {
+                            "type": "string",
+                            "description": "dot1dRegenUserPriority",
+                            "x-yang-type": "leafref"
+                          },
+                          "dot1dPortOutboundAccessPriority": {
+                            "type": "integer",
+                            "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dPortOutboundAccessPriorityTable": {
                     "dot1dBasePort": "example-string",
                     "dot1dRegenUserPriority": "example-string",
-                    "dot1dPortOutboundAccessPriority": -2147483648
+                    "dot1dPortOutboundAccessPriority": -2147483648,
+                    "dot1dPortOutboundAccessPriorityEntry": [
+                      {
+                        "dot1dBasePort": "example-string",
+                        "dot1dRegenUserPriority": "example-string",
+                        "dot1dPortOutboundAccessPriority": -2147483648
+                      }
+                    ]
                   }
                 }
               }
@@ -492,8 +974,28 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Regenerated User Priority to Outbound Access Priority\n          mapping.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dPortOutboundAccessPriorityEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dRegenUserPriority": {
+                        "type": "string",
+                        "description": "dot1dRegenUserPriority",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dPortOutboundAccessPriority": {
+                        "type": "integer",
+                        "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -535,7 +1037,25 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dPortOutboundAccessPriorityEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "string",
+                      "description": "dot1dRegenUserPriority",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dPortOutboundAccessPriority": {
+                      "type": "integer",
+                      "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dPortOutboundAccessPriorityEntry": {
@@ -564,8 +1084,32 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Statistics information for each high-capacity port of a\n          transparent bridge.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpHCPortEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dTpPort": {
+                        "type": "string",
+                        "description": "dot1dTpPort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTpHCPortInFrames": {
+                        "type": "integer",
+                        "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                        "minimum": 0
+                      },
+                      "dot1dTpHCPortOutFrames": {
+                        "type": "integer",
+                        "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                        "minimum": 0
+                      },
+                      "dot1dTpHCPortInDiscards": {
+                        "type": "integer",
+                        "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                        "minimum": 0
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -608,7 +1152,29 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpHCPortEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpHCPortInFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortOutFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortInDiscards": {
+                      "type": "integer",
+                      "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                      "minimum": 0
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpHCPortEntry": {
@@ -638,8 +1204,35 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "The most significant bits of statistics counters for a high-\n          capacity interface of a transparent bridge.  Each object is\n          associated with a corresponding object in dot1dTpPortTable\n          that indicates the least significant bits of the counter.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpPortOverflowEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dTpPort": {
+                        "type": "string",
+                        "description": "dot1dTpPort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTpPortInOverflowFrames": {
+                        "type": "integer",
+                        "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "dot1dTpPortOutOverflowFrames": {
+                        "type": "integer",
+                        "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "dot1dTpPortInOverflowDiscards": {
+                        "type": "integer",
+                        "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -682,7 +1275,32 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTpPortOverflowEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpPortInOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortOutOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortInOverflowDiscards": {
+                      "type": "integer",
+                      "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTpPortOverflowEntry": {
@@ -712,8 +1330,29 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A mapping of incoming User Priority to a Regenerated\n          User Priority.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dUserPriorityRegenEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dUserPriority": {
+                        "type": "integer",
+                        "description": "The User Priority for a frame received on this port.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "dot1dRegenUserPriority": {
+                        "type": "integer",
+                        "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -755,7 +1394,26 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dUserPriorityRegenEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dUserPriority": {
+                      "type": "integer",
+                      "description": "The User Priority for a frame received on this port.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "integer",
+                      "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dUserPriorityRegenEntry": {
@@ -784,8 +1442,29 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "User Priority to Traffic Class mapping.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTrafficClassEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dTrafficClassPriority": {
+                        "type": "integer",
+                        "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "dot1dTrafficClass": {
+                        "type": "integer",
+                        "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -827,7 +1506,26 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dTrafficClassEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTrafficClassPriority": {
+                      "type": "integer",
+                      "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dTrafficClass": {
+                      "type": "integer",
+                      "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dTrafficClassEntry": {
@@ -856,8 +1554,28 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "Regenerated User Priority to Outbound Access Priority\n          mapping.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dPortOutboundAccessPriorityEntry"
+                    "type": "object",
+                    "properties": {
+                      "dot1dBasePort": {
+                        "type": "string",
+                        "description": "dot1dBasePort",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dRegenUserPriority": {
+                        "type": "string",
+                        "description": "dot1dRegenUserPriority",
+                        "x-yang-type": "leafref"
+                      },
+                      "dot1dPortOutboundAccessPriority": {
+                        "type": "integer",
+                        "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -899,7 +1617,25 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/P-BRIDGE-MIB_dot1dPortOutboundAccessPriorityEntry"
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "string",
+                      "description": "dot1dRegenUserPriority",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dPortOutboundAccessPriority": {
+                      "type": "integer",
+                      "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
                 },
                 "example": {
                   "P-BRIDGE-MIB:dot1dPortOutboundAccessPriorityEntry": {
@@ -1006,6 +1742,149 @@
             "minimum": -2147483648,
             "maximum": 2147483647
           },
+          "dot1dTpHCPortEntry": {
+            "type": "array",
+            "description": "Statistics information for each high-capacity port of a\n          transparent bridge.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "dot1dTpPort": {
+                  "type": "string",
+                  "description": "dot1dTpPort",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dTpHCPortInFrames": {
+                  "type": "integer",
+                  "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                  "minimum": 0
+                },
+                "dot1dTpHCPortOutFrames": {
+                  "type": "integer",
+                  "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                  "minimum": 0
+                },
+                "dot1dTpHCPortInDiscards": {
+                  "type": "integer",
+                  "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "dot1dTpPortOverflowEntry": {
+            "type": "array",
+            "description": "The most significant bits of statistics counters for a high-\n          capacity interface of a transparent bridge.  Each object is\n          associated with a corresponding object in dot1dTpPortTable\n          that indicates the least significant bits of the counter.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "dot1dTpPort": {
+                  "type": "string",
+                  "description": "dot1dTpPort",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dTpPortInOverflowFrames": {
+                  "type": "integer",
+                  "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "dot1dTpPortOutOverflowFrames": {
+                  "type": "integer",
+                  "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "dot1dTpPortInOverflowDiscards": {
+                  "type": "integer",
+                  "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                }
+              }
+            }
+          },
+          "dot1dUserPriorityRegenEntry": {
+            "type": "array",
+            "description": "A mapping of incoming User Priority to a Regenerated\n          User Priority.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "dot1dBasePort": {
+                  "type": "string",
+                  "description": "dot1dBasePort",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dUserPriority": {
+                  "type": "integer",
+                  "description": "The User Priority for a frame received on this port.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "dot1dRegenUserPriority": {
+                  "type": "integer",
+                  "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                }
+              }
+            }
+          },
+          "dot1dTrafficClassEntry": {
+            "type": "array",
+            "description": "User Priority to Traffic Class mapping.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "dot1dBasePort": {
+                  "type": "string",
+                  "description": "dot1dBasePort",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dTrafficClassPriority": {
+                  "type": "integer",
+                  "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "dot1dTrafficClass": {
+                  "type": "integer",
+                  "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                }
+              }
+            }
+          },
+          "dot1dPortOutboundAccessPriorityEntry": {
+            "type": "array",
+            "description": "Regenerated User Priority to Outbound Access Priority\n          mapping.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "dot1dBasePort": {
+                  "type": "string",
+                  "description": "dot1dBasePort",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dRegenUserPriority": {
+                  "type": "string",
+                  "description": "dot1dRegenUserPriority",
+                  "x-yang-type": "leafref"
+                },
+                "dot1dPortOutboundAccessPriority": {
+                  "type": "integer",
+                  "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                }
+              }
+            }
+          },
           "dot1dExtBase": {
             "type": "object",
             "description": "dot1dExtBase",
@@ -1048,6 +1927,36 @@
                 "type": "integer",
                 "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
                 "minimum": 0
+              },
+              "dot1dTpHCPortEntry": {
+                "type": "array",
+                "description": "Statistics information for each high-capacity port of a\n          transparent bridge.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpHCPortInFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been received by this\n            port from its segment.  Note that a frame received on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortOutFrames": {
+                      "type": "integer",
+                      "description": "The number of frames that have been transmitted by this\n            port to its segment.  Note that a frame transmitted on\n            the interface corresponding to this port is only counted\n            by this object if and only if it is for a protocol being\n            processed by the local bridging function, including\n            bridge management frames.",
+                      "minimum": 0
+                    },
+                    "dot1dTpHCPortInDiscards": {
+                      "type": "integer",
+                      "description": "Count of valid frames that have been received by this\n            port from its segment that were discarded (i.e.,\n            filtered) by the Forwarding Process.",
+                      "minimum": 0
+                    }
+                  }
+                }
               }
             }
           },
@@ -1077,6 +1986,39 @@
                 "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
                 "minimum": 0,
                 "maximum": 4294967295
+              },
+              "dot1dTpPortOverflowEntry": {
+                "type": "array",
+                "description": "The most significant bits of statistics counters for a high-\n          capacity interface of a transparent bridge.  Each object is\n          associated with a corresponding object in dot1dTpPortTable\n          that indicates the least significant bits of the counter.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dot1dTpPort": {
+                      "type": "string",
+                      "description": "dot1dTpPort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTpPortInOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortInFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortOutOverflowFrames": {
+                      "type": "integer",
+                      "description": "The number of times the associated dot1dTpPortOutFrames\n            counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "dot1dTpPortInOverflowDiscards": {
+                      "type": "integer",
+                      "description": "The number of times the associated\n            dot1dTpPortInDiscards counter has overflowed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
+                }
               }
             }
           },
@@ -1100,6 +2042,33 @@
                 "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
                 "minimum": -2147483648,
                 "maximum": 2147483647
+              },
+              "dot1dUserPriorityRegenEntry": {
+                "type": "array",
+                "description": "A mapping of incoming User Priority to a Regenerated\n          User Priority.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dUserPriority": {
+                      "type": "integer",
+                      "description": "The User Priority for a frame received on this port.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "integer",
+                      "description": "The Regenerated User Priority that the incoming User\n            \n            Priority is mapped to for this port.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
               }
             }
           },
@@ -1123,6 +2092,33 @@
                 "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
                 "minimum": -2147483648,
                 "maximum": 2147483647
+              },
+              "dot1dTrafficClassEntry": {
+                "type": "array",
+                "description": "User Priority to Traffic Class mapping.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dTrafficClassPriority": {
+                      "type": "integer",
+                      "description": "The Priority value determined for the received frame.\n            This value is equivalent to the priority indicated in\n            the tagged frame received, or one of the evaluated\n            priorities, determined according to the media-type.\n            \n            For untagged frames received from Ethernet media, this\n            value is equal to the dot1dPortDefaultUserPriority value\n            for the ingress port.\n            \n            For untagged frames received from non-Ethernet media,\n            this value is equal to the dot1dRegenUserPriority value\n            for the ingress port and media-specific user priority.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "dot1dTrafficClass": {
+                      "type": "integer",
+                      "description": "The Traffic Class the received frame is mapped to.\n            \n            The value of this object MUST be retained across\n            reinitializations of the management system.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
               }
             }
           },
@@ -1145,6 +2141,32 @@
                 "description": "The Outbound Access Priority the received frame is\n            mapped to.",
                 "minimum": -2147483648,
                 "maximum": 2147483647
+              },
+              "dot1dPortOutboundAccessPriorityEntry": {
+                "type": "array",
+                "description": "Regenerated User Priority to Outbound Access Priority\n          mapping.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "dot1dBasePort": {
+                      "type": "string",
+                      "description": "dot1dBasePort",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dRegenUserPriority": {
+                      "type": "string",
+                      "description": "dot1dRegenUserPriority",
+                      "x-yang-type": "leafref"
+                    },
+                    "dot1dPortOutboundAccessPriority": {
+                      "type": "integer",
+                      "description": "The Outbound Access Priority the received frame is\n            mapped to.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
               }
             }
           }

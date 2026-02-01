@@ -29,7 +29,27 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetObjects"
+                  "type": "object",
+                  "description": "snmpTargetObjects",
+                  "properties": {
+                    "snmpTargetSpinLock": {
+                      "type": "string",
+                      "description": "This object is used to facilitate modification of table\n          entries in the SNMP-TARGET-MIB module by multiple\n          \n          \n          \n          \n          \n          managers.  In particular, it is useful when modifying\n          the value of the snmpTargetAddrTagList object.\n          \n          The procedure for modifying the snmpTargetAddrTagList\n          object is as follows:\n          \n              1.  Retrieve the value of snmpTargetSpinLock and\n                  of snmpTargetAddrTagList.\n          \n              2.  Generate a new value for snmpTargetAddrTagList.\n          \n              3.  Set the value of snmpTargetSpinLock to the\n                  retrieved value, and the value of\n                  snmpTargetAddrTagList to the new value.  If\n                  the set fails for the snmpTargetSpinLock\n                  object, go back to step 1.",
+                      "x-yang-type": "snmpv2-tc:TestAndIncr"
+                    },
+                    "snmpUnavailableContexts": {
+                      "type": "integer",
+                      "description": "The total number of packets received by the SNMP\n          engine which were dropped because the context\n          contained in the message was unavailable.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "snmpUnknownContexts": {
+                      "type": "integer",
+                      "description": "The total number of packets received by the SNMP\n          engine which were dropped because the context\n          contained in the message was unknown.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetObjects": {
@@ -57,7 +77,112 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetAddrTable"
+                  "type": "object",
+                  "description": "A table of transport addresses to be used in the generation\n        of SNMP messages.",
+                  "properties": {
+                    "snmpTargetAddrName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrTDomain": {
+                      "type": "string",
+                      "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "snmpTargetAddrTAddress": {
+                      "type": "string",
+                      "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "snmpTargetAddrTimeout": {
+                      "type": "string",
+                      "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                      "x-yang-type": "snmpv2-tc:TimeInterval"
+                    },
+                    "snmpTargetAddrRetryCount": {
+                      "type": "integer",
+                      "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "snmpTargetAddrTagList": {
+                      "type": "string",
+                      "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                      "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                    },
+                    "snmpTargetAddrParams": {
+                      "type": "string",
+                      "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetAddrRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "snmpTargetAddrEntry": {
+                      "type": "array",
+                      "description": "A transport address to be used in the generation\n          of SNMP operations.\n          \n          Entries in the snmpTargetAddrTable are created and\n          deleted using the snmpTargetAddrRowStatus object.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "snmpTargetAddrName": {
+                            "type": "string",
+                            "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "snmpTargetAddrTDomain": {
+                            "type": "string",
+                            "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                            "x-yang-type": "snmpv2-tc:TDomain"
+                          },
+                          "snmpTargetAddrTAddress": {
+                            "type": "string",
+                            "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                            "x-yang-type": "snmpv2-tc:TAddress"
+                          },
+                          "snmpTargetAddrTimeout": {
+                            "type": "string",
+                            "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                            "x-yang-type": "snmpv2-tc:TimeInterval"
+                          },
+                          "snmpTargetAddrRetryCount": {
+                            "type": "integer",
+                            "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                            "minimum": -2147483648,
+                            "maximum": 2147483647
+                          },
+                          "snmpTargetAddrTagList": {
+                            "type": "string",
+                            "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                            "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                          },
+                          "snmpTargetAddrParams": {
+                            "type": "string",
+                            "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "snmpTargetAddrStorageType": {
+                            "type": "string",
+                            "description": "The storage type for this conceptual row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          },
+                          "snmpTargetAddrRowStatus": {
+                            "type": "string",
+                            "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetAddrTable": {
@@ -69,7 +194,20 @@
                     "snmpTargetAddrTagList": "192.168.1.1",
                     "snmpTargetAddrParams": "192.168.1.1",
                     "snmpTargetAddrStorageType": "192.168.1.1",
-                    "snmpTargetAddrRowStatus": "192.168.1.1"
+                    "snmpTargetAddrRowStatus": "192.168.1.1",
+                    "snmpTargetAddrEntry": [
+                      {
+                        "snmpTargetAddrName": "192.168.1.1",
+                        "snmpTargetAddrTDomain": "192.168.1.1",
+                        "snmpTargetAddrTAddress": "192.168.1.1",
+                        "snmpTargetAddrTimeout": "192.168.1.1",
+                        "snmpTargetAddrRetryCount": -2147483648,
+                        "snmpTargetAddrTagList": "192.168.1.1",
+                        "snmpTargetAddrParams": "192.168.1.1",
+                        "snmpTargetAddrStorageType": "192.168.1.1",
+                        "snmpTargetAddrRowStatus": "192.168.1.1"
+                      }
+                    ]
                   }
                 }
               }
@@ -92,8 +230,58 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A transport address to be used in the generation\n          of SNMP operations.\n          \n          Entries in the snmpTargetAddrTable are created and\n          deleted using the snmpTargetAddrRowStatus object.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetAddrEntry"
+                    "type": "object",
+                    "properties": {
+                      "snmpTargetAddrName": {
+                        "type": "string",
+                        "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetAddrTDomain": {
+                        "type": "string",
+                        "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                        "x-yang-type": "snmpv2-tc:TDomain"
+                      },
+                      "snmpTargetAddrTAddress": {
+                        "type": "string",
+                        "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                        "x-yang-type": "snmpv2-tc:TAddress"
+                      },
+                      "snmpTargetAddrTimeout": {
+                        "type": "string",
+                        "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                        "x-yang-type": "snmpv2-tc:TimeInterval"
+                      },
+                      "snmpTargetAddrRetryCount": {
+                        "type": "integer",
+                        "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "snmpTargetAddrTagList": {
+                        "type": "string",
+                        "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                        "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                      },
+                      "snmpTargetAddrParams": {
+                        "type": "string",
+                        "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetAddrStorageType": {
+                        "type": "string",
+                        "description": "The storage type for this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "snmpTargetAddrRowStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -141,7 +329,55 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetAddrEntry"
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetAddrName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrTDomain": {
+                      "type": "string",
+                      "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "snmpTargetAddrTAddress": {
+                      "type": "string",
+                      "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "snmpTargetAddrTimeout": {
+                      "type": "string",
+                      "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                      "x-yang-type": "snmpv2-tc:TimeInterval"
+                    },
+                    "snmpTargetAddrRetryCount": {
+                      "type": "integer",
+                      "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "snmpTargetAddrTagList": {
+                      "type": "string",
+                      "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                      "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                    },
+                    "snmpTargetAddrParams": {
+                      "type": "string",
+                      "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetAddrRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetAddrEntry": {
@@ -175,7 +411,90 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetParamsTable"
+                  "type": "object",
+                  "description": "A table of SNMP target information to be used\n        in the generation of SNMP messages.",
+                  "properties": {
+                    "snmpTargetParamsName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsMPModel": {
+                      "type": "string",
+                      "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                    },
+                    "snmpTargetParamsSecurityModel": {
+                      "type": "string",
+                      "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                    },
+                    "snmpTargetParamsSecurityName": {
+                      "type": "string",
+                      "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsSecurityLevel": {
+                      "type": "string",
+                      "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                    },
+                    "snmpTargetParamsStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetParamsRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "snmpTargetParamsEntry": {
+                      "type": "array",
+                      "description": "A set of SNMP target information.\n          \n          Entries in the snmpTargetParamsTable are created and\n          deleted using the snmpTargetParamsRowStatus object.",
+                      "properties": {},
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "snmpTargetParamsName": {
+                            "type": "string",
+                            "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "snmpTargetParamsMPModel": {
+                            "type": "string",
+                            "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                            "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                          },
+                          "snmpTargetParamsSecurityModel": {
+                            "type": "string",
+                            "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                            "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                          },
+                          "snmpTargetParamsSecurityName": {
+                            "type": "string",
+                            "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                          },
+                          "snmpTargetParamsSecurityLevel": {
+                            "type": "string",
+                            "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                            "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                          },
+                          "snmpTargetParamsStorageType": {
+                            "type": "string",
+                            "description": "The storage type for this conceptual row.",
+                            "x-yang-type": "snmpv2-tc:StorageType"
+                          },
+                          "snmpTargetParamsRowStatus": {
+                            "type": "string",
+                            "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                            "x-yang-type": "snmpv2-tc:RowStatus"
+                          }
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetParamsTable": {
@@ -185,7 +504,18 @@
                     "snmpTargetParamsSecurityName": "interface-1",
                     "snmpTargetParamsSecurityLevel": "example-string",
                     "snmpTargetParamsStorageType": "ethernetCsmacd(6)",
-                    "snmpTargetParamsRowStatus": "up(1)"
+                    "snmpTargetParamsRowStatus": "up(1)",
+                    "snmpTargetParamsEntry": [
+                      {
+                        "snmpTargetParamsName": "interface-1",
+                        "snmpTargetParamsMPModel": "example-string",
+                        "snmpTargetParamsSecurityModel": "example-string",
+                        "snmpTargetParamsSecurityName": "interface-1",
+                        "snmpTargetParamsSecurityLevel": "example-string",
+                        "snmpTargetParamsStorageType": "ethernetCsmacd(6)",
+                        "snmpTargetParamsRowStatus": "up(1)"
+                      }
+                    ]
                   }
                 }
               }
@@ -208,8 +538,47 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A set of SNMP target information.\n          \n          Entries in the snmpTargetParamsTable are created and\n          deleted using the snmpTargetParamsRowStatus object.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetParamsEntry"
+                    "type": "object",
+                    "properties": {
+                      "snmpTargetParamsName": {
+                        "type": "string",
+                        "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetParamsMPModel": {
+                        "type": "string",
+                        "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                        "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                      },
+                      "snmpTargetParamsSecurityModel": {
+                        "type": "string",
+                        "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                        "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                      },
+                      "snmpTargetParamsSecurityName": {
+                        "type": "string",
+                        "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetParamsSecurityLevel": {
+                        "type": "string",
+                        "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                        "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                      },
+                      "snmpTargetParamsStorageType": {
+                        "type": "string",
+                        "description": "The storage type for this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "snmpTargetParamsRowStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -255,7 +624,44 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetParamsEntry"
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetParamsName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsMPModel": {
+                      "type": "string",
+                      "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                    },
+                    "snmpTargetParamsSecurityModel": {
+                      "type": "string",
+                      "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                    },
+                    "snmpTargetParamsSecurityName": {
+                      "type": "string",
+                      "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsSecurityLevel": {
+                      "type": "string",
+                      "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                    },
+                    "snmpTargetParamsStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetParamsRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetParamsEntry": {
@@ -288,8 +694,58 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A transport address to be used in the generation\n          of SNMP operations.\n          \n          Entries in the snmpTargetAddrTable are created and\n          deleted using the snmpTargetAddrRowStatus object.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetAddrEntry"
+                    "type": "object",
+                    "properties": {
+                      "snmpTargetAddrName": {
+                        "type": "string",
+                        "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetAddrTDomain": {
+                        "type": "string",
+                        "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                        "x-yang-type": "snmpv2-tc:TDomain"
+                      },
+                      "snmpTargetAddrTAddress": {
+                        "type": "string",
+                        "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                        "x-yang-type": "snmpv2-tc:TAddress"
+                      },
+                      "snmpTargetAddrTimeout": {
+                        "type": "string",
+                        "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                        "x-yang-type": "snmpv2-tc:TimeInterval"
+                      },
+                      "snmpTargetAddrRetryCount": {
+                        "type": "integer",
+                        "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "snmpTargetAddrTagList": {
+                        "type": "string",
+                        "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                        "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                      },
+                      "snmpTargetAddrParams": {
+                        "type": "string",
+                        "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetAddrStorageType": {
+                        "type": "string",
+                        "description": "The storage type for this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "snmpTargetAddrRowStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -337,7 +793,55 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetAddrEntry"
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetAddrName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrTDomain": {
+                      "type": "string",
+                      "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "snmpTargetAddrTAddress": {
+                      "type": "string",
+                      "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "snmpTargetAddrTimeout": {
+                      "type": "string",
+                      "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                      "x-yang-type": "snmpv2-tc:TimeInterval"
+                    },
+                    "snmpTargetAddrRetryCount": {
+                      "type": "integer",
+                      "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "snmpTargetAddrTagList": {
+                      "type": "string",
+                      "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                      "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                    },
+                    "snmpTargetAddrParams": {
+                      "type": "string",
+                      "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetAddrRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetAddrEntry": {
@@ -372,8 +876,47 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
+                  "description": "A set of SNMP target information.\n          \n          Entries in the snmpTargetParamsTable are created and\n          deleted using the snmpTargetParamsRowStatus object.",
+                  "properties": {},
                   "items": {
-                    "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetParamsEntry"
+                    "type": "object",
+                    "properties": {
+                      "snmpTargetParamsName": {
+                        "type": "string",
+                        "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetParamsMPModel": {
+                        "type": "string",
+                        "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                        "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                      },
+                      "snmpTargetParamsSecurityModel": {
+                        "type": "string",
+                        "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                        "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                      },
+                      "snmpTargetParamsSecurityName": {
+                        "type": "string",
+                        "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                        "x-yang-type": "snmp-framework:SnmpAdminString"
+                      },
+                      "snmpTargetParamsSecurityLevel": {
+                        "type": "string",
+                        "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                        "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                      },
+                      "snmpTargetParamsStorageType": {
+                        "type": "string",
+                        "description": "The storage type for this conceptual row.",
+                        "x-yang-type": "snmpv2-tc:StorageType"
+                      },
+                      "snmpTargetParamsRowStatus": {
+                        "type": "string",
+                        "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                        "x-yang-type": "snmpv2-tc:RowStatus"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -419,7 +962,44 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SNMP-TARGET-MIB_snmpTargetParamsEntry"
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetParamsName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsMPModel": {
+                      "type": "string",
+                      "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                    },
+                    "snmpTargetParamsSecurityModel": {
+                      "type": "string",
+                      "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                    },
+                    "snmpTargetParamsSecurityName": {
+                      "type": "string",
+                      "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsSecurityLevel": {
+                      "type": "string",
+                      "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                    },
+                    "snmpTargetParamsStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetParamsRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
                 },
                 "example": {
                   "SNMP-TARGET-MIB:snmpTargetParamsEntry": {
@@ -543,6 +1123,107 @@
             "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
             "x-yang-type": "snmpv2-tc:RowStatus"
           },
+          "snmpTargetAddrEntry": {
+            "type": "array",
+            "description": "A transport address to be used in the generation\n          of SNMP operations.\n          \n          Entries in the snmpTargetAddrTable are created and\n          deleted using the snmpTargetAddrRowStatus object.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "snmpTargetAddrName": {
+                  "type": "string",
+                  "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "snmpTargetAddrTDomain": {
+                  "type": "string",
+                  "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                  "x-yang-type": "snmpv2-tc:TDomain"
+                },
+                "snmpTargetAddrTAddress": {
+                  "type": "string",
+                  "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                  "x-yang-type": "snmpv2-tc:TAddress"
+                },
+                "snmpTargetAddrTimeout": {
+                  "type": "string",
+                  "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                  "x-yang-type": "snmpv2-tc:TimeInterval"
+                },
+                "snmpTargetAddrRetryCount": {
+                  "type": "integer",
+                  "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                  "minimum": -2147483648,
+                  "maximum": 2147483647
+                },
+                "snmpTargetAddrTagList": {
+                  "type": "string",
+                  "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                  "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                },
+                "snmpTargetAddrParams": {
+                  "type": "string",
+                  "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "snmpTargetAddrStorageType": {
+                  "type": "string",
+                  "description": "The storage type for this conceptual row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                },
+                "snmpTargetAddrRowStatus": {
+                  "type": "string",
+                  "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
+          "snmpTargetParamsEntry": {
+            "type": "array",
+            "description": "A set of SNMP target information.\n          \n          Entries in the snmpTargetParamsTable are created and\n          deleted using the snmpTargetParamsRowStatus object.",
+            "properties": {},
+            "items": {
+              "type": "object",
+              "properties": {
+                "snmpTargetParamsName": {
+                  "type": "string",
+                  "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "snmpTargetParamsMPModel": {
+                  "type": "string",
+                  "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                  "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                },
+                "snmpTargetParamsSecurityModel": {
+                  "type": "string",
+                  "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                  "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                },
+                "snmpTargetParamsSecurityName": {
+                  "type": "string",
+                  "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                },
+                "snmpTargetParamsSecurityLevel": {
+                  "type": "string",
+                  "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                  "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                },
+                "snmpTargetParamsStorageType": {
+                  "type": "string",
+                  "description": "The storage type for this conceptual row.",
+                  "x-yang-type": "snmpv2-tc:StorageType"
+                },
+                "snmpTargetParamsRowStatus": {
+                  "type": "string",
+                  "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                  "x-yang-type": "snmpv2-tc:RowStatus"
+                }
+              }
+            }
+          },
           "snmpTargetObjects": {
             "type": "object",
             "description": "snmpTargetObjects",
@@ -615,6 +1296,62 @@
                 "type": "string",
                 "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "snmpTargetAddrEntry": {
+                "type": "array",
+                "description": "A transport address to be used in the generation\n          of SNMP operations.\n          \n          Entries in the snmpTargetAddrTable are created and\n          deleted using the snmpTargetAddrRowStatus object.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetAddrName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetAddrEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrTDomain": {
+                      "type": "string",
+                      "description": "This object indicates the transport type of the address\n            contained in the snmpTargetAddrTAddress object.",
+                      "x-yang-type": "snmpv2-tc:TDomain"
+                    },
+                    "snmpTargetAddrTAddress": {
+                      "type": "string",
+                      "description": "This object contains a transport address.  The format of\n            this address depends on the value of the\n            snmpTargetAddrTDomain object.",
+                      "x-yang-type": "snmpv2-tc:TAddress"
+                    },
+                    "snmpTargetAddrTimeout": {
+                      "type": "string",
+                      "description": "This object should reflect the expected maximum round\n            trip time for communicating with the transport address\n            defined by this row.  When a message is sent to this\n            address, and a response (if one is expected) is not\n            received within this time period, an implementation\n            may assume that the response will not be delivered.\n            \n            Note that the time interval that an application waits\n            for a response may actually be derived from the value\n            of this object.  The method for deriving the actual time\n            interval is implementation dependent.  One such method\n            \n            \n            \n            \n            \n            is to derive the expected round trip time based on a\n            particular retransmission algorithm and on the number\n            of timeouts which have occurred.  The type of message may\n            also be considered when deriving expected round trip\n            times for retransmissions.  For example, if a message is\n            being sent with a securityLevel that indicates both\n            authentication and privacy, the derived value may be\n            increased to compensate for extra processing time spent\n            during authentication and encryption processing.",
+                      "x-yang-type": "snmpv2-tc:TimeInterval"
+                    },
+                    "snmpTargetAddrRetryCount": {
+                      "type": "integer",
+                      "description": "This object specifies a default number of retries to be\n            attempted when a response is not received for a generated\n            message.  An application may provide its own retry count,\n            in which case the value of this object is ignored.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "snmpTargetAddrTagList": {
+                      "type": "string",
+                      "description": "This object contains a list of tag values which are\n            used to select target addresses for a particular\n            operation.",
+                      "x-yang-type": "SNMP-TARGET-MIB:SnmpTagList"
+                    },
+                    "snmpTargetAddrParams": {
+                      "type": "string",
+                      "description": "The value of this object identifies an entry in the\n            snmpTargetParamsTable.  The identified entry\n            contains SNMP parameters to be used when generating\n            messages to be sent to this transport address.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetAddrStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetAddrRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetAddrRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            active until the corresponding instances of\n            snmpTargetAddrTDomain, snmpTargetAddrTAddress, and\n            snmpTargetAddrParams have all been set.\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetAddrTDomain\n                - snmpTargetAddrTAddress\n            An attempt to set these objects while the value of\n            snmpTargetAddrRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           },
@@ -656,6 +1393,51 @@
                 "type": "string",
                 "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
                 "x-yang-type": "snmpv2-tc:RowStatus"
+              },
+              "snmpTargetParamsEntry": {
+                "type": "array",
+                "description": "A set of SNMP target information.\n          \n          Entries in the snmpTargetParamsTable are created and\n          deleted using the snmpTargetParamsRowStatus object.",
+                "properties": {},
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "snmpTargetParamsName": {
+                      "type": "string",
+                      "description": "The locally arbitrary, but unique identifier associated\n            with this snmpTargetParamsEntry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsMPModel": {
+                      "type": "string",
+                      "description": "The Message Processing Model to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpMessageProcessingModel"
+                    },
+                    "snmpTargetParamsSecurityModel": {
+                      "type": "string",
+                      "description": "The Security Model to be used when generating SNMP\n            messages using this entry.  An implementation may\n            choose to return an inconsistentValue error if an\n            attempt is made to set this variable to a value\n            for a security model which the implementation does\n            \n            \n            \n            \n            \n            not support.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityModel"
+                    },
+                    "snmpTargetParamsSecurityName": {
+                      "type": "string",
+                      "description": "The securityName which identifies the Principal on\n            whose behalf SNMP messages will be generated using\n            this entry.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    },
+                    "snmpTargetParamsSecurityLevel": {
+                      "type": "string",
+                      "description": "The Level of Security to be used when generating\n            SNMP messages using this entry.",
+                      "x-yang-type": "snmp-framework:SnmpSecurityLevel"
+                    },
+                    "snmpTargetParamsStorageType": {
+                      "type": "string",
+                      "description": "The storage type for this conceptual row.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    },
+                    "snmpTargetParamsRowStatus": {
+                      "type": "string",
+                      "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            Until instances of all corresponding columns are\n            appropriately configured, the value of the\n            corresponding instance of the snmpTargetParamsRowStatus\n            column is 'notReady'.\n            \n            In particular, a newly created row cannot be made\n            \n            \n            \n            \n            \n            active until the corresponding\n            snmpTargetParamsMPModel,\n            snmpTargetParamsSecurityModel,\n            snmpTargetParamsSecurityName,\n            and snmpTargetParamsSecurityLevel have all been set.\n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpTargetParamsMPModel\n                - snmpTargetParamsSecurityModel\n                - snmpTargetParamsSecurityName\n                - snmpTargetParamsSecurityLevel\n            An attempt to set these objects while the value of\n            snmpTargetParamsRowStatus is active(1) will result in\n            an inconsistentValue error.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                }
               }
             }
           }
