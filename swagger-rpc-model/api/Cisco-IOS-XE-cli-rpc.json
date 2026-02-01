@@ -32,12 +32,47 @@
                 "type": "object",
                 "properties": {
                   "cli_rpc:config-ios-cli-rpc": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "config-clis": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 60000,
+                        "description": "Configuration CLI commands"
+                      },
+                      "timeout": {
+                        "type": "integer",
+                        "minimum": 10,
+                        "maximum": 1800,
+                        "description": "Configurable timeout for the RPC",
+                        "default": "300"
+                      },
+                      "error-tag": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64,
+                        "description": "Tag returned in the response if parser response matches\n           the error-pattern"
+                      },
+                      "error-pattern": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256,
+                        "description": "error pattern to check against the parser response."
+                      }
+                    },
+                    "required": [
+                      "config-clis"
+                    ]
                   }
                 }
               },
               "example": {
-                "cli_rpc:config-ios-cli-rpc": {}
+                "cli_rpc:config-ios-cli-rpc": {
+                  "config-clis": "example-string",
+                  "timeout": 30,
+                  "error-tag": "example-string",
+                  "error-pattern": "example-string"
+                }
               }
             }
           }
@@ -48,9 +83,39 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Output returned by the network element"
+                    },
+                    "lineno": {
+                      "type": "string",
+                      "description": "line number of the failed CLI"
+                    },
+                    "error-code": {
+                      "type": "string",
+                      "description": "Error code returned by the parser"
+                    },
+                    "error-string": {
+                      "type": "string",
+                      "description": "Error string"
+                    },
+                    "error-tag": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "description": "supplied error tag that matched the error-pattern"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "result": "example-string",
+                  "lineno": "example-string",
+                  "error-code": "example-string",
+                  "error-string": "example-string",
+                  "error-tag": "example-string"
+                }
               }
             }
           },

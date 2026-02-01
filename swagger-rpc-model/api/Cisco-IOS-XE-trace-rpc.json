@@ -32,12 +32,57 @@
                 "type": "object",
                 "properties": {
                   "trace_rpc:trace-archive": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "location": {
+                        "type": "string",
+                        "description": "Location where archive gets generated"
+                      },
+                      "file-name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "pattern": "[A-Za-z0-9_@!-/]*",
+                        "description": "Name of the archive. When trace bundle is generated.\n         File name is limited to 100 characters"
+                      },
+                      "all": {
+                        "type": "object",
+                        "properties": {
+                          "location": {
+                            "type": "string",
+                            "description": "Location where archive gets generated"
+                          },
+                          "file-name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "[A-Za-z0-9_@!-/]*",
+                            "description": "Name of the archive. When trace bundle is generated.\n         File name is limited to 100 characters"
+                          }
+                        },
+                        "required": [
+                          "location",
+                          "file-name"
+                        ],
+                        "description": "Generate trace archive"
+                      }
+                    },
+                    "required": [
+                      "location",
+                      "file-name"
+                    ]
                   }
                 }
               },
               "example": {
-                "trace_rpc:trace-archive": {}
+                "trace_rpc:trace-archive": {
+                  "location": "example-string",
+                  "file-name": "flash:/config.txt",
+                  "all": {
+                    "location": "example-string",
+                    "file-name": "flash:/config.txt"
+                  }
+                }
               }
             }
           }
@@ -48,9 +93,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "unique-id": {
+                      "type": "string",
+                      "description": "The unique identifier is a number which is generated for\n         a successful trace archive rpc action."
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "unique-id": "example-string"
+                }
               }
             }
           },
@@ -82,12 +135,1567 @@
                 "type": "object",
                 "properties": {
                   "trace_rpc:trace-message": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "file-location": {
+                        "type": "string",
+                        "description": "Location where file will be generated"
+                      },
+                      "file-name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "pattern": "[A-Za-z0-9_@!-/]*",
+                        "description": "Name of the file that will be generated.\n         A UTC date string will be appended to the file name and will be\n         the name of trace bundle. For example, when RPC is fired with\n         file name as 'trace-file' at 2021:01:01 01:01:01,\n         the name of trace bundle will be  'trace-file-20210101-010101.tar.gz'.\n         File name is limited to 100 characters"
+                      },
+                      "start-marker-type": {
+                        "type": "string",
+                        "description": "Marker type start or start last to select logs",
+                        "default": "trace-marker-start-none"
+                      },
+                      "end-marker-type": {
+                        "type": "string",
+                        "description": "Marker end start or end last to stop logging",
+                        "default": "trace-marker-end-none"
+                      },
+                      "start-marker": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Display logs when a specific marker is found in file set",
+                        "default": "none"
+                      },
+                      "end-marker": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                        "default": "none"
+                      },
+                      "start-type": {
+                        "type": "string",
+                        "description": "Type of start interval options",
+                        "default": "start-interval-none"
+                      },
+                      "start-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967295,
+                        "description": "Allows to fill value of start interval period",
+                        "default": "0"
+                      },
+                      "end-type": {
+                        "type": "string",
+                        "description": "Type of end interval options",
+                        "default": "end-interval-none"
+                      },
+                      "end-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967295,
+                        "description": "Allows to fill value of end interval period",
+                        "default": "0"
+                      },
+                      "start-timestamp": {
+                        "type": "string",
+                        "description": "Start time stamp for filtering log",
+                        "default": "1970-01-01T00:00:00.000000Z"
+                      },
+                      "end-timestamp": {
+                        "type": "string",
+                        "description": "End time stamp for filtering log",
+                        "default": "1970-01-01T00:00:00.000000Z"
+                      },
+                      "filter-none": {
+                        "type": "string",
+                        "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                        "default": "true"
+                      },
+                      "mac-address": {
+                        "type": "string",
+                        "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                        "default": "00:00:00:00:00:00"
+                      },
+                      "integer-value": {
+                        "type": "string",
+                        "description": "Integer-based filter",
+                        "default": "none"
+                      },
+                      "ipv4-address": {
+                        "type": "string",
+                        "description": "IPv4-based filter",
+                        "default": "0.0.0.0"
+                      },
+                      "ipv6-address": {
+                        "type": "string",
+                        "description": "IPv6-based filter",
+                        "default": "::ff"
+                      },
+                      "uuid-string": {
+                        "type": "string",
+                        "description": "UUID based filter",
+                        "default": "none"
+                      },
+                      "string-value": {
+                        "type": "string",
+                        "description": "String based filter",
+                        "default": "none"
+                      },
+                      "switch-id": {
+                        "type": "string",
+                        "description": "Switch",
+                        "default": "switch-none"
+                      },
+                      "switch-num": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2,
+                        "description": "Set switch number 1 or 2 for logging",
+                        "default": "1"
+                      },
+                      "metadata": {
+                        "type": "string",
+                        "description": "Display meta data for every log message",
+                        "default": "false"
+                      },
+                      "pcap-extract": {
+                        "type": "string",
+                        "description": "Packet capture file to extract",
+                        "default": "false"
+                      },
+                      "debug-level-id": {
+                        "type": "string",
+                        "description": "Debug level for logging the logs",
+                        "default": "debug-level-none"
+                      },
+                      "consumer": {
+                        "type": "string",
+                        "description": "Consumer type for logs",
+                        "default": "trace-tac"
+                      },
+                      "tof-flag": {
+                        "type": "string",
+                        "description": "Display trace on failure logs",
+                        "default": "false"
+                      },
+                      "module": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Select logs for specific modules",
+                        "default": "none"
+                      },
+                      "marker": {
+                        "type": "object",
+                        "properties": {
+                          "start-marker-type": {
+                            "type": "string",
+                            "description": "Marker type start or start last to select logs",
+                            "default": "trace-marker-start-none"
+                          },
+                          "end-marker-type": {
+                            "type": "string",
+                            "description": "Marker end start or end last to stop logging",
+                            "default": "trace-marker-end-none"
+                          },
+                          "start-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Display logs when a specific marker is found in file set",
+                            "default": "none"
+                          },
+                          "end-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                            "default": "none"
+                          }
+                        },
+                        "description": "Marker for displaying logs"
+                      },
+                      "interval": {
+                        "type": "object",
+                        "properties": {
+                          "start-type": {
+                            "type": "string",
+                            "description": "Type of start interval options",
+                            "default": "start-interval-none"
+                          },
+                          "start-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of start interval period",
+                            "default": "0"
+                          },
+                          "end-type": {
+                            "type": "string",
+                            "description": "Type of end interval options",
+                            "default": "end-interval-none"
+                          },
+                          "end-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of end interval period",
+                            "default": "0"
+                          }
+                        },
+                        "description": "Interval for displaying logs"
+                      },
+                      "timestamp": {
+                        "type": "object",
+                        "properties": {
+                          "start-timestamp": {
+                            "type": "string",
+                            "description": "Start time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          },
+                          "end-timestamp": {
+                            "type": "string",
+                            "description": "End time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          }
+                        },
+                        "description": "Use time stamp for filtering log"
+                      },
+                      "filter": {
+                        "type": "object",
+                        "properties": {
+                          "filter-none": {
+                            "type": "string",
+                            "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                            "default": "true"
+                          },
+                          "mac-address": {
+                            "type": "string",
+                            "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                            "default": "00:00:00:00:00:00"
+                          },
+                          "integer-value": {
+                            "type": "string",
+                            "description": "Integer-based filter",
+                            "default": "none"
+                          },
+                          "ipv4-address": {
+                            "type": "string",
+                            "description": "IPv4-based filter",
+                            "default": "0.0.0.0"
+                          },
+                          "ipv6-address": {
+                            "type": "string",
+                            "description": "IPv6-based filter",
+                            "default": "::ff"
+                          },
+                          "uuid-string": {
+                            "type": "string",
+                            "description": "UUID based filter",
+                            "default": "none"
+                          },
+                          "string-value": {
+                            "type": "string",
+                            "description": "String based filter",
+                            "default": "none"
+                          }
+                        },
+                        "description": "Select logs using filter"
+                      },
+                      "switch-info": {
+                        "type": "object",
+                        "properties": {
+                          "switch-id": {
+                            "type": "string",
+                            "description": "Switch",
+                            "default": "switch-none"
+                          },
+                          "switch-num": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2,
+                            "description": "Set switch number 1 or 2 for logging",
+                            "default": "1"
+                          }
+                        },
+                        "description": "Information about switch for logging"
+                      },
+                      "profile-option": {
+                        "type": "string",
+                        "description": "Trace profile type",
+                        "default": "trace-profile-predefined"
+                      },
+                      "profile-location": {
+                        "type": "string",
+                        "description": "Location of the profile file",
+                        "default": "bootflash"
+                      },
+                      "profile-file": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "pattern": "[A-Za-z0-9_@!-/]*",
+                        "description": "Name of the profile file.\n         File name is limited to 100 characters",
+                        "default": "none"
+                      },
+                      "predefined-profile": {
+                        "type": "string",
+                        "description": " Allows to select pre-defined profile name",
+                        "default": "all-profiles"
+                      },
+                      "process": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "Process name to show logs for specific process"
+                      },
+                      "file-info": {
+                        "type": "object",
+                        "properties": {
+                          "file-location": {
+                            "type": "string",
+                            "description": "Location where file will be generated"
+                          },
+                          "file-name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "[A-Za-z0-9_@!-/]*",
+                            "description": "Name of the file that will be generated.\n         A UTC date string will be appended to the file name and will be\n         the name of trace bundle. For example, when RPC is fired with\n         file name as 'trace-file' at 2021:01:01 01:01:01,\n         the name of trace bundle will be  'trace-file-20210101-010101.tar.gz'.\n         File name is limited to 100 characters"
+                          }
+                        },
+                        "required": [
+                          "file-location",
+                          "file-name"
+                        ],
+                        "description": "Location and name of file"
+                      },
+                      "trace-filter-options": {
+                        "type": "object",
+                        "properties": {
+                          "start-marker-type": {
+                            "type": "string",
+                            "description": "Marker type start or start last to select logs",
+                            "default": "trace-marker-start-none"
+                          },
+                          "end-marker-type": {
+                            "type": "string",
+                            "description": "Marker end start or end last to stop logging",
+                            "default": "trace-marker-end-none"
+                          },
+                          "start-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Display logs when a specific marker is found in file set",
+                            "default": "none"
+                          },
+                          "end-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                            "default": "none"
+                          },
+                          "start-type": {
+                            "type": "string",
+                            "description": "Type of start interval options",
+                            "default": "start-interval-none"
+                          },
+                          "start-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of start interval period",
+                            "default": "0"
+                          },
+                          "end-type": {
+                            "type": "string",
+                            "description": "Type of end interval options",
+                            "default": "end-interval-none"
+                          },
+                          "end-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of end interval period",
+                            "default": "0"
+                          },
+                          "start-timestamp": {
+                            "type": "string",
+                            "description": "Start time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          },
+                          "end-timestamp": {
+                            "type": "string",
+                            "description": "End time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          },
+                          "filter-none": {
+                            "type": "string",
+                            "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                            "default": "true"
+                          },
+                          "mac-address": {
+                            "type": "string",
+                            "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                            "default": "00:00:00:00:00:00"
+                          },
+                          "integer-value": {
+                            "type": "string",
+                            "description": "Integer-based filter",
+                            "default": "none"
+                          },
+                          "ipv4-address": {
+                            "type": "string",
+                            "description": "IPv4-based filter",
+                            "default": "0.0.0.0"
+                          },
+                          "ipv6-address": {
+                            "type": "string",
+                            "description": "IPv6-based filter",
+                            "default": "::ff"
+                          },
+                          "uuid-string": {
+                            "type": "string",
+                            "description": "UUID based filter",
+                            "default": "none"
+                          },
+                          "string-value": {
+                            "type": "string",
+                            "description": "String based filter",
+                            "default": "none"
+                          },
+                          "switch-id": {
+                            "type": "string",
+                            "description": "Switch",
+                            "default": "switch-none"
+                          },
+                          "switch-num": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2,
+                            "description": "Set switch number 1 or 2 for logging",
+                            "default": "1"
+                          },
+                          "metadata": {
+                            "type": "string",
+                            "description": "Display meta data for every log message",
+                            "default": "false"
+                          },
+                          "pcap-extract": {
+                            "type": "string",
+                            "description": "Packet capture file to extract",
+                            "default": "false"
+                          },
+                          "debug-level-id": {
+                            "type": "string",
+                            "description": "Debug level for logging the logs",
+                            "default": "debug-level-none"
+                          },
+                          "consumer": {
+                            "type": "string",
+                            "description": "Consumer type for logs",
+                            "default": "trace-tac"
+                          },
+                          "tof-flag": {
+                            "type": "string",
+                            "description": "Display trace on failure logs",
+                            "default": "false"
+                          },
+                          "module": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Select logs for specific modules",
+                            "default": "none"
+                          },
+                          "marker": {
+                            "type": "object",
+                            "properties": {
+                              "start-marker-type": {
+                                "type": "string",
+                                "description": "Marker type start or start last to select logs",
+                                "default": "trace-marker-start-none"
+                              },
+                              "end-marker-type": {
+                                "type": "string",
+                                "description": "Marker end start or end last to stop logging",
+                                "default": "trace-marker-end-none"
+                              },
+                              "start-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Display logs when a specific marker is found in file set",
+                                "default": "none"
+                              },
+                              "end-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                                "default": "none"
+                              }
+                            },
+                            "description": "Marker for displaying logs"
+                          },
+                          "interval": {
+                            "type": "object",
+                            "properties": {
+                              "start-type": {
+                                "type": "string",
+                                "description": "Type of start interval options",
+                                "default": "start-interval-none"
+                              },
+                              "start-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of start interval period",
+                                "default": "0"
+                              },
+                              "end-type": {
+                                "type": "string",
+                                "description": "Type of end interval options",
+                                "default": "end-interval-none"
+                              },
+                              "end-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of end interval period",
+                                "default": "0"
+                              }
+                            },
+                            "description": "Interval for displaying logs"
+                          },
+                          "timestamp": {
+                            "type": "object",
+                            "properties": {
+                              "start-timestamp": {
+                                "type": "string",
+                                "description": "Start time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              },
+                              "end-timestamp": {
+                                "type": "string",
+                                "description": "End time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              }
+                            },
+                            "description": "Use time stamp for filtering log"
+                          },
+                          "filter": {
+                            "type": "object",
+                            "properties": {
+                              "filter-none": {
+                                "type": "string",
+                                "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                                "default": "true"
+                              },
+                              "mac-address": {
+                                "type": "string",
+                                "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                                "default": "00:00:00:00:00:00"
+                              },
+                              "integer-value": {
+                                "type": "string",
+                                "description": "Integer-based filter",
+                                "default": "none"
+                              },
+                              "ipv4-address": {
+                                "type": "string",
+                                "description": "IPv4-based filter",
+                                "default": "0.0.0.0"
+                              },
+                              "ipv6-address": {
+                                "type": "string",
+                                "description": "IPv6-based filter",
+                                "default": "::ff"
+                              },
+                              "uuid-string": {
+                                "type": "string",
+                                "description": "UUID based filter",
+                                "default": "none"
+                              },
+                              "string-value": {
+                                "type": "string",
+                                "description": "String based filter",
+                                "default": "none"
+                              }
+                            },
+                            "description": "Select logs using filter"
+                          },
+                          "switch-info": {
+                            "type": "object",
+                            "properties": {
+                              "switch-id": {
+                                "type": "string",
+                                "description": "Switch",
+                                "default": "switch-none"
+                              },
+                              "switch-num": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 2,
+                                "description": "Set switch number 1 or 2 for logging",
+                                "default": "1"
+                              }
+                            },
+                            "description": "Information about switch for logging"
+                          }
+                        },
+                        "description": "Show logs of specific file"
+                      },
+                      "profile": {
+                        "type": "object",
+                        "properties": {
+                          "profile-option": {
+                            "type": "string",
+                            "description": "Trace profile type",
+                            "default": "trace-profile-predefined"
+                          },
+                          "profile-location": {
+                            "type": "string",
+                            "description": "Location of the profile file",
+                            "default": "bootflash"
+                          },
+                          "profile-file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "[A-Za-z0-9_@!-/]*",
+                            "description": "Name of the profile file.\n         File name is limited to 100 characters",
+                            "default": "none"
+                          },
+                          "predefined-profile": {
+                            "type": "string",
+                            "description": " Allows to select pre-defined profile name",
+                            "default": "all-profiles"
+                          }
+                        },
+                        "description": "Profile name: show logs of specific profile number"
+                      },
+                      "trace-all-options": {
+                        "type": "object",
+                        "properties": {
+                          "file-location": {
+                            "type": "string",
+                            "description": "Location where file will be generated"
+                          },
+                          "file-name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "[A-Za-z0-9_@!-/]*",
+                            "description": "Name of the file that will be generated.\n         A UTC date string will be appended to the file name and will be\n         the name of trace bundle. For example, when RPC is fired with\n         file name as 'trace-file' at 2021:01:01 01:01:01,\n         the name of trace bundle will be  'trace-file-20210101-010101.tar.gz'.\n         File name is limited to 100 characters"
+                          },
+                          "start-marker-type": {
+                            "type": "string",
+                            "description": "Marker type start or start last to select logs",
+                            "default": "trace-marker-start-none"
+                          },
+                          "end-marker-type": {
+                            "type": "string",
+                            "description": "Marker end start or end last to stop logging",
+                            "default": "trace-marker-end-none"
+                          },
+                          "start-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Display logs when a specific marker is found in file set",
+                            "default": "none"
+                          },
+                          "end-marker": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                            "default": "none"
+                          },
+                          "start-type": {
+                            "type": "string",
+                            "description": "Type of start interval options",
+                            "default": "start-interval-none"
+                          },
+                          "start-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of start interval period",
+                            "default": "0"
+                          },
+                          "end-type": {
+                            "type": "string",
+                            "description": "Type of end interval options",
+                            "default": "end-interval-none"
+                          },
+                          "end-interval": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295,
+                            "description": "Allows to fill value of end interval period",
+                            "default": "0"
+                          },
+                          "start-timestamp": {
+                            "type": "string",
+                            "description": "Start time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          },
+                          "end-timestamp": {
+                            "type": "string",
+                            "description": "End time stamp for filtering log",
+                            "default": "1970-01-01T00:00:00.000000Z"
+                          },
+                          "filter-none": {
+                            "type": "string",
+                            "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                            "default": "true"
+                          },
+                          "mac-address": {
+                            "type": "string",
+                            "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                            "default": "00:00:00:00:00:00"
+                          },
+                          "integer-value": {
+                            "type": "string",
+                            "description": "Integer-based filter",
+                            "default": "none"
+                          },
+                          "ipv4-address": {
+                            "type": "string",
+                            "description": "IPv4-based filter",
+                            "default": "0.0.0.0"
+                          },
+                          "ipv6-address": {
+                            "type": "string",
+                            "description": "IPv6-based filter",
+                            "default": "::ff"
+                          },
+                          "uuid-string": {
+                            "type": "string",
+                            "description": "UUID based filter",
+                            "default": "none"
+                          },
+                          "string-value": {
+                            "type": "string",
+                            "description": "String based filter",
+                            "default": "none"
+                          },
+                          "switch-id": {
+                            "type": "string",
+                            "description": "Switch",
+                            "default": "switch-none"
+                          },
+                          "switch-num": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 2,
+                            "description": "Set switch number 1 or 2 for logging",
+                            "default": "1"
+                          },
+                          "metadata": {
+                            "type": "string",
+                            "description": "Display meta data for every log message",
+                            "default": "false"
+                          },
+                          "pcap-extract": {
+                            "type": "string",
+                            "description": "Packet capture file to extract",
+                            "default": "false"
+                          },
+                          "debug-level-id": {
+                            "type": "string",
+                            "description": "Debug level for logging the logs",
+                            "default": "debug-level-none"
+                          },
+                          "consumer": {
+                            "type": "string",
+                            "description": "Consumer type for logs",
+                            "default": "trace-tac"
+                          },
+                          "tof-flag": {
+                            "type": "string",
+                            "description": "Display trace on failure logs",
+                            "default": "false"
+                          },
+                          "module": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Select logs for specific modules",
+                            "default": "none"
+                          },
+                          "marker": {
+                            "type": "object",
+                            "properties": {
+                              "start-marker-type": {
+                                "type": "string",
+                                "description": "Marker type start or start last to select logs",
+                                "default": "trace-marker-start-none"
+                              },
+                              "end-marker-type": {
+                                "type": "string",
+                                "description": "Marker end start or end last to stop logging",
+                                "default": "trace-marker-end-none"
+                              },
+                              "start-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Display logs when a specific marker is found in file set",
+                                "default": "none"
+                              },
+                              "end-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                                "default": "none"
+                              }
+                            },
+                            "description": "Marker for displaying logs"
+                          },
+                          "interval": {
+                            "type": "object",
+                            "properties": {
+                              "start-type": {
+                                "type": "string",
+                                "description": "Type of start interval options",
+                                "default": "start-interval-none"
+                              },
+                              "start-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of start interval period",
+                                "default": "0"
+                              },
+                              "end-type": {
+                                "type": "string",
+                                "description": "Type of end interval options",
+                                "default": "end-interval-none"
+                              },
+                              "end-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of end interval period",
+                                "default": "0"
+                              }
+                            },
+                            "description": "Interval for displaying logs"
+                          },
+                          "timestamp": {
+                            "type": "object",
+                            "properties": {
+                              "start-timestamp": {
+                                "type": "string",
+                                "description": "Start time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              },
+                              "end-timestamp": {
+                                "type": "string",
+                                "description": "End time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              }
+                            },
+                            "description": "Use time stamp for filtering log"
+                          },
+                          "filter": {
+                            "type": "object",
+                            "properties": {
+                              "filter-none": {
+                                "type": "string",
+                                "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                                "default": "true"
+                              },
+                              "mac-address": {
+                                "type": "string",
+                                "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                                "default": "00:00:00:00:00:00"
+                              },
+                              "integer-value": {
+                                "type": "string",
+                                "description": "Integer-based filter",
+                                "default": "none"
+                              },
+                              "ipv4-address": {
+                                "type": "string",
+                                "description": "IPv4-based filter",
+                                "default": "0.0.0.0"
+                              },
+                              "ipv6-address": {
+                                "type": "string",
+                                "description": "IPv6-based filter",
+                                "default": "::ff"
+                              },
+                              "uuid-string": {
+                                "type": "string",
+                                "description": "UUID based filter",
+                                "default": "none"
+                              },
+                              "string-value": {
+                                "type": "string",
+                                "description": "String based filter",
+                                "default": "none"
+                              }
+                            },
+                            "description": "Select logs using filter"
+                          },
+                          "switch-info": {
+                            "type": "object",
+                            "properties": {
+                              "switch-id": {
+                                "type": "string",
+                                "description": "Switch",
+                                "default": "switch-none"
+                              },
+                              "switch-num": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 2,
+                                "description": "Set switch number 1 or 2 for logging",
+                                "default": "1"
+                              }
+                            },
+                            "description": "Information about switch for logging"
+                          },
+                          "profile-option": {
+                            "type": "string",
+                            "description": "Trace profile type",
+                            "default": "trace-profile-predefined"
+                          },
+                          "profile-location": {
+                            "type": "string",
+                            "description": "Location of the profile file",
+                            "default": "bootflash"
+                          },
+                          "profile-file": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "[A-Za-z0-9_@!-/]*",
+                            "description": "Name of the profile file.\n         File name is limited to 100 characters",
+                            "default": "none"
+                          },
+                          "predefined-profile": {
+                            "type": "string",
+                            "description": " Allows to select pre-defined profile name",
+                            "default": "all-profiles"
+                          },
+                          "process": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Process name to show logs for specific process"
+                          },
+                          "file-info": {
+                            "type": "object",
+                            "properties": {
+                              "file-location": {
+                                "type": "string",
+                                "description": "Location where file will be generated"
+                              },
+                              "file-name": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 100,
+                                "pattern": "[A-Za-z0-9_@!-/]*",
+                                "description": "Name of the file that will be generated.\n         A UTC date string will be appended to the file name and will be\n         the name of trace bundle. For example, when RPC is fired with\n         file name as 'trace-file' at 2021:01:01 01:01:01,\n         the name of trace bundle will be  'trace-file-20210101-010101.tar.gz'.\n         File name is limited to 100 characters"
+                              }
+                            },
+                            "required": [
+                              "file-location",
+                              "file-name"
+                            ],
+                            "description": "Location and name of file"
+                          },
+                          "trace-filter-options": {
+                            "type": "object",
+                            "properties": {
+                              "start-marker-type": {
+                                "type": "string",
+                                "description": "Marker type start or start last to select logs",
+                                "default": "trace-marker-start-none"
+                              },
+                              "end-marker-type": {
+                                "type": "string",
+                                "description": "Marker end start or end last to stop logging",
+                                "default": "trace-marker-end-none"
+                              },
+                              "start-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Display logs when a specific marker is found in file set",
+                                "default": "none"
+                              },
+                              "end-marker": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                                "default": "none"
+                              },
+                              "start-type": {
+                                "type": "string",
+                                "description": "Type of start interval options",
+                                "default": "start-interval-none"
+                              },
+                              "start-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of start interval period",
+                                "default": "0"
+                              },
+                              "end-type": {
+                                "type": "string",
+                                "description": "Type of end interval options",
+                                "default": "end-interval-none"
+                              },
+                              "end-interval": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Allows to fill value of end interval period",
+                                "default": "0"
+                              },
+                              "start-timestamp": {
+                                "type": "string",
+                                "description": "Start time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              },
+                              "end-timestamp": {
+                                "type": "string",
+                                "description": "End time stamp for filtering log",
+                                "default": "1970-01-01T00:00:00.000000Z"
+                              },
+                              "filter-none": {
+                                "type": "string",
+                                "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                                "default": "true"
+                              },
+                              "mac-address": {
+                                "type": "string",
+                                "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                                "default": "00:00:00:00:00:00"
+                              },
+                              "integer-value": {
+                                "type": "string",
+                                "description": "Integer-based filter",
+                                "default": "none"
+                              },
+                              "ipv4-address": {
+                                "type": "string",
+                                "description": "IPv4-based filter",
+                                "default": "0.0.0.0"
+                              },
+                              "ipv6-address": {
+                                "type": "string",
+                                "description": "IPv6-based filter",
+                                "default": "::ff"
+                              },
+                              "uuid-string": {
+                                "type": "string",
+                                "description": "UUID based filter",
+                                "default": "none"
+                              },
+                              "string-value": {
+                                "type": "string",
+                                "description": "String based filter",
+                                "default": "none"
+                              },
+                              "switch-id": {
+                                "type": "string",
+                                "description": "Switch",
+                                "default": "switch-none"
+                              },
+                              "switch-num": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 2,
+                                "description": "Set switch number 1 or 2 for logging",
+                                "default": "1"
+                              },
+                              "metadata": {
+                                "type": "string",
+                                "description": "Display meta data for every log message",
+                                "default": "false"
+                              },
+                              "pcap-extract": {
+                                "type": "string",
+                                "description": "Packet capture file to extract",
+                                "default": "false"
+                              },
+                              "debug-level-id": {
+                                "type": "string",
+                                "description": "Debug level for logging the logs",
+                                "default": "debug-level-none"
+                              },
+                              "consumer": {
+                                "type": "string",
+                                "description": "Consumer type for logs",
+                                "default": "trace-tac"
+                              },
+                              "tof-flag": {
+                                "type": "string",
+                                "description": "Display trace on failure logs",
+                                "default": "false"
+                              },
+                              "module": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 128,
+                                "description": "Select logs for specific modules",
+                                "default": "none"
+                              },
+                              "marker": {
+                                "type": "object",
+                                "properties": {
+                                  "start-marker-type": {
+                                    "type": "string",
+                                    "description": "Marker type start or start last to select logs",
+                                    "default": "trace-marker-start-none"
+                                  },
+                                  "end-marker-type": {
+                                    "type": "string",
+                                    "description": "Marker end start or end last to stop logging",
+                                    "default": "trace-marker-end-none"
+                                  },
+                                  "start-marker": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 128,
+                                    "description": "Display logs when a specific marker is found in file set",
+                                    "default": "none"
+                                  },
+                                  "end-marker": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 128,
+                                    "description": "Stop displaying logs when a specific marker\n         is found in file set",
+                                    "default": "none"
+                                  }
+                                },
+                                "description": "Marker for displaying logs"
+                              },
+                              "interval": {
+                                "type": "object",
+                                "properties": {
+                                  "start-type": {
+                                    "type": "string",
+                                    "description": "Type of start interval options",
+                                    "default": "start-interval-none"
+                                  },
+                                  "start-interval": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 4294967295,
+                                    "description": "Allows to fill value of start interval period",
+                                    "default": "0"
+                                  },
+                                  "end-type": {
+                                    "type": "string",
+                                    "description": "Type of end interval options",
+                                    "default": "end-interval-none"
+                                  },
+                                  "end-interval": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 4294967295,
+                                    "description": "Allows to fill value of end interval period",
+                                    "default": "0"
+                                  }
+                                },
+                                "description": "Interval for displaying logs"
+                              },
+                              "timestamp": {
+                                "type": "object",
+                                "properties": {
+                                  "start-timestamp": {
+                                    "type": "string",
+                                    "description": "Start time stamp for filtering log",
+                                    "default": "1970-01-01T00:00:00.000000Z"
+                                  },
+                                  "end-timestamp": {
+                                    "type": "string",
+                                    "description": "End time stamp for filtering log",
+                                    "default": "1970-01-01T00:00:00.000000Z"
+                                  }
+                                },
+                                "description": "Use time stamp for filtering log"
+                              },
+                              "filter": {
+                                "type": "object",
+                                "properties": {
+                                  "filter-none": {
+                                    "type": "string",
+                                    "description": "Default option - no action needed by user.\n             [Optional]: 'filter-none' can be set to true by user,\n             though it is a default option. If the user intends to use any of the\n             'filter-by-choice' options other than 'type-none', example -\n             type-mac-address, type-ipv4-address etc. 'filter-none' will be set\n             to default value and user need not modify this value.",
+                                    "default": "true"
+                                  },
+                                  "mac-address": {
+                                    "type": "string",
+                                    "description": "MAC address filter. Make sure it\n             is in 'aa:aa:aa:aa:aa:aa' format",
+                                    "default": "00:00:00:00:00:00"
+                                  },
+                                  "integer-value": {
+                                    "type": "string",
+                                    "description": "Integer-based filter",
+                                    "default": "none"
+                                  },
+                                  "ipv4-address": {
+                                    "type": "string",
+                                    "description": "IPv4-based filter",
+                                    "default": "0.0.0.0"
+                                  },
+                                  "ipv6-address": {
+                                    "type": "string",
+                                    "description": "IPv6-based filter",
+                                    "default": "::ff"
+                                  },
+                                  "uuid-string": {
+                                    "type": "string",
+                                    "description": "UUID based filter",
+                                    "default": "none"
+                                  },
+                                  "string-value": {
+                                    "type": "string",
+                                    "description": "String based filter",
+                                    "default": "none"
+                                  }
+                                },
+                                "description": "Select logs using filter"
+                              },
+                              "switch-info": {
+                                "type": "object",
+                                "properties": {
+                                  "switch-id": {
+                                    "type": "string",
+                                    "description": "Switch",
+                                    "default": "switch-none"
+                                  },
+                                  "switch-num": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 2,
+                                    "description": "Set switch number 1 or 2 for logging",
+                                    "default": "1"
+                                  }
+                                },
+                                "description": "Information about switch for logging"
+                              }
+                            },
+                            "description": "Show logs of specific file"
+                          },
+                          "profile": {
+                            "type": "object",
+                            "properties": {
+                              "profile-option": {
+                                "type": "string",
+                                "description": "Trace profile type",
+                                "default": "trace-profile-predefined"
+                              },
+                              "profile-location": {
+                                "type": "string",
+                                "description": "Location of the profile file",
+                                "default": "bootflash"
+                              },
+                              "profile-file": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 100,
+                                "pattern": "[A-Za-z0-9_@!-/]*",
+                                "description": "Name of the profile file.\n         File name is limited to 100 characters",
+                                "default": "none"
+                              },
+                              "predefined-profile": {
+                                "type": "string",
+                                "description": " Allows to select pre-defined profile name",
+                                "default": "all-profiles"
+                              }
+                            },
+                            "description": "Profile name: show logs of specific profile number"
+                          }
+                        },
+                        "required": [
+                          "file-location",
+                          "file-name",
+                          "process"
+                        ],
+                        "description": "Options for generating logs"
+                      }
+                    },
+                    "required": [
+                      "file-location",
+                      "file-name",
+                      "process"
+                    ]
                   }
                 }
               },
               "example": {
-                "trace_rpc:trace-message": {}
+                "trace_rpc:trace-message": {
+                  "file-location": "flash:/config.txt",
+                  "file-name": "flash:/config.txt",
+                  "start-marker-type": "example-string",
+                  "end-marker-type": "example-string",
+                  "start-marker": "example-string",
+                  "end-marker": "example-string",
+                  "start-type": "example-string",
+                  "start-interval": 10,
+                  "end-type": "example-string",
+                  "end-interval": 10,
+                  "start-timestamp": "example-string",
+                  "end-timestamp": "example-string",
+                  "filter-none": "example-string",
+                  "mac-address": "00:11:22:33:44:55",
+                  "integer-value": "example-string",
+                  "ipv4-address": "192.168.1.1",
+                  "ipv6-address": "2001:db8::1",
+                  "uuid-string": "example-string",
+                  "string-value": "example-string",
+                  "switch-id": "example-string",
+                  "switch-num": 2,
+                  "metadata": "example-string",
+                  "pcap-extract": "example-string",
+                  "debug-level-id": "example-string",
+                  "consumer": "example-string",
+                  "tof-flag": "example-string",
+                  "module": "example-string",
+                  "marker": {
+                    "start-marker-type": "example-string",
+                    "end-marker-type": "example-string",
+                    "start-marker": "example-string",
+                    "end-marker": "example-string"
+                  },
+                  "interval": {
+                    "start-type": "example-string",
+                    "start-interval": 10,
+                    "end-type": "example-string",
+                    "end-interval": 10
+                  },
+                  "timestamp": {
+                    "start-timestamp": "example-string",
+                    "end-timestamp": "example-string"
+                  },
+                  "filter": {
+                    "filter-none": "example-string",
+                    "mac-address": "00:11:22:33:44:55",
+                    "integer-value": "example-string",
+                    "ipv4-address": "192.168.1.1",
+                    "ipv6-address": "2001:db8::1",
+                    "uuid-string": "example-string",
+                    "string-value": "example-string"
+                  },
+                  "switch-info": {
+                    "switch-id": "example-string",
+                    "switch-num": 2
+                  },
+                  "profile-option": "flash:/config.txt",
+                  "profile-location": "flash:/config.txt",
+                  "profile-file": "flash:/config.txt",
+                  "predefined-profile": "flash:/config.txt",
+                  "process": "example-string",
+                  "file-info": {
+                    "file-location": "flash:/config.txt",
+                    "file-name": "flash:/config.txt"
+                  },
+                  "trace-filter-options": {
+                    "start-marker-type": "example-string",
+                    "end-marker-type": "example-string",
+                    "start-marker": "example-string",
+                    "end-marker": "example-string",
+                    "start-type": "example-string",
+                    "start-interval": 10,
+                    "end-type": "example-string",
+                    "end-interval": 10,
+                    "start-timestamp": "example-string",
+                    "end-timestamp": "example-string",
+                    "filter-none": "example-string",
+                    "mac-address": "00:11:22:33:44:55",
+                    "integer-value": "example-string",
+                    "ipv4-address": "192.168.1.1",
+                    "ipv6-address": "2001:db8::1",
+                    "uuid-string": "example-string",
+                    "string-value": "example-string",
+                    "switch-id": "example-string",
+                    "switch-num": 2,
+                    "metadata": "example-string",
+                    "pcap-extract": "example-string",
+                    "debug-level-id": "example-string",
+                    "consumer": "example-string",
+                    "tof-flag": "example-string",
+                    "module": "example-string",
+                    "marker": {
+                      "start-marker-type": "example-string",
+                      "end-marker-type": "example-string",
+                      "start-marker": "example-string",
+                      "end-marker": "example-string"
+                    },
+                    "interval": {
+                      "start-type": "example-string",
+                      "start-interval": 10,
+                      "end-type": "example-string",
+                      "end-interval": 10
+                    },
+                    "timestamp": {
+                      "start-timestamp": "example-string",
+                      "end-timestamp": "example-string"
+                    },
+                    "filter": {
+                      "filter-none": "example-string",
+                      "mac-address": "00:11:22:33:44:55",
+                      "integer-value": "example-string",
+                      "ipv4-address": "192.168.1.1",
+                      "ipv6-address": "2001:db8::1",
+                      "uuid-string": "example-string",
+                      "string-value": "example-string"
+                    },
+                    "switch-info": {
+                      "switch-id": "example-string",
+                      "switch-num": 2
+                    }
+                  },
+                  "profile": {
+                    "profile-option": "flash:/config.txt",
+                    "profile-location": "flash:/config.txt",
+                    "profile-file": "flash:/config.txt",
+                    "predefined-profile": "flash:/config.txt"
+                  },
+                  "trace-all-options": {
+                    "file-location": "flash:/config.txt",
+                    "file-name": "flash:/config.txt",
+                    "start-marker-type": "example-string",
+                    "end-marker-type": "example-string",
+                    "start-marker": "example-string",
+                    "end-marker": "example-string",
+                    "start-type": "example-string",
+                    "start-interval": 10,
+                    "end-type": "example-string",
+                    "end-interval": 10,
+                    "start-timestamp": "example-string",
+                    "end-timestamp": "example-string",
+                    "filter-none": "example-string",
+                    "mac-address": "00:11:22:33:44:55",
+                    "integer-value": "example-string",
+                    "ipv4-address": "192.168.1.1",
+                    "ipv6-address": "2001:db8::1",
+                    "uuid-string": "example-string",
+                    "string-value": "example-string",
+                    "switch-id": "example-string",
+                    "switch-num": 2,
+                    "metadata": "example-string",
+                    "pcap-extract": "example-string",
+                    "debug-level-id": "example-string",
+                    "consumer": "example-string",
+                    "tof-flag": "example-string",
+                    "module": "example-string",
+                    "marker": {
+                      "start-marker-type": "example-string",
+                      "end-marker-type": "example-string",
+                      "start-marker": "example-string",
+                      "end-marker": "example-string"
+                    },
+                    "interval": {
+                      "start-type": "example-string",
+                      "start-interval": 10,
+                      "end-type": "example-string",
+                      "end-interval": 10
+                    },
+                    "timestamp": {
+                      "start-timestamp": "example-string",
+                      "end-timestamp": "example-string"
+                    },
+                    "filter": {
+                      "filter-none": "example-string",
+                      "mac-address": "00:11:22:33:44:55",
+                      "integer-value": "example-string",
+                      "ipv4-address": "192.168.1.1",
+                      "ipv6-address": "2001:db8::1",
+                      "uuid-string": "example-string",
+                      "string-value": "example-string"
+                    },
+                    "switch-info": {
+                      "switch-id": "example-string",
+                      "switch-num": 2
+                    },
+                    "profile-option": "flash:/config.txt",
+                    "profile-location": "flash:/config.txt",
+                    "profile-file": "flash:/config.txt",
+                    "predefined-profile": "flash:/config.txt",
+                    "process": "example-string",
+                    "file-info": {
+                      "file-location": "flash:/config.txt",
+                      "file-name": "flash:/config.txt"
+                    },
+                    "trace-filter-options": {
+                      "start-marker-type": "example-string",
+                      "end-marker-type": "example-string",
+                      "start-marker": "example-string",
+                      "end-marker": "example-string",
+                      "start-type": "example-string",
+                      "start-interval": 10,
+                      "end-type": "example-string",
+                      "end-interval": 10,
+                      "start-timestamp": "example-string",
+                      "end-timestamp": "example-string",
+                      "filter-none": "example-string",
+                      "mac-address": "00:11:22:33:44:55",
+                      "integer-value": "example-string",
+                      "ipv4-address": "192.168.1.1",
+                      "ipv6-address": "2001:db8::1",
+                      "uuid-string": "example-string",
+                      "string-value": "example-string",
+                      "switch-id": "example-string",
+                      "switch-num": 2,
+                      "metadata": "example-string",
+                      "pcap-extract": "example-string",
+                      "debug-level-id": "example-string",
+                      "consumer": "example-string",
+                      "tof-flag": "example-string",
+                      "module": "example-string",
+                      "marker": {
+                        "start-marker-type": "example-string",
+                        "end-marker-type": "example-string",
+                        "start-marker": "example-string",
+                        "end-marker": "example-string"
+                      },
+                      "interval": {
+                        "start-type": "example-string",
+                        "start-interval": 10,
+                        "end-type": "example-string",
+                        "end-interval": 10
+                      },
+                      "timestamp": {
+                        "start-timestamp": "example-string",
+                        "end-timestamp": "example-string"
+                      },
+                      "filter": {
+                        "filter-none": "example-string",
+                        "mac-address": "00:11:22:33:44:55",
+                        "integer-value": "example-string",
+                        "ipv4-address": "192.168.1.1",
+                        "ipv6-address": "2001:db8::1",
+                        "uuid-string": "example-string",
+                        "string-value": "example-string"
+                      },
+                      "switch-info": {
+                        "switch-id": "example-string",
+                        "switch-num": 2
+                      }
+                    },
+                    "profile": {
+                      "profile-option": "flash:/config.txt",
+                      "profile-location": "flash:/config.txt",
+                      "profile-file": "flash:/config.txt",
+                      "predefined-profile": "flash:/config.txt"
+                    }
+                  }
+                }
               }
             }
           }
@@ -98,9 +1706,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "unique-id": {
+                      "type": "string",
+                      "description": "The unique identifier is a number which is generated for\n         a successful trace message rpc action and can be used to\n         track the progress of action via trace events."
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "unique-id": "example-string"
+                }
               }
             }
           },

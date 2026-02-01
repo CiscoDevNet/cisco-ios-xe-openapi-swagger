@@ -32,12 +32,92 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:install": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "vpn": {
+                        "type": "string",
+                        "description": "The VPN ID is used to indicate device to select the interface\n         for the image download"
+                      },
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "one-shot": {
+                        "type": "string",
+                        "description": "Software activate and commit in one shot"
+                      },
+                      "reloadfast": {
+                        "type": "string",
+                        "description": "This leaf is obsolete. Use new leaf xfsu in the future"
+                      },
+                      "issu": {
+                        "type": "string",
+                        "description": "Perform one shot In Service Software Upgrade (ISSU)"
+                      },
+                      "download-timeout": {
+                        "type": "string",
+                        "description": "Download timeout is used on device from initiating image download request\n         to complete from remote repository. The image download timeout value is\n         in minutes and in range between 1 and 1440"
+                      },
+                      "xfsu": {
+                        "type": "string",
+                        "description": "Perform one shot Extended Fast Software Upgrade (xFSU)"
+                      },
+                      "scheduled-start": {
+                        "type": "string",
+                        "description": "Scheduled start time for image install"
+                      },
+                      "scheduled-end": {
+                        "type": "string",
+                        "description": "Scheduled end time for image install"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Path to software image"
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Install profile is used in the wireless image\n             upgrade workflow. Currently it is only used in EWC 9100\n             wireless platform for AP pre-image download using profile\n             on device to upgrade APs in network. Profile name is string"
+                      },
+                      "controller-mode-options": {
+                        "type": "object",
+                        "properties": {
+                          "vpn": {
+                            "type": "string",
+                            "description": "The VPN ID is used to indicate device to select the interface\n         for the image download"
+                          }
+                        },
+                        "description": "Controller mode options only"
+                      }
+                    },
+                    "required": [
+                      "uuid",
+                      "path",
+                      "name"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:install": {}
+                "install_rpc:install": {
+                  "vpn": "GigabitEthernet1/0/1",
+                  "uuid": "example-string",
+                  "one-shot": "example-string",
+                  "reloadfast": "example-string",
+                  "issu": "example-string",
+                  "download-timeout": "example-string",
+                  "xfsu": "example-string",
+                  "scheduled-start": "example-string",
+                  "scheduled-end": "example-string",
+                  "path": "flash:/config.txt",
+                  "name": "example-string",
+                  "controller-mode-options": {
+                    "vpn": "GigabitEthernet1/0/1"
+                  }
+                }
               }
             }
           }
@@ -82,12 +162,77 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:activate": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "smuid": {
+                        "type": "string",
+                        "description": "ID for patching image"
+                      },
+                      "auto-abort-timer-val": {
+                        "type": "integer",
+                        "minimum": 30,
+                        "maximum": 1200,
+                        "description": "Option to change default auto abort wait timer during image\n         activate action. The timer value is in minutes and\n         in range between 30 and 1200 minutes. Image activate will\n         auto abort if action is not confirmed through commit."
+                      },
+                      "one-shot": {
+                        "type": "string",
+                        "description": "Software activate and commit in one shot"
+                      },
+                      "issu": {
+                        "type": "string",
+                        "description": "Perform activation via In Service Software Upgrade (ISSU)"
+                      },
+                      "scheduled-start": {
+                        "type": "string",
+                        "description": "Scheduled start time for image activate"
+                      },
+                      "scheduled-end": {
+                        "type": "string",
+                        "description": "Scheduled end time for image activate"
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "Image version to activate"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Path to the software image"
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Profile name"
+                      }
+                    },
+                    "required": [
+                      "uuid",
+                      "version",
+                      "path",
+                      "name"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:activate": {}
+                "install_rpc:activate": {
+                  "uuid": "example-string",
+                  "smuid": "example-string",
+                  "auto-abort-timer-val": 30,
+                  "one-shot": "example-string",
+                  "issu": "example-string",
+                  "scheduled-start": "example-string",
+                  "scheduled-end": "example-string",
+                  "version": "example-string",
+                  "path": "flash:/config.txt",
+                  "name": "example-string"
+                }
               }
             }
           }
@@ -132,12 +277,23 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:install-commit": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      }
+                    },
+                    "required": [
+                      "uuid"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:install-commit": {}
+                "install_rpc:install-commit": {
+                  "uuid": "example-string"
+                }
               }
             }
           }
@@ -182,12 +338,25 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:autoupgrade": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      }
+                    },
+                    "required": [
+                      "uuid"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:autoupgrade": {}
+                "install_rpc:autoupgrade": {
+                  "uuid": "example-string"
+                }
               }
             }
           }
@@ -232,12 +401,56 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:remove": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "smuid": {
+                        "type": "string",
+                        "description": "ID for patching image"
+                      },
+                      "version": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 128,
+                        "description": "Image version to remove software image"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Image path to remove software image"
+                      },
+                      "inactive": {
+                        "type": "string",
+                        "description": "Remove inactive software image"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Profile name to remove profile"
+                      }
+                    },
+                    "required": [
+                      "uuid",
+                      "version",
+                      "path",
+                      "inactive",
+                      "name"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:remove": {}
+                "install_rpc:remove": {
+                  "uuid": "example-string",
+                  "smuid": "example-string",
+                  "version": "example-string",
+                  "path": "flash:/config.txt",
+                  "inactive": "example-string",
+                  "name": "example-string"
+                }
               }
             }
           }
@@ -282,12 +495,43 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:deactivate": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "auto-abort-timer-val": {
+                        "type": "integer",
+                        "minimum": 30,
+                        "maximum": 1200,
+                        "description": "Option to change default auto abort wait timer during image\n         deactivate action. The timer value is in minutes and\n         in range between 30 and 1200 minutes. Image deactivate will\n         auto abort if action is not confirmed through commit."
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Path to the software image"
+                      },
+                      "issu": {
+                        "type": "string",
+                        "description": "Perform deactivate operation via In Service Software Upgrade (ISSU)"
+                      }
+                    },
+                    "required": [
+                      "uuid",
+                      "path"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:deactivate": {}
+                "install_rpc:deactivate": {
+                  "uuid": "example-string",
+                  "auto-abort-timer-val": 30,
+                  "path": "flash:/config.txt",
+                  "issu": "example-string"
+                }
               }
             }
           }
@@ -332,12 +576,28 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:abort": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "issu": {
+                        "type": "string",
+                        "description": "Perform abort via In Service Software Upgrade (ISSU)"
+                      }
+                    },
+                    "required": [
+                      "uuid"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:abort": {}
+                "install_rpc:abort": {
+                  "uuid": "example-string",
+                  "issu": "example-string"
+                }
               }
             }
           }
@@ -382,12 +642,23 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:auto-abort-timer": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      }
+                    },
+                    "required": [
+                      "uuid"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:auto-abort-timer": {}
+                "install_rpc:auto-abort-timer": {
+                  "uuid": "example-string"
+                }
               }
             }
           }
@@ -432,12 +703,52 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:rollback": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "uuid": {
+                        "type": "string",
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      },
+                      "issu": {
+                        "type": "string",
+                        "description": "ISSU rollback"
+                      },
+                      "base": {
+                        "type": "string",
+                        "description": "Confirm roll back to base"
+                      },
+                      "commited": {
+                        "type": "string",
+                        "description": "Confirm roll back"
+                      },
+                      "rollback-id": {
+                        "type": "string",
+                        "description": "Rollback Id"
+                      },
+                      "rollback-label": {
+                        "type": "string",
+                        "description": "Rollback label"
+                      }
+                    },
+                    "required": [
+                      "uuid",
+                      "base",
+                      "commited",
+                      "rollback-id",
+                      "rollback-label"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:rollback": {}
+                "install_rpc:rollback": {
+                  "uuid": "example-string",
+                  "issu": "example-string",
+                  "base": "example-string",
+                  "commited": "example-string",
+                  "rollback-id": "example-string",
+                  "rollback-label": "example-string"
+                }
               }
             }
           }
@@ -482,12 +793,32 @@
                 "type": "object",
                 "properties": {
                   "install_rpc:set-default": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 256,
+                        "description": "Software image version to set as default"
+                      },
+                      "uuid": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128,
+                        "description": "The UUID (universally unique identifier) is a string and is a textual\n         representation of a UUID.\n         UUID is used to uniquely identify the install action invoked via RPC\n         and it is replayed back in the install progress notifications to correlate\n         them back to the original install operation."
+                      }
+                    },
+                    "required": [
+                      "version"
+                    ]
                   }
                 }
               },
               "example": {
-                "install_rpc:set-default": {}
+                "install_rpc:set-default": {
+                  "version": "example-string",
+                  "uuid": "example-string"
+                }
               }
             }
           }

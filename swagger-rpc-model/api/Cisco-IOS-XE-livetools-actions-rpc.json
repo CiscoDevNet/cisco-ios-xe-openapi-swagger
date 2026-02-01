@@ -32,12 +32,47 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:wol-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "mac-addr": {
+                        "type": "string",
+                        "description": "Destination MAC address"
+                      },
+                      "vlan": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4094,
+                        "description": "Destination VLAN identifier",
+                        "default": "1"
+                      },
+                      "interval": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3600,
+                        "description": "Interval between retries",
+                        "default": "120"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 255,
+                        "description": "Number of packets to be sent",
+                        "default": "1"
+                      }
+                    },
+                    "required": [
+                      "mac-addr"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:wol-action": {}
+                "livetools_actions_rpc:wol-action": {
+                  "mac-addr": "00:11:22:33:44:55",
+                  "vlan": 100,
+                  "interval": 10,
+                  "count": 10
+                }
               }
             }
           }
@@ -48,9 +83,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the WAKE-ON-LAN oper model,\n         allowing us to retrieve the operational data associated with a\n         specific ID. This is useful for matching an action RPC response ID\n         with the corresponding operational data"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -82,12 +125,82 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:thrpt-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "proto": {
+                        "type": "string",
+                        "description": "Role of throughput tool: client/server",
+                        "default": "thrpt-tcp-client"
+                      },
+                      "dest-addr": {
+                        "type": "string",
+                        "description": "Server IP address"
+                      },
+                      "ni-type": {
+                        "type": "string",
+                        "description": "Network instance type. Differentiates between the\n         default routing instance and VRFs",
+                        "default": "net-inst-default"
+                      },
+                      "ni-name": {
+                        "type": "string",
+                        "description": "Network instance name. If the type is\n         net-inst-default, the name is not meaningful"
+                      },
+                      "timeout": {
+                        "type": "string",
+                        "description": "Measurement time",
+                        "default": "5"
+                      },
+                      "wnd-span": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295,
+                        "description": "Duration of measurement window(s)",
+                        "default": "1"
+                      },
+                      "num-wnds": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4294967295,
+                        "description": "Number of windows",
+                        "default": "5"
+                      },
+                      "port": {
+                        "type": "string",
+                        "description": "Server transport port"
+                      },
+                      "dscp": {
+                        "type": "string",
+                        "description": "Numeric value of DSCP used during traffic generation",
+                        "default": "0"
+                      },
+                      "client-rcv": {
+                        "type": "string",
+                        "description": "Flag to indicate that client should receive/read\n         data from the server instead of the default mode of writing data to\n         the server for throughput measurement",
+                        "default": "false"
+                      },
+                      "mode": {
+                        "type": "string",
+                        "description": "Measurement mode",
+                        "default": "thrpt-mode-full"
+                      }
+                    }
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:thrpt-action": {}
+                "livetools_actions_rpc:thrpt-action": {
+                  "proto": "example-string",
+                  "dest-addr": "192.168.1.1",
+                  "ni-type": "example-string",
+                  "ni-name": "example-string",
+                  "timeout": "example-string",
+                  "wnd-span": 10,
+                  "num-wnds": 10,
+                  "port": "example-string",
+                  "dscp": "example-string",
+                  "client-rcv": "example-string",
+                  "mode": "example-string"
+                }
               }
             }
           }
@@ -98,9 +211,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the throughput oper model,\n         allowing us to retrieve the operational data associated with a\n         specific ID. This is useful for matching an action RPC response ID\n         with the corresponding operational data"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -132,12 +253,106 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:ip-tracert-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "ni-type": {
+                        "type": "string",
+                        "description": "Network instance type. Differentiates between the\n         default routing instance and VRFs",
+                        "default": "net-inst-default"
+                      },
+                      "ni-name": {
+                        "type": "string",
+                        "description": "Network instance name. If the type is\n         net-inst-default, the name is not meaningful."
+                      },
+                      "num-probes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 5,
+                        "description": "Number of probes to be sent per hop",
+                        "default": "3"
+                      },
+                      "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "description": "Destination port to send UDP packets",
+                        "default": "33434"
+                      },
+                      "timeout": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3600,
+                        "description": "Probe timeout value",
+                        "default": "3"
+                      },
+                      "min-ttl": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 30,
+                        "description": "Minimum value of time to live(TTL) for an IP packet",
+                        "default": "1"
+                      },
+                      "max-ttl": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 30,
+                        "description": "Maximum value of time to live(TTL) for an IP packet",
+                        "default": "30"
+                      },
+                      "dscp-num": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 63,
+                        "description": "DSCP numeric value"
+                      },
+                      "dscp-ascii": {
+                        "type": "string",
+                        "description": "DSCP ascii value selected from a set of known DSCP options"
+                      },
+                      "src-if": {
+                        "type": "string",
+                        "description": "Source interface name"
+                      },
+                      "src-ip": {
+                        "type": "string",
+                        "description": "Source IP/IPv6 address"
+                      },
+                      "host-name": {
+                        "type": "string",
+                        "description": "Destination host name"
+                      },
+                      "host-ip": {
+                        "type": "string",
+                        "description": "Destination host IP address"
+                      }
+                    },
+                    "required": [
+                      "dscp-num",
+                      "dscp-ascii",
+                      "src-if",
+                      "src-ip",
+                      "host-name",
+                      "host-ip"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:ip-tracert-action": {}
+                "livetools_actions_rpc:ip-tracert-action": {
+                  "ni-type": "example-string",
+                  "ni-name": "example-string",
+                  "num-probes": 5,
+                  "port": 8080,
+                  "timeout": 30,
+                  "min-ttl": 10,
+                  "max-ttl": 10,
+                  "dscp-num": 10,
+                  "dscp-ascii": "example-string",
+                  "src-if": "GigabitEthernet1/0/1",
+                  "src-ip": "2001:db8::1",
+                  "host-name": "router1.example.com",
+                  "host-ip": "192.168.1.1"
+                }
               }
             }
           }
@@ -148,9 +363,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the IP trace route,\n         allowing us to retrieve the operational data associated with a\n         specific ID. This is useful for matching an action RPC response ID\n         with the corresponding operational data."
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -182,12 +405,90 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:ip-ping-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "ni-type": {
+                        "type": "string",
+                        "description": "Network instance type. Differentiates between the\n         default routing instance and VRFs",
+                        "default": "net-inst-default"
+                      },
+                      "ni-name": {
+                        "type": "string",
+                        "description": "Network instance name. If the type is\n         net-inst-default, the name is not meaningful"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 30,
+                        "description": "Number of echoes to be sent as part of the IP ping request",
+                        "default": "5"
+                      },
+                      "proto-hint": {
+                        "type": "string",
+                        "description": "Force traffic to use a specific DNS resolution type",
+                        "default": "dns-proto-none"
+                      },
+                      "egress-if-name": {
+                        "type": "string",
+                        "description": "Force traffic to use a specific egress interface, bypassing standard routing"
+                      },
+                      "next-hop": {
+                        "type": "string",
+                        "description": "Force traffic to use a specific LAN IP nexthop address"
+                      },
+                      "dscp-num": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 63,
+                        "description": "DSCP numeric value"
+                      },
+                      "dscp-ascii": {
+                        "type": "string",
+                        "description": "DSCP ascii value selected from a set of known DSCP options"
+                      },
+                      "src-if": {
+                        "type": "string",
+                        "description": "Source interface name"
+                      },
+                      "src-ip": {
+                        "type": "string",
+                        "description": "Source IP address"
+                      },
+                      "host-name": {
+                        "type": "string",
+                        "description": "Destination host name"
+                      },
+                      "host-ip": {
+                        "type": "string",
+                        "description": "Destination host IP address"
+                      }
+                    },
+                    "required": [
+                      "dscp-num",
+                      "dscp-ascii",
+                      "src-if",
+                      "src-ip",
+                      "host-name",
+                      "host-ip"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:ip-ping-action": {}
+                "livetools_actions_rpc:ip-ping-action": {
+                  "ni-type": "example-string",
+                  "ni-name": "example-string",
+                  "count": 10,
+                  "proto-hint": "example-string",
+                  "egress-if-name": "GigabitEthernet1/0/1",
+                  "next-hop": "example-string",
+                  "dscp-num": 10,
+                  "dscp-ascii": "example-string",
+                  "src-if": "GigabitEthernet1/0/1",
+                  "src-ip": "192.168.1.1",
+                  "host-name": "router1.example.com",
+                  "host-ip": "192.168.1.1"
+                }
               }
             }
           }
@@ -198,9 +499,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the ping oper model,\n         allowing us to retrieve the operational data associated with a\n         specific ID"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -232,12 +541,112 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:mtr-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "ni-type": {
+                        "type": "string",
+                        "description": "Network instance type. Differentiates between the\n         default routing instance and VRFs",
+                        "default": "net-inst-default"
+                      },
+                      "ni-name": {
+                        "type": "string",
+                        "description": "Network instance name. If the type is\n         net-inst-default, the name is not meaningful"
+                      },
+                      "proto-hint": {
+                        "type": "string",
+                        "description": "DNS resolution type",
+                        "default": "dns-proto-none"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10,
+                        "description": "The number of traceroute/ping probes or packets to be sent to each hop along the traceroute path",
+                        "default": "10"
+                      },
+                      "port": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 65535,
+                        "description": "Destination port to send UDP packets",
+                        "default": "33434"
+                      },
+                      "timeout": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 3600,
+                        "description": "Probe timeout value",
+                        "default": "3"
+                      },
+                      "min-ttl": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 30,
+                        "description": "Minimum value of time to live(TTL) for an IP packet",
+                        "default": "1"
+                      },
+                      "max-ttl": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 30,
+                        "description": "Maximum value of time to live(TTL) for an IP packet",
+                        "default": "30"
+                      },
+                      "dscp-num": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 63,
+                        "description": "DSCP numeric value"
+                      },
+                      "dscp-ascii": {
+                        "type": "string",
+                        "description": "DSCP ASCII value selected from a set of known DSCP options"
+                      },
+                      "src-if": {
+                        "type": "string",
+                        "description": "Source interface name"
+                      },
+                      "src-ip": {
+                        "type": "string",
+                        "description": "Source IP/IPv6 address"
+                      },
+                      "host-name": {
+                        "type": "string",
+                        "description": "Destination host name"
+                      },
+                      "host-ip": {
+                        "type": "string",
+                        "description": "Destination host IP address"
+                      }
+                    },
+                    "required": [
+                      "dscp-num",
+                      "dscp-ascii",
+                      "src-if",
+                      "src-ip",
+                      "host-name",
+                      "host-ip"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:mtr-action": {}
+                "livetools_actions_rpc:mtr-action": {
+                  "ni-type": "example-string",
+                  "ni-name": "example-string",
+                  "proto-hint": "example-string",
+                  "count": 10,
+                  "port": 8080,
+                  "timeout": 30,
+                  "min-ttl": 10,
+                  "max-ttl": 10,
+                  "dscp-num": 10,
+                  "dscp-ascii": "example-string",
+                  "src-if": "GigabitEthernet1/0/1",
+                  "src-ip": "2001:db8::1",
+                  "host-name": "router1.example.com",
+                  "host-ip": "192.168.1.1"
+                }
               }
             }
           }
@@ -248,9 +657,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the MTR,\n         allowing us to retrieve the operational data associated with a\n         specific ID. This is useful for matching an action RPC response ID\n         with the corresponding operational data"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -282,12 +699,46 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:dns-query-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "ni-type": {
+                        "type": "string",
+                        "description": "Network instance type. Differentiates between the\n         default routing instance and VRFs",
+                        "default": "net-inst-default"
+                      },
+                      "ni-name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "description": "Network instance name. If the type is\n         net-inst-default, the name is not meaningful"
+                      },
+                      "dns-server": {
+                        "type": "string",
+                        "description": "Specify the DNS server address"
+                      },
+                      "a-qry": {
+                        "type": "object",
+                        "description": "DNS query for IPv4 address lookup"
+                      },
+                      "aaaa-qry": {
+                        "type": "object",
+                        "description": "DNS query for IPv6 address lookup"
+                      }
+                    },
+                    "required": [
+                      "dns-server"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:dns-query-action": {}
+                "livetools_actions_rpc:dns-query-action": {
+                  "ni-type": "example-string",
+                  "ni-name": "example-string",
+                  "dns-server": "example-string",
+                  "a-qry": {},
+                  "aaaa-qry": {}
+                }
               }
             }
           }
@@ -298,9 +749,17 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated per RPC request.\n         It is used in conjunction with the DNS lookup oper model,\n         allowing us to retrieve the operational data associated with a\n         specific ID"
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "example-string"
+                }
               }
             }
           },
@@ -332,12 +791,23 @@
                 "type": "object",
                 "properties": {
                   "livetools_actions_rpc:nextun-pcap-action": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "action-type": {
+                        "type": "string",
+                        "description": "Action to take"
+                      }
+                    },
+                    "required": [
+                      "action-type"
+                    ]
                   }
                 }
               },
               "example": {
-                "livetools_actions_rpc:nextun-pcap-action": {}
+                "livetools_actions_rpc:nextun-pcap-action": {
+                  "action-type": "example-string"
+                }
               }
             }
           }
@@ -348,9 +818,48 @@
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "job-id": {
+                      "type": "string",
+                      "description": "The ID is a unique identifier generated for each RPC request. It is appended to the\n         pcap file name in bootflash:, with possible file prefixes meraki_nextunnel_pcap_binos\n         for Binos and meraki_nextunnel_pcap_iosd for IOS, enabling retrieval of the pcap\n         file for a run."
+                    },
+                    "active": {
+                      "type": "string",
+                      "description": "Flag to indicate if Meraki Nextunnel Packet Capture is running.\n         If the process is active, the value is true, otherwise false"
+                    },
+                    "job": {
+                      "type": "object",
+                      "properties": {
+                        "job-id": {
+                          "type": "string",
+                          "description": "The ID is a unique identifier generated for each RPC request. It is appended to the\n         pcap file name in bootflash:, with possible file prefixes meraki_nextunnel_pcap_binos\n         for Binos and meraki_nextunnel_pcap_iosd for IOS, enabling retrieval of the pcap\n         file for a run."
+                        }
+                      },
+                      "description": "Job information for the packet capture action"
+                    },
+                    "status": {
+                      "type": "object",
+                      "properties": {
+                        "active": {
+                          "type": "string",
+                          "description": "Flag to indicate if Meraki Nextunnel Packet Capture is running.\n         If the process is active, the value is true, otherwise false"
+                        }
+                      },
+                      "description": "Status information for the packet capture action."
+                    }
+                  }
                 },
-                "example": {}
+                "example": {
+                  "job-id": "192.168.1.0/24",
+                  "active": "example-string",
+                  "job": {
+                    "job-id": "192.168.1.0/24"
+                  },
+                  "status": {
+                    "active": "example-string"
+                  }
+                }
               }
             }
           },

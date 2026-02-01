@@ -166,11 +166,21 @@ class RPCYANGToOpenAPIConverter:
         is_presence = 'presence' in content or re.search(r'\bpresence\s+"[^"]+"', content)
         
         # Resolve 'uses' statements (RFC 7950 Section 7.13)
-        uses_pattern = r'\buses\s+(\S+);'
+        uses_pattern = r'\buses\s+(?:[\w-]+:)?(\S+);'
         for uses_match in re.finditer(uses_pattern, content):
             grouping_name = uses_match.group(1)
+            # Try with and without prefix
+            grouping_content = None
             if grouping_name in self.groupings_cache:
                 grouping_content = self.groupings_cache[grouping_name]
+            else:
+                # Try finding grouping with any prefix
+                for key in self.groupings_cache:
+                    if key.endswith(':' + grouping_name) or key == grouping_name:
+                        grouping_content = self.groupings_cache[key]
+                        break
+            
+            if grouping_content:
                 grouping_schema = self.parse_container_or_grouping(grouping_content, grouping_name, depth + 1)
                 if 'properties' in grouping_schema and grouping_schema['properties']:
                     properties.update(grouping_schema['properties'])
