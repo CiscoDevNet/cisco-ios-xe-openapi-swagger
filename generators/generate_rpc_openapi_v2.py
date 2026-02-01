@@ -323,41 +323,84 @@ class RPCYANGToOpenAPIConverter:
         
         return schema
     
-    def create_example_data(self, schema: Dict[str, Any]) -> Any:
-        """Generate example data from a schema"""
+    def create_example_data(self, schema: Dict[str, Any], prop_name: str = '') -> Any:
+        """Generate example data from a schema with context-aware examples"""
         if not schema:
             return {}
         
         schema_type = schema.get('type', 'object')
+        description = schema.get('description', '').lower()
         
         if schema_type == 'object':
             example = {}
             properties = schema.get('properties', {})
-            for prop_name, prop_schema in properties.items():
-                example[prop_name] = self.create_example_data(prop_schema)
+            for name, prop_schema in properties.items():
+                example[name] = self.create_example_data(prop_schema, name)
             return example
         
         elif schema_type == 'array':
             items_schema = schema.get('items', {})
-            return [self.create_example_data(items_schema)]
+            return [self.create_example_data(items_schema, prop_name)]
         
         elif schema_type == 'string':
-            # Check for specific formats or patterns
-            fmt = schema.get('format')
-            pattern = schema.get('pattern')
-            if fmt == 'ipv6':
+            # Check property name and description for context
+            name_lower = prop_name.lower()
+            
+            # Interface examples
+            if 'interface' in name_lower or 'interface' in description:
+                return "GigabitEthernet1/0/1"
+            
+            # IP address examples
+            if 'ipv6' in name_lower or 'ipv6' in description:
                 return "2001:db8::1"
-            elif pattern and 'ipv4' in pattern:
+            elif 'ipv4' in name_lower or 'ip-address' in description or 'ip address' in description:
                 return "192.168.1.1"
-            elif 'ipv4-prefix' in schema.get('description', ''):
+            elif 'prefix' in name_lower or 'prefix' in description:
                 return "192.168.1.0/24"
-            elif 'ip-address' in schema.get('description', ''):
-                return "192.168.1.1"
+            
+            # Filename/path examples
+            if 'file' in name_lower or 'path' in name_lower or 'url' in name_lower:
+                return "flash:/config.txt"
+            
+            # VRF examples
+            if 'vrf' in name_lower:
+                return "Mgmt-vrf"
+            
+            # VLAN examples
+            if 'vlan' in name_lower:
+                return "100"
+            
+            # MAC address
+            if 'mac' in name_lower:
+                return "00:11:22:33:44:55"
+            
+            # Username/password
+            if 'user' in name_lower or 'username' in name_lower:
+                return "admin"
+            if 'password' in name_lower or 'secret' in name_lower:
+                return "***REDACTED***!"
+            
+            # Hostname
+            if 'host' in name_lower:
+                return "router1.example.com"
+            
+            # Default based on pattern
+            pattern = schema.get('format')
+            if pattern == 'ipv6':
+                return "2001:db8::1"
+            
             return "example-string"
         
         elif schema_type == 'integer':
             minimum = schema.get('minimum', 0)
             maximum = schema.get('maximum', 100)
+            # Use meaningful defaults
+            if 'vlan' in prop_name.lower():
+                return 100
+            elif 'port' in prop_name.lower():
+                return 8080
+            elif 'timeout' in prop_name.lower():
+                return 30
             return min(maximum, max(minimum, 10))
         
         elif schema_type == 'number':
