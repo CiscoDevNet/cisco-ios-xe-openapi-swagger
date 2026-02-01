@@ -20,6 +20,83 @@ class IETFToOpenAPI:
         self.processed_modules = []
         self.total_paths = 0
 
+    def create_example_data(self, schema: Dict[str, Any], property_name: str = "") -> Any:
+        """Generate realistic example data based on schema and property name"""
+        if not schema:
+            return "example-value"
+        
+        schema_type = schema.get('type', 'string')
+        
+        # Handle arrays - generate 3 items for better examples
+        if schema_type == 'array':
+            items_schema = schema.get('items', {})
+            example_items = []
+            for i in range(3):
+                item = self.create_example_data(items_schema, property_name)
+                # Vary data for each entry
+                if isinstance(item, dict):
+                    # Update index fields
+                    for key in list(item.keys()):
+                        if 'index' in key.lower() or 'id' in key.lower():
+                            if isinstance(item[key], str):
+                                item[key] = str(i + 1)
+                            elif isinstance(item[key], int):
+                                item[key] = i + 1
+                    # Update interface-specific fields
+                    if 'name' in item and 'interface' in property_name.lower():
+                        item['name'] = f"GigabitEthernet0/0/{i}"
+                    if 'address' in item and 'ip' in str(item.keys()).lower():
+                        item['address'] = f"192.168.{i+1}.1"
+                example_items.append(item)
+            return example_items
+        
+        # Handle objects
+        if schema_type == 'object':
+            example_obj = {}
+            properties = schema.get('properties', {})
+            for prop_name, prop_schema in properties.items():
+                example_obj[prop_name] = self.create_example_data(prop_schema, prop_name)
+            return example_obj
+        
+        # Context-aware examples based on property name
+        name_lower = property_name.lower()
+        
+        if schema_type == 'boolean':
+            return True
+        
+        if schema_type == 'integer' or schema_type == 'number':
+            if 'port' in name_lower:
+                return 830
+            if 'timeout' in name_lower:
+                return 30
+            if 'mtu' in name_lower:
+                return 1500
+            if 'id' in name_lower or 'index' in name_lower:
+                return 1
+            return schema.get('minimum', 0)
+        
+        # String type with context awareness
+        if 'ip' in name_lower or 'addr' in name_lower:
+            if 'ipv6' in name_lower:
+                return "2001:db8::1"
+            return "192.168.1.1"
+        if 'interface' in name_lower or 'name' in name_lower:
+            return "GigabitEthernet0/0/0"
+        if 'hostname' in name_lower or 'host' in name_lower:
+            return "router.example.com"
+        if 'username' in name_lower or 'user' in name_lower:
+            return "admin"
+        if 'password' in name_lower:
+            return "********"
+        if 'description' in name_lower or 'descr' in name_lower:
+            return "Example configuration"
+        if 'type' in name_lower:
+            return "ethernet"
+        if 'status' in name_lower or 'state' in name_lower:
+            return "up"
+        
+        return "example-string"
+
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
         """Find the end position of balanced braces"""
         if start_pos >= len(text) or text[start_pos] != '{':
@@ -525,7 +602,8 @@ class IETFToOpenAPI:
                         'description': 'Success',
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': path_info['schema'],
+                                'example': self.create_example_data(path_info['schema'], path_info['name'])
                             }
                         }
                     },
@@ -545,7 +623,8 @@ class IETFToOpenAPI:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': path_info['schema'],
+                                'example': self.create_example_data(path_info['schema'], path_info['name'])
                             }
                         }
                     },
@@ -566,7 +645,8 @@ class IETFToOpenAPI:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': path_info['schema'],
+                                'example': self.create_example_data(path_info['schema'], path_info['name'])
                             }
                         }
                     },
@@ -590,6 +670,8 @@ class IETFToOpenAPI:
 
             # POST for collections (create list entry)
             if path_info.get('is_collection', False):
+                # Get the item schema from the array schema
+                item_schema = path_info['schema'].get('items', {})
                 operations['post'] = {
                     'summary': f"Add {path_info['name']} entry",
                     'description': f"Add a new entry to {path_info['description']}",
@@ -599,7 +681,8 @@ class IETFToOpenAPI:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': item_schema,
+                                'example': self.create_example_data(item_schema, path_info['name'])
                             }
                         }
                     },
