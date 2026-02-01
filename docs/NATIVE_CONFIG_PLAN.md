@@ -198,6 +198,9 @@ pyang --validate Cisco-IOS-XE-native.yang (validation)
 ### 📊 Current Stats
 - **Total Paths**: 1,155
 - **Categories**: 15
+- **Max Depth**: 7 levels (configured: 10)
+- **Average Depth**: 2.98
+- **Depth Distribution**: 63.5% at depth ≤3, 94.4% at depth ≤5, 100% at depth ≤7
 - **Top Categories by Paths**:
   - System: 723 paths
   - Interfaces: 195 paths
