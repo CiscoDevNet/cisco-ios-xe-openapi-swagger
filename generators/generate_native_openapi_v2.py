@@ -43,6 +43,167 @@ class NativeToOpenAPI:
                       'memory', 'scheduler', 'process', 'platform', 'license', 'line']
         }
 
+    def create_example_data(self, schema: Dict[str, Any], property_name: str = '') -> Any:
+        """Generate context-aware example data based on schema and property name"""
+        schema_type = schema.get('type', 'string')
+        
+        # Handle enumerations
+        if 'enum' in schema and schema['enum']:
+            return schema['enum'][0]
+        
+        # Context-aware examples based on property name
+        name_lower = property_name.lower()
+        
+        # Hostname examples
+        if 'hostname' in name_lower:
+            return 'router-core-1'
+        
+        # Interface examples
+        if 'interface' in name_lower or 'name' in name_lower:
+            if 'loopback' in name_lower:
+                return 'Loopback0'
+            elif 'vlan' in name_lower:
+                return 'Vlan100'
+            elif 'tunnel' in name_lower:
+                return 'Tunnel0'
+            else:
+                return 'GigabitEthernet1/0/1'
+        
+        # IP address examples
+        if any(x in name_lower for x in ['ip-address', 'ipaddress', 'address']):
+            if 'ipv6' in name_lower or 'v6' in name_lower:
+                return '2001:db8::1'
+            return '192.168.1.1'
+        
+        # Network mask examples
+        if 'mask' in name_lower or 'netmask' in name_lower:
+            return '255.255.255.0'
+        
+        # Prefix examples
+        if 'prefix' in name_lower:
+            if 'ipv6' in name_lower:
+                return '2001:db8::/32'
+            return '192.168.0.0/24'
+        
+        # MAC address examples
+        if 'mac' in name_lower and 'address' in name_lower:
+            return '00:11:22:33:44:55'
+        
+        # VLAN examples
+        if 'vlan' in name_lower and 'id' in name_lower:
+            return 100
+        
+        # VRF examples
+        if 'vrf' in name_lower:
+            return 'VRF-PROD'
+        
+        # AS number examples
+        if 'as' in name_lower or 'asn' in name_lower:
+            return 65001
+        
+        # Description examples
+        if 'description' in name_lower or 'descr' in name_lower:
+            return 'Configured via RESTCONF API'
+        
+        # Banner examples
+        if 'banner' in name_lower:
+            return 'Authorized Access Only'
+        
+        # Domain examples
+        if 'domain' in name_lower:
+            return 'example.com'
+        
+        # Username examples
+        if 'username' in name_lower or 'user' in name_lower:
+            return 'admin'
+        
+        # Password examples
+        if 'password' in name_lower or 'secret' in name_lower:
+            return '********'
+        
+        # Port examples
+        if 'port' in name_lower:
+            return 8443
+        
+        # Handle based on schema type
+        if schema_type == 'array':
+            items_schema = schema.get('items', {'type': 'string'})
+            # Generate 3 example items with variations
+            examples = []
+            for i in range(3):
+                item = self.create_example_data(items_schema, property_name)
+                if isinstance(item, dict):
+                    # Vary numeric and interface fields
+                    if 'name' in item:
+                        if isinstance(item['name'], str) and 'GigabitEthernet' in item['name']:
+                            item['name'] = f'GigabitEthernet1/0/{i+1}'
+                        elif isinstance(item['name'], str) and 'Vlan' in item['name']:
+                            item['name'] = f'Vlan{100+i*10}'
+                    if 'vlan' in item and 'id' in str(item.get('vlan', '')):
+                        item['vlan'] = 100 + i * 10
+                    if 'id' in item and isinstance(item['id'], int):
+                        item['id'] = i + 1
+                    if 'address' in item:
+                        if isinstance(item['address'], str) and '192.168' in item['address']:
+                            item['address'] = f'192.168.{i+1}.1'
+                examples.append(item)
+            return examples
+        
+        elif schema_type == 'object':
+            properties = schema.get('properties', {})
+            if not properties:
+                return {}
+            
+            example_obj = {}
+            for prop_name, prop_schema in properties.items():
+                example_obj[prop_name] = self.create_example_data(prop_schema, prop_name)
+            return example_obj
+        
+        elif schema_type == 'integer':
+            minimum = schema.get('minimum', 0)
+            maximum = schema.get('maximum', 100)
+            
+            # Context-specific integer values
+            if 'mtu' in name_lower:
+                return 1500
+            elif 'bandwidth' in name_lower:
+                return 1000000
+            elif 'delay' in name_lower:
+                return 100
+            elif 'metric' in name_lower:
+                return 10
+            elif 'cost' in name_lower:
+                return 1
+            elif 'priority' in name_lower:
+                return 100
+            elif 'weight' in name_lower:
+                return 1
+            
+            # Use minimum if it's reasonable, otherwise use a sensible default
+            if minimum >= 0 and minimum <= 1000:
+                return minimum + 1 if minimum < maximum else minimum
+            return 1
+        
+        elif schema_type == 'boolean':
+            return True
+        
+        elif schema_type == 'number':
+            return 1.0
+        
+        else:  # string or unknown
+            # Check format hints
+            if schema.get('format') == 'ipv4':
+                return '192.168.1.1'
+            elif schema.get('format') == 'ipv6':
+                return '2001:db8::1'
+            elif schema.get('format') == 'byte':
+                return 'QmFzZTY0RW5jb2RlZA=='
+            
+            # Generic string examples
+            if 'name' in name_lower:
+                return 'example-name'
+            return 'example-string'
+
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
         """Find the end position of balanced braces"""
         if start_pos >= len(text) or text[start_pos] != '{':
@@ -443,7 +604,8 @@ class NativeToOpenAPI:
                             'description': 'Success',
                             'content': {
                                 'application/yang-data+json': {
-                                    'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                    'schema': path_info['schema'],
+                                    'example': self.create_example_data(path_info['schema'], path_info['name'])
                                 }
                             }
                         },
@@ -460,7 +622,8 @@ class NativeToOpenAPI:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': path_info['schema'],
+                                'example': self.create_example_data(path_info['schema'], path_info['name'])
                             }
                         }
                     },
@@ -480,7 +643,8 @@ class NativeToOpenAPI:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': {'$ref': f"#/components/schemas/{schema_name}"}
+                                'schema': path_info['schema'],
+                                'example': self.create_example_data(path_info['schema'], path_info['name'])
                             }
                         }
                     },
