@@ -91,6 +91,17 @@
                 document.getElementById('totalModules').textContent = allModules.length;
                 renderModuleList(allModules);
                 
+                // Count total operations by loading each spec
+                let totalOps = 0;
+                for (const mod of allModules) {
+                    try {
+                        const specResponse = await fetch(`api/${mod}.json`);
+                        const spec = await specResponse.json();
+                        totalOps += Object.keys(spec.paths || {}).length;
+                    } catch (e) { }
+                }
+                document.getElementById('totalOperations').textContent = totalOps;
+                
                 // Auto-load first module after short delay
                 if (allModules.length > 0) {
                     setTimeout(() => loadSpec(allModules[0]), 200);

@@ -66,6 +66,10 @@
                     <div class="stat-value" id="totalModules">0</div>
                     <div class="stat-label">Modules</div>
                 </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalOperations">0</div>
+                    <div class="stat-label">Endpoints</div>
+                </div>
             </div>
             <ul class="module-list" id="moduleList"></ul>
         </aside>
@@ -94,6 +98,17 @@
                 allModules = manifest.modules || [];
                 document.getElementById('totalModules').textContent = allModules.length;
                 renderModuleList(allModules);
+                
+                // Count total operations by loading each spec
+                let totalOps = 0;
+                for (const mod of allModules) {
+                    try {
+                        const specResponse = await fetch(`api/${mod}.json`);
+                        const spec = await specResponse.json();
+                        totalOps += Object.keys(spec.paths || {}).length;
+                    } catch (e) { }
+                }
+                document.getElementById('totalOperations').textContent = totalOps;
                 
                 // Auto-load first module if available
                 if (allModules.length > 0) {
