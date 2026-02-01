@@ -49,16 +49,30 @@ class NativeToOpenAPI:
             'wireless': ['wireless', 'wlan', 'ap ', 'dot11'],
             'platform': ['hw-module', 'stack', 'switch', 'breakout', 'module', 'card',
                         'platform', 'stack-power', 'controller', 'cisp', 'redundancy',
-                        'upgrade', 'software', 'boot', 'config-register'],
+                        'upgrade', 'software', 'boot', 'config-register', 'subslot', 
+                        'transceiver'],
             'call-home': ['call-home'],
             'monitor': ['monitor', 'span', 'rspan', 'erspan', 'flow', 'sampler', 'rmon',
-                       'netflow'],
+                       'netflow', 'session'],
             'voice': ['voice', 'dial-peer', 'voice-class', 'sip', 'scada-gw'],
+            'switching': ['vlan', 'spanning-tree', 'switchport', 'channel-group', 
+                         'mac-address-table', 'errdisable', 'vtp', 'lacp', 'port-channel',
+                         'l2', 'mvrp', 'avb', 'xconnect', 'pseudowire', 'l2tp', 'mac'],
+            'security': ['access-list', 'aaa', 'zone', 'class-map', 'policy-map', 
+                        'acl', 'key chain', 'enable', 'username', 'user-name', 'password',
+                        'login', 'privilege', 'dot1x', 'mab', 'eap', 'radius', 'tacacs',
+                        'identity', 'object-group'],
+            'services': ['dhcp', 'nat', 'ntp', 'snmp', 'logging', 'cdp', 'lldp', 
+                        'dns', 'domain', 'ip domain', 'archive', 'tftp-server',
+                        'radius-server', 'ldap', 'http', 'telnet', 'ssh', 'service'],
             'system': ['hostname', 'banner', 'clock', 'version', 'memory', 'scheduler', 
                       'process', 'license', 'line', 'parser', 'location', 'fabric',
                       'system', 'epm', 'ptp', 'multilink', 'ppp', 'macro', 'vrf',
                       'fallback', 'subscriber', 'frame-relay', 'aqm-register',
-                      'control-plane', 'exception', 'transport', 'md-list']
+                      'control-plane', 'exception', 'transport', 'md-list', 'network-clock',
+                      'protocol', 'type', 'default', 'border', 'master', 'secret', 'clns',
+                      'cts', 'cwmp', 'pfr', 'facility-alarm', 'setup', 'profile', 'time-range',
+                      'alias', 'group', 'tod-clock', 'transport-map']
         }
 
     def create_example_data(self, schema: Dict[str, Any], property_name: str = '') -> Any:
@@ -569,10 +583,16 @@ class NativeToOpenAPI:
         return paths
 
     def categorize_path(self, path_name: str) -> str:
-        """Determine category for a path"""
+        """Determine category for a path - check specific categories first"""
         name_lower = path_name.lower()
         
-        for category, keywords in self.category_keywords.items():
+        # Priority order: check specific categories before generic ones
+        priority_categories = ['interfaces', 'crypto', 'platform', 'monitor', 'routing', 
+                              'switching', 'security', 'services', 'qos', 'mpls', 'vpn', 
+                              'wireless', 'call-home', 'voice', 'system']
+        
+        for category in priority_categories:
+            keywords = self.category_keywords.get(category, [])
             for keyword in keywords:
                 if keyword.lower() in name_lower:
                     return category
@@ -779,20 +799,63 @@ class NativeToOpenAPI:
         print("\nGenerating OpenAPI specs by category:")
         total_specs = 0
         manifest_modules = []
+        MAX_FILE_SIZE_MB = 5
         
         for category, paths in categorized_paths.items():
             if not paths:
                 continue
-                
+            
+            # Try generating the spec
             spec = self.create_openapi_spec(category, paths)
+            spec_json = json.dumps(spec, indent=2)
+            size_mb = len(spec_json.encode('utf-8')) / (1024 * 1024)
             
-            output_file = self.output_dir / f"native-{category}.json"
-            with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(spec, f, indent=2)
-            
-            print(f"  * {category}: {len(paths)} paths -> {output_file.name}")
-            total_specs += 1
-            manifest_modules.append(f"native-{category}")
+            # If file is too large, split it alphabetically
+            if size_mb > MAX_FILE_SIZE_MB:
+                print(f"  * {category}: {len(paths)} paths ({size_mb:.2f} MB) - SPLITTING...")
+                
+                # Sort paths alphabetically by name
+                sorted_paths = sorted(paths, key=lambda p: p['name'].lower())
+                
+                # Calculate number of chunks needed (be conservative)
+                num_chunks = int(size_mb / (MAX_FILE_SIZE_MB * 0.8)) + 1  # Target 80% of max to be safe
+                chunk_size = len(sorted_paths) // num_chunks
+                if chunk_size == 0:
+                    chunk_size = 1
+                
+                chunk_num = 0
+                for i in range(num_chunks):
+                    start_idx = i * chunk_size
+                    end_idx = (i + 1) * chunk_size if i < num_chunks - 1 else len(sorted_paths)
+                    chunk_paths = sorted_paths[start_idx:end_idx]
+                    
+                    if not chunk_paths:
+                        continue
+                    
+                    chunk_num += 1
+                    chunk_spec = self.create_openapi_spec(f"{category} (Part {chunk_num})", chunk_paths)
+                    # Update title to indicate split
+                    chunk_spec['info']['title'] = chunk_spec['info']['title'].replace(f"Native - {category.title()}", 
+                                                                                      f"Native - {category.title()} (Part {chunk_num})")
+                    
+                    output_file = self.output_dir / f"native-{category}-{chunk_num}.json"
+                    with open(output_file, 'w', encoding='utf-8') as f:
+                        json.dump(chunk_spec, f, indent=2)
+                    
+                    chunk_size_mb = len(json.dumps(chunk_spec, indent=2).encode('utf-8')) / (1024 * 1024)
+                    print(f"    Part {chunk_num}: {len(chunk_paths)} paths ({chunk_size_mb:.2f} MB) -> {output_file.name}")
+                    total_specs += 1
+                    manifest_modules.append(f"native-{category}-{chunk_num}")
+            else:
+                # File is small enough, write as single file
+                output_file = self.output_dir / f"native-{category}.json"
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(spec, f, indent=2)
+                
+                print(f"  * {category}: {len(paths)} paths ({size_mb:.2f} MB) -> {output_file.name}")
+                total_specs += 1
+                manifest_modules.append(f"native-{category}")
+        
         
         # Generate manifest
         manifest = {
