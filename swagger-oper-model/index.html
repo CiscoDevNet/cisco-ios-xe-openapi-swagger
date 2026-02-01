@@ -95,13 +95,27 @@
         async function loadModules() {
             try {
                 const response = await fetch('api/manifest.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
                 document.getElementById('totalModules').textContent = allModules.length;
+                
+                // Calculate total paths from manifest if available
+                if (manifest.total_paths) {
+                    document.getElementById('totalPaths').textContent = manifest.total_paths;
+                }
+                
                 renderModuleList(allModules);
+                
+                // Auto-load first module if available
+                if (allModules.length > 0) {
+                    loadSpec(allModules[0]);
+                }
             } catch (error) {
                 console.error('Error loading manifest:', error);
-                document.getElementById('moduleList').innerHTML = '<li style="padding:20px;color:#666;">Error loading modules. Please check console.</li>';
+                document.getElementById('moduleList').innerHTML = '<li style="padding:20px;color:#666;">Error loading modules: ' + error.message + '</li>';
             }
         }
         
