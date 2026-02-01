@@ -106,11 +106,26 @@
                 document.getElementById('totalOperations').textContent = totalPaths;
                 renderModuleList(allModules);
                 
-                // DISABLE AUTO-LOAD FOR DEBUGGING
-                // Users must click a module manually
-                console.log('MIB modules loaded. Click a module to view.');
-                console.log('Total modules:', allModules.length);
-                console.log('First 3 modules:', allModules.slice(0, 3));
+                // Auto-load IF-MIB if available, otherwise first module
+                let moduleToLoad = 'IF-MIB'; // Default to IF-MIB
+                
+                // Check if IF-MIB exists in modules
+                const hasIFMIB = allModules.some(mod => {
+                    const modName = typeof mod === 'string' ? mod : mod.name;
+                    return modName === 'IF-MIB';
+                });
+                
+                // If IF-MIB not found, use first module
+                if (!hasIFMIB && allModules.length > 0) {
+                    const firstMod = allModules[0];
+                    moduleToLoad = typeof firstMod === 'string' ? firstMod : firstMod.name;
+                }
+                
+                // Load the selected module
+                if (hasIFMIB || allModules.length > 0) {
+                    console.log('Auto-loading module:', moduleToLoad);
+                    loadSpec(moduleToLoad);
+                }
             } catch (error) {
                 console.error('Error loading manifest:', error);
             }
@@ -118,10 +133,22 @@
         
         function renderModuleList(modules) {
             const list = document.getElementById('moduleList');
-            list.innerHTML = modules.map(mod => {
+            list.innerHTML = '';
+            
+            modules.forEach(mod => {
                 const modName = typeof mod === 'string' ? mod : mod.name;
-                return `<li><a href="#" onclick="loadSpec('${modName}')" id="mod-${modName}">${modName}</a></li>`;
-            }).join('');
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = modName;
+                a.id = 'mod-' + modName;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadSpec(modName);
+                });
+                li.appendChild(a);
+                list.appendChild(li);
+            });
         }
         
         function filterModules() {
