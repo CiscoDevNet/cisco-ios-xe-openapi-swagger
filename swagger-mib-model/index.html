@@ -112,13 +112,17 @@
         function renderModuleList(modules) {
             const list = document.getElementById('moduleList');
             list.innerHTML = modules.map(mod => {
-                return `<li><a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${mod}</a></li>`;
+                const modName = typeof mod === 'string' ? mod : mod.name;
+                return `<li><a href="#" onclick="loadSpec('${modName}')" id="mod-${modName}">${modName}</a></li>`;
             }).join('');
         }
         
         function filterModules() {
             const search = document.getElementById('moduleSearch').value.toLowerCase();
-            const filtered = allModules.filter(mod => mod.toLowerCase().includes(search));
+            const filtered = allModules.filter(mod => {
+                const modName = typeof mod === 'string' ? mod : mod.name;
+                return modName.toLowerCase().includes(search);
+            });
             renderModuleList(filtered);
         }
         
