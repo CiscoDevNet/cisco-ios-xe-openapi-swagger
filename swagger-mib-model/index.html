@@ -92,12 +92,13 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
     <script>
+        // CACHE BUSTER: 20260201-150000 - DO NOT CACHE THIS PAGE
         // Version: 2026-02-01-v2 - Force cache refresh
         let allModules = [];
         
         async function loadModules() {
             try {
-                const response = await fetch('api/manifest.json');
+                const response = await fetch('api/manifest.json?v=' + Date.now());
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
                 const totalPaths = allModules.reduce((sum, m) => sum + (m.paths || 0), 0);
@@ -105,30 +106,11 @@
                 document.getElementById('totalOperations').textContent = totalPaths;
                 renderModuleList(allModules);
                 
-                // Auto-load IF-MIB if available, otherwise first module
-                let moduleToLoad = null;
-                
-                // Try to find IF-MIB
-                for (let i = 0; i < allModules.length; i++) {
-                    const mod = allModules[i];
-                    const modName = (typeof mod === 'string') ? mod : mod.name;
-                    if (modName === 'IF-MIB') {
-                        moduleToLoad = modName;
-                        break;
-                    }
-                }
-                
-                // If IF-MIB not found, use first module
-                if (!moduleToLoad && allModules.length > 0) {
-                    const firstMod = allModules[0];
-                    moduleToLoad = (typeof firstMod === 'string') ? firstMod : firstMod.name;
-                }
-                
-                // Load the module
-                if (moduleToLoad) {
-                    console.log('Auto-loading module:', moduleToLoad);
-                    loadSpec(moduleToLoad);
-                }
+                // DISABLE AUTO-LOAD FOR DEBUGGING
+                // Users must click a module manually
+                console.log('MIB modules loaded. Click a module to view.');
+                console.log('Total modules:', allModules.length);
+                console.log('First 3 modules:', allModules.slice(0, 3));
             } catch (error) {
                 console.error('Error loading manifest:', error);
             }
