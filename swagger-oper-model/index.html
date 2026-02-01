@@ -25,8 +25,8 @@
         .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
         .module-list a:hover { background: #f5f8ff; }
         .module-list a.selected { background: #e3f2fd; border-left: 3px solid #049fd9; }
-        .main-content { flex: 1; overflow: hidden; }
-        .swagger-container { height: 100%; overflow-y: auto; }
+        .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .swagger-container { flex: 1; overflow-y: auto; }
         .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
         .stat { text-align: center; }
         .stat-value { font-size: 24px; font-weight: bold; color: #049fd9; }
@@ -134,21 +134,26 @@
         }
         
         function loadSpec(moduleName) {
+            console.log('Loading spec for:', moduleName);
             document.getElementById('welcomeBox').style.display = 'none';
             document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
             const link = document.getElementById('mod-' + moduleName);
             if (link) link.classList.add('selected');
             
-            SwaggerUIBundle({
+            const ui = SwaggerUIBundle({
                 url: `api/${moduleName}.json`,
                 dom_id: '#swagger-ui',
                 presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
                 layout: 'StandaloneLayout',
                 deepLinking: true,
                 defaultModelsExpandDepth: 1,
-                defaultModelExpandDepth: 1
+                defaultModelExpandDepth: 1,
+                onComplete: function() {
+                    console.log('Swagger UI loaded successfully for:', moduleName);
+                }
             });
             currentModule = moduleName;
+            window.ui = ui;
         }
         
         loadModules();
