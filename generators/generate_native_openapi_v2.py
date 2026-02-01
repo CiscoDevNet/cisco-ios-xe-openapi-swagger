@@ -435,8 +435,117 @@ class NativeToOpenAPI:
 
         return result
 
+    def extract_nested_paths(self, content: str, parent_path: str, depth: int = 0, max_depth: int = 10) -> List[Dict[str, Any]]:
+        """Recursively extract all nested paths from YANG content"""
+        paths = []
+        
+        if depth > max_depth:
+            return paths
+        
+        # Extract nested containers
+        pos = 0
+        while True:
+            cont_match = re.search(r'\bcontainer\s+(\S+)\s*\{', content[pos:])
+            if not cont_match:
+                break
+                
+            cont_name = cont_match.group(1)
+            cont_start = pos + cont_match.end() - 1
+            cont_end = self.find_balanced_braces(content, cont_start)
+            
+            if cont_end == -1:
+                pos += cont_match.end()
+                continue
+                
+            cont_body = content[cont_start + 1:cont_end]
+            
+            # Get description
+            desc_match = re.search(r'\bdescription\s+"([^"]+)"', cont_body)
+            description = desc_match.group(1)[:200] if desc_match else f"{cont_name} configuration"
+            
+            # Parse schema
+            schema = self.parse_container_or_list(cont_body, cont_name, 0)
+            
+            full_path = f"{parent_path}/{cont_name}"
+            paths.append({
+                'path': full_path,
+                'name': cont_name,
+                'description': description,
+                'schema': schema,
+                'is_list': False,
+                'depth': depth
+            })
+            
+            # Recursively extract nested paths
+            nested_paths = self.extract_nested_paths(cont_body, full_path, depth + 1, max_depth)
+            paths.extend(nested_paths)
+            
+            pos = cont_end + 1
+        
+        # Extract nested lists
+        pos = 0
+        while True:
+            list_match = re.search(r'\blist\s+(\S+)\s*\{', content[pos:])
+            if not list_match:
+                break
+                
+            list_name = list_match.group(1)
+            list_start = pos + list_match.end() - 1
+            list_end = self.find_balanced_braces(content, list_start)
+            
+            if list_end == -1:
+                pos += list_match.end()
+                continue
+                
+            list_body = content[list_start + 1:list_end]
+            
+            # Get key
+            key_match = re.search(r'\bkey\s+"([^"]+)"', list_body)
+            key_name = key_match.group(1).split()[0] if key_match else "id"
+            
+            # Get description
+            desc_match = re.search(r'\bdescription\s+"([^"]+)"', list_body)
+            description = desc_match.group(1)[:200] if desc_match else f"{list_name} list"
+            
+            # Parse schema
+            schema = self.parse_container_or_list(list_body, list_name, 0)
+            
+            full_path_collection = f"{parent_path}/{list_name}"
+            full_path_item = f"{parent_path}/{list_name}={{{key_name}}}"
+            
+            # Collection endpoint
+            paths.append({
+                'path': full_path_collection,
+                'name': list_name,
+                'description': f"{description} (collection)",
+                'schema': {'type': 'array', 'items': schema},
+                'is_list': True,
+                'is_collection': True,
+                'depth': depth
+            })
+            
+            # Individual item endpoint
+            paths.append({
+                'path': full_path_item,
+                'name': f"{list_name}-item",
+                'description': description,
+                'schema': schema,
+                'is_list': True,
+                'is_collection': False,
+                'key': key_name,
+                'depth': depth
+            })
+            
+            # Recursively extract nested paths from list items
+            nested_paths = self.extract_nested_paths(list_body, full_path_item, depth + 1, max_depth)
+            paths.extend(nested_paths)
+            
+            pos = list_end + 1
+        
+        return paths
+
     def extract_paths_from_native(self, content: str) -> List[Dict[str, Any]]:
-        """Extract paths from the native container"""
+        """Extract ALL paths from the native container recursively"""
         paths = []
         
         # Find the main 'native' container
@@ -454,90 +563,8 @@ class NativeToOpenAPI:
         # Remove groupings to get actual data nodes
         cleaned_content = self._remove_groupings_and_typedefs(native_body)
         
-        # Extract top-level containers within native
-        pos = 0
-        while True:
-            cont_match = re.search(r'\bcontainer\s+(\S+)\s*\{', cleaned_content[pos:])
-            if not cont_match:
-                break
-                
-            cont_name = cont_match.group(1)
-            cont_start = pos + cont_match.end() - 1
-            cont_end = self.find_balanced_braces(cleaned_content, cont_start)
-            
-            if cont_end == -1:
-                pos += cont_match.end()
-                continue
-                
-            cont_body = cleaned_content[cont_start + 1:cont_end]
-            
-            # Get description
-            desc_match = re.search(r'\bdescription\s+"([^"]+)"', cont_body)
-            description = desc_match.group(1)[:200] if desc_match else f"{cont_name} configuration"
-            
-            # Parse schema
-            schema = self.parse_container_or_list(cont_body, cont_name, 0)
-            
-            paths.append({
-                'path': f"native/{cont_name}",
-                'name': cont_name,
-                'description': description,
-                'schema': schema,
-                'is_list': False
-            })
-            
-            pos = cont_end + 1
-        
-        # Extract top-level lists within native
-        pos = 0
-        while True:
-            list_match = re.search(r'\blist\s+(\S+)\s*\{', cleaned_content[pos:])
-            if not list_match:
-                break
-                
-            list_name = list_match.group(1)
-            list_start = pos + list_match.end() - 1
-            list_end = self.find_balanced_braces(cleaned_content, list_start)
-            
-            if list_end == -1:
-                pos += list_match.end()
-                continue
-                
-            list_body = cleaned_content[list_start + 1:list_end]
-            
-            # Get key
-            key_match = re.search(r'\bkey\s+"([^"]+)"', list_body)
-            key_name = key_match.group(1).split()[0] if key_match else "id"
-            
-            # Get description
-            desc_match = re.search(r'\bdescription\s+"([^"]+)"', list_body)
-            description = desc_match.group(1)[:200] if desc_match else f"{list_name} list"
-            
-            # Parse schema
-            schema = self.parse_container_or_list(list_body, list_name, 0)
-            
-            # Collection endpoint
-            paths.append({
-                'path': f"native/{list_name}",
-                'name': list_name,
-                'description': f"{description} (collection)",
-                'schema': {'type': 'array', 'items': schema},
-                'is_list': True,
-                'is_collection': True
-            })
-            
-            # Individual item endpoint
-            paths.append({
-                'path': f"native/{list_name}={{{key_name}}}",
-                'name': f"{list_name}-item",
-                'description': description,
-                'schema': schema,
-                'is_list': True,
-                'is_collection': False,
-                'key': key_name
-            })
-            
-            pos = list_end + 1
+        # Extract all paths recursively
+        paths = self.extract_nested_paths(cleaned_content, "native", depth=0, max_depth=10)
             
         return paths
 
