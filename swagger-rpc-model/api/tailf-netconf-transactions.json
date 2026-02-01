@@ -1,0 +1,246 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "tailf-netconf-transactions - RPC Operations",
+    "description": "This module introduces four new rpc methods that are used to\n     control a two-phase commit transaction on the NETCONF server.\n     The normal <edit-config> operation is used to write data in the\n     transaction, but the modifications are not applied until an\n     explicit <commit-transaction> is sent.\n\n     A typical sequence of operations looks like this:\n\n\n               C                           S\n               |                           |\n               |  capability exchange      |\n               |-------------------------->|\n               |<------------------------->|\n               |                           |\n               |   <start-transaction>     |\n               |-------------------------->|\n               |<--------------------------|\n               |         <ok/>             |\n               |                           |\n               |     <edit-config>         |\n               |-------------------------->|\n               |<--------------------------|\n               |         <ok/>             |\n               |                           |\n               |  <prepare-transaction>    |\n               |-------------------------->|\n               |<--------------------------|\n               |         <ok/>             |\n               |                           |\n               |   <commit-transaction>    |\n               |-------------------------->|\n               |<--------------------------|\n               |         <ok/>             |\n               |                           |\n\n\n\n     Copyright 2019 Cisco Systems, Inc.\n     All rights reserved.\n     Permission is hereby granted to redistribute this file without\n     modification.\n\n**Module:** `tailf-netconf-transactions`\n**Version:** 1.0.0\n**Operations:** 4",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/tailf_netconf_transactions:start-transaction": {
+      "post": {
+        "summary": "Name of the configuration datastore towards which the\n           transaction is started.",
+        "description": "Name of the configuration datastore towards which the\n           transaction is started.\n\n**Endpoint:** `POST /restconf/operations/tailf_netconf_transactions:start-transaction`",
+        "operationId": "start-transaction",
+        "tags": [
+          "tailf-netconf-transactions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tailf_netconf_transactions:start-transaction": {
+                    "type": "object",
+                    "properties": {
+                      "startup": {
+                        "type": "string"
+                      },
+                      "running": {
+                        "type": "string"
+                      },
+                      "candidate": {
+                        "type": "string"
+                      },
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "startup": {
+                            "type": "string"
+                          },
+                          "running": {
+                            "type": "string"
+                          },
+                          "candidate": {
+                            "type": "string"
+                          }
+                        },
+                        "description": "Name of the configuration datastore towards which the\n           transaction is started."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/tailf_netconf_transactions:prepare-transaction": {
+      "post": {
+        "summary": "Prepares the transaction state for commit.  The server may reject\n       the prepare request for any reason, for example due to lack of\n       resources or if the combined changes would result in an invalid\n       configuration datastore.\n\n       After a successful <prepare-transaction>, the next transaction\n       related rpc operation must be <commit-transaction> or\n       <abort-transaction>.  Note that an <edit-config> cannot be sent\n       before the transaction is either committed or aborted.\n\n       Care must be taken by the server to make sure that if\n       <prepare-transaction> succeeds then the <commit-transaction>\n       SHOULD not fail, since this might result in an inconsistent\n       distributed state.  Thus, <prepare-transaction> should allocate\n       any resources needed to make sure the <commit-transaction> will\n       succeed.\n\n       If there is no ongoing transaction in this session, or if the\n       ongoing transaction already has been prepared, an error MUST be\n       returned with <error-app-tag> set to 'bad-state'.",
+        "description": "Prepares the transaction state for commit.  The server may reject\n       the prepare request for any reason, for example due to lack of\n       resources or if the combined changes would result in an invalid\n       configuration datastore.\n\n       After a successful <prepare-transaction>, the next transaction\n       related rpc operation must be <commit-transaction> or\n       <abort-transaction>.  Note that an <edit-config> cannot be sent\n       before the transaction is either committed or aborted.\n\n       Care must be taken by the server to make sure that if\n       <prepare-transaction> succeeds then the <commit-transaction>\n       SHOULD not fail, since this might result in an inconsistent\n       distributed state.  Thus, <prepare-transaction> should allocate\n       any resources needed to make sure the <commit-transaction> will\n       succeed.\n\n       If there is no ongoing transaction in this session, or if the\n       ongoing transaction already has been prepared, an error MUST be\n       returned with <error-app-tag> set to 'bad-state'.\n\n**Endpoint:** `POST /restconf/operations/tailf_netconf_transactions:prepare-transaction`",
+        "operationId": "prepare-transaction",
+        "tags": [
+          "tailf-netconf-transactions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tailf_netconf_transactions:prepare-transaction": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/tailf_netconf_transactions:commit-transaction": {
+      "post": {
+        "summary": "Applies the changes made in the transaction to the configuration\n       datatore.  The transaction is closed after a <commit-transaction>.\n\n       If there is no ongoing transaction in this session, or if the\n       ongoing transaction already has not been prepared, an error\n       MUST be returned with <error-app-tag> set to 'bad-state'.",
+        "description": "Applies the changes made in the transaction to the configuration\n       datatore.  The transaction is closed after a <commit-transaction>.\n\n       If there is no ongoing transaction in this session, or if the\n       ongoing transaction already has not been prepared, an error\n       MUST be returned with <error-app-tag> set to 'bad-state'.\n\n**Endpoint:** `POST /restconf/operations/tailf_netconf_transactions:commit-transaction`",
+        "operationId": "commit-transaction",
+        "tags": [
+          "tailf-netconf-transactions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tailf_netconf_transactions:commit-transaction": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/tailf_netconf_transactions:abort-transaction": {
+      "post": {
+        "summary": "Aborts the ongoing transaction, and all pending changes are\n       discarded.  <abort-transaction> can be given at any time during an\n       ongoing transaction.\n\n       If there is no ongoing transaction in this session, an error MUST\n       be returned with <error-app-tag> set to 'bad-state'.",
+        "description": "Aborts the ongoing transaction, and all pending changes are\n       discarded.  <abort-transaction> can be given at any time during an\n       ongoing transaction.\n\n       If there is no ongoing transaction in this session, an error MUST\n       be returned with <error-app-tag> set to 'bad-state'.\n\n**Endpoint:** `POST /restconf/operations/tailf_netconf_transactions:abort-transaction`",
+        "operationId": "abort-transaction",
+        "tags": [
+          "tailf-netconf-transactions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tailf_netconf_transactions:abort-transaction": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

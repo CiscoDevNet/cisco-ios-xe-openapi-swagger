@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco IOS-XE 17.18 - Events/Telemetry APIs</title>
+    <link rel="stylesheet" href="../swagger-ui-5.11.0/dist/swagger-ui.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #fafafa; }
+        .header { background: linear-gradient(135deg, #c2185b 0%, #880e4f 100%); color: white; padding: 20px 40px; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .nav-bar { background: #1b1b1b; padding: 10px 40px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .nav-bar a { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
+        .nav-bar a:hover { background: #333; }
+        .nav-bar a.active { background: #c2185b; }
+        .container { display: flex; min-height: calc(100vh - 140px); }
+        .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
+        .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
+        .sidebar-header h3 { font-size: 14px; color: #333; }
+        .search-box { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-top: 10px; }
+        .module-list { list-style: none; }
+        .module-list li { border-bottom: 1px solid #f0f0f0; }
+        .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
+        .module-list a:hover { background: #fce4ec; }
+        .module-list a.selected { background: #fce4ec; border-left: 3px solid #c2185b; }
+        .main-content { flex: 1; overflow: hidden; }
+        .swagger-container { height: 100%; overflow-y: auto; }
+        .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #c2185b; }
+        .stat-label { font-size: 12px; color: #666; }
+        .info-box { padding: 20px; margin: 20px; background: #fce4ec; border-radius: 8px; }
+        .info-box h3 { color: #880e4f; margin-bottom: 10px; }
+        .info-box p { color: #333; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cisco IOS-XE 17.18.1 - Events/Telemetry APIs</h1>
+        <p>Model-driven telemetry and event notification subscriptions</p>
+    </div>
+    
+    <nav class="nav-bar">
+        <a href="../index.html">Home</a>
+        <a href="../swagger-oper-model/index.html">Operational</a>
+        <a href="../swagger-rpc-model/index.html">RPC</a>
+        <a href="../swagger-cfg-model/index.html">Config</a>
+        <a href="../swagger-native-config-model/index.html">Native</a>
+        <a href="../swagger-openconfig-model/index.html">OpenConfig</a>
+        <a href="../swagger-ietf-model/index.html">IETF</a>
+        <a href="../swagger-mib-model/index.html">MIB</a>
+        <a href="../swagger-events-model/index.html" class="active">Events</a>
+        <a href="../swagger-other-model/index.html">Other</a>
+    </nav>
+    
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Event Modules</h3>
+                <input type="text" class="search-box" id="moduleSearch" placeholder="Search modules..." oninput="filterModules()">
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalModules">0</div>
+                    <div class="stat-label">Modules</div>
+                </div>
+            </div>
+            <ul class="module-list" id="moduleList"></ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="info-box" id="welcomeBox">
+                <h3>Welcome to Events/Telemetry API Documentation</h3>
+                <p>Select a module from the sidebar. Event modules define notifications for model-driven telemetry subscriptions.</p>
+                <p style="margin-top: 10px;"><strong>Protocol:</strong> RFC 8639 (Subscription to YANG Notifications)</p>
+                <p><strong>Usage:</strong> Subscribe to streams via NETCONF/RESTCONF for real-time events</p>
+            </div>
+            <div id="swagger-ui" class="swagger-container"></div>
+        </main>
+    </div>
+
+    <script src="../swagger-ui-5.11.0/dist/swagger-ui-bundle.js"></script>
+    <script src="../swagger-ui-5.11.0/dist/swagger-ui-standalone-preset.js"></script>
+    <script>
+        let allModules = [];
+        
+        async function loadModules() {
+            try {
+                const response = await fetch('api/manifest.json');
+                const manifest = await response.json();
+                allModules = manifest.modules ? manifest.modules.map(m => m.name) : [];
+                document.getElementById('totalModules').textContent = allModules.length;
+                renderModuleList(allModules);
+            } catch (error) {
+                console.error('Error loading manifest:', error);
+            }
+        }
+        
+        function renderModuleList(modules) {
+            const list = document.getElementById('moduleList');
+            list.innerHTML = modules.map(mod => {
+                const displayName = mod.replace('Cisco-IOS-XE-', '').replace('-events', '');
+                return `<li><a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${displayName}</a></li>`;
+            }).join('');
+        }
+        
+        function filterModules() {
+            const search = document.getElementById('moduleSearch').value.toLowerCase();
+            const filtered = allModules.filter(mod => mod.toLowerCase().includes(search));
+            renderModuleList(filtered);
+        }
+        
+        function loadSpec(moduleName) {
+            document.getElementById('welcomeBox').style.display = 'none';
+            document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
+            const link = document.getElementById('mod-' + moduleName);
+            if (link) link.classList.add('selected');
+            
+            SwaggerUIBundle({
+                url: `api/${moduleName}.json`,
+                dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout',
+                deepLinking: true
+            });
+        }
+        
+        loadModules();
+    </script>
+</body>
+</html>
