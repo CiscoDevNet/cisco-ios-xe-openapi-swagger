@@ -13,7 +13,11 @@ output_dir.mkdir(parents=True, exist_ok=True)
 print("\n🔧 IOS-XE Events YANG to OpenAPI Generator")
 print("=" * 60)
 
-events_files = sorted(yang_dir.glob("Cisco-IOS-XE-*-events.yang"))
+# Include both *-events.yang and *-events-oper.yang patterns
+events_files = []
+events_files.extend(yang_dir.glob("Cisco-IOS-XE-*-events.yang"))
+events_files.extend(yang_dir.glob("Cisco-IOS-XE-*-events-oper.yang"))
+events_files = sorted(set(events_files))  # Remove duplicates and sort
 print(f"Found {len(events_files)} Events modules")
 print()
 
