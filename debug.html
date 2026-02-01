@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Swagger</title>
+    <link rel="stylesheet" href="swagger-ui-5.11.0/dist/swagger-ui.css">
+    <style>
+        body { margin: 20px; }
+        #debug { background: #f0f0f0; padding: 10px; margin-bottom: 20px; }
+        #swagger-ui { border: 2px solid red; min-height: 500px; }
+    </style>
+</head>
+<body>
+    <div id="debug">
+        <h3>Debug Info</h3>
+        <div id="log"></div>
+    </div>
+    <div id="swagger-ui"></div>
+    
+    <script src="swagger-ui-5.11.0/dist/swagger-ui-bundle.js"></script>
+    <script src="swagger-ui-5.11.0/dist/swagger-ui-standalone-preset.js"></script>
+    <script>
+        function log(msg) {
+            document.getElementById('log').innerHTML += '<div>' + msg + '</div>';
+            console.log(msg);
+        }
+        
+        log('Starting...');
+        log('SwaggerUIBundle available: ' + (typeof SwaggerUIBundle !== 'undefined'));
+        log('SwaggerUIStandalonePreset available: ' + (typeof SwaggerUIStandalonePreset !== 'undefined'));
+        
+        try {
+            log('Creating SwaggerUIBundle...');
+            const ui = SwaggerUIBundle({
+                url: "swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json",
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "StandaloneLayout",
+                onComplete: function() {
+                    log('Swagger UI onComplete called!');
+                }
+            });
+            log('SwaggerUIBundle created: ' + (ui ? 'yes' : 'no'));
+            window.ui = ui;
+        } catch (e) {
+            log('ERROR: ' + e.message);
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

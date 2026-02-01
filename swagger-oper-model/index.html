@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cisco IOS-XE 17.18 - Operational State APIs</title>
-    <link rel="stylesheet" href="../swagger-ui-5.11.0/dist/swagger-ui.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #fafafa; }
+        html, body { height: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #fafafa; display: flex; flex-direction: column; }
         .header { background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%); color: white; padding: 20px 40px; }
         .header h1 { font-size: 28px; margin-bottom: 8px; }
         .header p { opacity: 0.9; font-size: 14px; }
@@ -15,26 +16,22 @@
         .nav-bar a { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
         .nav-bar a:hover { background: #333; }
         .nav-bar a.active { background: #049fd9; }
-        .container { display: flex; min-height: calc(100vh - 140px); }
-        .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
-        .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
+        .container { flex: 1; display: flex; overflow: hidden; }
+        .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
         .sidebar-header h3 { font-size: 14px; color: #333; }
         .search-box { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-top: 10px; }
-        .module-list { list-style: none; }
-        .module-list li { border-bottom: 1px solid #f0f0f0; }
-        .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
-        .module-list a:hover { background: #f5f8ff; }
-        .module-list a.selected { background: #e3f2fd; border-left: 3px solid #049fd9; }
-        .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-        .swagger-container { flex: 1; overflow-y: auto; }
-        .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+        .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; }
         .stat { text-align: center; }
         .stat-value { font-size: 24px; font-weight: bold; color: #049fd9; }
         .stat-label { font-size: 12px; color: #666; }
-        .category-header { padding: 10px 20px; background: #e8e8e8; font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-        .info-box { padding: 20px; margin: 20px; background: #e3f2fd; border-radius: 8px; }
-        .info-box h3 { color: #0070c9; margin-bottom: 10px; }
-        .info-box p { color: #333; line-height: 1.6; }
+        .module-list { list-style: none; flex: 1; overflow-y: auto; }
+        .module-list li { border-bottom: 1px solid #f0f0f0; }
+        .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
+        .module-list a:hover { background: #f5f8ff; }
+        .module-list a.selected { background: #e3f2fd; border-left: 3px solid #049fd9; font-weight: 500; }
+        .main-content { flex: 1; overflow: hidden; }
+        #swagger-ui { height: 100%; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -76,46 +73,30 @@
         </aside>
         
         <main class="main-content">
-            <div class="info-box" id="welcomeBox">
-                <h3>Welcome to IOS-XE Operational State API Documentation</h3>
-                <p>Select a module from the sidebar to view its OpenAPI specification. These APIs provide read-only access to real-time operational state data from Cisco IOS-XE devices via RESTCONF.</p>
-                <p style="margin-top: 10px;"><strong>Base URL:</strong> <code>https://{device}/restconf/data/</code></p>
-                <p><strong>Authentication:</strong> HTTP Basic Authentication</p>
-            </div>
-            <div id="swagger-ui" class="swagger-container"></div>
+            <div id="swagger-ui"></div>
         </main>
     </div>
 
-    <script src="../swagger-ui-5.11.0/dist/swagger-ui-bundle.js"></script>
-    <script src="../swagger-ui-5.11.0/dist/swagger-ui-standalone-preset.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
     <script>
         let allModules = [];
-        let currentModule = null;
+        let swaggerUI = null;
         
         async function loadModules() {
             try {
                 const response = await fetch('api/manifest.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
                 document.getElementById('totalModules').textContent = allModules.length;
-                
-                // Calculate total paths from manifest if available
-                if (manifest.total_paths) {
-                    document.getElementById('totalPaths').textContent = manifest.total_paths;
-                }
-                
                 renderModuleList(allModules);
                 
-                // Auto-load first module if available
+                // Auto-load first module after short delay
                 if (allModules.length > 0) {
-                    loadSpec(allModules[0]);
+                    setTimeout(() => loadSpec(allModules[0]), 200);
                 }
             } catch (error) {
                 console.error('Error loading manifest:', error);
-                document.getElementById('moduleList').innerHTML = '<li style="padding:20px;color:#666;">Error loading modules: ' + error.message + '</li>';
             }
         }
         
@@ -123,7 +104,7 @@
             const list = document.getElementById('moduleList');
             list.innerHTML = modules.map(mod => {
                 const displayName = mod.replace('Cisco-IOS-XE-', '').replace('-oper', '');
-                return `<li><a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${displayName}</a></li>`;
+                return `<li><a href="javascript:void(0)" onclick="loadSpec('${mod}')" id="mod-${mod}">${displayName}</a></li>`;
             }).join('');
         }
         
@@ -134,26 +115,24 @@
         }
         
         function loadSpec(moduleName) {
-            console.log('Loading spec for:', moduleName);
-            document.getElementById('welcomeBox').style.display = 'none';
+            console.log('Loading spec:', moduleName);
+            
+            // Update selection
             document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
             const link = document.getElementById('mod-' + moduleName);
             if (link) link.classList.add('selected');
             
-            const ui = SwaggerUIBundle({
+            // Initialize Swagger UI
+            swaggerUI = SwaggerUIBundle({
                 url: `api/${moduleName}.json`,
                 dom_id: '#swagger-ui',
-                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
                 layout: 'StandaloneLayout',
-                deepLinking: true,
-                defaultModelsExpandDepth: 1,
-                defaultModelExpandDepth: 1,
-                onComplete: function() {
-                    console.log('Swagger UI loaded successfully for:', moduleName);
-                }
+                deepLinking: true
             });
-            currentModule = moduleName;
-            window.ui = ui;
         }
         
         loadModules();
