@@ -168,12 +168,15 @@ pyang --validate Cisco-IOS-XE-native.yang (validation)
 ## Success Criteria
 - ✅ All categories have realistic examples (Phase 1)
 - ✅ 6 new categories added: platform, call-home, monitor, crypto, voice, vpn (Phase 2)
-- ✅ Total 15 categories with enhanced keywords
+- ✅ Total 18 categories (15 base + wireless + 4 system parts)
 - ✅ Recursive path extraction implemented (Phase 3)
-- ✅ **1,155 total paths** extracted (477% increase)
-- ✅ Deep hierarchies extracted (up to 6+ levels)
+- ✅ **1,540 total paths** extracted (537% increase from initial)
+- ✅ **6,160 total operations** (GET, PUT, PATCH, DELETE)
+- ✅ Deep hierarchies extracted (up to 7 levels actual, 10 configured)
 - ✅ Example data is context-aware and valid
 - ✅ All generated specs validate
+- ✅ Leaf node extraction (hostname, version, etc.) - Phase 4
+- ✅ File splitting for GitHub Pages (<5MB per file)
 
 ## Implementation Summary
 
@@ -189,24 +192,31 @@ pyang --validate Cisco-IOS-XE-native.yang (validation)
 - 242 paths distributed across categories
 
 ### ✅ Phase 3: Recursive Path Extraction (Complete)
-- **1,155 paths extracted** (up from 242)
-- **477% coverage increase**
+- **1,540 paths extracted** (up from 242)
+- **537% coverage increase**
 - Recursive extraction up to depth 10
 - Deep paths: `native/monitor/session={id}/type/erspan-source/source/interface={name}`
 - See [XPATH_COVERAGE_ANALYSIS.md](XPATH_COVERAGE_ANALYSIS.md) for details
 
-### 📊 Current Stats
-- **Total Paths**: 1,155
-- **Categories**: 15
+### ✅ Phase 4: Leaf Node Extraction (Complete)
+- **Added top-level leaf nodes** (hostname, version, config-register, etc.)
+- **370 additional paths** from simple leaf configs
+- Total increased from 1,269 → 1,540 paths
+- Critical configs now available: hostname, version, boot markers
+
+### 📊 Current Stats (Final)
+- **Total Paths**: 1,540
+- **Total Operations**: 6,160 (GET, PUT, PATCH, DELETE)
+- **Categories**: 18 (including wireless + 4 system parts)
 - **Max Depth**: 7 levels (configured: 10)
-- **Average Depth**: 2.98
-- **Depth Distribution**: 63.5% at depth ≤3, 94.4% at depth ≤5, 100% at depth ≤7
+- **YANG Tree Lines** (depth 6): 63,313
+- **Coverage**: 2.4% (focused on config paths)
 - **Top Categories by Paths**:
-  - System: 723 paths
-  - Interfaces: 195 paths
-  - Platform: 59 paths
-  - Security: 51 paths
-  - Services: 42 paths
+  - System: 1,018 paths (split across 4 files)
+  - Interfaces: 205 paths
+  - Platform: 75 paths
+  - Security: 63 paths
+  - Services: 56 paths
 
 ## Next Steps for Further Enhancement
 1. ⏳ Validate against comprehensive pyang tree (depth=15+)
@@ -214,3 +224,4 @@ pyang --validate Cisco-IOS-XE-native.yang (validation)
 3. ⏳ Expand grouping resolution
 4. ⏳ Add choice/case handling
 5. ⏳ Create validation suite
+6. ✅ File splitting for GitHub Pages (complete - 5MB max)

@@ -556,6 +556,61 @@ class NativeToOpenAPI:
             
             pos = list_end + 1
         
+        # Extract leaf nodes (only at depth 0 for top-level configs like hostname)
+        if depth == 0:
+            pos = 0
+            while True:
+                # Match leaf pattern: "leaf name { ... }"
+                leaf_match = re.search(r'\bleaf\s+(\S+)\s*\{', content[pos:])
+                if not leaf_match:
+                    break
+                    
+                leaf_name = leaf_match.group(1)
+                leaf_start = pos + leaf_match.end() - 1
+                leaf_end = self.find_balanced_braces(content, leaf_start)
+                
+                if leaf_end == -1:
+                    pos += leaf_match.end()
+                    continue
+                    
+                leaf_body = content[leaf_start + 1:leaf_end]
+                
+                # Get type
+                type_match = re.search(r'\btype\s+(\S+)', leaf_body)
+                yang_type = type_match.group(1) if type_match else "string"
+                
+                # Map YANG type to JSON schema type
+                if yang_type in ['string', 'inet:ipv4-address', 'inet:ipv6-address', 'inet:domain-name']:
+                    json_type = 'string'
+                elif yang_type in ['int8', 'int16', 'int32', 'int64', 'uint8', 'uint16', 'uint32', 'uint64']:
+                    json_type = 'integer'
+                elif yang_type == 'boolean':
+                    json_type = 'boolean'
+                elif yang_type == 'empty':
+                    json_type = 'boolean'  # empty leaf becomes boolean
+                else:
+                    json_type = 'string'
+                
+                # Get description
+                desc_match = re.search(r'\bdescription\s+"([^"]+)"', leaf_body)
+                description = desc_match.group(1)[:200] if desc_match else f"{leaf_name} configuration"
+                
+                # Create schema
+                schema = {'type': json_type}
+                
+                full_path = f"{parent_path}/{leaf_name}"
+                paths.append({
+                    'path': full_path,
+                    'name': leaf_name,
+                    'description': description,
+                    'schema': schema,
+                    'is_list': False,
+                    'is_leaf': True,
+                    'depth': depth
+                })
+                
+                pos = leaf_end + 1
+        
         return paths
 
     def extract_paths_from_native(self, content: str) -> List[Dict[str, Any]]:
