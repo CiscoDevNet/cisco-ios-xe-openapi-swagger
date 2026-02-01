@@ -27,10 +27,29 @@ class MIBToOpenAPI:
         
         schema_type = schema.get('type', 'string')
         
-        # Handle arrays
+        # Handle arrays - generate 3 items for better examples
         if schema_type == 'array':
             items_schema = schema.get('items', {})
-            return [self.create_example_data(items_schema, property_name)]
+            example_items = []
+            for i in range(3):
+                item = self.create_example_data(items_schema, property_name)
+                # Vary data for each entry
+                if isinstance(item, dict):
+                    # Update index fields
+                    for key in list(item.keys()):
+                        if 'Index' in key or 'index' in key:
+                            item[key] = str(i + 1) if isinstance(item[key], str) else i + 1
+                    # Update interface-specific fields
+                    if 'ifDescr' in item:
+                        item['ifDescr'] = f"GigabitEthernet1/0/{i + 1}"
+                    if 'ifPhysAddress' in item:
+                        item['ifPhysAddress'] = f"00:11:22:33:44:{i+1:02x}"
+                    if 'ifInOctets' in item:
+                        item['ifInOctets'] = 1234567890 + (i * 1000000)
+                    if 'ifOutOctets' in item:
+                        item['ifOutOctets'] = 1234567890 + (i * 1000000)
+                example_items.append(item)
+            return example_items
         
         # Handle objects
         if schema_type == 'object':
