@@ -174,21 +174,9 @@
                   "type": "object",
                   "description": "For each type of entity (represented entPhysicalVendorType\n        OID), this table contains a mapping between a unique \n        ceAlarmDescrIndex and entPhysicalvendorType OID.",
                   "properties": {
-                    "ceAlarmDescrIndex": {
-                      "type": "integer",
-                      "description": "This object uniquely identifies an alarm description.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ceAlarmDescrVendorType": {
-                      "type": "string",
-                      "description": "This object specifies an object identifier (typically an\n            enterprise-specific OID) that uniquely identifies the vendor\n            type of those physical entities that this alarm description\n            applies to.",
-                      "x-yang-type": "snmpv2-tc:AutonomousType"
-                    },
                     "ceAlarmDescrMapEntry": {
                       "type": "array",
                       "description": "A mapping between an alarm description and a vendor type.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -210,8 +198,6 @@
                 },
                 "example": {
                   "CISCO-ENTITY-ALARM-MIB:ceAlarmDescrMapTable": {
-                    "ceAlarmDescrIndex": 1,
-                    "ceAlarmDescrVendorType": "GigabitEthernet1/0/1",
                     "ceAlarmDescrMapEntry": [
                       {
                         "ceAlarmDescrIndex": 1,
@@ -241,7 +227,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A mapping between an alarm description and a vendor type.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -340,30 +325,9 @@
                   "type": "object",
                   "description": "This table contains a description for each alarm type\n        defined by each vendor type employed by the system.\n        Observe that this table is sparse in nature, as it is\n        rarely the case that a physical entity type needs to \n        define every alarm in its alarm space.",
                   "properties": {
-                    "ceAlarmDescrIndex": {
-                      "type": "string",
-                      "description": "ceAlarmDescrIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ceAlarmDescrAlarmType": {
-                      "type": "string",
-                      "description": "This object specifies the alarm type being described.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-                    },
-                    "ceAlarmDescrSeverity": {
-                      "type": "string",
-                      "description": "This object specifies the severity associated with the\n            alarm type.\n            \n            An implementation may chose to not allow dynamic severity\n            assignment, in which case it would restrict access to this\n            object to be read-only.\n            \n            If an implementation allows dynamic severity assignment, then\n            a management client can revert to the default severity by\n            writing the value '0' to this object.\n            \n            There exists a class of systems that should implement dynamic\n            severity assignment.  For example, consider a DSLAM (Digital\n            Subscriber Loop Access Multiplexor) designed for both the\n            central office and pedestal environments.  A 'pedestal' is\n            typically a dark-green metal box mounted on a concrete or stone\n            foundation in which carrier-class companies house equipment.\n            The central office typically controls the temperature and\n            humidity of the environment, reducing reliance on a system's\n            fans.  Thus, the customer probably has a desire to reduce the \n            severity of alarms indicating the failure of a fan.  However, a\n            pedestal environment has a much greater reliance on a system's\n            fans.  Thus, the customer probably has a desire to increase the\n            severity of alarms indicating the failure of a fan.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-                    },
-                    "ceAlarmDescrText": {
-                      "type": "string",
-                      "description": "This object specifies a human-readable message describing\n            the alarm.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    },
                     "ceAlarmDescrEntry": {
                       "type": "array",
                       "description": "A collection of attributes that describe an alarm type.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -394,10 +358,6 @@
                 },
                 "example": {
                   "CISCO-ENTITY-ALARM-MIB:ceAlarmDescrTable": {
-                    "ceAlarmDescrIndex": "GigabitEthernet1/0/1",
-                    "ceAlarmDescrAlarmType": "GigabitEthernet1/0/1",
-                    "ceAlarmDescrSeverity": "GigabitEthernet1/0/1",
-                    "ceAlarmDescrText": "GigabitEthernet1/0/1",
                     "ceAlarmDescrEntry": [
                       {
                         "ceAlarmDescrIndex": "GigabitEthernet1/0/1",
@@ -429,7 +389,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A collection of attributes that describe an alarm type.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -550,30 +509,9 @@
                   "type": "object",
                   "description": "This table specifies alarm control and status information\n        related to each physical entity contained by the system,\n        including the alarms currently being asserted by each physical\n        entity capable of generating alarms.",
                   "properties": {
-                    "entPhysicalIndex": {
-                      "type": "string",
-                      "description": "entPhysicalIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ceAlarmFilterProfile": {
-                      "type": "string",
-                      "description": "This object specifies the alarm filter profile associated\n            with the corresponding physical entity.  An alarm filter\n            profile controls which alarm types the agent will monitor\n            and signal for the corresponding physical entity.\n            \n            If the value of this object is '0', then the agent monitors\n            and signals all alarms associated with the corresponding\n            physical entity.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-                    },
-                    "ceAlarmSeverity": {
-                      "type": "string",
-                      "description": "This object specifies the highest severity alarm currently\n            being asserted by the corresponding physical entity.  A value\n            of '0' indicates that there the corresponding physical entity\n            currently is not asserting any alarms.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-                    },
-                    "ceAlarmList": {
-                      "type": "string",
-                      "description": "This object specifies those alarms currently being asserted\n            by the corresponding physical entity.  Note, an alarm indicates\n            a condition, not an event.  An alarm has two states:\n            \n                'asserted'  Indicates that the condition described by the\n                            alarm exists.\n            \n                'cleared'   Indicates that the condition described by the\n                            alarm does not exist.\n            \n            For example, a slot in a chassis may define an alarm that\n            specifies whether the slot contains a module.  At the time of\n            module insertion, the physical entity corresponding to the slot\n            asserts this alarm, and the alarm remains asserted until the \n            slot becomes empty.\n            \n            If an alarm is being asserted by the physical entity, then the\n            corresponding bit in the alarm list is set to a one. Observe\n            that if the physical entity is not currently asserting any\n            alarms, then the list will have a length of zero.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-                    },
                     "ceAlarmEntry": {
                       "type": "array",
                       "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -604,10 +542,6 @@
                 },
                 "example": {
                   "CISCO-ENTITY-ALARM-MIB:ceAlarmTable": {
-                    "entPhysicalIndex": "example-string",
-                    "ceAlarmFilterProfile": "example-string",
-                    "ceAlarmSeverity": "example-string",
-                    "ceAlarmList": "example-string",
                     "ceAlarmEntry": [
                       {
                         "entPhysicalIndex": "example-string",
@@ -639,7 +573,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -760,40 +693,9 @@
                   "type": "object",
                   "description": "This table contains a history of ceAlarmIndicate and\n        ceAlarmClear traps generated by the agent.",
                   "properties": {
-                    "ceAlarmHistIndex": {
-                      "type": "integer",
-                      "description": "An integer value uniquely identifying the entry in the table.\n            The value of this object starts at '1' and monotonically\n            increases for each alarm condition transition monitored by the\n            agent.  If the value of this object is '4294967295', the agent\n            will reset it to '1' upon monitoring the next alarm condition\n            transition.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ceAlarmHistType": {
-                      "type": "string",
-                      "description": "This object specifies whether the agent created the entry as\n            the result of an alarm being asserted or cleared."
-                    },
-                    "ceAlarmHistEntPhysicalIndex": {
-                      "type": "string",
-                      "description": "This object specifies the physical entity that generated\n            the alarm.",
-                      "x-yang-type": "entity-mib:PhysicalIndex"
-                    },
-                    "ceAlarmHistAlarmType": {
-                      "type": "string",
-                      "description": "This object specifies the type of alarm generated.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-                    },
-                    "ceAlarmHistSeverity": {
-                      "type": "string",
-                      "description": "This object specifies the severity of the alarm generated.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverity"
-                    },
-                    "ceAlarmHistTimeStamp": {
-                      "type": "string",
-                      "description": "This object specifies the value of the sysUpTime object at\n            the time the alarm was generated.",
-                      "x-yang-type": "yang:timestamp"
-                    },
                     "ceAlarmHistEntry": {
                       "type": "array",
                       "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -834,12 +736,6 @@
                 },
                 "example": {
                   "CISCO-ENTITY-ALARM-MIB:ceAlarmHistTable": {
-                    "ceAlarmHistIndex": 1,
-                    "ceAlarmHistType": "ethernetCsmacd(6)",
-                    "ceAlarmHistEntPhysicalIndex": "example-string",
-                    "ceAlarmHistAlarmType": "ethernetCsmacd(6)",
-                    "ceAlarmHistSeverity": "example-string",
-                    "ceAlarmHistTimeStamp": "example-string",
                     "ceAlarmHistEntry": [
                       {
                         "ceAlarmHistIndex": 1,
@@ -873,7 +769,6 @@
                 "schema": {
                   "type": "array",
                   "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1018,40 +913,9 @@
                   "type": "object",
                   "description": "This table contains a list of alarm filter profiles.",
                   "properties": {
-                    "ceAlarmFilterIndex": {
-                      "type": "string",
-                      "description": "This object uniquely identifies the alarm filter profile.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-                    },
-                    "ceAlarmFilterStatus": {
-                      "type": "string",
-                      "description": "This object facilitates the creation, modification, or \n            deletion of a conceptual row in this table.\n            \n            A management client can create a conceptual row in this\n            table by setting this object to 'createAndWait' or \n            'createAndGo'.  If a request to create a conceptual row\n            in this table fails, then the system is not capable of\n            supporting any more alarm filters.\n            \n            Before modifying a conceptual row in this table, the \n            management client must set this object to 'notInService'.\n            After modifying a conceptual row in this table, the \n            management client must set this object to 'active'.\n            This operation causes the modifications made to an\n            alarm filter profile to take effect.\n            \n            An implementation should not allow a conceptual row in\n            this table to be deleted if one or more physical entities\n            reference it.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "ceAlarmFilterAlias": {
-                      "type": "string",
-                      "description": "This object specifies an arbitrary name associated with the\n            alarm filter profile by the management client, and provides\n            a non-volatile 'handle' for the alarm filter profile.\n            \n            On the first instantiation of an alarm filter profile, the\n            value of this object is a zero-length string.  However, an\n            agent may choose to set the value to a locally unique default\n            value.\n            \n            If an implementation supports write access to this object,\n            then the agent is responsible for ensuring the retention\n            of any value written to this object until a management client\n            deletes it.  The level of retention must span reboots and \n            reinitializations of the network management system, including\n            those that result in different assignments to the value of\n            the entPhysicalIndex associated with the physical entity.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ceAlarmFilterAlarmsEnabled": {
-                      "type": "string",
-                      "description": "This object specifies a list of alarms that are enabled.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-                    },
-                    "ceAlarmFilterNotifiesEnabled": {
-                      "type": "string",
-                      "description": "This object specifies a list of alarms for which notification\n            generation is enabled.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-                    },
-                    "ceAlarmFilterSyslogEnabled": {
-                      "type": "string",
-                      "description": "This object specifies a list of alarms for which syslog\n            message generation is enabled.",
-                      "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-                    },
                     "ceAlarmFilterProfileEntry": {
                       "type": "array",
                       "description": "ceAlarmFilterProfileEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -1092,12 +956,6 @@
                 },
                 "example": {
                   "CISCO-ENTITY-ALARM-MIB:ceAlarmFilterProfileTable": {
-                    "ceAlarmFilterIndex": "example-string",
-                    "ceAlarmFilterStatus": "up(1)",
-                    "ceAlarmFilterAlias": "example-string",
-                    "ceAlarmFilterAlarmsEnabled": "example-string",
-                    "ceAlarmFilterNotifiesEnabled": "example-string",
-                    "ceAlarmFilterSyslogEnabled": "example-string",
                     "ceAlarmFilterProfileEntry": [
                       {
                         "ceAlarmFilterIndex": "example-string",
@@ -1131,7 +989,6 @@
                 "schema": {
                   "type": "array",
                   "description": "ceAlarmFilterProfileEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1275,7 +1132,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A mapping between an alarm description and a vendor type.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1373,7 +1229,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A collection of attributes that describe an alarm type.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1493,7 +1348,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1613,7 +1467,6 @@
                 "schema": {
                   "type": "array",
                   "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1757,7 +1610,6 @@
                 "schema": {
                   "type": "array",
                   "description": "ceAlarmFilterProfileEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1893,164 +1745,9 @@
         "type": "object",
         "description": "The value of this object specifies the number of alarms\n          currently asserted with a severity of 'critical'.",
         "properties": {
-          "ceAlarmCriticalCount": {
-            "type": "integer",
-            "description": "The value of this object specifies the number of alarms\n          currently asserted with a severity of 'critical'.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ceAlarmMajorCount": {
-            "type": "integer",
-            "description": "The value of this object specifies the number of alarms\n          currently asserted with a severity of 'major'.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ceAlarmMinorCount": {
-            "type": "integer",
-            "description": "The value of this object specifies the number of alarms\n          currently asserted with a severity of 'minor'.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ceAlarmCutOff": {
-            "type": "boolean",
-            "description": "If the management client writes a value of 'true' to this\n          object, the agent stops signalling all external audible alarms\n          under the control of the agent.  Reading this object should\n          always result in a value of 'false'.\n          \n          Observe that alarm cutoff does not have an effect on monitoring,\n          history logging, generation of notifications, or syslog message\n          generation.  It also does not prevent the agent from signalling\n          external audible alarms for alarms asserted after alarm-cutoff.\n          \n          This object emulates the 'alarm cut-off' mechanism typically\n          installed in a central office (e.g., a big red button).  Observe\n          this object should neither affect external visual alarms under\n          the control of the agent, nor should it affect the current state\n          of alarms being asserted by the system."
-          },
-          "ceAlarmHistTableSize": {
-            "type": "integer",
-            "description": "This object specifies the number of entries that the \n          ceAlarmHistTable can contain.  When a physical entity\n          generates an unfiltered alarm, and the capacity of the\n          ceAlarmHistTable has reached the value specified by\n          this object, then the agent deletes the oldest entity in\n          order to accommodate the new entry. A value of '0' prevents\n          any history from being retained.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ceAlarmHistLastIndex": {
-            "type": "integer",
-            "description": "This object specifies the value of the ceAlarmHistIndex\n          object corresponding to the last entry added to the table by the\n          agent.\n          \n          If the management client uses the notifications defined by this\n          module, then it can poll this object to determine whether it has\n          missed a notification sent by the agent.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ceAlarmNotifiesEnable": {
-            "type": "string",
-            "description": "This object specifies a severity threshold governing the\n          generation of ceAlarmAsserted and ceAlarmCleared\n          notifications.  For example, if the value of this object is\n          set to 'major', then the agent generates these notifications\n          if and only if the severity of the alarm being indicated is\n          'major' or 'critical'.  The value of '0' disables the \n          generation of notifications.\n          \n          Observe that this setting overrides the value of the \n          ceAlarmFilterNotifiesEnabled object.\n          \n          This object affects notification generation only; that is, it\n          does not affect monitoring, history logging, and syslog message\n          generation.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-          },
-          "ceAlarmSyslogEnable": {
-            "type": "string",
-            "description": "This object specifies a severity threshold governing the\n          generation of syslog messages corresponding to alarms.  For\n          example, if the value of this object is set to 'major', then\n          the agent generates these a syslog message if and only if the\n          severity of the alarm being indicated is 'major' or 'critical'.\n          The value of '0' disables the generation of syslog messages\n          corresponding to alarms.\n          \n          Observe that this setting overrides the value of the \n          ceAlarmFilterSyslogEnabled object.\n          \n          This object affects syslog message generation only; that is, it\n          does not have an effect on monitoring, history logging, and\n          generation of notifications.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-          },
-          "ceAlarmFilterProfileIndexNext": {
-            "type": "string",
-            "description": "This object contains an appropriate value to be used\n          for ceAlarmFilterIndex when creating entries in the\n          ceAlarmFilterProfileTable.  The value '0' indicates\n          that no unassigned entries are available.  To obtain\n          a ceAlarmFilterIndex, the management client issues\n          a get request.  The agent has the responsibility of \n          modifying the value of this object following each \n          successful get request.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-          },
-          "ceAlarmDescrIndex": {
-            "type": "string",
-            "description": "ceAlarmDescrIndex",
-            "x-yang-type": "leafref"
-          },
-          "ceAlarmDescrVendorType": {
-            "type": "string",
-            "description": "This object specifies an object identifier (typically an\n            enterprise-specific OID) that uniquely identifies the vendor\n            type of those physical entities that this alarm description\n            applies to.",
-            "x-yang-type": "snmpv2-tc:AutonomousType"
-          },
-          "ceAlarmDescrAlarmType": {
-            "type": "string",
-            "description": "This object specifies the alarm type being described.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-          },
-          "ceAlarmDescrSeverity": {
-            "type": "string",
-            "description": "This object specifies the severity associated with the\n            alarm type.\n            \n            An implementation may chose to not allow dynamic severity\n            assignment, in which case it would restrict access to this\n            object to be read-only.\n            \n            If an implementation allows dynamic severity assignment, then\n            a management client can revert to the default severity by\n            writing the value '0' to this object.\n            \n            There exists a class of systems that should implement dynamic\n            severity assignment.  For example, consider a DSLAM (Digital\n            Subscriber Loop Access Multiplexor) designed for both the\n            central office and pedestal environments.  A 'pedestal' is\n            typically a dark-green metal box mounted on a concrete or stone\n            foundation in which carrier-class companies house equipment.\n            The central office typically controls the temperature and\n            humidity of the environment, reducing reliance on a system's\n            fans.  Thus, the customer probably has a desire to reduce the \n            severity of alarms indicating the failure of a fan.  However, a\n            pedestal environment has a much greater reliance on a system's\n            fans.  Thus, the customer probably has a desire to increase the\n            severity of alarms indicating the failure of a fan.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-          },
-          "ceAlarmDescrText": {
-            "type": "string",
-            "description": "This object specifies a human-readable message describing\n            the alarm.",
-            "x-yang-type": "snmp-framework:SnmpAdminString"
-          },
-          "entPhysicalIndex": {
-            "type": "string",
-            "description": "entPhysicalIndex",
-            "x-yang-type": "leafref"
-          },
-          "ceAlarmFilterProfile": {
-            "type": "string",
-            "description": "This object specifies the alarm filter profile associated\n            with the corresponding physical entity.  An alarm filter\n            profile controls which alarm types the agent will monitor\n            and signal for the corresponding physical entity.\n            \n            If the value of this object is '0', then the agent monitors\n            and signals all alarms associated with the corresponding\n            physical entity.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-          },
-          "ceAlarmSeverity": {
-            "type": "string",
-            "description": "This object specifies the highest severity alarm currently\n            being asserted by the corresponding physical entity.  A value\n            of '0' indicates that there the corresponding physical entity\n            currently is not asserting any alarms.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-          },
-          "ceAlarmList": {
-            "type": "string",
-            "description": "This object specifies those alarms currently being asserted\n            by the corresponding physical entity.  Note, an alarm indicates\n            a condition, not an event.  An alarm has two states:\n            \n                'asserted'  Indicates that the condition described by the\n                            alarm exists.\n            \n                'cleared'   Indicates that the condition described by the\n                            alarm does not exist.\n            \n            For example, a slot in a chassis may define an alarm that\n            specifies whether the slot contains a module.  At the time of\n            module insertion, the physical entity corresponding to the slot\n            asserts this alarm, and the alarm remains asserted until the \n            slot becomes empty.\n            \n            If an alarm is being asserted by the physical entity, then the\n            corresponding bit in the alarm list is set to a one. Observe\n            that if the physical entity is not currently asserting any\n            alarms, then the list will have a length of zero.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-          },
-          "ceAlarmHistIndex": {
-            "type": "integer",
-            "description": "An integer value uniquely identifying the entry in the table.\n            The value of this object starts at '1' and monotonically\n            increases for each alarm condition transition monitored by the\n            agent.  If the value of this object is '4294967295', the agent\n            will reset it to '1' upon monitoring the next alarm condition\n            transition.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ceAlarmHistType": {
-            "type": "string",
-            "description": "This object specifies whether the agent created the entry as\n            the result of an alarm being asserted or cleared."
-          },
-          "ceAlarmHistEntPhysicalIndex": {
-            "type": "string",
-            "description": "This object specifies the physical entity that generated\n            the alarm.",
-            "x-yang-type": "entity-mib:PhysicalIndex"
-          },
-          "ceAlarmHistAlarmType": {
-            "type": "string",
-            "description": "This object specifies the type of alarm generated.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-          },
-          "ceAlarmHistSeverity": {
-            "type": "string",
-            "description": "This object specifies the severity of the alarm generated.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverity"
-          },
-          "ceAlarmHistTimeStamp": {
-            "type": "string",
-            "description": "This object specifies the value of the sysUpTime object at\n            the time the alarm was generated.",
-            "x-yang-type": "yang:timestamp"
-          },
-          "ceAlarmFilterIndex": {
-            "type": "string",
-            "description": "This object uniquely identifies the alarm filter profile.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-          },
-          "ceAlarmFilterStatus": {
-            "type": "string",
-            "description": "This object facilitates the creation, modification, or \n            deletion of a conceptual row in this table.\n            \n            A management client can create a conceptual row in this\n            table by setting this object to 'createAndWait' or \n            'createAndGo'.  If a request to create a conceptual row\n            in this table fails, then the system is not capable of\n            supporting any more alarm filters.\n            \n            Before modifying a conceptual row in this table, the \n            management client must set this object to 'notInService'.\n            After modifying a conceptual row in this table, the \n            management client must set this object to 'active'.\n            This operation causes the modifications made to an\n            alarm filter profile to take effect.\n            \n            An implementation should not allow a conceptual row in\n            this table to be deleted if one or more physical entities\n            reference it.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "ceAlarmFilterAlias": {
-            "type": "string",
-            "description": "This object specifies an arbitrary name associated with the\n            alarm filter profile by the management client, and provides\n            a non-volatile 'handle' for the alarm filter profile.\n            \n            On the first instantiation of an alarm filter profile, the\n            value of this object is a zero-length string.  However, an\n            agent may choose to set the value to a locally unique default\n            value.\n            \n            If an implementation supports write access to this object,\n            then the agent is responsible for ensuring the retention\n            of any value written to this object until a management client\n            deletes it.  The level of retention must span reboots and \n            reinitializations of the network management system, including\n            those that result in different assignments to the value of\n            the entPhysicalIndex associated with the physical entity.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "ceAlarmFilterAlarmsEnabled": {
-            "type": "string",
-            "description": "This object specifies a list of alarms that are enabled.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-          },
-          "ceAlarmFilterNotifiesEnabled": {
-            "type": "string",
-            "description": "This object specifies a list of alarms for which notification\n            generation is enabled.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-          },
-          "ceAlarmFilterSyslogEnabled": {
-            "type": "string",
-            "description": "This object specifies a list of alarms for which syslog\n            message generation is enabled.",
-            "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-          },
           "ceAlarmDescrMapEntry": {
             "type": "array",
             "description": "A mapping between an alarm description and a vendor type.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2071,7 +1768,6 @@
           "ceAlarmDescrEntry": {
             "type": "array",
             "description": "A collection of attributes that describe an alarm type.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2101,7 +1797,6 @@
           "ceAlarmEntry": {
             "type": "array",
             "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2131,7 +1826,6 @@
           "ceAlarmHistEntry": {
             "type": "array",
             "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2171,7 +1865,6 @@
           "ceAlarmFilterProfileEntry": {
             "type": "array",
             "description": "ceAlarmFilterProfileEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2279,21 +1972,9 @@
             "type": "object",
             "description": "For each type of entity (represented entPhysicalVendorType\n        OID), this table contains a mapping between a unique \n        ceAlarmDescrIndex and entPhysicalvendorType OID.",
             "properties": {
-              "ceAlarmDescrIndex": {
-                "type": "integer",
-                "description": "This object uniquely identifies an alarm description.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "ceAlarmDescrVendorType": {
-                "type": "string",
-                "description": "This object specifies an object identifier (typically an\n            enterprise-specific OID) that uniquely identifies the vendor\n            type of those physical entities that this alarm description\n            applies to.",
-                "x-yang-type": "snmpv2-tc:AutonomousType"
-              },
               "ceAlarmDescrMapEntry": {
                 "type": "array",
                 "description": "A mapping between an alarm description and a vendor type.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2317,30 +1998,9 @@
             "type": "object",
             "description": "This table contains a description for each alarm type\n        defined by each vendor type employed by the system.\n        Observe that this table is sparse in nature, as it is\n        rarely the case that a physical entity type needs to \n        define every alarm in its alarm space.",
             "properties": {
-              "ceAlarmDescrIndex": {
-                "type": "string",
-                "description": "ceAlarmDescrIndex",
-                "x-yang-type": "leafref"
-              },
-              "ceAlarmDescrAlarmType": {
-                "type": "string",
-                "description": "This object specifies the alarm type being described.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-              },
-              "ceAlarmDescrSeverity": {
-                "type": "string",
-                "description": "This object specifies the severity associated with the\n            alarm type.\n            \n            An implementation may chose to not allow dynamic severity\n            assignment, in which case it would restrict access to this\n            object to be read-only.\n            \n            If an implementation allows dynamic severity assignment, then\n            a management client can revert to the default severity by\n            writing the value '0' to this object.\n            \n            There exists a class of systems that should implement dynamic\n            severity assignment.  For example, consider a DSLAM (Digital\n            Subscriber Loop Access Multiplexor) designed for both the\n            central office and pedestal environments.  A 'pedestal' is\n            typically a dark-green metal box mounted on a concrete or stone\n            foundation in which carrier-class companies house equipment.\n            The central office typically controls the temperature and\n            humidity of the environment, reducing reliance on a system's\n            fans.  Thus, the customer probably has a desire to reduce the \n            severity of alarms indicating the failure of a fan.  However, a\n            pedestal environment has a much greater reliance on a system's\n            fans.  Thus, the customer probably has a desire to increase the\n            severity of alarms indicating the failure of a fan.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-              },
-              "ceAlarmDescrText": {
-                "type": "string",
-                "description": "This object specifies a human-readable message describing\n            the alarm.",
-                "x-yang-type": "snmp-framework:SnmpAdminString"
-              },
               "ceAlarmDescrEntry": {
                 "type": "array",
                 "description": "A collection of attributes that describe an alarm type.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2373,30 +2033,9 @@
             "type": "object",
             "description": "This table specifies alarm control and status information\n        related to each physical entity contained by the system,\n        including the alarms currently being asserted by each physical\n        entity capable of generating alarms.",
             "properties": {
-              "entPhysicalIndex": {
-                "type": "string",
-                "description": "entPhysicalIndex",
-                "x-yang-type": "leafref"
-              },
-              "ceAlarmFilterProfile": {
-                "type": "string",
-                "description": "This object specifies the alarm filter profile associated\n            with the corresponding physical entity.  An alarm filter\n            profile controls which alarm types the agent will monitor\n            and signal for the corresponding physical entity.\n            \n            If the value of this object is '0', then the agent monitors\n            and signals all alarms associated with the corresponding\n            physical entity.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-              },
-              "ceAlarmSeverity": {
-                "type": "string",
-                "description": "This object specifies the highest severity alarm currently\n            being asserted by the corresponding physical entity.  A value\n            of '0' indicates that there the corresponding physical entity\n            currently is not asserting any alarms.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverityOrZero"
-              },
-              "ceAlarmList": {
-                "type": "string",
-                "description": "This object specifies those alarms currently being asserted\n            by the corresponding physical entity.  Note, an alarm indicates\n            a condition, not an event.  An alarm has two states:\n            \n                'asserted'  Indicates that the condition described by the\n                            alarm exists.\n            \n                'cleared'   Indicates that the condition described by the\n                            alarm does not exist.\n            \n            For example, a slot in a chassis may define an alarm that\n            specifies whether the slot contains a module.  At the time of\n            module insertion, the physical entity corresponding to the slot\n            asserts this alarm, and the alarm remains asserted until the \n            slot becomes empty.\n            \n            If an alarm is being asserted by the physical entity, then the\n            corresponding bit in the alarm list is set to a one. Observe\n            that if the physical entity is not currently asserting any\n            alarms, then the list will have a length of zero.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-              },
               "ceAlarmEntry": {
                 "type": "array",
                 "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2429,40 +2068,9 @@
             "type": "object",
             "description": "This table contains a history of ceAlarmIndicate and\n        ceAlarmClear traps generated by the agent.",
             "properties": {
-              "ceAlarmHistIndex": {
-                "type": "integer",
-                "description": "An integer value uniquely identifying the entry in the table.\n            The value of this object starts at '1' and monotonically\n            increases for each alarm condition transition monitored by the\n            agent.  If the value of this object is '4294967295', the agent\n            will reset it to '1' upon monitoring the next alarm condition\n            transition.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "ceAlarmHistType": {
-                "type": "string",
-                "description": "This object specifies whether the agent created the entry as\n            the result of an alarm being asserted or cleared."
-              },
-              "ceAlarmHistEntPhysicalIndex": {
-                "type": "string",
-                "description": "This object specifies the physical entity that generated\n            the alarm.",
-                "x-yang-type": "entity-mib:PhysicalIndex"
-              },
-              "ceAlarmHistAlarmType": {
-                "type": "string",
-                "description": "This object specifies the type of alarm generated.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmType"
-              },
-              "ceAlarmHistSeverity": {
-                "type": "string",
-                "description": "This object specifies the severity of the alarm generated.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmSeverity"
-              },
-              "ceAlarmHistTimeStamp": {
-                "type": "string",
-                "description": "This object specifies the value of the sysUpTime object at\n            the time the alarm was generated.",
-                "x-yang-type": "yang:timestamp"
-              },
               "ceAlarmHistEntry": {
                 "type": "array",
                 "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2505,40 +2113,9 @@
             "type": "object",
             "description": "This table contains a list of alarm filter profiles.",
             "properties": {
-              "ceAlarmFilterIndex": {
-                "type": "string",
-                "description": "This object uniquely identifies the alarm filter profile.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmFilterProfileType"
-              },
-              "ceAlarmFilterStatus": {
-                "type": "string",
-                "description": "This object facilitates the creation, modification, or \n            deletion of a conceptual row in this table.\n            \n            A management client can create a conceptual row in this\n            table by setting this object to 'createAndWait' or \n            'createAndGo'.  If a request to create a conceptual row\n            in this table fails, then the system is not capable of\n            supporting any more alarm filters.\n            \n            Before modifying a conceptual row in this table, the \n            management client must set this object to 'notInService'.\n            After modifying a conceptual row in this table, the \n            management client must set this object to 'active'.\n            This operation causes the modifications made to an\n            alarm filter profile to take effect.\n            \n            An implementation should not allow a conceptual row in\n            this table to be deleted if one or more physical entities\n            reference it.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "ceAlarmFilterAlias": {
-                "type": "string",
-                "description": "This object specifies an arbitrary name associated with the\n            alarm filter profile by the management client, and provides\n            a non-volatile 'handle' for the alarm filter profile.\n            \n            On the first instantiation of an alarm filter profile, the\n            value of this object is a zero-length string.  However, an\n            agent may choose to set the value to a locally unique default\n            value.\n            \n            If an implementation supports write access to this object,\n            then the agent is responsible for ensuring the retention\n            of any value written to this object until a management client\n            deletes it.  The level of retention must span reboots and \n            reinitializations of the network management system, including\n            those that result in different assignments to the value of\n            the entPhysicalIndex associated with the physical entity.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "ceAlarmFilterAlarmsEnabled": {
-                "type": "string",
-                "description": "This object specifies a list of alarms that are enabled.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-              },
-              "ceAlarmFilterNotifiesEnabled": {
-                "type": "string",
-                "description": "This object specifies a list of alarms for which notification\n            generation is enabled.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-              },
-              "ceAlarmFilterSyslogEnabled": {
-                "type": "string",
-                "description": "This object specifies a list of alarms for which syslog\n            message generation is enabled.",
-                "x-yang-type": "CISCO-ENTITY-ALARM-MIB:AlarmList"
-              },
               "ceAlarmFilterProfileEntry": {
                 "type": "array",
                 "description": "ceAlarmFilterProfileEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2646,7 +2223,6 @@
       "CISCO-ENTITY-ALARM-MIB_ceAlarmDescrMapEntry": {
         "type": "array",
         "description": "A mapping between an alarm description and a vendor type.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2667,7 +2243,6 @@
       "CISCO-ENTITY-ALARM-MIB_ceAlarmDescrEntry": {
         "type": "array",
         "description": "A collection of attributes that describe an alarm type.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2697,7 +2272,6 @@
       "CISCO-ENTITY-ALARM-MIB_ceAlarmEntry": {
         "type": "array",
         "description": "Alarm control and status information related to the \n          corresponding physical entity, including a list of those\n          alarms currently being asserted by that physical entity.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2727,7 +2301,6 @@
       "CISCO-ENTITY-ALARM-MIB_ceAlarmHistEntry": {
         "type": "array",
         "description": "The information conveyed by a ceAlarmIndicate or\n          ceAlarmClear trap.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2767,7 +2340,6 @@
       "CISCO-ENTITY-ALARM-MIB_ceAlarmFilterProfileEntry": {
         "type": "array",
         "description": "ceAlarmFilterProfileEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

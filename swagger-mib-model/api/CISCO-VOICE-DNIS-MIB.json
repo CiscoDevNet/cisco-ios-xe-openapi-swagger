@@ -32,34 +32,9 @@
                   "type": "object",
                   "description": "The table contains the map name and a url specifying\n        a file name. The file contains DNIS entries that belong\n        to the DNIS mapping.",
                   "properties": {
-                    "cvDnisMappingName": {
-                      "type": "string",
-                      "description": "The name which uniquely identifies a DNIS mapping.",
-                      "x-yang-type": "CISCO-VOICE-DNIS-MIB:DnisMapname"
-                    },
-                    "cvDnisMappingUrl": {
-                      "type": "string",
-                      "description": "The url specifies a file location. The file contains\n            individual DNIS entries that belong to the DNIS map \n            name specified by cvDnisMappingName.\n            \n            Once a url is created and associated with a map name (the\n            association is complete when the row is made active(1)),\n            it cannot be modified while cvDnisMappingStatus is\n            active. If a different url needs to be associated with\n            the current map name, the row status should be made\n            notInService(2) and this object has to be modified to\n            associate a new url. When a new association is made all\n            the DNIS entries corresponding to the old association\n            will be deleted from the cvDnisNodeTable.\n            \n            The url is read when the row status is made active(1) or\n            when the row status is active and the object \n             cvDnisMappingRefresh is explicitly set to refresh(2). \n             If the url is not accessible then a\n            cvDnisMappingUrlInaccessible notification will be\n            generted.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "cvDnisMappingRefresh": {
-                      "type": "string",
-                      "description": "Whenever there is a need to re-read the contents of the\n            file specified by cvDnisMappingUrl, this object can be\n            set to refresh(2). This will cause the contents of the\n            file to be re-read and correspondingly update the\n            cvDnisNodeTable. After the completion of this operation,\n            the value of this object is reset to idle(1). The only\n            operation allowed on this object is setting it to\n            refresh(2). This can only be done when the current value\n            is idle(1) and the rowstatus is active(1).\n            \n            idle       - The refreshing process is idle and the user\n                         can modify this object to refresh.\n            refresh    - The refreshing process is currently busy and\n                         the user have to wait till the object\n                         becomes idle to issue new refresh."
-                    },
-                    "cvDnisMappingUrlAccessError": {
-                      "type": "string",
-                      "description": "ASCII text describing the error on last access of the url\n            specified in cvDnisMappingUrl.\n            \n            If the url access does not succeed, then this object is\n            populated with an error message indicating the reason for\n            failure. If the url access succeeds, this object is set\n            to null string.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "cvDnisMappingStatus": {
-                      "type": "string",
-                      "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. When making the\n            status active(1), if a valid cvDnisMappingUrl is present\n            the contents of the url is downloaded and during that\n            time cvDnisMappingRefresh is set to refresh(2). When\n            cvDnisMappingRefresh is set to refresh(2), only the\n            destroy(6) operation is allowed.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
                     "cvDnisMappingEntry": {
                       "type": "array",
                       "description": "cvDnisMappingEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -94,11 +69,6 @@
                 },
                 "example": {
                   "CISCO-VOICE-DNIS-MIB:cvDnisMappingTable": {
-                    "cvDnisMappingName": "interface-1",
-                    "cvDnisMappingUrl": "example-string",
-                    "cvDnisMappingRefresh": "example-string",
-                    "cvDnisMappingUrlAccessError": "example-string",
-                    "cvDnisMappingStatus": "up(1)",
                     "cvDnisMappingEntry": [
                       {
                         "cvDnisMappingName": "interface-1",
@@ -131,7 +101,6 @@
                 "schema": {
                   "type": "array",
                   "description": "cvDnisMappingEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -262,34 +231,9 @@
                   "type": "object",
                   "description": "The table contains a DNIS name and a url. The url is a\n        pointer to a VXML page for the DNIS name.",
                   "properties": {
-                    "cvDnisMappingName": {
-                      "type": "string",
-                      "description": "cvDnisMappingName",
-                      "x-yang-type": "leafref"
-                    },
-                    "cvDnisNumber": {
-                      "type": "string",
-                      "description": "The individual DNIS name. It is unique within a DNIS\n            mapping.",
-                      "x-yang-type": "CISCO-VOICE-DNIS-MIB:CvE164String"
-                    },
-                    "cvDnisNodeUrl": {
-                      "type": "string",
-                      "description": "The url specifies a VXML page. This page contains\n            voice XML links to play audio data.\n            \n            This url which is a VXML page is not read immediately\n            when the row is made active(1), but only when a call that\n            requires the use of this DNIS comes through.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "cvDnisNodeModifiable": {
-                      "type": "boolean",
-                      "description": "This object specifies whether the object in a particular\n            row is modifiable. The object is set to true(1) if the\n            corresponding map name (defined in cvDnisMappingTable)\n            does not have any file name provided in the\n            cvDnisMappingUrl object. Otherwise this object is set to\n            false(2) and the row becomes read only."
-                    },
-                    "cvDnisNodeStatus": {
-                      "type": "string",
-                      "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. The objects in a\n            row can be modified or deleted while the row status is\n            active(1) and cvDnisNodeModifiable is true(1). The row\n            status cannot be set to notInService(2) or\n            createAndWait(5).",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
                     "cvDnisNodeEntry": {
                       "type": "array",
                       "description": "cvDnisNodeEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -324,11 +268,6 @@
                 },
                 "example": {
                   "CISCO-VOICE-DNIS-MIB:cvDnisNodeTable": {
-                    "cvDnisMappingName": "interface-1",
-                    "cvDnisNumber": "example-string",
-                    "cvDnisNodeUrl": "example-string",
-                    "cvDnisNodeModifiable": true,
-                    "cvDnisNodeStatus": "up(1)",
                     "cvDnisNodeEntry": [
                       {
                         "cvDnisMappingName": "interface-1",
@@ -361,7 +300,6 @@
                 "schema": {
                   "type": "array",
                   "description": "cvDnisNodeEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -491,7 +429,6 @@
                 "schema": {
                   "type": "array",
                   "description": "cvDnisMappingEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -621,7 +558,6 @@
                 "schema": {
                   "type": "array",
                   "description": "cvDnisNodeEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -743,53 +679,9 @@
         "type": "object",
         "description": "The table contains the map name and a url specifying\n        a file name. The file contains DNIS entries that belong\n        to the DNIS mapping.",
         "properties": {
-          "cvDnisMappingName": {
-            "type": "string",
-            "description": "cvDnisMappingName",
-            "x-yang-type": "leafref"
-          },
-          "cvDnisMappingUrl": {
-            "type": "string",
-            "description": "The url specifies a file location. The file contains\n            individual DNIS entries that belong to the DNIS map \n            name specified by cvDnisMappingName.\n            \n            Once a url is created and associated with a map name (the\n            association is complete when the row is made active(1)),\n            it cannot be modified while cvDnisMappingStatus is\n            active. If a different url needs to be associated with\n            the current map name, the row status should be made\n            notInService(2) and this object has to be modified to\n            associate a new url. When a new association is made all\n            the DNIS entries corresponding to the old association\n            will be deleted from the cvDnisNodeTable.\n            \n            The url is read when the row status is made active(1) or\n            when the row status is active and the object \n             cvDnisMappingRefresh is explicitly set to refresh(2). \n             If the url is not accessible then a\n            cvDnisMappingUrlInaccessible notification will be\n            generted.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "cvDnisMappingRefresh": {
-            "type": "string",
-            "description": "Whenever there is a need to re-read the contents of the\n            file specified by cvDnisMappingUrl, this object can be\n            set to refresh(2). This will cause the contents of the\n            file to be re-read and correspondingly update the\n            cvDnisNodeTable. After the completion of this operation,\n            the value of this object is reset to idle(1). The only\n            operation allowed on this object is setting it to\n            refresh(2). This can only be done when the current value\n            is idle(1) and the rowstatus is active(1).\n            \n            idle       - The refreshing process is idle and the user\n                         can modify this object to refresh.\n            refresh    - The refreshing process is currently busy and\n                         the user have to wait till the object\n                         becomes idle to issue new refresh."
-          },
-          "cvDnisMappingUrlAccessError": {
-            "type": "string",
-            "description": "ASCII text describing the error on last access of the url\n            specified in cvDnisMappingUrl.\n            \n            If the url access does not succeed, then this object is\n            populated with an error message indicating the reason for\n            failure. If the url access succeeds, this object is set\n            to null string.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "cvDnisMappingStatus": {
-            "type": "string",
-            "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. When making the\n            status active(1), if a valid cvDnisMappingUrl is present\n            the contents of the url is downloaded and during that\n            time cvDnisMappingRefresh is set to refresh(2). When\n            cvDnisMappingRefresh is set to refresh(2), only the\n            destroy(6) operation is allowed.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "cvDnisNumber": {
-            "type": "string",
-            "description": "The individual DNIS name. It is unique within a DNIS\n            mapping.",
-            "x-yang-type": "CISCO-VOICE-DNIS-MIB:CvE164String"
-          },
-          "cvDnisNodeUrl": {
-            "type": "string",
-            "description": "The url specifies a VXML page. This page contains\n            voice XML links to play audio data.\n            \n            This url which is a VXML page is not read immediately\n            when the row is made active(1), but only when a call that\n            requires the use of this DNIS comes through.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "cvDnisNodeModifiable": {
-            "type": "boolean",
-            "description": "This object specifies whether the object in a particular\n            row is modifiable. The object is set to true(1) if the\n            corresponding map name (defined in cvDnisMappingTable)\n            does not have any file name provided in the\n            cvDnisMappingUrl object. Otherwise this object is set to\n            false(2) and the row becomes read only."
-          },
-          "cvDnisNodeStatus": {
-            "type": "string",
-            "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. The objects in a\n            row can be modified or deleted while the row status is\n            active(1) and cvDnisNodeModifiable is true(1). The row\n            status cannot be set to notInService(2) or\n            createAndWait(5).",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
           "cvDnisMappingEntry": {
             "type": "array",
             "description": "cvDnisMappingEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -823,7 +715,6 @@
           "cvDnisNodeEntry": {
             "type": "array",
             "description": "cvDnisNodeEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -858,34 +749,9 @@
             "type": "object",
             "description": "The table contains the map name and a url specifying\n        a file name. The file contains DNIS entries that belong\n        to the DNIS mapping.",
             "properties": {
-              "cvDnisMappingName": {
-                "type": "string",
-                "description": "The name which uniquely identifies a DNIS mapping.",
-                "x-yang-type": "CISCO-VOICE-DNIS-MIB:DnisMapname"
-              },
-              "cvDnisMappingUrl": {
-                "type": "string",
-                "description": "The url specifies a file location. The file contains\n            individual DNIS entries that belong to the DNIS map \n            name specified by cvDnisMappingName.\n            \n            Once a url is created and associated with a map name (the\n            association is complete when the row is made active(1)),\n            it cannot be modified while cvDnisMappingStatus is\n            active. If a different url needs to be associated with\n            the current map name, the row status should be made\n            notInService(2) and this object has to be modified to\n            associate a new url. When a new association is made all\n            the DNIS entries corresponding to the old association\n            will be deleted from the cvDnisNodeTable.\n            \n            The url is read when the row status is made active(1) or\n            when the row status is active and the object \n             cvDnisMappingRefresh is explicitly set to refresh(2). \n             If the url is not accessible then a\n            cvDnisMappingUrlInaccessible notification will be\n            generted.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "cvDnisMappingRefresh": {
-                "type": "string",
-                "description": "Whenever there is a need to re-read the contents of the\n            file specified by cvDnisMappingUrl, this object can be\n            set to refresh(2). This will cause the contents of the\n            file to be re-read and correspondingly update the\n            cvDnisNodeTable. After the completion of this operation,\n            the value of this object is reset to idle(1). The only\n            operation allowed on this object is setting it to\n            refresh(2). This can only be done when the current value\n            is idle(1) and the rowstatus is active(1).\n            \n            idle       - The refreshing process is idle and the user\n                         can modify this object to refresh.\n            refresh    - The refreshing process is currently busy and\n                         the user have to wait till the object\n                         becomes idle to issue new refresh."
-              },
-              "cvDnisMappingUrlAccessError": {
-                "type": "string",
-                "description": "ASCII text describing the error on last access of the url\n            specified in cvDnisMappingUrl.\n            \n            If the url access does not succeed, then this object is\n            populated with an error message indicating the reason for\n            failure. If the url access succeeds, this object is set\n            to null string.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "cvDnisMappingStatus": {
-                "type": "string",
-                "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. When making the\n            status active(1), if a valid cvDnisMappingUrl is present\n            the contents of the url is downloaded and during that\n            time cvDnisMappingRefresh is set to refresh(2). When\n            cvDnisMappingRefresh is set to refresh(2), only the\n            destroy(6) operation is allowed.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
               "cvDnisMappingEntry": {
                 "type": "array",
                 "description": "cvDnisMappingEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -922,34 +788,9 @@
             "type": "object",
             "description": "The table contains a DNIS name and a url. The url is a\n        pointer to a VXML page for the DNIS name.",
             "properties": {
-              "cvDnisMappingName": {
-                "type": "string",
-                "description": "cvDnisMappingName",
-                "x-yang-type": "leafref"
-              },
-              "cvDnisNumber": {
-                "type": "string",
-                "description": "The individual DNIS name. It is unique within a DNIS\n            mapping.",
-                "x-yang-type": "CISCO-VOICE-DNIS-MIB:CvE164String"
-              },
-              "cvDnisNodeUrl": {
-                "type": "string",
-                "description": "The url specifies a VXML page. This page contains\n            voice XML links to play audio data.\n            \n            This url which is a VXML page is not read immediately\n            when the row is made active(1), but only when a call that\n            requires the use of this DNIS comes through.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "cvDnisNodeModifiable": {
-                "type": "boolean",
-                "description": "This object specifies whether the object in a particular\n            row is modifiable. The object is set to true(1) if the\n            corresponding map name (defined in cvDnisMappingTable)\n            does not have any file name provided in the\n            cvDnisMappingUrl object. Otherwise this object is set to\n            false(2) and the row becomes read only."
-              },
-              "cvDnisNodeStatus": {
-                "type": "string",
-                "description": "This object is used to create a new row or modify or\n            delete an existing row in this table. The objects in a\n            row can be modified or deleted while the row status is\n            active(1) and cvDnisNodeModifiable is true(1). The row\n            status cannot be set to notInService(2) or\n            createAndWait(5).",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
               "cvDnisNodeEntry": {
                 "type": "array",
                 "description": "cvDnisNodeEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1019,7 +860,6 @@
       "CISCO-VOICE-DNIS-MIB_cvDnisMappingEntry": {
         "type": "array",
         "description": "cvDnisMappingEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -1053,7 +893,6 @@
       "CISCO-VOICE-DNIS-MIB_cvDnisNodeEntry": {
         "type": "array",
         "description": "cvDnisNodeEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

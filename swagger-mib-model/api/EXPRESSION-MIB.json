@@ -135,25 +135,9 @@
                   "type": "object",
                   "description": "A table of expression names, for creating and deleting\n        expressions.",
                   "properties": {
-                    "expName": {
-                      "type": "string",
-                      "description": "The name of the expression.  Choosing names with useful\n            lexical ordering supports using GetNext or GetBulk to\n            retrieve a useful subset of the table.",
-                      "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-                    },
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "The numeric identification of the expression.\n            \n            Applications may select this number in ascending numerical\n            order by using expNameHighestIndex as a hint or may use any\n            other acceptable, unused number.\n            \n            Once set this value may not be set to a different value.",
-                      "x-yang-type": "EXPRESSION-MIB:ExpressionIndex"
-                    },
-                    "expNameStatus": {
-                      "type": "string",
-                      "description": "The control that allows creation/deletion of entries.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
                     "expNameEntry": {
                       "type": "array",
                       "description": "expNameEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -179,9 +163,6 @@
                 },
                 "example": {
                   "EXPRESSION-MIB:expNameTable": {
-                    "expName": "interface-1",
-                    "expExpressionIndex": "example-string",
-                    "expNameStatus": "up(1)",
                     "expNameEntry": [
                       {
                         "expName": "interface-1",
@@ -212,7 +193,6 @@
                 "schema": {
                   "type": "array",
                   "description": "expNameEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -321,76 +301,9 @@
                   "type": "object",
                   "description": "A table of expression definitions.",
                   "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expExpressionName": {
-                      "type": "string",
-                      "description": "The unique name of the expression, the same as expName.\n            \n            Use this object to change the expression's name without\n            changing its expExpressionIndex.",
-                      "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-                    },
-                    "expExpression": {
-                      "type": "string",
-                      "description": "The expression to be evaluated.  This object is the same\n            as a DisplayString (RFC 1903) except for its maximum length.\n            \n            Except for the variable names the expression is in ANSI C\n            syntax.  Only the subset of ANSI C operators and functions\n            listed here is allowed.\n            \n            Variables are expressed as a dollar sign ('$') and an\n            integer that corresponds to an expObjectIndex.  An\n            example of a valid expression is:\n            \n                    ($1-$5)*100\n            \n            Expressions may not be recursive, that is although an\n            expression may use the results of another expression, it\n            may not contain any variable that is directly or\n            indirectly a result of its own evaluation.\n            \n            The only allowed operators are:\n            \n                    ( )\n                    - (unary)\n                    + - * / %\n                    & | ^ << >> ~\n                    ! && || == != > >= < <=\n            \n            Note the parentheses are included for parenthesizing the\n            expression, not for casting data types.\n            \n            The only constant types defined are:\n            \n                    int (32-bit signed)\n                    long (64-bit signed)\n                    unsigned int\n                    unsigned long\n                    hexadecimal\n                    character\n                    string\n                    oid\n            \n            The default type for a positive integer is int unless it\n            is too large in which case it is long.\n            \n            All but oid are as defined for ANSI C.  Note that a\n            hexadecimal constant may end up as a scalar or an array of\n            8-bit integers.  A string constant is enclosed in double\n            quotes and may contain back-slashed individual characters\n            as in ANSI C.\n            \n            An oid constant comprises 32-bit, unsigned integers and at\n            least one period, for example:\n            \n                    0.\n                    .0\n                    1.3.6.1\n            \n            Integer-typed objects are treated as 32- or 64-bit, signed\n            or unsigned integers, as appropriate.  The results of\n            mixing them are as for ANSI C, including the type of the\n            result.  Note that a 32-bit value is thus promoted to 64\n            bits only in an operation with a 64-bit value.  There is\n            no provision for larger values to handle overflow.\n            \n            Relative to SNMP data types, a resulting value becomes\n            unsigned when calculating it uses any unsigned value,\n            including a counter.  To force the final value to be of\n            data type counter the expression must explicitly use the\n            counter32() or counter64() function (defined below).\n            \n            OCTET STRINGS and OBJECT IDENTIFIERs are treated as 1-based\n            arrays of unsigned 8-bit integers and unsigned 32-bit\n            integers, respectively.\n            \n            IpAddresses are treated as 32-bit, unsigned integers in\n            network byte order, that is, the hex version of 255.0.0.0 is\n            0xff000000.\n            \n            Conditional expressions result in a 32-bit, unsigned integer\n            of value 0 for false or 1 for true. When an arbitrary value\n            is used as a boolean 0 is false and non-zero is true.\n            \n            Rules for the resulting data type from an operation, based\n            on the operator:\n            \n            For << and >> the result is the same as the left hand\n            operand.\n            \n            For &&, ||, ==, !=, <, <=, >, and >= the result is always\n            Unsigned32.\n            \n            For unary - the result is always Integer32.\n            \n            For +, -, *, /, %, &, |, and ^ the result is promoted\n            according to the following rules, in order from most to\n            least preferred:\n            \n                    If left hand and right hand operands are the same\n                    type, use that.\n            \n                    If either side is Counter64, use that.\n            \n                    If either side is IpAddress, use that.\n            \n                    If either side is TimeTicks, use that.\n            \n                    If either side is Counter32, use that.\n            \n                    Otherwise use Unsigned32.\n            \n            The following rules say what operators apply with what\n            data types.  Any combination not explicitly defined does\n            not work.\n            \n            For all operators any of the following can be the left\n            hand or right hand operand: Integer32, Counter32,\n            Unsigned32, Counter64.\n            \n            The operators +, -, *, /, %, <, <=, >, and >= also work with\n            TimeTicks.\n            \n            The operators &, |, and ^ also work with IpAddress.\n            \n            The operators << and >> also work with IpAddress but only\n            as the left hand operand.\n            \n            The + operator performs a concatenation of two OCTET STRINGs\n            or two OBJECT IDENTIFIERs.\n            \n            The operators &, | perform bitwise operations on\n            OCTET STRINGs.  If the OCTET STRING happens to be a\n            DisplayString the results may be meaningless, but the agent\n            system does not check this as some such systems do not\n            have this information.\n            \n            The operators << and >> perform bitwise operations on\n            OCTET STRINGs appearing as the left hand operand.\n            \n            The only functions defined are:\n            \n                    counter32\n                    counter64\n                    arraySection\n                    stringBegins\n                    stringEnds\n                    stringContains\n                    oidBegins\n                    oidEnds\n                    oidContains\n                    sum\n                    exists\n            \n            The following function definitions indicate their by naming\n            the data type of the parameter in the parameter's position\n            in the parameter list.  The parameter must be of the type\n            indicated and generally may be a constant, a MIB object, a\n            function, or an expression.\n            \n            counter32(integer) - wrapped around an integer value\n            counter32 forces Counter32 as a data type.\n            \n            counter64(integer) - similar to counter32 except that the\n            resulting data type is 'counter64'.\n            \n            arraySection(array, integer, integer) - selects a piece of\n            an array (i.e. part of an OCTET STRING or\n            OBJECT IDENTIFIER).  The integer arguments are in the\n            range 0 to 4,294,967,295.  The first is an initial array\n            index (1-based) and the second is an ending array index. \n            A value of 0 indicates first or last element, respectively. \n            If the first element is larger than the array length the\n            result is 0 length.  If the second integer is less than or\n            equal to the first, the result is 0 length.  If the second\n            is larger than the array length it indicates last element.\n            \n            stringBegins/Ends/Contains(octetString, octetString) -\n            looks for the second string (which can be a string constant)\n            in the first and returns the 1-based index where the match\n            began.  A return value of 0 indicates no match (i.e.\n            boolean false).\n            \n            oidBegins/Ends/Contains(oid, oid) - looks for the second OID\n            (which can be an OID constant) in the first and returns the\n            the 1-based index where the match began.  A return value\n            of 0 indicates no match (i.e. boolean false).\n            \n            sum(integerObject*) - sums all availiable values of the\n            wildcarded integer object, resulting in an integer scalar.\n            Must be used with caution as it wraps on overflow with no\n            notification.\n            \n            exists(anyTypeObject) - verifies the object instance\n            exists. A return value of 0 indicates NoSuchInstance\n            (i.e. boolean false).",
-                      "format": "binary"
-                    },
-                    "expExpressionValueType": {
-                      "type": "string",
-                      "description": "The type of the expression value.  One and only one of\n            the value objects in expValueTable will be instantiated to\n            match this type.\n            \n            If the result of the expression can not be made into this\n            type, an invalidOperandType error will occur."
-                    },
-                    "expExpressionComment": {
-                      "type": "string",
-                      "description": "A comment to explain the use or meaning of the expression.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "expExpressionDeltaInterval": {
-                      "type": "integer",
-                      "description": "Sampling interval for objects in this expression with\n            expObjectSampleType 'deltaValue'.\n            \n            This object is not instantiated if not applicable.\n            \n            A value of 0 indicates no automated sampling.  In this case\n            the delta is the difference from the last time the\n            expression was evaluated.  Note that this is subject to\n            unpredictable delta times in the face of retries or\n            multiple managers.\n            \n            A value greater than zero is the number of seconds between\n            automated samples.\n            \n            Until the delta interval has expired once the delta for the\n            object is effectively not instantiated and evaluating\n            the expression has results as if the object itself were not\n            instantiated.\n            \n            Note that delta values potentially consume large amounts of\n            system CPU and memory.  Delta state and processing must\n            continue constantly even if the expression is not being\n            used.  That is, the expression is being evaluated every\n            delta interval, even if no application is reading those\n            values.  For wildcarded objects this can be substantial\n            overhead.\n            \n            Note that delta intervals, external expression value\n            sampling intervals and delta intervals for expressions\n            within other expressions can have unusual interactions as\n            they are impossible to synchronize accurately.  In general\n            one interval embedded below another must be enough shorter\n            that the higher sample sees relatively smooth, predictable\n            behavior.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "expExpressionPrefix": {
-                      "type": "string",
-                      "description": "An object prefix to assist an application in determining\n            the instance indexing to use in expValueTable, relieving the\n            application of the need to scan the expObjectTable to\n            determine such a prefix.\n            \n            See expObjectTable for information on wildcarded objects.\n            \n            If the expValueInstance portion of the value OID may\n            be treated as a scalar (that is, normally, 0) the value of\n            expExpressionPrefix is zero length, that is, no OID at all.\n            \n            Otherwise expExpressionPrefix is the value of any wildcarded\n            instance of expObjectID for the expression.  This is\n            sufficient as the remainder, that is, the instance fragment\n            relevant to instancing the values must be the same for all\n            wildcarded objects in the expression.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expExpressionErrors": {
-                      "type": "integer",
-                      "description": "The number of errors encountered while evaluating this\n            expression.\n            \n            Note that an object in the expression not being accessible\n            is not considered an error.  It is a legitimate condition\n            that causes the corresponding expression value not to be\n            instantiated.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expExpressionErrorTime": {
-                      "type": "string",
-                      "description": "The value of sysUpTime the last time an error caused a\n            failure to evaluate this expression.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                      "x-yang-type": "yang:timestamp"
-                    },
-                    "expExpressionErrorIndex": {
-                      "type": "integer",
-                      "description": "The 1-based character index into expExpression for where\n            the error occurred.  The value zero indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "expExpressionError": {
-                      "type": "string",
-                      "description": "The error that occurred.  In the following explanations the\n            expected timing of the error is in parentheses.  'S' means\n            the error occurs on a Set request.  'E' means the error\n            occurs on the attempt to evaluate the expression either\n            due to Get from expValueTable or in ongoing delta\n            processing.\n            \n            invalidSyntax           the value sent for expExpression\n                                    is not valid Expression MIB\n                                    expression syntax (S)\n            undefinedObjectIndex    an object reference ($n) in\n                                    expExpression does not have a\n                                    matching instance in\n                                    expObjectTable (E)\n            unrecognizedOperator    the value sent for expExpression\n                                    held an unrecognized operator (S)\n            unrecognizedFunction    the value sent for expExpression\n                                    held an unrecognized function\n                                    name (S)\n            invalidOperandType      an operand in expExpression is not\n                                    the right type for the associated\n                                    operator or result (SE)\n            unmatchedParenthesis    the value sent for expExpression\n                                    is not correctly parenthesized (S)\n            tooManyWildcardValues   evaluating the expression exceeded\n                                    the limit set by expResourceDelta\n                                    WildcardInstanceMaximum (E)\n            recursion               through some chain of embedded\n                                    expressions the expression invokes\n                                    itself (E)\n            deltaTooShort           the delta for the next evaluation\n                                    passed before the system could\n                                    evaluate the present sample (E)\n            resourceUnavailable     some resource, typically dynamic\n                                    memory, was unavailable (SE)\n            divideByZero            an attempt to divide by zero\n                                    occurred (E)\n            \n            For the errors that occur when the attempt is made to set\n            expExpression Set request fails with the SNMP error code\n            'wrongValue'. Such failures refer to the most recent failure\n            to Set expExpression, not to the present value of\n            expExpression which must be either unset or syntactically\n            correct.\n            \n            Errors that occur during evalutaion for a Get* operation\n            return the SNMP error code 'genErr' except for\n            'tooManyWildcardValues' and 'resourceUnavailable' which\n            return the SNMP error code 'resourceUnavailable'.\n            \n            This object is not instantiated if there have been no\n            errors."
-                    },
-                    "expExpressionInstance": {
-                      "type": "string",
-                      "description": "The expValueInstance being evaluated when the error\n            occurred.  A zero-length indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expExpressionOwner": {
-                      "type": "string",
-                      "description": "The entity that configured this entry and is therefore\n            using the resources assigned to it.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
                     "expExpressionEntry": {
                       "type": "array",
                       "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -467,19 +380,6 @@
                 },
                 "example": {
                   "EXPRESSION-MIB:expExpressionTable": {
-                    "expExpressionIndex": "example-string",
-                    "expExpressionName": "interface-1",
-                    "expExpression": "example-string",
-                    "expExpressionValueType": "ethernetCsmacd(6)",
-                    "expExpressionComment": "example-string",
-                    "expExpressionDeltaInterval": -2147483648,
-                    "expExpressionPrefix": "example-string",
-                    "expExpressionErrors": 0,
-                    "expExpressionErrorTime": "example-string",
-                    "expExpressionErrorIndex": 1,
-                    "expExpressionError": "example-string",
-                    "expExpressionInstance": "example-string",
-                    "expExpressionOwner": "example-string",
                     "expExpressionEntry": [
                       {
                         "expExpressionIndex": "example-string",
@@ -520,7 +420,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -751,61 +650,9 @@
                   "type": "object",
                   "description": "expObjectTable",
                   "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expObjectIndex": {
-                      "type": "integer",
-                      "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expObjectID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectSampleType": {
-                      "type": "string",
-                      "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
-                    },
-                    "expObjectDeltaDiscontinuityID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectDiscontinuityIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectDiscontinuityIDType": {
-                      "type": "string",
-                      "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
-                    },
-                    "expObjectConditional": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectConditionalWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
-                    },
-                    "expObjectStatus": {
-                      "type": "string",
-                      "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
                     "expObjectEntry": {
                       "type": "array",
                       "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -867,17 +714,6 @@
                 },
                 "example": {
                   "EXPRESSION-MIB:expObjectTable": {
-                    "expExpressionIndex": "example-string",
-                    "expObjectIndex": 1,
-                    "expObjectID": "example-string",
-                    "expObjectIDWildcard": true,
-                    "expObjectSampleType": "ethernetCsmacd(6)",
-                    "expObjectDeltaDiscontinuityID": "example-string",
-                    "expObjectDiscontinuityIDWildcard": true,
-                    "expObjectDiscontinuityIDType": "ethernetCsmacd(6)",
-                    "expObjectConditional": "example-string",
-                    "expObjectConditionalWildcard": true,
-                    "expObjectStatus": "up(1)",
                     "expObjectEntry": [
                       {
                         "expExpressionIndex": "example-string",
@@ -916,7 +752,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1113,58 +948,9 @@
                   "type": "object",
                   "description": "A table of values from evaluated expressions.",
                   "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expValueInstance": {
-                      "type": "string",
-                      "description": "The final instance portion of a value's OID according to\n            the wildcarding in instances of expObjectID for the\n            expression.  The prefix of this OID fragment is 0.0,\n            leading to the following behavior.\n            \n            If there is no wildcarding, the value is 0.0.0.  In other\n            words, there is one value which standing alone would have\n            been a scalar with a 0 at the end of its OID.\n            \n            If there is wildcarding, the value is 0.0 followed by\n            a value that the wildcard can take, thus defining one value\n            instance for each real, possible value of the wildcard.\n            So, for example, if the wildcard worked out to be an\n            ifIndex, there is an expValueInstance for each applicable\n            ifIndex.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expValueCounter32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'counter32'.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expValueUnsigned32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is\n            'unsignedOrGauge32' or 'timeTicks'.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expValueInteger32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'integer32'.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "expValueIpAddressVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'ipAddress'.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "expValueOctetStringVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'octetString'.",
-                      "format": "binary"
-                    },
-                    "expValueOidVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'objectId'.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expValueCounter64Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'counter64'.",
-                      "minimum": 0
-                    },
                     "expValueEntry": {
                       "type": "array",
                       "description": "expValueEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -1223,15 +1009,6 @@
                 },
                 "example": {
                   "EXPRESSION-MIB:expValueTable": {
-                    "expExpressionIndex": "example-string",
-                    "expValueInstance": "example-string",
-                    "expValueCounter32Val": 1234567890,
-                    "expValueUnsigned32Val": 0,
-                    "expValueInteger32Val": -2147483648,
-                    "expValueIpAddressVal": "192.168.1.1",
-                    "expValueOctetStringVal": "example-string",
-                    "expValueOidVal": "1.3.6.1.2.1.1",
-                    "expValueCounter64Val": 1234567890,
                     "expValueEntry": [
                       {
                         "expExpressionIndex": "example-string",
@@ -1268,7 +1045,6 @@
                 "schema": {
                   "type": "array",
                   "description": "expValueEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1454,7 +1230,6 @@
                 "schema": {
                   "type": "array",
                   "description": "expNameEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1562,7 +1337,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1792,7 +1566,6 @@
                 "schema": {
                   "type": "array",
                   "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1988,7 +1761,6 @@
                 "schema": {
                   "type": "array",
                   "description": "expValueEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2166,215 +1938,9 @@
         "type": "object",
         "description": "EXPRESSION-MIB",
         "properties": {
-          "expResourceDeltaMinimum": {
-            "type": "integer",
-            "description": "The minimum expExpressionDeltaInterval this system will\n          accept.  A system may use the larger values of this minimum\n          to lessen the impact of constantly computing deltas.\n          \n          The value -1 indicates this system will not accept\n          deltaValue as a value for expObjectSampleType.\n          \n          Unless explicitly resource limited, a system's value for\n          this object should be 1.\n          \n          Changing this value will not invalidate an existing setting\n          of expObjectSampleType.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "expResourceDeltaWildcardInstanceMaximum": {
-            "type": "integer",
-            "description": "The maximum number of dynamic instance entries this system\n          will support for wildcarded delta objects in expressions.\n          These are the entries that maintain state, one for each\n          instance of each deltaValue object for each value of an\n          expression.\n          \n          A value of 0 indicates no preset limit, that is, the limit\n          is dynamic based on system operation and resources.\n          \n          Unless explicitly resource limited, a system's value for\n          this object should be 0.\n          \n          Changing this value will not eliminate or inhibit existing\n          delta wildcard instance objects but will prevent the\n          creation of more such objects.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expResourceDeltaWildcardInstances": {
-            "type": "integer",
-            "description": "The number of currently active instance entries as\n          defined for expResourceDeltaWildcardInstanceMaximum.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expResourceDeltaWildcardInstancesHigh": {
-            "type": "integer",
-            "description": "The highest value of expResourceDeltaWildcardInstances\n          that has occurred since initialization of the management\n          system.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expResourceDeltaWildcardInstanceResourceLacks": {
-            "type": "integer",
-            "description": "The number of times this system could not evaluate an\n          expression because that would have created a value\n          instance in excess of\n          expResourceDeltaWildcardInstanceMaximum.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expNameLastChange": {
-            "type": "string",
-            "description": "The value of sysUpTime the last time an expression was\n          created or deleted or had its name changed using\n          expExpressionName.",
-            "x-yang-type": "yang:timestamp"
-          },
-          "expNameHighestIndex": {
-            "type": "string",
-            "description": "The highest value of ExpressionIndex ever assigned on\n          this system.  Preferrably this value is preserved across\n          system reboots.  A managed system that is unable to\n          store expressions across reboots need not preserve this\n          value across reboots.\n          \n          If all expression-creating applications cooperate, they\n          may use this to avoid reusing an ExpressionIndex.  To\n          do so, attempt creation of a new entry with this\n          value + 1 as the value of expExpressionIndex.\n          \n          Although reusing ExpressionIndexes could lead to an\n          application receiving a misunderstood value, it is a\n          matter of local management policy whether to reuse them.",
-            "x-yang-type": "EXPRESSION-MIB:ExpressionIndexOrZero"
-          },
-          "expName": {
-            "type": "string",
-            "description": "The name of the expression.  Choosing names with useful\n            lexical ordering supports using GetNext or GetBulk to\n            retrieve a useful subset of the table.",
-            "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-          },
-          "expExpressionIndex": {
-            "type": "string",
-            "description": "expExpressionIndex",
-            "x-yang-type": "leafref"
-          },
-          "expNameStatus": {
-            "type": "string",
-            "description": "The control that allows creation/deletion of entries.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "expExpressionName": {
-            "type": "string",
-            "description": "The unique name of the expression, the same as expName.\n            \n            Use this object to change the expression's name without\n            changing its expExpressionIndex.",
-            "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-          },
-          "expExpression": {
-            "type": "string",
-            "description": "The expression to be evaluated.  This object is the same\n            as a DisplayString (RFC 1903) except for its maximum length.\n            \n            Except for the variable names the expression is in ANSI C\n            syntax.  Only the subset of ANSI C operators and functions\n            listed here is allowed.\n            \n            Variables are expressed as a dollar sign ('$') and an\n            integer that corresponds to an expObjectIndex.  An\n            example of a valid expression is:\n            \n                    ($1-$5)*100\n            \n            Expressions may not be recursive, that is although an\n            expression may use the results of another expression, it\n            may not contain any variable that is directly or\n            indirectly a result of its own evaluation.\n            \n            The only allowed operators are:\n            \n                    ( )\n                    - (unary)\n                    + - * / %\n                    & | ^ << >> ~\n                    ! && || == != > >= < <=\n            \n            Note the parentheses are included for parenthesizing the\n            expression, not for casting data types.\n            \n            The only constant types defined are:\n            \n                    int (32-bit signed)\n                    long (64-bit signed)\n                    unsigned int\n                    unsigned long\n                    hexadecimal\n                    character\n                    string\n                    oid\n            \n            The default type for a positive integer is int unless it\n            is too large in which case it is long.\n            \n            All but oid are as defined for ANSI C.  Note that a\n            hexadecimal constant may end up as a scalar or an array of\n            8-bit integers.  A string constant is enclosed in double\n            quotes and may contain back-slashed individual characters\n            as in ANSI C.\n            \n            An oid constant comprises 32-bit, unsigned integers and at\n            least one period, for example:\n            \n                    0.\n                    .0\n                    1.3.6.1\n            \n            Integer-typed objects are treated as 32- or 64-bit, signed\n            or unsigned integers, as appropriate.  The results of\n            mixing them are as for ANSI C, including the type of the\n            result.  Note that a 32-bit value is thus promoted to 64\n            bits only in an operation with a 64-bit value.  There is\n            no provision for larger values to handle overflow.\n            \n            Relative to SNMP data types, a resulting value becomes\n            unsigned when calculating it uses any unsigned value,\n            including a counter.  To force the final value to be of\n            data type counter the expression must explicitly use the\n            counter32() or counter64() function (defined below).\n            \n            OCTET STRINGS and OBJECT IDENTIFIERs are treated as 1-based\n            arrays of unsigned 8-bit integers and unsigned 32-bit\n            integers, respectively.\n            \n            IpAddresses are treated as 32-bit, unsigned integers in\n            network byte order, that is, the hex version of 255.0.0.0 is\n            0xff000000.\n            \n            Conditional expressions result in a 32-bit, unsigned integer\n            of value 0 for false or 1 for true. When an arbitrary value\n            is used as a boolean 0 is false and non-zero is true.\n            \n            Rules for the resulting data type from an operation, based\n            on the operator:\n            \n            For << and >> the result is the same as the left hand\n            operand.\n            \n            For &&, ||, ==, !=, <, <=, >, and >= the result is always\n            Unsigned32.\n            \n            For unary - the result is always Integer32.\n            \n            For +, -, *, /, %, &, |, and ^ the result is promoted\n            according to the following rules, in order from most to\n            least preferred:\n            \n                    If left hand and right hand operands are the same\n                    type, use that.\n            \n                    If either side is Counter64, use that.\n            \n                    If either side is IpAddress, use that.\n            \n                    If either side is TimeTicks, use that.\n            \n                    If either side is Counter32, use that.\n            \n                    Otherwise use Unsigned32.\n            \n            The following rules say what operators apply with what\n            data types.  Any combination not explicitly defined does\n            not work.\n            \n            For all operators any of the following can be the left\n            hand or right hand operand: Integer32, Counter32,\n            Unsigned32, Counter64.\n            \n            The operators +, -, *, /, %, <, <=, >, and >= also work with\n            TimeTicks.\n            \n            The operators &, |, and ^ also work with IpAddress.\n            \n            The operators << and >> also work with IpAddress but only\n            as the left hand operand.\n            \n            The + operator performs a concatenation of two OCTET STRINGs\n            or two OBJECT IDENTIFIERs.\n            \n            The operators &, | perform bitwise operations on\n            OCTET STRINGs.  If the OCTET STRING happens to be a\n            DisplayString the results may be meaningless, but the agent\n            system does not check this as some such systems do not\n            have this information.\n            \n            The operators << and >> perform bitwise operations on\n            OCTET STRINGs appearing as the left hand operand.\n            \n            The only functions defined are:\n            \n                    counter32\n                    counter64\n                    arraySection\n                    stringBegins\n                    stringEnds\n                    stringContains\n                    oidBegins\n                    oidEnds\n                    oidContains\n                    sum\n                    exists\n            \n            The following function definitions indicate their by naming\n            the data type of the parameter in the parameter's position\n            in the parameter list.  The parameter must be of the type\n            indicated and generally may be a constant, a MIB object, a\n            function, or an expression.\n            \n            counter32(integer) - wrapped around an integer value\n            counter32 forces Counter32 as a data type.\n            \n            counter64(integer) - similar to counter32 except that the\n            resulting data type is 'counter64'.\n            \n            arraySection(array, integer, integer) - selects a piece of\n            an array (i.e. part of an OCTET STRING or\n            OBJECT IDENTIFIER).  The integer arguments are in the\n            range 0 to 4,294,967,295.  The first is an initial array\n            index (1-based) and the second is an ending array index. \n            A value of 0 indicates first or last element, respectively. \n            If the first element is larger than the array length the\n            result is 0 length.  If the second integer is less than or\n            equal to the first, the result is 0 length.  If the second\n            is larger than the array length it indicates last element.\n            \n            stringBegins/Ends/Contains(octetString, octetString) -\n            looks for the second string (which can be a string constant)\n            in the first and returns the 1-based index where the match\n            began.  A return value of 0 indicates no match (i.e.\n            boolean false).\n            \n            oidBegins/Ends/Contains(oid, oid) - looks for the second OID\n            (which can be an OID constant) in the first and returns the\n            the 1-based index where the match began.  A return value\n            of 0 indicates no match (i.e. boolean false).\n            \n            sum(integerObject*) - sums all availiable values of the\n            wildcarded integer object, resulting in an integer scalar.\n            Must be used with caution as it wraps on overflow with no\n            notification.\n            \n            exists(anyTypeObject) - verifies the object instance\n            exists. A return value of 0 indicates NoSuchInstance\n            (i.e. boolean false).",
-            "format": "binary"
-          },
-          "expExpressionValueType": {
-            "type": "string",
-            "description": "The type of the expression value.  One and only one of\n            the value objects in expValueTable will be instantiated to\n            match this type.\n            \n            If the result of the expression can not be made into this\n            type, an invalidOperandType error will occur."
-          },
-          "expExpressionComment": {
-            "type": "string",
-            "description": "A comment to explain the use or meaning of the expression.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "expExpressionDeltaInterval": {
-            "type": "integer",
-            "description": "Sampling interval for objects in this expression with\n            expObjectSampleType 'deltaValue'.\n            \n            This object is not instantiated if not applicable.\n            \n            A value of 0 indicates no automated sampling.  In this case\n            the delta is the difference from the last time the\n            expression was evaluated.  Note that this is subject to\n            unpredictable delta times in the face of retries or\n            multiple managers.\n            \n            A value greater than zero is the number of seconds between\n            automated samples.\n            \n            Until the delta interval has expired once the delta for the\n            object is effectively not instantiated and evaluating\n            the expression has results as if the object itself were not\n            instantiated.\n            \n            Note that delta values potentially consume large amounts of\n            system CPU and memory.  Delta state and processing must\n            continue constantly even if the expression is not being\n            used.  That is, the expression is being evaluated every\n            delta interval, even if no application is reading those\n            values.  For wildcarded objects this can be substantial\n            overhead.\n            \n            Note that delta intervals, external expression value\n            sampling intervals and delta intervals for expressions\n            within other expressions can have unusual interactions as\n            they are impossible to synchronize accurately.  In general\n            one interval embedded below another must be enough shorter\n            that the higher sample sees relatively smooth, predictable\n            behavior.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "expExpressionPrefix": {
-            "type": "string",
-            "description": "An object prefix to assist an application in determining\n            the instance indexing to use in expValueTable, relieving the\n            application of the need to scan the expObjectTable to\n            determine such a prefix.\n            \n            See expObjectTable for information on wildcarded objects.\n            \n            If the expValueInstance portion of the value OID may\n            be treated as a scalar (that is, normally, 0) the value of\n            expExpressionPrefix is zero length, that is, no OID at all.\n            \n            Otherwise expExpressionPrefix is the value of any wildcarded\n            instance of expObjectID for the expression.  This is\n            sufficient as the remainder, that is, the instance fragment\n            relevant to instancing the values must be the same for all\n            wildcarded objects in the expression.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expExpressionErrors": {
-            "type": "integer",
-            "description": "The number of errors encountered while evaluating this\n            expression.\n            \n            Note that an object in the expression not being accessible\n            is not considered an error.  It is a legitimate condition\n            that causes the corresponding expression value not to be\n            instantiated.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expExpressionErrorTime": {
-            "type": "string",
-            "description": "The value of sysUpTime the last time an error caused a\n            failure to evaluate this expression.\n            \n            This object is not instantiated if there have been no\n            errors.",
-            "x-yang-type": "yang:timestamp"
-          },
-          "expExpressionErrorIndex": {
-            "type": "integer",
-            "description": "The 1-based character index into expExpression for where\n            the error occurred.  The value zero indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "expExpressionError": {
-            "type": "string",
-            "description": "The error that occurred.  In the following explanations the\n            expected timing of the error is in parentheses.  'S' means\n            the error occurs on a Set request.  'E' means the error\n            occurs on the attempt to evaluate the expression either\n            due to Get from expValueTable or in ongoing delta\n            processing.\n            \n            invalidSyntax           the value sent for expExpression\n                                    is not valid Expression MIB\n                                    expression syntax (S)\n            undefinedObjectIndex    an object reference ($n) in\n                                    expExpression does not have a\n                                    matching instance in\n                                    expObjectTable (E)\n            unrecognizedOperator    the value sent for expExpression\n                                    held an unrecognized operator (S)\n            unrecognizedFunction    the value sent for expExpression\n                                    held an unrecognized function\n                                    name (S)\n            invalidOperandType      an operand in expExpression is not\n                                    the right type for the associated\n                                    operator or result (SE)\n            unmatchedParenthesis    the value sent for expExpression\n                                    is not correctly parenthesized (S)\n            tooManyWildcardValues   evaluating the expression exceeded\n                                    the limit set by expResourceDelta\n                                    WildcardInstanceMaximum (E)\n            recursion               through some chain of embedded\n                                    expressions the expression invokes\n                                    itself (E)\n            deltaTooShort           the delta for the next evaluation\n                                    passed before the system could\n                                    evaluate the present sample (E)\n            resourceUnavailable     some resource, typically dynamic\n                                    memory, was unavailable (SE)\n            divideByZero            an attempt to divide by zero\n                                    occurred (E)\n            \n            For the errors that occur when the attempt is made to set\n            expExpression Set request fails with the SNMP error code\n            'wrongValue'. Such failures refer to the most recent failure\n            to Set expExpression, not to the present value of\n            expExpression which must be either unset or syntactically\n            correct.\n            \n            Errors that occur during evalutaion for a Get* operation\n            return the SNMP error code 'genErr' except for\n            'tooManyWildcardValues' and 'resourceUnavailable' which\n            return the SNMP error code 'resourceUnavailable'.\n            \n            This object is not instantiated if there have been no\n            errors."
-          },
-          "expExpressionInstance": {
-            "type": "string",
-            "description": "The expValueInstance being evaluated when the error\n            occurred.  A zero-length indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expExpressionOwner": {
-            "type": "string",
-            "description": "The entity that configured this entry and is therefore\n            using the resources assigned to it.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "expObjectIndex": {
-            "type": "integer",
-            "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expObjectID": {
-            "type": "string",
-            "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expObjectIDWildcard": {
-            "type": "boolean",
-            "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-          },
-          "expObjectSampleType": {
-            "type": "string",
-            "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
-          },
-          "expObjectDeltaDiscontinuityID": {
-            "type": "string",
-            "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expObjectDiscontinuityIDWildcard": {
-            "type": "boolean",
-            "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-          },
-          "expObjectDiscontinuityIDType": {
-            "type": "string",
-            "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
-          },
-          "expObjectConditional": {
-            "type": "string",
-            "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expObjectConditionalWildcard": {
-            "type": "boolean",
-            "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
-          },
-          "expObjectStatus": {
-            "type": "string",
-            "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "expValueInstance": {
-            "type": "string",
-            "description": "The final instance portion of a value's OID according to\n            the wildcarding in instances of expObjectID for the\n            expression.  The prefix of this OID fragment is 0.0,\n            leading to the following behavior.\n            \n            If there is no wildcarding, the value is 0.0.0.  In other\n            words, there is one value which standing alone would have\n            been a scalar with a 0 at the end of its OID.\n            \n            If there is wildcarding, the value is 0.0 followed by\n            a value that the wildcard can take, thus defining one value\n            instance for each real, possible value of the wildcard.\n            So, for example, if the wildcard worked out to be an\n            ifIndex, there is an expValueInstance for each applicable\n            ifIndex.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expValueCounter32Val": {
-            "type": "integer",
-            "description": "The value when expExpressionValueType is 'counter32'.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expValueUnsigned32Val": {
-            "type": "integer",
-            "description": "The value when expExpressionValueType is\n            'unsignedOrGauge32' or 'timeTicks'.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "expValueInteger32Val": {
-            "type": "integer",
-            "description": "The value when expExpressionValueType is 'integer32'.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "expValueIpAddressVal": {
-            "type": "string",
-            "description": "The value when expExpressionValueType is 'ipAddress'.",
-            "format": "inet:ipv4-address"
-          },
-          "expValueOctetStringVal": {
-            "type": "string",
-            "description": "The value when expExpressionValueType is 'octetString'.",
-            "format": "binary"
-          },
-          "expValueOidVal": {
-            "type": "string",
-            "description": "The value when expExpressionValueType is 'objectId'.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "expValueCounter64Val": {
-            "type": "integer",
-            "description": "The value when expExpressionValueType is 'counter64'.",
-            "minimum": 0
-          },
           "expNameEntry": {
             "type": "array",
             "description": "expNameEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2399,7 +1965,6 @@
           "expExpressionEntry": {
             "type": "array",
             "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2475,7 +2040,6 @@
           "expObjectEntry": {
             "type": "array",
             "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2536,7 +2100,6 @@
           "expValueEntry": {
             "type": "array",
             "description": "expValueEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2647,25 +2210,9 @@
             "type": "object",
             "description": "A table of expression names, for creating and deleting\n        expressions.",
             "properties": {
-              "expName": {
-                "type": "string",
-                "description": "The name of the expression.  Choosing names with useful\n            lexical ordering supports using GetNext or GetBulk to\n            retrieve a useful subset of the table.",
-                "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-              },
-              "expExpressionIndex": {
-                "type": "string",
-                "description": "The numeric identification of the expression.\n            \n            Applications may select this number in ascending numerical\n            order by using expNameHighestIndex as a hint or may use any\n            other acceptable, unused number.\n            \n            Once set this value may not be set to a different value.",
-                "x-yang-type": "EXPRESSION-MIB:ExpressionIndex"
-              },
-              "expNameStatus": {
-                "type": "string",
-                "description": "The control that allows creation/deletion of entries.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
               "expNameEntry": {
                 "type": "array",
                 "description": "expNameEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2693,76 +2240,9 @@
             "type": "object",
             "description": "A table of expression definitions.",
             "properties": {
-              "expExpressionIndex": {
-                "type": "string",
-                "description": "expExpressionIndex",
-                "x-yang-type": "leafref"
-              },
-              "expExpressionName": {
-                "type": "string",
-                "description": "The unique name of the expression, the same as expName.\n            \n            Use this object to change the expression's name without\n            changing its expExpressionIndex.",
-                "x-yang-type": "EXPRESSION-MIB:ExpressionName"
-              },
-              "expExpression": {
-                "type": "string",
-                "description": "The expression to be evaluated.  This object is the same\n            as a DisplayString (RFC 1903) except for its maximum length.\n            \n            Except for the variable names the expression is in ANSI C\n            syntax.  Only the subset of ANSI C operators and functions\n            listed here is allowed.\n            \n            Variables are expressed as a dollar sign ('$') and an\n            integer that corresponds to an expObjectIndex.  An\n            example of a valid expression is:\n            \n                    ($1-$5)*100\n            \n            Expressions may not be recursive, that is although an\n            expression may use the results of another expression, it\n            may not contain any variable that is directly or\n            indirectly a result of its own evaluation.\n            \n            The only allowed operators are:\n            \n                    ( )\n                    - (unary)\n                    + - * / %\n                    & | ^ << >> ~\n                    ! && || == != > >= < <=\n            \n            Note the parentheses are included for parenthesizing the\n            expression, not for casting data types.\n            \n            The only constant types defined are:\n            \n                    int (32-bit signed)\n                    long (64-bit signed)\n                    unsigned int\n                    unsigned long\n                    hexadecimal\n                    character\n                    string\n                    oid\n            \n            The default type for a positive integer is int unless it\n            is too large in which case it is long.\n            \n            All but oid are as defined for ANSI C.  Note that a\n            hexadecimal constant may end up as a scalar or an array of\n            8-bit integers.  A string constant is enclosed in double\n            quotes and may contain back-slashed individual characters\n            as in ANSI C.\n            \n            An oid constant comprises 32-bit, unsigned integers and at\n            least one period, for example:\n            \n                    0.\n                    .0\n                    1.3.6.1\n            \n            Integer-typed objects are treated as 32- or 64-bit, signed\n            or unsigned integers, as appropriate.  The results of\n            mixing them are as for ANSI C, including the type of the\n            result.  Note that a 32-bit value is thus promoted to 64\n            bits only in an operation with a 64-bit value.  There is\n            no provision for larger values to handle overflow.\n            \n            Relative to SNMP data types, a resulting value becomes\n            unsigned when calculating it uses any unsigned value,\n            including a counter.  To force the final value to be of\n            data type counter the expression must explicitly use the\n            counter32() or counter64() function (defined below).\n            \n            OCTET STRINGS and OBJECT IDENTIFIERs are treated as 1-based\n            arrays of unsigned 8-bit integers and unsigned 32-bit\n            integers, respectively.\n            \n            IpAddresses are treated as 32-bit, unsigned integers in\n            network byte order, that is, the hex version of 255.0.0.0 is\n            0xff000000.\n            \n            Conditional expressions result in a 32-bit, unsigned integer\n            of value 0 for false or 1 for true. When an arbitrary value\n            is used as a boolean 0 is false and non-zero is true.\n            \n            Rules for the resulting data type from an operation, based\n            on the operator:\n            \n            For << and >> the result is the same as the left hand\n            operand.\n            \n            For &&, ||, ==, !=, <, <=, >, and >= the result is always\n            Unsigned32.\n            \n            For unary - the result is always Integer32.\n            \n            For +, -, *, /, %, &, |, and ^ the result is promoted\n            according to the following rules, in order from most to\n            least preferred:\n            \n                    If left hand and right hand operands are the same\n                    type, use that.\n            \n                    If either side is Counter64, use that.\n            \n                    If either side is IpAddress, use that.\n            \n                    If either side is TimeTicks, use that.\n            \n                    If either side is Counter32, use that.\n            \n                    Otherwise use Unsigned32.\n            \n            The following rules say what operators apply with what\n            data types.  Any combination not explicitly defined does\n            not work.\n            \n            For all operators any of the following can be the left\n            hand or right hand operand: Integer32, Counter32,\n            Unsigned32, Counter64.\n            \n            The operators +, -, *, /, %, <, <=, >, and >= also work with\n            TimeTicks.\n            \n            The operators &, |, and ^ also work with IpAddress.\n            \n            The operators << and >> also work with IpAddress but only\n            as the left hand operand.\n            \n            The + operator performs a concatenation of two OCTET STRINGs\n            or two OBJECT IDENTIFIERs.\n            \n            The operators &, | perform bitwise operations on\n            OCTET STRINGs.  If the OCTET STRING happens to be a\n            DisplayString the results may be meaningless, but the agent\n            system does not check this as some such systems do not\n            have this information.\n            \n            The operators << and >> perform bitwise operations on\n            OCTET STRINGs appearing as the left hand operand.\n            \n            The only functions defined are:\n            \n                    counter32\n                    counter64\n                    arraySection\n                    stringBegins\n                    stringEnds\n                    stringContains\n                    oidBegins\n                    oidEnds\n                    oidContains\n                    sum\n                    exists\n            \n            The following function definitions indicate their by naming\n            the data type of the parameter in the parameter's position\n            in the parameter list.  The parameter must be of the type\n            indicated and generally may be a constant, a MIB object, a\n            function, or an expression.\n            \n            counter32(integer) - wrapped around an integer value\n            counter32 forces Counter32 as a data type.\n            \n            counter64(integer) - similar to counter32 except that the\n            resulting data type is 'counter64'.\n            \n            arraySection(array, integer, integer) - selects a piece of\n            an array (i.e. part of an OCTET STRING or\n            OBJECT IDENTIFIER).  The integer arguments are in the\n            range 0 to 4,294,967,295.  The first is an initial array\n            index (1-based) and the second is an ending array index. \n            A value of 0 indicates first or last element, respectively. \n            If the first element is larger than the array length the\n            result is 0 length.  If the second integer is less than or\n            equal to the first, the result is 0 length.  If the second\n            is larger than the array length it indicates last element.\n            \n            stringBegins/Ends/Contains(octetString, octetString) -\n            looks for the second string (which can be a string constant)\n            in the first and returns the 1-based index where the match\n            began.  A return value of 0 indicates no match (i.e.\n            boolean false).\n            \n            oidBegins/Ends/Contains(oid, oid) - looks for the second OID\n            (which can be an OID constant) in the first and returns the\n            the 1-based index where the match began.  A return value\n            of 0 indicates no match (i.e. boolean false).\n            \n            sum(integerObject*) - sums all availiable values of the\n            wildcarded integer object, resulting in an integer scalar.\n            Must be used with caution as it wraps on overflow with no\n            notification.\n            \n            exists(anyTypeObject) - verifies the object instance\n            exists. A return value of 0 indicates NoSuchInstance\n            (i.e. boolean false).",
-                "format": "binary"
-              },
-              "expExpressionValueType": {
-                "type": "string",
-                "description": "The type of the expression value.  One and only one of\n            the value objects in expValueTable will be instantiated to\n            match this type.\n            \n            If the result of the expression can not be made into this\n            type, an invalidOperandType error will occur."
-              },
-              "expExpressionComment": {
-                "type": "string",
-                "description": "A comment to explain the use or meaning of the expression.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "expExpressionDeltaInterval": {
-                "type": "integer",
-                "description": "Sampling interval for objects in this expression with\n            expObjectSampleType 'deltaValue'.\n            \n            This object is not instantiated if not applicable.\n            \n            A value of 0 indicates no automated sampling.  In this case\n            the delta is the difference from the last time the\n            expression was evaluated.  Note that this is subject to\n            unpredictable delta times in the face of retries or\n            multiple managers.\n            \n            A value greater than zero is the number of seconds between\n            automated samples.\n            \n            Until the delta interval has expired once the delta for the\n            object is effectively not instantiated and evaluating\n            the expression has results as if the object itself were not\n            instantiated.\n            \n            Note that delta values potentially consume large amounts of\n            system CPU and memory.  Delta state and processing must\n            continue constantly even if the expression is not being\n            used.  That is, the expression is being evaluated every\n            delta interval, even if no application is reading those\n            values.  For wildcarded objects this can be substantial\n            overhead.\n            \n            Note that delta intervals, external expression value\n            sampling intervals and delta intervals for expressions\n            within other expressions can have unusual interactions as\n            they are impossible to synchronize accurately.  In general\n            one interval embedded below another must be enough shorter\n            that the higher sample sees relatively smooth, predictable\n            behavior.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "expExpressionPrefix": {
-                "type": "string",
-                "description": "An object prefix to assist an application in determining\n            the instance indexing to use in expValueTable, relieving the\n            application of the need to scan the expObjectTable to\n            determine such a prefix.\n            \n            See expObjectTable for information on wildcarded objects.\n            \n            If the expValueInstance portion of the value OID may\n            be treated as a scalar (that is, normally, 0) the value of\n            expExpressionPrefix is zero length, that is, no OID at all.\n            \n            Otherwise expExpressionPrefix is the value of any wildcarded\n            instance of expObjectID for the expression.  This is\n            sufficient as the remainder, that is, the instance fragment\n            relevant to instancing the values must be the same for all\n            wildcarded objects in the expression.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expExpressionErrors": {
-                "type": "integer",
-                "description": "The number of errors encountered while evaluating this\n            expression.\n            \n            Note that an object in the expression not being accessible\n            is not considered an error.  It is a legitimate condition\n            that causes the corresponding expression value not to be\n            instantiated.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "expExpressionErrorTime": {
-                "type": "string",
-                "description": "The value of sysUpTime the last time an error caused a\n            failure to evaluate this expression.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                "x-yang-type": "yang:timestamp"
-              },
-              "expExpressionErrorIndex": {
-                "type": "integer",
-                "description": "The 1-based character index into expExpression for where\n            the error occurred.  The value zero indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "expExpressionError": {
-                "type": "string",
-                "description": "The error that occurred.  In the following explanations the\n            expected timing of the error is in parentheses.  'S' means\n            the error occurs on a Set request.  'E' means the error\n            occurs on the attempt to evaluate the expression either\n            due to Get from expValueTable or in ongoing delta\n            processing.\n            \n            invalidSyntax           the value sent for expExpression\n                                    is not valid Expression MIB\n                                    expression syntax (S)\n            undefinedObjectIndex    an object reference ($n) in\n                                    expExpression does not have a\n                                    matching instance in\n                                    expObjectTable (E)\n            unrecognizedOperator    the value sent for expExpression\n                                    held an unrecognized operator (S)\n            unrecognizedFunction    the value sent for expExpression\n                                    held an unrecognized function\n                                    name (S)\n            invalidOperandType      an operand in expExpression is not\n                                    the right type for the associated\n                                    operator or result (SE)\n            unmatchedParenthesis    the value sent for expExpression\n                                    is not correctly parenthesized (S)\n            tooManyWildcardValues   evaluating the expression exceeded\n                                    the limit set by expResourceDelta\n                                    WildcardInstanceMaximum (E)\n            recursion               through some chain of embedded\n                                    expressions the expression invokes\n                                    itself (E)\n            deltaTooShort           the delta for the next evaluation\n                                    passed before the system could\n                                    evaluate the present sample (E)\n            resourceUnavailable     some resource, typically dynamic\n                                    memory, was unavailable (SE)\n            divideByZero            an attempt to divide by zero\n                                    occurred (E)\n            \n            For the errors that occur when the attempt is made to set\n            expExpression Set request fails with the SNMP error code\n            'wrongValue'. Such failures refer to the most recent failure\n            to Set expExpression, not to the present value of\n            expExpression which must be either unset or syntactically\n            correct.\n            \n            Errors that occur during evalutaion for a Get* operation\n            return the SNMP error code 'genErr' except for\n            'tooManyWildcardValues' and 'resourceUnavailable' which\n            return the SNMP error code 'resourceUnavailable'.\n            \n            This object is not instantiated if there have been no\n            errors."
-              },
-              "expExpressionInstance": {
-                "type": "string",
-                "description": "The expValueInstance being evaluated when the error\n            occurred.  A zero-length indicates irrelevance.\n            \n            This object is not instantiated if there have been no\n            errors.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expExpressionOwner": {
-                "type": "string",
-                "description": "The entity that configured this entry and is therefore\n            using the resources assigned to it.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
               "expExpressionEntry": {
                 "type": "array",
                 "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2841,61 +2321,9 @@
             "type": "object",
             "description": "expObjectTable",
             "properties": {
-              "expExpressionIndex": {
-                "type": "string",
-                "description": "expExpressionIndex",
-                "x-yang-type": "leafref"
-              },
-              "expObjectIndex": {
-                "type": "integer",
-                "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "expObjectID": {
-                "type": "string",
-                "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expObjectIDWildcard": {
-                "type": "boolean",
-                "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-              },
-              "expObjectSampleType": {
-                "type": "string",
-                "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
-              },
-              "expObjectDeltaDiscontinuityID": {
-                "type": "string",
-                "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expObjectDiscontinuityIDWildcard": {
-                "type": "boolean",
-                "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-              },
-              "expObjectDiscontinuityIDType": {
-                "type": "string",
-                "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
-              },
-              "expObjectConditional": {
-                "type": "string",
-                "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expObjectConditionalWildcard": {
-                "type": "boolean",
-                "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
-              },
-              "expObjectStatus": {
-                "type": "string",
-                "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
               "expObjectEntry": {
                 "type": "array",
                 "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2959,58 +2387,9 @@
             "type": "object",
             "description": "A table of values from evaluated expressions.",
             "properties": {
-              "expExpressionIndex": {
-                "type": "string",
-                "description": "expExpressionIndex",
-                "x-yang-type": "leafref"
-              },
-              "expValueInstance": {
-                "type": "string",
-                "description": "The final instance portion of a value's OID according to\n            the wildcarding in instances of expObjectID for the\n            expression.  The prefix of this OID fragment is 0.0,\n            leading to the following behavior.\n            \n            If there is no wildcarding, the value is 0.0.0.  In other\n            words, there is one value which standing alone would have\n            been a scalar with a 0 at the end of its OID.\n            \n            If there is wildcarding, the value is 0.0 followed by\n            a value that the wildcard can take, thus defining one value\n            instance for each real, possible value of the wildcard.\n            So, for example, if the wildcard worked out to be an\n            ifIndex, there is an expValueInstance for each applicable\n            ifIndex.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expValueCounter32Val": {
-                "type": "integer",
-                "description": "The value when expExpressionValueType is 'counter32'.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "expValueUnsigned32Val": {
-                "type": "integer",
-                "description": "The value when expExpressionValueType is\n            'unsignedOrGauge32' or 'timeTicks'.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "expValueInteger32Val": {
-                "type": "integer",
-                "description": "The value when expExpressionValueType is 'integer32'.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "expValueIpAddressVal": {
-                "type": "string",
-                "description": "The value when expExpressionValueType is 'ipAddress'.",
-                "format": "inet:ipv4-address"
-              },
-              "expValueOctetStringVal": {
-                "type": "string",
-                "description": "The value when expExpressionValueType is 'octetString'.",
-                "format": "binary"
-              },
-              "expValueOidVal": {
-                "type": "string",
-                "description": "The value when expExpressionValueType is 'objectId'.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "expValueCounter64Val": {
-                "type": "integer",
-                "description": "The value when expExpressionValueType is 'counter64'.",
-                "minimum": 0
-              },
               "expValueEntry": {
                 "type": "array",
                 "description": "expValueEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -3072,7 +2451,6 @@
       "EXPRESSION-MIB_expNameEntry": {
         "type": "array",
         "description": "expNameEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -3097,7 +2475,6 @@
       "EXPRESSION-MIB_expExpressionEntry": {
         "type": "array",
         "description": "Information about a single expression.  An entry appears\n          in this table when an entry is created in expNameTable.\n          Deleting that expNameTable entry automatically deletes\n          this entry and its associated expObjectTable entries.\n          \n          Values of read-write objects in this table may be changed\n          at any time.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -3173,7 +2550,6 @@
       "EXPRESSION-MIB_expObjectEntry": {
         "type": "array",
         "description": "Information about an object.  An application uses\n          expObjectStatus to create entries in this table while\n          in the process of defining an expression.\n          \n          Values of read-create objects in this table may be\n          changed at any time.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -3234,7 +2610,6 @@
       "EXPRESSION-MIB_expValueEntry": {
         "type": "array",
         "description": "expValueEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

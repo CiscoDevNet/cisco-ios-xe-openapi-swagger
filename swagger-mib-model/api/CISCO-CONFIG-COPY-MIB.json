@@ -32,90 +32,9 @@
                   "type": "object",
                   "description": "A table of config-copy requests.",
                   "properties": {
-                    "ccCopyIndex": {
-                      "type": "integer",
-                      "description": "Object which specifies a unique entry in the\n            ccCopyTable.  A management station wishing\n            to initiate a config-copy operation should use a\n            random value for this object when creating\n            or modifying an instance of a ccCopyEntry.\n            The RowStatus semantics of the ccCopyEntryRowStatus\n            object will prevent access conflicts.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ccCopyProtocol": {
-                      "type": "string",
-                      "description": "The protocol to be used for any copy.\n            \n            If the copy operation occurs locally on the SNMP \n            agent (e.g. 'runningConfig' to 'startupConfig'),\n            this object may be ignored by the implementation.",
-                      "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyProtocol"
-                    },
-                    "ccCopySourceFileType": {
-                      "type": "string",
-                      "description": "Specifies the type of file to copy from. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType\n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopySourceFileType has the value of \n            'networkFile', the ccCopyServerAddress/\n            ccCopyServerAddressRev1 and ccCopyServerAddressType\n            and ccCopyFileName must also be created, and 3 \n            objects together (ccCopySourceFileType,\n            ccCopyServerAddressRev1, ccCopyFileName) will \n            uniquely identify the source file. If \n            ccCopyServerAddress is created then \n            ccCopyServerAddressRev1 will store the\n            same IP address and ccCopyServerAddressType will \n            take the value 'ipv4'. \n            \n            If the ccCopySourceFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the \n            2 objects together (ccCopySourceFileType,\n            ccCopyFileName) will uniquely identify the source \n            file.",
-                      "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-                    },
-                    "ccCopyDestFileType": {
-                      "type": "string",
-                      "description": "specifies the type of file to copy to. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType \n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopyDestFileType has the value of \n            'networkFile', the \n            ccCopyServerAddress/ccCopyServerAddressType and\n            ccCopyServerAddressRev1 and ccCopyFileName must\n            also be created, and 3 objects together\n            (ccCopyDestFileType, ccCopyServerAddressRev1,  \n            ccCopyFileName) will uniquely identify the \n            destination file. If ccCopyServerAddress is created\n            then ccCopyServerAddressRev1 will store the same IP\n            address and ccCopyServerAddressType will take the \n            value 'ipv4'. \n            \n            If the ccCopyDestFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the 2\n            objects together (ccCopyDestFileType, \n            ccCopyFileName) will uniquely identify the \n            destination file.",
-                      "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-                    },
-                    "ccCopyServerAddress": {
-                      "type": "string",
-                      "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object \n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'. \n            Values of 0.0.0.0 or FF.FF.FF.FF for\n            ccCopyServerAddress are not allowed.\n            \n            Since this object can just hold only IPv4 Transport\n            type, it is deprecated and replaced by \n            ccCopyServerAddressRev1.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ccCopyFileName": {
-                      "type": "string",
-                      "description": "The file name (including the path, if applicable)\n            of the file. This object must be created when either\n            the ccCopySourceFileType or ccCopyDestFileType has\n            the value 'networkFile' or 'iosFile'.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ccCopyUserName": {
-                      "type": "string",
-                      "description": "Remote username for copy via FTP, RCP, SFTP or\n            SCP protocol.\n            This object must be created when the ccCopyProtocol\n            is 'rcp', 'scp', 'ftp', or 'sftp'.\n            If the protocol is RCP, it will override the remote \n            username configured through the \n                    rcmd remote-username <username>\n            configuration command. \n            The remote username is sent as the server username \n            in an RCP command request sent by the system to a\n            remote RCP server.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ccCopyUserPassword": {
-                      "type": "string",
-                      "description": "Password used by FTP, SFTP or SCP for copying a\n            file to/from an FTP/SFTP/SCP server. This object \n            must be created when the ccCopyProtocol is FTP or\n            SCP. \n            Reading it returns a zero-length string for security \n            reasons.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ccCopyNotificationOnCompletion": {
-                      "type": "boolean",
-                      "description": "Specifies whether or not a ccCopyCompletion\n            notification should be issued on completion of the\n            TFTP transfer. If such a notification is desired, \n            it is the responsibility of the management entity to\n            ensure that the SNMP administrative model is \n            configured in such a way as to allow the \n            notification to be delivered."
-                    },
-                    "ccCopyState": {
-                      "type": "string",
-                      "description": "Specifies the state of this config-copy request.\n            This value of this object is instantiated only after \n            the row has been instantiated, i.e. after the \n            ccCopyEntryRowStatus has been made active.",
-                      "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyState"
-                    },
-                    "ccCopyTimeStarted": {
-                      "type": "string",
-                      "description": "Specifies the time the ccCopyState last\n            transitioned to 'running', or 0 if the state has \n            never transitioned to 'running'(e.g., stuck in\n            'waiting' state).\n            \n            This object is instantiated only after the row has \n            been instantiated.",
-                      "x-yang-type": "yang:timestamp"
-                    },
-                    "ccCopyTimeCompleted": {
-                      "type": "string",
-                      "description": "Specifies the time the ccCopyState last\n            transitioned from 'running' to 'successful' or \n            'failed' states. This object is instantiated only \n            after the row has been instantiated.\n            Its value will remain 0 until the request has \n            completed.",
-                      "x-yang-type": "yang:timestamp"
-                    },
-                    "ccCopyFailCause": {
-                      "type": "string",
-                      "description": "The reason why the config-copy operation failed.\n            This object is instantiated only when the \n            ccCopyState for this entry is in the \n            'failed' state.",
-                      "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyFailCause"
-                    },
-                    "ccCopyEntryRowStatus": {
-                      "type": "string",
-                      "description": "The status of this table entry. Once the entry\n            status is set to active, the associated entry cannot \n            be modified until the request completes \n            (ccCopyState transitions to 'successful'\n            or 'failed' state).",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "ccCopyServerAddressType": {
-                      "type": "string",
-                      "description": "This object indicates the transport type of the\n            address contained in ccCopyServerAddressRev1 object.\n            \n            This must be created when either the\n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "ccCopyServerAddressRev1": {
-                      "type": "string",
-                      "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object\n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.  \n            \n            All bits as 0s or 1s for ccCopyServerAddressRev1 are\n            not allowed.\n            \n            The format of this address depends on the value of \n            the ccCopyServerAddressType object.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
                     "ccCopyEntry": {
                       "type": "array",
                       "description": "ccCopyEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -206,22 +125,6 @@
                 },
                 "example": {
                   "CISCO-CONFIG-COPY-MIB:ccCopyTable": {
-                    "ccCopyIndex": 1,
-                    "ccCopyProtocol": "example-string",
-                    "ccCopySourceFileType": "ethernetCsmacd(6)",
-                    "ccCopyDestFileType": "ethernetCsmacd(6)",
-                    "ccCopyServerAddress": "192.168.1.1",
-                    "ccCopyFileName": "interface-1",
-                    "ccCopyUserName": "interface-1",
-                    "ccCopyUserPassword": "example-string",
-                    "ccCopyNotificationOnCompletion": true,
-                    "ccCopyState": "up(1)",
-                    "ccCopyTimeStarted": "example-string",
-                    "ccCopyTimeCompleted": "example-string",
-                    "ccCopyFailCause": "example-string",
-                    "ccCopyEntryRowStatus": "up(1)",
-                    "ccCopyServerAddressType": "192.168.1.1",
-                    "ccCopyServerAddressRev1": "192.168.1.1",
                     "ccCopyEntry": [
                       {
                         "ccCopyIndex": 1,
@@ -265,7 +168,6 @@
                 "schema": {
                   "type": "array",
                   "description": "ccCopyEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -530,41 +432,9 @@
                   "type": "object",
                   "description": "ccCopyErrorTable",
                   "properties": {
-                    "ccCopyIndex": {
-                      "type": "string",
-                      "description": "ccCopyIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ccCopyErrorIndex": {
-                      "type": "integer",
-                      "description": "A monotonically increasing integer for the sole\n            purpose of indexing entries in this table.\n            When a config copy operation has multiple \n            destinations, then this index value is used to \n            distinguish between those multiple destinations.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ccCopyErrorDeviceIpAddressType": {
-                      "type": "string",
-                      "description": "The type of Internet address for this destination\n            device on which config copy operation is performed.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "ccCopyErrorDeviceIpAddress": {
-                      "type": "string",
-                      "description": "The IP address of this destination device on which\n            config copy operation is performed.\n            The object value has to be consistent with the type\n            specified in ccCopyErrorDeviceIpAddressType.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "ccCopyErrorDeviceWWN": {
-                      "type": "string",
-                      "description": "The World Wide Name (WWN) of this destination\n            device on which config copy operation is performed.\n            The value of this object is zero-length string if \n            WWN is unassigned or unknown. For example, devices \n            which do not support fibre channel would not\n            have WWN.",
-                      "x-yang-type": "cisco-st:FcNameIdOrZero"
-                    },
-                    "ccCopyErrorDescription": {
-                      "type": "string",
-                      "description": "The error description for the error happened\n            for this destination of this config copy \n            operation.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    },
                     "ccCopyErrorEntry": {
                       "type": "array",
                       "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -606,12 +476,6 @@
                 },
                 "example": {
                   "CISCO-CONFIG-COPY-MIB:ccCopyErrorTable": {
-                    "ccCopyIndex": "example-string",
-                    "ccCopyErrorIndex": 1,
-                    "ccCopyErrorDeviceIpAddressType": "192.168.1.1",
-                    "ccCopyErrorDeviceIpAddress": "192.168.1.1",
-                    "ccCopyErrorDeviceWWN": "example-string",
-                    "ccCopyErrorDescription": "192.168.1.1",
                     "ccCopyErrorEntry": [
                       {
                         "ccCopyIndex": "example-string",
@@ -645,7 +509,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -791,7 +654,6 @@
                 "schema": {
                   "type": "array",
                   "description": "ccCopyEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1055,7 +917,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1193,115 +1054,9 @@
         "type": "object",
         "description": "A table of config-copy requests.",
         "properties": {
-          "ccCopyIndex": {
-            "type": "string",
-            "description": "ccCopyIndex",
-            "x-yang-type": "leafref"
-          },
-          "ccCopyProtocol": {
-            "type": "string",
-            "description": "The protocol to be used for any copy.\n            \n            If the copy operation occurs locally on the SNMP \n            agent (e.g. 'runningConfig' to 'startupConfig'),\n            this object may be ignored by the implementation.",
-            "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyProtocol"
-          },
-          "ccCopySourceFileType": {
-            "type": "string",
-            "description": "Specifies the type of file to copy from. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType\n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopySourceFileType has the value of \n            'networkFile', the ccCopyServerAddress/\n            ccCopyServerAddressRev1 and ccCopyServerAddressType\n            and ccCopyFileName must also be created, and 3 \n            objects together (ccCopySourceFileType,\n            ccCopyServerAddressRev1, ccCopyFileName) will \n            uniquely identify the source file. If \n            ccCopyServerAddress is created then \n            ccCopyServerAddressRev1 will store the\n            same IP address and ccCopyServerAddressType will \n            take the value 'ipv4'. \n            \n            If the ccCopySourceFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the \n            2 objects together (ccCopySourceFileType,\n            ccCopyFileName) will uniquely identify the source \n            file.",
-            "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-          },
-          "ccCopyDestFileType": {
-            "type": "string",
-            "description": "specifies the type of file to copy to. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType \n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopyDestFileType has the value of \n            'networkFile', the \n            ccCopyServerAddress/ccCopyServerAddressType and\n            ccCopyServerAddressRev1 and ccCopyFileName must\n            also be created, and 3 objects together\n            (ccCopyDestFileType, ccCopyServerAddressRev1,  \n            ccCopyFileName) will uniquely identify the \n            destination file. If ccCopyServerAddress is created\n            then ccCopyServerAddressRev1 will store the same IP\n            address and ccCopyServerAddressType will take the \n            value 'ipv4'. \n            \n            If the ccCopyDestFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the 2\n            objects together (ccCopyDestFileType, \n            ccCopyFileName) will uniquely identify the \n            destination file.",
-            "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-          },
-          "ccCopyServerAddress": {
-            "type": "string",
-            "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object \n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'. \n            Values of 0.0.0.0 or FF.FF.FF.FF for\n            ccCopyServerAddress are not allowed.\n            \n            Since this object can just hold only IPv4 Transport\n            type, it is deprecated and replaced by \n            ccCopyServerAddressRev1.",
-            "format": "inet:ipv4-address"
-          },
-          "ccCopyFileName": {
-            "type": "string",
-            "description": "The file name (including the path, if applicable)\n            of the file. This object must be created when either\n            the ccCopySourceFileType or ccCopyDestFileType has\n            the value 'networkFile' or 'iosFile'.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "ccCopyUserName": {
-            "type": "string",
-            "description": "Remote username for copy via FTP, RCP, SFTP or\n            SCP protocol.\n            This object must be created when the ccCopyProtocol\n            is 'rcp', 'scp', 'ftp', or 'sftp'.\n            If the protocol is RCP, it will override the remote \n            username configured through the \n                    rcmd remote-username <username>\n            configuration command. \n            The remote username is sent as the server username \n            in an RCP command request sent by the system to a\n            remote RCP server.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "ccCopyUserPassword": {
-            "type": "string",
-            "description": "Password used by FTP, SFTP or SCP for copying a\n            file to/from an FTP/SFTP/SCP server. This object \n            must be created when the ccCopyProtocol is FTP or\n            SCP. \n            Reading it returns a zero-length string for security \n            reasons.",
-            "x-yang-type": "snmpv2-tc:DisplayString"
-          },
-          "ccCopyNotificationOnCompletion": {
-            "type": "boolean",
-            "description": "Specifies whether or not a ccCopyCompletion\n            notification should be issued on completion of the\n            TFTP transfer. If such a notification is desired, \n            it is the responsibility of the management entity to\n            ensure that the SNMP administrative model is \n            configured in such a way as to allow the \n            notification to be delivered."
-          },
-          "ccCopyState": {
-            "type": "string",
-            "description": "Specifies the state of this config-copy request.\n            This value of this object is instantiated only after \n            the row has been instantiated, i.e. after the \n            ccCopyEntryRowStatus has been made active.",
-            "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyState"
-          },
-          "ccCopyTimeStarted": {
-            "type": "string",
-            "description": "Specifies the time the ccCopyState last\n            transitioned to 'running', or 0 if the state has \n            never transitioned to 'running'(e.g., stuck in\n            'waiting' state).\n            \n            This object is instantiated only after the row has \n            been instantiated.",
-            "x-yang-type": "yang:timestamp"
-          },
-          "ccCopyTimeCompleted": {
-            "type": "string",
-            "description": "Specifies the time the ccCopyState last\n            transitioned from 'running' to 'successful' or \n            'failed' states. This object is instantiated only \n            after the row has been instantiated.\n            Its value will remain 0 until the request has \n            completed.",
-            "x-yang-type": "yang:timestamp"
-          },
-          "ccCopyFailCause": {
-            "type": "string",
-            "description": "The reason why the config-copy operation failed.\n            This object is instantiated only when the \n            ccCopyState for this entry is in the \n            'failed' state.",
-            "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyFailCause"
-          },
-          "ccCopyEntryRowStatus": {
-            "type": "string",
-            "description": "The status of this table entry. Once the entry\n            status is set to active, the associated entry cannot \n            be modified until the request completes \n            (ccCopyState transitions to 'successful'\n            or 'failed' state).",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "ccCopyServerAddressType": {
-            "type": "string",
-            "description": "This object indicates the transport type of the\n            address contained in ccCopyServerAddressRev1 object.\n            \n            This must be created when either the\n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.",
-            "x-yang-type": "inet-address:InetAddressType"
-          },
-          "ccCopyServerAddressRev1": {
-            "type": "string",
-            "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object\n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.  \n            \n            All bits as 0s or 1s for ccCopyServerAddressRev1 are\n            not allowed.\n            \n            The format of this address depends on the value of \n            the ccCopyServerAddressType object.",
-            "x-yang-type": "inet-address:InetAddress"
-          },
-          "ccCopyErrorIndex": {
-            "type": "integer",
-            "description": "A monotonically increasing integer for the sole\n            purpose of indexing entries in this table.\n            When a config copy operation has multiple \n            destinations, then this index value is used to \n            distinguish between those multiple destinations.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ccCopyErrorDeviceIpAddressType": {
-            "type": "string",
-            "description": "The type of Internet address for this destination\n            device on which config copy operation is performed.",
-            "x-yang-type": "inet-address:InetAddressType"
-          },
-          "ccCopyErrorDeviceIpAddress": {
-            "type": "string",
-            "description": "The IP address of this destination device on which\n            config copy operation is performed.\n            The object value has to be consistent with the type\n            specified in ccCopyErrorDeviceIpAddressType.",
-            "x-yang-type": "inet-address:InetAddress"
-          },
-          "ccCopyErrorDeviceWWN": {
-            "type": "string",
-            "description": "The World Wide Name (WWN) of this destination\n            device on which config copy operation is performed.\n            The value of this object is zero-length string if \n            WWN is unassigned or unknown. For example, devices \n            which do not support fibre channel would not\n            have WWN.",
-            "x-yang-type": "cisco-st:FcNameIdOrZero"
-          },
-          "ccCopyErrorDescription": {
-            "type": "string",
-            "description": "The error description for the error happened\n            for this destination of this config copy \n            operation.",
-            "x-yang-type": "snmp-framework:SnmpAdminString"
-          },
           "ccCopyEntry": {
             "type": "array",
             "description": "ccCopyEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1391,7 +1146,6 @@
           "ccCopyErrorEntry": {
             "type": "array",
             "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1433,90 +1187,9 @@
             "type": "object",
             "description": "A table of config-copy requests.",
             "properties": {
-              "ccCopyIndex": {
-                "type": "integer",
-                "description": "Object which specifies a unique entry in the\n            ccCopyTable.  A management station wishing\n            to initiate a config-copy operation should use a\n            random value for this object when creating\n            or modifying an instance of a ccCopyEntry.\n            The RowStatus semantics of the ccCopyEntryRowStatus\n            object will prevent access conflicts.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "ccCopyProtocol": {
-                "type": "string",
-                "description": "The protocol to be used for any copy.\n            \n            If the copy operation occurs locally on the SNMP \n            agent (e.g. 'runningConfig' to 'startupConfig'),\n            this object may be ignored by the implementation.",
-                "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyProtocol"
-              },
-              "ccCopySourceFileType": {
-                "type": "string",
-                "description": "Specifies the type of file to copy from. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType\n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopySourceFileType has the value of \n            'networkFile', the ccCopyServerAddress/\n            ccCopyServerAddressRev1 and ccCopyServerAddressType\n            and ccCopyFileName must also be created, and 3 \n            objects together (ccCopySourceFileType,\n            ccCopyServerAddressRev1, ccCopyFileName) will \n            uniquely identify the source file. If \n            ccCopyServerAddress is created then \n            ccCopyServerAddressRev1 will store the\n            same IP address and ccCopyServerAddressType will \n            take the value 'ipv4'. \n            \n            If the ccCopySourceFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the \n            2 objects together (ccCopySourceFileType,\n            ccCopyFileName) will uniquely identify the source \n            file.",
-                "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-              },
-              "ccCopyDestFileType": {
-                "type": "string",
-                "description": "specifies the type of file to copy to. Either the\n            ccCopySourceFileType or the ccCopyDestFileType \n            (or both) must be of type 'runningConfig' or \n            'startupConfig'. Also, the ccCopySourceFileType \n            must be different from the ccCopyDestFileType.\n            \n            If the ccCopyDestFileType has the value of \n            'networkFile', the \n            ccCopyServerAddress/ccCopyServerAddressType and\n            ccCopyServerAddressRev1 and ccCopyFileName must\n            also be created, and 3 objects together\n            (ccCopyDestFileType, ccCopyServerAddressRev1,  \n            ccCopyFileName) will uniquely identify the \n            destination file. If ccCopyServerAddress is created\n            then ccCopyServerAddressRev1 will store the same IP\n            address and ccCopyServerAddressType will take the \n            value 'ipv4'. \n            \n            If the ccCopyDestFileType is 'iosFile', the \n            ccCopyFileName must also be created, and the 2\n            objects together (ccCopyDestFileType, \n            ccCopyFileName) will uniquely identify the \n            destination file.",
-                "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigFileType"
-              },
-              "ccCopyServerAddress": {
-                "type": "string",
-                "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object \n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'. \n            Values of 0.0.0.0 or FF.FF.FF.FF for\n            ccCopyServerAddress are not allowed.\n            \n            Since this object can just hold only IPv4 Transport\n            type, it is deprecated and replaced by \n            ccCopyServerAddressRev1.",
-                "format": "inet:ipv4-address"
-              },
-              "ccCopyFileName": {
-                "type": "string",
-                "description": "The file name (including the path, if applicable)\n            of the file. This object must be created when either\n            the ccCopySourceFileType or ccCopyDestFileType has\n            the value 'networkFile' or 'iosFile'.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "ccCopyUserName": {
-                "type": "string",
-                "description": "Remote username for copy via FTP, RCP, SFTP or\n            SCP protocol.\n            This object must be created when the ccCopyProtocol\n            is 'rcp', 'scp', 'ftp', or 'sftp'.\n            If the protocol is RCP, it will override the remote \n            username configured through the \n                    rcmd remote-username <username>\n            configuration command. \n            The remote username is sent as the server username \n            in an RCP command request sent by the system to a\n            remote RCP server.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "ccCopyUserPassword": {
-                "type": "string",
-                "description": "Password used by FTP, SFTP or SCP for copying a\n            file to/from an FTP/SFTP/SCP server. This object \n            must be created when the ccCopyProtocol is FTP or\n            SCP. \n            Reading it returns a zero-length string for security \n            reasons.",
-                "x-yang-type": "snmpv2-tc:DisplayString"
-              },
-              "ccCopyNotificationOnCompletion": {
-                "type": "boolean",
-                "description": "Specifies whether or not a ccCopyCompletion\n            notification should be issued on completion of the\n            TFTP transfer. If such a notification is desired, \n            it is the responsibility of the management entity to\n            ensure that the SNMP administrative model is \n            configured in such a way as to allow the \n            notification to be delivered."
-              },
-              "ccCopyState": {
-                "type": "string",
-                "description": "Specifies the state of this config-copy request.\n            This value of this object is instantiated only after \n            the row has been instantiated, i.e. after the \n            ccCopyEntryRowStatus has been made active.",
-                "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyState"
-              },
-              "ccCopyTimeStarted": {
-                "type": "string",
-                "description": "Specifies the time the ccCopyState last\n            transitioned to 'running', or 0 if the state has \n            never transitioned to 'running'(e.g., stuck in\n            'waiting' state).\n            \n            This object is instantiated only after the row has \n            been instantiated.",
-                "x-yang-type": "yang:timestamp"
-              },
-              "ccCopyTimeCompleted": {
-                "type": "string",
-                "description": "Specifies the time the ccCopyState last\n            transitioned from 'running' to 'successful' or \n            'failed' states. This object is instantiated only \n            after the row has been instantiated.\n            Its value will remain 0 until the request has \n            completed.",
-                "x-yang-type": "yang:timestamp"
-              },
-              "ccCopyFailCause": {
-                "type": "string",
-                "description": "The reason why the config-copy operation failed.\n            This object is instantiated only when the \n            ccCopyState for this entry is in the \n            'failed' state.",
-                "x-yang-type": "CISCO-CONFIG-COPY-MIB:ConfigCopyFailCause"
-              },
-              "ccCopyEntryRowStatus": {
-                "type": "string",
-                "description": "The status of this table entry. Once the entry\n            status is set to active, the associated entry cannot \n            be modified until the request completes \n            (ccCopyState transitions to 'successful'\n            or 'failed' state).",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "ccCopyServerAddressType": {
-                "type": "string",
-                "description": "This object indicates the transport type of the\n            address contained in ccCopyServerAddressRev1 object.\n            \n            This must be created when either the\n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.",
-                "x-yang-type": "inet-address:InetAddressType"
-              },
-              "ccCopyServerAddressRev1": {
-                "type": "string",
-                "description": "The IP address of the TFTP server from (or to)\n            which to copy the configuration file. This object\n            must be created when either the \n            ccCopySourceFileType or ccCopyDestFileType has the\n            value 'networkFile'.  \n            \n            All bits as 0s or 1s for ccCopyServerAddressRev1 are\n            not allowed.\n            \n            The format of this address depends on the value of \n            the ccCopyServerAddressType object.",
-                "x-yang-type": "inet-address:InetAddress"
-              },
               "ccCopyEntry": {
                 "type": "array",
                 "description": "ccCopyEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1609,41 +1282,9 @@
             "type": "object",
             "description": "ccCopyErrorTable",
             "properties": {
-              "ccCopyIndex": {
-                "type": "string",
-                "description": "ccCopyIndex",
-                "x-yang-type": "leafref"
-              },
-              "ccCopyErrorIndex": {
-                "type": "integer",
-                "description": "A monotonically increasing integer for the sole\n            purpose of indexing entries in this table.\n            When a config copy operation has multiple \n            destinations, then this index value is used to \n            distinguish between those multiple destinations.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "ccCopyErrorDeviceIpAddressType": {
-                "type": "string",
-                "description": "The type of Internet address for this destination\n            device on which config copy operation is performed.",
-                "x-yang-type": "inet-address:InetAddressType"
-              },
-              "ccCopyErrorDeviceIpAddress": {
-                "type": "string",
-                "description": "The IP address of this destination device on which\n            config copy operation is performed.\n            The object value has to be consistent with the type\n            specified in ccCopyErrorDeviceIpAddressType.",
-                "x-yang-type": "inet-address:InetAddress"
-              },
-              "ccCopyErrorDeviceWWN": {
-                "type": "string",
-                "description": "The World Wide Name (WWN) of this destination\n            device on which config copy operation is performed.\n            The value of this object is zero-length string if \n            WWN is unassigned or unknown. For example, devices \n            which do not support fibre channel would not\n            have WWN.",
-                "x-yang-type": "cisco-st:FcNameIdOrZero"
-              },
-              "ccCopyErrorDescription": {
-                "type": "string",
-                "description": "The error description for the error happened\n            for this destination of this config copy \n            operation.",
-                "x-yang-type": "snmp-framework:SnmpAdminString"
-              },
               "ccCopyErrorEntry": {
                 "type": "array",
                 "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1784,7 +1425,6 @@
       "CISCO-CONFIG-COPY-MIB_ccCopyEntry": {
         "type": "array",
         "description": "ccCopyEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -1874,7 +1514,6 @@
       "CISCO-CONFIG-COPY-MIB_ccCopyErrorEntry": {
         "type": "array",
         "description": "An entry containing information about the\n          outcome at one destination of a failed config\n          copy operation.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

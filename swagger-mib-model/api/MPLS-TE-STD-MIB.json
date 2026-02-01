@@ -145,193 +145,9 @@
                   "type": "object",
                   "description": "mplsTunnelTable",
                   "properties": {
-                    "mplsTunnelIndex": {
-                      "type": "string",
-                      "description": "Uniquely identifies a set of tunnel instances\n            between a pair of ingress and egress LSRs.\n            Managers should obtain new values for row\n            creation in this table by reading\n            mplsTunnelIndexNext. When\n            the MPLS signalling protocol is rsvp(2) this value\n            SHOULD be equal to the value signaled in the\n            Tunnel Id of the Session object. When the MPLS\n            signalling protocol is crldp(3) this value\n            SHOULD be equal to the value signaled in the\n            LSP ID.",
-                      "x-yang-type": "mpls-tc:MplsTunnelIndex"
-                    },
-                    "mplsTunnelInstance": {
-                      "type": "string",
-                      "description": "Uniquely identifies a particular instance of a\n            tunnel between a pair of ingress and egress LSRs.\n            It is useful to identify multiple instances of\n            tunnels for the purposes of backup and parallel\n            tunnels. When the MPLS signaling protocol is\n            rsvp(2) this value SHOULD be equal to the LSP Id\n            of the Sender Template object. When the signaling\n            protocol is crldp(3) there is no equivalent\n            signaling object.",
-                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-                    },
-                    "mplsTunnelIngressLSRId": {
-                      "type": "string",
-                      "description": "Identity of the ingress LSR associated with this\n            tunnel instance. When the MPLS signalling protocol\n            is rsvp(2) this value SHOULD be equal to the Tunnel\n            Sender Address in the Sender Template object and MAY\n            be equal to the Extended Tunnel Id field in the\n            SESSION object. When the MPLS signalling protocol is\n            crldp(3) this value SHOULD be equal to the Ingress\n            LSR Router ID field in the LSPID TLV object.",
-                      "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-                    },
-                    "mplsTunnelEgressLSRId": {
-                      "type": "string",
-                      "description": "Identity of the egress LSR associated with this\n            tunnel instance.",
-                      "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-                    },
-                    "mplsTunnelName": {
-                      "type": "string",
-                      "description": "The canonical name assigned to the tunnel. This name\n            can be used to refer to the tunnel on the LSR's\n            console port.  If mplsTunnelIsIf is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    },
-                    "mplsTunnelDescr": {
-                      "type": "string",
-                      "description": "A textual string containing information about the\n            tunnel.  If there is no description this object\n            contains a zero length string. This object is may\n            not be signaled by MPLS signaling protocols,\n            consequentally the value of this object at transit\n            and egress LSRs MAY be automatically generated or\n            absent.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    },
-                    "mplsTunnelIsIf": {
-                      "type": "boolean",
-                      "description": "Denotes whether or not this tunnel corresponds to an\n            interface represented in the interfaces group\n            table. Note that if this variable is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.  This object is meaningful only at the\n            ingress and egress LSRs."
-                    },
-                    "mplsTunnelIfIndex": {
-                      "type": "string",
-                      "description": "If mplsTunnelIsIf is set to true, then this value\n            contains the LSR-assigned ifIndex which corresponds\n            to an entry in the interfaces table.  Otherwise\n            this variable should contain the value of zero\n            indicating that a valid ifIndex was not assigned to\n            this tunnel interface.",
-                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
-                    },
-                    "mplsTunnelOwner": {
-                      "type": "string",
-                      "description": "Denotes the entity that created and is responsible\n            for managing this tunnel. This column is\n            automatically filled by the agent on creation of a\n            row.",
-                      "x-yang-type": "mpls-tc:MplsOwner"
-                    },
-                    "mplsTunnelRole": {
-                      "type": "string",
-                      "description": "This value signifies the role that this tunnel\n            entry/instance represents. This value MUST be set\n            to head(1) at the originating point of the tunnel.\n            This value MUST be set to transit(2) at transit\n            points along the tunnel, if transit points are\n            supported. This value MUST be set to tail(3) at the\n            terminating point of the tunnel if tunnel tails are\n            supported.\n            \n            The value headTail(4) is provided for tunnels that\n            begin and end on the same LSR."
-                    },
-                    "mplsTunnelXCPointer": {
-                      "type": "string",
-                      "description": "This variable points to a row in the mplsXCTable.\n            This table identifies the segments that compose\n            this tunnel, their characteristics, and\n            relationships to each other. A value of zeroDotZero\n            indicates that no LSP has been associated with this\n            tunnel yet.",
-                      "x-yang-type": "snmpv2-tc:RowPointer"
-                    },
-                    "mplsTunnelSignallingProto": {
-                      "type": "string",
-                      "description": "The signalling protocol, if any, used to setup this\n            tunnel."
-                    },
-                    "mplsTunnelSetupPrio": {
-                      "type": "integer",
-                      "description": "Indicates the setup priority of this tunnel.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "mplsTunnelHoldingPrio": {
-                      "type": "integer",
-                      "description": "Indicates the holding priority for this tunnel.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "mplsTunnelSessionAttributes": {
-                      "type": "string",
-                      "description": "This bit mask indicates optional session values for\n            this tunnel. The following describes these bit\n            fields:\n            \n            fastRerouteThis flag indicates that the any tunnel\n            hop may choose to reroute this tunnel without\n            tearing it down.  This flag permits transit routers\n            to use a local repair mechanism which may result in\n            violation of the explicit routing of this tunnel.\n            When a fault is detected on an adjacent downstream\n            link or node, a transit router can re-route traffic\n            for fast service restoration.\n            \n            mergingPermitted This flag permits transit routers\n            to merge this session with other RSVP sessions for\n            the purpose of reducing resource overhead on\n            downstream transit routers, thereby providing\n            better network scaling.\n            \n            isPersistent  Indicates whether this tunnel should\n            be restored automatically after a failure occurs.\n            \n            isPinned   This flag indicates whether the loose-\n            routed hops of this tunnel are to be pinned.\n            \n            recordRouteThis flag indicates whether or not the\n            signalling protocol should remember the tunnel path\n            after it has been signaled."
-                    },
-                    "mplsTunnelLocalProtectInUse": {
-                      "type": "boolean",
-                      "description": "Indicates that the local repair mechanism is in use\n            to maintain this tunnel (usually in the face of an\n            outage of the link it was previously routed over)."
-                    },
-                    "mplsTunnelResourcePointer": {
-                      "type": "string",
-                      "description": "This variable represents a pointer to the traffic\n            parameter specification for this tunnel.  This\n            value may point at an entry in the\n            mplsTunnelResourceEntry to indicate which\n            mplsTunnelResourceEntry is to be assigned to this\n            LSP instance.  This value may optionally point at\n            an externally defined traffic parameter\n            specification table.  A value of zeroDotZero\n            indicates best-effort treatment.  By having the\n            same value of this object, two or more LSPs can\n            indicate resource sharing.",
-                      "x-yang-type": "snmpv2-tc:RowPointer"
-                    },
-                    "mplsTunnelPrimaryInstance": {
-                      "type": "string",
-                      "description": "Specifies the instance index of the primary instance\n            of this tunnel. More details of the definition of\n            tunnel instances and the primary tunnel instance\n            can be found in the description of the TEXTUAL-CONVENTION\n            MplsTunnelInstanceIndex.",
-                      "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-                    },
-                    "mplsTunnelInstancePriority": {
-                      "type": "integer",
-                      "description": "This value indicates which priority, in descending\n            order, with 0 indicating the lowest priority,\n            within a group of tunnel instances. A group of\n            tunnel instances is defined as a set of LSPs with\n            the same mplsTunnelIndex in this table, but with a\n            different mplsTunnelInstance. Tunnel instance\n            priorities are used to denote the priority at which\n            a particular tunnel instance will supercede\n            another. Instances of tunnels containing the same\n            mplsTunnelInstancePriority will be used for load\n            sharing.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelHopTableIndex": {
-                      "type": "string",
-                      "description": "Index into the mplsTunnelHopTable entry that\n            specifies the explicit route hops for this tunnel.\n            This object is meaningful only at the head-end of\n            the tunnel.",
-                      "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-                    },
-                    "mplsTunnelPathInUse": {
-                      "type": "string",
-                      "description": "This value denotes the configured path that was\n            chosen for this tunnel. This value reflects the\n            secondary index into mplsTunnelHopTable. This path\n            may not exactly match the one in\n            mplsTunnelARHopTable due to the fact that some CSPF\n            modification may have taken place. See\n            mplsTunnelARHopTable for the actual path being\n            taken by the tunnel. A value of zero denotes that\n            no path is currently in use or available.",
-                      "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-                    },
-                    "mplsTunnelARHopTableIndex": {
-                      "type": "string",
-                      "description": "Index into the mplsTunnelARHopTable entry that\n            specifies the actual hops traversed by the tunnel.\n            This is automatically updated by the agent when the\n            actual hops becomes available.",
-                      "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-                    },
-                    "mplsTunnelCHopTableIndex": {
-                      "type": "string",
-                      "description": "Index into the mplsTunnelCHopTable entry that\n            specifies the computed hops traversed by the\n            tunnel. This is automatically updated by the agent\n            when computed hops become available or when\n            computed hops get modified.",
-                      "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-                    },
-                    "mplsTunnelIncludeAnyAffinity": {
-                      "type": "string",
-                      "description": "A link satisfies the include-any constraint if and\n            only if the constraint is zero, or the link and the\n            constraint have a resource class in common.",
-                      "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-                    },
-                    "mplsTunnelIncludeAllAffinity": {
-                      "type": "string",
-                      "description": "A link satisfies the include-all constraint if and\n            only if the link contains all of the administrative\n            groups specified in the constraint.",
-                      "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-                    },
-                    "mplsTunnelExcludeAnyAffinity": {
-                      "type": "string",
-                      "description": "A link satisfies the exclude-any constraint if and\n            only if the link contains none of the\n            administrative groups specified in the constraint.",
-                      "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-                    },
-                    "mplsTunnelTotalUpTime": {
-                      "type": "string",
-                      "description": "This value represents the aggregate up time for all\n            instances of this tunnel, if available. If this\n            value is unavailable, it MUST return a value of 0.",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "mplsTunnelInstanceUpTime": {
-                      "type": "string",
-                      "description": "This value identifies the total time that this\n            tunnel instance's operStatus has been Up(1).",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "mplsTunnelPrimaryUpTime": {
-                      "type": "string",
-                      "description": "Specifies the total time the primary instance of\n            this tunnel has been active. The primary instance\n            of this tunnel is defined in\n            mplsTunnelPrimaryInstance.",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "mplsTunnelPathChanges": {
-                      "type": "integer",
-                      "description": "Specifies the number of times the actual path for\n            this tunnel instance has changed.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelLastPathChange": {
-                      "type": "string",
-                      "description": "Specifies the time since the last change to the\n            actual path for this tunnel instance.",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "mplsTunnelCreationTime": {
-                      "type": "string",
-                      "description": "Specifies the value of SysUpTime when the first\n            instance of this tunnel came into existence.\n            That is, when the value of mplsTunnelOperStatus\n            was first set to up(1).",
-                      "x-yang-type": "yang:timestamp"
-                    },
-                    "mplsTunnelStateTransitions": {
-                      "type": "integer",
-                      "description": "Specifies the number of times the state\n            (mplsTunnelOperStatus) of this tunnel instance has\n            changed.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelAdminStatus": {
-                      "type": "string",
-                      "description": "Indicates the desired operational status of this\n            tunnel."
-                    },
-                    "mplsTunnelOperStatus": {
-                      "type": "string",
-                      "description": "Indicates the actual operational status of this\n            tunnel, which is typically but not limited to, a\n            function of the state of individual segments of\n            this tunnel."
-                    },
-                    "mplsTunnelRowStatus": {
-                      "type": "string",
-                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelAdminStatus, mplsTunnelRowStatus and\n            mplsTunnelStorageType.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "mplsTunnelStorageType": {
-                      "type": "string",
-                      "description": "The storage type for this tunnel entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
-                    },
                     "mplsTunnelEntry": {
                       "type": "array",
                       "description": "mplsTunnelEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -525,43 +341,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelTable": {
-                    "mplsTunnelIndex": "example-string",
-                    "mplsTunnelInstance": "example-string",
-                    "mplsTunnelIngressLSRId": "example-string",
-                    "mplsTunnelEgressLSRId": "example-string",
-                    "mplsTunnelName": "interface-1",
-                    "mplsTunnelDescr": "GigabitEthernet1/0/1",
-                    "mplsTunnelIsIf": true,
-                    "mplsTunnelIfIndex": "example-string",
-                    "mplsTunnelOwner": "example-string",
-                    "mplsTunnelRole": "example-string",
-                    "mplsTunnelXCPointer": "example-string",
-                    "mplsTunnelSignallingProto": "example-string",
-                    "mplsTunnelSetupPrio": -2147483648,
-                    "mplsTunnelHoldingPrio": -2147483648,
-                    "mplsTunnelSessionAttributes": "example-string",
-                    "mplsTunnelLocalProtectInUse": true,
-                    "mplsTunnelResourcePointer": "example-string",
-                    "mplsTunnelPrimaryInstance": "example-string",
-                    "mplsTunnelInstancePriority": 0,
-                    "mplsTunnelHopTableIndex": "example-string",
-                    "mplsTunnelPathInUse": "example-string",
-                    "mplsTunnelARHopTableIndex": "example-string",
-                    "mplsTunnelCHopTableIndex": "example-string",
-                    "mplsTunnelIncludeAnyAffinity": "example-string",
-                    "mplsTunnelIncludeAllAffinity": "example-string",
-                    "mplsTunnelExcludeAnyAffinity": "example-string",
-                    "mplsTunnelTotalUpTime": "example-string",
-                    "mplsTunnelInstanceUpTime": "example-string",
-                    "mplsTunnelPrimaryUpTime": "example-string",
-                    "mplsTunnelPathChanges": 0,
-                    "mplsTunnelLastPathChange": "example-string",
-                    "mplsTunnelCreationTime": "example-string",
-                    "mplsTunnelStateTransitions": 0,
-                    "mplsTunnelAdminStatus": "up(1)",
-                    "mplsTunnelOperStatus": "up(1)",
-                    "mplsTunnelRowStatus": "up(1)",
-                    "mplsTunnelStorageType": "ethernetCsmacd(6)",
                     "mplsTunnelEntry": [
                       {
                         "mplsTunnelIndex": "example-string",
@@ -626,7 +405,6 @@
                 "schema": {
                   "type": "array",
                   "description": "mplsTunnelEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1139,82 +917,9 @@
                   "type": "object",
                   "description": "mplsTunnelHopTable",
                   "properties": {
-                    "mplsTunnelHopListIndex": {
-                      "type": "string",
-                      "description": "Primary index into this table identifying a\n            particular explicit route object.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelHopPathOptionIndex": {
-                      "type": "string",
-                      "description": "Secondary index into this table identifying a\n            particular group of hops representing a particular\n            configured path. This is otherwise known as a path\n            option.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelHopIndex": {
-                      "type": "string",
-                      "description": "Tertiary index into this table identifying a\n            particular hop.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelHopAddrType": {
-                      "type": "string",
-                      "description": "The Hop Address Type of this tunnel hop.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                      "x-yang-type": "mpls-tc:TeHopAddressType"
-                    },
-                    "mplsTunnelHopIpAddr": {
-                      "type": "string",
-                      "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelHopAddrType.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.",
-                      "x-yang-type": "mpls-tc:TeHopAddress"
-                    },
-                    "mplsTunnelHopIpPrefixLen": {
-                      "type": "string",
-                      "description": "If mplsTunnelHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-                      "x-yang-type": "inet-address:InetAddressPrefixLength"
-                    },
-                    "mplsTunnelHopAsNumber": {
-                      "type": "string",
-                      "description": "If mplsTunnelHopAddrType is set to asnumber(3), then\n            this value will contain the AS number of this hop.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-                      "x-yang-type": "mpls-tc:TeHopAddressAS"
-                    },
-                    "mplsTunnelHopAddrUnnum": {
-                      "type": "string",
-                      "description": "If mplsTunnelHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelHopIpAddress which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-                      "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-                    },
-                    "mplsTunnelHopLspId": {
-                      "type": "string",
-                      "description": "If mplsTunnelHopAddrType is set to lspid(5), then\n            this value will contain the LSPID of a tunnel of\n            this hop. The present tunnel being configured is\n            tunneled through this hop (using label stacking).\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                      "x-yang-type": "mpls-tc:MplsLSPID"
-                    },
-                    "mplsTunnelHopType": {
-                      "type": "string",
-                      "description": "Denotes whether this tunnel hop is routed in a\n            strict or loose fashion. The value of this object\n            has no meaning if the mplsTunnelHopInclude object\n            is set to 'false'."
-                    },
-                    "mplsTunnelHopInclude": {
-                      "type": "boolean",
-                      "description": "If this value is set to true, then this indicates\n            that this hop must be included in the tunnel's\n            path. If this value is set to 'false', then this hop\n            must be avoided when calculating the path for this\n            tunnel. The default value of this object is 'true',\n            so that by default all indicated hops are included\n            in the CSPF path computation. If this object is set\n            to 'false' the value of mplsTunnelHopType should be\n            ignored."
-                    },
-                    "mplsTunnelHopPathOptionName": {
-                      "type": "string",
-                      "description": "The description of this series of hops as they\n            relate to the specified path option. The\n            value of this object SHOULD be the same for\n            each hop in the series that comprises a\n            path option.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    },
-                    "mplsTunnelHopEntryPathComp": {
-                      "type": "string",
-                      "description": "If this value is set to dynamic, then the user\n            should only specify the source and destination of\n            the path and expect that the CSPF will calculate\n            the remainder of the path.  If this value is set to\n            explicit, the user should specify the entire path\n            for the tunnel to take.  This path may contain\n            strict or loose hops.  Each hop along a specific\n            path SHOULD have this object set to the same value"
-                    },
-                    "mplsTunnelHopRowStatus": {
-                      "type": "string",
-                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelHopRowStatus and\n            mplsTunnelHopStorageType.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "mplsTunnelHopStorageType": {
-                      "type": "string",
-                      "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
-                    },
                     "mplsTunnelHopEntry": {
                       "type": "array",
                       "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -1297,21 +1002,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelHopTable": {
-                    "mplsTunnelHopListIndex": "example-string",
-                    "mplsTunnelHopPathOptionIndex": "example-string",
-                    "mplsTunnelHopIndex": "example-string",
-                    "mplsTunnelHopAddrType": "192.168.1.1",
-                    "mplsTunnelHopIpAddr": "192.168.1.1",
-                    "mplsTunnelHopIpPrefixLen": "192.168.1.1",
-                    "mplsTunnelHopAsNumber": "example-string",
-                    "mplsTunnelHopAddrUnnum": "192.168.1.1",
-                    "mplsTunnelHopLspId": "example-string",
-                    "mplsTunnelHopType": "ethernetCsmacd(6)",
-                    "mplsTunnelHopInclude": true,
-                    "mplsTunnelHopPathOptionName": "interface-1",
-                    "mplsTunnelHopEntryPathComp": "example-string",
-                    "mplsTunnelHopRowStatus": "up(1)",
-                    "mplsTunnelHopStorageType": "ethernetCsmacd(6)",
                     "mplsTunnelHopEntry": [
                       {
                         "mplsTunnelHopListIndex": "example-string",
@@ -1354,7 +1044,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1601,61 +1290,9 @@
                   "type": "object",
                   "description": "The mplsTunnelResourceTable allows a manager to\n        specify which resources are desired for an MPLS\n        tunnel.  This table also allows several tunnels to\n        point to a single entry in this table, implying\n        that these tunnels should share resources.",
                   "properties": {
-                    "mplsTunnelResourceIndex": {
-                      "type": "integer",
-                      "description": "Uniquely identifies this row.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelResourceMaxRate": {
-                      "type": "string",
-                      "description": "The maximum rate in bits/second.  Note that setting\n            mplsTunnelResourceMaxRate,\n            mplsTunnelResourceMeanRate, and\n            mplsTunnelResourceMaxBurstSize to 0 indicates best-\n            effort treatment.",
-                      "x-yang-type": "mpls-tc:MplsBitRate"
-                    },
-                    "mplsTunnelResourceMeanRate": {
-                      "type": "string",
-                      "description": "This object is copied into an instance of\n            mplsTrafficParamMeanRate in the\n            mplsTrafficParamTable. The OID of this table entry\n            is then copied into the corresponding\n            mplsInSegmentTrafficParamPtr.",
-                      "x-yang-type": "mpls-tc:MplsBitRate"
-                    },
-                    "mplsTunnelResourceMaxBurstSize": {
-                      "type": "string",
-                      "description": "The maximum burst size in bytes.",
-                      "x-yang-type": "mpls-tc:MplsBurstSize"
-                    },
-                    "mplsTunnelResourceMeanBurstSize": {
-                      "type": "string",
-                      "description": "The mean burst size in bytes.  The implementations\n            which do not implement this variable must return\n            a noSuchObject exception for this object and must\n            not allow a user to set this object.",
-                      "x-yang-type": "mpls-tc:MplsBurstSize"
-                    },
-                    "mplsTunnelResourceExBurstSize": {
-                      "type": "string",
-                      "description": "The Excess burst size in bytes.  The implementations\n            which do not implement this variable must return\n            noSuchObject exception for this object and must\n            not allow a user to set this value.",
-                      "x-yang-type": "mpls-tc:MplsBurstSize"
-                    },
-                    "mplsTunnelResourceFrequency": {
-                      "type": "string",
-                      "description": "The granularity of the availability of committed\n            rate.  The implementations which do not implement\n            this variable must return unspecified(1) for this\n            value and must not allow a user to set this value."
-                    },
-                    "mplsTunnelResourceWeight": {
-                      "type": "integer",
-                      "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelResourceRowStatus": {
-                      "type": "string",
-                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelResourceRowStatus and\n            mplsTunnelResourceStorageType.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "mplsTunnelResourceStorageType": {
-                      "type": "string",
-                      "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
-                    },
                     "mplsTunnelResourceEntry": {
                       "type": "array",
                       "description": "mplsTunnelResourceEntry",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -1717,16 +1354,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelResourceTable": {
-                    "mplsTunnelResourceIndex": 1,
-                    "mplsTunnelResourceMaxRate": "example-string",
-                    "mplsTunnelResourceMeanRate": "example-string",
-                    "mplsTunnelResourceMaxBurstSize": "example-string",
-                    "mplsTunnelResourceMeanBurstSize": "example-string",
-                    "mplsTunnelResourceExBurstSize": "example-string",
-                    "mplsTunnelResourceFrequency": "example-string",
-                    "mplsTunnelResourceWeight": 0,
-                    "mplsTunnelResourceRowStatus": "up(1)",
-                    "mplsTunnelResourceStorageType": "ethernetCsmacd(6)",
                     "mplsTunnelResourceEntry": [
                       {
                         "mplsTunnelResourceIndex": 1,
@@ -1764,7 +1391,6 @@
                 "schema": {
                   "type": "array",
                   "description": "mplsTunnelResourceEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1959,40 +1585,9 @@
                   "type": "object",
                   "description": "mplsTunnelARHopTable",
                   "properties": {
-                    "mplsTunnelARHopListIndex": {
-                      "type": "string",
-                      "description": "Primary index into this table identifying a\n            particular recorded hop list.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelARHopIndex": {
-                      "type": "string",
-                      "description": "Secondary index into this table identifying the\n            particular hop.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelARHopAddrType": {
-                      "type": "string",
-                      "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                      "x-yang-type": "mpls-tc:TeHopAddressType"
-                    },
-                    "mplsTunnelARHopIpAddr": {
-                      "type": "string",
-                      "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelARHopAddrType.\n            If mplsTunnelARHopAddrType is set to unnum(4),\n             then this value contains the LSR Router ID of the\n             unnumbered interface. Otherwise the agent SHOULD\n             set this object to the zero-length string and the\n             manager should ignore this object.",
-                      "x-yang-type": "mpls-tc:TeHopAddress"
-                    },
-                    "mplsTunnelARHopAddrUnnum": {
-                      "type": "string",
-                      "description": "If mplsTunnelARHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelARHopIpAddr which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-                      "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-                    },
-                    "mplsTunnelARHopLspId": {
-                      "type": "string",
-                      "description": "If mplsTunnelARHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                      "x-yang-type": "mpls-tc:MplsLSPID"
-                    },
                     "mplsTunnelARHopEntry": {
                       "type": "array",
                       "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -2033,12 +1628,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelARHopTable": {
-                    "mplsTunnelARHopListIndex": "example-string",
-                    "mplsTunnelARHopIndex": "example-string",
-                    "mplsTunnelARHopAddrType": "192.168.1.1",
-                    "mplsTunnelARHopIpAddr": "192.168.1.1",
-                    "mplsTunnelARHopAddrUnnum": "192.168.1.1",
-                    "mplsTunnelARHopLspId": "example-string",
                     "mplsTunnelARHopEntry": [
                       {
                         "mplsTunnelARHopListIndex": "example-string",
@@ -2072,7 +1661,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2217,54 +1805,9 @@
                   "type": "object",
                   "description": "mplsTunnelCHopTable",
                   "properties": {
-                    "mplsTunnelCHopListIndex": {
-                      "type": "string",
-                      "description": "Primary index into this table identifying a\n            particular computed hop list.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelCHopIndex": {
-                      "type": "string",
-                      "description": "Secondary index into this table identifying the\n            particular hop.",
-                      "x-yang-type": "mpls-tc:MplsPathIndex"
-                    },
-                    "mplsTunnelCHopAddrType": {
-                      "type": "string",
-                      "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                      "x-yang-type": "mpls-tc:TeHopAddressType"
-                    },
-                    "mplsTunnelCHopIpAddr": {
-                      "type": "string",
-                      "description": "The Tunnel Hop Address for this tunnel hop.\n            The type of this address is determined by the\n             value of the corresponding mplsTunnelCHopAddrType.\n            \n            If mplsTunnelCHopAddrType is set to unnum(4), then\n             this value will contain the LSR Router ID of the\n             unnumbered interface. Otherwise the agent should\n             set this object to the zero-length string and the\n             manager SHOULD ignore this object.",
-                      "x-yang-type": "mpls-tc:TeHopAddress"
-                    },
-                    "mplsTunnelCHopIpPrefixLen": {
-                      "type": "string",
-                      "description": "If mplsTunnelCHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelCHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-                      "x-yang-type": "inet-address:InetAddressPrefixLength"
-                    },
-                    "mplsTunnelCHopAsNumber": {
-                      "type": "string",
-                      "description": "If mplsTunnelCHopAddrType is set to asnumber(3),\n            then this value will contain the AS number of this\n            hop. Otherwise the agent should set this object to\n            zero-length string and the manager should ignore\n            this.",
-                      "x-yang-type": "mpls-tc:TeHopAddressAS"
-                    },
-                    "mplsTunnelCHopAddrUnnum": {
-                      "type": "string",
-                      "description": "If mplsTunnelCHopAddrType is set to unnum(4), then\n            this value will contain the unnumbered interface\n            identifier of this hop. This object should be used\n            in conjunction with mplsTunnelCHopIpAddr which\n            would contain the LSR Router ID in this case.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-                      "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-                    },
-                    "mplsTunnelCHopLspId": {
-                      "type": "string",
-                      "description": "If mplsTunnelCHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                      "x-yang-type": "mpls-tc:MplsLSPID"
-                    },
-                    "mplsTunnelCHopType": {
-                      "type": "string",
-                      "description": "Denotes whether this is tunnel hop is routed in a\n            strict or loose fashion."
-                    },
                     "mplsTunnelCHopEntry": {
                       "type": "array",
                       "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -2319,15 +1862,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelCHopTable": {
-                    "mplsTunnelCHopListIndex": "example-string",
-                    "mplsTunnelCHopIndex": "example-string",
-                    "mplsTunnelCHopAddrType": "192.168.1.1",
-                    "mplsTunnelCHopIpAddr": "192.168.1.1",
-                    "mplsTunnelCHopIpPrefixLen": "192.168.1.1",
-                    "mplsTunnelCHopAsNumber": "example-string",
-                    "mplsTunnelCHopAddrUnnum": "192.168.1.1",
-                    "mplsTunnelCHopLspId": "example-string",
-                    "mplsTunnelCHopType": "ethernetCsmacd(6)",
                     "mplsTunnelCHopEntry": [
                       {
                         "mplsTunnelCHopListIndex": "example-string",
@@ -2364,7 +1898,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2543,51 +2076,9 @@
                   "type": "object",
                   "description": "The mplsTunnelCRLDPResTable allows a manager to\n        specify which CR-LDP-specific resources are desired\n        for an MPLS tunnel if that tunnel is signaled using\n        CR-LDP. Note that these attributes are in addition\n        to those specified in mplsTunnelResourceTable. This\n        table also allows several tunnels to point to a\n        single entry in this table, implying that these\n        tunnels should share resources.",
                   "properties": {
-                    "mplsTunnelResourceIndex": {
-                      "type": "string",
-                      "description": "mplsTunnelResourceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "mplsTunnelCRLDPResMeanBurstSize": {
-                      "type": "string",
-                      "description": "The mean burst size in bytes.",
-                      "x-yang-type": "mpls-tc:MplsBurstSize"
-                    },
-                    "mplsTunnelCRLDPResExBurstSize": {
-                      "type": "string",
-                      "description": "The Excess burst size in bytes.",
-                      "x-yang-type": "mpls-tc:MplsBurstSize"
-                    },
-                    "mplsTunnelCRLDPResFrequency": {
-                      "type": "string",
-                      "description": "The granularity of the availability of committed\n            rate."
-                    },
-                    "mplsTunnelCRLDPResWeight": {
-                      "type": "integer",
-                      "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelCRLDPResFlags": {
-                      "type": "integer",
-                      "description": "The value of the 1 byte Flags conveyed as part of\n            the traffic parameters during the establishment of\n            the CRLSP. The bits in this object are to be\n            interpreted as follows.\n            \n            +--+--+--+--+--+--+--+--+\n            | Res |F6|F5|F4|F3|F2|F1|\n            +--+--+--+--+--+--+--+--+\n            \n            Res - These bits are reserved. Zero on transmission.\n            Ignored on receipt.\n            F1 - Corresponds to the PDR.\n            F2 - Corresponds to the PBS.\n            F3 - Corresponds to the CDR.\n            F4 - Corresponds to the CBS.\n            F5 - Corresponds to the EBS.\n            F6 - Corresponds to the Weight.\n            \n            Each flag if is a Negotiable Flag corresponding to a\n            Traffic Parameter. The Negotiable Flag value zero\n            denotes Not Negotiable and value one denotes\n            Negotiable.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "mplsTunnelCRLDPResRowStatus": {
-                      "type": "string",
-                      "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelCRLDPResRowStatus and\n            mplsTunnelCRLDPResStorageType.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "mplsTunnelCRLDPResStorageType": {
-                      "type": "string",
-                      "description": "The storage type for this CR-LDP Resource entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
-                    },
                     "mplsTunnelCRLDPResEntry": {
                       "type": "array",
                       "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -2639,14 +2130,6 @@
                 },
                 "example": {
                   "MPLS-TE-STD-MIB:mplsTunnelCRLDPResTable": {
-                    "mplsTunnelResourceIndex": "example-string",
-                    "mplsTunnelCRLDPResMeanBurstSize": "example-string",
-                    "mplsTunnelCRLDPResExBurstSize": "example-string",
-                    "mplsTunnelCRLDPResFrequency": "example-string",
-                    "mplsTunnelCRLDPResWeight": 0,
-                    "mplsTunnelCRLDPResFlags": 0,
-                    "mplsTunnelCRLDPResRowStatus": "up(1)",
-                    "mplsTunnelCRLDPResStorageType": "ethernetCsmacd(6)",
                     "mplsTunnelCRLDPResEntry": [
                       {
                         "mplsTunnelResourceIndex": "example-string",
@@ -2682,7 +2165,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -2852,7 +2334,6 @@
                 "schema": {
                   "type": "array",
                   "description": "mplsTunnelEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -3364,7 +2845,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -3610,7 +3090,6 @@
                 "schema": {
                   "type": "array",
                   "description": "mplsTunnelResourceEntry",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -3804,7 +3283,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -3948,7 +3426,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -4126,7 +3603,6 @@
                 "schema": {
                   "type": "array",
                   "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -4288,473 +3764,9 @@
         "type": "object",
         "description": "The number of tunnels configured on this device. A\n          tunnel is considered configured if the\n          mplsTunnelRowStatus is active(1).",
         "properties": {
-          "mplsTunnelConfigured": {
-            "type": "integer",
-            "description": "The number of tunnels configured on this device. A\n          tunnel is considered configured if the\n          mplsTunnelRowStatus is active(1).",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelActive": {
-            "type": "integer",
-            "description": "The number of tunnels active on this device. A\n          tunnel is considered active if the\n          mplsTunnelOperStatus is up(1).",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelTEDistProto": {
-            "type": "string",
-            "description": "The traffic engineering distribution protocol(s)\n          used by this LSR. Note that an LSR may support more\n          than one distribution protocol simultaneously."
-          },
-          "mplsTunnelMaxHops": {
-            "type": "integer",
-            "description": "The maximum number of hops that can be specified for\n          a tunnel on this device.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelNotificationMaxRate": {
-            "type": "integer",
-            "description": "This variable indicates the maximum number of\n          notifications issued per second. If events occur\n          more rapidly, the implementation may simply fail to\n          emit these notifications during that period, or may\n          queue them until an appropriate time. A value of 0\n          means no throttling is applied and events may be\n          notified at the rate at which they occur.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelIndexNext": {
-            "type": "string",
-            "description": "This object contains an unused value for\n          mplsTunnelIndex, or a zero to indicate\n          that none exist. Negative values are not allowed,\n          as they do not correspond to valid values of\n          mplsTunnelIndex.\n          \n          Note that this object offers an unused value\n          for an mplsTunnelIndex value at the ingress\n          side of a tunnel. At other LSRs the value\n          of mplsTunnelIndex SHOULD be taken from the\n          value signaled by the MPLS signaling protocol.",
-            "x-yang-type": "diffserv-mib:IndexIntegerNextFree"
-          },
-          "mplsTunnelHopListIndexNext": {
-            "type": "string",
-            "description": "This object contains an appropriate value to be used\n          for mplsTunnelHopListIndex when creating entries in\n          the mplsTunnelHopTable.  If the number of\n          unassigned entries is exhausted, a retrieval\n          operation will return a value of 0.  This object\n          may also return a value of 0 when the LSR is unable\n          to accept conceptual row creation, for example, if\n          the mplsTunnelHopTable is implemented as read-only.\n          To obtain the value of mplsTunnelHopListIndex for a\n          new entry in the mplsTunnelHopTable, the manager\n          issues a management protocol retrieval operation to\n          obtain the current value of mplsTunnelHopIndex.\n          \n          When the SET is performed to create a row in the\n          mplsTunnelHopTable, the Command Responder (agent)\n          must determine whether the value is indeed still\n          unused; Two Network Management Applications may\n          attempt to create a row (configuration entry)\n          simultaneously and use the same value. If it is\n          currently unused, the SET succeeds and the Command\n          Responder (agent) changes the value of this object,\n          according to an implementation-specific algorithm.\n          If the value is in use, however, the SET fails.  The\n          Network Management Application must then re-read\n          this variable to obtain a new usable value.",
-            "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-          },
-          "mplsTunnelResourceIndexNext": {
-            "type": "integer",
-            "description": "This object contains the next appropriate value to\n          be used for mplsTunnelResourceIndex when creating\n          entries in the mplsTunnelResourceTable. If the\n          number of unassigned entries is exhausted, a\n          retrieval operation will return a value of 0.  This\n          object may also return a value of 0 when the LSR is\n          unable to accept conceptual row creation, for\n          example, if the mplsTunnelTable is implemented as\n          read-only.  To obtain the mplsTunnelResourceIndex\n          value for a new entry, the manager must first issue\n          a management protocol retrieval operation to obtain\n          the current value of this object.\n          \n          When the SET is performed to create a row in the\n          mplsTunnelResourceTable, the Command Responder\n          (agent) must determine whether the value is indeed\n          still unused; Two Network Management Applications\n          may attempt to create a row (configuration entry)\n          simultaneously and use the same value. If it is\n          currently unused, the SET succeeds and the Command\n          Responder (agent) changes the value of this object,\n          according to an implementation-specific algorithm.\n          If the value is in use, however, the SET fails.  The\n          Network Management Application must then re-read\n          this variable to obtain a new usable value.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelNotificationEnable": {
-            "type": "boolean",
-            "description": "If this object is true, then it enables the\n          generation of mplsTunnelUp and mplsTunnelDown\n          traps, otherwise these traps are not emitted."
-          },
-          "mplsTunnelIndex": {
-            "type": "string",
-            "description": "Uniquely identifies a set of tunnel instances\n            between a pair of ingress and egress LSRs.\n            Managers should obtain new values for row\n            creation in this table by reading\n            mplsTunnelIndexNext. When\n            the MPLS signalling protocol is rsvp(2) this value\n            SHOULD be equal to the value signaled in the\n            Tunnel Id of the Session object. When the MPLS\n            signalling protocol is crldp(3) this value\n            SHOULD be equal to the value signaled in the\n            LSP ID.",
-            "x-yang-type": "mpls-tc:MplsTunnelIndex"
-          },
-          "mplsTunnelInstance": {
-            "type": "string",
-            "description": "Uniquely identifies a particular instance of a\n            tunnel between a pair of ingress and egress LSRs.\n            It is useful to identify multiple instances of\n            tunnels for the purposes of backup and parallel\n            tunnels. When the MPLS signaling protocol is\n            rsvp(2) this value SHOULD be equal to the LSP Id\n            of the Sender Template object. When the signaling\n            protocol is crldp(3) there is no equivalent\n            signaling object.",
-            "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-          },
-          "mplsTunnelIngressLSRId": {
-            "type": "string",
-            "description": "Identity of the ingress LSR associated with this\n            tunnel instance. When the MPLS signalling protocol\n            is rsvp(2) this value SHOULD be equal to the Tunnel\n            Sender Address in the Sender Template object and MAY\n            be equal to the Extended Tunnel Id field in the\n            SESSION object. When the MPLS signalling protocol is\n            crldp(3) this value SHOULD be equal to the Ingress\n            LSR Router ID field in the LSPID TLV object.",
-            "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-          },
-          "mplsTunnelEgressLSRId": {
-            "type": "string",
-            "description": "Identity of the egress LSR associated with this\n            tunnel instance.",
-            "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-          },
-          "mplsTunnelName": {
-            "type": "string",
-            "description": "The canonical name assigned to the tunnel. This name\n            can be used to refer to the tunnel on the LSR's\n            console port.  If mplsTunnelIsIf is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.",
-            "x-yang-type": "snmp-framework:SnmpAdminString"
-          },
-          "mplsTunnelDescr": {
-            "type": "string",
-            "description": "A textual string containing information about the\n            tunnel.  If there is no description this object\n            contains a zero length string. This object is may\n            not be signaled by MPLS signaling protocols,\n            consequentally the value of this object at transit\n            and egress LSRs MAY be automatically generated or\n            absent.",
-            "x-yang-type": "snmp-framework:SnmpAdminString"
-          },
-          "mplsTunnelIsIf": {
-            "type": "boolean",
-            "description": "Denotes whether or not this tunnel corresponds to an\n            interface represented in the interfaces group\n            table. Note that if this variable is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.  This object is meaningful only at the\n            ingress and egress LSRs."
-          },
-          "mplsTunnelIfIndex": {
-            "type": "string",
-            "description": "If mplsTunnelIsIf is set to true, then this value\n            contains the LSR-assigned ifIndex which corresponds\n            to an entry in the interfaces table.  Otherwise\n            this variable should contain the value of zero\n            indicating that a valid ifIndex was not assigned to\n            this tunnel interface.",
-            "x-yang-type": "if-mib:InterfaceIndexOrZero"
-          },
-          "mplsTunnelOwner": {
-            "type": "string",
-            "description": "Denotes the entity that created and is responsible\n            for managing this tunnel. This column is\n            automatically filled by the agent on creation of a\n            row.",
-            "x-yang-type": "mpls-tc:MplsOwner"
-          },
-          "mplsTunnelRole": {
-            "type": "string",
-            "description": "This value signifies the role that this tunnel\n            entry/instance represents. This value MUST be set\n            to head(1) at the originating point of the tunnel.\n            This value MUST be set to transit(2) at transit\n            points along the tunnel, if transit points are\n            supported. This value MUST be set to tail(3) at the\n            terminating point of the tunnel if tunnel tails are\n            supported.\n            \n            The value headTail(4) is provided for tunnels that\n            begin and end on the same LSR."
-          },
-          "mplsTunnelXCPointer": {
-            "type": "string",
-            "description": "This variable points to a row in the mplsXCTable.\n            This table identifies the segments that compose\n            this tunnel, their characteristics, and\n            relationships to each other. A value of zeroDotZero\n            indicates that no LSP has been associated with this\n            tunnel yet.",
-            "x-yang-type": "snmpv2-tc:RowPointer"
-          },
-          "mplsTunnelSignallingProto": {
-            "type": "string",
-            "description": "The signalling protocol, if any, used to setup this\n            tunnel."
-          },
-          "mplsTunnelSetupPrio": {
-            "type": "integer",
-            "description": "Indicates the setup priority of this tunnel.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "mplsTunnelHoldingPrio": {
-            "type": "integer",
-            "description": "Indicates the holding priority for this tunnel.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "mplsTunnelSessionAttributes": {
-            "type": "string",
-            "description": "This bit mask indicates optional session values for\n            this tunnel. The following describes these bit\n            fields:\n            \n            fastRerouteThis flag indicates that the any tunnel\n            hop may choose to reroute this tunnel without\n            tearing it down.  This flag permits transit routers\n            to use a local repair mechanism which may result in\n            violation of the explicit routing of this tunnel.\n            When a fault is detected on an adjacent downstream\n            link or node, a transit router can re-route traffic\n            for fast service restoration.\n            \n            mergingPermitted This flag permits transit routers\n            to merge this session with other RSVP sessions for\n            the purpose of reducing resource overhead on\n            downstream transit routers, thereby providing\n            better network scaling.\n            \n            isPersistent  Indicates whether this tunnel should\n            be restored automatically after a failure occurs.\n            \n            isPinned   This flag indicates whether the loose-\n            routed hops of this tunnel are to be pinned.\n            \n            recordRouteThis flag indicates whether or not the\n            signalling protocol should remember the tunnel path\n            after it has been signaled."
-          },
-          "mplsTunnelLocalProtectInUse": {
-            "type": "boolean",
-            "description": "Indicates that the local repair mechanism is in use\n            to maintain this tunnel (usually in the face of an\n            outage of the link it was previously routed over)."
-          },
-          "mplsTunnelResourcePointer": {
-            "type": "string",
-            "description": "This variable represents a pointer to the traffic\n            parameter specification for this tunnel.  This\n            value may point at an entry in the\n            mplsTunnelResourceEntry to indicate which\n            mplsTunnelResourceEntry is to be assigned to this\n            LSP instance.  This value may optionally point at\n            an externally defined traffic parameter\n            specification table.  A value of zeroDotZero\n            indicates best-effort treatment.  By having the\n            same value of this object, two or more LSPs can\n            indicate resource sharing.",
-            "x-yang-type": "snmpv2-tc:RowPointer"
-          },
-          "mplsTunnelPrimaryInstance": {
-            "type": "string",
-            "description": "Specifies the instance index of the primary instance\n            of this tunnel. More details of the definition of\n            tunnel instances and the primary tunnel instance\n            can be found in the description of the TEXTUAL-CONVENTION\n            MplsTunnelInstanceIndex.",
-            "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-          },
-          "mplsTunnelInstancePriority": {
-            "type": "integer",
-            "description": "This value indicates which priority, in descending\n            order, with 0 indicating the lowest priority,\n            within a group of tunnel instances. A group of\n            tunnel instances is defined as a set of LSPs with\n            the same mplsTunnelIndex in this table, but with a\n            different mplsTunnelInstance. Tunnel instance\n            priorities are used to denote the priority at which\n            a particular tunnel instance will supercede\n            another. Instances of tunnels containing the same\n            mplsTunnelInstancePriority will be used for load\n            sharing.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelHopTableIndex": {
-            "type": "string",
-            "description": "Index into the mplsTunnelHopTable entry that\n            specifies the explicit route hops for this tunnel.\n            This object is meaningful only at the head-end of\n            the tunnel.",
-            "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-          },
-          "mplsTunnelPathInUse": {
-            "type": "string",
-            "description": "This value denotes the configured path that was\n            chosen for this tunnel. This value reflects the\n            secondary index into mplsTunnelHopTable. This path\n            may not exactly match the one in\n            mplsTunnelARHopTable due to the fact that some CSPF\n            modification may have taken place. See\n            mplsTunnelARHopTable for the actual path being\n            taken by the tunnel. A value of zero denotes that\n            no path is currently in use or available.",
-            "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-          },
-          "mplsTunnelARHopTableIndex": {
-            "type": "string",
-            "description": "Index into the mplsTunnelARHopTable entry that\n            specifies the actual hops traversed by the tunnel.\n            This is automatically updated by the agent when the\n            actual hops becomes available.",
-            "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-          },
-          "mplsTunnelCHopTableIndex": {
-            "type": "string",
-            "description": "Index into the mplsTunnelCHopTable entry that\n            specifies the computed hops traversed by the\n            tunnel. This is automatically updated by the agent\n            when computed hops become available or when\n            computed hops get modified.",
-            "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-          },
-          "mplsTunnelIncludeAnyAffinity": {
-            "type": "string",
-            "description": "A link satisfies the include-any constraint if and\n            only if the constraint is zero, or the link and the\n            constraint have a resource class in common.",
-            "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-          },
-          "mplsTunnelIncludeAllAffinity": {
-            "type": "string",
-            "description": "A link satisfies the include-all constraint if and\n            only if the link contains all of the administrative\n            groups specified in the constraint.",
-            "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-          },
-          "mplsTunnelExcludeAnyAffinity": {
-            "type": "string",
-            "description": "A link satisfies the exclude-any constraint if and\n            only if the link contains none of the\n            administrative groups specified in the constraint.",
-            "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-          },
-          "mplsTunnelTotalUpTime": {
-            "type": "string",
-            "description": "This value represents the aggregate up time for all\n            instances of this tunnel, if available. If this\n            value is unavailable, it MUST return a value of 0.",
-            "x-yang-type": "yang:timeticks"
-          },
-          "mplsTunnelInstanceUpTime": {
-            "type": "string",
-            "description": "This value identifies the total time that this\n            tunnel instance's operStatus has been Up(1).",
-            "x-yang-type": "yang:timeticks"
-          },
-          "mplsTunnelPrimaryUpTime": {
-            "type": "string",
-            "description": "Specifies the total time the primary instance of\n            this tunnel has been active. The primary instance\n            of this tunnel is defined in\n            mplsTunnelPrimaryInstance.",
-            "x-yang-type": "yang:timeticks"
-          },
-          "mplsTunnelPathChanges": {
-            "type": "integer",
-            "description": "Specifies the number of times the actual path for\n            this tunnel instance has changed.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelLastPathChange": {
-            "type": "string",
-            "description": "Specifies the time since the last change to the\n            actual path for this tunnel instance.",
-            "x-yang-type": "yang:timeticks"
-          },
-          "mplsTunnelCreationTime": {
-            "type": "string",
-            "description": "Specifies the value of SysUpTime when the first\n            instance of this tunnel came into existence.\n            That is, when the value of mplsTunnelOperStatus\n            was first set to up(1).",
-            "x-yang-type": "yang:timestamp"
-          },
-          "mplsTunnelStateTransitions": {
-            "type": "integer",
-            "description": "Specifies the number of times the state\n            (mplsTunnelOperStatus) of this tunnel instance has\n            changed.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelAdminStatus": {
-            "type": "string",
-            "description": "Indicates the desired operational status of this\n            tunnel."
-          },
-          "mplsTunnelOperStatus": {
-            "type": "string",
-            "description": "Indicates the actual operational status of this\n            tunnel, which is typically but not limited to, a\n            function of the state of individual segments of\n            this tunnel."
-          },
-          "mplsTunnelRowStatus": {
-            "type": "string",
-            "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelAdminStatus, mplsTunnelRowStatus and\n            mplsTunnelStorageType.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "mplsTunnelStorageType": {
-            "type": "string",
-            "description": "The storage type for this tunnel entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-            "x-yang-type": "snmpv2-tc:StorageType"
-          },
-          "mplsTunnelHopListIndex": {
-            "type": "string",
-            "description": "Primary index into this table identifying a\n            particular explicit route object.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelHopPathOptionIndex": {
-            "type": "string",
-            "description": "Secondary index into this table identifying a\n            particular group of hops representing a particular\n            configured path. This is otherwise known as a path\n            option.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelHopIndex": {
-            "type": "string",
-            "description": "Tertiary index into this table identifying a\n            particular hop.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelHopAddrType": {
-            "type": "string",
-            "description": "The Hop Address Type of this tunnel hop.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-            "x-yang-type": "mpls-tc:TeHopAddressType"
-          },
-          "mplsTunnelHopIpAddr": {
-            "type": "string",
-            "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelHopAddrType.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.",
-            "x-yang-type": "mpls-tc:TeHopAddress"
-          },
-          "mplsTunnelHopIpPrefixLen": {
-            "type": "string",
-            "description": "If mplsTunnelHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-            "x-yang-type": "inet-address:InetAddressPrefixLength"
-          },
-          "mplsTunnelHopAsNumber": {
-            "type": "string",
-            "description": "If mplsTunnelHopAddrType is set to asnumber(3), then\n            this value will contain the AS number of this hop.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-            "x-yang-type": "mpls-tc:TeHopAddressAS"
-          },
-          "mplsTunnelHopAddrUnnum": {
-            "type": "string",
-            "description": "If mplsTunnelHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelHopIpAddress which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-            "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-          },
-          "mplsTunnelHopLspId": {
-            "type": "string",
-            "description": "If mplsTunnelHopAddrType is set to lspid(5), then\n            this value will contain the LSPID of a tunnel of\n            this hop. The present tunnel being configured is\n            tunneled through this hop (using label stacking).\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-            "x-yang-type": "mpls-tc:MplsLSPID"
-          },
-          "mplsTunnelHopType": {
-            "type": "string",
-            "description": "Denotes whether this tunnel hop is routed in a\n            strict or loose fashion. The value of this object\n            has no meaning if the mplsTunnelHopInclude object\n            is set to 'false'."
-          },
-          "mplsTunnelHopInclude": {
-            "type": "boolean",
-            "description": "If this value is set to true, then this indicates\n            that this hop must be included in the tunnel's\n            path. If this value is set to 'false', then this hop\n            must be avoided when calculating the path for this\n            tunnel. The default value of this object is 'true',\n            so that by default all indicated hops are included\n            in the CSPF path computation. If this object is set\n            to 'false' the value of mplsTunnelHopType should be\n            ignored."
-          },
-          "mplsTunnelHopPathOptionName": {
-            "type": "string",
-            "description": "The description of this series of hops as they\n            relate to the specified path option. The\n            value of this object SHOULD be the same for\n            each hop in the series that comprises a\n            path option.",
-            "x-yang-type": "snmp-framework:SnmpAdminString"
-          },
-          "mplsTunnelHopEntryPathComp": {
-            "type": "string",
-            "description": "If this value is set to dynamic, then the user\n            should only specify the source and destination of\n            the path and expect that the CSPF will calculate\n            the remainder of the path.  If this value is set to\n            explicit, the user should specify the entire path\n            for the tunnel to take.  This path may contain\n            strict or loose hops.  Each hop along a specific\n            path SHOULD have this object set to the same value"
-          },
-          "mplsTunnelHopRowStatus": {
-            "type": "string",
-            "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelHopRowStatus and\n            mplsTunnelHopStorageType.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "mplsTunnelHopStorageType": {
-            "type": "string",
-            "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-            "x-yang-type": "snmpv2-tc:StorageType"
-          },
-          "mplsTunnelResourceIndex": {
-            "type": "string",
-            "description": "mplsTunnelResourceIndex",
-            "x-yang-type": "leafref"
-          },
-          "mplsTunnelResourceMaxRate": {
-            "type": "string",
-            "description": "The maximum rate in bits/second.  Note that setting\n            mplsTunnelResourceMaxRate,\n            mplsTunnelResourceMeanRate, and\n            mplsTunnelResourceMaxBurstSize to 0 indicates best-\n            effort treatment.",
-            "x-yang-type": "mpls-tc:MplsBitRate"
-          },
-          "mplsTunnelResourceMeanRate": {
-            "type": "string",
-            "description": "This object is copied into an instance of\n            mplsTrafficParamMeanRate in the\n            mplsTrafficParamTable. The OID of this table entry\n            is then copied into the corresponding\n            mplsInSegmentTrafficParamPtr.",
-            "x-yang-type": "mpls-tc:MplsBitRate"
-          },
-          "mplsTunnelResourceMaxBurstSize": {
-            "type": "string",
-            "description": "The maximum burst size in bytes.",
-            "x-yang-type": "mpls-tc:MplsBurstSize"
-          },
-          "mplsTunnelResourceMeanBurstSize": {
-            "type": "string",
-            "description": "The mean burst size in bytes.  The implementations\n            which do not implement this variable must return\n            a noSuchObject exception for this object and must\n            not allow a user to set this object.",
-            "x-yang-type": "mpls-tc:MplsBurstSize"
-          },
-          "mplsTunnelResourceExBurstSize": {
-            "type": "string",
-            "description": "The Excess burst size in bytes.  The implementations\n            which do not implement this variable must return\n            noSuchObject exception for this object and must\n            not allow a user to set this value.",
-            "x-yang-type": "mpls-tc:MplsBurstSize"
-          },
-          "mplsTunnelResourceFrequency": {
-            "type": "string",
-            "description": "The granularity of the availability of committed\n            rate.  The implementations which do not implement\n            this variable must return unspecified(1) for this\n            value and must not allow a user to set this value."
-          },
-          "mplsTunnelResourceWeight": {
-            "type": "integer",
-            "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelResourceRowStatus": {
-            "type": "string",
-            "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelResourceRowStatus and\n            mplsTunnelResourceStorageType.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "mplsTunnelResourceStorageType": {
-            "type": "string",
-            "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-            "x-yang-type": "snmpv2-tc:StorageType"
-          },
-          "mplsTunnelARHopListIndex": {
-            "type": "string",
-            "description": "Primary index into this table identifying a\n            particular recorded hop list.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelARHopIndex": {
-            "type": "string",
-            "description": "Secondary index into this table identifying the\n            particular hop.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelARHopAddrType": {
-            "type": "string",
-            "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-            "x-yang-type": "mpls-tc:TeHopAddressType"
-          },
-          "mplsTunnelARHopIpAddr": {
-            "type": "string",
-            "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelARHopAddrType.\n            If mplsTunnelARHopAddrType is set to unnum(4),\n             then this value contains the LSR Router ID of the\n             unnumbered interface. Otherwise the agent SHOULD\n             set this object to the zero-length string and the\n             manager should ignore this object.",
-            "x-yang-type": "mpls-tc:TeHopAddress"
-          },
-          "mplsTunnelARHopAddrUnnum": {
-            "type": "string",
-            "description": "If mplsTunnelARHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelARHopIpAddr which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-            "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-          },
-          "mplsTunnelARHopLspId": {
-            "type": "string",
-            "description": "If mplsTunnelARHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-            "x-yang-type": "mpls-tc:MplsLSPID"
-          },
-          "mplsTunnelCHopListIndex": {
-            "type": "string",
-            "description": "Primary index into this table identifying a\n            particular computed hop list.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelCHopIndex": {
-            "type": "string",
-            "description": "Secondary index into this table identifying the\n            particular hop.",
-            "x-yang-type": "mpls-tc:MplsPathIndex"
-          },
-          "mplsTunnelCHopAddrType": {
-            "type": "string",
-            "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-            "x-yang-type": "mpls-tc:TeHopAddressType"
-          },
-          "mplsTunnelCHopIpAddr": {
-            "type": "string",
-            "description": "The Tunnel Hop Address for this tunnel hop.\n            The type of this address is determined by the\n             value of the corresponding mplsTunnelCHopAddrType.\n            \n            If mplsTunnelCHopAddrType is set to unnum(4), then\n             this value will contain the LSR Router ID of the\n             unnumbered interface. Otherwise the agent should\n             set this object to the zero-length string and the\n             manager SHOULD ignore this object.",
-            "x-yang-type": "mpls-tc:TeHopAddress"
-          },
-          "mplsTunnelCHopIpPrefixLen": {
-            "type": "string",
-            "description": "If mplsTunnelCHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelCHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-            "x-yang-type": "inet-address:InetAddressPrefixLength"
-          },
-          "mplsTunnelCHopAsNumber": {
-            "type": "string",
-            "description": "If mplsTunnelCHopAddrType is set to asnumber(3),\n            then this value will contain the AS number of this\n            hop. Otherwise the agent should set this object to\n            zero-length string and the manager should ignore\n            this.",
-            "x-yang-type": "mpls-tc:TeHopAddressAS"
-          },
-          "mplsTunnelCHopAddrUnnum": {
-            "type": "string",
-            "description": "If mplsTunnelCHopAddrType is set to unnum(4), then\n            this value will contain the unnumbered interface\n            identifier of this hop. This object should be used\n            in conjunction with mplsTunnelCHopIpAddr which\n            would contain the LSR Router ID in this case.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-            "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-          },
-          "mplsTunnelCHopLspId": {
-            "type": "string",
-            "description": "If mplsTunnelCHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-            "x-yang-type": "mpls-tc:MplsLSPID"
-          },
-          "mplsTunnelCHopType": {
-            "type": "string",
-            "description": "Denotes whether this is tunnel hop is routed in a\n            strict or loose fashion."
-          },
-          "mplsTunnelCRLDPResMeanBurstSize": {
-            "type": "string",
-            "description": "The mean burst size in bytes.",
-            "x-yang-type": "mpls-tc:MplsBurstSize"
-          },
-          "mplsTunnelCRLDPResExBurstSize": {
-            "type": "string",
-            "description": "The Excess burst size in bytes.",
-            "x-yang-type": "mpls-tc:MplsBurstSize"
-          },
-          "mplsTunnelCRLDPResFrequency": {
-            "type": "string",
-            "description": "The granularity of the availability of committed\n            rate."
-          },
-          "mplsTunnelCRLDPResWeight": {
-            "type": "integer",
-            "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelCRLDPResFlags": {
-            "type": "integer",
-            "description": "The value of the 1 byte Flags conveyed as part of\n            the traffic parameters during the establishment of\n            the CRLSP. The bits in this object are to be\n            interpreted as follows.\n            \n            +--+--+--+--+--+--+--+--+\n            | Res |F6|F5|F4|F3|F2|F1|\n            +--+--+--+--+--+--+--+--+\n            \n            Res - These bits are reserved. Zero on transmission.\n            Ignored on receipt.\n            F1 - Corresponds to the PDR.\n            F2 - Corresponds to the PBS.\n            F3 - Corresponds to the CDR.\n            F4 - Corresponds to the CBS.\n            F5 - Corresponds to the EBS.\n            F6 - Corresponds to the Weight.\n            \n            Each flag if is a Negotiable Flag corresponding to a\n            Traffic Parameter. The Negotiable Flag value zero\n            denotes Not Negotiable and value one denotes\n            Negotiable.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "mplsTunnelCRLDPResRowStatus": {
-            "type": "string",
-            "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelCRLDPResRowStatus and\n            mplsTunnelCRLDPResStorageType.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
-          "mplsTunnelCRLDPResStorageType": {
-            "type": "string",
-            "description": "The storage type for this CR-LDP Resource entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-            "x-yang-type": "snmpv2-tc:StorageType"
-          },
           "mplsTunnelEntry": {
             "type": "array",
             "description": "mplsTunnelEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -4947,7 +3959,6 @@
           "mplsTunnelHopEntry": {
             "type": "array",
             "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -5029,7 +4040,6 @@
           "mplsTunnelResourceEntry": {
             "type": "array",
             "description": "mplsTunnelResourceEntry",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -5090,7 +4100,6 @@
           "mplsTunnelARHopEntry": {
             "type": "array",
             "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -5130,7 +4139,6 @@
           "mplsTunnelCHopEntry": {
             "type": "array",
             "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -5184,7 +4192,6 @@
           "mplsTunnelCRLDPResEntry": {
             "type": "array",
             "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -5296,193 +4303,9 @@
             "type": "object",
             "description": "mplsTunnelTable",
             "properties": {
-              "mplsTunnelIndex": {
-                "type": "string",
-                "description": "Uniquely identifies a set of tunnel instances\n            between a pair of ingress and egress LSRs.\n            Managers should obtain new values for row\n            creation in this table by reading\n            mplsTunnelIndexNext. When\n            the MPLS signalling protocol is rsvp(2) this value\n            SHOULD be equal to the value signaled in the\n            Tunnel Id of the Session object. When the MPLS\n            signalling protocol is crldp(3) this value\n            SHOULD be equal to the value signaled in the\n            LSP ID.",
-                "x-yang-type": "mpls-tc:MplsTunnelIndex"
-              },
-              "mplsTunnelInstance": {
-                "type": "string",
-                "description": "Uniquely identifies a particular instance of a\n            tunnel between a pair of ingress and egress LSRs.\n            It is useful to identify multiple instances of\n            tunnels for the purposes of backup and parallel\n            tunnels. When the MPLS signaling protocol is\n            rsvp(2) this value SHOULD be equal to the LSP Id\n            of the Sender Template object. When the signaling\n            protocol is crldp(3) there is no equivalent\n            signaling object.",
-                "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-              },
-              "mplsTunnelIngressLSRId": {
-                "type": "string",
-                "description": "Identity of the ingress LSR associated with this\n            tunnel instance. When the MPLS signalling protocol\n            is rsvp(2) this value SHOULD be equal to the Tunnel\n            Sender Address in the Sender Template object and MAY\n            be equal to the Extended Tunnel Id field in the\n            SESSION object. When the MPLS signalling protocol is\n            crldp(3) this value SHOULD be equal to the Ingress\n            LSR Router ID field in the LSPID TLV object.",
-                "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-              },
-              "mplsTunnelEgressLSRId": {
-                "type": "string",
-                "description": "Identity of the egress LSR associated with this\n            tunnel instance.",
-                "x-yang-type": "mpls-tc:MplsExtendedTunnelId"
-              },
-              "mplsTunnelName": {
-                "type": "string",
-                "description": "The canonical name assigned to the tunnel. This name\n            can be used to refer to the tunnel on the LSR's\n            console port.  If mplsTunnelIsIf is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.",
-                "x-yang-type": "snmp-framework:SnmpAdminString"
-              },
-              "mplsTunnelDescr": {
-                "type": "string",
-                "description": "A textual string containing information about the\n            tunnel.  If there is no description this object\n            contains a zero length string. This object is may\n            not be signaled by MPLS signaling protocols,\n            consequentally the value of this object at transit\n            and egress LSRs MAY be automatically generated or\n            absent.",
-                "x-yang-type": "snmp-framework:SnmpAdminString"
-              },
-              "mplsTunnelIsIf": {
-                "type": "boolean",
-                "description": "Denotes whether or not this tunnel corresponds to an\n            interface represented in the interfaces group\n            table. Note that if this variable is set to true\n            then the ifName of the interface corresponding to\n            this tunnel should have a value equal to\n            mplsTunnelName.  Also see the description of ifName\n            in RFC 2863.  This object is meaningful only at the\n            ingress and egress LSRs."
-              },
-              "mplsTunnelIfIndex": {
-                "type": "string",
-                "description": "If mplsTunnelIsIf is set to true, then this value\n            contains the LSR-assigned ifIndex which corresponds\n            to an entry in the interfaces table.  Otherwise\n            this variable should contain the value of zero\n            indicating that a valid ifIndex was not assigned to\n            this tunnel interface.",
-                "x-yang-type": "if-mib:InterfaceIndexOrZero"
-              },
-              "mplsTunnelOwner": {
-                "type": "string",
-                "description": "Denotes the entity that created and is responsible\n            for managing this tunnel. This column is\n            automatically filled by the agent on creation of a\n            row.",
-                "x-yang-type": "mpls-tc:MplsOwner"
-              },
-              "mplsTunnelRole": {
-                "type": "string",
-                "description": "This value signifies the role that this tunnel\n            entry/instance represents. This value MUST be set\n            to head(1) at the originating point of the tunnel.\n            This value MUST be set to transit(2) at transit\n            points along the tunnel, if transit points are\n            supported. This value MUST be set to tail(3) at the\n            terminating point of the tunnel if tunnel tails are\n            supported.\n            \n            The value headTail(4) is provided for tunnels that\n            begin and end on the same LSR."
-              },
-              "mplsTunnelXCPointer": {
-                "type": "string",
-                "description": "This variable points to a row in the mplsXCTable.\n            This table identifies the segments that compose\n            this tunnel, their characteristics, and\n            relationships to each other. A value of zeroDotZero\n            indicates that no LSP has been associated with this\n            tunnel yet.",
-                "x-yang-type": "snmpv2-tc:RowPointer"
-              },
-              "mplsTunnelSignallingProto": {
-                "type": "string",
-                "description": "The signalling protocol, if any, used to setup this\n            tunnel."
-              },
-              "mplsTunnelSetupPrio": {
-                "type": "integer",
-                "description": "Indicates the setup priority of this tunnel.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "mplsTunnelHoldingPrio": {
-                "type": "integer",
-                "description": "Indicates the holding priority for this tunnel.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "mplsTunnelSessionAttributes": {
-                "type": "string",
-                "description": "This bit mask indicates optional session values for\n            this tunnel. The following describes these bit\n            fields:\n            \n            fastRerouteThis flag indicates that the any tunnel\n            hop may choose to reroute this tunnel without\n            tearing it down.  This flag permits transit routers\n            to use a local repair mechanism which may result in\n            violation of the explicit routing of this tunnel.\n            When a fault is detected on an adjacent downstream\n            link or node, a transit router can re-route traffic\n            for fast service restoration.\n            \n            mergingPermitted This flag permits transit routers\n            to merge this session with other RSVP sessions for\n            the purpose of reducing resource overhead on\n            downstream transit routers, thereby providing\n            better network scaling.\n            \n            isPersistent  Indicates whether this tunnel should\n            be restored automatically after a failure occurs.\n            \n            isPinned   This flag indicates whether the loose-\n            routed hops of this tunnel are to be pinned.\n            \n            recordRouteThis flag indicates whether or not the\n            signalling protocol should remember the tunnel path\n            after it has been signaled."
-              },
-              "mplsTunnelLocalProtectInUse": {
-                "type": "boolean",
-                "description": "Indicates that the local repair mechanism is in use\n            to maintain this tunnel (usually in the face of an\n            outage of the link it was previously routed over)."
-              },
-              "mplsTunnelResourcePointer": {
-                "type": "string",
-                "description": "This variable represents a pointer to the traffic\n            parameter specification for this tunnel.  This\n            value may point at an entry in the\n            mplsTunnelResourceEntry to indicate which\n            mplsTunnelResourceEntry is to be assigned to this\n            LSP instance.  This value may optionally point at\n            an externally defined traffic parameter\n            specification table.  A value of zeroDotZero\n            indicates best-effort treatment.  By having the\n            same value of this object, two or more LSPs can\n            indicate resource sharing.",
-                "x-yang-type": "snmpv2-tc:RowPointer"
-              },
-              "mplsTunnelPrimaryInstance": {
-                "type": "string",
-                "description": "Specifies the instance index of the primary instance\n            of this tunnel. More details of the definition of\n            tunnel instances and the primary tunnel instance\n            can be found in the description of the TEXTUAL-CONVENTION\n            MplsTunnelInstanceIndex.",
-                "x-yang-type": "mpls-tc:MplsTunnelInstanceIndex"
-              },
-              "mplsTunnelInstancePriority": {
-                "type": "integer",
-                "description": "This value indicates which priority, in descending\n            order, with 0 indicating the lowest priority,\n            within a group of tunnel instances. A group of\n            tunnel instances is defined as a set of LSPs with\n            the same mplsTunnelIndex in this table, but with a\n            different mplsTunnelInstance. Tunnel instance\n            priorities are used to denote the priority at which\n            a particular tunnel instance will supercede\n            another. Instances of tunnels containing the same\n            mplsTunnelInstancePriority will be used for load\n            sharing.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelHopTableIndex": {
-                "type": "string",
-                "description": "Index into the mplsTunnelHopTable entry that\n            specifies the explicit route hops for this tunnel.\n            This object is meaningful only at the head-end of\n            the tunnel.",
-                "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-              },
-              "mplsTunnelPathInUse": {
-                "type": "string",
-                "description": "This value denotes the configured path that was\n            chosen for this tunnel. This value reflects the\n            secondary index into mplsTunnelHopTable. This path\n            may not exactly match the one in\n            mplsTunnelARHopTable due to the fact that some CSPF\n            modification may have taken place. See\n            mplsTunnelARHopTable for the actual path being\n            taken by the tunnel. A value of zero denotes that\n            no path is currently in use or available.",
-                "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-              },
-              "mplsTunnelARHopTableIndex": {
-                "type": "string",
-                "description": "Index into the mplsTunnelARHopTable entry that\n            specifies the actual hops traversed by the tunnel.\n            This is automatically updated by the agent when the\n            actual hops becomes available.",
-                "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-              },
-              "mplsTunnelCHopTableIndex": {
-                "type": "string",
-                "description": "Index into the mplsTunnelCHopTable entry that\n            specifies the computed hops traversed by the\n            tunnel. This is automatically updated by the agent\n            when computed hops become available or when\n            computed hops get modified.",
-                "x-yang-type": "mpls-tc:MplsPathIndexOrZero"
-              },
-              "mplsTunnelIncludeAnyAffinity": {
-                "type": "string",
-                "description": "A link satisfies the include-any constraint if and\n            only if the constraint is zero, or the link and the\n            constraint have a resource class in common.",
-                "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-              },
-              "mplsTunnelIncludeAllAffinity": {
-                "type": "string",
-                "description": "A link satisfies the include-all constraint if and\n            only if the link contains all of the administrative\n            groups specified in the constraint.",
-                "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-              },
-              "mplsTunnelExcludeAnyAffinity": {
-                "type": "string",
-                "description": "A link satisfies the exclude-any constraint if and\n            only if the link contains none of the\n            administrative groups specified in the constraint.",
-                "x-yang-type": "mpls-tc:MplsTunnelAffinity"
-              },
-              "mplsTunnelTotalUpTime": {
-                "type": "string",
-                "description": "This value represents the aggregate up time for all\n            instances of this tunnel, if available. If this\n            value is unavailable, it MUST return a value of 0.",
-                "x-yang-type": "yang:timeticks"
-              },
-              "mplsTunnelInstanceUpTime": {
-                "type": "string",
-                "description": "This value identifies the total time that this\n            tunnel instance's operStatus has been Up(1).",
-                "x-yang-type": "yang:timeticks"
-              },
-              "mplsTunnelPrimaryUpTime": {
-                "type": "string",
-                "description": "Specifies the total time the primary instance of\n            this tunnel has been active. The primary instance\n            of this tunnel is defined in\n            mplsTunnelPrimaryInstance.",
-                "x-yang-type": "yang:timeticks"
-              },
-              "mplsTunnelPathChanges": {
-                "type": "integer",
-                "description": "Specifies the number of times the actual path for\n            this tunnel instance has changed.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelLastPathChange": {
-                "type": "string",
-                "description": "Specifies the time since the last change to the\n            actual path for this tunnel instance.",
-                "x-yang-type": "yang:timeticks"
-              },
-              "mplsTunnelCreationTime": {
-                "type": "string",
-                "description": "Specifies the value of SysUpTime when the first\n            instance of this tunnel came into existence.\n            That is, when the value of mplsTunnelOperStatus\n            was first set to up(1).",
-                "x-yang-type": "yang:timestamp"
-              },
-              "mplsTunnelStateTransitions": {
-                "type": "integer",
-                "description": "Specifies the number of times the state\n            (mplsTunnelOperStatus) of this tunnel instance has\n            changed.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelAdminStatus": {
-                "type": "string",
-                "description": "Indicates the desired operational status of this\n            tunnel."
-              },
-              "mplsTunnelOperStatus": {
-                "type": "string",
-                "description": "Indicates the actual operational status of this\n            tunnel, which is typically but not limited to, a\n            function of the state of individual segments of\n            this tunnel."
-              },
-              "mplsTunnelRowStatus": {
-                "type": "string",
-                "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelAdminStatus, mplsTunnelRowStatus and\n            mplsTunnelStorageType.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "mplsTunnelStorageType": {
-                "type": "string",
-                "description": "The storage type for this tunnel entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-                "x-yang-type": "snmpv2-tc:StorageType"
-              },
               "mplsTunnelEntry": {
                 "type": "array",
                 "description": "mplsTunnelEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -5678,82 +4501,9 @@
             "type": "object",
             "description": "mplsTunnelHopTable",
             "properties": {
-              "mplsTunnelHopListIndex": {
-                "type": "string",
-                "description": "Primary index into this table identifying a\n            particular explicit route object.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelHopPathOptionIndex": {
-                "type": "string",
-                "description": "Secondary index into this table identifying a\n            particular group of hops representing a particular\n            configured path. This is otherwise known as a path\n            option.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelHopIndex": {
-                "type": "string",
-                "description": "Tertiary index into this table identifying a\n            particular hop.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelHopAddrType": {
-                "type": "string",
-                "description": "The Hop Address Type of this tunnel hop.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                "x-yang-type": "mpls-tc:TeHopAddressType"
-              },
-              "mplsTunnelHopIpAddr": {
-                "type": "string",
-                "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelHopAddrType.\n            \n            The value of this object cannot be changed\n            if the value of the corresponding\n            mplsTunnelHopRowStatus object is 'active'.",
-                "x-yang-type": "mpls-tc:TeHopAddress"
-              },
-              "mplsTunnelHopIpPrefixLen": {
-                "type": "string",
-                "description": "If mplsTunnelHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-                "x-yang-type": "inet-address:InetAddressPrefixLength"
-              },
-              "mplsTunnelHopAsNumber": {
-                "type": "string",
-                "description": "If mplsTunnelHopAddrType is set to asnumber(3), then\n            this value will contain the AS number of this hop.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-                "x-yang-type": "mpls-tc:TeHopAddressAS"
-              },
-              "mplsTunnelHopAddrUnnum": {
-                "type": "string",
-                "description": "If mplsTunnelHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelHopIpAddress which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-                "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-              },
-              "mplsTunnelHopLspId": {
-                "type": "string",
-                "description": "If mplsTunnelHopAddrType is set to lspid(5), then\n            this value will contain the LSPID of a tunnel of\n            this hop. The present tunnel being configured is\n            tunneled through this hop (using label stacking).\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                "x-yang-type": "mpls-tc:MplsLSPID"
-              },
-              "mplsTunnelHopType": {
-                "type": "string",
-                "description": "Denotes whether this tunnel hop is routed in a\n            strict or loose fashion. The value of this object\n            has no meaning if the mplsTunnelHopInclude object\n            is set to 'false'."
-              },
-              "mplsTunnelHopInclude": {
-                "type": "boolean",
-                "description": "If this value is set to true, then this indicates\n            that this hop must be included in the tunnel's\n            path. If this value is set to 'false', then this hop\n            must be avoided when calculating the path for this\n            tunnel. The default value of this object is 'true',\n            so that by default all indicated hops are included\n            in the CSPF path computation. If this object is set\n            to 'false' the value of mplsTunnelHopType should be\n            ignored."
-              },
-              "mplsTunnelHopPathOptionName": {
-                "type": "string",
-                "description": "The description of this series of hops as they\n            relate to the specified path option. The\n            value of this object SHOULD be the same for\n            each hop in the series that comprises a\n            path option.",
-                "x-yang-type": "snmp-framework:SnmpAdminString"
-              },
-              "mplsTunnelHopEntryPathComp": {
-                "type": "string",
-                "description": "If this value is set to dynamic, then the user\n            should only specify the source and destination of\n            the path and expect that the CSPF will calculate\n            the remainder of the path.  If this value is set to\n            explicit, the user should specify the entire path\n            for the tunnel to take.  This path may contain\n            strict or loose hops.  Each hop along a specific\n            path SHOULD have this object set to the same value"
-              },
-              "mplsTunnelHopRowStatus": {
-                "type": "string",
-                "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelHopRowStatus and\n            mplsTunnelHopStorageType.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "mplsTunnelHopStorageType": {
-                "type": "string",
-                "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-                "x-yang-type": "snmpv2-tc:StorageType"
-              },
               "mplsTunnelHopEntry": {
                 "type": "array",
                 "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -5838,61 +4588,9 @@
             "type": "object",
             "description": "The mplsTunnelResourceTable allows a manager to\n        specify which resources are desired for an MPLS\n        tunnel.  This table also allows several tunnels to\n        point to a single entry in this table, implying\n        that these tunnels should share resources.",
             "properties": {
-              "mplsTunnelResourceIndex": {
-                "type": "integer",
-                "description": "Uniquely identifies this row.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelResourceMaxRate": {
-                "type": "string",
-                "description": "The maximum rate in bits/second.  Note that setting\n            mplsTunnelResourceMaxRate,\n            mplsTunnelResourceMeanRate, and\n            mplsTunnelResourceMaxBurstSize to 0 indicates best-\n            effort treatment.",
-                "x-yang-type": "mpls-tc:MplsBitRate"
-              },
-              "mplsTunnelResourceMeanRate": {
-                "type": "string",
-                "description": "This object is copied into an instance of\n            mplsTrafficParamMeanRate in the\n            mplsTrafficParamTable. The OID of this table entry\n            is then copied into the corresponding\n            mplsInSegmentTrafficParamPtr.",
-                "x-yang-type": "mpls-tc:MplsBitRate"
-              },
-              "mplsTunnelResourceMaxBurstSize": {
-                "type": "string",
-                "description": "The maximum burst size in bytes.",
-                "x-yang-type": "mpls-tc:MplsBurstSize"
-              },
-              "mplsTunnelResourceMeanBurstSize": {
-                "type": "string",
-                "description": "The mean burst size in bytes.  The implementations\n            which do not implement this variable must return\n            a noSuchObject exception for this object and must\n            not allow a user to set this object.",
-                "x-yang-type": "mpls-tc:MplsBurstSize"
-              },
-              "mplsTunnelResourceExBurstSize": {
-                "type": "string",
-                "description": "The Excess burst size in bytes.  The implementations\n            which do not implement this variable must return\n            noSuchObject exception for this object and must\n            not allow a user to set this value.",
-                "x-yang-type": "mpls-tc:MplsBurstSize"
-              },
-              "mplsTunnelResourceFrequency": {
-                "type": "string",
-                "description": "The granularity of the availability of committed\n            rate.  The implementations which do not implement\n            this variable must return unspecified(1) for this\n            value and must not allow a user to set this value."
-              },
-              "mplsTunnelResourceWeight": {
-                "type": "integer",
-                "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelResourceRowStatus": {
-                "type": "string",
-                "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelResourceRowStatus and\n            mplsTunnelResourceStorageType.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "mplsTunnelResourceStorageType": {
-                "type": "string",
-                "description": "The storage type for this Hop entry. Conceptual\n            rows having the value 'permanent' need not\n            allow write-access to any columnar objects\n            in the row.",
-                "x-yang-type": "snmpv2-tc:StorageType"
-              },
               "mplsTunnelResourceEntry": {
                 "type": "array",
                 "description": "mplsTunnelResourceEntry",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -5956,40 +4654,9 @@
             "type": "object",
             "description": "mplsTunnelARHopTable",
             "properties": {
-              "mplsTunnelARHopListIndex": {
-                "type": "string",
-                "description": "Primary index into this table identifying a\n            particular recorded hop list.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelARHopIndex": {
-                "type": "string",
-                "description": "Secondary index into this table identifying the\n            particular hop.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelARHopAddrType": {
-                "type": "string",
-                "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                "x-yang-type": "mpls-tc:TeHopAddressType"
-              },
-              "mplsTunnelARHopIpAddr": {
-                "type": "string",
-                "description": "The Tunnel Hop Address for this tunnel hop.\n            \n            The type of this address is determined by the\n            value of the corresponding mplsTunnelARHopAddrType.\n            If mplsTunnelARHopAddrType is set to unnum(4),\n             then this value contains the LSR Router ID of the\n             unnumbered interface. Otherwise the agent SHOULD\n             set this object to the zero-length string and the\n             manager should ignore this object.",
-                "x-yang-type": "mpls-tc:TeHopAddress"
-              },
-              "mplsTunnelARHopAddrUnnum": {
-                "type": "string",
-                "description": "If mplsTunnelARHopAddrType is set to unnum(4), then\n            this value will contain the interface identifier of\n            the unnumbered interface for this hop. This object\n            should be used in conjunction with\n            mplsTunnelARHopIpAddr which would contain the LSR\n            Router ID in this case. Otherwise the agent should\n            set this object to zero-length string and the\n            manager should ignore this.",
-                "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-              },
-              "mplsTunnelARHopLspId": {
-                "type": "string",
-                "description": "If mplsTunnelARHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                "x-yang-type": "mpls-tc:MplsLSPID"
-              },
               "mplsTunnelARHopEntry": {
                 "type": "array",
                 "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -6032,54 +4699,9 @@
             "type": "object",
             "description": "mplsTunnelCHopTable",
             "properties": {
-              "mplsTunnelCHopListIndex": {
-                "type": "string",
-                "description": "Primary index into this table identifying a\n            particular computed hop list.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelCHopIndex": {
-                "type": "string",
-                "description": "Secondary index into this table identifying the\n            particular hop.",
-                "x-yang-type": "mpls-tc:MplsPathIndex"
-              },
-              "mplsTunnelCHopAddrType": {
-                "type": "string",
-                "description": "The Hop Address Type of this tunnel hop.\n            \n            Note that lspid(5) is a valid option only\n            for tunnels signaled via CRLDP.",
-                "x-yang-type": "mpls-tc:TeHopAddressType"
-              },
-              "mplsTunnelCHopIpAddr": {
-                "type": "string",
-                "description": "The Tunnel Hop Address for this tunnel hop.\n            The type of this address is determined by the\n             value of the corresponding mplsTunnelCHopAddrType.\n            \n            If mplsTunnelCHopAddrType is set to unnum(4), then\n             this value will contain the LSR Router ID of the\n             unnumbered interface. Otherwise the agent should\n             set this object to the zero-length string and the\n             manager SHOULD ignore this object.",
-                "x-yang-type": "mpls-tc:TeHopAddress"
-              },
-              "mplsTunnelCHopIpPrefixLen": {
-                "type": "string",
-                "description": "If mplsTunnelCHopAddrType is set to ipv4(1) or\n            ipv6(2), then this value will contain an\n            appropriate prefix length for the IP address in\n            object mplsTunnelCHopIpAddr. Otherwise this value\n            is irrelevant and should be ignored.",
-                "x-yang-type": "inet-address:InetAddressPrefixLength"
-              },
-              "mplsTunnelCHopAsNumber": {
-                "type": "string",
-                "description": "If mplsTunnelCHopAddrType is set to asnumber(3),\n            then this value will contain the AS number of this\n            hop. Otherwise the agent should set this object to\n            zero-length string and the manager should ignore\n            this.",
-                "x-yang-type": "mpls-tc:TeHopAddressAS"
-              },
-              "mplsTunnelCHopAddrUnnum": {
-                "type": "string",
-                "description": "If mplsTunnelCHopAddrType is set to unnum(4), then\n            this value will contain the unnumbered interface\n            identifier of this hop. This object should be used\n            in conjunction with mplsTunnelCHopIpAddr which\n            would contain the LSR Router ID in this case.\n            Otherwise the agent should set this object to zero-\n            length string and the manager should ignore this.",
-                "x-yang-type": "mpls-tc:TeHopAddressUnnum"
-              },
-              "mplsTunnelCHopLspId": {
-                "type": "string",
-                "description": "If mplsTunnelCHopAddrType is set to lspid(5), then\n            this value will contain the LSP ID of this hop.\n            This object is otherwise insignificant and should\n            contain a value of 0 to indicate this fact.",
-                "x-yang-type": "mpls-tc:MplsLSPID"
-              },
-              "mplsTunnelCHopType": {
-                "type": "string",
-                "description": "Denotes whether this is tunnel hop is routed in a\n            strict or loose fashion."
-              },
               "mplsTunnelCHopEntry": {
                 "type": "array",
                 "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -6136,51 +4758,9 @@
             "type": "object",
             "description": "The mplsTunnelCRLDPResTable allows a manager to\n        specify which CR-LDP-specific resources are desired\n        for an MPLS tunnel if that tunnel is signaled using\n        CR-LDP. Note that these attributes are in addition\n        to those specified in mplsTunnelResourceTable. This\n        table also allows several tunnels to point to a\n        single entry in this table, implying that these\n        tunnels should share resources.",
             "properties": {
-              "mplsTunnelResourceIndex": {
-                "type": "string",
-                "description": "mplsTunnelResourceIndex",
-                "x-yang-type": "leafref"
-              },
-              "mplsTunnelCRLDPResMeanBurstSize": {
-                "type": "string",
-                "description": "The mean burst size in bytes.",
-                "x-yang-type": "mpls-tc:MplsBurstSize"
-              },
-              "mplsTunnelCRLDPResExBurstSize": {
-                "type": "string",
-                "description": "The Excess burst size in bytes.",
-                "x-yang-type": "mpls-tc:MplsBurstSize"
-              },
-              "mplsTunnelCRLDPResFrequency": {
-                "type": "string",
-                "description": "The granularity of the availability of committed\n            rate."
-              },
-              "mplsTunnelCRLDPResWeight": {
-                "type": "integer",
-                "description": "The relative weight for using excess bandwidth above\n            its committed rate.  The value of 0 means that\n            weight is not applicable for the CR-LSP.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelCRLDPResFlags": {
-                "type": "integer",
-                "description": "The value of the 1 byte Flags conveyed as part of\n            the traffic parameters during the establishment of\n            the CRLSP. The bits in this object are to be\n            interpreted as follows.\n            \n            +--+--+--+--+--+--+--+--+\n            | Res |F6|F5|F4|F3|F2|F1|\n            +--+--+--+--+--+--+--+--+\n            \n            Res - These bits are reserved. Zero on transmission.\n            Ignored on receipt.\n            F1 - Corresponds to the PDR.\n            F2 - Corresponds to the PBS.\n            F3 - Corresponds to the CDR.\n            F4 - Corresponds to the CBS.\n            F5 - Corresponds to the EBS.\n            F6 - Corresponds to the Weight.\n            \n            Each flag if is a Negotiable Flag corresponding to a\n            Traffic Parameter. The Negotiable Flag value zero\n            denotes Not Negotiable and value one denotes\n            Negotiable.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
-              "mplsTunnelCRLDPResRowStatus": {
-                "type": "string",
-                "description": "This variable is used to create, modify, and/or\n            delete a row in this table.  When a row in this\n            table is in active(1) state, no objects in that row\n            can be modified by the agent except\n            mplsTunnelCRLDPResRowStatus and\n            mplsTunnelCRLDPResStorageType.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
-              "mplsTunnelCRLDPResStorageType": {
-                "type": "string",
-                "description": "The storage type for this CR-LDP Resource entry.\n            Conceptual rows having the value 'permanent'\n            need not allow write-access to any columnar\n            objects in the row.",
-                "x-yang-type": "snmpv2-tc:StorageType"
-              },
               "mplsTunnelCRLDPResEntry": {
                 "type": "array",
                 "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -6297,7 +4877,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelEntry": {
         "type": "array",
         "description": "mplsTunnelEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -6490,7 +5069,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelHopEntry": {
         "type": "array",
         "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by a network administrator for\n          signaled ERLSP set up by an MPLS signalling\n          protocol.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -6572,7 +5150,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelResourceEntry": {
         "type": "array",
         "description": "mplsTunnelResourceEntry",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -6633,7 +5210,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelARHopEntry": {
         "type": "array",
         "description": "An entry in this table represents a tunnel hop.  An\n          entry is created by the agent for signaled ERLSP\n          set up by an MPLS signalling protocol.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -6673,7 +5249,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelCHopEntry": {
         "type": "array",
         "description": "An entry in this table represents a tunnel hop.  An\n          entry in this table is created by a path\n          computation engine using CSPF techniques applied to\n          the information collected by routing protocols and\n          the hops specified in the corresponding\n          mplsTunnelHopTable.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -6727,7 +5302,6 @@
       "MPLS-TE-STD-MIB_mplsTunnelCRLDPResEntry": {
         "type": "array",
         "description": "An entry in this table represents a set of resources\n          for an MPLS tunnel established using CRLDP\n          (mplsTunnelSignallingProto equal to crldp (3)). An\n          entry can be created by a network administrator or\n          by an SNMP agent as instructed by any MPLS\n          signalling protocol.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

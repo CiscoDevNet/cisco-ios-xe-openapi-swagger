@@ -74,92 +74,9 @@
                   "type": "object",
                   "description": "This entity's IP Routing table.",
                   "properties": {
-                    "ipForwardDest": {
-                      "type": "string",
-                      "description": "The destination IP address of this route.   An\n            entry  with  a value of 0.0.0.0 is considered a\n            default route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardMask object is not equal to x.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipForwardMask": {
-                      "type": "string",
-                      "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipForwardDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipForwardMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardDest object is not equal to ipForward-\n            Dest.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipForwardPolicy": {
-                      "type": "integer",
-                      "description": "The general set of conditions that would cause\n            the  selection  of  one multipath route (set of\n            next hops for a given destination) is  referred\n            to as 'policy'.\n            \n            Unless the mechanism indicated by ipForwardPro-\n            to specifies otherwise, the policy specifier is\n            the IP TOS Field.  The encoding of IP TOS is as\n             specified  by  the  following convention.  Zero\n            indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30\n            \n            Protocols defining 'policy' otherwise must  ei-\n            ther define a set of values which are valid for\n            this  object  or  must  implement  an  integer-\n            instanced  policy table for which this object's\n            value acts as an index.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardNextHop": {
-                      "type": "string",
-                      "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipForwardIfIndex": {
-                      "type": "integer",
-                      "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardType": {
-                      "type": "string",
-                      "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Setting this object to the value invalid(2) has\n            the  effect  of  invalidating the corresponding\n            entry in the ipForwardTable object.   That  is,\n            it  effectively  disassociates  the destination\n            identified with said entry from the route iden-\n            tified    with    said   entry.    It   is   an\n            implementation-specific matter  as  to  whether\n            the agent removes an invalidated entry from the\n            table.  Accordingly, management  stations  must\n            be prepared to receive tabular information from\n            agents that corresponds to entries not current-\n            ly  in  use.  Proper interpretation of such en-\n            tries requires examination of the relevant  ip-\n            ForwardType object."
-                    },
-                    "ipForwardProto": {
-                      "type": "string",
-                      "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-                    },
-                    "ipForwardAge": {
-                      "type": "integer",
-                      "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardInfo": {
-                      "type": "string",
-                      "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipForwardProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "ipForwardNextHopAS": {
-                      "type": "integer",
-                      "description": "The Autonomous System Number of the Next  Hop.\n            When  this  is  unknown  or not relevant to the\n            protocol indicated by ipForwardProto, zero.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardMetric1": {
-                      "type": "integer",
-                      "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardMetric2": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardMetric3": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardMetric4": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipForwardMetric5": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
                     "ipForwardEntry": {
                       "type": "array",
                       "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -252,21 +169,6 @@
                 },
                 "example": {
                   "IP-FORWARD-MIB:ipForwardTable": {
-                    "ipForwardDest": "192.168.1.1",
-                    "ipForwardMask": "192.168.1.1",
-                    "ipForwardPolicy": -2147483648,
-                    "ipForwardNextHop": "192.168.1.1",
-                    "ipForwardIfIndex": 1,
-                    "ipForwardType": "192.168.1.1",
-                    "ipForwardProto": "192.168.1.1",
-                    "ipForwardAge": -2147483648,
-                    "ipForwardInfo": "192.168.1.1",
-                    "ipForwardNextHopAS": -2147483648,
-                    "ipForwardMetric1": -2147483648,
-                    "ipForwardMetric2": -2147483648,
-                    "ipForwardMetric3": -2147483648,
-                    "ipForwardMetric4": -2147483648,
-                    "ipForwardMetric5": -2147483648,
                     "ipForwardEntry": [
                       {
                         "ipForwardDest": "192.168.1.1",
@@ -309,7 +211,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -576,97 +477,9 @@
                   "type": "object",
                   "description": "This entity's IP Routing table.",
                   "properties": {
-                    "ipCidrRouteDest": {
-                      "type": "string",
-                      "description": "The destination IP address of this route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteMask object is not equal to x.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipCidrRouteMask": {
-                      "type": "string",
-                      "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipCidrRouteDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipCidrRouteMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteDest object is not equal to ipCidrRoute-\n            Dest.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipCidrRouteTos": {
-                      "type": "integer",
-                      "description": "The policy specifier is the IP TOS Field.  The encoding\n            of IP TOS is as specified  by  the  following convention.\n            Zero indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteNextHop": {
-                      "type": "string",
-                      "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "ipCidrRouteIfIndex": {
-                      "type": "integer",
-                      "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteType": {
-                      "type": "string",
-                      "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Routes which do not result in traffic forwarding or\n            rejection should not be displayed even if the\n            implementation keeps them stored internally.\n            \n            \n            reject (2) refers to a route which, if matched, discards\n            the message as unreachable. This is used in some\n            protocols as a means of correctly aggregating routes."
-                    },
-                    "ipCidrRouteProto": {
-                      "type": "string",
-                      "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-                    },
-                    "ipCidrRouteAge": {
-                      "type": "integer",
-                      "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteInfo": {
-                      "type": "string",
-                      "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipCidrRouteProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "ipCidrRouteNextHopAS": {
-                      "type": "integer",
-                      "description": "The Autonomous System Number of the Next  Hop.\n            The  semantics of this object are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value. When  this object is\n            unknown or not relevant its value should be set\n            to zero.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteMetric1": {
-                      "type": "integer",
-                      "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteMetric2": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteMetric3": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteMetric4": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteMetric5": {
-                      "type": "integer",
-                      "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ipCidrRouteStatus": {
-                      "type": "string",
-                      "description": "The row status variable, used according to\n            row installation and removal conventions.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
                     "ipCidrRouteEntry": {
                       "type": "array",
                       "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -764,22 +577,6 @@
                 },
                 "example": {
                   "IP-FORWARD-MIB:ipCidrRouteTable": {
-                    "ipCidrRouteDest": "192.168.1.1",
-                    "ipCidrRouteMask": "192.168.1.1",
-                    "ipCidrRouteTos": -2147483648,
-                    "ipCidrRouteNextHop": "192.168.1.1",
-                    "ipCidrRouteIfIndex": 1,
-                    "ipCidrRouteType": "192.168.1.1",
-                    "ipCidrRouteProto": "192.168.1.1",
-                    "ipCidrRouteAge": -2147483648,
-                    "ipCidrRouteInfo": "192.168.1.1",
-                    "ipCidrRouteNextHopAS": -2147483648,
-                    "ipCidrRouteMetric1": -2147483648,
-                    "ipCidrRouteMetric2": -2147483648,
-                    "ipCidrRouteMetric3": -2147483648,
-                    "ipCidrRouteMetric4": -2147483648,
-                    "ipCidrRouteMetric5": -2147483648,
-                    "ipCidrRouteStatus": "192.168.1.1",
                     "ipCidrRouteEntry": [
                       {
                         "ipCidrRouteDest": "192.168.1.1",
@@ -823,7 +620,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1101,7 +897,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1367,7 +1162,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1637,191 +1431,9 @@
         "type": "object",
         "description": "The number of current  ipForwardTable  entries\n          that are not invalid.",
         "properties": {
-          "ipForwardNumber": {
-            "type": "integer",
-            "description": "The number of current  ipForwardTable  entries\n          that are not invalid.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ipCidrRouteNumber": {
-            "type": "integer",
-            "description": "The number of current ipCidrRouteTable entries\n          that are not invalid.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "ipForwardDest": {
-            "type": "string",
-            "description": "The destination IP address of this route.   An\n            entry  with  a value of 0.0.0.0 is considered a\n            default route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardMask object is not equal to x.",
-            "format": "inet:ipv4-address"
-          },
-          "ipForwardMask": {
-            "type": "string",
-            "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipForwardDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipForwardMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardDest object is not equal to ipForward-\n            Dest.",
-            "format": "inet:ipv4-address"
-          },
-          "ipForwardPolicy": {
-            "type": "integer",
-            "description": "The general set of conditions that would cause\n            the  selection  of  one multipath route (set of\n            next hops for a given destination) is  referred\n            to as 'policy'.\n            \n            Unless the mechanism indicated by ipForwardPro-\n            to specifies otherwise, the policy specifier is\n            the IP TOS Field.  The encoding of IP TOS is as\n             specified  by  the  following convention.  Zero\n            indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30\n            \n            Protocols defining 'policy' otherwise must  ei-\n            ther define a set of values which are valid for\n            this  object  or  must  implement  an  integer-\n            instanced  policy table for which this object's\n            value acts as an index.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardNextHop": {
-            "type": "string",
-            "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-            "format": "inet:ipv4-address"
-          },
-          "ipForwardIfIndex": {
-            "type": "integer",
-            "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardType": {
-            "type": "string",
-            "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Setting this object to the value invalid(2) has\n            the  effect  of  invalidating the corresponding\n            entry in the ipForwardTable object.   That  is,\n            it  effectively  disassociates  the destination\n            identified with said entry from the route iden-\n            tified    with    said   entry.    It   is   an\n            implementation-specific matter  as  to  whether\n            the agent removes an invalidated entry from the\n            table.  Accordingly, management  stations  must\n            be prepared to receive tabular information from\n            agents that corresponds to entries not current-\n            ly  in  use.  Proper interpretation of such en-\n            tries requires examination of the relevant  ip-\n            ForwardType object."
-          },
-          "ipForwardProto": {
-            "type": "string",
-            "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-          },
-          "ipForwardAge": {
-            "type": "integer",
-            "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardInfo": {
-            "type": "string",
-            "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipForwardProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "ipForwardNextHopAS": {
-            "type": "integer",
-            "description": "The Autonomous System Number of the Next  Hop.\n            When  this  is  unknown  or not relevant to the\n            protocol indicated by ipForwardProto, zero.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardMetric1": {
-            "type": "integer",
-            "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardMetric2": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardMetric3": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardMetric4": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipForwardMetric5": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteDest": {
-            "type": "string",
-            "description": "The destination IP address of this route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteMask object is not equal to x.",
-            "format": "inet:ipv4-address"
-          },
-          "ipCidrRouteMask": {
-            "type": "string",
-            "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipCidrRouteDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipCidrRouteMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteDest object is not equal to ipCidrRoute-\n            Dest.",
-            "format": "inet:ipv4-address"
-          },
-          "ipCidrRouteTos": {
-            "type": "integer",
-            "description": "The policy specifier is the IP TOS Field.  The encoding\n            of IP TOS is as specified  by  the  following convention.\n            Zero indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteNextHop": {
-            "type": "string",
-            "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-            "format": "inet:ipv4-address"
-          },
-          "ipCidrRouteIfIndex": {
-            "type": "integer",
-            "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteType": {
-            "type": "string",
-            "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Routes which do not result in traffic forwarding or\n            rejection should not be displayed even if the\n            implementation keeps them stored internally.\n            \n            \n            reject (2) refers to a route which, if matched, discards\n            the message as unreachable. This is used in some\n            protocols as a means of correctly aggregating routes."
-          },
-          "ipCidrRouteProto": {
-            "type": "string",
-            "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-          },
-          "ipCidrRouteAge": {
-            "type": "integer",
-            "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteInfo": {
-            "type": "string",
-            "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipCidrRouteProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-            "x-yang-type": "yang:object-identifier-128"
-          },
-          "ipCidrRouteNextHopAS": {
-            "type": "integer",
-            "description": "The Autonomous System Number of the Next  Hop.\n            The  semantics of this object are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value. When  this object is\n            unknown or not relevant its value should be set\n            to zero.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteMetric1": {
-            "type": "integer",
-            "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteMetric2": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteMetric3": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteMetric4": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteMetric5": {
-            "type": "integer",
-            "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "ipCidrRouteStatus": {
-            "type": "string",
-            "description": "The row status variable, used according to\n            row installation and removal conventions.",
-            "x-yang-type": "snmpv2-tc:RowStatus"
-          },
           "ipForwardEntry": {
             "type": "array",
             "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1913,7 +1525,6 @@
           "ipCidrRouteEntry": {
             "type": "array",
             "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -2029,92 +1640,9 @@
             "type": "object",
             "description": "This entity's IP Routing table.",
             "properties": {
-              "ipForwardDest": {
-                "type": "string",
-                "description": "The destination IP address of this route.   An\n            entry  with  a value of 0.0.0.0 is considered a\n            default route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardMask object is not equal to x.",
-                "format": "inet:ipv4-address"
-              },
-              "ipForwardMask": {
-                "type": "string",
-                "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipForwardDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipForwardMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipForwardDest object is not equal to ipForward-\n            Dest.",
-                "format": "inet:ipv4-address"
-              },
-              "ipForwardPolicy": {
-                "type": "integer",
-                "description": "The general set of conditions that would cause\n            the  selection  of  one multipath route (set of\n            next hops for a given destination) is  referred\n            to as 'policy'.\n            \n            Unless the mechanism indicated by ipForwardPro-\n            to specifies otherwise, the policy specifier is\n            the IP TOS Field.  The encoding of IP TOS is as\n             specified  by  the  following convention.  Zero\n            indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30\n            \n            Protocols defining 'policy' otherwise must  ei-\n            ther define a set of values which are valid for\n            this  object  or  must  implement  an  integer-\n            instanced  policy table for which this object's\n            value acts as an index.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardNextHop": {
-                "type": "string",
-                "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-                "format": "inet:ipv4-address"
-              },
-              "ipForwardIfIndex": {
-                "type": "integer",
-                "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardType": {
-                "type": "string",
-                "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Setting this object to the value invalid(2) has\n            the  effect  of  invalidating the corresponding\n            entry in the ipForwardTable object.   That  is,\n            it  effectively  disassociates  the destination\n            identified with said entry from the route iden-\n            tified    with    said   entry.    It   is   an\n            implementation-specific matter  as  to  whether\n            the agent removes an invalidated entry from the\n            table.  Accordingly, management  stations  must\n            be prepared to receive tabular information from\n            agents that corresponds to entries not current-\n            ly  in  use.  Proper interpretation of such en-\n            tries requires examination of the relevant  ip-\n            ForwardType object."
-              },
-              "ipForwardProto": {
-                "type": "string",
-                "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-              },
-              "ipForwardAge": {
-                "type": "integer",
-                "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardInfo": {
-                "type": "string",
-                "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipForwardProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "ipForwardNextHopAS": {
-                "type": "integer",
-                "description": "The Autonomous System Number of the Next  Hop.\n            When  this  is  unknown  or not relevant to the\n            protocol indicated by ipForwardProto, zero.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardMetric1": {
-                "type": "integer",
-                "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardMetric2": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardMetric3": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardMetric4": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipForwardMetric5": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipForwardProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
               "ipForwardEntry": {
                 "type": "array",
                 "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2209,97 +1737,9 @@
             "type": "object",
             "description": "This entity's IP Routing table.",
             "properties": {
-              "ipCidrRouteDest": {
-                "type": "string",
-                "description": "The destination IP address of this route.\n            \n            This object may not take a Multicast (Class  D)\n            address value.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteMask object is not equal to x.",
-                "format": "inet:ipv4-address"
-              },
-              "ipCidrRouteMask": {
-                "type": "string",
-                "description": "Indicate the mask to be logical-ANDed with the\n            destination  address  before  being compared to\n            the value  in  the  ipCidrRouteDest  field.   For\n            those  systems  that  do  not support arbitrary\n            subnet masks, an agent constructs the value  of\n            the  ipCidrRouteMask  by  reference to the IP Ad-\n            dress Class.\n            \n            Any assignment (implicit or  otherwise)  of  an\n            instance  of  this  object to a value x must be\n            rejected if the bitwise logical-AND of  x  with\n            the  value of the corresponding instance of the\n            ipCidrRouteDest object is not equal to ipCidrRoute-\n            Dest.",
-                "format": "inet:ipv4-address"
-              },
-              "ipCidrRouteTos": {
-                "type": "integer",
-                "description": "The policy specifier is the IP TOS Field.  The encoding\n            of IP TOS is as specified  by  the  following convention.\n            Zero indicates the default path if no more  specific\n            policy applies.\n            \n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            |                 |                       |     |\n            |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |\n            |                 |                       |     |\n            +-----+-----+-----+-----+-----+-----+-----+-----+\n            \n                     IP TOS                IP TOS\n                Field     Policy      Field     Policy\n                Contents    Code      Contents    Code\n                0 0 0 0  ==>   0      0 0 0 1  ==>   2\n                0 0 1 0  ==>   4      0 0 1 1  ==>   6\n                0 1 0 0  ==>   8      0 1 0 1  ==>  10\n                0 1 1 0  ==>  12      0 1 1 1  ==>  14\n                1 0 0 0  ==>  16      1 0 0 1  ==>  18\n                1 0 1 0  ==>  20      1 0 1 1  ==>  22\n                1 1 0 0  ==>  24      1 1 0 1  ==>  26\n                1 1 1 0  ==>  28      1 1 1 1  ==>  30",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteNextHop": {
-                "type": "string",
-                "description": "On remote routes, the address of the next sys-\n            tem en route; Otherwise, 0.0.0.0.",
-                "format": "inet:ipv4-address"
-              },
-              "ipCidrRouteIfIndex": {
-                "type": "integer",
-                "description": "The ifIndex value which identifies  the  local\n            interface  through  which  the next hop of this\n            route should be reached.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteType": {
-                "type": "string",
-                "description": "The type of route.  Note that local(3)  refers\n            to  a route for which the next hop is the final\n            destination; remote(4) refers to  a  route  for\n            which  the  next  hop is not the final destina-\n            tion.\n            \n            Routes which do not result in traffic forwarding or\n            rejection should not be displayed even if the\n            implementation keeps them stored internally.\n            \n            \n            reject (2) refers to a route which, if matched, discards\n            the message as unreachable. This is used in some\n            protocols as a means of correctly aggregating routes."
-              },
-              "ipCidrRouteProto": {
-                "type": "string",
-                "description": "The routing mechanism via which this route was\n            learned.  Inclusion of values for gateway rout-\n            ing protocols is not  intended  to  imply  that\n            hosts should support those protocols."
-              },
-              "ipCidrRouteAge": {
-                "type": "integer",
-                "description": "The number of seconds  since  this  route  was\n            last  updated  or  otherwise  determined  to be\n            correct.  Note that no semantics of  `too  old'\n            can  be implied except through knowledge of the\n            routing  protocol  by  which  the   route   was\n            learned.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteInfo": {
-                "type": "string",
-                "description": "A reference to MIB definitions specific to the\n            particular  routing protocol which is responsi-\n            ble for this route, as determined by the  value\n            specified  in the route's ipCidrRouteProto value.\n            If this information is not present,  its  value\n            should be set to the OBJECT IDENTIFIER { 0 0 },\n            which is a syntactically valid object  identif-\n            ier, and any implementation conforming to ASN.1\n            and the Basic Encoding Rules must  be  able  to\n            generate and recognize this value.",
-                "x-yang-type": "yang:object-identifier-128"
-              },
-              "ipCidrRouteNextHopAS": {
-                "type": "integer",
-                "description": "The Autonomous System Number of the Next  Hop.\n            The  semantics of this object are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value. When  this object is\n            unknown or not relevant its value should be set\n            to zero.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteMetric1": {
-                "type": "integer",
-                "description": "The primary routing  metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteMetric2": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteMetric3": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteMetric4": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteMetric5": {
-                "type": "integer",
-                "description": "An alternate routing metric  for  this  route.\n            The  semantics of this metric are determined by\n            the routing-protocol specified in  the  route's\n            ipCidrRouteProto  value.   If  this metric is not\n            used, its value should be set to -1.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "ipCidrRouteStatus": {
-                "type": "string",
-                "description": "The row status variable, used according to\n            row installation and removal conventions.",
-                "x-yang-type": "snmpv2-tc:RowStatus"
-              },
               "ipCidrRouteEntry": {
                 "type": "array",
                 "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -2400,7 +1840,6 @@
       "IP-FORWARD-MIB_ipForwardEntry": {
         "type": "array",
         "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2492,7 +1931,6 @@
       "IP-FORWARD-MIB_ipCidrRouteEntry": {
         "type": "array",
         "description": "A particular route to  a  particular  destina-\n          tion, under a particular policy.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

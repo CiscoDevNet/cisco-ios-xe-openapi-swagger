@@ -32,45 +32,9 @@
                   "type": "object",
                   "description": "A table of information about state/status of entities.\n        This is a sparse augment of the entPhysicalTable.  Entries\n        appear in this table for values of\n        entPhysicalClass [RFC4133] that in this implementation\n        are able to report any of the state or status stored in\n        this table.",
                   "properties": {
-                    "entPhysicalIndex": {
-                      "type": "string",
-                      "description": "entPhysicalIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "entStateLastChanged": {
-                      "type": "string",
-                      "description": "The value of this object is the date and\n            time when the value of any of entStateAdmin,\n            entStateOper, entStateUsage, entStateAlarm,\n            or entStateStandby changed for this entity.\n            \n            If there has been no change since\n            the last re-initialization of the local system,\n            this object contains the date and time of\n            local system initialization.  If there has been\n            no change since the entity was added to the\n            local system, this object contains the date and\n            time of the insertion.",
-                      "x-yang-type": "snmpv2-tc:DateAndTime"
-                    },
-                    "entStateAdmin": {
-                      "type": "string",
-                      "description": "The administrative state for this entity.\n            \n            This object refers to an entities administrative\n            permission to service both other entities within\n            its containment hierarchy as well other users of\n            its services defined by means outside the scope\n            of this MIB.\n            \n            Setting this object to 'notSupported' will result\n            in an 'inconsistentValue' error.  For entities that\n            do not support administrative state, all set\n            operations will result in an 'inconsistentValue'\n            error.\n            \n            Some physical entities exhibit only a subset of the\n            remaining administrative state values.  Some entities\n            cannot be locked, and hence this object exhibits only\n            the 'unlocked' state.  Other entities cannot be shutdown\n            gracefully, and hence this object does not exhibit the\n            'shuttingDown' state.  A value of 'inconsistentValue'\n            will be returned if attempts are made to set this\n            object to values not supported by its administrative\n            model.",
-                      "x-yang-type": "entity-state:EntityAdminState"
-                    },
-                    "entStateOper": {
-                      "type": "string",
-                      "description": "The operational state for this entity.\n            \n            Note that unlike the state model used within the\n            Interfaces MIB [RFC2863], this object does not follow\n            the administrative state.  An administrative state of\n            down does not predict an operational state\n            of disabled.\n            \n            A value of 'testing' means that entity currently being\n            tested and cannot therefore report whether it is\n            operational or not.\n            \n            A value of 'disabled' means that an entity is totally\n            inoperable and unable to provide service both to entities\n            within its containment hierarchy, or to other receivers\n            of its service as defined in ways outside the scope of\n            this MIB.\n            \n            A value of 'enabled' means that an entity is fully or\n            partially operable and able to provide service both to\n            \n            entities within its containment hierarchy, or to other\n            receivers of its service as defined in ways outside the\n            scope of this MIB.\n            \n            Note that some implementations may not be able to\n            accurately report entStateOper while the\n            entStateAdmin object has a value other than 'unlocked'.\n            In these cases, this object MUST have a value\n            of 'unknown'.",
-                      "x-yang-type": "entity-state:EntityOperState"
-                    },
-                    "entStateUsage": {
-                      "type": "string",
-                      "description": "The usage state for this entity.\n            \n            This object refers to an entity's ability to service more\n            physical entities in a containment hierarchy.  A value\n            of 'idle' means this entity is able to contain other\n            entities but that no other entity is currently\n            contained within this entity.\n            \n            A value of 'active' means that at least one entity is\n            contained within this entity, but that it could handle\n            more.  A value of 'busy' means that the entity is unable\n            to handle any additional entities being contained in it.\n            \n            Some entities will exhibit only a subset of the\n            usage state values.  Entities that are unable to ever\n            service any entities within a containment hierarchy will\n            always have a usage state of 'busy'.  Some entities will\n            only ever be able to support one entity within its\n            containment hierarchy and will therefore only exhibit\n            values of 'idle' and 'busy'.",
-                      "x-yang-type": "entity-state:EntityUsageState"
-                    },
-                    "entStateAlarm": {
-                      "type": "string",
-                      "description": "The alarm status for this entity.  It does not include\n            the alarms raised on child components within its\n            containment hierarchy.\n            \n            A value of 'unknown' means that this entity is\n            \n            unable to report alarm state.  Note that this differs\n            from 'indeterminate', which means that alarm state\n            is supported and there are alarms against this entity,\n            but the severity of some of the alarms is not known.\n            \n            If no bits are set, then this entity supports reporting\n            of alarms, but there are currently no active alarms\n            against this entity.",
-                      "x-yang-type": "entity-state:EntityAlarmStatus"
-                    },
-                    "entStateStandby": {
-                      "type": "string",
-                      "description": "The standby status for this entity.\n            \n            Some entities will exhibit only a subset of the\n            remaining standby state values.  If this entity\n            cannot operate in a standby role, the value of this\n            object will always be 'providingService'.",
-                      "x-yang-type": "entity-state:EntityStandbyStatus"
-                    },
                     "entStateEntry": {
                       "type": "array",
                       "description": "State information about this physical entity.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -116,13 +80,6 @@
                 },
                 "example": {
                   "ENTITY-STATE-MIB:entStateTable": {
-                    "entPhysicalIndex": "example-string",
-                    "entStateLastChanged": "up(1)",
-                    "entStateAdmin": "up(1)",
-                    "entStateOper": "up(1)",
-                    "entStateUsage": "up(1)",
-                    "entStateAlarm": "up(1)",
-                    "entStateStandby": "up(1)",
                     "entStateEntry": [
                       {
                         "entPhysicalIndex": "example-string",
@@ -157,7 +114,6 @@
                 "schema": {
                   "type": "array",
                   "description": "State information about this physical entity.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -313,7 +269,6 @@
                 "schema": {
                   "type": "array",
                   "description": "State information about this physical entity.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -461,45 +416,9 @@
         "type": "object",
         "description": "A table of information about state/status of entities.\n        This is a sparse augment of the entPhysicalTable.  Entries\n        appear in this table for values of\n        entPhysicalClass [RFC4133] that in this implementation\n        are able to report any of the state or status stored in\n        this table.",
         "properties": {
-          "entPhysicalIndex": {
-            "type": "string",
-            "description": "entPhysicalIndex",
-            "x-yang-type": "leafref"
-          },
-          "entStateLastChanged": {
-            "type": "string",
-            "description": "The value of this object is the date and\n            time when the value of any of entStateAdmin,\n            entStateOper, entStateUsage, entStateAlarm,\n            or entStateStandby changed for this entity.\n            \n            If there has been no change since\n            the last re-initialization of the local system,\n            this object contains the date and time of\n            local system initialization.  If there has been\n            no change since the entity was added to the\n            local system, this object contains the date and\n            time of the insertion.",
-            "x-yang-type": "snmpv2-tc:DateAndTime"
-          },
-          "entStateAdmin": {
-            "type": "string",
-            "description": "The administrative state for this entity.\n            \n            This object refers to an entities administrative\n            permission to service both other entities within\n            its containment hierarchy as well other users of\n            its services defined by means outside the scope\n            of this MIB.\n            \n            Setting this object to 'notSupported' will result\n            in an 'inconsistentValue' error.  For entities that\n            do not support administrative state, all set\n            operations will result in an 'inconsistentValue'\n            error.\n            \n            Some physical entities exhibit only a subset of the\n            remaining administrative state values.  Some entities\n            cannot be locked, and hence this object exhibits only\n            the 'unlocked' state.  Other entities cannot be shutdown\n            gracefully, and hence this object does not exhibit the\n            'shuttingDown' state.  A value of 'inconsistentValue'\n            will be returned if attempts are made to set this\n            object to values not supported by its administrative\n            model.",
-            "x-yang-type": "entity-state:EntityAdminState"
-          },
-          "entStateOper": {
-            "type": "string",
-            "description": "The operational state for this entity.\n            \n            Note that unlike the state model used within the\n            Interfaces MIB [RFC2863], this object does not follow\n            the administrative state.  An administrative state of\n            down does not predict an operational state\n            of disabled.\n            \n            A value of 'testing' means that entity currently being\n            tested and cannot therefore report whether it is\n            operational or not.\n            \n            A value of 'disabled' means that an entity is totally\n            inoperable and unable to provide service both to entities\n            within its containment hierarchy, or to other receivers\n            of its service as defined in ways outside the scope of\n            this MIB.\n            \n            A value of 'enabled' means that an entity is fully or\n            partially operable and able to provide service both to\n            \n            entities within its containment hierarchy, or to other\n            receivers of its service as defined in ways outside the\n            scope of this MIB.\n            \n            Note that some implementations may not be able to\n            accurately report entStateOper while the\n            entStateAdmin object has a value other than 'unlocked'.\n            In these cases, this object MUST have a value\n            of 'unknown'.",
-            "x-yang-type": "entity-state:EntityOperState"
-          },
-          "entStateUsage": {
-            "type": "string",
-            "description": "The usage state for this entity.\n            \n            This object refers to an entity's ability to service more\n            physical entities in a containment hierarchy.  A value\n            of 'idle' means this entity is able to contain other\n            entities but that no other entity is currently\n            contained within this entity.\n            \n            A value of 'active' means that at least one entity is\n            contained within this entity, but that it could handle\n            more.  A value of 'busy' means that the entity is unable\n            to handle any additional entities being contained in it.\n            \n            Some entities will exhibit only a subset of the\n            usage state values.  Entities that are unable to ever\n            service any entities within a containment hierarchy will\n            always have a usage state of 'busy'.  Some entities will\n            only ever be able to support one entity within its\n            containment hierarchy and will therefore only exhibit\n            values of 'idle' and 'busy'.",
-            "x-yang-type": "entity-state:EntityUsageState"
-          },
-          "entStateAlarm": {
-            "type": "string",
-            "description": "The alarm status for this entity.  It does not include\n            the alarms raised on child components within its\n            containment hierarchy.\n            \n            A value of 'unknown' means that this entity is\n            \n            unable to report alarm state.  Note that this differs\n            from 'indeterminate', which means that alarm state\n            is supported and there are alarms against this entity,\n            but the severity of some of the alarms is not known.\n            \n            If no bits are set, then this entity supports reporting\n            of alarms, but there are currently no active alarms\n            against this entity.",
-            "x-yang-type": "entity-state:EntityAlarmStatus"
-          },
-          "entStateStandby": {
-            "type": "string",
-            "description": "The standby status for this entity.\n            \n            Some entities will exhibit only a subset of the\n            remaining standby state values.  If this entity\n            cannot operate in a standby role, the value of this\n            object will always be 'providingService'.",
-            "x-yang-type": "entity-state:EntityStandbyStatus"
-          },
           "entStateEntry": {
             "type": "array",
             "description": "State information about this physical entity.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -545,45 +464,9 @@
             "type": "object",
             "description": "A table of information about state/status of entities.\n        This is a sparse augment of the entPhysicalTable.  Entries\n        appear in this table for values of\n        entPhysicalClass [RFC4133] that in this implementation\n        are able to report any of the state or status stored in\n        this table.",
             "properties": {
-              "entPhysicalIndex": {
-                "type": "string",
-                "description": "entPhysicalIndex",
-                "x-yang-type": "leafref"
-              },
-              "entStateLastChanged": {
-                "type": "string",
-                "description": "The value of this object is the date and\n            time when the value of any of entStateAdmin,\n            entStateOper, entStateUsage, entStateAlarm,\n            or entStateStandby changed for this entity.\n            \n            If there has been no change since\n            the last re-initialization of the local system,\n            this object contains the date and time of\n            local system initialization.  If there has been\n            no change since the entity was added to the\n            local system, this object contains the date and\n            time of the insertion.",
-                "x-yang-type": "snmpv2-tc:DateAndTime"
-              },
-              "entStateAdmin": {
-                "type": "string",
-                "description": "The administrative state for this entity.\n            \n            This object refers to an entities administrative\n            permission to service both other entities within\n            its containment hierarchy as well other users of\n            its services defined by means outside the scope\n            of this MIB.\n            \n            Setting this object to 'notSupported' will result\n            in an 'inconsistentValue' error.  For entities that\n            do not support administrative state, all set\n            operations will result in an 'inconsistentValue'\n            error.\n            \n            Some physical entities exhibit only a subset of the\n            remaining administrative state values.  Some entities\n            cannot be locked, and hence this object exhibits only\n            the 'unlocked' state.  Other entities cannot be shutdown\n            gracefully, and hence this object does not exhibit the\n            'shuttingDown' state.  A value of 'inconsistentValue'\n            will be returned if attempts are made to set this\n            object to values not supported by its administrative\n            model.",
-                "x-yang-type": "entity-state:EntityAdminState"
-              },
-              "entStateOper": {
-                "type": "string",
-                "description": "The operational state for this entity.\n            \n            Note that unlike the state model used within the\n            Interfaces MIB [RFC2863], this object does not follow\n            the administrative state.  An administrative state of\n            down does not predict an operational state\n            of disabled.\n            \n            A value of 'testing' means that entity currently being\n            tested and cannot therefore report whether it is\n            operational or not.\n            \n            A value of 'disabled' means that an entity is totally\n            inoperable and unable to provide service both to entities\n            within its containment hierarchy, or to other receivers\n            of its service as defined in ways outside the scope of\n            this MIB.\n            \n            A value of 'enabled' means that an entity is fully or\n            partially operable and able to provide service both to\n            \n            entities within its containment hierarchy, or to other\n            receivers of its service as defined in ways outside the\n            scope of this MIB.\n            \n            Note that some implementations may not be able to\n            accurately report entStateOper while the\n            entStateAdmin object has a value other than 'unlocked'.\n            In these cases, this object MUST have a value\n            of 'unknown'.",
-                "x-yang-type": "entity-state:EntityOperState"
-              },
-              "entStateUsage": {
-                "type": "string",
-                "description": "The usage state for this entity.\n            \n            This object refers to an entity's ability to service more\n            physical entities in a containment hierarchy.  A value\n            of 'idle' means this entity is able to contain other\n            entities but that no other entity is currently\n            contained within this entity.\n            \n            A value of 'active' means that at least one entity is\n            contained within this entity, but that it could handle\n            more.  A value of 'busy' means that the entity is unable\n            to handle any additional entities being contained in it.\n            \n            Some entities will exhibit only a subset of the\n            usage state values.  Entities that are unable to ever\n            service any entities within a containment hierarchy will\n            always have a usage state of 'busy'.  Some entities will\n            only ever be able to support one entity within its\n            containment hierarchy and will therefore only exhibit\n            values of 'idle' and 'busy'.",
-                "x-yang-type": "entity-state:EntityUsageState"
-              },
-              "entStateAlarm": {
-                "type": "string",
-                "description": "The alarm status for this entity.  It does not include\n            the alarms raised on child components within its\n            containment hierarchy.\n            \n            A value of 'unknown' means that this entity is\n            \n            unable to report alarm state.  Note that this differs\n            from 'indeterminate', which means that alarm state\n            is supported and there are alarms against this entity,\n            but the severity of some of the alarms is not known.\n            \n            If no bits are set, then this entity supports reporting\n            of alarms, but there are currently no active alarms\n            against this entity.",
-                "x-yang-type": "entity-state:EntityAlarmStatus"
-              },
-              "entStateStandby": {
-                "type": "string",
-                "description": "The standby status for this entity.\n            \n            Some entities will exhibit only a subset of the\n            remaining standby state values.  If this entity\n            cannot operate in a standby role, the value of this\n            object will always be 'providingService'.",
-                "x-yang-type": "entity-state:EntityStandbyStatus"
-              },
               "entStateEntry": {
                 "type": "array",
                 "description": "State information about this physical entity.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -664,7 +547,6 @@
       "ENTITY-STATE-MIB_entStateEntry": {
         "type": "array",
         "description": "State information about this physical entity.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

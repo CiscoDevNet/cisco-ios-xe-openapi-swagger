@@ -168,36 +168,9 @@
                   "type": "object",
                   "description": "A table containing information about existing IPv4-specific\n        TCP connections or listeners.  This table has been\n        deprecated in favor of the version neutral\n        tcpConnectionTable.",
                   "properties": {
-                    "tcpConnState": {
-                      "type": "string",
-                      "description": "The state of this TCP connection.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-                    },
-                    "tcpConnLocalAddress": {
-                      "type": "string",
-                      "description": "The local IP address for this TCP connection.  In the case\n            of a connection in the listen state willing to\n            accept connections for any IP interface associated with the\n            node, the value 0.0.0.0 is used.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tcpConnLocalPort": {
-                      "type": "integer",
-                      "description": "The local port number for this TCP connection.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "tcpConnRemAddress": {
-                      "type": "string",
-                      "description": "The remote IP address for this TCP connection.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tcpConnRemPort": {
-                      "type": "integer",
-                      "description": "The remote port number for this TCP connection.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
                     "tcpConnEntry": {
                       "type": "array",
                       "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -234,11 +207,6 @@
                 },
                 "example": {
                   "TCP-MIB:tcpConnTable": {
-                    "tcpConnState": "up(1)",
-                    "tcpConnLocalAddress": "192.168.1.1",
-                    "tcpConnLocalPort": -2147483648,
-                    "tcpConnRemAddress": "192.168.1.1",
-                    "tcpConnRemPort": -2147483648,
                     "tcpConnEntry": [
                       {
                         "tcpConnState": "up(1)",
@@ -271,7 +239,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -406,50 +373,9 @@
                   "type": "object",
                   "description": "A table containing information about existing TCP\n        connections.  Note that unlike earlier TCP MIBs, there\n        is a separate table for connections in the LISTEN state.",
                   "properties": {
-                    "tcpConnectionLocalAddressType": {
-                      "type": "string",
-                      "description": "The address type of tcpConnectionLocalAddress.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "tcpConnectionLocalAddress": {
-                      "type": "string",
-                      "description": "The local IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionLocalAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "tcpConnectionLocalPort": {
-                      "type": "string",
-                      "description": "The local port number for this TCP connection.",
-                      "format": "inet:port-number"
-                    },
-                    "tcpConnectionRemAddressType": {
-                      "type": "string",
-                      "description": "The address type of tcpConnectionRemAddress.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "tcpConnectionRemAddress": {
-                      "type": "string",
-                      "description": "The remote IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionRemAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "tcpConnectionRemPort": {
-                      "type": "string",
-                      "description": "The remote port number for this TCP connection.",
-                      "format": "inet:port-number"
-                    },
-                    "tcpConnectionState": {
-                      "type": "string",
-                      "description": "The state of this TCP connection.\n            \n            The value listen(2) is included only for parallelism to the\n            old tcpConnTable and should not be used.  A connection in\n            LISTEN state should be present in the tcpListenerTable.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-                    },
-                    "tcpConnectionProcess": {
-                      "type": "integer",
-                      "description": "The system's process ID for the process associated with\n            this connection, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
                     "tcpConnectionEntry": {
                       "type": "array",
                       "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -500,14 +426,6 @@
                 },
                 "example": {
                   "TCP-MIB:tcpConnectionTable": {
-                    "tcpConnectionLocalAddressType": "192.168.1.1",
-                    "tcpConnectionLocalAddress": "192.168.1.1",
-                    "tcpConnectionLocalPort": "example-string",
-                    "tcpConnectionRemAddressType": "192.168.1.1",
-                    "tcpConnectionRemAddress": "192.168.1.1",
-                    "tcpConnectionRemPort": "example-string",
-                    "tcpConnectionState": "up(1)",
-                    "tcpConnectionProcess": 0,
                     "tcpConnectionEntry": [
                       {
                         "tcpConnectionLocalAddressType": "192.168.1.1",
@@ -543,7 +461,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -712,31 +629,9 @@
                   "type": "object",
                   "description": "tcpListenerTable",
                   "properties": {
-                    "tcpListenerLocalAddressType": {
-                      "type": "string",
-                      "description": "The address type of tcpListenerLocalAddress.  The value\n            should be unknown (0) if connection initiations to all\n            local IP addresses are accepted.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "tcpListenerLocalAddress": {
-                      "type": "string",
-                      "description": "The local IP address for this TCP connection.\n            \n            The value of this object can be represented in three\n            possible ways, depending on the characteristics of the\n            listening application:\n            \n            1. For an application willing to accept both IPv4 and\n               IPv6 datagrams, the value of this object must be\n               ''h (a zero-length octet-string), with the value\n               of the corresponding tcpListenerLocalAddressType\n               object being unknown (0).\n            \n            2. For an application willing to accept only IPv4 or\n               IPv6 datagrams, the value of this object must be\n               '0.0.0.0' or '::' respectively, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            3. For an application which is listening for data\n               destined only to a specific IP address, the value\n               of this object is the specific local address, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            As this object is used in the index for the\n            tcpListenerTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed, using SNMPv1, SNMPv2c, or SNMPv3.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "tcpListenerLocalPort": {
-                      "type": "string",
-                      "description": "The local port number for this TCP connection.",
-                      "format": "inet:port-number"
-                    },
-                    "tcpListenerProcess": {
-                      "type": "integer",
-                      "description": "The system's process ID for the process associated with\n            this listener, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
                     "tcpListenerEntry": {
                       "type": "array",
                       "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-                      "properties": {},
                       "items": {
                         "type": "object",
                         "properties": {
@@ -768,10 +663,6 @@
                 },
                 "example": {
                   "TCP-MIB:tcpListenerTable": {
-                    "tcpListenerLocalAddressType": "192.168.1.1",
-                    "tcpListenerLocalAddress": "192.168.1.1",
-                    "tcpListenerLocalPort": "example-string",
-                    "tcpListenerProcess": 0,
                     "tcpListenerEntry": [
                       {
                         "tcpListenerLocalAddressType": "192.168.1.1",
@@ -803,7 +694,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -925,7 +815,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1059,7 +948,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1227,7 +1115,6 @@
                 "schema": {
                   "type": "array",
                   "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-                  "properties": {},
                   "items": {
                     "type": "object",
                     "properties": {
@@ -1341,189 +1228,9 @@
         "type": "object",
         "description": "TCP-MIB",
         "properties": {
-          "tcpRtoAlgorithm": {
-            "type": "string",
-            "description": "The algorithm used to determine the timeout value used for\n          retransmitting unacknowledged octets."
-          },
-          "tcpRtoMin": {
-            "type": "integer",
-            "description": "The minimum value permitted by a TCP implementation for\n          the retransmission timeout, measured in milliseconds.\n          More refined semantics for objects of this type depend\n          on the algorithm used to determine the retransmission\n          timeout; in particular, the IETF standard algorithm\n          rfc2988(5) provides a minimum value.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "tcpRtoMax": {
-            "type": "integer",
-            "description": "The maximum value permitted by a TCP implementation for\n          the retransmission timeout, measured in milliseconds.\n          More refined semantics for objects of this type depend\n          on the algorithm used to determine the retransmission\n          timeout; in particular, the IETF standard algorithm\n          rfc2988(5) provides an upper bound (as part of an\n          adaptive backoff algorithm).",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "tcpMaxConn": {
-            "type": "integer",
-            "description": "The limit on the total number of TCP connections the entity\n          can support.  In entities where the maximum number of\n          connections is dynamic, this object should contain the\n          value -1.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "tcpActiveOpens": {
-            "type": "integer",
-            "description": "The number of times that TCP connections have made a direct\n          transition to the SYN-SENT state from the CLOSED state.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpPassiveOpens": {
-            "type": "integer",
-            "description": "The number of times TCP connections have made a direct\n          transition to the SYN-RCVD state from the LISTEN state.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpAttemptFails": {
-            "type": "integer",
-            "description": "The number of times that TCP connections have made a direct\n          transition to the CLOSED state from either the SYN-SENT\n          state or the SYN-RCVD state, plus the number of times that\n          TCP connections have made a direct transition to the\n          LISTEN state from the SYN-RCVD state.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpEstabResets": {
-            "type": "integer",
-            "description": "The number of times that TCP connections have made a direct\n          transition to the CLOSED state from either the ESTABLISHED\n          state or the CLOSE-WAIT state.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpCurrEstab": {
-            "type": "integer",
-            "description": "The number of TCP connections for which the current state\n          is either ESTABLISHED or CLOSE-WAIT.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpInSegs": {
-            "type": "integer",
-            "description": "The total number of segments received, including those\n          received in error.  This count includes segments received\n          on currently established connections.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpOutSegs": {
-            "type": "integer",
-            "description": "The total number of segments sent, including those on\n          current connections but excluding those containing only\n          retransmitted octets.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpRetransSegs": {
-            "type": "integer",
-            "description": "The total number of segments retransmitted; that is, the\n          number of TCP segments transmitted containing one or more\n          previously transmitted octets.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpInErrs": {
-            "type": "integer",
-            "description": "The total number of segments received in error (e.g., bad\n          TCP checksums).\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpOutRsts": {
-            "type": "integer",
-            "description": "The number of TCP segments sent containing the RST flag.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpHCInSegs": {
-            "type": "integer",
-            "description": "The total number of segments received, including those\n          received in error.  This count includes segments received\n          \n          on currently established connections.  This object is\n          the 64-bit equivalent of tcpInSegs.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0
-          },
-          "tcpHCOutSegs": {
-            "type": "integer",
-            "description": "The total number of segments sent, including those on\n          current connections but excluding those containing only\n          retransmitted octets.  This object is the 64-bit\n          equivalent of tcpOutSegs.\n          \n          Discontinuities in the value of this counter are\n          indicated via discontinuities in the value of sysUpTime.",
-            "minimum": 0
-          },
-          "tcpConnState": {
-            "type": "string",
-            "description": "The state of this TCP connection.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-          },
-          "tcpConnLocalAddress": {
-            "type": "string",
-            "description": "The local IP address for this TCP connection.  In the case\n            of a connection in the listen state willing to\n            accept connections for any IP interface associated with the\n            node, the value 0.0.0.0 is used.",
-            "format": "inet:ipv4-address"
-          },
-          "tcpConnLocalPort": {
-            "type": "integer",
-            "description": "The local port number for this TCP connection.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "tcpConnRemAddress": {
-            "type": "string",
-            "description": "The remote IP address for this TCP connection.",
-            "format": "inet:ipv4-address"
-          },
-          "tcpConnRemPort": {
-            "type": "integer",
-            "description": "The remote port number for this TCP connection.",
-            "minimum": -2147483648,
-            "maximum": 2147483647
-          },
-          "tcpConnectionLocalAddressType": {
-            "type": "string",
-            "description": "The address type of tcpConnectionLocalAddress.",
-            "x-yang-type": "inet-address:InetAddressType"
-          },
-          "tcpConnectionLocalAddress": {
-            "type": "string",
-            "description": "The local IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionLocalAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-            "x-yang-type": "inet-address:InetAddress"
-          },
-          "tcpConnectionLocalPort": {
-            "type": "string",
-            "description": "The local port number for this TCP connection.",
-            "format": "inet:port-number"
-          },
-          "tcpConnectionRemAddressType": {
-            "type": "string",
-            "description": "The address type of tcpConnectionRemAddress.",
-            "x-yang-type": "inet-address:InetAddressType"
-          },
-          "tcpConnectionRemAddress": {
-            "type": "string",
-            "description": "The remote IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionRemAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-            "x-yang-type": "inet-address:InetAddress"
-          },
-          "tcpConnectionRemPort": {
-            "type": "string",
-            "description": "The remote port number for this TCP connection.",
-            "format": "inet:port-number"
-          },
-          "tcpConnectionState": {
-            "type": "string",
-            "description": "The state of this TCP connection.\n            \n            The value listen(2) is included only for parallelism to the\n            old tcpConnTable and should not be used.  A connection in\n            LISTEN state should be present in the tcpListenerTable.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-          },
-          "tcpConnectionProcess": {
-            "type": "integer",
-            "description": "The system's process ID for the process associated with\n            this connection, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
-          "tcpListenerLocalAddressType": {
-            "type": "string",
-            "description": "The address type of tcpListenerLocalAddress.  The value\n            should be unknown (0) if connection initiations to all\n            local IP addresses are accepted.",
-            "x-yang-type": "inet-address:InetAddressType"
-          },
-          "tcpListenerLocalAddress": {
-            "type": "string",
-            "description": "The local IP address for this TCP connection.\n            \n            The value of this object can be represented in three\n            possible ways, depending on the characteristics of the\n            listening application:\n            \n            1. For an application willing to accept both IPv4 and\n               IPv6 datagrams, the value of this object must be\n               ''h (a zero-length octet-string), with the value\n               of the corresponding tcpListenerLocalAddressType\n               object being unknown (0).\n            \n            2. For an application willing to accept only IPv4 or\n               IPv6 datagrams, the value of this object must be\n               '0.0.0.0' or '::' respectively, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            3. For an application which is listening for data\n               destined only to a specific IP address, the value\n               of this object is the specific local address, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            As this object is used in the index for the\n            tcpListenerTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed, using SNMPv1, SNMPv2c, or SNMPv3.",
-            "x-yang-type": "inet-address:InetAddress"
-          },
-          "tcpListenerLocalPort": {
-            "type": "string",
-            "description": "The local port number for this TCP connection.",
-            "format": "inet:port-number"
-          },
-          "tcpListenerProcess": {
-            "type": "integer",
-            "description": "The system's process ID for the process associated with\n            this listener, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-            "minimum": 0,
-            "maximum": 4294967295
-          },
           "tcpConnEntry": {
             "type": "array",
             "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1559,7 +1266,6 @@
           "tcpConnectionEntry": {
             "type": "array",
             "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1609,7 +1315,6 @@
           "tcpListenerEntry": {
             "type": "array",
             "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-            "properties": {},
             "items": {
               "type": "object",
               "properties": {
@@ -1739,36 +1444,9 @@
             "type": "object",
             "description": "A table containing information about existing IPv4-specific\n        TCP connections or listeners.  This table has been\n        deprecated in favor of the version neutral\n        tcpConnectionTable.",
             "properties": {
-              "tcpConnState": {
-                "type": "string",
-                "description": "The state of this TCP connection.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-              },
-              "tcpConnLocalAddress": {
-                "type": "string",
-                "description": "The local IP address for this TCP connection.  In the case\n            of a connection in the listen state willing to\n            accept connections for any IP interface associated with the\n            node, the value 0.0.0.0 is used.",
-                "format": "inet:ipv4-address"
-              },
-              "tcpConnLocalPort": {
-                "type": "integer",
-                "description": "The local port number for this TCP connection.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
-              "tcpConnRemAddress": {
-                "type": "string",
-                "description": "The remote IP address for this TCP connection.",
-                "format": "inet:ipv4-address"
-              },
-              "tcpConnRemPort": {
-                "type": "integer",
-                "description": "The remote port number for this TCP connection.",
-                "minimum": -2147483648,
-                "maximum": 2147483647
-              },
               "tcpConnEntry": {
                 "type": "array",
                 "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1807,50 +1485,9 @@
             "type": "object",
             "description": "A table containing information about existing TCP\n        connections.  Note that unlike earlier TCP MIBs, there\n        is a separate table for connections in the LISTEN state.",
             "properties": {
-              "tcpConnectionLocalAddressType": {
-                "type": "string",
-                "description": "The address type of tcpConnectionLocalAddress.",
-                "x-yang-type": "inet-address:InetAddressType"
-              },
-              "tcpConnectionLocalAddress": {
-                "type": "string",
-                "description": "The local IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionLocalAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-                "x-yang-type": "inet-address:InetAddress"
-              },
-              "tcpConnectionLocalPort": {
-                "type": "string",
-                "description": "The local port number for this TCP connection.",
-                "format": "inet:port-number"
-              },
-              "tcpConnectionRemAddressType": {
-                "type": "string",
-                "description": "The address type of tcpConnectionRemAddress.",
-                "x-yang-type": "inet-address:InetAddressType"
-              },
-              "tcpConnectionRemAddress": {
-                "type": "string",
-                "description": "The remote IP address for this TCP connection.  The type\n            of this address is determined by the value of\n            tcpConnectionRemAddressType.\n            \n            As this object is used in the index for the\n            tcpConnectionTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed by using SNMPv1, SNMPv2c, or SNMPv3.",
-                "x-yang-type": "inet-address:InetAddress"
-              },
-              "tcpConnectionRemPort": {
-                "type": "string",
-                "description": "The remote port number for this TCP connection.",
-                "format": "inet:port-number"
-              },
-              "tcpConnectionState": {
-                "type": "string",
-                "description": "The state of this TCP connection.\n            \n            The value listen(2) is included only for parallelism to the\n            old tcpConnTable and should not be used.  A connection in\n            LISTEN state should be present in the tcpListenerTable.\n            \n            The only value that may be set by a management station is\n            deleteTCB(12).  Accordingly, it is appropriate for an agent\n            to return a `badValue' response if a management station\n            attempts to set this object to any other value.\n            \n            If a management station sets this object to the value\n            deleteTCB(12), then the TCB (as defined in [RFC793]) of\n            the corresponding connection on the managed node is\n            deleted, resulting in immediate termination of the\n            connection.\n            \n            As an implementation-specific option, a RST segment may be\n            sent from the managed node to the other TCP endpoint (note,\n            however, that RST segments are not sent reliably)."
-              },
-              "tcpConnectionProcess": {
-                "type": "integer",
-                "description": "The system's process ID for the process associated with\n            this connection, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
               "tcpConnectionEntry": {
                 "type": "array",
                 "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1903,31 +1540,9 @@
             "type": "object",
             "description": "tcpListenerTable",
             "properties": {
-              "tcpListenerLocalAddressType": {
-                "type": "string",
-                "description": "The address type of tcpListenerLocalAddress.  The value\n            should be unknown (0) if connection initiations to all\n            local IP addresses are accepted.",
-                "x-yang-type": "inet-address:InetAddressType"
-              },
-              "tcpListenerLocalAddress": {
-                "type": "string",
-                "description": "The local IP address for this TCP connection.\n            \n            The value of this object can be represented in three\n            possible ways, depending on the characteristics of the\n            listening application:\n            \n            1. For an application willing to accept both IPv4 and\n               IPv6 datagrams, the value of this object must be\n               ''h (a zero-length octet-string), with the value\n               of the corresponding tcpListenerLocalAddressType\n               object being unknown (0).\n            \n            2. For an application willing to accept only IPv4 or\n               IPv6 datagrams, the value of this object must be\n               '0.0.0.0' or '::' respectively, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            3. For an application which is listening for data\n               destined only to a specific IP address, the value\n               of this object is the specific local address, with\n               tcpListenerLocalAddressType representing the\n               appropriate address type.\n            \n            As this object is used in the index for the\n            tcpListenerTable, implementors should be\n            careful not to create entries that would result in OIDs\n            with more than 128 subidentifiers; otherwise the information\n            cannot be accessed, using SNMPv1, SNMPv2c, or SNMPv3.",
-                "x-yang-type": "inet-address:InetAddress"
-              },
-              "tcpListenerLocalPort": {
-                "type": "string",
-                "description": "The local port number for this TCP connection.",
-                "format": "inet:port-number"
-              },
-              "tcpListenerProcess": {
-                "type": "integer",
-                "description": "The system's process ID for the process associated with\n            this listener, or zero if there is no such process.  This\n            value is expected to be the same as HOST-RESOURCES-MIB::\n            hrSWRunIndex or SYSAPPL-MIB::sysApplElmtRunIndex for some\n            row in the appropriate tables.",
-                "minimum": 0,
-                "maximum": 4294967295
-              },
               "tcpListenerEntry": {
                 "type": "array",
                 "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-                "properties": {},
                 "items": {
                   "type": "object",
                   "properties": {
@@ -1962,7 +1577,6 @@
       "TCP-MIB_tcpConnEntry": {
         "type": "array",
         "description": "A conceptual row of the tcpConnTable containing information\n          about a particular current IPv4 TCP connection.  Each row\n          of this table is transient in that it ceases to exist when\n          (or soon after) the connection makes the transition to the\n          CLOSED state.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -1998,7 +1612,6 @@
       "TCP-MIB_tcpConnectionEntry": {
         "type": "array",
         "description": "A conceptual row of the tcpConnectionTable containing\n          information about a particular current TCP connection.\n          Each row of this table is transient in that it ceases to\n          exist when (or soon after) the connection makes the\n          transition to the CLOSED state.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {
@@ -2048,7 +1661,6 @@
       "TCP-MIB_tcpListenerEntry": {
         "type": "array",
         "description": "A conceptual row of the tcpListenerTable containing\n          information about a particular TCP listener.",
-        "properties": {},
         "items": {
           "type": "object",
           "properties": {

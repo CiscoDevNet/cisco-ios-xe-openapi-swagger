@@ -204,6 +204,8 @@ class MIBToOpenAPI:
         if is_list:
             schema["type"] = "array"
             schema["items"] = {"type": "object", "properties": {}}
+            # Remove properties field from array type
+            del schema["properties"]
 
         # Extract description
         desc_match = re.search(r'description\s+"([^"]+)"', content[:500])
@@ -212,23 +214,14 @@ class MIBToOpenAPI:
 
         # Parse nested elements
         properties_target = schema["items"]["properties"] if is_list else schema["properties"]
-
-        # Find all leaves
-        pos = 0
-        while True:
-            leaf_match = re.search(r'\n\s+(leaf|leaf-list)\s+(\S+)\s*\{', content[pos:])
-            if not leaf_match:
-                break
-
-            leaf_name = leaf_match.group(2)
-            leaf_start = pos + leaf_match.end() - 1
-            leaf_end = self.find_balanced_braces(content, leaf_start)
-
-            if leaf_end != -1:
-                leaf_content = content[leaf_start + 1:leaf_end]
-                properties_target[leaf_name] = self.parse_leaf(leaf_content, leaf_name)
-
-            pos = leaf_end + 1 if leaf_end != -1 else pos + leaf_match.end()
+        
+        # First, check if this container has nested lists or containers
+        # If it does, we should only add those as properties, not the leaves
+        has_nested_structures = bool(re.search(r'\n\s+(list|container)\s+\S+\s*\{', content))
+        
+        # First, check if this container has nested lists or containers
+        # If it does, we should only add those as properties, not the leaves
+        has_nested_structures = bool(re.search(r'\n\s+(list|container)\s+\S+\s*\{', content))
 
         # Find nested lists first (they should be properties of the container)
         pos = 0
@@ -248,12 +241,11 @@ class MIBToOpenAPI:
 
             pos = list_end + 1 if list_end != -1 else pos + list_match.end()
 
-        # Find nested containers (limit depth)
+        # Find nested containers
         pos = 0
-        depth_limit = 3
         while True:
             container_match = re.search(r'\n\s+container\s+(\S+)\s*\{', content[pos:])
-            if not container_match or depth_limit <= 0:
+            if not container_match:
                 break
 
             cont_name = container_match.group(1)
@@ -265,6 +257,25 @@ class MIBToOpenAPI:
                 properties_target[cont_name] = self.parse_container_or_grouping(cont_content, cont_name, False)
 
             pos = cont_end + 1 if cont_end != -1 else pos + container_match.end()
+        
+        # Only parse direct leaves if there are no nested lists
+        # This prevents duplication when a container only exists to hold a list
+        if not has_nested_structures or is_list:
+            pos = 0
+            while True:
+                leaf_match = re.search(r'\n\s+(leaf|leaf-list)\s+(\S+)\s*\{', content[pos:])
+                if not leaf_match:
+                    break
+
+                leaf_name = leaf_match.group(2)
+                leaf_start = pos + leaf_match.end() - 1
+                leaf_end = self.find_balanced_braces(content, leaf_start)
+
+                if leaf_end != -1:
+                    leaf_content = content[leaf_start + 1:leaf_end]
+                    properties_target[leaf_name] = self.parse_leaf(leaf_content, leaf_name)
+
+                pos = leaf_end + 1 if leaf_end != -1 else pos + leaf_match.end()
 
         return schema
 
