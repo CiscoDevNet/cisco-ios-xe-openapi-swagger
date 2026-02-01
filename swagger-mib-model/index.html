@@ -107,22 +107,25 @@
                 renderModuleList(allModules);
                 
                 // Auto-load IF-MIB if available, otherwise first module
-                let moduleToLoad = 'IF-MIB'; // Default to IF-MIB
+                let moduleToLoad = null;
                 
                 // Check if IF-MIB exists in modules
-                const hasIFMIB = allModules.some(mod => {
+                const ifMibModule = allModules.find(mod => {
                     const modName = typeof mod === 'string' ? mod : mod.name;
                     return modName === 'IF-MIB';
                 });
                 
-                // If IF-MIB not found, use first module
-                if (!hasIFMIB && allModules.length > 0) {
+                if (ifMibModule) {
+                    // IF-MIB found
+                    moduleToLoad = typeof ifMibModule === 'string' ? ifMibModule : ifMibModule.name;
+                } else if (allModules.length > 0) {
+                    // Use first module
                     const firstMod = allModules[0];
                     moduleToLoad = typeof firstMod === 'string' ? firstMod : firstMod.name;
                 }
                 
                 // Load the selected module
-                if (hasIFMIB || allModules.length > 0) {
+                if (moduleToLoad) {
                     console.log('Auto-loading module:', moduleToLoad);
                     loadSpec(moduleToLoad);
                 }
