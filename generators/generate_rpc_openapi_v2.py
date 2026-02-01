@@ -323,6 +323,51 @@ class RPCYANGToOpenAPIConverter:
         
         return schema
     
+    def create_example_data(self, schema: Dict[str, Any]) -> Any:
+        """Generate example data from a schema"""
+        if not schema:
+            return {}
+        
+        schema_type = schema.get('type', 'object')
+        
+        if schema_type == 'object':
+            example = {}
+            properties = schema.get('properties', {})
+            for prop_name, prop_schema in properties.items():
+                example[prop_name] = self.create_example_data(prop_schema)
+            return example
+        
+        elif schema_type == 'array':
+            items_schema = schema.get('items', {})
+            return [self.create_example_data(items_schema)]
+        
+        elif schema_type == 'string':
+            # Check for specific formats or patterns
+            fmt = schema.get('format')
+            pattern = schema.get('pattern')
+            if fmt == 'ipv6':
+                return "2001:db8::1"
+            elif pattern and 'ipv4' in pattern:
+                return "192.168.1.1"
+            elif 'ipv4-prefix' in schema.get('description', ''):
+                return "192.168.1.0/24"
+            elif 'ip-address' in schema.get('description', ''):
+                return "192.168.1.1"
+            return "example-string"
+        
+        elif schema_type == 'integer':
+            minimum = schema.get('minimum', 0)
+            maximum = schema.get('maximum', 100)
+            return min(maximum, max(minimum, 10))
+        
+        elif schema_type == 'number':
+            return 1.5
+        
+        elif schema_type == 'boolean':
+            return True
+        
+        return None
+    
     def parse_yang_file(self, yang_file: Path) -> Dict[str, Any]:
         """Parse YANG file and extract module info"""
         with open(yang_file, 'r', encoding='utf-8') as f:
@@ -453,6 +498,9 @@ class RPCYANGToOpenAPIConverter:
                 }
             }
             
+            # Create example request
+            request_example = self.create_example_data(request_schema)
+            
             openapi_spec['paths'][path] = {
                 'post': {
                     'summary': rpc['description'],
@@ -463,7 +511,8 @@ class RPCYANGToOpenAPIConverter:
                         'required': True,
                         'content': {
                             'application/yang-data+json': {
-                                'schema': request_schema
+                                'schema': request_schema,
+                                'example': request_example
                             }
                         }
                     },
@@ -472,7 +521,8 @@ class RPCYANGToOpenAPIConverter:
                             'description': 'RPC executed successfully',
                             'content': {
                                 'application/yang-data+json': {
-                                    'schema': rpc['output_schema']
+                                    'schema': rpc['output_schema'],
+                                    'example': self.create_example_data(rpc['output_schema'])
                                 }
                             }
                         },
