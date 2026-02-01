@@ -26,21 +26,39 @@ class NativeToOpenAPI:
         self.category_keywords = {
             'interfaces': ['interface', 'GigabitEthernet', 'TenGigabitEthernet', 'Loopback', 
                           'Tunnel', 'Vlan', 'Port-channel', 'FastEthernet', 'Ethernet',
-                          'BDI', 'Serial', 'Dialer', 'Virtual-Template'],
+                          'BDI', 'Serial', 'Dialer', 'Virtual-Template', 'management-interface'],
             'routing': ['router', 'bgp', 'ospf', 'eigrp', 'rip', 'isis', 'ip route', 
-                       'ipv6 route', 'route-map', 'prefix-list'],
-            'security': ['access-list', 'aaa', 'crypto', 'zone', 'parameter-map', 
-                        'class-map', 'policy-map', 'acl', 'key chain', 'enable', 'username'],
+                       'ipv6 route', 'route-map', 'prefix-list', 'rtr', 'track', 'bfd',
+                       'global-address-family', 'table-map', 'route-tag'],
+            'security': ['access-list', 'aaa', 'zone', 'class-map', 'policy-map', 
+                        'acl', 'key chain', 'enable', 'username', 'user-name', 'password',
+                        'login', 'privilege', 'dot1x', 'mab', 'eap', 'radius', 'tacacs',
+                        'identity', 'object-group'],
+            'crypto': ['crypto', 'ikev2', 'ipsec', 'isakmp', 'pki', 'key', 'certificate',
+                      'keyring', 'trustpoint', 'mka', 'macsec'],
             'switching': ['vlan', 'spanning-tree', 'switchport', 'channel-group', 
-                         'mac-address-table', 'errdisable'],
+                         'mac-address-table', 'errdisable', 'vtp', 'lacp', 'port-channel',
+                         'l2', 'mvrp', 'avb', 'xconnect', 'pseudowire', 'l2tp'],
             'services': ['dhcp', 'nat', 'ntp', 'snmp', 'logging', 'cdp', 'lldp', 
-                        'dns', 'domain', 'ip domain', 'archive'],
-            'qos': ['qos', 'service-policy', 'mls qos', 'class', 'policy'],
+                        'dns', 'domain', 'ip domain', 'archive', 'tftp-server',
+                        'radius-server', 'ldap', 'http', 'telnet', 'ssh', 'service'],
+            'qos': ['qos', 'service-policy', 'mls qos', 'class', 'policy', 'avc',
+                   'parameter-map', 'sdm'],
             'mpls': ['mpls', 'ldp', 'traffic-eng', 'segment-routing'],
-            'vpn': ['tunnel', 'ipsec', 'isakmp', 'ikev2', 'l2tp', 'gre', 'dmvpn'],
+            'vpn': ['tunnel', 'gre', 'dmvpn'],
             'wireless': ['wireless', 'wlan', 'ap ', 'dot11'],
-            'system': ['hostname', 'banner', 'boot', 'clock', 'version', 'service', 
-                      'memory', 'scheduler', 'process', 'platform', 'license', 'line']
+            'platform': ['hw-module', 'stack', 'switch', 'breakout', 'module', 'card',
+                        'platform', 'stack-power', 'controller', 'cisp', 'redundancy',
+                        'upgrade', 'software', 'boot', 'config-register'],
+            'call-home': ['call-home'],
+            'monitor': ['monitor', 'span', 'rspan', 'erspan', 'flow', 'sampler', 'rmon',
+                       'netflow'],
+            'voice': ['voice', 'dial-peer', 'voice-class', 'sip', 'scada-gw'],
+            'system': ['hostname', 'banner', 'clock', 'version', 'memory', 'scheduler', 
+                      'process', 'license', 'line', 'parser', 'location', 'fabric',
+                      'system', 'epm', 'ptp', 'multilink', 'ppp', 'macro', 'vrf',
+                      'fallback', 'subscriber', 'frame-relay', 'aqm-register',
+                      'control-plane', 'exception', 'transport', 'md-list']
         }
 
     def create_example_data(self, schema: Dict[str, Any], property_name: str = '') -> Any:
@@ -541,12 +559,17 @@ class NativeToOpenAPI:
             'interfaces': 'Native - Interfaces',
             'routing': 'Native - Routing Protocols',
             'security': 'Native - Security & AAA',
+            'crypto': 'Native - Cryptography & PKI',
             'switching': 'Native - Switching & VLANs',
             'services': 'Native - Network Services',
             'qos': 'Native - QoS & Policy',
             'mpls': 'Native - MPLS & TE',
             'vpn': 'Native - VPN & Tunnels',
             'wireless': 'Native - Wireless',
+            'platform': 'Native - Platform & Hardware',
+            'call-home': 'Native - Call Home & Licensing',
+            'monitor': 'Native - Monitoring & Analytics',
+            'voice': 'Native - Voice & Telephony',
             'system': 'Native - System & Management'
         }
         
@@ -740,7 +763,7 @@ class NativeToOpenAPI:
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(spec, f, indent=2)
             
-            print(f"  ✓ {category}: {len(paths)} paths -> {output_file.name}")
+            print(f"  * {category}: {len(paths)} paths -> {output_file.name}")
             total_specs += 1
             manifest_modules.append(f"native-{category}")
         
