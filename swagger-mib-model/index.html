@@ -140,13 +140,24 @@
         }
         
         function loadSpec(moduleName) {
+            console.log('loadSpec called with:', moduleName, 'type:', typeof moduleName);
+            
+            // Ensure we have a string module name
+            if (!moduleName || typeof moduleName !== 'string') {
+                console.error('Invalid module name:', moduleName);
+                return;
+            }
+            
             document.getElementById('welcomeBox').style.display = 'none';
             document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
             const link = document.getElementById('mod-' + moduleName);
             if (link) link.classList.add('selected');
             
+            const specUrl = `api/${moduleName}.json`;
+            console.log('Loading spec from:', specUrl);
+            
             SwaggerUIBundle({
-                url: `api/${moduleName}.json`,
+                url: specUrl,
                 dom_id: '#swagger-ui',
                 presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
                 layout: 'StandaloneLayout',
