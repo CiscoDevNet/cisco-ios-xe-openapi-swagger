@@ -102,18 +102,20 @@
         function renderModuleList(modules) {
             const list = document.getElementById('moduleList');
             list.innerHTML = modules.map(mod => {
-                return `<li><a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${mod}</a></li>`;
+                const modName = typeof mod === 'object' ? mod.name : mod;
+                return `<li><a href="#" onclick="loadSpec('${modName}'); return false;" id="mod-${modName}">${modName}</a></li>`;
             }).join('');
         }
         
         function loadSpec(moduleName) {
+            const modName = typeof moduleName === 'object' ? moduleName.name : moduleName;
             document.getElementById('welcomeBox').style.display = 'none';
             document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
-            const link = document.getElementById('mod-' + moduleName);
+            const link = document.getElementById('mod-' + modName);
             if (link) link.classList.add('selected');
             
             SwaggerUIBundle({
-                url: `api/${moduleName}.json`,
+                url: `api/${modName}.json`,
                 dom_id: '#swagger-ui',
                 presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
                 layout: 'StandaloneLayout',
