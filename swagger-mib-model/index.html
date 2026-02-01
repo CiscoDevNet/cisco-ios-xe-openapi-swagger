@@ -105,17 +105,28 @@
                 renderModuleList(allModules);
                 
                 // Auto-load IF-MIB if available, otherwise first module
-                const defaultModule = allModules.find(mod => {
-                    const modName = typeof mod === 'string' ? mod : mod.name;
-                    return modName === 'IF-MIB';
-                });
+                let moduleToLoad = null;
                 
-                if (defaultModule) {
-                    const modName = typeof defaultModule === 'string' ? defaultModule : defaultModule.name;
-                    loadSpec(modName);
-                } else if (allModules.length > 0) {
-                    const modName = typeof allModules[0] === 'string' ? allModules[0] : allModules[0].name;
-                    loadSpec(modName);
+                // Try to find IF-MIB
+                for (let i = 0; i < allModules.length; i++) {
+                    const mod = allModules[i];
+                    const modName = (typeof mod === 'string') ? mod : mod.name;
+                    if (modName === 'IF-MIB') {
+                        moduleToLoad = modName;
+                        break;
+                    }
+                }
+                
+                // If IF-MIB not found, use first module
+                if (!moduleToLoad && allModules.length > 0) {
+                    const firstMod = allModules[0];
+                    moduleToLoad = (typeof firstMod === 'string') ? firstMod : firstMod.name;
+                }
+                
+                // Load the module
+                if (moduleToLoad) {
+                    console.log('Auto-loading module:', moduleToLoad);
+                    loadSpec(moduleToLoad);
                 }
             } catch (error) {
                 console.error('Error loading manifest:', error);
