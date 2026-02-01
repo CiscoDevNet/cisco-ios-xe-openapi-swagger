@@ -66,6 +66,10 @@
                     <div class="stat-value" id="totalModules">0</div>
                     <div class="stat-label">Modules</div>
                 </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalOperations">0</div>
+                    <div class="stat-label">Operations</div>
+                </div>
             </div>
             <ul class="module-list" id="moduleList"></ul>
         </aside>
@@ -91,7 +95,9 @@
                 const response = await fetch('api/manifest.json');
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
+                const totalOps = allModules.reduce((sum, m) => sum + (m.paths || 0), 0);
                 document.getElementById('totalModules').textContent = allModules.length;
+                document.getElementById('totalOperations').textContent = totalOps;
                 renderModuleList(allModules);
                 
                 // Auto-load first module if available
