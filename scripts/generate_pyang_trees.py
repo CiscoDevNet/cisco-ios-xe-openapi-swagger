@@ -133,10 +133,12 @@ def generate_pyang_tree(yang_file: Path, output_dir: Path) -> bool:
     </div>
     
     <div style="background: #e3f2fd; padding: 15px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #0070c9;">
-        <p style="color: #01579b; font-size: 14px; margin-bottom: 8px;"><strong>📚 API Documentation</strong></p>
-        <a href="../{swagger_dir}/" style="color: #0070c9; text-decoration: none; font-size: 13px;">View {swagger_label} →</a>
-        <span style="color: #666; margin: 0 8px;">|</span>
-        <a href="index.html" style="color: #0070c9; text-decoration: none; font-size: 13px;">Browse All Trees</a>
+        <p style="color: #01579b; font-size: 14px; margin-bottom: 10px;"><strong>📚 API Documentation & Navigation</strong></p>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="../{swagger_dir}/?url=api/{module_name}.json" style="color: white; background: #0070c9; text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 4px; font-weight: 500;">📄 Swagger API Spec</a>
+            <a href="../{swagger_dir}/" style="color: #0070c9; text-decoration: none; font-size: 13px; padding: 6px 12px; background: white; border-radius: 4px; border: 1px solid #e0e0e0;">📂 Browse {swagger_label}</a>
+            <a href="index.html" style="color: #666; text-decoration: none; font-size: 13px; padding: 6px 12px; background: white; border-radius: 4px; border: 1px solid #e0e0e0;">🌳 All Trees</a>
+        </div>
     </div>
     
     <div class="tree-container">
