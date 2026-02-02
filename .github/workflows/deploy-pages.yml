@@ -1,0 +1,79 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Prepare deployment directory
+        run: |
+          # Create a clean deployment directory
+          mkdir -p deploy
+          
+          # Copy only necessary files for the website (exclude heavy references and scripts)
+          echo "Copying model directories..."
+          cp -r swagger-*-model deploy/ 2>/dev/null || true
+          
+          echo "Copying Swagger UI (if exists)..."
+          if [ -d "swagger-ui-5.11.0" ]; then
+            mkdir -p deploy/swagger-ui-5.11.0
+            cp -r swagger-ui-5.11.0/swagger-ui-dist-package deploy/swagger-ui-5.11.0/ 2>/dev/null || true
+            # Copy dist directory if it exists
+            cp -r swagger-ui-5.11.0/dist deploy/swagger-ui-5.11.0/ 2>/dev/null || true
+          fi
+          
+          echo "Copying YANG trees..."
+          cp -r yang-trees deploy/ 2>/dev/null || true
+          
+          echo "Copying docs..."
+          cp -r docs deploy/ 2>/dev/null || true
+          
+          echo "Copying root files..."
+          # Copy root HTML files and config
+          cp *.html deploy/ 2>/dev/null || true
+          cp *.json deploy/ 2>/dev/null || true
+          cp *.md deploy/ 2>/dev/null || true
+          cp .nojekyll deploy/ 2>/dev/null || true
+          
+          # Exclude heavy directories
+          echo "Excluding references, archive, generators, scripts from deployment..."
+          
+          # Show deployment size for debugging
+          echo "=== Deployment Summary ==="
+          du -sh deploy
+          echo "Total files to deploy:"
+          find deploy -type f | wc -l
+          echo "Deployment directory structure:"
+          ls -lah deploy/
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'deploy'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
