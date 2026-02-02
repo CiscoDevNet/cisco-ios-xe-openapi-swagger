@@ -1,249 +1,25 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "RPC - Debug & Troubleshooting",
-    "description": "Cisco IOS-XE RPC Operations - Debug\n\n**Category:** Debug Operations\n**Modules:** 3\n**RPC Actions:** 5\n\n**HTTP Methods:**\n- POST: Execute RPC action/operation\n\n**Modules Included:**\n- logging-ios\n- tech-support\n- trace\n\n**RPC Operation Pattern:**\nRPC operations are executed via RESTCONF POST to `/operations/` endpoints.\nEach RPC accepts input parameters and returns output results.\n\n**Example RPC Execution:**\n```bash\nPOST /restconf/operations/Cisco-IOS-XE-rpc:ping\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"ping-request\": {\n      \"destination\": \"10.0.0.1\",\n      \"repeat-count\": 5,\n      \"size\": 100\n    }\n  }\n}\n```\n\n**Example Response:**\n```json\n{\n  \"output\": {\n    \"ping-reply\": {\n      \"destination\": \"10.0.0.1\",\n      \"request-count\": 5,\n      \"reply-count\": 5,\n      \"success-rate\": 100,\n      \"minimum-rtt\": 1,\n      \"average-rtt\": 2,\n      \"maximum-rtt\": 3\n    }\n  }\n}\n```\n\n**Common Operations:**\n- logging_ios_actions_rpc:send-log\n- tech_support_rpc:tech-support-archive\n- tech_support_rpc:tech-support-file\n- trace_rpc:trace-archive\n- trace_rpc:trace-message\n\n",
-    "version": "17.18.1"
+    "title": "Cisco-IOS-XE-trace-rpc - RPC Operations",
+    "description": "Copyright (c) 2021-2022 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `Cisco-IOS-XE-trace-rpc`\n**Version:** 2022-11-01\n**Operations:** 2",
+    "version": "2022-11-01"
   },
   "servers": [
     {
       "url": "https://{device}/restconf",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "router.example.com"
         }
       }
     }
   ],
   "paths": {
-    "/operations/logging_ios_actions_rpc:send-log": {
-      "post": {
-        "summary": "To send a syslog message.",
-        "description": "**Source Module:** logging-ios\n\nTo send a syslog message.\n\n**Endpoint:** `POST /restconf/operations/logging_ios_actions_rpc:send-log`",
-        "operationId": "send-log",
-        "tags": [
-          "Cisco-IOS-XE-logging-ios-actions-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "logging_ios_actions_rpc:send-log": {
-                    "type": "object",
-                    "properties": {
-                      "facility": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 256,
-                        "pattern": "[^ ]*",
-                        "description": "Facility name"
-                      },
-                      "mnemonics": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 256,
-                        "pattern": "[^ ]*",
-                        "description": "Mnemonics"
-                      },
-                      "message": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 256,
-                        "description": "Logging message"
-                      },
-                      "severity": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 7,
-                        "description": "Severity",
-                        "default": "7"
-                      }
-                    },
-                    "required": [
-                      "message"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "logging_ios_actions_rpc:send-log": {
-                  "facility": "example-string",
-                  "mnemonics": "example-string",
-                  "message": "example-string",
-                  "severity": 7
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/tech_support_rpc:tech-support-archive": {
-      "post": {
-        "summary": "RPC message for tech-support archive generation",
-        "description": "**Source Module:** tech-support\n\nRPC message for tech-support archive generation\n\n**Endpoint:** `POST /restconf/operations/tech_support_rpc:tech-support-archive`",
-        "operationId": "tech-support-archive",
-        "tags": [
-          "Cisco-IOS-XE-tech-support-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tech_support_rpc:tech-support-archive": {
-                    "type": "object",
-                    "properties": {
-                      "archive": {
-                        "type": "string",
-                        "description": "Tech-support archive generate option.\n         This is the only option and if this option is marked as 'true',\n         tech-support archive will be generated.\n         The tech-support file included in the archive will be equivalent\n         to the output generated by 'show tech-support'.",
-                        "default": "true"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "tech_support_rpc:tech-support-archive": {
-                  "archive": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "file-name": {
-                      "type": "string",
-                      "pattern": "(flash:|bootflash:|crashinfo:|harddisk:)[A-Za-z_0-9]*",
-                      "description": "File name of the tech-support archive/file that will be generated. If\n         the file-name is empty, it indicates that there was failure in the\n         operation, possibly an internal error or another operation was being\n         processed. In such cases, the reason for failure will also be\n         attached to the response message. The arrival of response does not\n         indicate that the operation is complete because the tech-support\n         operation takes a huge amount of time to complete and notifications\n         related to the execution can be consumed by subscribing to the tech-support\n         event notification model which will contain the same file-name found in this\n         response message."
-                    }
-                  }
-                },
-                "example": {
-                  "file-name": "flash:/config.txt"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/tech_support_rpc:tech-support-file": {
-      "post": {
-        "summary": "RPC message for tech-support file generation",
-        "description": "**Source Module:** tech-support\n\nRPC message for tech-support file generation\n\n**Endpoint:** `POST /restconf/operations/tech_support_rpc:tech-support-file`",
-        "operationId": "tech-support-file",
-        "tags": [
-          "Cisco-IOS-XE-tech-support-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "tech_support_rpc:tech-support-file": {
-                    "type": "object",
-                    "properties": {
-                      "default-option": {
-                        "type": "string",
-                        "description": "This is option will gather all tech-support information, except for\n             protocol-specific tech-support information. Selecting this option\n             will generate tech-support file which contains data collected by\n             the basic version of show-tech support CLI - 'show tech-support'.",
-                        "default": "true"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "tech_support_rpc:tech-support-file": {
-                  "default-option": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "file-name": {
-                      "type": "string",
-                      "pattern": "(flash:|bootflash:|crashinfo:|harddisk:)[A-Za-z_0-9]*",
-                      "description": "File name of the tech-support archive/file that will be generated. If\n         the file-name is empty, it indicates that there was failure in the\n         operation, possibly an internal error or another operation was being\n         processed. In such cases, the reason for failure will also be\n         attached to the response message. The arrival of response does not\n         indicate that the operation is complete because the tech-support\n         operation takes a huge amount of time to complete and notifications\n         related to the execution can be consumed by subscribing to the tech-support\n         event notification model which will contain the same file-name found in this\n         response message."
-                    }
-                  }
-                },
-                "example": {
-                  "file-name": "flash:/config.txt"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/operations/trace_rpc:trace-archive": {
       "post": {
         "summary": "RPC for generating trace archive",
-        "description": "**Source Module:** trace\n\nRPC for generating trace archive\n\n**Endpoint:** `POST /restconf/operations/trace_rpc:trace-archive`",
+        "description": "RPC for generating trace archive\n\n**Endpoint:** `POST /restconf/operations/trace_rpc:trace-archive`",
         "operationId": "trace-archive",
         "tags": [
           "Cisco-IOS-XE-trace-rpc"
@@ -346,7 +122,7 @@
     "/operations/trace_rpc:trace-message": {
       "post": {
         "summary": "RPC for trace logging operations",
-        "description": "**Source Module:** trace\n\nRPC for trace logging operations\n\n**Endpoint:** `POST /restconf/operations/trace_rpc:trace-message`",
+        "description": "RPC for trace logging operations\n\n**Endpoint:** `POST /restconf/operations/trace_rpc:trace-message`",
         "operationId": "trace-message",
         "tags": [
           "Cisco-IOS-XE-trace-rpc"
@@ -1956,5 +1732,18 @@
         }
       }
     }
-  }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
 }

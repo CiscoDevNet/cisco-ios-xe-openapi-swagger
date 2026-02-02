@@ -1,280 +1,25 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "RPC - Network Operations",
-    "description": "Cisco IOS-XE RPC Operations - Network\n\n**Category:** Network Operations\n**Modules:** 2\n**RPC Actions:** 10\n\n**HTTP Methods:**\n- POST: Execute RPC action/operation\n\n**Modules Included:**\n- bridge-domain\n- livetools\n\n**RPC Operation Pattern:**\nRPC operations are executed via RESTCONF POST to `/operations/` endpoints.\nEach RPC accepts input parameters and returns output results.\n\n**Example RPC Execution:**\n```bash\nPOST /restconf/operations/Cisco-IOS-XE-rpc:ping\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"ping-request\": {\n      \"destination\": \"10.0.0.1\",\n      \"repeat-count\": 5,\n      \"size\": 100\n    }\n  }\n}\n```\n\n**Example Response:**\n```json\n{\n  \"output\": {\n    \"ping-reply\": {\n      \"destination\": \"10.0.0.1\",\n      \"request-count\": 5,\n      \"reply-count\": 5,\n      \"success-rate\": 100,\n      \"minimum-rtt\": 1,\n      \"average-rtt\": 2,\n      \"maximum-rtt\": 3\n    }\n  }\n}\n```\n\n**Common Operations:**\n- cisco_bridge_domain:clear-bridge-domain\n- cisco_bridge_domain:clear-mac-address\n- cisco_bridge_domain:create-parameterized-bridge-domains\n- livetools_actions_rpc:wol-action\n- livetools_actions_rpc:thrpt-action\n...\n",
-    "version": "17.18.1"
+    "title": "Cisco-IOS-XE-livetools-actions-rpc - RPC Operations",
+    "description": "This module contains a collection of YANG definitions\n     for live tools action RPC.\n     Copyright (c) 2024-2025 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `Cisco-IOS-XE-livetools-actions-rpc`\n**Version:** 2025-07-01\n**Operations:** 7",
+    "version": "2025-07-01"
   },
   "servers": [
     {
       "url": "https://{device}/restconf",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "router.example.com"
         }
       }
     }
   ],
   "paths": {
-    "/operations/cisco_bridge_domain:clear-bridge-domain": {
-      "post": {
-        "summary": "Clear mac-address table for bridge-domain and allows a bridge\n       to forward again after it was put in shutdown state as a\n       result of exceeding the configured MAC limit.",
-        "description": "**Source Module:** bridge-domain\n\nClear mac-address table for bridge-domain and allows a bridge\n       to forward again after it was put in shutdown state as a\n       result of exceeding the configured MAC limit.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:clear-bridge-domain`",
-        "operationId": "clear-bridge-domain",
-        "tags": [
-          "cisco-bridge-domain"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_bridge_domain:clear-bridge-domain": {
-                    "type": "object",
-                    "properties": {
-                      "all": {
-                        "type": "string",
-                        "description": "Clear all bridge-domains configured on the device."
-                      },
-                      "bd-id": {
-                        "type": "string",
-                        "description": "Clear a single bridge-domain"
-                      },
-                      "bg-id": {
-                        "type": "string",
-                        "description": "Clears all bridge-domains under this bridge-group."
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "cisco_bridge_domain:clear-bridge-domain": {
-                  "all": "example-string",
-                  "bd-id": "example-string",
-                  "bg-id": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errstr": {
-                      "type": "string",
-                      "description": "Error message from the device if RPC failed."
-                    }
-                  }
-                },
-                "example": {
-                  "errstr": "example-string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_bridge_domain:clear-mac-address": {
-      "post": {
-        "summary": "This RPC allows to clear dynamically learnt mac-address\n       entries from the mac-address table.",
-        "description": "**Source Module:** bridge-domain\n\nThis RPC allows to clear dynamically learnt mac-address\n       entries from the mac-address table.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:clear-mac-address`",
-        "operationId": "clear-mac-address",
-        "tags": [
-          "cisco-bridge-domain"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_bridge_domain:clear-mac-address": {
-                    "type": "object",
-                    "properties": {
-                      "bd-id": {
-                        "type": "string",
-                        "description": "Bridge-domain identifier, clear all mac-address entries\n             dynamically learnt on this bridge-domain"
-                      },
-                      "bg-id": {
-                        "type": "string",
-                        "description": "Bridge-group identifier, clear all mac-address entries\n             from all bridge-domains under this bridge-group."
-                      },
-                      "interface": {
-                        "type": "string",
-                        "description": "Reference to an interface. Clear mac-addesses learnt by\n           by this interface."
-                      },
-                      "mac-address": {
-                        "type": "string",
-                        "description": "Clear a specific mac-address entry from the mac-table."
-                      },
-                      "bridge-domain": {
-                        "type": "object",
-                        "properties": {
-                          "bd-id": {
-                            "type": "string",
-                            "description": "Bridge-domain identifier, clear all mac-address entries\n             dynamically learnt on this bridge-domain"
-                          },
-                          "bg-id": {
-                            "type": "string",
-                            "description": "Bridge-group identifier, clear all mac-address entries\n             from all bridge-domains under this bridge-group."
-                          }
-                        },
-                        "required": [
-                          "bd-id",
-                          "bg-id"
-                        ],
-                        "description": "Clear mac-address entries for given bridge-domain(s)."
-                      }
-                    },
-                    "required": [
-                      "bd-id",
-                      "bg-id"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_bridge_domain:clear-mac-address": {
-                  "bd-id": "example-string",
-                  "bg-id": "example-string",
-                  "interface": "GigabitEthernet1/0/1",
-                  "mac-address": "00:11:22:33:44:55",
-                  "bridge-domain": {
-                    "bd-id": "example-string",
-                    "bg-id": "example-string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errstr": {
-                      "type": "string",
-                      "description": "Error message from the device if RPC failed."
-                    }
-                  }
-                },
-                "example": {
-                  "errstr": "example-string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_bridge_domain:create-parameterized-bridge-domains": {
-      "post": {
-        "summary": "Create bridge domains automatically from user defined\n       parameters.",
-        "description": "**Source Module:** bridge-domain\n\nCreate bridge domains automatically from user defined\n       parameters.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:create-parameterized-bridge-domains`",
-        "operationId": "create-parameterized-bridge-domains",
-        "tags": [
-          "cisco-bridge-domain"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_bridge_domain:create-parameterized-bridge-domains": {
-                    "type": "object",
-                    "properties": {
-                      "parameter": {
-                        "type": "string",
-                        "description": "Create bridge-domains from vlan encapsulations of the\n               member interfaces."
-                      },
-                      "interface": {
-                        "type": "string",
-                        "description": "Reference to an interface instance which is\n             configured to be part of this bridge domain"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "cisco_bridge_domain:create-parameterized-bridge-domains": {
-                  "parameter": "GigabitEthernet1/0/1",
-                  "interface": "GigabitEthernet1/0/1"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errstr": {
-                      "type": "string",
-                      "description": "Error message from the device if RPC failed."
-                    }
-                  }
-                },
-                "example": {
-                  "errstr": "example-string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
     "/operations/livetools_actions_rpc:wol-action": {
       "post": {
         "summary": "This RPC is used to test the WAKE-ON-LAN feature execution and it returns\n       with an 'JOB ID' if the RPC execution was successful",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to test the WAKE-ON-LAN feature execution and it returns\n       with an 'JOB ID' if the RPC execution was successful\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:wol-action`",
+        "description": "This RPC is used to test the WAKE-ON-LAN feature execution and it returns\n       with an 'JOB ID' if the RPC execution was successful\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:wol-action`",
         "operationId": "wol-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -367,7 +112,7 @@
     "/operations/livetools_actions_rpc:thrpt-action": {
       "post": {
         "summary": "Network throughput measurement",
-        "description": "**Source Module:** livetools\n\nNetwork throughput measurement\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:thrpt-action`",
+        "description": "Network throughput measurement\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:thrpt-action`",
         "operationId": "thrpt-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -495,7 +240,7 @@
     "/operations/livetools_actions_rpc:ip-tracert-action": {
       "post": {
         "summary": "This RPC is used to denote an IP trace route operation",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to denote an IP trace route operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:ip-tracert-action`",
+        "description": "This RPC is used to denote an IP trace route operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:ip-tracert-action`",
         "operationId": "ip-tracert-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -647,7 +392,7 @@
     "/operations/livetools_actions_rpc:ip-ping-action": {
       "post": {
         "summary": "This RPC is used to denote an IP ping operation",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to denote an IP ping operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:ip-ping-action`",
+        "description": "This RPC is used to denote an IP ping operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:ip-ping-action`",
         "operationId": "ip-ping-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -783,7 +528,7 @@
     "/operations/livetools_actions_rpc:mtr-action": {
       "post": {
         "summary": "This RPC is used to denote a my trace route (MTR) operation",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to denote a my trace route (MTR) operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:mtr-action`",
+        "description": "This RPC is used to denote a my trace route (MTR) operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:mtr-action`",
         "operationId": "mtr-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -941,7 +686,7 @@
     "/operations/livetools_actions_rpc:dns-query-action": {
       "post": {
         "summary": "This RPC is used to denote DNS query operation",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to denote DNS query operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:dns-query-action`",
+        "description": "This RPC is used to denote DNS query operation\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:dns-query-action`",
         "operationId": "dns-query-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -1033,7 +778,7 @@
     "/operations/livetools_actions_rpc:nextun-pcap-action": {
       "post": {
         "summary": "This RPC is used to execute the Meraki Nextunnel Packet Capture (pcap) feature. It returns\n       with a 'job-id' if the RPC execution was successful queued for execution.\n       Starting a job with one already running or stopping a job that is not running will\n       result in an error.",
-        "description": "**Source Module:** livetools\n\nThis RPC is used to execute the Meraki Nextunnel Packet Capture (pcap) feature. It returns\n       with a 'job-id' if the RPC execution was successful queued for execution.\n       Starting a job with one already running or stopping a job that is not running will\n       result in an error.\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:nextun-pcap-action`",
+        "description": "This RPC is used to execute the Meraki Nextunnel Packet Capture (pcap) feature. It returns\n       with a 'job-id' if the RPC execution was successful queued for execution.\n       Starting a job with one already running or stopping a job that is not running will\n       result in an error.\n\n**Endpoint:** `POST /restconf/operations/livetools_actions_rpc:nextun-pcap-action`",
         "operationId": "nextun-pcap-action",
         "tags": [
           "Cisco-IOS-XE-livetools-actions-rpc"
@@ -1130,5 +875,18 @@
         }
       }
     }
-  }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
 }
