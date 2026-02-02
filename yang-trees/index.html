@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANG Tree Browser - IOS-XE 17.18.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .module-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .module-card a {
+            color: #0070c9;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .module-card a:hover {
+            text-decoration: underline;
+        }
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stats h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 YANG Tree Browser</h1>
+        <p>Visual data structure for all IOS-XE 17.18.1 YANG modules</p>
+        <input type="text" class="search-box" id="searchBox" placeholder="Search modules..." onkeyup="filterModules()">
+    </div>
+    
+    <div class="stats">
+        <h2>568 Modules with Tree Structure</h2>
+        <p style="color: #666; margin-top: 5px;">Data-bearing modules only (types-only modules excluded)</p>
+    </div>
+    
+    <div class="module-grid" id="moduleGrid">
+        <div class="module-card"><a href="Cisco-IOS-XE-aaa.html">Cisco-IOS-XE-aaa</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aaa-actions-rpc.html">Cisco-IOS-XE-aaa-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aaa-events.html">Cisco-IOS-XE-aaa-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aaa-oper.html">Cisco-IOS-XE-aaa-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-acl.html">Cisco-IOS-XE-acl</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-acl-oper.html">Cisco-IOS-XE-acl-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-adsl.html">Cisco-IOS-XE-adsl</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-alarm-profile.html">Cisco-IOS-XE-alarm-profile</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-app-cflowd-oper.html">Cisco-IOS-XE-app-cflowd-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-app-hosting.html">Cisco-IOS-XE-app-hosting</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-app-hosting-cfg.html">Cisco-IOS-XE-app-hosting-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-app-hosting-oper.html">Cisco-IOS-XE-app-hosting-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-events.html">Cisco-IOS-XE-appqoe-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-http-oper.html">Cisco-IOS-XE-appqoe-http-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-oper.html">Cisco-IOS-XE-appqoe-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-serv-oper.html">Cisco-IOS-XE-appqoe-serv-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-sslproxy-oper.html">Cisco-IOS-XE-appqoe-sslproxy-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-appqoe-tcpproxy-oper.html">Cisco-IOS-XE-appqoe-tcpproxy-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-arp.html">Cisco-IOS-XE-arp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-arp-oper.html">Cisco-IOS-XE-arp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-atm.html">Cisco-IOS-XE-atm</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-avb.html">Cisco-IOS-XE-avb</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aws-cw-cfg.html">Cisco-IOS-XE-aws-cw-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aws-cw-oper.html">Cisco-IOS-XE-aws-cw-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aws-s3-cfg.html">Cisco-IOS-XE-aws-s3-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-aws-s3-oper.html">Cisco-IOS-XE-aws-s3-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bba-group.html">Cisco-IOS-XE-bba-group</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bbu-oper.html">Cisco-IOS-XE-bbu-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bfd.html">Cisco-IOS-XE-bfd</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bfd-oper.html">Cisco-IOS-XE-bfd-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bgp.html">Cisco-IOS-XE-bgp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bgp-actions-rpc.html">Cisco-IOS-XE-bgp-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bgp-nbr-oper.html">Cisco-IOS-XE-bgp-nbr-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bgp-oper.html">Cisco-IOS-XE-bgp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bgp-rib-oper.html">Cisco-IOS-XE-bgp-rib-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-boot-integrity-oper.html">Cisco-IOS-XE-boot-integrity-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-breakout-port-oper.html">Cisco-IOS-XE-breakout-port-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bridge.html">Cisco-IOS-XE-bridge</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bridge-domain.html">Cisco-IOS-XE-bridge-domain</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-bridge-oper.html">Cisco-IOS-XE-bridge-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-buffers.html">Cisco-IOS-XE-buffers</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cable-diag-oper.html">Cisco-IOS-XE-cable-diag-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cable-diag-rpc.html">Cisco-IOS-XE-cable-diag-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-call-home.html">Cisco-IOS-XE-call-home</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-card.html">Cisco-IOS-XE-card</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cdp.html">Cisco-IOS-XE-cdp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cdp-oper.html">Cisco-IOS-XE-cdp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cef.html">Cisco-IOS-XE-cef</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cellular.html">Cisco-IOS-XE-cellular</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cellular-rpc.html">Cisco-IOS-XE-cellular-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cellwan-oper.html">Cisco-IOS-XE-cellwan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cfm-oper.html">Cisco-IOS-XE-cfm-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-chassis-rpc.html">Cisco-IOS-XE-chassis-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-checkpoint-archive-oper.html">Cisco-IOS-XE-checkpoint-archive-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cli-preview-rpc.html">Cisco-IOS-XE-cli-preview-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cli-rpc.html">Cisco-IOS-XE-cli-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-clns.html">Cisco-IOS-XE-clns</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cloud-services-cfg.html">Cisco-IOS-XE-cloud-services-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cloud-services-oper.html">Cisco-IOS-XE-cloud-services-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cloud-services-rpc.html">Cisco-IOS-XE-cloud-services-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-coap.html">Cisco-IOS-XE-coap</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-controller.html">Cisco-IOS-XE-controller</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-controller-shdsl-events.html">Cisco-IOS-XE-controller-shdsl-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-controller-shdsl-oper.html">Cisco-IOS-XE-controller-shdsl-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-controller-t1e1-oper.html">Cisco-IOS-XE-controller-t1e1-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-controller-vdsl-oper.html">Cisco-IOS-XE-controller-vdsl-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto.html">Cisco-IOS-XE-crypto</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto-actions-rpc.html">Cisco-IOS-XE-crypto-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto-events.html">Cisco-IOS-XE-crypto-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto-oper.html">Cisco-IOS-XE-crypto-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto-pki-events.html">Cisco-IOS-XE-crypto-pki-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-crypto-pki-oper.html">Cisco-IOS-XE-crypto-pki-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ctrl-mng-cfg.html">Cisco-IOS-XE-ctrl-mng-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cts.html">Cisco-IOS-XE-cts</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cts-rpc.html">Cisco-IOS-XE-cts-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cwan-actions-rpc.html">Cisco-IOS-XE-cwan-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cwan-fw-rpc.html">Cisco-IOS-XE-cwan-fw-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-cwmp.html">Cisco-IOS-XE-cwmp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dapr.html">Cisco-IOS-XE-dapr</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dca-events.html">Cisco-IOS-XE-dca-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-device-hardware-oper.html">Cisco-IOS-XE-device-hardware-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-device-sensor.html">Cisco-IOS-XE-device-sensor</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-device-tracking.html">Cisco-IOS-XE-device-tracking</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dhcp.html">Cisco-IOS-XE-dhcp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dhcp-oper.html">Cisco-IOS-XE-dhcp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dhcp-security-track-server-oper.html">Cisco-IOS-XE-dhcp-security-track-server-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-diagnostics.html">Cisco-IOS-XE-diagnostics</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dialer.html">Cisco-IOS-XE-dialer</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-diffserv-target-oper.html">Cisco-IOS-XE-diffserv-target-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-digital-io-oper.html">Cisco-IOS-XE-digital-io-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-digitalio.html">Cisco-IOS-XE-digitalio</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dlr.html">Cisco-IOS-XE-dlr</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dlr-oper.html">Cisco-IOS-XE-dlr-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dns-oper.html">Cisco-IOS-XE-dns-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dot1x.html">Cisco-IOS-XE-dot1x</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dre-cp-oper.html">Cisco-IOS-XE-dre-cp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dre-oper.html">Cisco-IOS-XE-dre-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-dying-gasp.html">Cisco-IOS-XE-dying-gasp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eem.html">Cisco-IOS-XE-eem</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eem-oper.html">Cisco-IOS-XE-eem-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-efp-oper.html">Cisco-IOS-XE-efp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eigrp.html">Cisco-IOS-XE-eigrp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eigrp-oper.html">Cisco-IOS-XE-eigrp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-embedded-ap-actions-rpc.html">Cisco-IOS-XE-embedded-ap-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-embedded-ap-oper.html">Cisco-IOS-XE-embedded-ap-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-endpoint-tracker-events.html">Cisco-IOS-XE-endpoint-tracker-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-endpoint-tracker-oper.html">Cisco-IOS-XE-endpoint-tracker-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-environment-oper.html">Cisco-IOS-XE-environment-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eogre-tunnel-oper.html">Cisco-IOS-XE-eogre-tunnel-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-eta.html">Cisco-IOS-XE-eta</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ethernet.html">Cisco-IOS-XE-ethernet</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ethernet-rpc.html">Cisco-IOS-XE-ethernet-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ethinternal-subslot.html">Cisco-IOS-XE-ethinternal-subslot</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-evpn-oper.html">Cisco-IOS-XE-evpn-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ezpm.html">Cisco-IOS-XE-ezpm</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-factory-reset-secure-rpc.html">Cisco-IOS-XE-factory-reset-secure-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-fib-events.html">Cisco-IOS-XE-fib-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-fib-oper.html">Cisco-IOS-XE-fib-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-flow.html">Cisco-IOS-XE-flow</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-flow-monitor-oper.html">Cisco-IOS-XE-flow-monitor-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-flow-rpc.html">Cisco-IOS-XE-flow-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-fqdn.html">Cisco-IOS-XE-fqdn</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-frame-relay.html">Cisco-IOS-XE-frame-relay</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-fw-oper.html">Cisco-IOS-XE-fw-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-fwd-oper.html">Cisco-IOS-XE-fwd-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-geo.html">Cisco-IOS-XE-geo</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-geo-events.html">Cisco-IOS-XE-geo-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-geo-oper.html">Cisco-IOS-XE-geo-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-geo-rpc.html">Cisco-IOS-XE-geo-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-gir-oper.html">Cisco-IOS-XE-gir-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-gnmi-cfg.html">Cisco-IOS-XE-gnmi-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-gnss.html">Cisco-IOS-XE-gnss</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-gnss-dr-oper.html">Cisco-IOS-XE-gnss-dr-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-gnss-oper.html">Cisco-IOS-XE-gnss-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-group-policy.html">Cisco-IOS-XE-group-policy</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-group-policy-oper.html">Cisco-IOS-XE-group-policy-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-grpc-tunnel-cfg.html">Cisco-IOS-XE-grpc-tunnel-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ha-oper.html">Cisco-IOS-XE-ha-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-hsr-oper.html">Cisco-IOS-XE-hsr-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-hsrp-events.html">Cisco-IOS-XE-hsrp-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-hsrp-oper.html">Cisco-IOS-XE-hsrp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-http.html">Cisco-IOS-XE-http</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-icmp.html">Cisco-IOS-XE-icmp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ida.html">Cisco-IOS-XE-ida</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-identity-oper.html">Cisco-IOS-XE-identity-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-igmp.html">Cisco-IOS-XE-igmp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ignition-oper.html">Cisco-IOS-XE-ignition-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-im-events-oper.html">Cisco-IOS-XE-im-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-install-events.html">Cisco-IOS-XE-install-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-install-oper.html">Cisco-IOS-XE-install-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-install-rpc.html">Cisco-IOS-XE-install-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-interface-bw-events.html">Cisco-IOS-XE-interface-bw-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-interfaces-oper.html">Cisco-IOS-XE-interfaces-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ios-events-oper.html">Cisco-IOS-XE-ios-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ip-arp-oper.html">Cisco-IOS-XE-ip-arp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ip-sla-events.html">Cisco-IOS-XE-ip-sla-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ip-sla-oper.html">Cisco-IOS-XE-ip-sla-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ipc.html">Cisco-IOS-XE-ipc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ipmux.html">Cisco-IOS-XE-ipmux</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ipv6-nd-oper.html">Cisco-IOS-XE-ipv6-nd-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ipv6-oper.html">Cisco-IOS-XE-ipv6-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-irig.html">Cisco-IOS-XE-irig</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isdn.html">Cisco-IOS-XE-isdn</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isdn-oper.html">Cisco-IOS-XE-isdn-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isg.html">Cisco-IOS-XE-isg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isis.html">Cisco-IOS-XE-isis</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isis-intf-oper.html">Cisco-IOS-XE-isis-intf-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-isis-oper.html">Cisco-IOS-XE-isis-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-iwanfabric.html">Cisco-IOS-XE-iwanfabric</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-kron.html">Cisco-IOS-XE-kron</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l2nat.html">Cisco-IOS-XE-l2nat</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l2nat-oper.html">Cisco-IOS-XE-l2nat-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l2tp-oper.html">Cisco-IOS-XE-l2tp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l2vpn.html">Cisco-IOS-XE-l2vpn</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l2vpn-oper.html">Cisco-IOS-XE-l2vpn-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l3nat-iox.html">Cisco-IOS-XE-l3nat-iox</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-l3vpn.html">Cisco-IOS-XE-l3vpn</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lacp-oper.html">Cisco-IOS-XE-lacp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-line-actions-rpc.html">Cisco-IOS-XE-line-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-line-events.html">Cisco-IOS-XE-line-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-line-oper.html">Cisco-IOS-XE-line-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-linecard-oper.html">Cisco-IOS-XE-linecard-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lisp.html">Cisco-IOS-XE-lisp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lisp-oper.html">Cisco-IOS-XE-lisp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-livetools-actions-rpc.html">Cisco-IOS-XE-livetools-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-livetools-oper.html">Cisco-IOS-XE-livetools-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lldp.html">Cisco-IOS-XE-lldp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lldp-oper.html">Cisco-IOS-XE-lldp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-logging-ios-actions-rpc.html">Cisco-IOS-XE-logging-ios-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-loop-detect.html">Cisco-IOS-XE-loop-detect</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-loop-detect-events.html">Cisco-IOS-XE-loop-detect-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lorawan.html">Cisco-IOS-XE-lorawan</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lorawan-oper.html">Cisco-IOS-XE-lorawan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lte450.html">Cisco-IOS-XE-lte450</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-lte450-oper.html">Cisco-IOS-XE-lte450-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-macsec-oper.html">Cisco-IOS-XE-macsec-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-matm-events.html">Cisco-IOS-XE-matm-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-matm-oper.html">Cisco-IOS-XE-matm-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mcast-events.html">Cisco-IOS-XE-mcast-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdns-gateway.html">Cisco-IOS-XE-mdns-gateway</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdt-capabilities-oper.html">Cisco-IOS-XE-mdt-capabilities-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdt-cfg.html">Cisco-IOS-XE-mdt-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdt-oper.html">Cisco-IOS-XE-mdt-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdt-oper-v2.html">Cisco-IOS-XE-mdt-oper-v2</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mdt-stats-oper.html">Cisco-IOS-XE-mdt-stats-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-memory-oper.html">Cisco-IOS-XE-memory-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-meraki-connect-oper.html">Cisco-IOS-XE-meraki-connect-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-meraki-leds-actions-rpc.html">Cisco-IOS-XE-meraki-leds-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mka.html">Cisco-IOS-XE-mka</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mka-oper.html">Cisco-IOS-XE-mka-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mld.html">Cisco-IOS-XE-mld</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mlppp-oper.html">Cisco-IOS-XE-mlppp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mmode.html">Cisco-IOS-XE-mmode</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mobileip.html">Cisco-IOS-XE-mobileip</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mpls.html">Cisco-IOS-XE-mpls</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mpls-forwarding-oper.html">Cisco-IOS-XE-mpls-forwarding-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mpls-ldp-oper.html">Cisco-IOS-XE-mpls-ldp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mpls-te-oper.html">Cisco-IOS-XE-mpls-te-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mroute-oper.html">Cisco-IOS-XE-mroute-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mrp.html">Cisco-IOS-XE-mrp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mrp-oper.html">Cisco-IOS-XE-mrp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-msdp-oper.html">Cisco-IOS-XE-msdp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-multicast.html">Cisco-IOS-XE-multicast</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-mvrp.html">Cisco-IOS-XE-mvrp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nam.html">Cisco-IOS-XE-nam</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nat.html">Cisco-IOS-XE-nat</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nat-events.html">Cisco-IOS-XE-nat-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nat-oper.html">Cisco-IOS-XE-nat-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-native.html">Cisco-IOS-XE-native</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nbar.html">Cisco-IOS-XE-nbar</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ncch-cfg.html">Cisco-IOS-XE-ncch-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ncch-oper.html">Cisco-IOS-XE-ncch-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nd.html">Cisco-IOS-XE-nd</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-netconf-diag-oper.html">Cisco-IOS-XE-netconf-diag-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-netconf-diag-rpc.html">Cisco-IOS-XE-netconf-diag-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ngfw-events.html">Cisco-IOS-XE-ngfw-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nhrp.html">Cisco-IOS-XE-nhrp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ntp.html">Cisco-IOS-XE-ntp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ntp-oper.html">Cisco-IOS-XE-ntp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nve-oper.html">Cisco-IOS-XE-nve-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nwpi-oper.html">Cisco-IOS-XE-nwpi-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-nwpi-rpc.html">Cisco-IOS-XE-nwpi-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-object-group.html">Cisco-IOS-XE-object-group</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-omp-oper.html">Cisco-IOS-XE-omp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-omp-rpc.html">Cisco-IOS-XE-omp-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ospf.html">Cisco-IOS-XE-ospf</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ospf-events.html">Cisco-IOS-XE-ospf-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ospf-oper.html">Cisco-IOS-XE-ospf-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ospfv3.html">Cisco-IOS-XE-ospfv3</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-otv.html">Cisco-IOS-XE-otv</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pae.html">Cisco-IOS-XE-pae</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pathmgr.html">Cisco-IOS-XE-pathmgr</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-perf-measure.html">Cisco-IOS-XE-perf-measure</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-perf-measure-events.html">Cisco-IOS-XE-perf-measure-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-perf-measure-oper.html">Cisco-IOS-XE-perf-measure-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pfr.html">Cisco-IOS-XE-pfr</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pim-oper.html">Cisco-IOS-XE-pim-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-platform.html">Cisco-IOS-XE-platform</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-platform-events-oper.html">Cisco-IOS-XE-platform-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-platform-oper.html">Cisco-IOS-XE-platform-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-platform-software-events.html">Cisco-IOS-XE-platform-software-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-platform-software-oper.html">Cisco-IOS-XE-platform-software-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pnp.html">Cisco-IOS-XE-pnp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-poe-health-oper.html">Cisco-IOS-XE-poe-health-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-poe-oper.html">Cisco-IOS-XE-poe-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-policy.html">Cisco-IOS-XE-policy</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-policymap-target-oper.html">Cisco-IOS-XE-policymap-target-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-port-bounce-events.html">Cisco-IOS-XE-port-bounce-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-port-bounce-rpc.html">Cisco-IOS-XE-port-bounce-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-port-security-rpc.html">Cisco-IOS-XE-port-security-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-power.html">Cisco-IOS-XE-power</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-power-supply-rpc.html">Cisco-IOS-XE-power-supply-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ppp.html">Cisco-IOS-XE-ppp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ppp-oper.html">Cisco-IOS-XE-ppp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-pppoe.html">Cisco-IOS-XE-pppoe</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-process-cpu-oper.html">Cisco-IOS-XE-process-cpu-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-process-memory-oper.html">Cisco-IOS-XE-process-memory-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-prp.html">Cisco-IOS-XE-prp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-prp-oper.html">Cisco-IOS-XE-prp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-psecure-oper.html">Cisco-IOS-XE-psecure-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ptp.html">Cisco-IOS-XE-ptp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-appqoe-dp-oper.html">Cisco-IOS-XE-qfp-appqoe-dp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-classification-oper.html">Cisco-IOS-XE-qfp-classification-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-crypto-dp-oper.html">Cisco-IOS-XE-qfp-crypto-dp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-dp-cmn-stats-oper.html">Cisco-IOS-XE-qfp-dp-cmn-stats-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-resource-events.html">Cisco-IOS-XE-qfp-resource-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-resource-utilization-oper.html">Cisco-IOS-XE-qfp-resource-utilization-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-stats.html">Cisco-IOS-XE-qfp-stats</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qfp-stats-oper.html">Cisco-IOS-XE-qfp-stats-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-qos.html">Cisco-IOS-XE-qos</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rawsocket.html">Cisco-IOS-XE-rawsocket</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rawsocket-oper.html">Cisco-IOS-XE-rawsocket-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-red-app-events.html">Cisco-IOS-XE-red-app-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rescue-config-rpc.html">Cisco-IOS-XE-rescue-config-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rg-oper.html">Cisco-IOS-XE-rg-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rif-oper.html">Cisco-IOS-XE-rif-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rip.html">Cisco-IOS-XE-rip</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rmi-dad.html">Cisco-IOS-XE-rmi-dad</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-route-map.html">Cisco-IOS-XE-route-map</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rpc.html">Cisco-IOS-XE-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-rsvp.html">Cisco-IOS-XE-rsvp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sanet.html">Cisco-IOS-XE-sanet</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-scada-gw.html">Cisco-IOS-XE-scada-gw</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-scada-gw-oper.html">Cisco-IOS-XE-scada-gw-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sd-vxlan-oper.html">Cisco-IOS-XE-sd-vxlan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sdwan-aaa-oper.html">Cisco-IOS-XE-sdwan-aaa-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sdwan-oper.html">Cisco-IOS-XE-sdwan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sdwan-rpc.html">Cisco-IOS-XE-sdwan-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-segment-routing.html">Cisco-IOS-XE-segment-routing</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-serial.html">Cisco-IOS-XE-serial</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-service-chain-oper.html">Cisco-IOS-XE-service-chain-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-service-discovery.html">Cisco-IOS-XE-service-discovery</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-service-insertion.html">Cisco-IOS-XE-service-insertion</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-service-insertion-oper.html">Cisco-IOS-XE-service-insertion-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-service-routing.html">Cisco-IOS-XE-service-routing</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-site-manager.html">Cisco-IOS-XE-site-manager</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sla.html">Cisco-IOS-XE-sla</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sm-events-oper.html">Cisco-IOS-XE-sm-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-snmp.html">Cisco-IOS-XE-snmp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-spanning-tree.html">Cisco-IOS-XE-spanning-tree</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-spanning-tree-events.html">Cisco-IOS-XE-spanning-tree-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-spanning-tree-oper.html">Cisco-IOS-XE-spanning-tree-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sslproxy-cfg.html">Cisco-IOS-XE-sslproxy-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-sslproxy-rpc.html">Cisco-IOS-XE-sslproxy-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stack-member-oper.html">Cisco-IOS-XE-stack-member-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stack-mgr-events-oper.html">Cisco-IOS-XE-stack-mgr-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stack-oper.html">Cisco-IOS-XE-stack-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stack-power-rpc.html">Cisco-IOS-XE-stack-power-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stacking-oper.html">Cisco-IOS-XE-stacking-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-stackwise-virtual.html">Cisco-IOS-XE-stackwise-virtual</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-steering-policy-oper.html">Cisco-IOS-XE-steering-policy-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch.html">Cisco-IOS-XE-switch</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-cp-svl-oper.html">Cisco-IOS-XE-switch-cp-svl-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-dp-mac-learning-oper.html">Cisco-IOS-XE-switch-dp-mac-learning-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-dp-punt-inject-oper.html">Cisco-IOS-XE-switch-dp-punt-inject-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-dp-resources-oper.html">Cisco-IOS-XE-switch-dp-resources-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-ptp-dp-oper.html">Cisco-IOS-XE-switch-ptp-dp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-ptp-oper.html">Cisco-IOS-XE-switch-ptp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switch-rpc.html">Cisco-IOS-XE-switch-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-switchport-oper.html">Cisco-IOS-XE-switchport-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-synce.html">Cisco-IOS-XE-synce</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-system-integrity-oper.html">Cisco-IOS-XE-system-integrity-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-tcam-oper.html">Cisco-IOS-XE-tcam-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-tech-support-events.html">Cisco-IOS-XE-tech-support-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-tech-support-rpc.html">Cisco-IOS-XE-tech-support-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-template.html">Cisco-IOS-XE-template</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-teyes-oper.html">Cisco-IOS-XE-teyes-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-trace-events.html">Cisco-IOS-XE-trace-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-trace-rpc.html">Cisco-IOS-XE-trace-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-track.html">Cisco-IOS-XE-track</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-transceiver-oper.html">Cisco-IOS-XE-transceiver-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-trustsec-oper.html">Cisco-IOS-XE-trustsec-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-tunnel.html">Cisco-IOS-XE-tunnel</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-tunnel-oper.html">Cisco-IOS-XE-tunnel-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-uac-actions-rpc.html">Cisco-IOS-XE-uac-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ucse.html">Cisco-IOS-XE-ucse</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ucse-oper.html">Cisco-IOS-XE-ucse-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-ucse-rpc.html">Cisco-IOS-XE-ucse-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-udld.html">Cisco-IOS-XE-udld</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-udld-events.html">Cisco-IOS-XE-udld-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-udld-oper.html">Cisco-IOS-XE-udld-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-uidp-oper.html">Cisco-IOS-XE-uidp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-umbrella.html">Cisco-IOS-XE-umbrella</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-umbrella-oper.html">Cisco-IOS-XE-umbrella-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-umbrella-oper-dp.html">Cisco-IOS-XE-umbrella-oper-dp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-umbrella-rpc.html">Cisco-IOS-XE-umbrella-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-uplink-autoconfig.html">Cisco-IOS-XE-uplink-autoconfig</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-uplink-autoconfig-oper.html">Cisco-IOS-XE-uplink-autoconfig-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-utd.html">Cisco-IOS-XE-utd</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-utd-actions-rpc.html">Cisco-IOS-XE-utd-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-utd-events.html">Cisco-IOS-XE-utd-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-utd-oper.html">Cisco-IOS-XE-utd-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-utd-rpc.html">Cisco-IOS-XE-utd-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vdsp-oper.html">Cisco-IOS-XE-vdsp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-verify-events.html">Cisco-IOS-XE-verify-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-verify-rpc.html">Cisco-IOS-XE-verify-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vlan.html">Cisco-IOS-XE-vlan</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vlan-oper.html">Cisco-IOS-XE-vlan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-voice.html">Cisco-IOS-XE-voice</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-voice-oper.html">Cisco-IOS-XE-voice-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-voice-port.html">Cisco-IOS-XE-voice-port</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-voice-rpc.html">Cisco-IOS-XE-voice-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vpdn.html">Cisco-IOS-XE-vpdn</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vrf-oper.html">Cisco-IOS-XE-vrf-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vrrp.html">Cisco-IOS-XE-vrrp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vrrp-oper.html">Cisco-IOS-XE-vrrp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vservice.html">Cisco-IOS-XE-vservice</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vstack.html">Cisco-IOS-XE-vstack</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vtp.html">Cisco-IOS-XE-vtp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-vxlan.html">Cisco-IOS-XE-vxlan</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wccp.html">Cisco-IOS-XE-wccp</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-access-point-cfg-rpc.html">Cisco-IOS-XE-wireless-access-point-cfg-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-access-point-cmd-rpc.html">Cisco-IOS-XE-wireless-access-point-cmd-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-access-point-oper.html">Cisco-IOS-XE-wireless-access-point-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-actions-rpc.html">Cisco-IOS-XE-wireless-actions-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-afc-cloud-oper.html">Cisco-IOS-XE-wireless-afc-cloud-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-afc-oper.html">Cisco-IOS-XE-wireless-afc-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-ap-cfg.html">Cisco-IOS-XE-wireless-ap-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-ap-global-oper.html">Cisco-IOS-XE-wireless-ap-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-apf-cfg.html">Cisco-IOS-XE-wireless-apf-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-awips-oper.html">Cisco-IOS-XE-wireless-awips-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-ble-ltx-oper.html">Cisco-IOS-XE-wireless-ble-ltx-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-ble-mgmt-cmd-rpc.html">Cisco-IOS-XE-wireless-ble-mgmt-cmd-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-ble-mgmt-oper.html">Cisco-IOS-XE-wireless-ble-mgmt-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-cisco-spaces-oper.html">Cisco-IOS-XE-wireless-cisco-spaces-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-client-global-oper.html">Cisco-IOS-XE-wireless-client-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-client-oper.html">Cisco-IOS-XE-wireless-client-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-client-rpc.html">Cisco-IOS-XE-wireless-client-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-cts-sxp-cfg.html">Cisco-IOS-XE-wireless-cts-sxp-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-cts-sxp-oper.html">Cisco-IOS-XE-wireless-cts-sxp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-dot11-cfg.html">Cisco-IOS-XE-wireless-dot11-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-dot15-cfg.html">Cisco-IOS-XE-wireless-dot15-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-events-oper.html">Cisco-IOS-XE-wireless-events-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-fabric-cfg.html">Cisco-IOS-XE-wireless-fabric-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-flex-cfg.html">Cisco-IOS-XE-wireless-flex-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-fqdn-cfg.html">Cisco-IOS-XE-wireless-fqdn-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-general-cfg.html">Cisco-IOS-XE-wireless-general-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-general-oper.html">Cisco-IOS-XE-wireless-general-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-geolocation-oper.html">Cisco-IOS-XE-wireless-geolocation-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-hotspot-cfg.html">Cisco-IOS-XE-wireless-hotspot-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-hyperlocation-oper.html">Cisco-IOS-XE-wireless-hyperlocation-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-lisp-agent-oper.html">Cisco-IOS-XE-wireless-lisp-agent-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-location-cfg.html">Cisco-IOS-XE-wireless-location-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-location-oper.html">Cisco-IOS-XE-wireless-location-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mcast-oper.html">Cisco-IOS-XE-wireless-mcast-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mdns-oper.html">Cisco-IOS-XE-wireless-mdns-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mesh-cfg.html">Cisco-IOS-XE-wireless-mesh-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mesh-global-oper.html">Cisco-IOS-XE-wireless-mesh-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mesh-oper.html">Cisco-IOS-XE-wireless-mesh-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mesh-rpc.html">Cisco-IOS-XE-wireless-mesh-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mobility-cfg.html">Cisco-IOS-XE-wireless-mobility-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mobility-oper.html">Cisco-IOS-XE-wireless-mobility-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-mstream-cfg.html">Cisco-IOS-XE-wireless-mstream-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-nmsp-oper.html">Cisco-IOS-XE-wireless-nmsp-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-power-cfg.html">Cisco-IOS-XE-wireless-power-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-radio-cfg.html">Cisco-IOS-XE-wireless-radio-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rf-cfg.html">Cisco-IOS-XE-wireless-rf-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rfid-cfg.html">Cisco-IOS-XE-wireless-rfid-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rfid-global-oper.html">Cisco-IOS-XE-wireless-rfid-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rfid-oper.html">Cisco-IOS-XE-wireless-rfid-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rlan-cfg.html">Cisco-IOS-XE-wireless-rlan-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rogue-authz-rpc.html">Cisco-IOS-XE-wireless-rogue-authz-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rogue-cfg.html">Cisco-IOS-XE-wireless-rogue-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rogue-oper.html">Cisco-IOS-XE-wireless-rogue-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rrm-cfg.html">Cisco-IOS-XE-wireless-rrm-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rrm-emul-oper.html">Cisco-IOS-XE-wireless-rrm-emul-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rrm-global-oper.html">Cisco-IOS-XE-wireless-rrm-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rrm-oper.html">Cisco-IOS-XE-wireless-rrm-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rrm-rpc.html">Cisco-IOS-XE-wireless-rrm-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rule-cfg.html">Cisco-IOS-XE-wireless-rule-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-rule-mdns-oper.html">Cisco-IOS-XE-wireless-rule-mdns-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-sdavc-oper.html">Cisco-IOS-XE-wireless-sdavc-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-security-cfg.html">Cisco-IOS-XE-wireless-security-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-sisf-global-oper.html">Cisco-IOS-XE-wireless-sisf-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-site-cfg.html">Cisco-IOS-XE-wireless-site-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-tech-support-rpc.html">Cisco-IOS-XE-wireless-tech-support-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-tunnel-cfg.html">Cisco-IOS-XE-wireless-tunnel-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-tunnel-oper.html">Cisco-IOS-XE-wireless-tunnel-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-urwb-cfg.html">Cisco-IOS-XE-wireless-urwb-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-urwbnet-oper.html">Cisco-IOS-XE-wireless-urwbnet-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-wat-cfg.html">Cisco-IOS-XE-wireless-wat-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-wlan-cfg.html">Cisco-IOS-XE-wireless-wlan-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wireless-wlan-global-oper.html">Cisco-IOS-XE-wireless-wlan-global-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wpan-oper.html">Cisco-IOS-XE-wpan-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-wsma.html">Cisco-IOS-XE-wsma</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-xcopy-events.html">Cisco-IOS-XE-xcopy-events</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-xcopy-rpc.html">Cisco-IOS-XE-xcopy-rpc</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-yang-interfaces-cfg.html">Cisco-IOS-XE-yang-interfaces-cfg</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-yang-interfaces-oper.html">Cisco-IOS-XE-yang-interfaces-oper</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-zone.html">Cisco-IOS-XE-zone</a></div>
+        <div class="module-card"><a href="Cisco-IOS-XE-zone-rpc.html">Cisco-IOS-XE-zone-rpc</a></div>
+        <div class="module-card"><a href="cisco-bridge-domain.html">cisco-bridge-domain</a></div>
+        <div class="module-card"><a href="cisco-ethernet.html">cisco-ethernet</a></div>
+        <div class="module-card"><a href="cisco-evpn-service.html">cisco-evpn-service</a></div>
+        <div class="module-card"><a href="cisco-ia.html">cisco-ia</a></div>
+        <div class="module-card"><a href="cisco-policy.html">cisco-policy</a></div>
+        <div class="module-card"><a href="cisco-policy-filters.html">cisco-policy-filters</a></div>
+        <div class="module-card"><a href="cisco-policy-target.html">cisco-policy-target</a></div>
+        <div class="module-card"><a href="cisco-pw.html">cisco-pw</a></div>
+        <div class="module-card"><a href="cisco-smart-license.html">cisco-smart-license</a></div>
+        <div class="module-card"><a href="cisco-xe-ietf-yang-push-ext.html">cisco-xe-ietf-yang-push-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-if-ethernet-ext.html">cisco-xe-openconfig-if-ethernet-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-interfaces-ext.html">cisco-xe-openconfig-interfaces-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-platform-ext.html">cisco-xe-openconfig-platform-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-rib-bgp-ext.html">cisco-xe-openconfig-rib-bgp-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-spanning-tree-ext.html">cisco-xe-openconfig-spanning-tree-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-system-ext.html">cisco-xe-openconfig-system-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-openconfig-vlan-ext.html">cisco-xe-openconfig-vlan-ext</a></div>
+        <div class="module-card"><a href="cisco-xe-routing-openconfig-system-ext.html">cisco-xe-routing-openconfig-system-ext</a></div>
+        <div class="module-card"><a href="common-mpls-static.html">common-mpls-static</a></div>
+        <div class="module-card"><a href="confd_dyncfg.html">confd_dyncfg</a></div>
+        <div class="module-card"><a href="ietf-diffserv-action.html">ietf-diffserv-action</a></div>
+        <div class="module-card"><a href="ietf-diffserv-classifier.html">ietf-diffserv-classifier</a></div>
+        <div class="module-card"><a href="ietf-diffserv-policy.html">ietf-diffserv-policy</a></div>
+        <div class="module-card"><a href="ietf-diffserv-target.html">ietf-diffserv-target</a></div>
+        <div class="module-card"><a href="ietf-event-notifications.html">ietf-event-notifications</a></div>
+        <div class="module-card"><a href="ietf-interfaces.html">ietf-interfaces</a></div>
+        <div class="module-card"><a href="ietf-interfaces-ext.html">ietf-interfaces-ext</a></div>
+        <div class="module-card"><a href="ietf-ip.html">ietf-ip</a></div>
+        <div class="module-card"><a href="ietf-ipv6-unicast-routing.html">ietf-ipv6-unicast-routing</a></div>
+        <div class="module-card"><a href="ietf-key-chain.html">ietf-key-chain</a></div>
+        <div class="module-card"><a href="ietf-netconf.html">ietf-netconf</a></div>
+        <div class="module-card"><a href="ietf-netconf-acm.html">ietf-netconf-acm</a></div>
+        <div class="module-card"><a href="ietf-netconf-monitoring.html">ietf-netconf-monitoring</a></div>
+        <div class="module-card"><a href="ietf-netconf-notifications.html">ietf-netconf-notifications</a></div>
+        <div class="module-card"><a href="ietf-netconf-with-defaults.html">ietf-netconf-with-defaults</a></div>
+        <div class="module-card"><a href="ietf-ospf.html">ietf-ospf</a></div>
+        <div class="module-card"><a href="ietf-restconf-monitoring.html">ietf-restconf-monitoring</a></div>
+        <div class="module-card"><a href="ietf-routing.html">ietf-routing</a></div>
+        <div class="module-card"><a href="ietf-yang-library.html">ietf-yang-library</a></div>
+        <div class="module-card"><a href="ietf-yang-push.html">ietf-yang-push</a></div>
+        <div class="module-card"><a href="ietf-yang-schema-mount.html">ietf-yang-schema-mount</a></div>
+        <div class="module-card"><a href="nvo.html">nvo</a></div>
+        <div class="module-card"><a href="openconfig-access-points.html">openconfig-access-points</a></div>
+        <div class="module-card"><a href="openconfig-acl.html">openconfig-acl</a></div>
+        <div class="module-card"><a href="openconfig-aft-network-instance.html">openconfig-aft-network-instance</a></div>
+        <div class="module-card"><a href="openconfig-alarms.html">openconfig-alarms</a></div>
+        <div class="module-card"><a href="openconfig-ap-manager.html">openconfig-ap-manager</a></div>
+        <div class="module-card"><a href="openconfig-bfd.html">openconfig-bfd</a></div>
+        <div class="module-card"><a href="openconfig-bgp-policy.html">openconfig-bgp-policy</a></div>
+        <div class="module-card"><a href="openconfig-ethernet-segments.html">openconfig-ethernet-segments</a></div>
+        <div class="module-card"><a href="openconfig-if-aggregate.html">openconfig-if-aggregate</a></div>
+        <div class="module-card"><a href="openconfig-if-ethernet.html">openconfig-if-ethernet</a></div>
+        <div class="module-card"><a href="openconfig-if-ip.html">openconfig-if-ip</a></div>
+        <div class="module-card"><a href="openconfig-if-ip-ext.html">openconfig-if-ip-ext</a></div>
+        <div class="module-card"><a href="openconfig-if-poe.html">openconfig-if-poe</a></div>
+        <div class="module-card"><a href="openconfig-interfaces.html">openconfig-interfaces</a></div>
+        <div class="module-card"><a href="openconfig-isis-policy.html">openconfig-isis-policy</a></div>
+        <div class="module-card"><a href="openconfig-keychain.html">openconfig-keychain</a></div>
+        <div class="module-card"><a href="openconfig-lacp.html">openconfig-lacp</a></div>
+        <div class="module-card"><a href="openconfig-lldp.html">openconfig-lldp</a></div>
+        <div class="module-card"><a href="openconfig-local-routing.html">openconfig-local-routing</a></div>
+        <div class="module-card"><a href="openconfig-macsec.html">openconfig-macsec</a></div>
+        <div class="module-card"><a href="openconfig-messages.html">openconfig-messages</a></div>
+        <div class="module-card"><a href="openconfig-mpls.html">openconfig-mpls</a></div>
+        <div class="module-card"><a href="openconfig-network-instance.html">openconfig-network-instance</a></div>
+        <div class="module-card"><a href="openconfig-network-instance-policy.html">openconfig-network-instance-policy</a></div>
+        <div class="module-card"><a href="openconfig-openflow.html">openconfig-openflow</a></div>
+        <div class="module-card"><a href="openconfig-ospf-policy.html">openconfig-ospf-policy</a></div>
+        <div class="module-card"><a href="openconfig-pf-srte.html">openconfig-pf-srte</a></div>
+        <div class="module-card"><a href="openconfig-platform.html">openconfig-platform</a></div>
+        <div class="module-card"><a href="openconfig-platform-cpu.html">openconfig-platform-cpu</a></div>
+        <div class="module-card"><a href="openconfig-platform-fan.html">openconfig-platform-fan</a></div>
+        <div class="module-card"><a href="openconfig-platform-linecard.html">openconfig-platform-linecard</a></div>
+        <div class="module-card"><a href="openconfig-platform-port.html">openconfig-platform-port</a></div>
+        <div class="module-card"><a href="openconfig-platform-psu.html">openconfig-platform-psu</a></div>
+        <div class="module-card"><a href="openconfig-platform-transceiver.html">openconfig-platform-transceiver</a></div>
+        <div class="module-card"><a href="openconfig-programming-errors.html">openconfig-programming-errors</a></div>
+        <div class="module-card"><a href="openconfig-rib-bgp-ext.html">openconfig-rib-bgp-ext</a></div>
+        <div class="module-card"><a href="openconfig-route-summary.html">openconfig-route-summary</a></div>
+        <div class="module-card"><a href="openconfig-routing-policy.html">openconfig-routing-policy</a></div>
+        <div class="module-card"><a href="openconfig-spanning-tree.html">openconfig-spanning-tree</a></div>
+        <div class="module-card"><a href="openconfig-system.html">openconfig-system</a></div>
+        <div class="module-card"><a href="openconfig-system-grpc.html">openconfig-system-grpc</a></div>
+        <div class="module-card"><a href="openconfig-vlan.html">openconfig-vlan</a></div>
+        <div class="module-card"><a href="openconfig-wifi-mac.html">openconfig-wifi-mac</a></div>
+        <div class="module-card"><a href="openconfig-wifi-phy.html">openconfig-wifi-phy</a></div>
+        <div class="module-card"><a href="tailf-aaa.html">tailf-aaa</a></div>
+        <div class="module-card"><a href="tailf-acm.html">tailf-acm</a></div>
+        <div class="module-card"><a href="tailf-confd-monitoring.html">tailf-confd-monitoring</a></div>
+        <div class="module-card"><a href="tailf-confd-monitoring2.html">tailf-confd-monitoring2</a></div>
+        <div class="module-card"><a href="tailf-key-rotation.html">tailf-key-rotation</a></div>
+        <div class="module-card"><a href="tailf-kicker.html">tailf-kicker</a></div>
+        <div class="module-card"><a href="tailf-netconf-extensions.html">tailf-netconf-extensions</a></div>
+        <div class="module-card"><a href="tailf-netconf-inactive.html">tailf-netconf-inactive</a></div>
+        <div class="module-card"><a href="tailf-netconf-monitoring.html">tailf-netconf-monitoring</a></div>
+        <div class="module-card"><a href="tailf-netconf-query.html">tailf-netconf-query</a></div>
+        <div class="module-card"><a href="tailf-netconf-transactions.html">tailf-netconf-transactions</a></div>
+    </div>
+    
+    <script>
+        function filterModules() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const cards = document.querySelectorAll('.module-card');
+            
+            cards.forEach(card => {
+                const moduleName = card.textContent.toLowerCase();
+                if (moduleName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

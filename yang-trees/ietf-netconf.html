@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ietf-netconf - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ietf-netconf</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-netconf.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: ietf-netconf
+
+  rpcs:
+    +---x get-config
+    |  +---w input
+    |  |  +---w source
+    |  |  |  +---w (config-source)
+    |  |  |     +--:(candidate)
+    |  |  |     |  +---w candidate?   empty {candidate}?
+    |  |  |     +--:(running)
+    |  |  |     |  +---w running?     empty
+    |  |  |     +--:(startup)
+    |  |  |        +---w startup?     empty {startup}?
+    |  |  +---w filter?   <anyxml>
+    |  +--ro output
+    |     +--ro data?   <anyxml>
+    +---x edit-config
+    |  +---w input
+    |     +---w target
+    |     |  +---w (config-target)
+    |     |     +--:(candidate)
+    |     |     |  +---w candidate?   empty {candidate}?
+    |     |     +--:(running)
+    |     |        +---w running?     empty {writable-running}?
+    |     +---w default-operation?   enumeration
+    |     +---w test-option?         enumeration {validate}?
+    |     +---w error-option?        enumeration
+    |     +---w (edit-content)
+    |        +--:(config)
+    |        |  +---w config?        <anyxml>
+    |        +--:(url)
+    |           +---w url?           inet:uri {url}?
+    +---x copy-config
+    |  +---w input
+    |     +---w target
+    |     |  +---w (config-target)
+    |     |     +--:(candidate)
+    |     |     |  +---w candidate?   empty {candidate}?
+    |     |     +--:(running)
+    |     |     |  +---w running?     empty {writable-running}?
+    |     |     +--:(startup)
+    |     |     |  +---w startup?     empty {startup}?
+    |     |     +--:(url)
+    |     |        +---w url?         inet:uri {url}?
+    |     +---w source
+    |        +---w (config-source)
+    |           +--:(candidate)
+    |           |  +---w candidate?   empty {candidate}?
+    |           +--:(running)
+    |           |  +---w running?     empty
+    |           +--:(startup)
+    |           |  +---w startup?     empty {startup}?
+    |           +--:(url)
+    |           |  +---w url?         inet:uri {url}?
+    |           +--:(config)
+    |              +---w config?      <anyxml>
+    +---x delete-config
+    |  +---w input
+    |     +---w target
+    |        +---w (config-target)
+    |           +--:(startup)
+    |           |  +---w startup?   empty {startup}?
+    |           +--:(url)
+    |              +---w url?       inet:uri {url}?
+    +---x lock
+    |  +---w input
+    |     +---w target
+    |        +---w (config-target)
+    |           +--:(candidate)
+    |           |  +---w candidate?   empty {candidate}?
+    |           +--:(running)
+    |           |  +---w running?     empty
+    |           +--:(startup)
+    |              +---w startup?     empty {startup}?
+    +---x unlock
+    |  +---w input
+    |     +---w target
+    |        +---w (config-target)
+    |           +--:(candidate)
+    |           |  +---w candidate?   empty {candidate}?
+    |           +--:(running)
+    |           |  +---w running?     empty
+    |           +--:(startup)
+    |              +---w startup?     empty {startup}?
+    +---x get
+    |  +---w input
+    |  |  +---w filter?   <anyxml>
+    |  +--ro output
+    |     +--ro data?   <anyxml>
+    +---x close-session
+    +---x kill-session
+    |  +---w input
+    |     +---w session-id    session-id-type
+    +---x commit {candidate}?
+    |  +---w input
+    |     +---w confirmed?         empty {confirmed-commit}?
+    |     +---w confirm-timeout?   uint32 {confirmed-commit}?
+    |     +---w persist?           string {confirmed-commit}?
+    |     +---w persist-id?        string {confirmed-commit}?
+    +---x discard-changes {candidate}?
+    +---x cancel-commit {confirmed-commit}?
+    |  +---w input
+    |     +---w persist-id?   string
+    +---x validate {validate}?
+       +---w input
+          +---w source
+             +---w (config-source)
+                +--:(candidate)
+                |  +---w candidate?   empty {candidate}?
+                +--:(running)
+                |  +---w running?     empty
+                +--:(startup)
+                |  +---w startup?     empty {startup}?
+                +--:(url)
+                |  +---w url?         inet:uri {url}?
+                +--:(config)
+                   +---w config?      <anyxml></pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

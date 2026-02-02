@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cisco-pw - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>cisco-pw</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-pw.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: cisco-pw
+  +--rw pseudowire-config
+  |  +--rw global
+  |  |  +--rw pw-grouping?                        boolean {pw-grouping-config}?
+  |  |  +--rw pw-oam-refresh-transmit?            uint32 {pw-oam-refresh-config}?
+  |  |  +--rw pw-status?                          boolean {pw-status-config}?
+  |  |  +--rw predictive-redundancy?              boolean {predictive-redundancy-config}?
+  |  |  +--rw vc-state-notification-enabled?      boolean
+  |  |  +--rw vc-state-notification-batch-size?   uint32
+  |  |  +--rw vc-state-notification-rate?         uint32
+  |  +--rw pw-templates
+  |  |  +--rw pw-template* [name]
+  |  |     +--rw name                        string
+  |  |     +--rw encapsulation?              identityref
+  |  |     +--rw control-word?               boolean
+  |  |     +--rw signaling-protocol?         identityref
+  |  |     +--rw load-balance {pw-load-balancing}?
+  |  |     |  +--rw (flow)? {pw-class-flow-setting}?
+  |  |     |  |  +--:(ethernet)
+  |  |     |  |  |  +--rw ethernet?   identityref
+  |  |     |  |  +--:(ip)
+  |  |     |  |     +--rw ip?         identityref
+  |  |     |  +--rw flow-label
+  |  |     |     +--rw direction?     enumeration
+  |  |     |     +--rw tlv-code-17?   boolean {flow-label-tlv-code17}?
+  |  |     |     +--rw static?        boolean {flow-label-static-config}?
+  |  |     +--rw preferred-path {pw-preferred-path}?
+  |  |     |  +--rw (path)?
+  |  |     |  |  +--:(interface)
+  |  |     |  |  |  +--rw interface?    if:interface-ref
+  |  |     |  |  +--:(address) {preferred-path-peer}?
+  |  |     |  |  |  +--rw address?      inet:ip-address
+  |  |     |  |  +--:(hostname) {preferred-path-peer}?
+  |  |     |  |     +--rw hostname?     string
+  |  |     |  +--rw disable-fallback?   boolean
+  |  |     +--rw sequencing {pw-sequencing}?
+  |  |     |  +--rw direction?   identityref
+  |  |     |  +--rw resync?      int32
+  |  |     +--rw vc-type?                    identityref
+  |  |     +--rw switching-tlv?              boolean
+  |  |     +--rw vccv {pw-vccv}?
+  |  |     |  +--rw control-word?   boolean
+  |  |     +--rw switchover-delay {pw-class-switchover-delay}?
+  |  |     |  +--rw switchover-timer?   uint8
+  |  |     |  +--rw (restore-timer-or-never)?
+  |  |     |     +--:(timer)
+  |  |     |     |  +--rw timer?        uint8
+  |  |     |     +--:(never)
+  |  |     |        +--rw never?        boolean
+  |  |     +--rw source-ip?                  inet:ipv4-address {pw-class-source-ip}?
+  |  |     +--rw tag-rewrite-ingress-vlan?   uint16 {pw-class-tag-rewrite}?
+  |  |     +--rw mac-withdraw?               boolean {pw-mac-withdraw-config}?
+  |  |     +--rw status
+  |  |     |  +--rw decoupled?              boolean {pw-class-status}?
+  |  |     |  +--rw disable?                boolean {pw-class-status}?
+  |  |     |  +--rw peer-topo-dual-homed?   boolean
+  |  |     |  +--rw route-watch-disable?    boolean {pw-class-status}?
+  |  |     |  +--rw redundancy-master?      boolean {pw-class-status}?
+  |  |     +--rw port-profile-spec {pw-port-profiles}?
+  |  |        +--rw description?   string
+  |  |        +--rw shutdown?      boolean
+  |  |        +--rw shut-force?    boolean
+  |  |        +--rw mtu?           uint32
+  |  |        +--rw max-ports?     uint16
+  |  |        +--rw enabled?       boolean
+  |  +--rw pw-static-oam-classes {pw-static-oam-config}?
+  |     +--rw pw-static-oam-class* [name]
+  |        +--rw name                    string
+  |        +--rw ack?                    boolean
+  |        +--rw keepalive?              uint32
+  |        +--rw timeout-refresh-send?   uint32
+  |        +--rw timeout-refresh-ack?    uint32
+  +--ro pseudowire-state
+     +--ro pseudowires* [vc-peer-address vc-id vc-owner-type vc-name vc-index]
+        +--ro vc-type?                   identityref
+        +--ro vc-owner-type              enumeration
+        +--ro vc-owner-name?             string
+        +--ro vc-psn-type?               enumeration
+        +--ro vc-peer-address            inet:ip-address
+        +--ro vc-id                      pw-vc-id-type
+        +--ro vc-index                   pw-vc-index-type
+        +--ro vc-local-group-id?         pw-group-id-type
+        +--ro vc-control-word?           boolean
+        +--ro vc-local-if-mtu?           uint32
+        +--ro vc-remote-group-id?        pw-group-id-type
+        +--ro vc-remote-control-word?    enumeration
+        +--ro vc-remote-if-mtu?          uint32
+        +--ro vc-outbound-label?         uint32
+        +--ro vc-inbound-label?          uint32
+        +--ro vc-name                    string
+        +--ro vc-oper-status?            pw-oper-state-type
+        +--ro vc-inbound-oper-status?    pw-oper-state-type
+        +--ro vc-outbound-oper-status?   pw-oper-state-type
+        +--ro statistics
+           +--ro vc-create-time?       yang:timestamp
+           +--ro vc-up-time?           yang:timeticks
+           +--ro discontinuity-time    yang:date-and-time
+           +--ro in-octets?            yang:counter64
+           +--ro in-pkts?              yang:counter64
+           +--ro in-errors?            yang:counter64
+           +--ro out-octets?           yang:counter64
+           +--ro out-pkts?             yang:counter64
+           +--ro out-errors?           yang:counter64
+
+  augment /if:interfaces/if:interface:
+    +--rw pw-neighbor {pw-interface}?
+       +--rw neighbor-ip-address?        inet:ip-address
+       +--rw vc-id?                      uint32
+       +--rw static-label
+       |  +--rw local-label?    uint32
+       |  +--rw remote-label?   uint32
+       +--rw source-template?            pw-template-ref
+       +--rw encapsulation?              identityref
+       +--rw control-word?               boolean
+       +--rw signaling-protocol?         identityref
+       +--rw load-balance {pw-load-balancing}?
+       |  +--rw (flow)? {pw-class-flow-setting}?
+       |  |  +--:(ethernet)
+       |  |  |  +--rw ethernet?   identityref
+       |  |  +--:(ip)
+       |  |     +--rw ip?         identityref
+       |  +--rw flow-label
+       |     +--rw direction?     enumeration
+       |     +--rw tlv-code-17?   boolean {flow-label-tlv-code17}?
+       |     +--rw static?        boolean {flow-label-static-config}?
+       +--rw preferred-path {pw-preferred-path}?
+       |  +--rw (path)?
+       |  |  +--:(interface)
+       |  |  |  +--rw interface?    if:interface-ref
+       |  |  +--:(address) {preferred-path-peer}?
+       |  |  |  +--rw address?      inet:ip-address
+       |  |  +--:(hostname) {preferred-path-peer}?
+       |  |     +--rw hostname?     string
+       |  +--rw disable-fallback?   boolean
+       +--rw sequencing {pw-sequencing}?
+       |  +--rw direction?   identityref
+       |  +--rw resync?      int32
+       +--rw vc-type?                    identityref
+       +--rw switching-tlv?              boolean
+       +--rw vccv {pw-vccv}?
+       |  +--rw control-word?   boolean
+       +--rw switchover-delay {pw-class-switchover-delay}?
+       |  +--rw switchover-timer?   uint8
+       |  +--rw (restore-timer-or-never)?
+       |     +--:(timer)
+       |     |  +--rw timer?        uint8
+       |     +--:(never)
+       |        +--rw never?        boolean
+       +--rw source-ip?                  inet:ipv4-address {pw-class-source-ip}?
+       +--rw tag-rewrite-ingress-vlan?   uint16 {pw-class-tag-rewrite}?
+       +--rw mac-withdraw?               boolean {pw-mac-withdraw-config}?
+       +--rw status
+          +--rw decoupled?              boolean {pw-class-status}?
+          +--rw disable?                boolean {pw-class-status}?
+          +--rw peer-topo-dual-homed?   boolean
+          +--rw route-watch-disable?    boolean {pw-class-status}?
+          +--rw redundancy-master?      boolean {pw-class-status}?
+  augment /if:interfaces-state/if:interface:
+    +--ro pseudowire
+       +--ro neighbor-ip-address?   inet:ip-address
+       +--ro vc-id?                 uint32
+
+  notifications:
+    +---n vc-up-notification
+    |  +--ro vc-list* []
+    |     +--ro vc-peer-address?   pw-oper-vc-peer-addr-ref
+    |     +--ro vc-id?             pw-oper-vc-id-ref
+    +---n vc-down-notification
+       +--ro vc-list* []
+          +--ro vc-peer-address?   pw-oper-vc-peer-addr-ref
+          +--ro vc-id?             pw-oper-vc-id-ref</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco-IOS-XE-utd - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cisco-IOS-XE-utd</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Cisco-IOS-XE-utd.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: Cisco-IOS-XE-utd
+
+  augment /ios:native:
+    +--rw utd!
+    |  +--rw all-interfaces?   empty
+    |  +--rw redirect
+    |  |  +--rw interface
+    |  |     +--rw (redirect-choice)?
+    |  |        +--:(BDI)
+    |  |        |  +--rw BDI?                -> /ios:native/interface/BDI/name
+    |  |        +--:(VirtualPortGroup)
+    |  |        |  +--rw VirtualPortGroup?   -> /ios:native/interface/VirtualPortGroup/name
+    |  |        +--:(BD-VIF)
+    |  |           +--rw BD-VIF?             -> /ios:native/interface/BD-VIF/name
+    |  +--rw engine!
+    |     +--rw mode?   enumeration
+    |     +--rw fail
+    |        +--rw close?   empty
+    +--rw utd-st
+    |  +--rw utd
+    |     +--rw web-filter
+    |     |  +--rw block
+    |     |  |  +--rw local-server
+    |     |  |  |  +--rw profile* [id]
+    |     |  |  |     +--rw id                      string
+    |     |  |  |     +--rw block-page-interface
+    |     |  |  |     |  +--rw Loopback?   -> /ios:native/interface/Loopback/name
+    |     |  |  |     +--rw content
+    |     |  |  |     |  +--rw (content-choice)?
+    |     |  |  |     |     +--:(text)
+    |     |  |  |     |     |  +--rw text?   string
+    |     |  |  |     |     +--:(file)
+    |     |  |  |     |        +--rw file?   string
+    |     |  |  |     +--rw http-ports?             string
+    |     |  |  +--rw page
+    |     |  |     +--rw profile* [id]
+    |     |  |        +--rw id                    string
+    |     |  |        +--rw (page-choice)?
+    |     |  |           +--:(file)
+    |     |  |           |  +--rw file?           string
+    |     |  |           +--:(redirect-url)
+    |     |  |           |  +--rw redirect-url?   string
+    |     |  |           +--:(text)
+    |     |  |              +--rw text?           string
+    |     |  +--rw sourcedb* [id]
+    |     |  |  +--rw id         string
+    |     |  |  +--rw logging
+    |     |  |     +--rw level?   enumeration
+    |     |  +--rw url
+    |     |  |  +--rw profile* [id]
+    |     |  |     +--rw id                          string
+    |     |  |     +--rw alert*                      utd-alert-type
+    |     |  |     +--rw blacklist!
+    |     |  |     |  +--rw parameter-map
+    |     |  |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |     |  |     +--rw categories
+    |     |  |     |  +--rw allow!
+    |     |  |     |  |  +--rw category* [name]
+    |     |  |     |  |     +--rw name    utd-category-type
+    |     |  |     |  +--rw block!
+    |     |  |     |     +--rw category* [name]
+    |     |  |     |        +--rw name    utd-category-type
+    |     |  |     +--rw block
+    |     |  |     |  +--rw local-server?   -> ../../../../block/local-server/profile/id
+    |     |  |     |  +--rw page-profile?   -> ../../../../block/page/profile/id
+    |     |  |     +--rw log
+    |     |  |     |  +--rw level?   utd-log-level-type
+    |     |  |     +--rw reputation!
+    |     |  |     |  +--rw block-threshold?   utd-reputation-type
+    |     |  |     +--rw sourcedb
+    |     |  |     |  +--rw fail
+    |     |  |     |     +--rw close?   empty
+    |     |  |     +--rw whitelist!
+    |     |  |     |  +--rw parameter-map
+    |     |  |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |     |  |     +--rw tls-decrypt-inject-block?   boolean
+    |     |  +--rw domain
+    |     |     +--rw profile* [id]
+    |     |        +--rw id                 string
+    |     |        +--rw alert?             enumeration
+    |     |        +--rw blacklist!
+    |     |        |  +--rw parameter-map
+    |     |        |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |     |        +--rw redirect-server
+    |     |        |  +--rw (id-choice)?
+    |     |        |     +--:(external)
+    |     |        |     |  +--rw external?             inet:ipv4-address
+    |     |        |     +--:(local-block-server)
+    |     |        |        +--rw local-block-server?   -> ../../../../block/local-server/profile/id
+    |     |        +--rw whitelist!
+    |     |           +--rw parameter-map
+    |     |              +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |     +--rw engine
+    |     |  +--rw advanced!
+    |     |  |  +--rw threat
+    |     |  |     +--rw detection?   empty
+    |     |  +--rw standard!
+    |     |     +--rw logging
+    |     |     |  +--rw host* [name]
+    |     |     |  |  +--rw name                string
+    |     |     |  |  +--rw source-interface?   string
+    |     |     |  +--rw syslog?   empty
+    |     |     +--rw threat-inspection!
+    |     |     |  +--rw signature
+    |     |     |  |  +--rw update
+    |     |     |  |     +--rw occur-at
+    |     |     |  |     |  +--rw (occur-at-choice)?
+    |     |     |  |     |  |  +--:(daily)
+    |     |     |  |     |  |  |  +--rw daily?     empty
+    |     |     |  |     |  |  +--:(monthly)
+    |     |     |  |     |  |  |  +--rw monthly?   string
+    |     |     |  |     |  |  +--:(weekly)
+    |     |     |  |     |  |     +--rw weekly?    string
+    |     |     |  |     |  +--rw hours?           uint8
+    |     |     |  |     |  +--rw minutes?         uint8
+    |     |     |  |     +--rw server
+    |     |     |  |        +--rw cisco
+    |     |     |  |        |  +--rw username?          string
+    |     |     |  |        |  +--rw password-config
+    |     |     |  |        |  |  +--rw type?       enumeration
+    |     |     |  |        |  |  +--rw password?   string
+    |     |     |  |        |  x--rw password?          string
+    |     |     |  |        +--rw url
+    |     |     |  |           +--rw (url-uname-passwd)?
+    |     |     |  |              +--:(all-case)
+    |     |     |  |              |  +--rw all
+    |     |     |  |              |     +--rw name?              string
+    |     |     |  |              |     +--rw username?          string
+    |     |     |  |              |     +--rw password-config
+    |     |     |  |              |     |  +--rw type?       enumeration
+    |     |     |  |              |     |  +--rw password?   string
+    |     |     |  |              |     x--rw password?          string
+    |     |     |  |              +--:(name-only)
+    |     |     |  |                 +--rw name?   string
+    |     |     |  +--rw threat?      enumeration
+    |     |     |  +--rw policy?      enumeration
+    |     |     |  +--rw logging
+    |     |     |  |  +--rw level?        enumeration
+    |     |     |  |  +--rw statistics
+    |     |     |  |     +--rw enable?   empty
+    |     |     |  +--rw port-scan!
+    |     |     |  |  +--rw sense
+    |     |     |  |     +--rw level?   enumeration
+    |     |     |  +--rw whitelist?   empty
+    |     |     +--rw web-filter!
+    |     |        +--rw cloud-lookup?     boolean
+    |     |        +--rw sourcedb?         -> ../../../../web-filter/sourcedb/id
+    |     |        +--rw domain-profile?   -> ../../../../web-filter/domain/profile/id
+    |     |        +--rw url-profile?      -> ../../../../web-filter/url/profile/id
+    |     +--rw threat-inspection
+    |        +--rw whitelist!
+    |           +--rw generator* [id]
+    |              +--rw id           uint32
+    |              +--rw signature* [id]
+    |                 +--rw id         uint32
+    |                 +--rw comment?   string
+    +--rw utd-mt
+    |  +--rw utd
+    |     +--rw multi-tenancy?   empty
+    |     +--rw engine
+    |        +--rw standard
+    |           +--rw multi-tenancy!
+    |              +--rw web-filter
+    |              |  +--rw block
+    |              |  |  +--rw local-server
+    |              |  |  |  +--rw profile* [id]
+    |              |  |  |     +--rw id                      string
+    |              |  |  |     +--rw block-page-interface
+    |              |  |  |     |  +--rw Loopback?   -> /ios:native/interface/Loopback/name
+    |              |  |  |     +--rw content
+    |              |  |  |     |  +--rw (content-choice)?
+    |              |  |  |     |     +--:(text)
+    |              |  |  |     |     |  +--rw text?   string
+    |              |  |  |     |     +--:(file)
+    |              |  |  |     |        +--rw file?   string
+    |              |  |  |     +--rw http-ports?             string
+    |              |  |  +--rw page
+    |              |  |     +--rw profile* [id]
+    |              |  |        +--rw id                    string
+    |              |  |        +--rw (page-choice)?
+    |              |  |           +--:(file)
+    |              |  |           |  +--rw file?           string
+    |              |  |           +--:(redirect-url)
+    |              |  |           |  +--rw redirect-url?   string
+    |              |  |           +--:(text)
+    |              |  |              +--rw text?           string
+    |              |  +--rw sourcedb* [id]
+    |              |  |  +--rw id         string
+    |              |  |  +--rw logging
+    |              |  |     +--rw level?   enumeration
+    |              |  +--rw url
+    |              |     +--rw profile* [id]
+    |              |        +--rw id                          string
+    |              |        +--rw alert*                      utd-alert-type
+    |              |        +--rw blacklist!
+    |              |        |  +--rw parameter-map
+    |              |        |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |              |        +--rw categories
+    |              |        |  +--rw allow!
+    |              |        |  |  +--rw category* [name]
+    |              |        |  |     +--rw name    utd-category-type
+    |              |        |  +--rw block!
+    |              |        |     +--rw category* [name]
+    |              |        |        +--rw name    utd-category-type
+    |              |        +--rw block
+    |              |        |  +--rw local-server?   -> ../../../../block/local-server/profile/id
+    |              |        |  +--rw page-profile?   -> ../../../../block/page/profile/id
+    |              |        +--rw log
+    |              |        |  +--rw level?   utd-log-level-type
+    |              |        +--rw reputation!
+    |              |        |  +--rw block-threshold?   utd-reputation-type
+    |              |        +--rw sourcedb
+    |              |        |  +--rw fail
+    |              |        |     +--rw close?   empty
+    |              |        +--rw whitelist!
+    |              |        |  +--rw parameter-map
+    |              |        |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |              |        +--rw tls-decrypt-inject-block?   boolean
+    |              +--rw threat-inspection
+    |              |  +--rw whitelist
+    |              |  |  +--rw profile* [name]
+    |              |  |     +--rw name         string
+    |              |  |     +--rw generator* [id]
+    |              |  |        +--rw id           uint32
+    |              |  |        +--rw signature* [id]
+    |              |  |           +--rw id         uint32
+    |              |  |           +--rw comment?   string
+    |              |  +--rw custom-signature
+    |              |  |  +--rw profile* [name]
+    |              |  |     +--rw name    string
+    |              |  |     +--rw file?   string
+    |              |  +--rw profile* [name]
+    |              |     +--rw name                string
+    |              |     +--rw threat?             enumeration
+    |              |     +--rw policy?             enumeration
+    |              |     +--rw logging
+    |              |     |  +--rw level?   enumeration
+    |              |     +--rw port-scan!
+    |              |     |  +--rw sense
+    |              |     |     +--rw level?   enumeration
+    |              |     +--rw whitelist
+    |              |     |  +--rw profile?   -> ../../../whitelist/profile/name
+    |              |     +--rw custom-signature
+    |              |        +--rw profile?   -> ../../../custom-signature/profile/name
+    |              +--rw utd
+    |              |  +--rw global!
+    |              |     +--rw logging
+    |              |     |  +--rw host* [name]
+    |              |     |  |  +--rw name                string
+    |              |     |  |  +--rw source-interface?   string
+    |              |     |  +--rw syslog?   empty
+    |              |     +--rw threat-inspection!
+    |              |     |  +--rw signature
+    |              |     |  |  +--rw update
+    |              |     |  |     +--rw occur-at
+    |              |     |  |     |  +--rw (occur-at-choice)?
+    |              |     |  |     |  |  +--:(daily)
+    |              |     |  |     |  |  |  +--rw daily?     empty
+    |              |     |  |     |  |  +--:(monthly)
+    |              |     |  |     |  |  |  +--rw monthly?   string
+    |              |     |  |     |  |  +--:(weekly)
+    |              |     |  |     |  |     +--rw weekly?    string
+    |              |     |  |     |  +--rw hours?           uint8
+    |              |     |  |     |  +--rw minutes?         uint8
+    |              |     |  |     +--rw server
+    |              |     |  |        +--rw cisco
+    |              |     |  |        |  +--rw username?          string
+    |              |     |  |        |  +--rw password-config
+    |              |     |  |        |  |  +--rw type?       enumeration
+    |              |     |  |        |  |  +--rw password?   string
+    |              |     |  |        |  x--rw password?          string
+    |              |     |  |        +--rw url
+    |              |     |  |           +--rw (url-uname-passwd)?
+    |              |     |  |              +--:(all-case)
+    |              |     |  |              |  +--rw all
+    |              |     |  |              |     +--rw name?              string
+    |              |     |  |              |     +--rw username?          string
+    |              |     |  |              |     +--rw password-config
+    |              |     |  |              |     |  +--rw type?       enumeration
+    |              |     |  |              |     |  +--rw password?   string
+    |              |     |  |              |     x--rw password?          string
+    |              |     |  |              +--:(name-only)
+    |              |     |  |                 +--rw name?   string
+    |              |     |  +--rw normalizer!
+    |              |     |  |  +--rw tcp!
+    |              |     |  |     +--rw (tcp-choice)?
+    |              |     |  |        +--:(tcp-all-case)
+    |              |     |  |        |  +--rw all?     boolean
+    |              |     |  |        +--:(tcp-options-case)
+    |              |     |  |           +--rw block?   boolean
+    |              |     |  +--rw custom-signature!
+    |              |     |     +--rw file?   string
+    |              |     +--rw web-filter!
+    |              |     |  +--rw cloud-lookup?   boolean
+    |              |     |  +--rw sourcedb?       -> ../../../../web-filter/sourcedb/id
+    |              |     +--rw file-reputation!
+    |              |     |  +--rw cloud-server?     string
+    |              |     |  +--rw est-server?       string
+    |              |     |  +--rw query-interval?   uint32
+    |              |     +--rw file-analysis!
+    |              |     |  +--rw cloud-server?   string
+    |              |     |  +--rw apikey
+    |              |     |     +--rw type?   enumeration
+    |              |     |     +--rw key?    string
+    |              |     +--rw flow-logging
+    |              |        +--rw (flow-logging-choice)?
+    |              |           +--:(all-case)
+    |              |           |  +--rw all?    empty
+    |              |           +--:(list-case)
+    |              |              +--rw list*   utd-flow-logging-type
+    |              +--rw file-analysis
+    |              |  +--rw profile* [name]
+    |              |     +--rw name          string
+    |              |     +--rw file-types!
+    |              |     |  +--rw file-type* [name]
+    |              |     |     +--rw name    enumeration
+    |              |     +--rw alert
+    |              |        +--rw level?   enumeration
+    |              +--rw file-reputation
+    |              |  +--rw profile* [name]
+    |              |     +--rw name     string
+    |              |     +--rw alert
+    |              |        +--rw level?   enumeration
+    |              +--rw file-inspection
+    |              |  +--rw profile* [name]
+    |              |     +--rw name          string
+    |              |     +--rw analysis!
+    |              |     |  +--rw profile?   -> ../../../../file-analysis/profile/name
+    |              |     +--rw reputation!
+    |              |        +--rw profile?   -> ../../../../file-reputation/profile/name
+    |              +--rw tls-decryption
+    |              |  +--rw profile* [name]
+    |              |     +--rw name          string
+    |              |     +--rw alert*        utd-ssl-alert-type
+    |              |     +--rw blacklist!
+    |              |     |  +--rw parameter-map
+    |              |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |              |     +--rw categories
+    |              |     |  +--rw decrypt!
+    |              |     |  |  +--rw category* [name]
+    |              |     |  |     +--rw name    utd-category-type
+    |              |     |  +--rw never-decrypt!
+    |              |     |  |  +--rw category* [name]
+    |              |     |  |     +--rw name    utd-category-type
+    |              |     |  +--rw skip-decrypt!
+    |              |     |     +--rw category* [name]
+    |              |     |        +--rw name    utd-category-type
+    |              |     +--rw graylist!
+    |              |     |  +--rw parameter-map
+    |              |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |              |     +--rw log
+    |              |     |  +--rw level?   utd-log-level-type
+    |              |     +--rw reputation!
+    |              |     |  +--rw decrypt-threshold?        utd-reputation-type
+    |              |     |  +--rw skip-decrypt-threshold?   utd-reputation-type
+    |              |     +--rw sourcedb
+    |              |     |  +--rw fail
+    |              |     |     +--rw decrypt?   empty
+    |              |     +--rw whitelist!
+    |              |        +--rw parameter-map
+    |              |           +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+    |              +--rw policy* [name]
+    |                 +--rw name                 string
+    |                 +--rw all-interfaces?      empty
+    |                 +--rw vrf* [name]
+    |                 |  +--rw name    string
+    |                 +--rw fail
+    |                 |  +--rw close?   empty
+    |                 +--rw file-inspection
+    |                 |  +--rw profile?   -> ../../../file-inspection/profile/name
+    |                 +--rw tls-decryption
+    |                 |  +--rw profile?   -> ../../../tls-decryption/profile/name
+    |                 |  +--rw action?    enumeration
+    |                 +--rw threat-inspection
+    |                 |  +--rw profile?   -> ../../../threat-inspection/profile/name
+    |                 +--rw web-filter
+    |                    +--rw url
+    |                       +--rw profile?   -> ../../../../web-filter/url/profile/id
+    +--rw utd-unified-policy
+       +--rw utd
+          +--rw engine
+             +--rw standard
+                +--rw unified-policy!
+                   +--rw web-filter
+                   |  +--rw block
+                   |  |  +--rw local-server
+                   |  |  |  +--rw profile* [id]
+                   |  |  |     +--rw id                      string
+                   |  |  |     +--rw block-page-interface
+                   |  |  |     |  +--rw Loopback?   -> /ios:native/interface/Loopback/name
+                   |  |  |     +--rw content
+                   |  |  |     |  +--rw (content-choice)?
+                   |  |  |     |     +--:(text)
+                   |  |  |     |     |  +--rw text?   string
+                   |  |  |     |     +--:(file)
+                   |  |  |     |        +--rw file?   string
+                   |  |  |     +--rw http-ports?             string
+                   |  |  +--rw page
+                   |  |     +--rw profile* [id]
+                   |  |        +--rw id                    string
+                   |  |        +--rw (page-choice)?
+                   |  |           +--:(file)
+                   |  |           |  +--rw file?           string
+                   |  |           +--:(redirect-url)
+                   |  |           |  +--rw redirect-url?   string
+                   |  |           +--:(text)
+                   |  |              +--rw text?           string
+                   |  +--rw sourcedb* [id]
+                   |  |  +--rw id         string
+                   |  |  +--rw logging
+                   |  |     +--rw level?   enumeration
+                   |  +--rw url
+                   |     +--rw profile* [id]
+                   |        +--rw id                          string
+                   |        +--rw alert*                      utd-alert-type
+                   |        +--rw blacklist!
+                   |        |  +--rw parameter-map
+                   |        |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+                   |        +--rw categories
+                   |        |  +--rw allow!
+                   |        |  |  +--rw category* [name]
+                   |        |  |     +--rw name    utd-category-type
+                   |        |  +--rw block!
+                   |        |     +--rw category* [name]
+                   |        |        +--rw name    utd-category-type
+                   |        +--rw block
+                   |        |  +--rw local-server?   -> ../../../../block/local-server/profile/id
+                   |        |  +--rw page-profile?   -> ../../../../block/page/profile/id
+                   |        +--rw log
+                   |        |  +--rw level?   utd-log-level-type
+                   |        +--rw reputation!
+                   |        |  +--rw block-threshold?   utd-reputation-type
+                   |        +--rw sourcedb
+                   |        |  +--rw fail
+                   |        |     +--rw close?   empty
+                   |        +--rw whitelist!
+                   |        |  +--rw parameter-map
+                   |        |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+                   |        +--rw tls-decrypt-inject-block?   boolean
+                   +--rw threat-inspection
+                   |  +--rw whitelist
+                   |  |  +--rw profile* [name]
+                   |  |     +--rw name         string
+                   |  |     +--rw generator* [id]
+                   |  |        +--rw id           uint32
+                   |  |        +--rw signature* [id]
+                   |  |           +--rw id         uint32
+                   |  |           +--rw comment?   string
+                   |  +--rw custom-signature
+                   |  |  +--rw profile* [name]
+                   |  |     +--rw name    string
+                   |  |     +--rw file?   string
+                   |  +--rw profile* [name]
+                   |     +--rw name                string
+                   |     +--rw threat?             enumeration
+                   |     +--rw policy?             enumeration
+                   |     +--rw logging
+                   |     |  +--rw level?   enumeration
+                   |     +--rw port-scan!
+                   |     |  +--rw sense
+                   |     |     +--rw level?   enumeration
+                   |     +--rw whitelist
+                   |     |  +--rw profile?   -> ../../../whitelist/profile/name
+                   |     +--rw custom-signature
+                   |        +--rw profile?   -> ../../../custom-signature/profile/name
+                   +--rw utd
+                   |  +--rw global!
+                   |     +--rw logging
+                   |     |  +--rw host* [name]
+                   |     |  |  +--rw name                string
+                   |     |  |  +--rw source-interface?   string
+                   |     |  +--rw syslog?   empty
+                   |     +--rw threat-inspection!
+                   |     |  +--rw signature
+                   |     |  |  +--rw update
+                   |     |  |     +--rw occur-at
+                   |     |  |     |  +--rw (occur-at-choice)?
+                   |     |  |     |  |  +--:(daily)
+                   |     |  |     |  |  |  +--rw daily?     empty
+                   |     |  |     |  |  +--:(monthly)
+                   |     |  |     |  |  |  +--rw monthly?   string
+                   |     |  |     |  |  +--:(weekly)
+                   |     |  |     |  |     +--rw weekly?    string
+                   |     |  |     |  +--rw hours?           uint8
+                   |     |  |     |  +--rw minutes?         uint8
+                   |     |  |     +--rw server
+                   |     |  |        +--rw cisco
+                   |     |  |        |  +--rw username?          string
+                   |     |  |        |  +--rw password-config
+                   |     |  |        |  |  +--rw type?       enumeration
+                   |     |  |        |  |  +--rw password?   string
+                   |     |  |        |  x--rw password?          string
+                   |     |  |        +--rw url
+                   |     |  |           +--rw (url-uname-passwd)?
+                   |     |  |              +--:(all-case)
+                   |     |  |              |  +--rw all
+                   |     |  |              |     +--rw name?              string
+                   |     |  |              |     +--rw username?          string
+                   |     |  |              |     +--rw password-config
+                   |     |  |              |     |  +--rw type?       enumeration
+                   |     |  |              |     |  +--rw password?   string
+                   |     |  |              |     x--rw password?          string
+                   |     |  |              +--:(name-only)
+                   |     |  |                 +--rw name?   string
+                   |     |  +--rw normalizer!
+                   |     |  |  +--rw tcp!
+                   |     |  |     +--rw (tcp-choice)?
+                   |     |  |        +--:(tcp-all-case)
+                   |     |  |        |  +--rw all?     boolean
+                   |     |  |        +--:(tcp-options-case)
+                   |     |  |           +--rw block?   boolean
+                   |     |  +--rw custom-signature!
+                   |     |     +--rw file?   string
+                   |     +--rw web-filter!
+                   |     |  +--rw cloud-lookup?   boolean
+                   |     |  +--rw sourcedb?       -> ../../../../web-filter/sourcedb/id
+                   |     +--rw file-reputation!
+                   |     |  +--rw cloud-server?     string
+                   |     |  +--rw est-server?       string
+                   |     |  +--rw query-interval?   uint32
+                   |     +--rw file-analysis!
+                   |     |  +--rw cloud-server?   string
+                   |     |  +--rw apikey
+                   |     |     +--rw type?   enumeration
+                   |     |     +--rw key?    string
+                   |     +--rw flow-logging
+                   |        +--rw (flow-logging-choice)?
+                   |           +--:(all-case)
+                   |           |  +--rw all?    empty
+                   |           +--:(list-case)
+                   |              +--rw list*   utd-flow-logging-type
+                   +--rw file-analysis
+                   |  +--rw profile* [name]
+                   |     +--rw name          string
+                   |     +--rw file-types!
+                   |     |  +--rw file-type* [name]
+                   |     |     +--rw name    enumeration
+                   |     +--rw alert
+                   |        +--rw level?   enumeration
+                   +--rw file-reputation
+                   |  +--rw profile* [name]
+                   |     +--rw name     string
+                   |     +--rw alert
+                   |        +--rw level?   enumeration
+                   +--rw file-inspection
+                   |  +--rw profile* [name]
+                   |     +--rw name          string
+                   |     +--rw analysis!
+                   |     |  +--rw profile?   -> ../../../../file-analysis/profile/name
+                   |     +--rw reputation!
+                   |        +--rw profile?   -> ../../../../file-reputation/profile/name
+                   +--rw tls-decryption
+                   |  +--rw profile* [name]
+                   |     +--rw name          string
+                   |     +--rw alert*        utd-ssl-alert-type
+                   |     +--rw blacklist!
+                   |     |  +--rw parameter-map
+                   |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+                   |     +--rw categories
+                   |     |  +--rw decrypt!
+                   |     |  |  +--rw category* [name]
+                   |     |  |     +--rw name    utd-category-type
+                   |     |  +--rw never-decrypt!
+                   |     |  |  +--rw category* [name]
+                   |     |  |     +--rw name    utd-category-type
+                   |     |  +--rw skip-decrypt!
+                   |     |     +--rw category* [name]
+                   |     |        +--rw name    utd-category-type
+                   |     +--rw graylist!
+                   |     |  +--rw parameter-map
+                   |     |     +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+                   |     +--rw log
+                   |     |  +--rw level?   utd-log-level-type
+                   |     +--rw reputation!
+                   |     |  +--rw decrypt-threshold?        utd-reputation-type
+                   |     |  +--rw skip-decrypt-threshold?   utd-reputation-type
+                   |     +--rw sourcedb
+                   |     |  +--rw fail
+                   |     |     +--rw decrypt?   empty
+                   |     +--rw whitelist!
+                   |        +--rw parameter-map
+                   |           +--rw regex?   -> /ios:native/parameter-map/type/ios-policy:regex/name
+                   +--rw policy* [name]
+                      +--rw name                 string
+                      +--rw fail
+                      |  +--rw close?   empty
+                      +--rw file-inspection
+                      |  +--rw profile?   -> ../../../file-inspection/profile/name
+                      +--rw tls-decryption
+                      |  +--rw profile?   -> ../../../tls-decryption/profile/name
+                      |  +--rw action?    enumeration
+                      +--rw threat-inspection
+                      |  +--rw profile?   -> ../../../threat-inspection/profile/name
+                      +--rw web-filter
+                         +--rw url
+                            +--rw profile?   -> ../../../../web-filter/url/profile/id
+  augment /ios:native/ios:interface/ios:Ethernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:FastEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:GigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:TenGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:FiveGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:AppGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:TwentyFiveGigE:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:TwentyFiveGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:FortyGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:FiftyGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:HundredGigE:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:TwoGigabitEthernet:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:LISP:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:Loopback:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:Tunnel:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:Virtual-Template:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:Vlan:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:vasileft:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:interface/ios:vasiright:
+    +--rw utd
+       +--rw enable?   empty
+  augment /ios:native/ios:parameter-map/ios:type/ios-policy:inspect:
+    +--rw utd-policy
+       +--rw policy-name?   -> /ios:native/ios-utd:utd-unified-policy/utd/engine/standard/unified-policy/policy/name
+  augment /ios:native/ios:parameter-map/ios:type/ios-policy:inspect-global:
+    +--rw utd-policy
+       +--rw policy-name?   -> /ios:native/ios-utd:utd-unified-policy/utd/engine/standard/unified-policy/policy/name</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

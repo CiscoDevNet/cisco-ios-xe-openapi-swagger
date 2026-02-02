@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cisco-bridge-domain - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>cisco-bridge-domain</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-bridge-domain.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: cisco-bridge-domain
+  +--rw bridge-domain-config
+  |  +--rw global
+  |  |  +--rw bd-state-notification-enabled?   boolean
+  |  |  +--rw bd-state-notification-rate?      uint32
+  |  |  +--rw pbb
+  |  |     +--rw backbone-src-mac?   yang:mac-address
+  |  +--rw bridge-groups {configurable-bd-groups}?
+  |  |  +--rw bridge-group* [name]
+  |  |     +--rw name    string
+  |  +--rw bridge-domains
+  |     +--rw bridge-domain* [id]
+  |        +--rw id                               string
+  |        +--rw bridge-group                     -> /bridge-domain-config/bridge-groups/bridge-group/name {configurable-bd-groups}?
+  |        +--rw enabled?                         boolean
+  |        +--rw bd-status-change-notification?   boolean
+  |        +--rw members
+  |        |  +--rw ac-member* [interface]
+  |        |  |  +--rw interface                 if:interface-ref
+  |        |  |  +--rw split-horizon-group! {configurable-bd-member-features}?
+  |        |  |  |  +--rw id    uint16 {configurable-bd-sh-group-number}?
+  |        |  |  +--rw mac {configurable-bd-member-features}?
+  |        |  |  |  +--rw learning-enabled?   boolean
+  |        |  |  |  +--rw limit
+  |        |  |  |  |  +--rw maximum?        uint32 {configurable-bd-mac-limit-max}?
+  |        |  |  |  |  +--rw action?         mac-limit-action {configurable-bd-mac-limit-actions}?
+  |        |  |  |  |  +--rw notification?   identityref {configurable-bd-mac-limit-notif}?
+  |        |  |  |  +--rw aging
+  |        |  |  |  |  +--rw time?   uint32
+  |        |  |  |  |  +--rw type?   mac-aging-type {configurable-bd-mac-aging-types}?
+  |        |  |  |  +--rw port-down {configurable-bd-mac-event-action}?
+  |        |  |  |  |  +--rw flush?   boolean
+  |        |  |  |  +--rw secure {configurable-bd-mac-secure}?
+  |        |  |  |     +--rw action?    mac-secure-action
+  |        |  |  |     +--rw logging?   boolean
+  |        |  |  |     +--rw enabled?   boolean
+  |        |  |  +--rw igmp-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |  |  |  +--rw profile-name    string
+  |        |  |  +--rw mld-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |  |  |  +--rw profile-name    string
+  |        |  |  +--rw dhcp-ipv4-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |  |  |  +--rw profile-name    string
+  |        |  |  +--rw flooding {configurable-bd-flooding,configurable-bd-member-features}?
+  |        |  |  |  +--rw disabled?                   empty
+  |        |  |  |  +--rw disabled-unknown-unicast?   empty
+  |        |  |  +--rw storm-control {configurable-bd-storm-control,configurable-bd-member-features}?
+  |        |  |  |  +--rw thresholds* [traffic-class]
+  |        |  |  |  |  +--rw traffic-class    cbridge:eth-traffic-class
+  |        |  |  |  |  +--rw value            uint32
+  |        |  |  |  |  +--rw unit             enumeration
+  |        |  |  |  +--rw action?       identityref {configurable-storm-control-actions}?
+  |        |  |  +--rw dynamic-arp-inspection {configurable-bd-dai}?
+  |        |  |  |  +--rw address-validation!
+  |        |  |  |  |  +--rw dst-mac?   empty
+  |        |  |  |  |  +--rw src-mac?   empty
+  |        |  |  |  |  +--rw ipv4?      empty
+  |        |  |  |  +--rw logging?              boolean
+  |        |  |  |  +--rw enable?               boolean
+  |        |  |  +--rw ip-source-guard {configurable-bd-ipsg}?
+  |        |  |     +--rw logging?   boolean
+  |        |  |     +--rw enable?    boolean
+  |        |  +--rw vfi-member* [interface]
+  |        |  |  +--rw interface    if:interface-ref
+  |        |  +--rw access-pw-member
+  |        |     +--rw access-pw-if-member* [interface]
+  |        |     |  +--rw interface    if:interface-ref
+  |        |     +--rw pw-neighbor-spec* [neighbor-ip-address vc-id]
+  |        |        +--rw neighbor-ip-address        inet:ip-address
+  |        |        +--rw vc-id                      uint32
+  |        |        +--rw static-label {static-label-direct-config}?
+  |        |        |  +--rw local-label?    uint32
+  |        |        |  +--rw remote-label?   uint32
+  |        |        +--rw (pw-class-or-specs)?
+  |        |        |  +--:(pw-class-template)
+  |        |        |  |  +--rw pw-class-template?   pw-template-ref
+  |        |        |  +--:(specs)
+  |        |        |     +--rw encap-type?          identityref {pw-short-config}?
+  |        |        |     +--rw tag-impose-vlan?     uint16 {pw-tag-impose-vlan-id}?
+  |        |        |     +--rw source-ipv6?         inet:ipv6-address {pw-ipv6-source}?
+  |        |        +--rw split-horizon-group! {configurable-bd-member-features}?
+  |        |        |  +--rw id    uint16 {configurable-bd-sh-group-number}?
+  |        |        +--rw mac {configurable-bd-member-features}?
+  |        |        |  +--rw learning-enabled?   boolean
+  |        |        |  +--rw limit
+  |        |        |  |  +--rw maximum?        uint32 {configurable-bd-mac-limit-max}?
+  |        |        |  |  +--rw action?         mac-limit-action {configurable-bd-mac-limit-actions}?
+  |        |        |  |  +--rw notification?   identityref {configurable-bd-mac-limit-notif}?
+  |        |        |  +--rw aging
+  |        |        |  |  +--rw time?   uint32
+  |        |        |  |  +--rw type?   mac-aging-type {configurable-bd-mac-aging-types}?
+  |        |        |  +--rw port-down {configurable-bd-mac-event-action}?
+  |        |        |  |  +--rw flush?   boolean
+  |        |        |  +--rw secure {configurable-bd-mac-secure}?
+  |        |        |     +--rw action?    mac-secure-action
+  |        |        |     +--rw logging?   boolean
+  |        |        |     +--rw enabled?   boolean
+  |        |        +--rw igmp-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |        |  +--rw profile-name    string
+  |        |        +--rw mld-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |        |  +--rw profile-name    string
+  |        |        +--rw dhcp-ipv4-snooping {configurable-bd-snooping-profiles,configurable-bd-member-features}?
+  |        |        |  +--rw profile-name    string
+  |        |        +--rw flooding {configurable-bd-flooding,configurable-bd-member-features}?
+  |        |        |  +--rw disabled?                   empty
+  |        |        |  +--rw disabled-unknown-unicast?   empty
+  |        |        +--rw storm-control {configurable-bd-storm-control,configurable-bd-member-features}?
+  |        |        |  +--rw thresholds* [traffic-class]
+  |        |        |  |  +--rw traffic-class    cbridge:eth-traffic-class
+  |        |        |  |  +--rw value            uint32
+  |        |        |  |  +--rw unit             enumeration
+  |        |        |  +--rw action?       identityref {configurable-storm-control-actions}?
+  |        |        +--rw backup
+  |        |           +--rw neighbor-ip-address?   inet:ip-address
+  |        |           +--rw vc-id?                 uint32
+  |        |           +--rw pw-class-template?     pw-template-ref
+  |        +--rw mtu?                             uint16 {configurable-bd-mtu}?
+  |        +--rw flooding-mode?                   enumeration {configurable-bd-flooding-mode}?
+  |        +--rw mac
+  |        |  +--rw learning-enabled?   boolean
+  |        |  +--rw limit
+  |        |  |  +--rw maximum?        uint32 {configurable-bd-mac-limit-max}?
+  |        |  |  +--rw action?         mac-limit-action {configurable-bd-mac-limit-actions}?
+  |        |  |  +--rw notification?   identityref {configurable-bd-mac-limit-notif}?
+  |        |  +--rw aging
+  |        |  |  +--rw time?   uint32
+  |        |  |  +--rw type?   mac-aging-type {configurable-bd-mac-aging-types}?
+  |        |  +--rw port-down {configurable-bd-mac-event-action}?
+  |        |  |  +--rw flush?   boolean
+  |        |  +--rw flooding {configurable-bd-flooding}?
+  |        |  |  +--rw disabled?                   empty
+  |        |  |  +--rw disabled-unknown-unicast?   empty
+  |        |  +--rw secure! {configurable-bd-mac-secure}?
+  |        |  |  +--rw action?    mac-secure-action
+  |        |  |  +--rw logging?   boolean
+  |        |  +--rw static {configurable-bd-static-mac}?
+  |        |     +--rw mac-addresses* [mac-addr]
+  |        |        +--rw mac-addr    yang:mac-address
+  |        |        +--rw drop        boolean
+  |        +--rw dynamic-arp-inspection! {configurable-bd-dai}?
+  |        |  +--rw address-validation!
+  |        |  |  +--rw dst-mac?   empty
+  |        |  |  +--rw src-mac?   empty
+  |        |  |  +--rw ipv4?      empty
+  |        |  +--rw logging?              boolean
+  |        +--rw ip-source-guard! {configurable-bd-ipsg}?
+  |        |  +--rw logging?   boolean
+  |        +--rw storm-control {configurable-bd-storm-control}?
+  |        |  +--rw thresholds* [traffic-class]
+  |        |  |  +--rw traffic-class    cbridge:eth-traffic-class
+  |        |  |  +--rw value            uint32
+  |        |  |  +--rw unit             enumeration
+  |        |  +--rw action?       identityref {configurable-storm-control-actions}?
+  |        +--rw igmp-snooping {configurable-bd-snooping-profiles}?
+  |        |  +--rw profile-name?   string
+  |        |  +--rw disabled?       empty
+  |        +--rw mld-snooping {configurable-bd-snooping-profiles}?
+  |        |  +--rw profile-name    string
+  |        +--rw dhcp-ipv4-snooping {configurable-bd-snooping-profiles}?
+  |           +--rw profile-name    string
+  +--ro bridge-domain-state
+     +--ro system-capabilities
+     |  +--ro max-bd?                    uint32
+     |  +--ro max-ac-per-bd?             uint32
+     |  +--ro max-pw-per-bd?             uint32
+     |  +--ro max-vfi-per-bd?            uint32
+     |  +--ro max-sh-group-per-bd?       uint32
+     |  +--ro max-interflex-if-per-bd?   uint32
+     +--ro module-capabilities
+     |  +--ro modules* [name]
+     |     +--ro name                   string
+     |     +--ro max-mac-per-bd?        uint32
+     |     +--ro max-pdd-edge-bd?       uint32
+     |     +--ro max-bd?                uint32
+     |     +--ro max-ac-per-bd?         uint32
+     |     +--ro max-pw-per-bd?         uint32
+     |     +--ro max-vfi-per-bd?        uint32
+     |     +--ro max-sh-group-per-bd?   uint32
+     +--ro bridge-domains
+     |  +--ro bridge-domain* [id]
+     |     +--ro id                    string
+     |     +--ro bd-state              bridge-domain-state-type
+     |     +--ro create-time?          yang:timestamp
+     |     +--ro last-status-change?   yang:timeticks
+     |     +--ro mac-limit-reached?    boolean
+     |     +--ro p2mp-pw-disabled?     boolean
+     |     +--ro members
+     |        +--ro ac-member* [interface]
+     |        |  +--ro interface           if:interface-state-ref
+     |        |  +--ro static-mac-count?   uint32
+     |        |  +--ro dai-stats
+     |        |  |  +--ro packet-drops?   yang:counter64
+     |        |  |  +--ro byte-drops?     yang:counter64
+     |        |  +--ro ipsg-stats
+     |        |  |  +--ro packet-drops?   yang:counter64
+     |        |  |  +--ro byte-drops?     yang:counter64
+     |        |  +--ro storm-control
+     |        |     +--ro drop-counter* [traffic-class]
+     |        |        +--ro traffic-class    cbridge:eth-traffic-class
+     |        |        +--ro packet-drops?    yang:counter64
+     |        |        +--ro octate-drops?    yang:counter64
+     |        +--ro vfi-member* [interface]
+     |        |  +--ro interface    if:interface-state-ref
+     |        |  +--ro flooding
+     |        |     +--ro status* [traffic-class]
+     |        |        +--ro traffic-class    eth-traffic-class
+     |        |        +--ro enabled?         boolean
+     |        +--ro access-pw-member* [vc-peer-address vc-id]
+     |           +--ro vc-peer-address    pw-oper-vc-peer-addr-ref
+     |           +--ro vc-id              pw-oper-vc-id-ref
+     |           +--ro flooding
+     |              +--ro status* [traffic-class]
+     |                 +--ro traffic-class    eth-traffic-class
+     |                 +--ro enabled?         boolean
+     +--ro mac-table* [bd-id mac-address]
+        +--ro bd-id          string
+        +--ro mac-address    yang:mac-address
+        +--ro mac-type?      enumeration
+        +--ro interface      if:interface-ref
+        +--ro secure-mac?    boolean
+        +--ro ntfy-mac?      boolean
+        +--ro age?           yang:timeticks
+        +--ro location?      string
+
+  rpcs:
+    +---x clear-bridge-domain {clear-bridge-domain}?
+    |  +---w input
+    |  |  +---w (bridge-domains)
+    |  |     +--:(all)
+    |  |     |  +---w all?     empty
+    |  |     +--:(bd-id)
+    |  |     |  +---w bd-id?   string
+    |  |     +--:(bg-id)
+    |  |        +---w bg-id?   string {configurable-bd-groups}?
+    |  +--ro output
+    |     +--ro errstr?   string
+    +---x clear-mac-address
+    |  +---w input
+    |  |  +---w bridge-domain
+    |  |  |  +---w bd-id    string
+    |  |  |  +---w bg-id    string {configurable-bd-groups}?
+    |  |  +---w interface?       if:interface-ref
+    |  |  +---w mac-address?     yang:mac-address
+    |  +--ro output
+    |     +--ro errstr?   string
+    +---x create-parameterized-bridge-domains {parameterized-bridge-domains}?
+       +---w input
+       |  +---w parameter?   enumeration
+       |  +---w member* [interface]
+       |     +---w interface    if:interface-ref
+       +--ro output
+          +--ro errstr?   string
+
+  notifications:
+    +---n bd-state-notification
+       +--ro id?         bd:bridge-domain-oper-ref
+       +--ro bd-state?   bridge-domain-state-type
+       +--ro time?       yang:timestamp</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

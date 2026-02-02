@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cisco-ia - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>cisco-ia</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-ia.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: cisco-ia
+
+  augment /cisco-sfm:netconf-yang:
+    +--rw cisco-ia
+       o--rw auto-sync?                 cia-sync-type
+       o--rw init-sync?                 cia-sync-type
+       o--rw intelligent-sync?          boolean
+       x--rw snmp-trap-control
+       |  x--rw global-forwarding?   boolean
+       |  x--rw trap-list* [trap-oid]
+       |     x--rw trap-oid       yang:object-identifier-128
+       |     x--rw description?   string
+       |     x--rw forward?       boolean
+       o--rw message-diag-level?        int16
+       o--rw max-diag-messages-saved?   int16
+       o--rw post-sync-acl-process?     boolean
+       o--rw config-change-delay?       int16
+       o--rw process-missing-prc?       boolean
+       o--rw missing-prc-method?        parser-msg-processing-method
+       +--rw snmp-community-string?     string
+       o--rw preserve-paths-enabled?    boolean
+       o--rw preserve-ned-path* [xpath]
+       |  +--rw xpath    string
+       +--ro parser-msg-ignore* [message]
+       |  +--ro message    string
+       o--rw conf-parser-msg-ignore* [message]
+       |  +--rw message    string
+       +--ro parser-msg-error* [message]
+       |  +--ro message    string
+       o--rw conf-parser-msg-error* [message]
+       |  +--rw message    string
+       o--ro full-sync-cli* [command]
+       |  +--ro command    string
+       o--rw conf-full-sync-cli* [command]
+       |  +--rw command    string
+       o--ro nes-ttynum?                int16
+       o--rw restored?                  boolean
+       o--rw logging
+       |  o--rw confd-log-level?      syslog-severity
+       |  o--rw ciaauthd-log-level?   cia-log-level
+       |  o--rw nes-log-level?        cia-log-level
+       |  o--rw onep-log-level?       onep-log-level
+       |  o--rw odm-log-level?        cia-log-level
+       |  o--rw sync-log-level?       cia-log-level
+       o--rw blocking
+       |  o--rw cli-blocking-enabled?         boolean
+       |  o--rw network-element-command* [command]
+       |  |  o--rw command    string
+       |  o--rw confd-cfg-blocking-enabled?   boolean
+       |  o--rw confd-cfg-command* [command]
+       |     o--rw command    string
+       +--rw pivot-commands
+          +--ro pivot-command* [command]
+             +--ro command    string
+             +--ro retry!
+                +--ro min-retry-time?   uint16
+                +--ro max-retry-time?   uint16
+
+  rpcs:
+    +---x sync-from
+    |  +---w input
+    |  |  +---w sync-defaults?         empty
+    |  |  +---w ignore-presrv-paths?   empty
+    |  +--ro output
+    |     +--ro result?   string
+    +---x save-config
+    |  +--ro output
+    |     +--ro result?   string
+    +---x netconf-session-id
+    |  +--ro output
+    |     +--ro result?   string
+    +---x current-time
+    |  +--ro output
+    |     +--ro result?   string
+    +---x is-syncing
+    |  +--ro output
+    |     +--ro result?                       string
+    |     +--ro syncing?                      boolean
+    |     +--ro syncs-pending?                boolean
+    |     +--ro running-datastore-locked?     boolean
+    |     +--ro candidate-datastore-locked?   boolean
+    |     +--ro candidate-datastore-dirty?    boolean
+    +---x checkpoint
+    |  +--ro output
+    |     +--ro result?   string
+    +---x revert
+    |  +---w input
+    |  |  +---w now?     empty
+    |  |  +---w timer?   int16
+    |  |  +---w idle?    int16
+    |  +--ro output
+    |     +--ro result?   string
+    +---x rollback
+       +---w input
+       |  +---w target-url         string
+       |  +---w verbose?           boolean
+       |  +---w nolock?            boolean
+       |  +---w revert-on-error?   empty
+       |  +---w revert-timer?      int16
+       +--ro output
+          +--ro result?   string</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

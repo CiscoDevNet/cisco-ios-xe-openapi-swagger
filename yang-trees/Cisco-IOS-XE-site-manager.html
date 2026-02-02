@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco-IOS-XE-site-manager - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cisco-IOS-XE-site-manager</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Cisco-IOS-XE-site-manager.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: Cisco-IOS-XE-site-manager
+
+  augment /ios:native:
+    +--rw site-manager!
+       +--rw master* [name]
+       |  +--rw name                       site-manager-site-type
+       |  +--rw advanced
+       |  |  +--rw dca-probe-http-interval?   union
+       |  |  +--rw dia-probe-icmp-interval?   union
+       |  |  +--rw dns-redirect?              inet:ipv4-address
+       |  +--rw dca-probe-http-interval?   union
+       |  +--rw dia-probe-icmp-interval?   union
+       |  +--rw dns-redirect?              inet:ipv4-address
+       |  +--rw domain-map
+       |     +--rw application* [name]
+       |        +--rw name      string
+       |        +--rw domain?   string
+       |        +--rw dscp?     ios-types:dscp-type
+       +--rw vrf* [name]
+          +--rw name      string
+          +--rw border
+          |  +--rw master?             union
+          |  +--rw shutdown?           empty
+          |  +--rw source-interface
+          |  |  +--rw Loopback?   -> /ios:native/interface/Loopback/name
+          |  +--rw password
+          |     +--rw enryption-type?   enumeration
+          |     +--rw auth-password?    string
+          +--rw master* [name]
+             +--rw name                site-manager-site-type
+             +--rw source-interface
+             |  +--rw Loopback?   -> /ios:native/interface/Loopback/name
+             +--rw shutdown?           empty
+             +--rw advanced
+             |  +--rw tcp
+             |  |  +--rw mc-port?   uint16
+             |  +--rw connection-keepalive-interval?   int8
+             +--rw password
+             |  +--rw enryption-type?   enumeration
+             |  +--rw auth-password?    string
+             +--rw policy
+                +--rw local* [type]
+                |  +--rw type     enumeration
+                |  +--rw class* [name sequence]
+                |     +--rw name               string
+                |     +--rw sequence           uint16
+                |     +--rw probe
+                |     |  +--rw icmp
+                |     |     +--rw address?   inet:ipv4-address
+                |     |     +--rw dscp?      ios-types:dscp-type
+                |     +--rw load-sharing
+                |     |  +--rw algorithm
+                |     |  |  +--rw (algorithm-choice)?
+                |     |  |     +--:(universal-case)
+                |     |  |     |  +--rw universal!
+                |     |  |     +--:(per-packet-case)
+                |     |  |     |  +--rw per-packet!
+                |     |  |     +--:(original-case)
+                |     |  |     |  +--rw original!
+                |     |  |     +--:(include-ports-case)
+                |     |  |        +--rw include-ports!
+                |     |  |           +--rw (include-ports-type-choice)?
+                |     |  |              +--:(distination-case)
+                |     |  |              |  +--rw destination!
+                |     |  |              +--:(source-case)
+                |     |  |                 +--rw source!
+                |     |  |                    +--rw destination!
+                |     |  |                       +--rw gtp?   empty
+                |     |  +--rw flow-stickiness?   enumeration
+                |     +--rw match
+                |     |  +--rw app-group* [name]
+                |     |  |  +--rw name      string
+                |     |  |  +--rw policy?   enumeration
+                |     |  +--rw application* [name]
+                |     |     +--rw name      string
+                |     |     +--rw policy?   enumeration
+                |     +--rw path-preference
+                |        +--rw primary?          string
+                |        +--rw primary2?         string
+                |        +--rw primary3?         string
+                |        +--rw primary4?         string
+                |        +--rw fallback?         union
+                |        +--rw fallback2?        string
+                |        +--rw fallback3?        string
+                |        +--rw fallback4?        string
+                |        +--rw next-fallback?    union
+                |        +--rw next-fallback2?   string
+                |        +--rw next-fallback3?   string
+                |        +--rw next-fallback4?   string
+                +--rw group* [group-name type]
+                   +--rw group-name    union
+                   +--rw type          enumeration
+                   +--rw class* [name sequence]
+                      +--rw name               string
+                      +--rw sequence           uint16
+                      +--rw probe
+                      |  +--rw icmp
+                      |     +--rw address?   inet:ipv4-address
+                      |     +--rw dscp?      ios-types:dscp-type
+                      +--rw load-sharing
+                      |  +--rw algorithm
+                      |  |  +--rw (algorithm-choice)?
+                      |  |     +--:(universal-case)
+                      |  |     |  +--rw universal!
+                      |  |     +--:(per-packet-case)
+                      |  |     |  +--rw per-packet!
+                      |  |     +--:(original-case)
+                      |  |     |  +--rw original!
+                      |  |     +--:(include-ports-case)
+                      |  |        +--rw include-ports!
+                      |  |           +--rw (include-ports-type-choice)?
+                      |  |              +--:(distination-case)
+                      |  |              |  +--rw destination!
+                      |  |              +--:(source-case)
+                      |  |                 +--rw source!
+                      |  |                    +--rw destination!
+                      |  |                       +--rw gtp?   empty
+                      |  +--rw flow-stickiness?   enumeration
+                      +--rw match
+                      |  +--rw app-group* [name]
+                      |  |  +--rw name      string
+                      |  |  +--rw policy?   enumeration
+                      |  +--rw application* [name]
+                      |     +--rw name      string
+                      |     +--rw policy?   enumeration
+                      +--rw path-preference
+                         +--rw primary?          string
+                         +--rw primary2?         string
+                         +--rw primary3?         string
+                         +--rw primary4?         string
+                         +--rw fallback?         union
+                         +--rw fallback2?        string
+                         +--rw fallback3?        string
+                         +--rw fallback4?        string
+                         +--rw next-fallback?    union
+                         +--rw next-fallback2?   string
+                         +--rw next-fallback3?   string
+                         +--rw next-fallback4?   string
+  augment /ios:native/ios:interface/ios:Ethernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:FastEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:ATM:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:ATM-subinterface/ios:ATM:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:ATM/ios-atm:pvc:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:ATM-subinterface/ios:ATM/ios-atm:pvc:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:GigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:TenGigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:FiveGigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:AppGigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:TwentyFiveGigE:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:FortyGigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:TwoGigabitEthernet:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:HundredGigE:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Multilink:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Port-channel:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Tunnel:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:LISP:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Virtual-Template:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:vasileft:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:vasiright:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Vlan:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:BDI:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Cellular:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Dialer:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16
+  augment /ios:native/ios:interface/ios:Serial:
+    +--rw site-manager
+       +--rw (sitemgr-path-type)?
+          +--:(sitemgr-path)
+          |  +--rw path?                     string
+          |  +--rw direct-internet-access?   empty
+          |  +--rw weight?                   int16
+          +--:(sitemgr-inside)
+          |  +--rw inside?                   empty
+          +--:(sitemgr-link-group)
+             +--rw link-group!
+                +--rw link-group-name?          string
+                +--rw direct-internet-access?   empty
+                +--rw weight?                   int16</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

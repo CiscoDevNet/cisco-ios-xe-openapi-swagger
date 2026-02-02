@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco-IOS-XE-controller - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cisco-IOS-XE-controller</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Cisco-IOS-XE-controller.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: Cisco-IOS-XE-controller
+
+  augment /ios:native/ios:controller:
+    +--rw controller-tx-ex-list* [name number]
+    |  +--rw name                enumeration
+    |  +--rw number              string
+    |  +--rw atm?                empty
+    |  +--rw framing-config
+    |  |  +--rw tx-framing?   enumeration
+    |  |  +--rw e1-framing?   enumeration
+    |  |  +--rw australia?    empty
+    |  o--rw framing?            string
+    |  +--rw clock
+    |  |  +--rw source
+    |  |     +--rw (source-choice)?
+    |  |        +--:(line)
+    |  |        |  +--rw line!
+    |  |        |     +--rw line-mode?   enumeration
+    |  |        +--:(internal)
+    |  |        |  +--rw internal?     empty
+    |  |        +--:(loop-timed)
+    |  |        |  +--rw loop-timed?   empty
+    |  |        +--:(network)
+    |  |           +--rw network?      empty
+    |  +--rw description?        string
+    |  +--rw linecode-t1?        enumeration
+    |  +--rw linecode-e1?        enumeration
+    |  +--rw linecode-t3?        enumeration
+    |  +--rw cablelength
+    |  |  +--rw (cablelength-choice)?
+    |  |     +--:(long)
+    |  |     |  +--rw long?    string
+    |  |     +--:(short)
+    |  |        +--rw short?   string
+    |  +--rw line-termination?   enumeration
+    |  +--rw channel-group* [number]
+    |  |  +--rw number       uint8
+    |  |  +--rw timeslots*   union
+    |  |  +--rw unframed?    empty
+    |  +--rw fdl?                enumeration
+    |  +--rw shutdown?           boolean
+    |  +--rw pri-group!
+    |     +--rw timeslots?                  string
+    |     +--rw (pri-group-choice)?
+    |        +--:(voice-dsp-choice)
+    |        |  +--rw voice-dsp-ce1t1pri?   empty
+    |        +--:(service-choice)
+    |        |  +--rw service?              enumeration
+    |        +--:(nfas-choice)
+    |           +--rw nfas_d?               enumeration
+    |           +--rw nfas_int?             uint8
+    |           +--rw nfas_group?           uint8
+    |           +--rw voice-dsp?            empty
+    +--rw Gps-Dr
+    |  +--rw dead-reckoning
+    |     +--rw nmea
+    |     |  +--rw udp
+    |     |     +--rw source-address?        inet:ipv4-address
+    |     |     +--rw destination-address?   inet:ipv4-address
+    |     |     +--rw destination-port?      uint16
+    |     +--rw enable?               empty
+    |     +--rw mode?                 enumeration
+    |     +--rw can-filter?           enumeration
+    |     +--rw constellation?        enumeration
+    |     +--rw iox-acc-frequency?    enumeration
+    |     +--rw iox-gyro-frequency?   enumeration
+    |     +--rw tty-baudrate?         enumeration
+    +--rw Cellular* [id]
+    |  +--rw id                         string
+    |  +--rw lte
+    |  |  +--rw sim
+    |  |  |  +--rw authenticate
+    |  |  |  |  +--rw pin-type?   enumeration
+    |  |  |  |  +--rw pin?        string
+    |  |  |  |  +--rw slot?       uint8
+    |  |  |  +--rw data-profile-list* [slot]
+    |  |  |  |  +--rw slot              uint8
+    |  |  |  |  +--rw data-profile?     -> ../../../../profile/id
+    |  |  |  |  +--rw attach-profile?   -> ../../../../profile/id
+    |  |  |  +--rw max-retry?           uint16
+    |  |  |  +--rw primary
+    |  |  |     +--rw slot?   uint8
+    |  |  +--rw sms
+    |  |  |  +--rw archive
+    |  |  |     +--rw path?   enumeration
+    |  |  +--rw gps
+    |  |  |  +--rw enable?          empty
+    |  |  |  +--rw mode?            enumeration
+    |  |  |  +--rw nmea-conf
+    |  |  |  |  +--rw nmea?   empty
+    |  |  |  +--rw nmea
+    |  |  |  |  +--rw ip
+    |  |  |  |     +--rw udp
+    |  |  |  |        +--rw source-address?        inet:ipv4-address
+    |  |  |  |        +--rw destination-address?   inet:ipv4-address
+    |  |  |  |        +--rw destination-port?      uint16
+    |  |  |  +--rw constellation?   enumeration {ios-features:cellular-gnss}?
+    |  |  +--rw failovertimer?   uint8
+    |  |  +--rw firmware!
+    |  |  |  +--rw auto-sim?   empty
+    |  |  +--rw radio
+    |  |  |  +--rw off?   empty
+    |  |  +--rw mobile-app
+    |  |  |  +--rw user-profile
+    |  |  |  |  +--rw id?          uint16
+    |  |  |  |  +--rw username?    string
+    |  |  |  |  +--rw password?    string
+    |  |  |  |  +--rw privilege?   string
+    |  |  |  +--rw allow-list
+    |  |  |  |  +--rw id?       uint16
+    |  |  |  |  +--rw msisdn?   string
+    |  |  |  o--rw white-list
+    |  |  |     o--rw id?       uint16
+    |  |  |     o--rw msisdn?   string
+    |  |  +--rw modem
+    |  |  |  +--rw dm-log
+    |  |  |  |  +--rw output
+    |  |  |  |  |  +--rw (output-choice)?
+    |  |  |  |  |     +--:(local-uf)
+    |  |  |  |  |     |  +--rw local-uf?   empty
+    |  |  |  |  |     +--:(path)
+    |  |  |  |  |        +--rw path?       enumeration
+    |  |  |  |  +--rw filter?     union
+    |  |  |  |  +--rw size?       uint16
+    |  |  |  |  +--rw filesize?   int8
+    |  |  |  |  +--rw rotation?   empty
+    |  |  |  |  +--rw enable?     empty
+    |  |  |  |  +--rw autostop
+    |  |  |  |     +--rw (autostop-choice)?
+    |  |  |  |        +--:(link-down)
+    |  |  |  |        |  +--rw link-down?   empty
+    |  |  |  |        +--:(timer)
+    |  |  |  |           +--rw timer?       int8
+    |  |  |  +--rw crash-action
+    |  |  |  |  +--rw auto-collect?    empty
+    |  |  |  |  +--rw boot-and-hold?   empty
+    |  |  |  +--rw fota
+    |  |  |  |  +--rw enable?       empty
+    |  |  |  |  +--rw poll-timer?   uint32
+    |  |  |  +--rw link-recovery
+    |  |  |  |  +--rw rssi
+    |  |  |  |  |  +--rw onset-threshold?   int32
+    |  |  |  |  +--rw rsrq
+    |  |  |  |  |  +--rw onset-threshold?   int32
+    |  |  |  |  +--rw rsrp
+    |  |  |  |  |  +--rw onset-threshold?   int32
+    |  |  |  |  +--rw echo-failure
+    |  |  |  |  |  +--rw ip?   inet:ip-address
+    |  |  |  |  +--rw monitor-timer?    uint32
+    |  |  |  |  +--rw wait-timer?       uint32
+    |  |  |  |  +--rw debounce-count?   uint32
+    |  |  |  |  +--rw disable?          empty
+    |  |  |  +--rw nas-log
+    |  |  |  |  +--rw output
+    |  |  |  |  |  +--rw path?   enumeration
+    |  |  |  |  +--rw size?       uint16
+    |  |  |  |  +--rw filesize?   int8
+    |  |  |  |  +--rw enable?     empty
+    |  |  |  +--rw serviceability {ios-features:cellular-serviceability-enhancement}?
+    |  |  |  |  +--rw modem-resets?       empty
+    |  |  |  |  +--rw interface-resets?   empty
+    |  |  |  |  +--rw gps?                empty
+    |  |  |  +--rw band-select* [slot]
+    |  |  |     +--rw slot                     uint8
+    |  |  |     +--rw (band-choice)
+    |  |  |        +--:(all-lte-only-case)
+    |  |  |        |  +--rw all-lte-only?      empty
+    |  |  |        +--:(all-umts3G-only-case)
+    |  |  |        |  +--rw all-umts3G-only?   empty
+    |  |  |        +--:(indices)
+    |  |  |           +--rw indices?           empty
+    |  |  |           +--rw umts3g?            string
+    |  |  |           +--rw lte4g?             string
+    |  |  |           +--rw nr5g-nsa?          string
+    |  |  |           +--rw nr5g-sa?           string
+    |  |  +--rw event
+    |  |  |  +--rw connection-status
+    |  |  |  |  +--rw mib-trap*   enumeration
+    |  |  |  +--rw ecio
+    |  |  |  |  +--rw abate
+    |  |  |  |  |  +--rw mib-trap*    enumeration
+    |  |  |  |  |  +--rw threshold?   int16
+    |  |  |  |  +--rw onset
+    |  |  |  |     +--rw mib-trap*    enumeration
+    |  |  |  |     +--rw threshold?   int16
+    |  |  |  +--rw modem-state
+    |  |  |  |  +--rw mib-trap*   enumeration
+    |  |  |  +--rw network
+    |  |  |  |  +--rw mib-trap?   empty
+    |  |  |  +--rw rsrp
+    |  |  |  |  +--rw abate
+    |  |  |  |  |  +--rw mib-trap*    enumeration
+    |  |  |  |  |  +--rw threshold?   int16
+    |  |  |  |  +--rw onset
+    |  |  |  |     +--rw mib-trap*    enumeration
+    |  |  |  |     +--rw threshold?   int16
+    |  |  |  +--rw rsrq
+    |  |  |  |  +--rw abate
+    |  |  |  |  |  +--rw mib-trap*    enumeration
+    |  |  |  |  |  +--rw threshold?   int8
+    |  |  |  |  +--rw onset
+    |  |  |  |     +--rw mib-trap*    enumeration
+    |  |  |  |     +--rw threshold?   int8
+    |  |  |  +--rw rssi
+    |  |  |  |  +--rw abate
+    |  |  |  |  |  +--rw mib-trap*    enumeration
+    |  |  |  |  |  +--rw threshold?   int16
+    |  |  |  |  +--rw onset
+    |  |  |  |     +--rw mib-trap*    enumeration
+    |  |  |  |     +--rw threshold?   int16
+    |  |  |  +--rw service
+    |  |  |  |  +--rw mib-trap?   empty
+    |  |  |  +--rw temperature
+    |  |  |     +--rw abate
+    |  |  |     |  +--rw mib-trap?    empty
+    |  |  |     |  +--rw threshold?   int16
+    |  |  |     +--rw onset
+    |  |  |        +--rw mib-trap?    empty
+    |  |  |        +--rw threshold?   int16
+    |  |  +--rw dyinggasp
+    |  |     +--rw detach
+    |  |     |  +--rw enable?   empty
+    |  |     +--rw sms
+    |  |        +--rw send?       string
+    |  |        +--rw sms-text?   string
+    |  +--rw profile* [id]
+    |  |  +--rw id                      int8
+    |  |  +--rw apn?                    string
+    |  |  +--rw authentication?         enumeration
+    |  |  +--rw username?               string
+    |  |  +--rw password?               string
+    |  |  +--rw encryption?             enumeration
+    |  |  +--rw pdn-type?               enumeration
+    |  |  +--rw slice-type?             int8
+    |  |  +--rw slice-differentiator?   int32
+    |  |  +--rw slot?                   uint8
+    |  |  +--rw no-overwrite?           empty
+    |  +--rw src-ip-violation-action
+    |     +--rw drop?   enumeration
+    +--rw SONET* [name]
+    |  +--rw name        string
+    |  +--rw framing?    enumeration
+    |  +--rw shutdown?   empty
+    |  +--rw clock
+    |  |  +--rw source?   enumeration
+    |  +--rw aug
+    |  |  +--rw mapping?   enumeration
+    |  +--rw au-3* [number]
+    |  |  +--rw number      int8
+    |  |  +--rw overhead
+    |  |  |  +--rw byte?     enumeration
+    |  |  |  +--rw length?   uint8
+    |  |  +--rw mode
+    |  |     +--rw mapping?   enumeration
+    |  +--rw au-4-atm
+    |  |  +--rw au-4
+    |  |     +--rw number?   int8
+    |  |     +--rw atm?      empty
+    |  +--rw au-4* [number tug-3]
+    |  |  +--rw number                     int8
+    |  |  +--rw tug-3                      int8
+    |  |  +--rw mode?                      enumeration
+    |  |  +--rw cem-group?                 int32
+    |  |  +--rw (framing-choice)?
+    |  |  |  +--:(unframed-case)
+    |  |  |  |  +--rw unframed?            empty
+    |  |  |  +--:(framing-case)
+    |  |  |     +--rw framing?             enumeration
+    |  |  +--rw cem-group-timeslots
+    |  |  |  +--rw tug-2* [number e1 cem-group]
+    |  |  |     +--rw number       int8
+    |  |  |     +--rw e1           int8
+    |  |  |     +--rw cem-group    int32
+    |  |  |     +--rw timeslots?   string
+    |  |  +--rw channel-group-timeslots
+    |  |  |  +--rw tug-2* [number e1 channel-group]
+    |  |  |     +--rw number           int8
+    |  |  |     +--rw e1               int8
+    |  |  |     +--rw channel-group    int32
+    |  |  |     +--rw timeslots?       string
+    |  |  +--rw cem-group-unframed
+    |  |  |  +--rw tug-2* [number e1 cem-group]
+    |  |  |     +--rw number       int8
+    |  |  |     +--rw e1           int8
+    |  |  |     +--rw cem-group    int32
+    |  |  |     +--rw unframed?    empty
+    |  |  +--rw framing-unframed
+    |  |  |  +--rw tug-2* [number e1]
+    |  |  |     +--rw number     int8
+    |  |  |     +--rw e1         int8
+    |  |  |     +--rw framing?   enumeration
+    |  |  +--rw cem-group-atm
+    |  |  |  +--rw tug-2* [number e1]
+    |  |  |     +--rw number    int8
+    |  |  |     +--rw e1        int8
+    |  |  |     +--rw atm?      empty
+    |  |  +--rw ima-group
+    |  |     +--rw tug-2* [number e1 ima-group]
+    |  |        +--rw number       int8
+    |  |        +--rw e1           int8
+    |  |        +--rw ima-group    int32
+    |  +--rw aps
+    |     +--rw group
+    |     |  +--rw group-number?   uint8
+    |     |  +--rw acr?            int8
+    |     +--rw working?         int8
+    |     +--rw protect
+    |     |  +--rw number?    int8
+    |     |  +--rw ip-addr?   inet:ipv4-address
+    |     +--rw hspw-icrm-grp?   uint8
+    |     +--rw interchassis
+    |        +--rw group?   uint8
+    +--rw SONET-ACR* [name]
+    |  +--rw name        string
+    |  +--rw framing?    enumeration
+    |  +--rw shutdown?   empty
+    |  +--rw clock
+    |  |  +--rw source?   enumeration
+    |  +--rw aug
+    |  |  +--rw mapping?   enumeration
+    |  +--rw au-3* [number]
+    |  |  +--rw number      int8
+    |  |  +--rw overhead
+    |  |  |  +--rw byte?     enumeration
+    |  |  |  +--rw length?   uint8
+    |  |  +--rw mode
+    |  |     +--rw mapping?   enumeration
+    |  +--rw au-4-atm
+    |  |  +--rw au-4
+    |  |     +--rw number?   int8
+    |  |     +--rw atm?      empty
+    |  +--rw au-4* [number tug-3]
+    |  |  +--rw number                     int8
+    |  |  +--rw tug-3                      int8
+    |  |  +--rw mode?                      enumeration
+    |  |  +--rw cem-group?                 int32
+    |  |  +--rw (framing-choice)?
+    |  |  |  +--:(unframed-case)
+    |  |  |  |  +--rw unframed?            empty
+    |  |  |  +--:(framing-case)
+    |  |  |     +--rw framing?             enumeration
+    |  |  +--rw cem-group-timeslots
+    |  |  |  +--rw tug-2* [number e1 cem-group]
+    |  |  |     +--rw number       int8
+    |  |  |     +--rw e1           int8
+    |  |  |     +--rw cem-group    int32
+    |  |  |     +--rw timeslots?   string
+    |  |  +--rw channel-group-timeslots
+    |  |  |  +--rw tug-2* [number e1 channel-group]
+    |  |  |     +--rw number           int8
+    |  |  |     +--rw e1               int8
+    |  |  |     +--rw channel-group    int32
+    |  |  |     +--rw timeslots?       string
+    |  |  +--rw cem-group-unframed
+    |  |  |  +--rw tug-2* [number e1 cem-group]
+    |  |  |     +--rw number       int8
+    |  |  |     +--rw e1           int8
+    |  |  |     +--rw cem-group    int32
+    |  |  |     +--rw unframed?    empty
+    |  |  +--rw framing-unframed
+    |  |  |  +--rw tug-2* [number e1]
+    |  |  |     +--rw number     int8
+    |  |  |     +--rw e1         int8
+    |  |  |     +--rw framing?   enumeration
+    |  |  +--rw cem-group-atm
+    |  |  |  +--rw tug-2* [number e1]
+    |  |  |     +--rw number    int8
+    |  |  |     +--rw e1        int8
+    |  |  |     +--rw atm?      empty
+    |  |  +--rw ima-group
+    |  |     +--rw tug-2* [number e1 ima-group]
+    |  |        +--rw number       int8
+    |  |        +--rw e1           int8
+    |  |        +--rw ima-group    int32
+    |  +--rw aps
+    |     +--rw group
+    |     |  +--rw group-number?   uint8
+    |     |  +--rw acr?            int8
+    |     +--rw working?         int8
+    |     +--rw protect
+    |     |  +--rw number?    int8
+    |     |  +--rw ip-addr?   inet:ipv4-address
+    |     +--rw hspw-icrm-grp?   uint8
+    |     +--rw interchassis
+    |        +--rw group?   uint8
+    +--rw wanphy* [name]
+    |  +--rw name    string
+    +--rw VDSL* [name]
+    |  +--rw name                  string
+    |  +--rw operating
+    |  |  +--rw mode
+    |  |     +--rw (operating-mode-choice-new)?
+    |  |     |  +--:(adsl1-new)
+    |  |     |  |  +--rw adsl1-new?             empty
+    |  |     |  +--:(adsl2-new)
+    |  |     |  |  +--rw adsl2-new!
+    |  |     |  |     +--rw annex-new?   enumeration
+    |  |     |  +--:(default-auto-config)
+    |  |     |  |  +--rw default-auto-config?   enumeration
+    |  |     |  +--:(auto-config)
+    |  |     |  |  +--rw auto-config
+    |  |     |  |     +--rw adsl1-new?       empty
+    |  |     |  |     +--rw adsl2-new?       empty
+    |  |     |  |     +--rw adsl2plus-new?   empty
+    |  |     |  |     +--rw vdsl2-new?       empty
+    |  |     |  |     +--rw ansi-new?        empty
+    |  |     |  +--:(vdsl2-new)
+    |  |     |  |  +--rw vdsl2-new?             empty
+    |  |     |  +--:(ansi-new)
+    |  |     |  |  +--rw ansi-new?              empty
+    |  |     |  +--:(adsl2plus-new)
+    |  |     |     +--rw adsl2plus-new!
+    |  |     |        +--rw annex-new?   enumeration
+    |  |     +--rw (operating-mode-choice)?
+    |  |        o--:(adsl1)
+    |  |        |  o--rw adsl1?                 empty
+    |  |        o--:(adsl2)
+    |  |        |  o--rw adsl2!
+    |  |        |     o--rw annex?   enumeration
+    |  |        o--:(auto)
+    |  |        |  o--rw auto!
+    |  |        |     o--rw adsl1?       empty
+    |  |        |     o--rw adsl2?       empty
+    |  |        |     o--rw adsl2plus?   empty
+    |  |        |     o--rw vdsl2?       empty
+    |  |        |     o--rw ansi?        empty
+    |  |        o--:(vdsl2)
+    |  |        |  o--rw vdsl2?                 empty
+    |  |        o--:(ansi)
+    |  |        |  o--rw ansi?                  empty
+    |  |        o--:(adsl2plus)
+    |  |           o--rw adsl2plus!
+    |  |              o--rw annex?   enumeration
+    |  +--rw line-mode
+    |  |  +--rw (line-mode-choice)?
+    |  |     +--:(bonding)
+    |  |     |  +--rw bonding?       empty
+    |  |     +--:(single-wire)
+    |  |        +--rw single-wire
+    |  |           +--rw line-config?   enumeration
+    |  |           +--rw profile?       enumeration
+    |  |           o--rw line
+    |  |              o--rw zero?   empty
+    |  |              o--rw one!
+    |  |                 o--rw profile?   enumeration
+    |  +--rw training
+    |  |  +--rw log
+    |  |     +--rw filename?   string
+    |  +--rw firmware
+    |  |  +--rw phy
+    |  |     +--rw filename?   string
+    |  +--rw sync
+    |  |  +--rw interval
+    |  |  |  +--rw seconds?   uint32
+    |  |  +--rw mode
+    |  |     +--rw itu!
+    |  |     |  +--rw previous?   empty
+    |  |     +--rw none?   empty
+    |  |     +--rw ansi!
+    |  |        +--rw previous?   empty
+    |  +--rw diagnostics-config
+    |  |  +--rw DELT?   boolean
+    |  +--rw bandwidth-set
+    |  |  +--rw downstream?   uint32
+    |  |  +--rw upstream?     uint32
+    |  o--rw diagnostics?          enumeration
+    |  +--rw modem?                string
+    |  +--rw shutdown-config?      boolean
+    |  o--rw shutdown?             empty
+    |  +--rw sra-config?           boolean
+    |  o--rw sra?                  empty
+    |  +--rw bitswap-config?       boolean
+    |  o--rw bitswap?              empty
+    |  +--rw description?          string
+    +--rw SHDSL* [name]
+       +--rw name           string
+       +--rw description?   string
+       +--rw firmware
+       |  +--rw phy
+       |     +--rw filename?   string
+       +--rw termination?   enumeration
+       +--rw mode?          enumeration
+       +--rw dsl-group* [group]
+          +--rw group               enumeration
+          +--rw pairs?              string
+          +--rw efm-bond?           empty
+          +--rw m-pair?             empty
+          o--rw efm-grp
+          |  o--rw add
+          |  |  o--rw link?   uint8
+          |  o--rw delete
+          |     o--rw link?   uint8
+          +--rw handshake
+          |  +--rw (handshake-sample-choice)?
+          |     +--:(ieee-case)
+          |     |  +--rw ieee?          empty
+          |     +--:(itut-case)
+          |     |  +--rw itut?          empty
+          |     +--:(auto-case)
+          |     |  +--rw auto-config?   enumeration
+          |     |  o--rw auto?          empty
+          |     +--:(g-shdsl-case)
+          |     |  +--rw g-shdsl?       empty
+          |     +--:(g-shdsl-bis-case)
+          |        +--rw g-shdsl-bis?   empty
+          +--rw handshake-config
+          |  +--rw (handshake-sample-choice)?
+          |     +--:(ieee-case)
+          |     |  +--rw ieee?          empty
+          |     +--:(itut-case)
+          |     |  +--rw itut?          enumeration
+          |     +--:(auto-case)
+          |     |  +--rw auto?          empty
+          |     +--:(g-shdsl-case)
+          |     |  +--rw g-shdsl?       empty
+          |     +--:(g-shdsl-bis-case)
+          |        +--rw g-shdsl-bis?   empty
+          +--rw ignore
+          |  +--rw crc
+          |     +--rw (crc-choice)?
+          |        +--:(crc-value-choice)
+          |        |  +--rw crc-value?   uint16
+          |        +--:(always-choice)
+          |           +--rw always?      empty
+          +--rw shutdown?           empty
+          +--rw shdsl
+             +--rw four-wire
+             |  +--rw mode
+             |     +--rw enhanced-config!
+             |     |  +--rw vendor-id-npsg?   empty
+             |     o--rw enhanced
+             |        o--rw vendor-id-npsg?   empty
+             +--rw rate
+             |  +--rw (rate-choice)?
+             |     +--:(rate-value-case)
+             |     |  +--rw rate-value?            uint16
+             |     +--:(default-rate-auto-case)
+             |     |  +--rw default-auto-config?   enumeration
+             |     +--:(rate-auto-case)
+             |     |  +--rw auto-config
+             |     |  |  +--rw current-config?   int8
+             |     |  |  +--rw worst-config?     int8
+             |     |  o--rw auto!
+             |     |     o--rw current?   int8
+             |     |     o--rw worst?     int8
+             |     +--:(rate-enhanced-case)
+             |        +--rw enhanced
+             |           +--rw (enhanced-rate-choice)?
+             |              +--:(enhanced-rate-value-case)
+             |              |  +--rw enhanced-rate-value?   uint16
+             |              +--:(enhanced-rate-auto-case)
+             |                 +--rw auto!
+             |                    +--rw current?   int8
+             |                    +--rw worst?     int8
+             +--rw rate-config
+             |  +--rw (rate-choice)?
+             |     +--:(rate-value-case)
+             |     |  +--rw rate-value?   uint16
+             |     +--:(rate-auto-case)
+             |     |  +--rw auto
+             |     |     +--rw current?   int8
+             |     |     +--rw worst?     int8
+             |     +--:(rate-enhanced-case)
+             |        +--rw enhanced
+             |           +--rw (enhanced-rate-choice)?
+             |              +--:(enhanced-rate-value-case)
+             |              |  +--rw enhanced-rate-value?            uint16
+             |              +--:(default-enhanced-rate-auto-case)
+             |              |  +--rw default-enhanced-auto-config?   enumeration
+             |              +--:(enhanced-rate-auto-case)
+             |                 +--rw auto
+             |                    +--rw current?   int8
+             |                    +--rw worst?     int8
+             +--rw annex
+                +--rw (annex-choice)?
+                   +--:(annex-a-case)
+                   |  +--rw a?          empty
+                   +--:(annex-a-f-case)
+                   |  +--rw a-f
+                   |     +--rw coding
+                   |        +--rw (coding-choice)?
+                   |           +--:(sixteen-tcpam-case)
+                   |           |  +--rw sixteen-tcpam?          empty
+                   |           +--:(thirty-two-tcpam-case)
+                   |           |  +--rw thirtytwo-tcpam?        empty
+                   |           +--:(sixty-four-tcpam-case)
+                   |           |  +--rw sixtyfour-tcpam?        empty
+                   |           +--:(one-twenty-eight-tcpam-case)
+                   |           |  +--rw onetwentyeight-tcpam?   empty
+                   |           +--:(four-tcpam-case)
+                   |           |  +--rw four-tcpam?             empty
+                   |           +--:(eight-tcpam-case)
+                   |              +--rw eight-tcpam?            empty
+                   +--:(annex-b-case)
+                   |  +--rw b-config?   enumeration
+                   |  o--rw b?          empty
+                   +--:(annex-b-g-case)
+                   |  +--rw b-g
+                   |     +--rw coding
+                   |        +--rw (coding-choice)?
+                   |           +--:(sixteen-tcpam-case)
+                   |           |  +--rw sixteen-tcpam?          empty
+                   |           +--:(thirty-two-tcpam-case)
+                   |           |  +--rw thirtytwo-tcpam?        empty
+                   |           +--:(sixty-four-tcpam-case)
+                   |           |  +--rw sixtyfour-tcpam?        empty
+                   |           +--:(one-twenty-eight-tcpam-case)
+                   |           |  +--rw onetwentyeight-tcpam?   empty
+                   |           +--:(four-tcpam-case)
+                   |           |  +--rw four-tcpam?             empty
+                   |           +--:(eight-tcpam-case)
+                   |              +--rw eight-tcpam?            empty
+                   +--:(annex-f-case)
+                   |  +--rw f
+                   |     +--rw coding
+                   |        +--rw (coding-choice)?
+                   |           +--:(sixteen-tcpam-case)
+                   |           |  +--rw sixteen-tcpam?          empty
+                   |           +--:(thirty-two-tcpam-case)
+                   |           |  +--rw thirtytwo-tcpam?        empty
+                   |           +--:(sixty-four-tcpam-case)
+                   |           |  +--rw sixtyfour-tcpam?        empty
+                   |           +--:(one-twenty-eight-tcpam-case)
+                   |           |  +--rw onetwentyeight-tcpam?   empty
+                   |           +--:(four-tcpam-case)
+                   |           |  +--rw four-tcpam?             empty
+                   |           +--:(eight-tcpam-case)
+                   |              +--rw eight-tcpam?            empty
+                   +--:(annex-g-case)
+                      +--rw g
+                         +--rw coding
+                            +--rw (coding-choice)?
+                               +--:(sixteen-tcpam-case)
+                               |  +--rw sixteen-tcpam?          empty
+                               +--:(thirty-two-tcpam-case)
+                               |  +--rw thirtytwo-tcpam?        empty
+                               +--:(sixty-four-tcpam-case)
+                               |  +--rw sixtyfour-tcpam?        empty
+                               +--:(one-twenty-eight-tcpam-case)
+                               |  +--rw onetwentyeight-tcpam?   empty
+                               +--:(four-tcpam-case)
+                               |  +--rw four-tcpam?             empty
+                               +--:(eight-tcpam-case)
+                                  +--rw eight-tcpam?            empty</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

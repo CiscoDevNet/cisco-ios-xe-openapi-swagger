@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco-IOS-XE-vxlan - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cisco-IOS-XE-vxlan</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Cisco-IOS-XE-vxlan.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: Cisco-IOS-XE-vxlan
+
+  augment /ios:native/ios:vxlan:
+    +--rw udp
+    |  +--rw port?   uint16
+    +--rw dummy-l2-tunnel-udp-port?   uint16
+    +--rw gpe-tunnel-udp-port?        uint16
+    +--rw route-profile* [name]
+    |  +--rw name                     string
+    |  +--rw dscp?                    uint8
+    |  +--rw dst-port?                uint16
+    |  +--rw persistent?              empty
+    |  +--rw tunnel
+    |  |  +--rw mode?                vxlan-tunnel-mode-type
+    |  |  +--rw mtu?                 uint16
+    |  |  +--rw source
+    |  |  |  +--rw interface
+    |  |  |     +--rw Loopback?   -> /ios:native/interface/Loopback/name
+    |  |  +--rw source-port-hash?    vxlan-source-port-hash-type
+    |  |  +--rw source-port-range
+    |  |     +--rw range
+    |  |        +--rw start?   uint16
+    |  |        +--rw end?     uint16
+    |  +--rw vxlan-reserved-word-1
+    |  |  +--rw hex-string?   string
+    |  +--rw vxlan-reserved-word-2
+    |  |  +--rw hex-string?   string
+    |  +--rw default-mac-source?      ios-types:cisco-mac-address-type
+    +--rw source-port-hash
+    |  +--rw dummy-l2-tunnel?   vxlan-source-port-hash-type
+    |  +--rw gpe-tunnel?        vxlan-source-port-hash-type
+    +--rw source-port-range
+    |  +--rw dummy-l2-tunnel-udp
+    |  |  +--rw range
+    |  |     +--rw start?   uint16
+    |  |     +--rw end?     uint16
+    |  +--rw gpe-tunnel-udp
+    |  |  +--rw range
+    |  |     +--rw start?   uint16
+    |  |     +--rw end?     uint16
+    |  +--rw udp
+    |     +--rw range
+    |        +--rw start?   uint16
+    |        +--rw end?     uint16
+    +--rw static-route
+       +--rw accounting-policing
+       |  +--rw bind
+       |     +--rw p2p-tunnel?   empty
+       +--rw auto-tunnel
+       |  +--rw range
+       |     +--rw start?   uint32
+       |     +--rw end?     uint32
+       +--rw policy
+       |  +--rw output
+       |     +--rw vrf* [name]
+       |        +--rw name      string
+       |        +--rw police
+       |           +--rw match
+       |              +--rw any
+       |                 +--rw vni-range-list* [vni]
+       |                    +--rw vni                uint32
+       |                    +--rw (vni-choice)?
+       |                       +--:(vni-single)
+       |                       |  +--rw rate?        uint64
+       |                       +--:(vni-range)
+       |                          +--rw vni-range
+       |                             +--rw vni-range-end?   uint32
+       |                             +--rw rate?            uint64
+       +--rw route-list
+          +--rw vrf* [name]
+             +--rw name                         string
+             +--rw vxlan-static-route-prefix* [prefix]
+                +--rw prefix                    union
+                +--rw vxlan-static-route-vni
+                   +--rw ipv4-addr-mask* [mask]
+                   |  +--rw mask        inet:ipv4-address
+                   |  +--rw vni-list* [vni]
+                   |     +--rw vni        uint32
+                   |     +--rw nh-list* [nh-address]
+                   |        +--rw nh-address       union
+                   |        +--rw dst-mac-list* [dst-mac]
+                   |        |  +--rw dst-mac          ios-types:cisco-mac-address-type
+                   |        |  +--rw route-profile* [name]
+                   |        |     +--rw name               string
+                   |        |     +--rw vxlan-sr-option
+                   |        |        +--rw persistent?   empty
+                   |        |        +--rw symmetric
+                   |        |           +--rw persistent?   empty
+                   |        +--rw route-profile* [name]
+                   |           +--rw name               string
+                   |           +--rw vxlan-sr-option
+                   |              +--rw persistent?   empty
+                   |              +--rw symmetric
+                   |                 +--rw persistent?   empty
+                   +--rw vni-list* [vni]
+                      +--rw vni        uint32
+                      +--rw nh-list* [nh-address]
+                         +--rw nh-address       union
+                         +--rw dst-mac-list* [dst-mac]
+                         |  +--rw dst-mac          ios-types:cisco-mac-address-type
+                         |  +--rw route-profile* [name]
+                         |     +--rw name               string
+                         |     +--rw vxlan-sr-option
+                         |        +--rw persistent?   empty
+                         |        +--rw symmetric
+                         |           +--rw persistent?   empty
+                         +--rw route-profile* [name]
+                            +--rw name               string
+                            +--rw vxlan-sr-option
+                               +--rw persistent?   empty
+                               +--rw symmetric
+                                  +--rw persistent?   empty</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

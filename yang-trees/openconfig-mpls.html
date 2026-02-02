@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openconfig-mpls - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>openconfig-mpls</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/openconfig-mpls.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: openconfig-mpls
+  +--rw mpls
+     +--rw global
+     |  +--rw config
+     |  |  +--rw null-label?   identityref
+     |  +--ro state
+     |  |  +--ro null-label?   identityref
+     |  +--rw interface-attributes
+     |  |  +--rw interface* [interface-id]
+     |  |     +--rw interface-id     -> ../config/interface-id
+     |  |     +--rw config
+     |  |     |  +--rw interface-id?   oc-if:interface-id
+     |  |     |  +--rw mpls-enabled?   boolean
+     |  |     +--ro state
+     |  |     |  +--ro interface-id?   oc-if:interface-id
+     |  |     |  +--ro mpls-enabled?   boolean
+     |  |     +--rw interface-ref
+     |  |        +--rw config
+     |  |        |  +--rw interface?      -> /oc-if:interfaces/interface/name
+     |  |        |  +--rw subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |  |        +--ro state
+     |  |           +--ro interface?      -> /oc-if:interfaces/interface/name
+     |  |           +--ro subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |  +--rw reserved-label-blocks
+     |     +--rw reserved-label-block* [local-id]
+     |        +--rw local-id    -> ../config/local-id
+     |        +--rw config
+     |        |  +--rw local-id?      string
+     |        |  +--rw lower-bound?   oc-mplst:mpls-label
+     |        |  +--rw upper-bound?   oc-mplst:mpls-label
+     |        +--ro state
+     |           +--ro local-id?      string
+     |           +--ro lower-bound?   oc-mplst:mpls-label
+     |           +--ro upper-bound?   oc-mplst:mpls-label
+     +--rw te-global-attributes
+     |  +--rw srlgs
+     |  |  +--rw srlg* [name]
+     |  |     +--rw name                   -> ../config/name
+     |  |     +--rw config
+     |  |     |  +--rw name?            string
+     |  |     |  +--rw value?           uint32
+     |  |     |  +--rw cost?            uint32
+     |  |     |  +--rw flooding-type?   mpls-srlg-flooding-type
+     |  |     +--ro state
+     |  |     |  +--ro name?            string
+     |  |     |  +--ro value?           uint32
+     |  |     |  +--ro cost?            uint32
+     |  |     |  +--ro flooding-type?   mpls-srlg-flooding-type
+     |  |     +--rw static-srlg-members
+     |  |        +--rw members-list* [from-address]
+     |  |           +--rw from-address    -> ../config/from-address
+     |  |           +--rw config
+     |  |           |  +--rw from-address?   inet:ip-address
+     |  |           |  +--rw to-address?     inet:ip-address
+     |  |           +--ro state
+     |  |              +--ro from-address?   inet:ip-address
+     |  |              +--ro to-address?     inet:ip-address
+     |  +--rw mpls-admin-groups
+     |  |  +--rw admin-group* [admin-group-name]
+     |  |     +--rw admin-group-name    -> ../config/admin-group-name
+     |  |     +--rw config
+     |  |     |  +--rw admin-group-name?   string
+     |  |     |  +--rw bit-position?       uint32
+     |  |     +--ro state
+     |  |        +--ro admin-group-name?   string
+     |  |        +--ro bit-position?       uint32
+     |  +--rw te-lsp-timers
+     |     +--rw config
+     |     |  +--rw install-delay?      uint16
+     |     |  +--rw cleanup-delay?      uint16
+     |     |  +--rw reoptimize-timer?   uint16
+     |     +--ro state
+     |        +--ro install-delay?      uint16
+     |        +--ro cleanup-delay?      uint16
+     |        +--ro reoptimize-timer?   uint16
+     +--rw te-interface-attributes
+     |  +--rw interface* [interface-id]
+     |     +--rw interface-id              -> ../config/interface-id
+     |     +--rw config
+     |     |  +--rw interface-id?      oc-if:interface-id
+     |     |  +--rw te-metric?         uint32
+     |     |  +--rw srlg-membership*   -> ../../../../te-global-attributes/srlgs/srlg/name
+     |     |  +--rw admin-group*       string
+     |     +--ro state
+     |     |  +--ro interface-id?      oc-if:interface-id
+     |     |  +--ro te-metric?         uint32
+     |     |  +--ro srlg-membership*   -> ../../../../te-global-attributes/srlgs/srlg/name
+     |     |  +--ro admin-group*       string
+     |     +--rw interface-ref
+     |     |  +--rw config
+     |     |  |  +--rw interface?      -> /oc-if:interfaces/interface/name
+     |     |  |  +--rw subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |     |  +--ro state
+     |     |     +--ro interface?      -> /oc-if:interfaces/interface/name
+     |     |     +--ro subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |     +--rw igp-flooding-bandwidth
+     |        +--rw config
+     |        |  +--rw threshold-type?            enumeration
+     |        |  +--rw delta-percentage?          oc-types:percentage
+     |        |  +--rw threshold-specification?   enumeration
+     |        |  +--rw up-thresholds*             oc-types:percentage
+     |        |  +--rw down-thresholds*           oc-types:percentage
+     |        |  +--rw up-down-thresholds*        oc-types:percentage
+     |        +--ro state
+     |           +--ro threshold-type?            enumeration
+     |           +--ro delta-percentage?          oc-types:percentage
+     |           +--ro threshold-specification?   enumeration
+     |           +--ro up-thresholds*             oc-types:percentage
+     |           +--ro down-thresholds*           oc-types:percentage
+     |           +--ro up-down-thresholds*        oc-types:percentage
+     +--rw signaling-protocols
+     |  +--rw rsvp-te
+     |  |  +--rw sessions
+     |  |  |  +--ro session* [local-index]
+     |  |  |     +--ro local-index             -> ../state/local-index
+     |  |  |     +--ro record-route-objects
+     |  |  |     |  +--ro record-route-object* [index]
+     |  |  |     |     +--ro index    -> ../state/index
+     |  |  |     |     +--ro state
+     |  |  |     |        +--ro index?            uint8
+     |  |  |     |        +--ro address?          inet:ip-address
+     |  |  |     |        +--ro reported-label?   oc-mplst:mpls-label
+     |  |  |     |        +--ro reported-flags?   uint8
+     |  |  |     +--ro state
+     |  |  |        +--ro local-index?           uint32
+     |  |  |        +--ro source-address?        inet:ip-address
+     |  |  |        +--ro destination-address?   inet:ip-address
+     |  |  |        +--ro tunnel-id?             uint16
+     |  |  |        +--ro lsp-id?                uint16
+     |  |  |        +--ro session-name?          string
+     |  |  |        +--ro status?                enumeration
+     |  |  |        +--ro type?                  identityref
+     |  |  |        +--ro label-in?              oc-mplst:mpls-label
+     |  |  |        +--ro label-out?             oc-mplst:mpls-label
+     |  |  +--rw neighbors
+     |  |  |  +--ro neighbor* [address]
+     |  |  |     +--ro address    -> ../state/address
+     |  |  |     +--ro state
+     |  |  |        +--ro address?              inet:ip-address
+     |  |  |        +--ro detected-interface?   string
+     |  |  |        +--ro neighbor-status?      enumeration
+     |  |  |        +--ro refresh-reduction?    boolean
+     |  |  +--rw global
+     |  |  |  +--rw graceful-restart
+     |  |  |  |  +--rw config
+     |  |  |  |  |  +--rw enable?          boolean
+     |  |  |  |  |  +--rw restart-time?    uint32
+     |  |  |  |  |  +--rw recovery-time?   uint32
+     |  |  |  |  +--ro state
+     |  |  |  |     +--ro enable?          boolean
+     |  |  |  |     +--ro restart-time?    uint32
+     |  |  |  |     +--ro recovery-time?   uint32
+     |  |  |  +--rw soft-preemption
+     |  |  |  |  +--rw config
+     |  |  |  |  |  +--rw enable?                    boolean
+     |  |  |  |  |  +--rw soft-preemption-timeout?   uint16
+     |  |  |  |  +--ro state
+     |  |  |  |     +--ro enable?                    boolean
+     |  |  |  |     +--ro soft-preemption-timeout?   uint16
+     |  |  |  +--rw hellos
+     |  |  |  |  +--rw config
+     |  |  |  |  |  +--rw hello-interval?      uint16
+     |  |  |  |  |  +--rw refresh-reduction?   boolean
+     |  |  |  |  +--ro state
+     |  |  |  |     +--ro hello-interval?      uint16
+     |  |  |  |     +--ro refresh-reduction?   boolean
+     |  |  |  +--ro state
+     |  |  |     +--ro counters
+     |  |  |        +--ro path-timeouts?                    yang:counter64
+     |  |  |        +--ro reservation-timeouts?             yang:counter64
+     |  |  |        +--ro rate-limited-messages?            yang:counter64
+     |  |  |        +--ro in-path-messages?                 yang:counter64
+     |  |  |        +--ro in-path-error-messages?           yang:counter64
+     |  |  |        +--ro in-path-tear-messages?            yang:counter64
+     |  |  |        +--ro in-reservation-messages?          yang:counter64
+     |  |  |        +--ro in-reservation-error-messages?    yang:counter64
+     |  |  |        +--ro in-reservation-tear-messages?     yang:counter64
+     |  |  |        +--ro in-hello-messages?                yang:counter64
+     |  |  |        +--ro in-srefresh-messages?             yang:counter64
+     |  |  |        +--ro in-ack-messages?                  yang:counter64
+     |  |  |        +--ro out-path-messages?                yang:counter64
+     |  |  |        +--ro out-path-error-messages?          yang:counter64
+     |  |  |        +--ro out-path-tear-messages?           yang:counter64
+     |  |  |        +--ro out-reservation-messages?         yang:counter64
+     |  |  |        +--ro out-reservation-error-messages?   yang:counter64
+     |  |  |        +--ro out-reservation-tear-messages?    yang:counter64
+     |  |  |        +--ro out-hello-messages?               yang:counter64
+     |  |  |        +--ro out-srefresh-messages?            yang:counter64
+     |  |  |        +--ro out-ack-messages?                 yang:counter64
+     |  |  +--rw interface-attributes
+     |  |     +--rw interface* [interface-id]
+     |  |        +--rw interface-id              -> ../config/interface-id
+     |  |        +--rw config
+     |  |        |  +--rw interface-id?   oc-if:interface-id
+     |  |        +--ro state
+     |  |        |  +--ro counters
+     |  |        |     +--ro in-path-messages?                 yang:counter64
+     |  |        |     +--ro in-path-error-messages?           yang:counter64
+     |  |        |     +--ro in-path-tear-messages?            yang:counter64
+     |  |        |     +--ro in-reservation-messages?          yang:counter64
+     |  |        |     +--ro in-reservation-error-messages?    yang:counter64
+     |  |        |     +--ro in-reservation-tear-messages?     yang:counter64
+     |  |        |     +--ro in-hello-messages?                yang:counter64
+     |  |        |     +--ro in-srefresh-messages?             yang:counter64
+     |  |        |     +--ro in-ack-messages?                  yang:counter64
+     |  |        |     +--ro out-path-messages?                yang:counter64
+     |  |        |     +--ro out-path-error-messages?          yang:counter64
+     |  |        |     +--ro out-path-tear-messages?           yang:counter64
+     |  |        |     +--ro out-reservation-messages?         yang:counter64
+     |  |        |     +--ro out-reservation-error-messages?   yang:counter64
+     |  |        |     +--ro out-reservation-tear-messages?    yang:counter64
+     |  |        |     +--ro out-hello-messages?               yang:counter64
+     |  |        |     +--ro out-srefresh-messages?            yang:counter64
+     |  |        |     +--ro out-ack-messages?                 yang:counter64
+     |  |        +--rw interface-ref
+     |  |        |  +--rw config
+     |  |        |  |  +--rw interface?      -> /oc-if:interfaces/interface/name
+     |  |        |  |  +--rw subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |  |        |  +--ro state
+     |  |        |     +--ro interface?      -> /oc-if:interfaces/interface/name
+     |  |        |     +--ro subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |  |        +--rw bandwidth-reservations
+     |  |        |  +--ro bandwidth-reservation* [priority]
+     |  |        |     +--ro priority    -> ../state/priority
+     |  |        |     +--ro state
+     |  |        |        +--ro priority?                    union
+     |  |        |        +--ro available-bandwidth?         oc-mplst:bandwidth-mbps
+     |  |        |        +--ro reserved-bandwidth?          oc-mplst:bandwidth-mbps
+     |  |        |        +--ro active-reservations-count?   yang:gauge64
+     |  |        |        +--ro highwater-mark?              oc-mplst:bandwidth-mbps
+     |  |        +--rw hellos
+     |  |        |  +--rw config
+     |  |        |  |  +--rw hello-interval?      uint16
+     |  |        |  |  +--rw refresh-reduction?   boolean
+     |  |        |  +--ro state
+     |  |        |     +--ro hello-interval?      uint16
+     |  |        |     +--ro refresh-reduction?   boolean
+     |  |        +--rw authentication
+     |  |        |  +--rw config
+     |  |        |  |  +--rw enable?               boolean
+     |  |        |  |  +--rw authentication-key?   string
+     |  |        |  +--ro state
+     |  |        |     +--ro enable?               boolean
+     |  |        |     +--ro authentication-key?   string
+     |  |        +--rw subscription
+     |  |        |  +--rw config
+     |  |        |  |  +--rw subscription?   oc-types:percentage
+     |  |        |  +--ro state
+     |  |        |     +--ro subscription?   oc-types:percentage
+     |  |        +--rw protection
+     |  |           +--rw config
+     |  |           |  +--rw link-protection-style-requested?   identityref
+     |  |           |  +--rw bypass-optimize-interval?          uint16
+     |  |           +--ro state
+     |  |              +--ro link-protection-style-requested?   identityref
+     |  |              +--ro bypass-optimize-interval?          uint16
+     |  +--rw ldp
+     |  |  +--rw timers
+     |  +--rw segment-routing
+     |     +--rw aggregate-sid-counters
+     |     |  +--ro aggregate-sid-counter* [mpls-label]
+     |     |     +--ro mpls-label    -> ../state/mpls-label
+     |     |     +--ro state
+     |     |        +--ro mpls-label?   oc-mpls-t:mpls-label
+     |     |        +--ro in-pkts?      yang:counter64
+     |     |        +--ro in-octets?    yang:counter64
+     |     |        +--ro out-pkts?     yang:counter64
+     |     |        +--ro out-octets?   yang:counter64
+     |     +--rw interfaces
+     |        +--rw interface* [interface-id]
+     |           +--rw interface-id     -> ../config/interface-id
+     |           +--rw config
+     |           |  +--rw interface-id?   string
+     |           +--ro state
+     |           |  +--ro interface-id?   string
+     |           |  +--ro in-pkts?        yang:counter64
+     |           |  +--ro in-octets?      yang:counter64
+     |           |  +--ro out-pkts?       yang:counter64
+     |           |  +--ro out-octets?     yang:counter64
+     |           +--rw sid-counters
+     |           |  +--ro sid-counter* [mpls-label]
+     |           |     +--ro mpls-label            -> ../state/mpls-label
+     |           |     +--ro state
+     |           |     |  +--ro mpls-label?   oc-mpls-t:mpls-label
+     |           |     |  +--ro in-pkts?      yang:counter64
+     |           |     |  +--ro in-octets?    yang:counter64
+     |           |     |  +--ro out-pkts?     yang:counter64
+     |           |     |  +--ro out-octets?   yang:counter64
+     |           |     +--ro forwarding-classes
+     |           |        +--ro forwarding-class* [exp]
+     |           |           +--ro exp      -> ../state/exp
+     |           |           +--ro state
+     |           |              +--ro exp?          uint8
+     |           |              +--ro in-pkts?      yang:counter64
+     |           |              +--ro in-octets?    yang:counter64
+     |           |              +--ro out-pkts?     yang:counter64
+     |           |              +--ro out-octets?   yang:counter64
+     |           +--rw interface-ref
+     |              +--rw config
+     |              |  +--rw interface?      -> /oc-if:interfaces/interface/name
+     |              |  +--rw subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     |              +--ro state
+     |                 +--ro interface?      -> /oc-if:interfaces/interface/name
+     |                 +--ro subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+     +--rw lsps
+        +--rw constrained-path
+        |  +--rw named-explicit-paths
+        |  |  +--rw named-explicit-path* [name]
+        |  |     +--rw name                      -> ../config/name
+        |  |     +--rw config
+        |  |     |  +--rw name?                      string
+        |  |     |  +--rw sid-selection-mode?        enumeration
+        |  |     |  +--rw sid-protection-required?   boolean
+        |  |     +--ro state
+        |  |     |  +--ro name?                      string
+        |  |     |  +--ro sid-selection-mode?        enumeration
+        |  |     |  +--ro sid-protection-required?   boolean
+        |  |     +--rw explicit-route-objects
+        |  |        +--rw explicit-route-object* [index]
+        |  |           +--rw index     -> ../config/index
+        |  |           +--rw config
+        |  |           |  +--rw address?    inet:ip-address
+        |  |           |  +--rw hop-type?   mpls-hop-type
+        |  |           |  +--rw index?      uint8
+        |  |           +--ro state
+        |  |              +--ro address?    inet:ip-address
+        |  |              +--ro hop-type?   mpls-hop-type
+        |  |              +--ro index?      uint8
+        |  +--rw tunnels
+        |     +--rw tunnel* [name]
+        |        +--rw name                     -> ../config/name
+        |        +--rw config
+        |        |  +--rw name?                         string
+        |        |  +--rw type?                         identityref
+        |        |  +--rw signaling-protocol?           identityref
+        |        |  +--rw description?                  string
+        |        |  +--rw admin-status?                 identityref
+        |        |  +--rw preference?                   uint8
+        |        |  +--rw metric-type?                  identityref
+        |        |  +--rw metric?                       int32
+        |        |  +--rw shortcut-eligible?            boolean
+        |        |  +--rw protection-style-requested?   identityref
+        |        |  +--rw reoptimize-timer?             uint16
+        |        |  +--rw source?                       inet:ip-address
+        |        |  +--rw soft-preemption?              boolean
+        |        |  +--rw setup-priority?               uint8
+        |        |  +--rw hold-priority?                uint8
+        |        +--ro state
+        |        |  +--ro name?                         string
+        |        |  +--ro type?                         identityref
+        |        |  +--ro signaling-protocol?           identityref
+        |        |  +--ro description?                  string
+        |        |  +--ro admin-status?                 identityref
+        |        |  +--ro preference?                   uint8
+        |        |  +--ro metric-type?                  identityref
+        |        |  +--ro metric?                       int32
+        |        |  +--ro shortcut-eligible?            boolean
+        |        |  +--ro protection-style-requested?   identityref
+        |        |  +--ro reoptimize-timer?             uint16
+        |        |  +--ro source?                       inet:ip-address
+        |        |  +--ro soft-preemption?              boolean
+        |        |  +--ro setup-priority?               uint8
+        |        |  +--ro hold-priority?                uint8
+        |        |  +--ro oper-status?                  identityref
+        |        |  +--ro role?                         identityref
+        |        |  +--ro counters
+        |        |     +--ro bytes?                      yang:counter64
+        |        |     +--ro packets?                    yang:counter64
+        |        |     +--ro path-changes?               yang:counter64
+        |        |     +--ro state-changes?              yang:counter64
+        |        |     +--ro online-time?                yang:date-and-time
+        |        |     +--ro current-path-time?          yang:date-and-time
+        |        |     +--ro next-reoptimization-time?   yang:date-and-time
+        |        +--rw bandwidth
+        |        |  +--rw config
+        |        |  |  +--rw specification-type?   te-bandwidth-type
+        |        |  |  +--rw set-bandwidth?        uint32
+        |        |  +--ro state
+        |        |  |  +--ro specification-type?   te-bandwidth-type
+        |        |  |  +--ro set-bandwidth?        uint32
+        |        |  +--rw auto-bandwidth
+        |        |     +--rw config
+        |        |     |  +--rw enabled?            boolean
+        |        |     |  +--rw min-bw?             uint32
+        |        |     |  +--rw max-bw?             uint32
+        |        |     |  +--rw adjust-interval?    uint32
+        |        |     |  +--rw adjust-threshold?   oc-types:percentage
+        |        |     +--ro state
+        |        |     |  +--ro enabled?            boolean
+        |        |     |  +--ro min-bw?             uint32
+        |        |     |  +--ro max-bw?             uint32
+        |        |     |  +--ro adjust-interval?    uint32
+        |        |     |  +--ro adjust-threshold?   oc-types:percentage
+        |        |     +--rw overflow
+        |        |     |  +--rw config
+        |        |     |  |  +--rw enabled?               boolean
+        |        |     |  |  +--rw overflow-threshold?    oc-types:percentage
+        |        |     |  |  +--rw trigger-event-count?   uint16
+        |        |     |  +--ro state
+        |        |     |     +--ro enabled?               boolean
+        |        |     |     +--ro overflow-threshold?    oc-types:percentage
+        |        |     |     +--ro trigger-event-count?   uint16
+        |        |     +--rw underflow
+        |        |        +--rw config
+        |        |        |  +--rw enabled?               boolean
+        |        |        |  +--rw underflow-threshold?   oc-types:percentage
+        |        |        |  +--rw trigger-event-count?   uint16
+        |        |        +--ro state
+        |        |           +--ro enabled?               boolean
+        |        |           +--ro underflow-threshold?   oc-types:percentage
+        |        |           +--ro trigger-event-count?   uint16
+        |        +--rw p2p-tunnel-attributes
+        |           +--rw config
+        |           |  +--rw destination?   inet:ip-address
+        |           +--ro state
+        |           |  +--ro destination?   inet:ip-address
+        |           +--rw p2p-primary-path
+        |           |  +--rw p2p-primary-path* [name]
+        |           |     +--rw name                         -> ../config/name
+        |           |     +--rw config
+        |           |     |  +--rw name?                      string
+        |           |     |  +--rw path-computation-method?   identityref
+        |           |     |  +--rw use-cspf?                  boolean
+        |           |     |  +--rw cspf-tiebreaker?           cspf-tie-breaking
+        |           |     |  +--rw path-computation-server?   inet:ip-address
+        |           |     |  +--rw explicit-path-name?        -> ../../../../../../../named-explicit-paths/named-explicit-path/config/name
+        |           |     |  +--rw preference?                uint8
+        |           |     |  +--rw setup-priority?            uint8
+        |           |     |  +--rw hold-priority?             uint8
+        |           |     |  +--rw retry-timer?               uint16
+        |           |     +--ro state
+        |           |     |  +--ro name?                      string
+        |           |     |  +--ro path-computation-method?   identityref
+        |           |     |  +--ro use-cspf?                  boolean
+        |           |     |  +--ro cspf-tiebreaker?           cspf-tie-breaking
+        |           |     |  +--ro path-computation-server?   inet:ip-address
+        |           |     |  +--ro explicit-path-name?        -> ../../../../../../../named-explicit-paths/named-explicit-path/config/name
+        |           |     |  +--ro preference?                uint8
+        |           |     |  +--ro setup-priority?            uint8
+        |           |     |  +--ro hold-priority?             uint8
+        |           |     |  +--ro retry-timer?               uint16
+        |           |     |  +--ro associated-rsvp-session?   -> ../../../../../../../../../signaling-protocols/rsvp-te/sessions/session/local-index
+        |           |     +--rw candidate-secondary-paths
+        |           |     |  +--rw candidate-secondary-path* [secondary-path]
+        |           |     |     +--rw secondary-path    -> ../config/secondary-path
+        |           |     |     +--rw config
+        |           |     |     |  +--rw secondary-path?   -> ../../../../../../p2p-secondary-paths/p2p-secondary-path/config/name
+        |           |     |     |  +--rw priority?         uint16
+        |           |     |     +--ro state
+        |           |     |        +--ro secondary-path?   -> ../../../../../../p2p-secondary-paths/p2p-secondary-path/config/name
+        |           |     |        +--ro priority?         uint16
+        |           |     |        +--ro active?           boolean
+        |           |     +--rw admin-groups
+        |           |        +--rw config
+        |           |        |  +--rw exclude-group*       -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           |        |  +--rw include-all-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           |        |  +--rw include-any-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           |        +--ro state
+        |           |           +--ro exclude-group*       -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           |           +--ro include-all-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           |           +--ro include-any-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |           +--rw p2p-secondary-paths
+        |              +--rw p2p-secondary-path* [name]
+        |                 +--rw name            -> ../config/name
+        |                 +--rw config
+        |                 |  +--rw name?                      string
+        |                 |  +--rw path-computation-method?   identityref
+        |                 |  +--rw use-cspf?                  boolean
+        |                 |  +--rw cspf-tiebreaker?           cspf-tie-breaking
+        |                 |  +--rw path-computation-server?   inet:ip-address
+        |                 |  +--rw explicit-path-name?        -> ../../../../../../../named-explicit-paths/named-explicit-path/config/name
+        |                 |  +--rw preference?                uint8
+        |                 |  +--rw setup-priority?            uint8
+        |                 |  +--rw hold-priority?             uint8
+        |                 |  +--rw retry-timer?               uint16
+        |                 +--ro state
+        |                 |  +--ro name?                      string
+        |                 |  +--ro path-computation-method?   identityref
+        |                 |  +--ro use-cspf?                  boolean
+        |                 |  +--ro cspf-tiebreaker?           cspf-tie-breaking
+        |                 |  +--ro path-computation-server?   inet:ip-address
+        |                 |  +--ro explicit-path-name?        -> ../../../../../../../named-explicit-paths/named-explicit-path/config/name
+        |                 |  +--ro preference?                uint8
+        |                 |  +--ro setup-priority?            uint8
+        |                 |  +--ro hold-priority?             uint8
+        |                 |  +--ro retry-timer?               uint16
+        |                 |  +--ro associated-rsvp-session?   -> ../../../../../../../../../signaling-protocols/rsvp-te/sessions/session/local-index
+        |                 +--rw admin-groups
+        |                    +--rw config
+        |                    |  +--rw exclude-group*       -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |                    |  +--rw include-all-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |                    |  +--rw include-any-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |                    +--ro state
+        |                       +--ro exclude-group*       -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |                       +--ro include-all-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        |                       +--ro include-any-group*   -> ../../../../../../../../../../te-global-attributes/mpls-admin-groups/admin-group/admin-group-name
+        +--rw unconstrained-path
+        |  +--rw path-setup-protocol
+        |     +--rw ldp
+        |        +--rw tunnel
+        |           +--rw tunnel-type?   oc-mplst:tunnel-type
+        |           +--rw ldp-type?      enumeration
+        |           +--rw p2p-lsp
+        |           |  +--rw fec-address*   inet:ip-prefix
+        |           +--rw p2mp-lsp
+        |           +--rw mp2mp-lsp
+        +--rw static-lsps
+           +--rw static-lsp* [name]
+              +--rw name       -> ../config/name
+              +--rw config
+              |  +--rw name?   string
+              +--ro state
+              |  +--ro name?   string
+              +--rw ingress
+              |  +--rw config
+              |  |  +--rw next-hop?         inet:ip-address
+              |  |  +--rw incoming-label?   oc-mplst:mpls-label
+              |  |  +--rw push-label?       oc-mplst:mpls-label
+              |  +--ro state
+              |     +--ro next-hop?         inet:ip-address
+              |     +--ro incoming-label?   oc-mplst:mpls-label
+              |     +--ro push-label?       oc-mplst:mpls-label
+              +--rw transit
+              |  +--rw config
+              |  |  +--rw next-hop?         inet:ip-address
+              |  |  +--rw incoming-label?   oc-mplst:mpls-label
+              |  |  +--rw push-label?       oc-mplst:mpls-label
+              |  +--ro state
+              |     +--ro next-hop?         inet:ip-address
+              |     +--ro incoming-label?   oc-mplst:mpls-label
+              |     +--ro push-label?       oc-mplst:mpls-label
+              +--rw egress
+                 +--rw config
+                 |  +--rw next-hop?         inet:ip-address
+                 |  +--rw incoming-label?   oc-mplst:mpls-label
+                 |  +--rw push-label?       oc-mplst:mpls-label
+                 +--ro state
+                    +--ro next-hop?         inet:ip-address
+                    +--ro incoming-label?   oc-mplst:mpls-label
+                    +--ro push-label?       oc-mplst:mpls-label</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

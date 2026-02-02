@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>confd_dyncfg - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>confd_dyncfg</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/confd_dyncfg.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: confd_dyncfg
+  +--rw confdConfig
+     +--rw subagents!
+     |  +--rw subagent* [name]
+     |     +--rw name                          subagentNameType
+     |     +--rw enabled?                      boolean
+     |     +--rw tcp!
+     |     |  +--rw ip           inet:ip-address
+     |     |  +--rw port?        inet:port-number
+     |     |  +--rw netns?       string
+     |     |  +--rw vrf?         string
+     |     |  +--rw confdAuth
+     |     |     +--rw user     string
+     |     |     +--rw group    string
+     |     +--rw ssh!
+     |     |  +--rw ip          inet:ip-address
+     |     |  +--rw port?       inet:port-number
+     |     |  +--rw netns?      string
+     |     |  +--rw vrf?        string
+     |     |  +--rw user        string
+     |     |  +--rw password    string
+     |     +--rw mount
+     |     |  +--rw path    string
+     |     |  +--rw node*   xs:QName
+     |     +--rw disableSubtreeOptimization?   boolean
+     +--rw notifications!
+     |  +--rw eventStreams
+     |     +--rw stream* [name]
+     |        +--rw name                  xs:token
+     |        +--rw description           string
+     |        +--rw replaySupport         boolean
+     |        +--rw builtinReplayStore!
+     |           +--rw enabled?    boolean
+     |           +--rw dir         string
+     |           +--rw maxSize     tailf:size
+     |           +--rw maxFiles    maxFilesType
+     +--rw opcache!
+     |  +--rw enabled?   boolean
+     |  +--rw timeout    uint64
+     +--rw snmpgw!
+     |  +--rw enabled?           boolean
+     |  +--rw trapPort?          inet:port-number
+     |  +--rw rowCacheMaxAge?    xs:duration
+     |  +--rw rowCacheMaxSize?   uint16
+     |  +--rw agent* [name]
+     |     +--rw name                  SNMPAgentNameType
+     |     +--rw subscriptionId?       xs:token
+     |     +--rw forwardNotifStream?   xs:token
+     |     +--rw enabled?              boolean
+     |     +--rw community?            string
+     |     +--rw community_bin?        xs:hexBinary
+     |     +--rw version?              snmpVersionType
+     |     +--rw timeout?              xs:duration
+     |     +--rw retries?              uint8
+     |     +--rw ip                    inet:ip-address
+     |     +--rw port?                 inet:port-number
+     |     +--rw netns?                string
+     |     +--rw vrf?                  string
+     |     +--rw module*               string
+     +--rw hideGroup* [name]
+     |  +--rw name        string
+     |  +--rw password?   tailf:md5-digest-string
+     |  +--rw callback?   string
+     +--rw encryptedStrings!
+     |  +--rw (method)?
+     |     +--:(externalKeys)
+     |     |  +--rw externalKeys!
+     |     |     +--rw command            string
+     |     |     +--rw commandTimeout?    timeoutType
+     |     |     +--rw commandArgument?   string
+     |     +--:(keyRotation)
+     |     |  +--rw keyRotation* [generation]
+     |     |     +--rw generation      int16
+     |     |     +--rw DES3CBC!
+     |     |     |  +--rw key1          hex8ValueType
+     |     |     |  +--rw key2          hex8ValueType
+     |     |     |  +--rw key3          hex8ValueType
+     |     |     |  +--rw initVector?   hex8ValueType
+     |     |     +--rw AESCFB128!
+     |     |     |  +--rw key           hex16ValueType
+     |     |     |  +--rw initVector?   hex16ValueType
+     |     |     +--rw AES256CFB128!
+     |     |        +--rw key    hex32ValueType
+     |     +--:(legacy)
+     |        +--rw DES3CBC!
+     |        |  +--rw key1          hex8ValueType
+     |        |  +--rw key2          hex8ValueType
+     |        |  +--rw key3          hex8ValueType
+     |        |  +--rw initVector?   hex8ValueType
+     |        +--rw AESCFB128!
+     |        |  +--rw key           hex16ValueType
+     |        |  +--rw initVector?   hex16ValueType
+     |        +--rw AES256CFB128!
+     |           +--rw key    hex32ValueType
+     +--rw logs!
+     |  +--rw syslogConfig!
+     |  |  +--rw version?         syslogVersionType
+     |  |  +--rw facility?        syslogFacilityType
+     |  |  +--rw udp!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw host       inet:host
+     |  |  |  +--rw port?      inet:port-number
+     |  |  +--rw syslogServers!
+     |  |     +--rw server* [host]
+     |  |        +--rw host        inet:host
+     |  |        +--rw port?       inet:port-number
+     |  |        +--rw version?    syslogVersionType
+     |  |        +--rw facility?   syslogFacilityType
+     |  |        +--rw enabled?    boolean
+     |  +--rw confdLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw developerLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw developerLogLevel?        developerLogLevelType
+     |  +--rw auditLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw auditLogCommit?           boolean
+     |  +--rw auditLogCommitDefaults?   boolean
+     |  +--rw auditNetworkLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw netconfLog!
+     |  |  +--rw enabled?          boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |  |  +--rw enabled?   boolean
+     |  |  +--rw logReplyStatus?   boolean
+     |  |  +--rw logGetContent?    boolean
+     |  |  +--rw maxContentSize?   uint16
+     |  +--rw jsonrpcLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw snmpLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw file!
+     |  |  |  +--rw enabled?   boolean
+     |  |  |  +--rw name       string
+     |  |  +--rw syslog!
+     |  |  |  +--rw enabled?    boolean
+     |  |  |  +--rw facility?   syslogFacilityType
+     |  |  +--rw external!
+     |  |     +--rw enabled?   boolean
+     |  +--rw snmpLogLevel?             snmpLogLevelType
+     |  +--rw snmpGatewayLog!
+     |  |  +--rw enabled?      boolean
+     |  |  +--rw northbound?   boolean
+     |  |  +--rw southbound?   boolean
+     |  |  +--rw filename?     string
+     |  |  +--rw external
+     |  |     +--rw enabled?   boolean
+     |  +--rw webuiBrowserLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename    string
+     |  +--rw webuiAccessLog!
+     |  |  +--rw enabled?      boolean
+     |  |  +--rw trafficLog?   boolean
+     |  |  +--rw dir           string
+     |  |  +--rw syslog!
+     |  |     +--rw enabled?    boolean
+     |  |     +--rw facility?   syslogFacilityType
+     |  +--rw netconfTraceLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename?   string
+     |  |  +--rw external
+     |  |  |  +--rw enabled?   boolean
+     |  |  +--rw format?     netconfTraceFormatType
+     |  +--rw xpathTraceLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename?   string
+     |  |  +--rw external
+     |  |     +--rw enabled?   boolean
+     |  +--rw transactionErrorLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename?   string
+     |  |  +--rw external
+     |  |     +--rw enabled?   boolean
+     |  +--rw extLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename    string
+     |  |  +--rw level?      uint8
+     |  +--rw errorLog!
+     |  |  +--rw enabled?    boolean
+     |  |  +--rw filename    string
+     |  |  +--rw maxSize?    tailf:size
+     |  |  +--rw debug!
+     |  |     +--rw enabled?   boolean
+     |  |     +--rw level?     uint16
+     |  |     +--rw tag*       xs:token
+     |  +--rw progressTrace!
+     |  |  +--rw enabled?   boolean
+     |  |  +--rw dir        string
+     |  +--rw external!
+     |  |  +--rw enabled?   boolean
+     |  |  +--rw command    string
+     |  |  +--rw restart
+     |  |     +--rw maxAttempts?   uint8
+     |  |     +--rw delay?         timeoutType
+     |  |     +--rw period?        timeoutType
+     |  +--rw traceId?                  boolean
+     +--rw sessionLimits!
+     |  +--rw maxSessions?          limitType
+     |  +--rw sessionLimit* [context]
+     |  |  +--rw context        xs:token
+     |  |  +--rw maxSessions    limitType
+     |  +--rw maxConfigSessions?    limitType
+     |  +--rw configSessionLimit* [context]
+     |     +--rw context        xs:token
+     |     +--rw maxSessions    limitType
+     +--rw parserLimits!
+     |  +--rw maxProcessingInstructionLength?   parserLimitType
+     |  +--rw maxTagLength?                     parserLimitType
+     |  +--rw maxAttributeLength?               parserLimitType
+     |  +--rw maxAttributeValueLength?          limitType
+     |  +--rw maxAttributeCount?                parserLimitType
+     |  +--rw maxXmlnsPrefixLength?             limitType
+     |  +--rw maxXmlnsValueLength?              parserLimitType
+     |  +--rw maxXmlnsCount?                    limitType
+     |  +--rw maxDataLength?                    limitType
+     +--rw aaa!
+     |  +--rw sshPubkeyAuthentication?   pubkeyAuthenticationType
+     |  +--rw sshLoginGraceTime?         xs:duration
+     |  +--rw sshMaxAuthTries?           limitType
+     |  +--rw defaultGroup?              string
+     |  +--rw authOrder?                 string
+     |  +--rw validationOrder?           string
+     |  +--rw challengeOrder?            string
+     |  +--rw expirationWarning?         expirationWarningType
+     |  +--rw auditUserName?             auditUserNameType
+     |  +--rw maxPasswordLength?         uint16
+     |  +--rw pam!
+     |  |  +--rw enabled?   boolean
+     |  |  +--rw service?   string
+     |  |  +--rw timeout?   xs:duration
+     |  +--rw restconf!
+     |  |  +--rw authCacheTTL?              xs:duration
+     |  |  +--rw enableAuthCacheClientIp?   boolean
+     |  +--rw externalAuthentication!
+     |  |  +--rw enabled?        boolean
+     |  |  +--rw executable?     string
+     |  |  +--rw useBase64?      boolean
+     |  |  +--rw includeExtra?   boolean
+     |  +--rw localAuthentication!
+     |  |  +--rw enabled?   boolean
+     |  +--rw authenticationCallback!
+     |  |  +--rw enabled?   boolean
+     |  +--rw externalValidation!
+     |  |  +--rw enabled?        boolean
+     |  |  +--rw executable?     string
+     |  |  +--rw useBase64?      boolean
+     |  |  +--rw includeExtra?   boolean
+     |  +--rw validationCallback!
+     |  |  +--rw enabled?   boolean
+     |  +--rw externalChallenge!
+     |  |  +--rw enabled?        boolean
+     |  |  +--rw executable?     string
+     |  |  +--rw useBase64?      boolean
+     |  |  +--rw includeExtra?   boolean
+     |  +--rw challengeCallback!
+     |  |  +--rw enabled?   boolean
+     |  +--rw authorization!
+     |     +--rw enabled?         boolean
+     |     +--rw callback!
+     |     |  +--rw enabled?   boolean
+     |     +--rw nacmCompliant?   boolean
+     +--rw ssh!
+     |  +--rw idleConnectionTimeout?   xs:duration
+     |  +--rw algorithms!
+     |  |  +--rw serverHostKey?   string
+     |  |  +--rw kex?             string
+     |  |  +--rw dhGroup!
+     |  |  |  +--rw minSize?   dhGroupSizeType
+     |  |  |  +--rw maxSize?   dhGroupSizeType
+     |  |  +--rw mac?             string
+     |  |  +--rw encryption?      string
+     |  +--rw clientAliveInterval?     timeoutType
+     |  +--rw clientAliveCountMax?     uint32
+     |  +--rw parallelLogin?           boolean
+     |  +--rw rekeyLimit
+     |     +--rw bytes?     uint64
+     |     +--rw minutes?   uint32
+     +--rw cli!
+     |  +--rw enabled?                        boolean
+     |  +--rw maxLineLength?                  uint32
+     |  +--rw allowImplicitWildcard?          boolean
+     |  +--rw enableLastLoginBanner?          boolean
+     |  +--rw startupScriptNonInteractive?    boolean
+     |  +--rw modeNameStyle?                  cliModeNameStyleType
+     |  +--rw allowOverwriteOnCopy?           boolean
+     |  +--rw inheritPaginate?                boolean
+     |  +--rw safeScriptExecution?            boolean
+     |  +--rw exitConfigModeOnCtrlC?          boolean
+     |  +--rw execNavigationCmds?             boolean
+     |  +--rw allowOldStyleModeCmds?          boolean
+     |  +--rw continueOnErrorCmdStack?        boolean
+     |  +--rw topLevelCmdsInSubMode?          boolean
+     |  +--rw mixedMode?                      boolean
+     |  +--rw completionShowOldVal?           boolean
+     |  +--rw completionMetaInfo?             completionMetaInfoType
+     |  +--rw reportInvalidCompletionInput?   boolean
+     |  +--rw useShortEnabled?                boolean
+     |  +--rw smartRenameFiltering?           boolean
+     |  +--rw allowParenQuotes?               boolean
+     |  +--rw singleElemPattern?              boolean
+     |  +--rw multiPatternOperation?          multiPatternOperationType
+     |  +--rw sortSubmodeCmds?                boolean
+     |  +--rw sortLocalCmds?                  boolean
+     |  +--rw displayEmptyConfigContainers?   boolean
+     |  +--rw displayNonPresenceAttributes?   boolean
+     |  +--rw showEditors?                    boolean
+     |  +--rw whoShowMode?                    boolean
+     |  +--rw whoHistoryDateTimeFormat?       whoHistoryDateTimeFormatType
+     |  +--rw resetScreenAfterMore?           boolean
+     |  +--rw editWrapMode?                   editWrapModeType
+     |  +--rw supportQuotedEOL?               boolean
+     |  +--rw allowWildcard?                  boolean
+     |  +--rw allowAllAsWildcard?             boolean
+     |  +--rw allowRangeExpression?           boolean
+     |  +--rw allowRangeExpressionAllTypes?   boolean
+     |  +--rw useDoubleDotRanges?             boolean
+     |  +--rw addExtraTableSpacing?           boolean
+     |  +--rw suppressRangeKeyword?           boolean
+     |  +--rw exitModeOnEmptyRange?           boolean
+     |  +--rw tableLabel?                     boolean
+     |  +--rw tableLookAhead?                 uint64
+     |  +--rw moreBufferLines?                limitType
+     |  +--rw showTableLabelsIfMultiple?      boolean
+     |  +--rw defaultTableBehavior?           tableBehaviorType
+     |  +--rw allowTableOverflow?             boolean
+     |  +--rw tableOverflowTruncate?          boolean
+     |  +--rw allowTableCellWrap?             boolean
+     |  +--rw showAllNs?                      boolean
+     |  +--rw useExposeNsPrefix?              boolean
+     |  +--rw orderedShowConfig?              boolean
+     |  +--rw suppressFastShow?               boolean
+     |  +--rw leafPrompting?                  boolean
+     |  +--rw modeInfoInAudit?                modeInfoInAuditType
+     |  +--rw auditLogMode?                   cliAuditLogType
+     |  +--rw transactions?                   boolean
+     |  +--rw transactionCtrlCmds?            boolean
+     |  +--rw actionCallNoListInstance?       cliActionNoListInst
+     |  +--rw style?                          cliStyle
+     |  +--rw completionShowMax?              cliMax
+     |  +--rw rollbackAAA?                    boolean
+     |  +--rw rollbackMax?                    rollMax
+     |  +--rw rollbackNumbering?              rollNumbering
+     |  +--rw rollbackNumberingInitial?       int64
+     |  +--rw inconsistentDatabaseSuffix?     string
+     |  +--rw showDefaults?                   boolean
+     |  +--rw reallocateOperTrans?            boolean
+     |  +--rw quickSshTeardown?               boolean
+     |  +--rw cAlignLeafValues?               boolean
+     |  +--rw cConfigAlignLeafValues?         boolean
+     |  +--rw jAlignLeafValues?               boolean
+     |  +--rw defaultPrefix?                  string
+     |  +--rw jWarningPrefix?                 string
+     |  +--rw jAbortedPrefix?                 string
+     |  +--rw jErrorPrefix?                   string
+     |  +--rw cWarningPrefix?                 string
+     |  +--rw cAbortedPrefix?                 string
+     |  +--rw cErrorPrefix?                   string
+     |  +--rw invalidDataString?              string
+     |  +--rw noEmbeddedComments?             boolean
+     |  +--rw showKeyName?                    boolean
+     |  +--rw timezone?                       cliTimezoneType
+     |  +--rw utcOffset?                      int64
+     |  +--rw oldDetailsArg?                  boolean
+     |  +--rw withDefaults?                   boolean
+     |  +--rw ignoreShowWithDefaultOnDiff?    boolean
+     |  +--rw trimDefaultShow?                boolean
+     |  +--rw trimDefaultSave?                boolean
+     |  +--rw banner?                         string
+     |  +--rw bannerFile?                     string
+     |  +--rw prompt1?                        string
+     |  +--rw prompt2?                        string
+     |  +--rw cPrompt1?                       string
+     |  +--rw cPrompt2?                       string
+     |  +--rw cStylePromptInJStyle?           boolean
+     |  +--rw waitLockedConfigMode?           boolean
+     |  +--rw promptHostnameDelimiter?        string
+     |  +--rw asyncPromptRefresh?             boolean
+     |  +--rw idleTimeout?                    xs:duration
+     |  +--rw promptSessionsCLI?              boolean
+     |  +--rw disableIdleTimeoutOnCmd?        boolean
+     |  +--rw commandTimeout?                 timeoutType
+     |  +--rw spaceCompletion!
+     |  |  +--rw enabled?   boolean
+     |  +--rw timestamp!
+     |  |  +--rw enabled?   boolean
+     |  |  +--rw clock24?   boolean
+     |  |  +--rw format?    string
+     |  +--rw autoWizard!
+     |  |  +--rw enabled?   boolean
+     |  +--rw ssh!
+     |  |  +--rw enabled?                  boolean
+     |  |  +--rw ip?                       inet:ip-address
+     |  |  +--rw port?                     inet:port-number
+     |  |  +--rw netns?                    string
+     |  |  +--rw vrf?                      string
+     |  |  +--rw extraIpPorts*             xs:token
+     |  |  +--rw haPrimaryListen*          xs:token
+     |  |  +--rw dscp?                     dscpType
+     |  |  +--rw useKeyboardInteractive?   boolean
+     |  |  +--rw banner?                   string
+     |  |  +--rw bannerFile?               string
+     |  +--rw commitMessage?                  boolean
+     |  +--rw commitMessageFormat?            string
+     |  +--rw suppressCommitMessages!
+     |  |  +--rw context*   string
+     |  +--rw jShowCR?                        boolean
+     |  +--rw showPipe?                       boolean
+     |  +--rw showPipeConfig?                 boolean
+     |  +--rw disablePipe?                    boolean
+     |  +--rw disablePipeConfig?              boolean
+     |  +--rw pipeHelpMode?                   pipeHelpModeType
+     |  +--rw jAllowDeleteAll?                boolean
+     |  +--rw cSilentNo?                      boolean
+     |  +--rw noFollowIncompleteCommand?      boolean
+     |  +--rw cRestrictiveNo?                 boolean
+     |  +--rw prioritizeSubmodeCmds?          boolean
+     |  +--rw cExtendedCmdSearch?             boolean
+     |  +--rw cSuppressCmdSearch?             boolean
+     |  +--rw enterSubmodeOnLeaf?             boolean
+     |  +--rw jExtendedShow?                  boolean
+     |  +--rw jShowUnset?                     boolean
+     |  +--rw jShowUnsetText?                 string
+     |  +--rw jStatusFormat?                  string
+     |  +--rw cModeExitFormat?                string
+     |  +--rw forcedExitFormat?               string
+     |  +--rw showSubsystemMessages?          boolean
+     |  +--rw ignoreSubsystemFailures?        boolean
+     |  +--rw showEmptyContainers?            boolean
+     |  +--rw showTags?                       boolean
+     |  +--rw showAnnotations?                boolean
+     |  +--rw showServiceMetaData?            boolean
+     |  +--rw suppressNedErrors?              boolean
+     |  +--rw jShowTableRecursive?            boolean
+     |  +--rw cPrivate?                       boolean
+     |  +--rw cTab?                           boolean
+     |  +--rw cTabInfo?                       boolean
+     |  +--rw tabExtend?                      boolean
+     |  +--rw cHelp?                          boolean
+     |  +--rw jHideHelp?                      boolean
+     |  +--rw restrictedFileAccess?           boolean
+     |  +--rw hideDotFiles?                   boolean
+     |  +--rw restrictedFileRegexp?           string
+     |  +--rw historySave?                    boolean
+     |  +--rw historyRemoveDuplicates?        boolean
+     |  +--rw historyMaxSize?                 int64
+     |  +--rw messageMaxSize?                 int64
+     |  +--rw mapActions?                     cliActionMapType
+     |  +--rw compactTable?                   boolean
+     |  +--rw compactShow?                    boolean
+     |  +--rw compactStatsShow?               boolean
+     |  +--rw prettifyStatsName?              boolean
+     |  +--rw showCommitProgress?             boolean
+     |  +--rw commitActivityClock?            boolean
+     |  +--rw confirmUncommitedOnExit?        confirmUncommitedOnExitType
+     |  +--rw reconfirmHidden?                boolean
+     |  +--rw dequoteHidden?                  boolean
+     |  +--rw enumKeyInfo?                    boolean
+     |  +--rw columnStats?                    boolean
+     |  +--rw allowAbbrevCmds?                boolean
+     |  +--rw allowAbbrevCmdsOnLoad?          boolean
+     |  +--rw allowAbbrevKeys?                boolean
+     |  +--rw allowAbbrevParamNames?          boolean
+     |  +--rw allowAbbrevEnums?               boolean
+     |  +--rw allowCaseInsensitiveEnums?      boolean
+     |  +--rw strictRefsOnLoad?               boolean
+     |  +--rw stopLoadOnError?                boolean
+     |  +--rw suppressBurstErrors?            boolean
+     |  +--rw allOrNothingLoad?               boolean
+     |  +--rw autocommitLoad?                 boolean
+     |  +--rw autocommitLoadChunkSize?        uint64
+     |  +--rw enableLoadMerge?                boolean
+     |  +--rw loadActivityClock?              boolean
+     |  +--rw instanceDescription?            boolean
+     |  +--rw addErrorPrefixSuffix?           boolean
+     |  +--rw compListCompact?                boolean
+     |  +--rw completionListLine?             boolean
+     |  +--rw infoOnMatch?                    boolean
+     |  +--rw externalActionErrorMsg?         string
+     |  +--rw enableDisplayLevel?             enableDisplayLevelType
+     |  +--rw defaultDisplayLevel?            int64
+     |  +--rw enableDisplayGroups?            boolean
+     |  +--rw unifiedHistory?                 boolean
+     |  +--rw modeInfoInAAA?                  modeInfoInAAAType
+     |  +--rw cmdAAAForAutowizard?            boolean
+     |  +--rw cStrictAAA?                     boolean
+     |  +--rw quoteStyle?                     quoteStyleType
+     |  +--rw laxBarQuoting?                  boolean
+     |  +--rw expandAliasOnCompletion?        boolean
+     |  +--rw expandAliasEscape?              aliasQuoteType
+     |  +--rw docWrap?                        boolean
+     |  +--rw infoOnTab?                      boolean
+     |  +--rw infoOnSpace?                    boolean
+     |  +--rw newLogout?                      boolean
+     |  +--rw newInsert?                      boolean
+     |  +--rw messageFormat?                  string
+     |  +--rw messageWordWrap?                boolean
+     |  +--rw messageQueueSize?               int64
+     |  +--rw promptEnumLimit?                uint64
+     |  +--rw caseInsensitive?                boolean
+     |  +--rw caseInsensitiveKeys?            boolean
+     |  +--rw ignoreLeadingWhitespace?        boolean
+     |  +--rw indentTemplates?                boolean
+     |  +--rw wrapInfo?                       boolean
+     |  +--rw wrapPrompt?                     boolean
+     |  +--rw sortShowElems?                  boolean
+     |  +--rw showMatchBeforePossible?        boolean
+     |  +--rw possibleCompletionsFormat?      string
+     |  +--rw showActionCompletions?          boolean
+     |  +--rw actionCompletionsFormat?        string
+     |  +--rw matchCompletionsFormat?         string
+     |  +--rw noMatchCompletionsFormat?       string
+     |  +--rw matchCompletionsSearchLimit?    limitType
+     |  +--rw showDescription?                boolean
+     |  +--rw explicitSetCreate?              boolean
+     |  +--rw templateFilter* [name]
+     |  |  +--rw name        string
+     |  |  +--rw callback?   string
+     |  +--rw escapeBackslash?                boolean
+     |  +--rw preserveSemicolon?              boolean
+     |  +--rw defaultLeafListStyle?           cliLeafListStyleType
+     |  +--rw bypassAllowAbbrevKeys?          boolean
+     |  +--rw jEnableLoadMergeLeafList?       boolean
+     |  +--rw enableLoadMergeLeafList?        boolean
+     |  +--rw enableCliCache?                 boolean
+     |  +--rw nmda!
+     |  |  +--rw showOperationalState?   boolean
+     |  +--rw turboParser
+     |  |  x--rw reportNoExists?   boolean
+     |  +--rw allowBracketsInNoLeafList?      boolean
+     +--rw webui!
+     |  +--rw customHeaders!
+     |  |  +--rw header* [name]
+     |  |     +--rw name     string
+     |  |     +--rw value    string
+     |  +--rw xFrameOptions?               X-Frame-OptionsType
+     |  +--rw xContentTypeOptions?         string
+     |  +--rw xXssProtection?              string
+     |  +--rw strictTransportSecurity?     string
+     |  +--rw contentSecurityPolicy?       string
+     |  +--rw crossOriginEmbedderPolicy?   string
+     |  +--rw crossOriginOpenerPolicy?     string
+     |  +--rw wasmScriptPolicyPattern?     string
+     |  +--rw enabled?                     boolean
+     |  +--rw serverName?                  xs:token
+     |  +--rw matchHostName?               boolean
+     |  +--rw cacheRefreshSecs?            uint64
+     |  +--rw maxRefEntries?               uint64
+     |  +--rw docroot?                     string
+     |  +--rw webuiIndexUrl?               string
+     |  +--rw loginDir?                    string
+     |  +--rw customDir?                   string
+     |  +--rw disableAuth!
+     |  |  +--rw dir*   string
+     |  +--rw allowSymlinks?               boolean
+     |  +--rw transport!
+     |  |  +--rw tcp!
+     |  |  |  +--rw enabled?                  boolean
+     |  |  |  +--rw disableNonAuthRedirect?   boolean
+     |  |  |  +--rw redirect?                 string
+     |  |  |  +--rw ip?                       inet:ip-address
+     |  |  |  +--rw port?                     inet:port-number
+     |  |  |  +--rw keepalive?                boolean
+     |  |  |  +--rw keepaliveTimeout?         uint64
+     |  |  |  +--rw netns?                    string
+     |  |  |  +--rw vrf?                      string
+     |  |  |  +--rw extraIpPorts*             xs:token
+     |  |  |  +--rw haPrimaryListen*          xs:token
+     |  |  |  +--rw dscp?                     dscpType
+     |  |  +--rw ssl!
+     |  |  |  +--rw enabled?                  boolean
+     |  |  |  +--rw disableNonAuthRedirect?   boolean
+     |  |  |  +--rw redirect?                 string
+     |  |  |  +--rw ip?                       inet:ip-address
+     |  |  |  +--rw port?                     inet:port-number
+     |  |  |  +--rw keepalive?                boolean
+     |  |  |  +--rw keepaliveTimeout?         uint64
+     |  |  |  +--rw netns?                    string
+     |  |  |  +--rw vrf?                      string
+     |  |  |  +--rw extraIpPorts*             xs:token
+     |  |  |  +--rw haPrimaryListen*          xs:token
+     |  |  |  +--rw dscp?                     dscpType
+     |  |  |  +--rw readFromDb?               boolean
+     |  |  |  +--rw keyFile?                  string
+     |  |  |  +--rw certFile?                 string
+     |  |  |  +--rw caCertFile?               string
+     |  |  |  +--rw verify?                   verifyType
+     |  |  |  +--rw depth?                    uint64
+     |  |  |  +--rw ciphers?                  string
+     |  |  |  +--rw protocols?                string
+     |  |  |  +--rw ellipticCurves?           string
+     |  |  +--rw unauthenticatedMessageLimit?   unauthenticatedMessageLimitType
+     |  +--rw cgi!
+     |  |  +--rw enabled?            boolean
+     |  |  +--rw dir?                string
+     |  |  +--rw requestFilter?      string
+     |  |  +--rw maxRequestLength?   uint16
+     |  |  +--rw php!
+     |  |     +--rw enabled?   boolean
+     |  +--rw idleTimeout?                 xs:duration
+     |  +--rw absoluteTimeout?             xs:duration
+     |  +--rw rateLimiting?                uint64
+     |  +--rw audit?                       boolean
+     |  +--rw resources!
+     |     +--rw enabled?   boolean
+     +--rw restconf!
+     |  +--rw enabled?                     boolean
+     |  +--rw showHidden?                  boolean
+     |  +--rw rootResource?                string
+     |  +--rw schemaServerUrl?             string
+     |  +--rw tokenResponse!
+     |  |  +--rw xAuthToken?    boolean
+     |  |  +--rw tokenCookie!
+     |  |     +--rw name?         string
+     |  |     +--rw directives?   string
+     |  +--rw customHeaders!
+     |  |  +--rw header* [name]
+     |  |     +--rw name     string
+     |  |     +--rw value    string
+     |  +--rw xFrameOptions?               X-Frame-OptionsType
+     |  +--rw xContentTypeOptions?         string
+     |  +--rw xXssProtection?              string
+     |  +--rw strictTransportSecurity?     string
+     |  +--rw contentSecurityPolicy?       string
+     |  +--rw crossOriginEmbedderPolicy?   string
+     |  +--rw crossOriginOpenerPolicy?     string
+     |  +--rw wasmScriptPolicyPattern?     string
+     |  +--rw requireModuleName!
+     |  |  +--rw enabled?   boolean
+     |  +--rw transport!
+     |     +--rw tcp!
+     |     |  +--rw enabled?           boolean
+     |     |  +--rw ip?                inet:ip-address
+     |     |  +--rw port?              inet:port-number
+     |     |  +--rw netns?             string
+     |     |  +--rw vrf?               string
+     |     |  +--rw extraIpPorts*      xs:token
+     |     |  +--rw haPrimaryListen*   xs:token
+     |     |  +--rw dscp?              dscpType
+     |     +--rw ssl!
+     |        +--rw enabled?           boolean
+     |        +--rw ip?                inet:ip-address
+     |        +--rw port?              inet:port-number
+     |        +--rw netns?             string
+     |        +--rw vrf?               string
+     |        +--rw extraIpPorts*      xs:token
+     |        +--rw haPrimaryListen*   xs:token
+     |        +--rw dscp?              dscpType
+     |        +--rw keyFile?           string
+     |        +--rw certFile?          string
+     |        +--rw caCertFile?        string
+     |        +--rw verify?            verifyType
+     |        +--rw depth?             uint64
+     |        +--rw ciphers?           string
+     |        +--rw protocols?         string
+     |        +--rw ellipticCurves?    string
+     +--rw proxyForwarding!
+     |  +--rw autoLogin?   boolean
+     |  +--rw proxy* [target]
+     |     +--rw target     xs:token
+     |     +--rw address    inet:host
+     |     +--rw netconf!
+     |     |  +--rw (transport1)?
+     |     |     +--:(ssh)
+     |     |     |  +--rw ssh
+     |     |     |     +--rw port?   inet:port-number
+     |     |     +--:(tcp)
+     |     |        +--rw tcp
+     |     |           +--rw port?   inet:port-number
+     |     +--rw cli!
+     |        +--rw (transport)?
+     |           +--:(ssh)
+     |              +--rw ssh
+     |                 +--rw port?   inet:port-number
+     +--rw snmpAgent!
+     |  +--rw enabled?                           boolean
+     |  +--rw ip?                                inet:ip-address
+     |  +--rw port?                              inet:port-number
+     |  +--rw netns?                             string
+     |  +--rw vrf?                               string
+     |  +--rw extraIpPorts*                      xs:token
+     |  +--rw dscp?                              dscpType
+     |  +--rw mibs!
+     |  |  +--rw file*           string
+     |  |  +--rw fromLoadPath?   boolean
+     |  +--rw temporaryStorageTime?              uint32
+     |  +--rw snmpVersions!
+     |  |  +--rw v1?    boolean
+     |  |  +--rw v2c?   boolean
+     |  |  +--rw v3?    boolean
+     |  +--rw snmpEngine!
+     |  |  +--rw snmpEngineID                tailf:hex-list
+     |  |  +--rw snmpEngineMaxMessageSize?   uint64
+     |  +--rw sessionIgnorePort?                 boolean
+     |  +--rw authenticationFailureNotifyName?   string
+     |  +--rw candidate!
+     |  |  +--rw maxLockWait?            xs:duration
+     |  |  +--rw pendingChangesAction?   pendingChangesActionType
+     |  +--rw dropWhenInUse?                     boolean
+     |  +--rw contexts*                          SNMPContextNameType
+     |  +--rw system!
+     |     +--rw sysDescr?      string
+     |     +--rw sysObjectID?   yang:object-identifier
+     |     +--rw sysServices?   uint64
+     |     +--rw sysORTable!
+     |        +--rw sysOREntry* [sysORIndex]
+     |           +--rw sysORIndex    uint64
+     |           +--rw sysORID       yang:object-identifier
+     |           +--rw sysORDescr    string
+     +--rw netconf!
+        +--rw enabled?                   boolean
+        +--rw transport!
+        |  +--rw sshCallHomeExecutable?      string
+        |  +--rw sshCallHomeSourceAddress!
+        |  |  +--rw ipv4?   inet:ipv4-address
+        |  |  +--rw ipv6?   inet:ipv6-address
+        |  +--rw ssh!
+        |  |  +--rw enabled?                  boolean
+        |  |  +--rw ip?                       inet:ip-address
+        |  |  +--rw port?                     inet:port-number
+        |  |  +--rw netns?                    string
+        |  |  +--rw vrf?                      string
+        |  |  +--rw extraIpPorts*             xs:token
+        |  |  +--rw haPrimaryListen*          xs:token
+        |  |  +--rw dscp?                     dscpType
+        |  |  +--rw useKeyboardInteractive?   boolean
+        |  |  +--rw rcvPktSize?               sshPktSizeType
+        |  |  +--rw ncChunkSize?              uint32
+        |  +--rw tcp!
+        |     +--rw enabled?           boolean
+        |     +--rw ip?                inet:ip-address
+        |     +--rw port?              inet:port-number
+        |     +--rw netns?             string
+        |     +--rw vrf?               string
+        |     +--rw keepalive?         boolean
+        |     +--rw extraIpPorts*      xs:token
+        |     +--rw haPrimaryListen*   xs:token
+        |     +--rw dscp?              dscpType
+        +--rw extendedSessions?          boolean
+        +--rw idleTimeout?               xs:duration
+        +--rw writeTimeout?              xs:duration
+        +--rw transactionReuseTimeout?   xs:duration
+        +--rw rpcErrors?                 rpcErrorType
+        +--rw maxBatchProcesses?         limitType</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

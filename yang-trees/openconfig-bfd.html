@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openconfig-bfd - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>openconfig-bfd</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/openconfig-bfd.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: openconfig-bfd
+  +--rw bfd
+     +--rw interfaces
+        +--rw interface* [id]
+           +--rw id                    -> ../config/id
+           +--rw config
+           |  +--rw id?                            string
+           |  +--rw enabled?                       boolean
+           |  +--rw local-address?                 oc-inet:ip-address
+           |  +--rw desired-minimum-tx-interval?   uint32
+           |  +--rw required-minimum-receive?      uint32
+           |  +--rw detection-multiplier?          uint8
+           |  +--rw enable-per-member-link?        boolean
+           +--ro state
+           |  +--ro id?                            string
+           |  +--ro enabled?                       boolean
+           |  +--ro local-address?                 oc-inet:ip-address
+           |  +--ro desired-minimum-tx-interval?   uint32
+           |  +--ro required-minimum-receive?      uint32
+           |  +--ro detection-multiplier?          uint8
+           |  +--ro enable-per-member-link?        boolean
+           +--rw interface-ref
+           |  +--rw config
+           |  |  +--rw interface?      -> /oc-if:interfaces/interface/name
+           |  |  +--rw subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+           |  +--ro state
+           |     +--ro interface?      -> /oc-if:interfaces/interface/name
+           |     +--ro subinterface?   -> /oc-if:interfaces/interface[oc-if:name=current()/../interface]/subinterfaces/subinterface/index
+           +--rw micro-bfd-sessions
+           |  +--rw micro-bfd-session* [member-interface]
+           |     +--rw member-interface    -> ../config/member-interface
+           |     +--rw config
+           |     |  +--rw local-address?      oc-inet:ip-address
+           |     |  +--rw remote-address?     oc-inet:ip-address
+           |     |  +--rw member-interface?   -> /oc-if:interfaces/interface/config/name
+           |     +--ro state
+           |        +--ro local-address?                      oc-inet:ip-address
+           |        +--ro remote-address?                     oc-inet:ip-address
+           |        +--ro member-interface?                   -> /oc-if:interfaces/interface/config/name
+           |        +--ro session-state?                      bfd-session-state
+           |        +--ro remote-session-state?               bfd-session-state
+           |        +--ro last-failure-time?                  oc-types:timeticks64
+           |        +--ro failure-transitions?                uint64
+           |        +--ro local-discriminator?                string
+           |        +--ro remote-discriminator?               string
+           |        +--ro local-diagnostic-code?              bfd-diagnostic-code
+           |        +--ro remote-diagnostic-code?             bfd-diagnostic-code
+           |        +--ro remote-minimum-receive-interval?    uint32
+           |        +--ro demand-mode-requested?              boolean
+           |        +--ro remote-authentication-enabled?      boolean
+           |        +--ro remote-control-plane-independent?   boolean
+           |        +--ro async
+           |           +--ro last-packet-transmitted?   uint64
+           |           +--ro last-packet-received?      uint64
+           |           +--ro transmitted-packets?       uint64
+           |           +--ro received-packets?          uint64
+           |           +--ro up-transitions?            uint64
+           +--rw peers
+              +--ro peer* [local-discriminator]
+                 +--ro local-discriminator    -> ../state/local-discriminator
+                 +--ro state
+                    +--ro local-address?                      oc-inet:ip-address
+                    +--ro remote-address?                     oc-inet:ip-address
+                    +--ro subscribed-protocols*               identityref
+                    +--ro session-state?                      bfd-session-state
+                    +--ro remote-session-state?               bfd-session-state
+                    +--ro last-failure-time?                  oc-types:timeticks64
+                    +--ro failure-transitions?                uint64
+                    +--ro local-discriminator?                string
+                    +--ro remote-discriminator?               string
+                    +--ro local-diagnostic-code?              bfd-diagnostic-code
+                    +--ro remote-diagnostic-code?             bfd-diagnostic-code
+                    +--ro remote-minimum-receive-interval?    uint32
+                    +--ro demand-mode-requested?              boolean
+                    +--ro remote-authentication-enabled?      boolean
+                    +--ro remote-control-plane-independent?   boolean
+                    +--ro echo
+                    |  +--ro active?                    boolean
+                    |  +--ro last-packet-transmitted?   uint64
+                    |  +--ro last-packet-received?      uint64
+                    |  +--ro transmitted-packets?       uint64
+                    |  +--ro received-packets?          uint64
+                    |  +--ro up-transitions?            uint64
+                    +--ro async
+                       +--ro last-packet-transmitted?   uint64
+                       +--ro last-packet-received?      uint64
+                       +--ro transmitted-packets?       uint64
+                       +--ro received-packets?          uint64
+                       +--ro up-transitions?            uint64</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

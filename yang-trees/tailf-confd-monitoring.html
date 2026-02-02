@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tailf-confd-monitoring - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>tailf-confd-monitoring</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/tailf-confd-monitoring.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: tailf-confd-monitoring
+  +--ro confd-state
+     +--ro version?              string
+     +--ro smp!
+     |  +--ro number-of-threads?   uint16
+     +--ro epoll?                boolean
+     +--ro daemon-status?        enumeration
+     +--ro read-only-mode?       empty
+     +--ro upgrade-mode?         empty
+     +--ro ha!
+     |  +--ro mode?                  enumeration
+     |  +--ro node-id?               ha-node-id
+     |  +--ro primary-node-id?       string
+     |  +--ro connected-secondary*   string
+     |  +--ro pending-secondary*     string
+     +--ro loaded-data-models
+     |  +--ro data-model* [name]
+     |  |  +--ro name                     string
+     |  |  +--ro revision?                string
+     |  |  +--ro namespace?               inet:uri
+     |  |  +--ro prefix?                  string
+     |  |  +--ro (exported)?
+     |  |     +--:(exported-to-all)
+     |  |     |  +--ro exported-to-all?   empty
+     |  |     +--:(exported-to)
+     |  |        +--ro exported-to*       union
+     |  +--ro mount* [mount-id]
+     |     +--ro mount-id      string
+     |     +--ro data-model* [name]
+     |        +--ro name                     string
+     |        +--ro revision?                string
+     |        +--ro namespace?               inet:uri
+     |        +--ro prefix?                  string
+     |        +--ro (exported)?
+     |           +--:(exported-to-all)
+     |           |  +--ro exported-to-all?   empty
+     |           +--:(exported-to)
+     |              +--ro exported-to*       union
+     +--ro netconf!
+     |  +--ro listen
+     |     +--ro tcp* []
+     |     |  +--ro ip?     inet:ip-address
+     |     |  +--ro port?   inet:port-number
+     |     +--ro ssh* []
+     |        +--ro ip?     inet:ip-address
+     |        +--ro port?   inet:port-number
+     +--ro cli!
+     |  +--ro listen
+     |     +--ro ssh* []
+     |        +--ro ip?     inet:ip-address
+     |        +--ro port?   inet:port-number
+     +--ro webui!
+     |  +--ro listen
+     |     +--ro tcp* []
+     |     |  +--ro ip?     inet:ip-address
+     |     |  +--ro port?   inet:port-number
+     |     +--ro ssl* []
+     |        +--ro ip?     inet:ip-address
+     |        +--ro port?   inet:port-number
+     +--ro rest!
+     |  +--ro listen
+     |     +--ro tcp* []
+     |     |  +--ro ip?     inet:ip-address
+     |     |  +--ro port?   inet:port-number
+     |     +--ro ssl* []
+     |        +--ro ip?     inet:ip-address
+     |        +--ro port?   inet:port-number
+     +--ro snmp!
+     |  +--ro listen
+     |  |  +--ro udp* []
+     |  |     +--ro ip?     inet:ip-address
+     |  |     +--ro port?   inet:port-number
+     |  +--ro mib*         string
+     |  +--ro version
+     |  |  +--ro v1?    empty
+     |  |  +--ro v2c?   empty
+     |  |  +--ro v3?    empty
+     |  +--ro engine-id?   string
+     +--ro internal
+        +--ro callpoints
+        |  +--ro callpoint* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro validationpoint* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro actionpoint* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro snmp-inform-callback* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro snmp-notification-subscription* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro error-formatting-callback* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro typepoint* [id]
+        |  |  +--ro id              string
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro notification-stream-replay* [name]
+        |  |  +--ro name              string
+        |  |  +--ro replay-support?   enumeration
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?       string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?       string
+        |  |  +--ro error?            enumeration
+        |  +--ro authentication-callback!
+        |  |  +--ro enabled?        boolean
+        |  |  +--ro (registration-type)?
+        |  |  |  +--:(daemon)
+        |  |  |  |  +--ro daemon
+        |  |  |  |     +--ro id?          uint32
+        |  |  |  |     +--ro name?        string
+        |  |  |  |     +--ro callbacks*   string
+        |  |  |  |     +--ro error?       enumeration
+        |  |  |  +--:(range)
+        |  |  |  |  +--ro path?     string
+        |  |  |  |  +--ro range* []
+        |  |  |  |     +--ro lower?     string
+        |  |  |  |     +--ro upper?     string
+        |  |  |  |     +--ro default?   empty
+        |  |  |  |     +--ro daemon
+        |  |  |  |        +--ro id?          uint32
+        |  |  |  |        +--ro name?        string
+        |  |  |  |        +--ro callbacks*   string
+        |  |  |  |        +--ro error?       enumeration
+        |  |  |  +--:(file)
+        |  |  |     +--ro file?     string
+        |  |  +--ro error?          enumeration
+        |  +--ro authorization-callbacks!
+        |     +--ro enabled?        boolean
+        |     +--ro (registration-type)?
+        |     |  +--:(daemon)
+        |     |  |  +--ro daemon
+        |     |  |     +--ro id?          uint32
+        |     |  |     +--ro name?        string
+        |     |  |     +--ro callbacks*   string
+        |     |  |     +--ro error?       enumeration
+        |     |  +--:(range)
+        |     |  |  +--ro path?     string
+        |     |  |  +--ro range* []
+        |     |  |     +--ro lower?     string
+        |     |  |     +--ro upper?     string
+        |     |  |     +--ro default?   empty
+        |     |  |     +--ro daemon
+        |     |  |        +--ro id?          uint32
+        |     |  |        +--ro name?        string
+        |     |  |        +--ro callbacks*   string
+        |     |  |        +--ro error?       enumeration
+        |     |  +--:(file)
+        |     |     +--ro file?     string
+        |     +--ro error?          enumeration
+        +--ro cdb
+           +--ro datastore* [name]
+           |  +--ro name                            datastore-name
+           |  +--ro transaction-id?                 string
+           |  +--ro write-queue?                    uint32
+           |  +--ro filename?                       string
+           |  +--ro disk-size?                      size-in-bytes
+           |  +--ro ram-size?                       size-in-bytes
+           |  +--ro read-locks?                     uint32
+           |  +--ro write-lock-set?                 boolean
+           |  +--ro pending-locks?                  uint32
+           |  +--ro subscription-lock-set?          boolean
+           |  +--ro waiting-for-replication-sync?   boolean
+           |  +--ro pending-subscription-sync!
+           |  |  +--ro priority?         subscription-priority
+           |  |  +--ro notification* []
+           |  |  |  +--ro client-name?        string
+           |  |  |  +--ro subscription-ids*   subscription-id
+           |  |  +--ro time-remaining?   union
+           |  +--ro pending-notification-queue* []
+           |     +--ro notification* []
+           |        +--ro priority?           subscription-priority
+           |        +--ro client-name?        string
+           |        +--ro subscription-ids*   subscription-id
+           +--ro client* []
+              +--ro name?           string
+              +--ro info?           string
+              +--ro type?           enumeration
+              +--ro datastore?      union
+              +--ro lock?           enumeration
+              +--ro subscription* []
+                 +--ro datastore?   datastore-name
+                 +--ro twophase?    empty
+                 +--ro priority?    subscription-priority
+                 +--ro id?          subscription-id
+                 +--ro path?        string
+                 +--ro error?       enumeration</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>

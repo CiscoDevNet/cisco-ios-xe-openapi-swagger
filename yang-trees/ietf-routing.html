@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ietf-routing - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .header a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+        .header a:hover {
+            opacity: 1;
+        }
+        .tree-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            color: #333;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0070c9;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ietf-routing</h1>
+        <p>YANG Data Model Tree Structure</p>
+        <p style="margin-top: 8px;">
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-routing.yang" target="_blank">View YANG Source on GitHub →</a>
+        </p>
+    </div>
+    
+    <div class="tree-container">
+        <pre>module: ietf-routing
+  +--ro routing-state
+  |  +--ro routing-instance* [name]
+  |     +--ro name                 string
+  |     +--ro type?                identityref
+  |     +--ro router-id?           yang:dotted-quad
+  |     +--ro interfaces
+  |     |  +--ro interface*   if:interface-state-ref
+  |     +--ro routing-protocols
+  |     |  +--ro routing-protocol* [type name]
+  |     |     +--ro type    identityref
+  |     |     +--ro name    string
+  |     +--ro ribs
+  |        +--ro rib* [name]
+  |           +--ro name              string
+  |           +--ro address-family    identityref
+  |           +--ro default-rib?      boolean {multiple-ribs}?
+  |           +--ro routes
+  |              +--ro route* [destination-prefix]
+  |                 +--ro route-preference?     route-preference
+  |                 +--ro destination-prefix    string
+  |                 +--ro metric?               uint32
+  |                 +--ro next-hop
+  |                 |  +--ro (next-hop-options)
+  |                 |     +--:(simple-next-hop)
+  |                 |     |  +--ro outgoing-interface?   string
+  |                 |     |  +--ro next-hop-address?     string
+  |                 |     +--:(special-next-hop)
+  |                 |        +--ro special-next-hop?     enumeration
+  |                 +--ro source-protocol       identityref
+  |                 +--ro active?               empty
+  |                 +--ro last-updated?         yang:date-and-time
+  |                 +--ro update-source?        string
+  +--rw routing
+     +--rw routing-instance* [name]
+        +--rw name                 string
+        +--rw type?                identityref
+        +--rw enabled?             boolean
+        +--rw router-id?           yang:dotted-quad {router-id}?
+        +--rw description?         string
+        +--rw interfaces
+        |  +--rw interface*   if:interface-ref
+        +--rw routing-protocols
+        |  +--rw routing-protocol* [type name]
+        |     +--rw type             identityref
+        |     +--rw name             string
+        |     +--rw description?     string
+        |     +--rw static-routes
+        +--rw ribs
+           +--rw rib* [name]
+              +--rw name              string
+              +--rw address-family?   identityref
+              +--rw description?      string
+
+  augment /if:interfaces-state/if:interface:
+    +--ro routing-instance?   string
+
+  rpcs:
+    +---x fib-route
+       +---w input
+       |  +---w routing-instance-name    string
+       |  +---w destination-address
+       |     +---w address-family    identityref
+       +--ro output
+          +--ro route
+             +--ro address-family     identityref
+             +--ro next-hop
+             |  +--ro (next-hop-options)
+             |     +--:(simple-next-hop)
+             |     |  +--ro outgoing-interface?   string
+             |     |  +--ro next-hop-address?     string
+             |     +--:(special-next-hop)
+             |        +--ro special-next-hop?     enumeration
+             +--ro source-protocol    identityref
+             +--ro active?            empty
+             +--ro last-updated?      yang:date-and-time</pre>
+    </div>
+    
+    <div class="footer">
+        Generated with pyang | 
+        <a href="../index.html">← Back to Main Page</a> | 
+        <a href="https://github.com/mbj4668/pyang" target="_blank">About pyang</a>
+    </div>
+</body>
+</html>
