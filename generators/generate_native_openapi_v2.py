@@ -24,6 +24,7 @@ class NativeToOpenAPI:
         
         # Category mapping for organizing paths
         self.category_keywords = {
+            'core': [],  # Will be matched explicitly in categorize_path for depth-0 leafs
             'interfaces': ['interface', 'GigabitEthernet', 'TenGigabitEthernet', 'Loopback', 
                           'Tunnel', 'Vlan', 'Port-channel', 'FastEthernet', 'Ethernet',
                           'BDI', 'Serial', 'Dialer', 'Virtual-Template', 'management-interface'],
@@ -86,9 +87,17 @@ class NativeToOpenAPI:
         # Context-aware examples based on property name
         name_lower = property_name.lower()
         
-        # Hostname examples
+        # Hostname examples - realistic production names
         if 'hostname' in name_lower:
-            return 'router-core-1'
+            return 'DC1-CORE-SW01'
+        
+        # Version examples
+        if 'version' in name_lower and not any(x in name_lower for x in ['ip', 'software', 'protocol']):
+            return '17.9'
+        
+        # Config register examples
+        if 'config-register' in name_lower:
+            return '0x2102'
         
         # Interface examples
         if 'interface' in name_lower or 'name' in name_lower:
@@ -641,6 +650,15 @@ class NativeToOpenAPI:
         """Determine category for a path - check specific categories first"""
         name_lower = path_name.lower()
         
+        # Check if this is a top-level leaf (core settings)
+        # These are paths like "native/hostname", "native/version", "native/config-register"
+        core_leafs = ['native/version', 'native/hostname', 'native/config-register', 
+                     'native/boot-start-marker', 'native/boot-end-marker', 
+                     'native/captive-portal-bypass', 'native/aqm-register-fnf', 
+                     'native/disable-eadi']
+        if name_lower in core_leafs:
+            return 'core'
+        
         # Priority order: check specific categories before generic ones
         priority_categories = ['interfaces', 'crypto', 'platform', 'monitor', 'routing', 
                               'switching', 'security', 'services', 'qos', 'mpls', 'vpn', 
@@ -658,6 +676,7 @@ class NativeToOpenAPI:
         """Create OpenAPI 3.0 spec for a category"""
         
         category_titles = {
+            'core': 'Native - Core System Settings',
             'interfaces': 'Native - Interfaces',
             'routing': 'Native - Routing Protocols',
             'security': 'Native - Security & AAA',
@@ -847,7 +866,7 @@ class NativeToOpenAPI:
         categorized_paths: Dict[str, List] = {cat: [] for cat in self.category_keywords.keys()}
         
         for path_info in all_paths:
-            category = self.categorize_path(path_info['name'])
+            category = self.categorize_path(path_info['path'])  # Use 'path' not 'name' for categorization
             categorized_paths[category].append(path_info)
         
         # Generate specs per category
@@ -903,13 +922,16 @@ class NativeToOpenAPI:
                     manifest_modules.append(f"native-{category}-{chunk_num}")
             else:
                 # File is small enough, write as single file
-                output_file = self.output_dir / f"native-{category}.json"
+                # Use 00 prefix for core to ensure it appears first
+                file_prefix = "native-00-core" if category == "core" else f"native-{category}"
+                output_file = self.output_dir / f"{file_prefix}.json"
                 with open(output_file, 'w', encoding='utf-8') as f:
                     json.dump(spec, f, indent=2)
                 
                 print(f"  * {category}: {len(paths)} paths ({size_mb:.2f} MB) -> {output_file.name}")
                 total_specs += 1
-                manifest_modules.append(f"native-{category}")
+                module_name = file_prefix.replace("native-", "").replace("-", "")
+                manifest_modules.append(file_prefix.replace("native-", ""))
         
         
         # Generate manifest
