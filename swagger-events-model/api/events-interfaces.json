@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Events - Interface & Port Events",
+    "description": "Cisco IOS-XE Event Notifications - Interfaces\n\n**Category:** Interfaces\n**Modules:** 3\n**Notification Endpoints:** 6\n\n**HTTP Methods:**\n- POST: Subscribe to event notifications (YANG notification streams)\n- GET: Query notification stream metadata\n\n**Modules Included:**\n- interface-bw\n- port-bounce\n- tech-support\n\n**Event Notification Pattern:**\nEvents are delivered via YANG notification streams. Subscribe using RESTCONF or NETCONF \nto receive real-time notifications when events occur.\n\n**Example Subscription:**\n```bash\nPOST /restconf/operations/ietf-subscribed-notifications:establish-subscription\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"stream\": \"NETCONF\",\n    \"encoding\": \"encode-json\",\n    \"filter\": {\n      \"stream-subtree-filter\": {\n        \"notification-name\": \"Cisco-IOS-XE-interface-bw-events:events\"\n      }\n    }\n  }\n}\n```\n\n**Example Notification:**\n```json\n{\n  \"ietf-restconf:notification\": {\n    \"eventTime\": \"2024-02-01T10:30:45.123Z\",\n    \"event\": {\n      \"severity\": \"critical\",\n      \"message\": \"Interface GigabitEthernet1/0/1 changed state to down\"\n    }\n  }\n}\n```\n",
+    "version": "17.18.1"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-interface-bw-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-interface-bw-events event subscriptions",
+        "description": "**Source Module:** interface-bw\n\nRetrieve active event subscriptions for Cisco-IOS-XE-interface-bw-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-interface-bw-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/operations/ietf-subscribed-notifications:establish-subscription": {
+      "post": {
+        "summary": "Create event subscription",
+        "description": "**Source Module:** tech-support\n\nEstablish a subscription to Cisco-IOS-XE-tech-support-events events",
+        "tags": [
+          "events"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "example": {
+                "input": {
+                  "stream": "Cisco-IOS-XE-tech-support-events:events",
+                  "encoding": "encode-json",
+                  "update-trigger": "periodic",
+                  "period": 6000
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription created",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "output": {
+                    "subscription-id": 12345
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-port-bounce-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-port-bounce-events event subscriptions",
+        "description": "**Source Module:** port-bounce\n\nRetrieve active event subscriptions for Cisco-IOS-XE-port-bounce-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-port-bounce-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-tech-support-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-tech-support-events event subscriptions",
+        "description": "**Source Module:** tech-support\n\nRetrieve active event subscriptions for Cisco-IOS-XE-tech-support-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-tech-support-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Events - Security & Authentication Events",
+    "description": "Cisco IOS-XE Event Notifications - Security\n\n**Category:** Security\n**Modules:** 4\n**Notification Endpoints:** 8\n\n**HTTP Methods:**\n- POST: Subscribe to event notifications (YANG notification streams)\n- GET: Query notification stream metadata\n\n**Modules Included:**\n- aaa\n- crypto\n- crypto-pki\n- ngfw\n\n**Event Notification Pattern:**\nEvents are delivered via YANG notification streams. Subscribe using RESTCONF or NETCONF \nto receive real-time notifications when events occur.\n\n**Example Subscription:**\n```bash\nPOST /restconf/operations/ietf-subscribed-notifications:establish-subscription\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"stream\": \"NETCONF\",\n    \"encoding\": \"encode-json\",\n    \"filter\": {\n      \"stream-subtree-filter\": {\n        \"notification-name\": \"Cisco-IOS-XE-aaa-events:events\"\n      }\n    }\n  }\n}\n```\n\n**Example Notification:**\n```json\n{\n  \"ietf-restconf:notification\": {\n    \"eventTime\": \"2024-02-01T10:30:45.123Z\",\n    \"event\": {\n      \"severity\": \"critical\",\n      \"message\": \"Interface GigabitEthernet1/0/1 changed state to down\"\n    }\n  }\n}\n```\n",
+    "version": "17.18.1"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-aaa-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-aaa-events event subscriptions",
+        "description": "**Source Module:** aaa\n\nRetrieve active event subscriptions for Cisco-IOS-XE-aaa-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-aaa-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/operations/ietf-subscribed-notifications:establish-subscription": {
+      "post": {
+        "summary": "Create event subscription",
+        "description": "**Source Module:** ngfw\n\nEstablish a subscription to Cisco-IOS-XE-ngfw-events events",
+        "tags": [
+          "events"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "example": {
+                "input": {
+                  "stream": "Cisco-IOS-XE-ngfw-events:events",
+                  "encoding": "encode-json",
+                  "update-trigger": "periodic",
+                  "period": 6000
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription created",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "output": {
+                    "subscription-id": 12345
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-crypto-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-crypto-events event subscriptions",
+        "description": "**Source Module:** crypto\n\nRetrieve active event subscriptions for Cisco-IOS-XE-crypto-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-crypto-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-crypto-pki-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-crypto-pki-events event subscriptions",
+        "description": "**Source Module:** crypto-pki\n\nRetrieve active event subscriptions for Cisco-IOS-XE-crypto-pki-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-crypto-pki-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-ngfw-events:events": {
+      "get": {
+        "summary": "Get Cisco-IOS-XE-ngfw-events event subscriptions",
+        "description": "**Source Module:** ngfw\n\nRetrieve active event subscriptions for Cisco-IOS-XE-ngfw-events",
+        "tags": [
+          "events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "example": {
+                  "Cisco-IOS-XE-ngfw-events:events": {
+                    "description": "Event notification stream"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  }
+}

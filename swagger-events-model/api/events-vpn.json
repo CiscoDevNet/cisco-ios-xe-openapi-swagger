@@ -1,16 +1,17 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Events - geo",
-    "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions\n     for GEO database events operational data.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication"
+    "title": "Events - VPN & Tunnel Events",
+    "description": "Cisco IOS-XE Event Notifications - Vpn\n\n**Category:** Vpn\n**Modules:** 1\n**Notification Endpoints:** 2\n\n**HTTP Methods:**\n- POST: Subscribe to event notifications (YANG notification streams)\n- GET: Query notification stream metadata\n\n**Modules Included:**\n- geo\n\n**Event Notification Pattern:**\nEvents are delivered via YANG notification streams. Subscribe using RESTCONF or NETCONF \nto receive real-time notifications when events occur.\n\n**Example Subscription:**\n```bash\nPOST /restconf/operations/ietf-subscribed-notifications:establish-subscription\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"stream\": \"NETCONF\",\n    \"encoding\": \"encode-json\",\n    \"filter\": {\n      \"stream-subtree-filter\": {\n        \"notification-name\": \"Cisco-IOS-XE-geo-events:events\"\n      }\n    }\n  }\n}\n```\n\n**Example Notification:**\n```json\n{\n  \"ietf-restconf:notification\": {\n    \"eventTime\": \"2024-02-01T10:30:45.123Z\",\n    \"event\": {\n      \"severity\": \"critical\",\n      \"message\": \"Interface GigabitEthernet1/0/1 changed state to down\"\n    }\n  }\n}\n```\n",
+    "version": "17.18.1"
   },
   "servers": [
     {
       "url": "https://{device}/restconf",
       "variables": {
         "device": {
-          "default": "sandbox-iosxe-latest-1.cisco.com"
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
         }
       }
     }
@@ -19,7 +20,7 @@
     "/data/Cisco-IOS-XE-geo-events:events": {
       "get": {
         "summary": "Get Cisco-IOS-XE-geo-events event subscriptions",
-        "description": "Retrieve active event subscriptions for Cisco-IOS-XE-geo-events",
+        "description": "**Source Module:** geo\n\nRetrieve active event subscriptions for Cisco-IOS-XE-geo-events",
         "tags": [
           "events"
         ],
@@ -45,7 +46,7 @@
     "/operations/ietf-subscribed-notifications:establish-subscription": {
       "post": {
         "summary": "Create event subscription",
-        "description": "Establish a subscription to Cisco-IOS-XE-geo-events events",
+        "description": "**Source Module:** geo\n\nEstablish a subscription to Cisco-IOS-XE-geo-events events",
         "tags": [
           "events"
         ],
@@ -80,24 +81,5 @@
         }
       }
     }
-  },
-  "components": {
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic"
-      }
-    }
-  },
-  "security": [
-    {
-      "basicAuth": []
-    }
-  ],
-  "tags": [
-    {
-      "name": "events",
-      "description": "Model-driven telemetry event subscriptions"
-    }
-  ]
+  }
 }
