@@ -98,15 +98,17 @@
             try {
                 const response = await fetch('api/manifest.json');
                 const manifest = await response.json();
-                allModules = manifest.modules ? manifest.modules.map(m => m.name) : [];
+                allModules = manifest.modules || [];
                 document.getElementById('totalModules').textContent = allModules.length;
-                document.getElementById('totalPaths').textContent = allModules.length;
-                document.getElementById('totalOperations').textContent = allModules.length * 2;
-                renderModuleList(allModules);                
+                document.getElementById('totalPaths').textContent = (manifest.total_paths || 0).toLocaleString();
+                document.getElementById('totalOperations').textContent = (manifest.total_paths || 0).toLocaleString();
+                renderModuleList(allModules);
+                
                 // Auto-load first module if available
                 if (allModules.length > 0) {
                     loadSpec(allModules[0]);
-                }            } catch (error) {
+                }
+            } catch (error) {
                 console.error('Error loading manifest:', error);
             }
         }
