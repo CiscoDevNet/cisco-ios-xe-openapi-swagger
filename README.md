@@ -3,10 +3,30 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+[![Enhanced](https://img.shields.io/badge/Enhanced-4%20Models-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. This project provides interactive API documentation for **543 modules** across **9 model types**, covering over **9,600 API paths**.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Enhanced with 53 categories, 6 quick-starts, and interactive code generation** for developer productivity.
 
-🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**
+🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
+🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
+📖 **[Getting Started Guide](docs/GETTING_STARTED.md)**
+
+## ✨ What's New - Enhanced Models
+
+**4 models have been reorganized and enhanced for better usability:**
+
+- ✅ **Native Config:** 28 files across 18 categories + 3 quick-starts (5,267 paths)
+- ✅ **Operational Data:** 20 files across 16 categories + 3 quick-starts (2,634 paths)
+- ✅ **Events:** 11 files across 10 categories (76 notifications)
+- ✅ **RPC Operations:** 10 files across 9 categories (284 actions)
+
+**New Features:**
+- 🚀 **6 Quick-Start Collections** - Curated endpoints for common workflows
+- 🛠️ **Code Generator** - Auto-generate curl, Python, and Ansible code
+- 📚 **Comprehensive Docs** - Getting started guide with 15+ examples
+- 🎯 **53 Logical Categories** - Organized by network engineer workflows
+
+📊 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
 ## 📊 Quick Stats
 
@@ -21,47 +41,56 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 ## 🗂️ Model Categories
 
-### 📊 Operational Data (197 modules, 2,634 paths)
+### ⭐ Enhanced Models (Reorganized & Categorized)
+
+#### 📊 Native Configuration - ENHANCED (28 files, 18 categories, 5,267 paths)
+Full CLI-equivalent configuration organized by network domain.
+- **Categories:** interfaces, routing, security, system, qos, vpn, wireless, switching, multicast, mpls, sdwan, services, platform, nat, voice, aaa, other
+- **Quick-Starts:** day0, interface-basics, routing-basics
+- [Browse Native Config APIs →](swagger-native-config-model/)
+
+#### 📈 Operational Data - ENHANCED (20 files, 16 categories, 2,634 paths)
 Real-time device state and statistics. Read-only GET operations.
-- Interface stats, BGP neighbors, memory usage, wireless clients
+- **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
+- **Quick-Starts:** troubleshooting, performance, inventory
 - [Browse Operational APIs →](swagger-oper-model/)
 
-### ⚡ RPC Operations (53 modules, 284 operations)
+#### 🔔 Events - ENHANCED (11 files, 10 categories, 76 notifications)
+Event notification modules for YANG-Push telemetry.
+- **Categories:** interfaces, routing, security, platform, wireless, vpn, sdwan, services, qos, other
+- [Browse Events APIs →](swagger-events-model/)
+
+#### ⚡ RPC Operations - ENHANCED (10 files, 9 categories, 284 actions)
 Remote procedure calls for device actions and commands.
-- Clear counters, reload device, save config, diagnostics
+- **Categories:** network-ops, wireless-ops, system-ops, security-ops, config-ops, debug-ops, platform-ops, cloud-ops, other
 - [Browse RPC APIs →](swagger-rpc-model/)
 
-### ⚙️ Configuration (39 modules, 612 paths)
+### 📚 Standard Models (Original Structure)
+
+#### ⚙️ Configuration (39 modules, 612 paths)
 Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
 - [Browse Config APIs →](swagger-cfg-model/)
 
-### 🌍 OpenConfig (41 modules, 772 paths)
+#### 🌍 OpenConfig (42 modules, 772 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
 
-### 📜 IETF Standards (21 modules, 505 paths)
+#### 📜 IETF Standards (22 modules, 505 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
 - [Browse IETF APIs →](swagger-ietf-model/)
 
-### 📡 MIB Translations (147 modules, 4,272 paths)
+#### 📡 MIB Translations (148 modules, 4,272 paths)
 SNMP MIB modules translated to YANG.
 - IF-MIB, CISCO-PROCESS-MIB, OSPF-MIB
 - [Browse MIB APIs →](swagger-mib-model/)
 
-### 🔔 Events (32 modules, 64 paths)
-Event notification modules for telemetry.
-- AAA events, interface events, crypto events
-- [Browse Events APIs →](swagger-events-model/)
-
-### 🏠 Native Config (9 categories, 229 paths)
-Cisco IOS-XE native configuration.
-- Organized by: Interfaces, Routing, Security, QoS, MPLS, VPN, System
-- [Browse Native APIs →](swagger-native-config-model/)
-
-### 📦 Other (4 modules, 287 paths)
+#### ⚙️ CFG Model (40 modules, 612 paths)
+Device configuration with full CRUD operations.
+- MDT subscriptions, gNMI config, wireless settings
+- [Browse Config APIs →](swagger-cfg-model/)
 Standalone and vendor-specific modules.
 - [Browse Other APIs →](swagger-other-model/)
 
