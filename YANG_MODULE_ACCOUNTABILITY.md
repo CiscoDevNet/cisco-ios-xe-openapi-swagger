@@ -3,7 +3,7 @@
 **Date:** February 01, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 848
-**Modules with OpenAPI Specs:** 386 (45.5%)
+**Modules with OpenAPI Specs:** 392 (46.2%)
 
 ---
 
@@ -21,7 +21,7 @@ This report provides **100% accountability** for every YANG module in the
 
 | Category | Total | With Specs | Coverage | Notes |
 |----------|-------|------------|----------|-------|
-| **oper** | 209 | 197 | 94% |  |
+| **oper** | 209 | 203 | 97% |  |
 | **rpc** | 63 | 50 | 79% |  |
 | **cfg** | 67 | 39 | 58% |  |
 | **openconfig** | 100 | 41 | 41% |  |
@@ -107,11 +107,11 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-hsrp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-identity-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ignition-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-im-events-oper | - | ❌ |
+| Cisco-IOS-XE-im-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-install-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-interfaces-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ios-common-oper | - | ❌ |
-| Cisco-IOS-XE-ios-events-oper | - | ❌ |
+| Cisco-IOS-XE-ios-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-ip-arp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ip-sla-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ipv6-nd-oper | swagger-oper-model | ✅ |
@@ -156,7 +156,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-perf-measure-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-pim-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-platform-common-oper | - | ❌ |
-| Cisco-IOS-XE-platform-events-oper | - | ❌ |
+| Cisco-IOS-XE-platform-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-platform-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-platform-software-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-poe-health-oper | swagger-oper-model | ✅ |
@@ -182,10 +182,10 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-sdwan-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-service-chain-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-service-insertion-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-sm-events-oper | - | ❌ |
+| Cisco-IOS-XE-sm-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-spanning-tree-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-stack-member-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-stack-mgr-events-oper | - | ❌ |
+| Cisco-IOS-XE-stack-mgr-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-stack-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-stacking-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-steering-policy-oper | swagger-oper-model | ✅ |
@@ -225,7 +225,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-client-global-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-client-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-cts-sxp-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-wireless-events-oper | - | ❌ |
+| Cisco-IOS-XE-wireless-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-wireless-general-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-geolocation-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-hyperlocation-oper | swagger-oper-model | ✅ |
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-02-01T09:00:06.514843*
+*Report generated: 2026-02-01T18:05:25.046204*

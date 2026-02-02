@@ -189,14 +189,61 @@
 
         <div class="module-section">
             <h3>🔍 Search & Filter Modules</h3>
-            <input type="text" id="searchBox" class="search-box" placeholder="Search modules by name...">
+            <input type="text" id="searchBox" class="search-box" placeholder="Search modules by name..." onkeyup="filterTable()">
             <div class="filter-section">
-                <strong>Filter by Status:</strong>
+                <strong>Filter by Category:</strong>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterModules('all')">All (848)</button>
-                    <button class="filter-btn" onclick="filterModules('documented')">✅ Documented (392)</button>
-                    <button class="filter-btn" onclick="filterModules('missing')">❌ Missing Spec (456)</button>
+                    <button class="filter-btn active" onclick="filterByCategory('all')">All (848)</button>
+                    <button class="filter-btn" onclick="filterByCategory('oper')">OPER (209)</button>
+                    <button class="filter-btn" onclick="filterByCategory('rpc')">RPC (63)</button>
+                    <button class="filter-btn" onclick="filterByCategory('events')">EVENTS (35)</button>
+                    <button class="filter-btn" onclick="filterByCategory('cfg')">CFG (67)</button>
+                    <button class="filter-btn" onclick="filterByCategory('ietf')">IETF (33)</button>
+                    <button class="filter-btn" onclick="filterByCategory('openconfig')">OPENCONFIG (100)</button>
+                    <button class="filter-btn" onclick="filterByCategory('native')">NATIVE (1)</button>
+                    <button class="filter-btn" onclick="filterByCategory('types')">TYPES (63)</button>
+                    <button class="filter-btn" onclick="filterByCategory('deviation')">DEVIATION (98)</button>
+                    <button class="filter-btn" onclick="filterByCategory('native-aug')">NATIVE-AUG (140)</button>
+                    <button class="filter-btn" onclick="filterByCategory('common')">COMMON (20)</button>
+                    <button class="filter-btn" onclick="filterByCategory('other')">OTHER (19)</button>
                 </div>
+                <div style="margin-top: 12px;">
+                    <strong>Filter by Status:</strong>
+                    <div class="filter-buttons">
+                        <button class="filter-btn" onclick="filterByStatus('all')">All</button>
+                        <button class="filter-btn" onclick="filterByStatus('documented')">✅ Documented (392)</button>
+                        <button class="filter-btn" onclick="filterByStatus('missing')">❌ No Spec (456)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="module-section">
+            <h3>📋 Complete Module Matrix (All 848 Modules)</h3>
+            <p style="color: #666; margin-bottom: 16px;">
+                <strong>Note:</strong> Use search and filters above to find specific modules. Click column headers to sort.
+                <span id="tableStats" style="float: right; font-weight: 500; color: #1565C0;">Showing: 848 modules</span>
+            </p>
+            <div style="overflow-x: auto;">
+                <table id="moduleTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" style="cursor: pointer;">#</th>
+                            <th onclick="sortTable(1)" style="cursor: pointer;">Module Name ⇅</th>
+                            <th onclick="sortTable(2)" style="cursor: pointer;">Category ⇅</th>
+                            <th onclick="sortTable(3)" style="cursor: pointer;">Status ⇅</th>
+                            <th onclick="sortTable(4)" style="cursor: pointer;">Swagger Folder ⇅</th>
+                        </tr>
+                    </thead>
+                    <tbody id="moduleTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">
+                                <div style="color: #1565C0; font-size: 1.2rem;">Loading module data...</div>
+                                <div style="color: #666; margin-top: 8px;">Please wait while we load all 848 modules</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -338,22 +385,150 @@
     </div>
 
     <script>
-        // Search functionality
-        document.getElementById('searchBox').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            // This is a placeholder - full search would require loading module data
-            console.log('Searching for:', searchTerm);
-        });
+        let allModules = [];
+        let currentFilter = { category: 'all', status: 'all' };
 
-        // Filter functionality
-        function filterModules(type) {
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // This is a placeholder - full filtering would require loading module data
-            console.log('Filtering by:', type);
+        // Load module data from JSON
+        async function loadModuleData() {
+            try {
+                const response = await fetch('yang_accountability.json');
+                const data = await response.json();
+                allModules = data.modules;
+                renderTable();
+            } catch (error) {
+                console.error('Error loading module data:', error);
+                document.getElementById('moduleTableBody').innerHTML = 
+                    '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #F44336;">Error loading module data. Please refresh the page.</td></tr>';
+            }
         }
+
+        // Render the table
+        function renderTable() {
+            const tbody = document.getElementById('moduleTableBody');
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            
+            let filteredModules = allModules.filter(module => {
+                // Apply category filter
+                if (currentFilter.category !== 'all' && module.category !== currentFilter.category) {
+                    return false;
+                }
+                
+                // Apply status filter
+                if (currentFilter.status === 'documented' && !module.has_spec) {
+                    return false;
+                }
+                if (currentFilter.status === 'missing' && module.has_spec) {
+                    return false;
+                }
+                
+                // Apply search filter
+                if (searchTerm && !module.name.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                
+                return true;
+            });
+
+            // Update stats
+            document.getElementById('tableStats').textContent = `Showing: ${filteredModules.length} of ${allModules.length} modules`;
+
+            // Render rows
+            if (filteredModules.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #666;">No modules match your filters</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredModules.map((module, index) => {
+                const statusIcon = module.has_spec ? '✅' : '❌';
+                const statusText = module.has_spec ? 'Documented' : 'No Spec';
+                const statusColor = module.has_spec ? '#4CAF50' : '#999';
+                const folder = module.swagger_folder || '-';
+                const categoryBadge = getCategoryBadge(module.category);
+                
+                return `
+                    <tr>
+                        <td style="color: #999;">${index + 1}</td>
+                        <td><strong>${module.name}</strong></td>
+                        <td>${categoryBadge}</td>
+                        <td style="color: ${statusColor};">${statusIcon} ${statusText}</td>
+                        <td style="color: #666; font-size: 0.9rem;">${folder}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Get category badge HTML
+        function getCategoryBadge(category) {
+            const badges = {
+                'oper': '<span class="badge badge-success">OPER</span>',
+                'rpc': '<span class="badge badge-warning">RPC</span>',
+                'events': '<span class="badge badge-success">EVENTS</span>',
+                'cfg': '<span class="badge badge-warning">CFG</span>',
+                'ietf': '<span class="badge badge-info">IETF</span>',
+                'openconfig': '<span class="badge badge-info">OPENCONFIG</span>',
+                'native': '<span class="badge">NATIVE</span>',
+                'types': '<span class="badge badge-info">TYPES</span>',
+                'deviation': '<span class="badge badge-info">DEVIATION</span>',
+                'native-aug': '<span class="badge badge-info">NATIVE-AUG</span>',
+                'common': '<span class="badge badge-info">COMMON</span>',
+                'other': '<span class="badge">OTHER</span>'
+            };
+            return badges[category] || `<span class="badge">${category.toUpperCase()}</span>`;
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            currentFilter.category = category;
+            document.querySelectorAll('.filter-buttons button').forEach(btn => {
+                if (btn.textContent.includes('OPER') || btn.textContent.includes('RPC') || 
+                    btn.textContent.includes('EVENTS') || btn.textContent.includes('CFG') ||
+                    btn.textContent.includes('IETF') || btn.textContent.includes('OPENCONFIG') ||
+                    btn.textContent.includes('NATIVE') || btn.textContent.includes('TYPES') ||
+                    btn.textContent.includes('DEVIATION') || btn.textContent.includes('COMMON') ||
+                    btn.textContent.includes('OTHER') || btn.textContent === 'All (848)') {
+                    btn.classList.remove('active');
+                }
+            });
+            event.target.classList.add('active');
+            renderTable();
+        }
+
+        // Filter by status
+        function filterByStatus(status) {
+            currentFilter.status = status;
+            renderTable();
+        }
+
+        // Filter table by search
+        function filterTable() {
+            renderTable();
+        }
+
+        // Sort table
+        let sortDirection = 1;
+        function sortTable(columnIndex) {
+            const tbody = document.getElementById('moduleTableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].textContent.trim();
+                const bText = b.cells[columnIndex].textContent.trim();
+                
+                if (columnIndex === 0) { // Numeric sort for index
+                    return sortDirection * (parseInt(aText) - parseInt(bText));
+                }
+                
+                return sortDirection * aText.localeCompare(bText);
+            });
+            
+            sortDirection *= -1; // Toggle direction
+            
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', loadModuleData);
     </script>
 </body>
 </html>
