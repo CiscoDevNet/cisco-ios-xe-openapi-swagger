@@ -3,7 +3,7 @@
 **Date:** February 01, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 848
-**Modules with OpenAPI Specs:** 392 (46.2%)
+**Modules with OpenAPI Specs:** 397 (46.8%)
 
 ---
 
@@ -21,14 +21,14 @@ This report provides **100% accountability** for every YANG module in the
 
 | Category | Total | With Specs | Coverage | Notes |
 |----------|-------|------------|----------|-------|
-| **oper** | 200 | 197 | 98% |  |
+| **oper** | 200 | 199 | 100% |  |
 | **rpc** | 63 | 50 | 79% |  |
 | **cfg** | 60 | 39 | 65% |  |
 | **openconfig** | 95 | 41 | 43% |  |
 | **ietf** | 33 | 21 | 64% |  |
-| **events** | 41 | 40 | 98% |  |
+| **events** | 41 | 41 | 100% |  |
 | **native** | 1 | 0 | 0% |  |
-| **other** | 36 | 4 | 11% |  |
+| **other** | 36 | 6 | 17% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
 | **common** | 18 | 0 | N/A | Excluded by design |
@@ -129,7 +129,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-matm-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-mdt-capabilities-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-mdt-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-mdt-oper-v2 | - | ❌ |
+| Cisco-IOS-XE-mdt-oper-v2 | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-mdt-stats-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-memory-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-meraki-connect-oper | swagger-oper-model | ✅ |
@@ -198,7 +198,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-udld-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-uidp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-umbrella-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-umbrella-oper-dp | - | ❌ |
+| Cisco-IOS-XE-umbrella-oper-dp | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-uplink-autoconfig-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-utd-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-vdsp-oper | swagger-oper-model | ✅ |
@@ -557,7 +557,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-xcopy-events | swagger-events-model | ✅ |
 | cisco-bridge-domain | swagger-rpc-model | ✅ |
-| cisco-pw | - | ❌ |
+| cisco-pw | swagger-other-model | ✅ |
 | cisco-smart-license | swagger-rpc-model | ✅ |
 
 ### NATIVE (1 modules)
@@ -570,12 +570,12 @@ This report provides **100% accountability** for every YANG module in the
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
-| cisco-ethernet | - | ❌ |
+| cisco-ethernet | swagger-other-model | ✅ |
 | cisco-evpn-service | - | ❌ |
 | cisco-extensions | - | ❌ |
 | cisco-ospf | - | ❌ |
 | cisco-policy | - | ❌ |
-| cisco-policy-filters | - | ❌ |
+| cisco-policy-filters | swagger-other-model | ✅ |
 | cisco-policy-target | - | ❌ |
 | cisco-routing-ext | - | ❌ |
 | cisco-self-mgmt | swagger-other-model | ✅ |
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-02-01T18:48:39.925953*
+*Report generated: 2026-02-01T19:49:21.111623*

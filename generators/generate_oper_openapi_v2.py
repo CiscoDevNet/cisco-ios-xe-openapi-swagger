@@ -800,8 +800,12 @@ class OperToOpenAPI:
         print("Operational YANG to OpenAPI 3.0 Generator v2")
         print(f"{'='*70}\n")
 
-        # Find all Cisco-IOS-XE-*-oper.yang files
-        yang_files = sorted(self.yang_dir.glob('Cisco-IOS-XE-*-oper.yang'))
+        # Find all Cisco-IOS-XE-*-oper.yang files (including -oper-v2, -oper-dp variants)
+        yang_files = []
+        yang_files.extend(self.yang_dir.glob('Cisco-IOS-XE-*-oper.yang'))
+        yang_files.extend(self.yang_dir.glob('Cisco-IOS-XE-*-oper-v*.yang'))
+        yang_files.extend(self.yang_dir.glob('Cisco-IOS-XE-*-oper-dp.yang'))
+        yang_files = sorted(set(yang_files))  # Remove duplicates and sort
 
         if not yang_files:
             print(f"No Operational YANG files found in {self.yang_dir}")

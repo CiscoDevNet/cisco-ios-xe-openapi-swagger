@@ -651,7 +651,13 @@ def main():
 
     # List of standalone misc/other modules
     modules = [
+        'cisco-bridge-domain',
+        'cisco-ethernet',
         'cisco-evpn-service',
+        'cisco-ospf',
+        'cisco-policy',
+        'cisco-policy-filters',
+        'cisco-pw',
         'cisco-self-mgmt',
         'cisco-smart-license',
         'cisco-storm-control',
