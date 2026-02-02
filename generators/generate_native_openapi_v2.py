@@ -87,7 +87,7 @@ class NativeToOpenAPI:
         # Context-aware examples based on property name
         name_lower = property_name.lower()
         
-        # Hostname examples - realistic production names
+        # Hostname examples - realistic production data center naming
         if 'hostname' in name_lower:
             return 'DC1-CORE-SW01'
         
@@ -99,64 +99,82 @@ class NativeToOpenAPI:
         if 'config-register' in name_lower:
             return '0x2102'
         
-        # Interface examples
+        # Interface examples - production port numbers
         if 'interface' in name_lower or 'name' in name_lower:
             if 'loopback' in name_lower:
                 return 'Loopback0'
             elif 'vlan' in name_lower:
                 return 'Vlan100'
             elif 'tunnel' in name_lower:
-                return 'Tunnel0'
+                return 'Tunnel10'
+            elif 'port-channel' in name_lower or 'portchannel' in name_lower:
+                return 'Port-channel1'
+            elif 'tengigabit' in name_lower:
+                return 'TenGigabitEthernet1/1/1'
             else:
-                return 'GigabitEthernet1/0/1'
+                return 'GigabitEthernet1/0/24'
         
-        # IP address examples
+        # IP address examples - corporate/private ranges
         if any(x in name_lower for x in ['ip-address', 'ipaddress', 'address']):
             if 'ipv6' in name_lower or 'v6' in name_lower:
-                return '2001:db8::1'
-            return '192.168.1.1'
+                return '2001:db8:1::1'
+            elif 'loopback' in name_lower:
+                return '10.255.255.1'
+            elif 'mgmt' in name_lower or 'management' in name_lower:
+                return '172.16.0.1'
+            return '10.10.10.1'
         
         # Network mask examples
         if 'mask' in name_lower or 'netmask' in name_lower:
             return '255.255.255.0'
         
-        # Prefix examples
+        # Prefix examples - realistic network addressing
         if 'prefix' in name_lower:
             if 'ipv6' in name_lower:
-                return '2001:db8::/32'
-            return '192.168.0.0/24'
+                return '2001:db8:1::/64'
+            return '10.10.0.0/16'
         
         # MAC address examples
         if 'mac' in name_lower and 'address' in name_lower:
-            return '00:11:22:33:44:55'
+            return '00:1A:2B:3C:4D:5E'
         
-        # VLAN examples
+        # VLAN examples - common production VLANs
         if 'vlan' in name_lower and 'id' in name_lower:
             return 100
         
         # VRF examples
         if 'vrf' in name_lower:
-            return 'VRF-PROD'
+            return 'PROD-VRF'
         
-        # AS number examples
+        # AS number examples - private AS range
         if 'as' in name_lower or 'asn' in name_lower:
             return 65001
         
-        # Description examples
+        # Description examples - network engineer style
         if 'description' in name_lower or 'descr' in name_lower:
-            return 'Configured via RESTCONF API'
+            if 'interface' in name_lower:
+                return 'UPLINK_TO_DC2_CORE_SW01'
+            elif 'bgp' in name_lower or 'peer' in name_lower:
+                return 'BGP_PEER_AS65002'
+            elif 'vlan' in name_lower:
+                return 'DATA_VLAN_FLOOR2'
+            return 'Managed_via_RESTCONF'
         
         # Banner examples
         if 'banner' in name_lower:
-            return 'Authorized Access Only'
+            if 'motd' in name_lower:
+                return '*** AUTHORIZED ACCESS ONLY - All activity monitored ***'
+            elif 'login' in name_lower:
+                return 'Corporate Network - Authenticate to proceed'
+            return 'Authorized Users Only'
         
         # Domain examples
         if 'domain' in name_lower:
-            return 'example.com'
+            return 'corp.example.com'
         
         # Username examples
         if 'username' in name_lower or 'user' in name_lower:
-            return 'admin'
+            return 'netadmin'
         
         # Password examples
         if 'password' in name_lower or 'secret' in name_lower:
@@ -164,29 +182,60 @@ class NativeToOpenAPI:
         
         # Port examples
         if 'port' in name_lower:
+            if 'ssh' in name_lower:
+                return 22
+            elif 'https' in name_lower:
+                return 443
             return 8443
+        
+        # Community string examples
+        if 'community' in name_lower:
+            return 'RO_SNMP_v2c'
+        
+        # Server/host examples
+        if 'server' in name_lower or 'host' in name_lower:
+            if 'ntp' in name_lower:
+                return 'ntp.corp.example.com'
+            elif 'syslog' in name_lower or 'log' in name_lower:
+                return 'syslog.corp.example.com'
+            elif 'tacacs' in name_lower:
+                return 'tacacs.corp.example.com'
+            elif 'radius' in name_lower:
+                return 'radius.corp.example.com'
+            return 'server.corp.example.com'
         
         # Handle based on schema type
         if schema_type == 'array':
             items_schema = schema.get('items', {'type': 'string'})
-            # Generate 3 example items with variations
+            # Generate 3 example items with production-realistic variations
             examples = []
             for i in range(3):
                 item = self.create_example_data(items_schema, property_name)
                 if isinstance(item, dict):
-                    # Vary numeric and interface fields
+                    # Vary numeric and interface fields with production patterns
                     if 'name' in item:
-                        if isinstance(item['name'], str) and 'GigabitEthernet' in item['name']:
-                            item['name'] = f'GigabitEthernet1/0/{i+1}'
-                        elif isinstance(item['name'], str) and 'Vlan' in item['name']:
-                            item['name'] = f'Vlan{100+i*10}'
+                        if isinstance(item['name'], str):
+                            if 'GigabitEthernet' in item['name']:
+                                item['name'] = f'GigabitEthernet1/0/{24+i}'
+                            elif 'TenGigabitEthernet' in item['name']:
+                                item['name'] = f'TenGigabitEthernet1/1/{i+1}'
+                            elif 'Vlan' in item['name']:
+                                item['name'] = f'Vlan{100+i*100}'  # 100, 200, 300
+                            elif 'Loopback' in item['name']:
+                                item['name'] = f'Loopback{i}'
                     if 'vlan' in item and 'id' in str(item.get('vlan', '')):
-                        item['vlan'] = 100 + i * 10
+                        item['vlan'] = [100, 200, 300][i]
                     if 'id' in item and isinstance(item['id'], int):
                         item['id'] = i + 1
                     if 'address' in item:
-                        if isinstance(item['address'], str) and '192.168' in item['address']:
-                            item['address'] = f'192.168.{i+1}.1'
+                        if isinstance(item['address'], str):
+                            if '10.10' in item['address']:
+                                item['address'] = f'10.10.{i+1}.1'
+                            elif '2001:db8' in item['address']:
+                                item['address'] = f'2001:db8:{i+1}::1'
+                    if 'description' in item:
+                        if isinstance(item['description'], str):
+                            item['description'] = f'LINK_TO_DEVICE_{chr(65+i)}'  # A, B, C
                 examples.append(item)
             return examples
         
@@ -603,8 +652,73 @@ class NativeToOpenAPI:
             desc_match = re.search(r'\bdescription\s+"([^"]+)"', leaf_body)
             description = desc_match.group(1)[:200] if desc_match else f"{leaf_name} configuration"
             
-            # Create schema
+            # Create schema with validation (Phase 2: add production-quality validation)
             schema = {'type': json_type}
+            
+            # Add validation patterns based on field name and type
+            leaf_lower = leaf_name.lower()
+            
+            if json_type == 'string':
+                # Hostname validation
+                if leaf_lower == 'hostname':
+                    schema['pattern'] = '^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'
+                    schema['minLength'] = 1
+                    schema['maxLength'] = 63
+                
+                # Interface name validation
+                elif any(x in leaf_lower for x in ['interface', 'ifname']):
+                    schema['pattern'] = '^(GigabitEthernet|TenGigabitEthernet|FastEthernet|Loopback|Vlan|Tunnel|Port-channel|BDI)[0-9/]+$'
+                
+                # IP address validation
+                elif yang_type == 'inet:ipv4-address' or 'ipv4' in leaf_lower:
+                    schema['pattern'] = '^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$'
+                    schema['format'] = 'ipv4'
+                elif yang_type == 'inet:ipv6-address' or 'ipv6' in leaf_lower:
+                    schema['pattern'] = '^([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}$'
+                    schema['format'] = 'ipv6'
+                
+                # MAC address validation
+                elif 'mac' in leaf_lower and 'address' in leaf_lower:
+                    schema['pattern'] = '^([0-9A-Fa-f]{4}\\.[0-9A-Fa-f]{4}\\.[0-9A-Fa-f]{4})|([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$'
+                
+                # Domain name validation
+                elif yang_type == 'inet:domain-name' or 'domain' in leaf_lower:
+                    schema['pattern'] = '^([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$'
+                    schema['maxLength'] = 253
+                
+                # Description field - reasonable length
+                elif 'description' in leaf_lower or 'descr' in leaf_lower:
+                    schema['maxLength'] = 255
+                
+                # Banner text - longer allowed
+                elif 'banner' in leaf_lower:
+                    schema['maxLength'] = 2000
+                
+            elif json_type == 'integer':
+                # VLAN ID validation
+                if 'vlan' in leaf_lower and any(x in leaf_lower for x in ['id', 'vlan']):
+                    schema['minimum'] = 1
+                    schema['maximum'] = 4094
+                
+                # Port number validation
+                elif 'port' in leaf_lower:
+                    schema['minimum'] = 1
+                    schema['maximum'] = 65535
+                
+                # MTU validation
+                elif 'mtu' in leaf_lower:
+                    schema['minimum'] = 64
+                    schema['maximum'] = 9216
+                
+                # AS number validation
+                elif 'as' in leaf_lower or 'asn' in leaf_lower:
+                    schema['minimum'] = 1
+                    schema['maximum'] = 4294967295
+                
+                # Priority/weight - typical range
+                elif 'priority' in leaf_lower or 'weight' in leaf_lower:
+                    schema['minimum'] = 0
+                    schema['maximum'] = 255
             
             full_path = f"{parent_path}/{leaf_name}"
             paths.append({
