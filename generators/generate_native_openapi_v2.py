@@ -22,7 +22,7 @@ class NativeToOpenAPI:
         self.typedefs_cache = {}
         self.processed_paths = []
         
-        # Category mapping for organizing paths
+        # Category mapping for organizing paths (Phase 3: reorganized from 11 to 18 categories)
         self.category_keywords = {
             'core': [],  # Will be matched explicitly in categorize_path for depth-0 leafs
             'interfaces': ['interface', 'GigabitEthernet', 'TenGigabitEthernet', 'Loopback', 
@@ -31,49 +31,44 @@ class NativeToOpenAPI:
             'routing': ['router', 'bgp', 'ospf', 'eigrp', 'rip', 'isis', 'ip route', 
                        'ipv6 route', 'route-map', 'prefix-list', 'rtr', 'track', 'bfd',
                        'global-address-family', 'table-map', 'route-tag'],
-            'security': ['access-list', 'aaa', 'zone', 'class-map', 'policy-map', 
+            'security': ['access-list', 'zone', 'class-map', 'policy-map', 
                         'acl', 'key chain', 'enable', 'username', 'user-name', 'password',
-                        'login', 'privilege', 'dot1x', 'mab', 'eap', 'radius', 'tacacs',
+                        'login', 'privilege', 'dot1x', 'mab', 'eap',
                         'identity', 'object-group'],
+            'aaa': ['aaa', 'radius', 'tacacs', 'radius-server', 'tacacs-server'],
             'crypto': ['crypto', 'ikev2', 'ipsec', 'isakmp', 'pki', 'key', 'certificate',
                       'keyring', 'trustpoint', 'mka', 'macsec'],
             'switching': ['vlan', 'spanning-tree', 'switchport', 'channel-group', 
                          'mac-address-table', 'errdisable', 'vtp', 'lacp', 'port-channel',
-                         'l2', 'mvrp', 'avb', 'xconnect', 'pseudowire', 'l2tp'],
-            'services': ['dhcp', 'nat', 'ntp', 'snmp', 'logging', 'cdp', 'lldp', 
-                        'dns', 'domain', 'ip domain', 'archive', 'tftp-server',
-                        'radius-server', 'ldap', 'http', 'telnet', 'ssh', 'service'],
+                         'l2', 'mvrp', 'avb', 'xconnect', 'pseudowire', 'l2tp', 'mac'],
+            'dhcp': ['dhcp'],
+            'ntp': ['ntp'],
+            'snmp': ['snmp'],
+            'logging': ['logging'],
+            'dns': ['dns', 'domain', 'ip domain'],
+            'services': ['nat', 'cdp', 'lldp', 'archive', 'tftp-server',
+                        'ldap', 'http-server', 'telnet', 'ssh-server'],
             'qos': ['qos', 'service-policy', 'mls qos', 'class', 'policy', 'avc',
                    'parameter-map', 'sdm'],
             'mpls': ['mpls', 'ldp', 'traffic-eng', 'segment-routing'],
             'vpn': ['tunnel', 'gre', 'dmvpn'],
             'wireless': ['wireless', 'wlan', 'ap ', 'dot11'],
             'platform': ['hw-module', 'stack', 'switch', 'breakout', 'module', 'card',
-                        'platform', 'stack-power', 'controller', 'cisp', 'redundancy',
+                        'platform', 'stack-power', 'controller', 'cisp',
                         'upgrade', 'software', 'boot', 'config-register', 'subslot', 
                         'transceiver'],
-            'call-home': ['call-home'],
+            'ha': ['redundancy', 'hsrp', 'vrrp', 'glbp', 'stackwise'],
+            'cli': ['banner', 'line', 'parser', 'alias', 'macro'],
+            'license': ['license', 'call-home'],
             'monitor': ['monitor', 'span', 'rspan', 'erspan', 'flow', 'sampler', 'rmon',
                        'netflow', 'session'],
             'voice': ['voice', 'dial-peer', 'voice-class', 'sip', 'scada-gw'],
-            'switching': ['vlan', 'spanning-tree', 'switchport', 'channel-group', 
-                         'mac-address-table', 'errdisable', 'vtp', 'lacp', 'port-channel',
-                         'l2', 'mvrp', 'avb', 'xconnect', 'pseudowire', 'l2tp', 'mac'],
-            'security': ['access-list', 'aaa', 'zone', 'class-map', 'policy-map', 
-                        'acl', 'key chain', 'enable', 'username', 'user-name', 'password',
-                        'login', 'privilege', 'dot1x', 'mab', 'eap', 'radius', 'tacacs',
-                        'identity', 'object-group'],
-            'services': ['dhcp', 'nat', 'ntp', 'snmp', 'logging', 'cdp', 'lldp', 
-                        'dns', 'domain', 'ip domain', 'archive', 'tftp-server',
-                        'radius-server', 'ldap', 'http', 'telnet', 'ssh', 'service'],
-            'system': ['hostname', 'banner', 'clock', 'version', 'memory', 'scheduler', 
-                      'process', 'license', 'line', 'parser', 'location', 'fabric',
-                      'system', 'epm', 'ptp', 'multilink', 'ppp', 'macro', 'vrf',
+            'system': ['hostname', 'clock', 'memory', 'scheduler', 
+                      'process', 'location', 'fabric', 'epm', 'ptp', 'multilink', 'ppp', 'vrf',
                       'fallback', 'subscriber', 'frame-relay', 'aqm-register',
-                      'control-plane', 'exception', 'transport', 'md-list', 'network-clock',
-                      'protocol', 'type', 'default', 'border', 'master', 'secret', 'clns',
-                      'cts', 'cwmp', 'pfr', 'facility-alarm', 'setup', 'profile', 'time-range',
-                      'alias', 'group', 'tod-clock', 'transport-map']
+                      'control-plane', 'exception', 'md-list', 'network-clock',
+                      'clns', 'cts', 'cwmp', 'pfr', 'facility-alarm', 'setup', 
+                      'tod-clock', 'transport-map']
         }
 
     def create_example_data(self, schema: Dict[str, Any], property_name: str = '') -> Any:
@@ -772,10 +767,11 @@ class NativeToOpenAPI:
         if name_lower in core_leafs:
             return 'core'
         
-        # Priority order: check specific categories before generic ones
+        # Priority order: check specific categories before generic ones (Phase 3: 18 categories, specific before generic)
         priority_categories = ['interfaces', 'crypto', 'platform', 'monitor', 'routing', 
-                              'switching', 'security', 'services', 'qos', 'mpls', 'vpn', 
-                              'wireless', 'call-home', 'voice', 'system']
+                              'switching', 'aaa', 'security', 'dhcp', 'ntp', 'snmp', 
+                              'logging', 'dns', 'ha', 'cli', 'license', 'qos', 'mpls', 'vpn', 
+                              'wireless', 'voice', 'services', 'system']
         
         for category in priority_categories:
             keywords = self.category_keywords.get(category, [])
@@ -792,16 +788,24 @@ class NativeToOpenAPI:
             'core': 'Native - Core System Settings',
             'interfaces': 'Native - Interfaces',
             'routing': 'Native - Routing Protocols',
-            'security': 'Native - Security & AAA',
+            'security': 'Native - Security & ACLs',
+            'aaa': 'Native - AAA & RADIUS/TACACS',
             'crypto': 'Native - Cryptography & PKI',
             'switching': 'Native - Switching & VLANs',
+            'dhcp': 'Native - DHCP Server & Relay',
+            'ntp': 'Native - NTP Time Services',
+            'snmp': 'Native - SNMP Monitoring',
+            'logging': 'Native - Syslog & Logging',
+            'dns': 'Native - DNS & Domain Services',
             'services': 'Native - Network Services',
             'qos': 'Native - QoS & Policy',
             'mpls': 'Native - MPLS & TE',
             'vpn': 'Native - VPN & Tunnels',
             'wireless': 'Native - Wireless',
             'platform': 'Native - Platform & Hardware',
-            'call-home': 'Native - Call Home & Licensing',
+            'ha': 'Native - High Availability & Redundancy',
+            'cli': 'Native - CLI & Banners',
+            'license': 'Native - Licensing & Call-Home',
             'monitor': 'Native - Monitoring & Analytics',
             'voice': 'Native - Voice & Telephony',
             'system': 'Native - System & Management'
