@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Code Generator - Cisco IOS-XE RESTCONF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%); color: white; padding: 40px 20px; text-align: center; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { font-size: 1.1rem; opacity: 0.9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+        .form-section { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .form-section h3 { color: #1565C0; margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 10px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            font-size: 14px; 
+            font-family: 'Roboto Mono', monospace;
+        }
+        .form-group textarea { font-family: 'Roboto Mono', monospace; min-height: 100px; }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #1565C0; color: white; }
+        .btn-primary:hover { background: #0D47A1; }
+        .btn-secondary { background: #666; color: white; }
+        .btn-secondary:hover { background: #444; }
+        .code-output { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .code-output h3 { color: #1565C0; margin-bottom: 16px; }
+        .code-block { 
+            background: #2d2d2d; 
+            color: #f8f8f2; 
+            padding: 16px; 
+            border-radius: 4px; 
+            font-family: 'Roboto Mono', monospace; 
+            font-size: 13px; 
+            overflow-x: auto; 
+            white-space: pre-wrap;
+            word-break: break-all;
+            position: relative;
+        }
+        .copy-btn { 
+            position: absolute; 
+            top: 8px; 
+            right: 8px; 
+            background: #1565C0; 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 12px;
+        }
+        .copy-btn:hover { background: #0D47A1; }
+        .tab-buttons { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e0e0e0; }
+        .tab-btn { 
+            padding: 10px 20px; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            font-weight: 500; 
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn.active { color: #1565C0; border-bottom-color: #1565C0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .example-box { background: #E3F2FD; border-left: 4px solid #1565C0; padding: 12px; border-radius: 4px; margin-top: 12px; font-size: 13px; }
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .number { color: #d19a66; }
+        .comment { color: #5c6370; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛠️ API Code Generator</h1>
+        <p>Generate curl, Python, and Ansible code for Cisco IOS-XE RESTCONF APIs</p>
+    </div>
+    
+    <div class="container">
+        <div class="form-section">
+            <h3>🔧 Request Configuration</h3>
+            
+            <div class="form-group">
+                <label>Device/Host</label>
+                <input type="text" id="host" value="10.0.0.1" placeholder="router.example.com or IP address">
+            </div>
+            
+            <div class="form-group">
+                <label>HTTP Method</label>
+                <select id="method">
+                    <option value="GET">GET - Retrieve data</option>
+                    <option value="POST">POST - Create resource</option>
+                    <option value="PUT">PUT - Replace resource</option>
+                    <option value="PATCH">PATCH - Update resource</option>
+                    <option value="DELETE">DELETE - Remove resource</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>API Path (starts with /restconf/...)</label>
+                <input type="text" id="path" value="/restconf/data/Cisco-IOS-XE-interfaces-oper:interfaces" placeholder="/restconf/data/...">
+                <div class="example-box">
+                    <strong>Examples:</strong><br>
+                    • Operational: /restconf/data/Cisco-IOS-XE-interfaces-oper:interfaces<br>
+                    • Config: /restconf/data/Cisco-IOS-XE-native:native<br>
+                    • RPC: /restconf/operations/Cisco-IOS-XE-rpc:ping
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" value="admin" placeholder="API username">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" value="cisco123" placeholder="API password">
+            </div>
+            
+            <div class="form-group" id="bodyGroup" style="display: none;">
+                <label>Request Body (JSON)</label>
+                <textarea id="body" placeholder='{"Cisco-IOS-XE-native:native": {"hostname": "Router1"}}'></textarea>
+                <div class="example-box">
+                    <strong>Example for POST/PUT/PATCH:</strong><br>
+                    {"Cisco-IOS-XE-native:native": {"hostname": "NewRouter"}}
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generateCode()">🚀 Generate Code</button>
+                <button class="btn btn-secondary" onclick="clearForm()">🔄 Clear Form</button>
+            </div>
+        </div>
+        
+        <div class="code-output" id="outputSection" style="display: none;">
+            <h3>📝 Generated Code</h3>
+            
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('curl')">curl</button>
+                <button class="tab-btn" onclick="switchTab('python')">Python (requests)</button>
+                <button class="tab-btn" onclick="switchTab('ansible')">Ansible</button>
+            </div>
+            
+            <div id="curlTab" class="tab-content active">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode('curlCode')">📋 Copy</button>
+                    <code id="curlCode"></code>
+                </div>
+            </div>
+            
+            <div id="pythonTab" class="tab-content">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode('pythonCode')">📋 Copy</button>
+                    <code id="pythonCode"></code>
+                </div>
+            </div>
+            
+            <div id="ansibleTab" class="tab-content">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode('ansibleCode')">📋 Copy</button>
+                    <code id="ansibleCode"></code>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Show/hide body input based on method
+        document.getElementById('method').addEventListener('change', function() {
+            const bodyGroup = document.getElementById('bodyGroup');
+            const method = this.value;
+            bodyGroup.style.display = ['POST', 'PUT', 'PATCH'].includes(method) ? 'block' : 'none';
+        });
+        
+        function generateCode() {
+            const host = document.getElementById('host').value;
+            const method = document.getElementById('method').value;
+            const path = document.getElementById('path').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const body = document.getElementById('body').value;
+            
+            const url = `https://${host}${path}`;
+            
+            // Generate curl code
+            let curlCode = `curl -k -X ${method} \\\n`;
+            curlCode += `  "${url}" \\\n`;
+            curlCode += `  -H "Accept: application/yang-data+json" \\\n`;
+            if (['POST', 'PUT', 'PATCH'].includes(method)) {
+                curlCode += `  -H "Content-Type: application/yang-data+json" \\\n`;
+            }
+            curlCode += `  -u "${username}:${password}"`;
+            if (['POST', 'PUT', 'PATCH'].includes(method) && body) {
+                curlCode += ` \\\n  -d '${body}'`;
+            }
+            
+            // Generate Python code
+            let pythonCode = `#!/usr/bin/env python3
+"""
+Cisco IOS-XE RESTCONF API Example
+Generated: ${new Date().toISOString()}
+"""
+
+import requests
+import json
+from urllib3.exceptions import InsecureRequestWarning
+
+# Disable SSL warnings (not recommended for production)
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
+# Device credentials
+host = "${host}"
+username = "${username}"
+password = "${password}"
+
+# API endpoint
+url = f"https://{host}${path}"
+
+# Headers
+headers = {
+    "Accept": "application/yang-data+json",
+    "Content-Type": "application/yang-data+json"
+}
+`;
+
+            if (['POST', 'PUT', 'PATCH'].includes(method) && body) {
+                pythonCode += `
+# Request body
+payload = ${body}
+
+# Make request
+response = requests.${method.toLowerCase()}(
+    url,
+    headers=headers,
+    auth=(username, password),
+    json=payload,
+    verify=False
+)
+`;
+            } else {
+                pythonCode += `
+# Make request
+response = requests.${method.toLowerCase()}(
+    url,
+    headers=headers,
+    auth=(username, password),
+    verify=False
+)
+`;
+            }
+
+            pythonCode += `
+# Check response
+print(f"Status Code: {response.status_code}")
+if response.status_code in [200, 201, 204]:
+    print("Success!")
+    if response.text:
+        print(json.dumps(response.json(), indent=2))
+else:
+    print(f"Error: {response.text}")`;
+
+            // Generate Ansible code
+            let ansibleCode = `---
+# Cisco IOS-XE RESTCONF API Playbook
+# Generated: ${new Date().toISOString()}
+
+- name: Cisco IOS-XE RESTCONF Example
+  hosts: localhost
+  gather_facts: no
+  
+  vars:
+    iosxe_host: "${host}"
+    iosxe_user: "${username}"
+    iosxe_pass: "${password}"
+    api_path: "${path}"
+  
+  tasks:
+    - name: ${method} request to IOS-XE RESTCONF
+      uri:
+        url: "https://{{ iosxe_host }}{{ api_path }}"
+        method: ${method}
+        user: "{{ iosxe_user }}"
+        password: "{{ iosxe_pass }}"
+        force_basic_auth: yes
+        validate_certs: no
+        headers:
+          Accept: "application/yang-data+json"
+          Content-Type: "application/yang-data+json"`;
+
+            if (['POST', 'PUT', 'PATCH'].includes(method) && body) {
+                ansibleCode += `
+        body: |
+          ${body}
+        body_format: json`;
+            }
+
+            ansibleCode += `
+        status_code:
+          - 200
+          - 201
+          - 204
+      register: api_response
+    
+    - name: Display response
+      debug:
+        var: api_response.json
+      when: api_response.json is defined`;
+
+            // Update code blocks
+            document.getElementById('curlCode').textContent = curlCode;
+            document.getElementById('pythonCode').textContent = pythonCode;
+            document.getElementById('ansibleCode').textContent = ansibleCode;
+            
+            // Show output section
+            document.getElementById('outputSection').style.display = 'block';
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tab + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function copyCode(elementId) {
+            const code = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+        
+        function clearForm() {
+            document.getElementById('host').value = '10.0.0.1';
+            document.getElementById('method').value = 'GET';
+            document.getElementById('path').value = '/restconf/data/Cisco-IOS-XE-interfaces-oper:interfaces';
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'cisco123';
+            document.getElementById('body').value = '';
+            document.getElementById('bodyGroup').style.display = 'none';
+            document.getElementById('outputSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
