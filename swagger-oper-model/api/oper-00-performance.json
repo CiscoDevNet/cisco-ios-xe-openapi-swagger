@@ -1,0 +1,98 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "\u2b50 Operational - Performance Monitoring Quick-Start",
+    "description": "Curated collection for monitoring device performance and resource utilization.\n\n**Performance Metrics:**\n\n**QoS Statistics:**\n- Queue depth and drops\n- Policing actions\n- Traffic shaping stats\n\n**Interface Performance:**\n- Input/output rates (bits/sec, packets/sec)\n- Utilization percentage\n- Broadcast/multicast rates\n\n**Buffer Statistics:**\n- Buffer allocation\n- Drop counters\n- Congestion indicators\n\n**Hardware Resources:**\n- Data plane utilization\n- TCAM usage\n- Forwarding engine stats\n\n**Use Cases:**\n- Identify traffic congestion\n- Monitor QoS policy effectiveness\n- Detect resource exhaustion\n- Capacity planning\n\n**Examples include real-world traffic patterns**\n",
+    "version": "17.18.1"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-diffserv-target-oper:diffserv-interfaces-state": {
+      "get": {
+        "summary": "Get QoS/DiffServ statistics",
+        "description": "Interface QoS policy statistics including queue depths, drops, policing\n\n**Example Response:**\n```json\n{\n  \"Cisco-IOS-XE-diffserv-target-oper:diffserv-interfaces-state\": {\n    \"diffserv-interface\": [\n      {\n        \"name\": \"GigabitEthernet1/0/1\",\n        \"direction\": \"outbound\",\n        \"diffserv-target-entry\": [\n          {\n            \"class-name\": \"class-default\",\n            \"queuing-stats\": {\n              \"output-pkts\": 10234567,\n              \"output-bytes\": 1023456700,\n              \"drop-pkts\": 0,\n              \"drop-bytes\": 0,\n              \"wred-stats\": {\n                \"early-drop-pkts\": 0,\n                \"early-drop-bytes\": 0\n              }\n            }\n          }\n        ]\n      }\n    ]\n  }\n}\n```\n",
+        "operationId": "get-qos-stats",
+        "tags": [
+          "QoS"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/ietf-interfaces:interfaces-state": {
+      "get": {
+        "summary": "Get interface statistics and rates",
+        "description": "Detailed interface statistics including rates\n\n**Example Response:**\n```json\n{\n  \"ietf-interfaces:interfaces-state\": {\n    \"interface\": [\n      {\n        \"name\": \"GigabitEthernet1/0/1\",\n        \"statistics\": {\n          \"in-octets\": 1284563200,\n          \"out-octets\": 1023456700,\n          \"in-unicast-pkts\": 12000000,\n          \"out-unicast-pkts\": 9500000,\n          \"in-broadcast-pkts\": 845632,\n          \"out-broadcast-pkts\": 734567,\n          \"in-discards\": 0,\n          \"out-discards\": 0,\n          \"in-errors\": 0,\n          \"out-errors\": 0\n        }\n      }\n    ]\n  }\n}\n```\n**Calculate Utilization:**\n```\nInput Rate (bps) = (in-octets * 8) / polling_interval\nUtilization% = (Input Rate / Interface Speed) * 100\n```\n",
+        "operationId": "get-interface-stats",
+        "tags": [
+          "Interfaces"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-platform-oper:components": {
+      "get": {
+        "summary": "Get hardware component statistics",
+        "description": "Hardware component operational statistics\n\n**Example Response:**\n```json\n{\n  \"Cisco-IOS-XE-platform-oper:components\": {\n    \"component\": [\n      {\n        \"name\": \"Chassis 1\",\n        \"state\": {\n          \"type\": \"chassis\",\n          \"description\": \"Cisco Catalyst 9300\"\n        }\n      }\n    ]\n  }\n}\n```\n",
+        "operationId": "get-components",
+        "tags": [
+          "Platform"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "QoS",
+      "description": "Quality of Service statistics"
+    },
+    {
+      "name": "Interfaces",
+      "description": "Interface utilization and rates"
+    },
+    {
+      "name": "Platform",
+      "description": "Hardware resource utilization"
+    }
+  ]
+}

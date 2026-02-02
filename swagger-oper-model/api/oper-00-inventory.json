@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "\u2b50 Operational - Inventory & Asset Management Quick-Start",
+    "description": "Curated collection for device inventory and asset tracking.\n\n**Inventory Data:**\n\n**Hardware:**\n- Chassis models and serial numbers\n- Line cards and modules\n- Transceivers (SFP/SFP+/QSFP)\n- Power supplies and fans\n\n**Software:**\n- IOS-XE version\n- Package versions\n- Boot variables\n\n**Licensing:**\n- Active licenses\n- License expiration dates\n- Entitlement status\n\n**Use Cases:**\n- Asset discovery and tracking\n- Compliance auditing\n- Lifecycle management\n- Capacity planning\n- Maintenance scheduling\n\n**Examples include realistic device information**\n",
+    "version": "17.18.1"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-platform-oper:components": {
+      "get": {
+        "summary": "Get hardware inventory",
+        "description": "Complete hardware inventory with models, serial numbers, versions\n\n**Example Response:**\n```json\n{\n  \"Cisco-IOS-XE-platform-oper:components\": {\n    \"component\": [\n      {\n        \"name\": \"Chassis 1\",\n        \"state\": {\n          \"type\": \"chassis\",\n          \"description\": \"Cisco Catalyst 9300-48P\",\n          \"serial-no\": \"FOC2145L0QS\",\n          \"part-no\": \"C9300-48P\",\n          \"mfg-name\": \"Cisco Systems Inc\"\n        }\n      },\n      {\n        \"name\": \"Switch 1 - Power Supply 1\",\n        \"state\": {\n          \"type\": \"power-supply\",\n          \"description\": \"715W AC Power Supply\",\n          \"serial-no\": \"LIT21450D5Q\",\n          \"part-no\": \"PWR-C1-715WAC\"\n        }\n      }\n    ]\n  }\n}\n```\n",
+        "operationId": "get-hardware-inventory",
+        "tags": [
+          "Inventory"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-platform-software-oper:cisco-platform-software": {
+      "get": {
+        "summary": "Get software version information",
+        "description": "IOS-XE software version and package information\n\n**Example Response:**\n```json\n{\n  \"Cisco-IOS-XE-platform-software-oper:cisco-platform-software\": {\n    \"q-filesystem\": [\n      {\n        \"name\": \"flash:\",\n        \"version-info\": {\n          \"version\": \"17.18.1\",\n          \"image-name\": \"cat9k_iosxe.17.18.01.SPA.bin\"\n        }\n      }\n    ]\n  }\n}\n```\n",
+        "operationId": "get-software-version",
+        "tags": [
+          "Software"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-transceiver-oper:transceiver-oper-data": {
+      "get": {
+        "summary": "Get optical transceiver inventory",
+        "description": "Installed transceivers with models, serial numbers, optical levels\n\n**Example Response:**\n```json\n{\n  \"Cisco-IOS-XE-transceiver-oper:transceiver-oper-data\": {\n    \"transceiver\": [\n      {\n        \"name\": \"GigabitEthernet1/0/1\",\n        \"enabled\": true,\n        \"present\": true,\n        \"identifier\": \"SFP-GE-T\",\n        \"connector\": \"RJ45\",\n        \"vendor-name\": \"CISCO-AVAGO\",\n        \"vendor-part\": \"ABCU-5710RZ-CS4\",\n        \"vendor-rev\": \"E\",\n        \"serial-no\": \"AGD2145L0Q1\",\n        \"nominal-bit-rate\": 1300\n      }\n    ]\n  }\n}\n```\n",
+        "operationId": "get-transceivers",
+        "tags": [
+          "Inventory"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Resource not found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Inventory",
+      "description": "Hardware inventory and asset tracking"
+    },
+    {
+      "name": "Software",
+      "description": "Software version information"
+    }
+  ]
+}
