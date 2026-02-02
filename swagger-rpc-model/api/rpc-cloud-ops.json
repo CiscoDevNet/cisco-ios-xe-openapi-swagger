@@ -1,28 +1,29 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Cisco-IOS-XE-utd-actions-rpc - RPC Operations",
-    "description": "This module contains a collection of YANG definitions for\n     Unified Threat Defense (UTD) RPC.\n     Copyright (c) 2022, 2025 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `Cisco-IOS-XE-utd-actions-rpc`\n**Version:** 2025-07-01\n**Operations:** 5",
-    "version": "2025-07-01"
+    "title": "RPC - Cloud Operations",
+    "description": "Cisco IOS-XE RPC Operations - Cloud\n\n**Category:** Cloud Operations\n**Modules:** 2\n**RPC Actions:** 5\n\n**HTTP Methods:**\n- POST: Execute RPC action/operation\n\n**Modules Included:**\n- cloud-services\n- meraki-leds\n\n**RPC Operation Pattern:**\nRPC operations are executed via RESTCONF POST to `/operations/` endpoints.\nEach RPC accepts input parameters and returns output results.\n\n**Example RPC Execution:**\n```bash\nPOST /restconf/operations/Cisco-IOS-XE-rpc:ping\nContent-Type: application/yang-data+json\n\n{\n  \"input\": {\n    \"ping-request\": {\n      \"destination\": \"10.0.0.1\",\n      \"repeat-count\": 5,\n      \"size\": 100\n    }\n  }\n}\n```\n\n**Example Response:**\n```json\n{\n  \"output\": {\n    \"ping-reply\": {\n      \"destination\": \"10.0.0.1\",\n      \"request-count\": 5,\n      \"reply-count\": 5,\n      \"success-rate\": 100,\n      \"minimum-rtt\": 1,\n      \"average-rtt\": 2,\n      \"maximum-rtt\": 3\n    }\n  }\n}\n```\n\n**Common Operations:**\n- cloud_services_rpc:cloudm-otp-token-import\n- cloud_services_rpc:cloudm-spaces-otp-token-import\n- cloud_services_rpc:cloudm-spaces-tokens-clear\n- meraki_leds_actions_rpc:set-system-led-state\n- meraki_leds_actions_rpc:blink-leds-cmd\n\n",
+    "version": "17.18.1"
   },
   "servers": [
     {
       "url": "https://{device}/restconf",
       "variables": {
         "device": {
-          "default": "router.example.com"
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
         }
       }
     }
   ],
   "paths": {
-    "/operations/utd_actions_rpc:utd-custom-signature-apply": {
+    "/operations/cloud_services_rpc:cloudm-otp-token-import": {
       "post": {
-        "summary": "Custom-signature apply action RPC.",
-        "description": "Custom-signature apply action RPC.\n\n**Endpoint:** `POST /restconf/operations/utd_actions_rpc:utd-custom-signature-apply`",
-        "operationId": "utd-custom-signature-apply",
+        "summary": "import OTP upgrade token for cloud services",
+        "description": "**Source Module:** cloud-services\n\nimport OTP upgrade token for cloud services\n\n**Endpoint:** `POST /restconf/operations/cloud_services_rpc:cloudm-otp-token-import`",
+        "operationId": "cloudm-otp-token-import",
         "tags": [
-          "Cisco-IOS-XE-utd-actions-rpc"
+          "Cisco-IOS-XE-cloud-services-rpc"
         ],
         "requestBody": {
           "required": true,
@@ -31,32 +32,217 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "utd_actions_rpc:utd-custom-signature-apply": {
+                  "cloud_services_rpc:cloudm-otp-token-import": {
                     "type": "object",
                     "properties": {
-                      "profile-name": {
+                      "otp-token": {
                         "type": "string",
                         "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature profile name"
+                        "maxLength": 4095,
+                        "description": "OTP upgrade token"
+                      }
+                    },
+                    "required": [
+                      "otp-token"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "cloud_services_rpc:cloudm-otp-token-import": {
+                  "otp-token": "example-string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/cloud_services_rpc:cloudm-spaces-otp-token-import": {
+      "post": {
+        "summary": "import OTP (authorization code) for spaces cloud services",
+        "description": "**Source Module:** cloud-services\n\nimport OTP (authorization code) for spaces cloud services\n\n**Endpoint:** `POST /restconf/operations/cloud_services_rpc:cloudm-spaces-otp-token-import`",
+        "operationId": "cloudm-spaces-otp-token-import",
+        "tags": [
+          "Cisco-IOS-XE-cloud-services-rpc"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cloud_services_rpc:cloudm-spaces-otp-token-import": {
+                    "type": "object",
+                    "properties": {
+                      "otp-token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4095,
+                        "description": "OTP upgrade token"
+                      }
+                    },
+                    "required": [
+                      "otp-token"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "cloud_services_rpc:cloudm-spaces-otp-token-import": {
+                  "otp-token": "example-string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/cloud_services_rpc:cloudm-spaces-tokens-clear": {
+      "post": {
+        "summary": "clear all tokens (persistent and temporary ones) for spaces cloud services",
+        "description": "**Source Module:** cloud-services\n\nclear all tokens (persistent and temporary ones) for spaces cloud services\n\n**Endpoint:** `POST /restconf/operations/cloud_services_rpc:cloudm-spaces-tokens-clear`",
+        "operationId": "cloudm-spaces-tokens-clear",
+        "tags": [
+          "Cisco-IOS-XE-cloud-services-rpc"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cloud_services_rpc:cloudm-spaces-tokens-clear": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string",
+                        "description": "Service name to clear tokens for"
+                      }
+                    },
+                    "required": [
+                      "service"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "cloud_services_rpc:cloudm-spaces-tokens-clear": {
+                  "service": "example-string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/operations/meraki_leds_actions_rpc:set-system-led-state": {
+      "post": {
+        "summary": "Set the system LED state for a device.",
+        "description": "**Source Module:** meraki-leds\n\nSet the system LED state for a device.\n\n**Endpoint:** `POST /restconf/operations/meraki_leds_actions_rpc:set-system-led-state`",
+        "operationId": "set-system-led-state",
+        "tags": [
+          "Cisco-IOS-XE-meraki-leds-actions-rpc"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "meraki_leds_actions_rpc:set-system-led-state": {
+                    "type": "object",
+                    "properties": {
+                      "chassis-number": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 16,
+                        "description": "Chassis number or switch number"
                       },
-                      "filename": {
+                      "led-state": {
                         "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature file name"
+                        "description": "New system LED state"
                       }
                     },
                     "required": [
-                      "profile-name"
+                      "led-state"
                     ]
                   }
                 }
               },
               "example": {
-                "utd_actions_rpc:utd-custom-signature-apply": {
-                  "profile-name": "flash:/config.txt",
-                  "filename": "flash:/config.txt"
+                "meraki_leds_actions_rpc:set-system-led-state": {
+                  "chassis-number": 10,
+                  "led-state": "example-string"
                 }
               }
             }
@@ -86,13 +272,13 @@
         }
       }
     },
-    "/operations/utd_actions_rpc:utd-custom-sig-glbl-apply": {
+    "/operations/meraki_leds_actions_rpc:blink-leds-cmd": {
       "post": {
-        "summary": "Custom-signature global apply action RPC.",
-        "description": "Custom-signature global apply action RPC.\n\n**Endpoint:** `POST /restconf/operations/utd_actions_rpc:utd-custom-sig-glbl-apply`",
-        "operationId": "utd-custom-sig-glbl-apply",
+        "summary": "Trigger for start/stop blinking device front LEDs",
+        "description": "**Source Module:** meraki-leds\n\nTrigger for start/stop blinking device front LEDs\n\n**Endpoint:** `POST /restconf/operations/meraki_leds_actions_rpc:blink-leds-cmd`",
+        "operationId": "blink-leds-cmd",
         "tags": [
-          "Cisco-IOS-XE-utd-actions-rpc"
+          "Cisco-IOS-XE-meraki-leds-actions-rpc"
         ],
         "requestBody": {
           "required": true,
@@ -101,221 +287,38 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "utd_actions_rpc:utd-custom-sig-glbl-apply": {
+                  "meraki_leds_actions_rpc:blink-leds-cmd": {
                     "type": "object",
                     "properties": {
-                      "filename": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature file name"
-                      }
-                    },
-                    "required": [
-                      "filename"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "utd_actions_rpc:utd-custom-sig-glbl-apply": {
-                  "filename": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/utd_actions_rpc:utd-custom-signature-load": {
-      "post": {
-        "summary": "Custom-signature load action RPC.",
-        "description": "Custom-signature load action RPC.\n\n**Endpoint:** `POST /restconf/operations/utd_actions_rpc:utd-custom-signature-load`",
-        "operationId": "utd-custom-signature-load",
-        "tags": [
-          "Cisco-IOS-XE-utd-actions-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "utd_actions_rpc:utd-custom-signature-load": {
-                    "type": "object",
-                    "properties": {
-                      "profile-name": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature profile name"
+                      "chassis-number": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 16,
+                        "description": "Chassis number or switch number, by default active switch/chassis will be targeted"
                       },
-                      "filename": {
+                      "action": {
                         "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature file name"
+                        "description": "Blinking start or stop action"
+                      },
+                      "duration": {
+                        "type": "integer",
+                        "minimum": 5,
+                        "maximum": 1800,
+                        "description": "Duration in seconds, After expiry of this period blinking stops",
+                        "default": "300"
                       }
                     },
                     "required": [
-                      "profile-name"
+                      "action"
                     ]
                   }
                 }
               },
               "example": {
-                "utd_actions_rpc:utd-custom-signature-load": {
-                  "profile-name": "flash:/config.txt",
-                  "filename": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/utd_actions_rpc:utd-custom-sig-glbl-load": {
-      "post": {
-        "summary": "Custom-signature global load action RPC.",
-        "description": "Custom-signature global load action RPC.\n\n**Endpoint:** `POST /restconf/operations/utd_actions_rpc:utd-custom-sig-glbl-load`",
-        "operationId": "utd-custom-sig-glbl-load",
-        "tags": [
-          "Cisco-IOS-XE-utd-actions-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "utd_actions_rpc:utd-custom-sig-glbl-load": {
-                    "type": "object",
-                    "properties": {
-                      "filename": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature file name"
-                      }
-                    },
-                    "required": [
-                      "filename"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "utd_actions_rpc:utd-custom-sig-glbl-load": {
-                  "filename": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/utd_actions_rpc:utd-custom-signature-validate": {
-      "post": {
-        "summary": "Custom-signature validate action RPC.",
-        "description": "Custom-signature validate action RPC.\n\n**Endpoint:** `POST /restconf/operations/utd_actions_rpc:utd-custom-signature-validate`",
-        "operationId": "utd-custom-signature-validate",
-        "tags": [
-          "Cisco-IOS-XE-utd-actions-rpc"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "utd_actions_rpc:utd-custom-signature-validate": {
-                    "type": "object",
-                    "properties": {
-                      "filename": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "Custom-signature file name"
-                      }
-                    },
-                    "required": [
-                      "filename"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "utd_actions_rpc:utd-custom-signature-validate": {
-                  "filename": "flash:/config.txt"
+                "meraki_leds_actions_rpc:blink-leds-cmd": {
+                  "chassis-number": 10,
+                  "action": "example-string",
+                  "duration": 10
                 }
               }
             }
@@ -345,18 +348,5 @@
         }
       }
     }
-  },
-  "components": {
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic"
-      }
-    }
-  },
-  "security": [
-    {
-      "basicAuth": []
-    }
-  ]
+  }
 }
