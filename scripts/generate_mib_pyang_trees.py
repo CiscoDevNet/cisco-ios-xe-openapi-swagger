@@ -158,7 +158,7 @@ def generate_tree_html(yang_file: Path, output_dir: Path) -> bool:
             <a href="../index.html">🏠 Home</a>
             <a href="index.html">🌳 Tree Browser</a>
             <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/MIBS/{module_name}.yang" target="_blank">📄 YANG Source</a>
-            <a href="../swagger-mib-model/">📚 MIB Swagger Specs</a>
+            <a href="../swagger-mib-model/api/{module_name}.json" target="_blank">📚 Swagger API Spec</a>
         </div>
         
         <div class="tree-container">

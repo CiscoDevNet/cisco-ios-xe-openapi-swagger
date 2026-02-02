@@ -8,10 +8,38 @@ import subprocess
 from pathlib import Path
 import re
 
+def get_swagger_category(module_name: str) -> tuple:
+    """Determine which swagger category a module belongs to"""
+    # Check for specific patterns
+    if module_name.endswith('-oper'):
+        return ('swagger-oper-model', 'Operational State APIs')
+    elif module_name.endswith('-rpc'):
+        return ('swagger-rpc-model', 'RPC APIs')
+    elif module_name.endswith('-events'):
+        return ('swagger-events-model', 'Event/Telemetry APIs')
+    elif module_name.endswith('-cfg'):
+        return ('swagger-cfg-model', 'Configuration APIs')
+    elif module_name.startswith('ietf-'):
+        return ('swagger-ietf-model', 'IETF Standard APIs')
+    elif module_name.startswith('openconfig-'):
+        return ('swagger-openconfig-model', 'OpenConfig APIs')
+    elif module_name == 'Cisco-IOS-XE-native':
+        return ('swagger-native-config-model', 'Native Config APIs')
+    elif module_name.startswith('cisco-') and not module_name.startswith('Cisco-IOS-XE-'):
+        return ('swagger-other-model', 'Other/Vendor APIs')
+    elif module_name in ['nvo', 'confd_dyncfg', 'common-mpls-static']:
+        return ('swagger-other-model', 'Other/Vendor APIs')
+    else:
+        # Default - likely in native config or other
+        return ('swagger-native-config-model', 'Native Config APIs')
+
 def generate_pyang_tree(yang_file: Path, output_dir: Path) -> bool:
     """Generate pyang tree for a single YANG module"""
     try:
         module_name = yang_file.stem
+        
+        # Get swagger category for this module
+        swagger_dir, swagger_label = get_swagger_category(module_name)
         
         # Run pyang tree command
         result = subprocess.run(
@@ -102,6 +130,13 @@ def generate_pyang_tree(yang_file: Path, output_dir: Path) -> bool:
         <p style="margin-top: 8px;">
             <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/{module_name}.yang" target="_blank">View YANG Source on GitHub →</a>
         </p>
+    </div>
+    
+    <div style="background: #e3f2fd; padding: 15px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid #0070c9;">
+        <p style="color: #01579b; font-size: 14px; margin-bottom: 8px;"><strong>📚 API Documentation</strong></p>
+        <a href="../{swagger_dir}/" style="color: #0070c9; text-decoration: none; font-size: 13px;">View {swagger_label} →</a>
+        <span style="color: #666; margin: 0 8px;">|</span>
+        <a href="index.html" style="color: #0070c9; text-decoration: none; font-size: 13px;">Browse All Trees</a>
     </div>
     
     <div class="tree-container">
