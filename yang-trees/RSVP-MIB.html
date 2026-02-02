@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP-MIB - YANG Tree</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            border-bottom: 4px solid #5a67d8;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .nav-links {
+            background: #f7fafc;
+            padding: 16px 40px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: #5a67d8;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        .nav-links a:hover {
+            background: #5a67d8;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(90, 103, 216, 0.2);
+        }
+        .tree-container {
+            padding: 40px;
+            background: #1a202c;
+        }
+        .tree-output {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 24px;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        pre {
+            color: #e2e8f0;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        .tree-output pre {
+            color: #68d391;
+        }
+        .info-box {
+            background: #edf2f7;
+            padding: 20px 40px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .info-box p {
+            color: #4a5568;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .info-box a {
+            color: #5a67d8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .info-box a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 20px; }
+            .tree-container { padding: 20px; }
+            .tree-output { padding: 16px; }
+            pre { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 RSVP-MIB</h1>
+            <p>MIB YANG Tree Visualization - IOS-XE 17.18.1</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="../index.html">🏠 Home</a>
+            <a href="index.html">🌳 Tree Browser</a>
+            <a href="https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/MIBS/RSVP-MIB.yang" target="_blank">📄 YANG Source</a>
+            <a href="../swagger-mib-model/">📚 MIB Swagger Specs</a>
+        </div>
+        
+        <div class="tree-container">
+            <div class="tree-output">
+                <pre>module: RSVP-MIB
+  +--ro RSVP-MIB
+     +--ro rsvpGenObjects
+     |  +--ro rsvpBadPackets?        yang:gauge32
+     |  +--ro rsvpSenderNewIndex?    snmpv2-tc:TestAndIncr
+     |  +--ro rsvpResvNewIndex?      snmpv2-tc:TestAndIncr
+     |  +--ro rsvpResvFwdNewIndex?   snmpv2-tc:TestAndIncr
+     |  +--ro rsvpSessionNewIndex?   snmpv2-tc:TestAndIncr
+     +--ro rsvpSessionTable
+     |  +--ro rsvpSessionEntry* [rsvpSessionNumber]
+     |     +--ro rsvpSessionNumber            integrated-services:SessionNumber
+     |     +--ro rsvpSessionType?             integrated-services:SessionType
+     |     +--ro rsvpSessionDestAddr?         binary
+     |     +--ro rsvpSessionDestAddrLength?   int32
+     |     +--ro rsvpSessionProtocol?         integrated-services:Protocol
+     |     +--ro rsvpSessionPort?             integrated-services:Port
+     |     +--ro rsvpSessionSenders?          yang:gauge32
+     |     +--ro rsvpSessionReceivers?        yang:gauge32
+     |     +--ro rsvpSessionRequests?         yang:gauge32
+     +--ro rsvpSenderTable
+     |  +--ro rsvpSenderEntry* [rsvpSessionNumber rsvpSenderNumber]
+     |     +--ro rsvpSessionNumber                       -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+     |     +--ro rsvpSenderNumber                        integrated-services:SessionNumber
+     |     +--ro rsvpSenderType?                         integrated-services:SessionType
+     |     +--ro rsvpSenderDestAddr?                     binary
+     |     +--ro rsvpSenderAddr?                         binary
+     |     +--ro rsvpSenderDestAddrLength?               int32
+     |     +--ro rsvpSenderAddrLength?                   int32
+     |     +--ro rsvpSenderProtocol?                     integrated-services:Protocol
+     |     +--ro rsvpSenderDestPort?                     integrated-services:Port
+     |     +--ro rsvpSenderPort?                         integrated-services:Port
+     |     +--ro rsvpSenderFlowId?                       int32
+     |     +--ro rsvpSenderHopAddr?                      binary
+     |     +--ro rsvpSenderHopLih?                       int32
+     |     +--ro rsvpSenderInterface?                    if-mib:InterfaceIndex
+     |     +--ro rsvpSenderTSpecRate?                    integrated-services:BitRate
+     |     +--ro rsvpSenderTSpecPeakRate?                integrated-services:BitRate
+     |     +--ro rsvpSenderTSpecBurst?                   integrated-services:BurstSize
+     |     +--ro rsvpSenderTSpecMinTU?                   integrated-services:MessageSize
+     |     +--ro rsvpSenderTSpecMaxTU?                   integrated-services:MessageSize
+     |     +--ro rsvpSenderInterval?                     RSVP-MIB:RefreshInterval
+     |     +--ro rsvpSenderRSVPHop?                      boolean
+     |     +--ro rsvpSenderLastChange?                   yang:timestamp
+     |     +--ro rsvpSenderPolicy?                       binary
+     |     +--ro rsvpSenderAdspecBreak?                  boolean
+     |     +--ro rsvpSenderAdspecHopCount?               int32
+     |     +--ro rsvpSenderAdspecPathBw?                 integrated-services:BitRate
+     |     +--ro rsvpSenderAdspecMinLatency?             int32
+     |     +--ro rsvpSenderAdspecMtu?                    int32
+     |     +--ro rsvpSenderAdspecGuaranteedSvc?          boolean
+     |     +--ro rsvpSenderAdspecGuaranteedBreak?        boolean
+     |     +--ro rsvpSenderAdspecGuaranteedCtot?         int32
+     |     +--ro rsvpSenderAdspecGuaranteedDtot?         int32
+     |     +--ro rsvpSenderAdspecGuaranteedCsum?         int32
+     |     +--ro rsvpSenderAdspecGuaranteedDsum?         int32
+     |     +--ro rsvpSenderAdspecGuaranteedHopCount?     int32
+     |     +--ro rsvpSenderAdspecGuaranteedPathBw?       integrated-services:BitRate
+     |     +--ro rsvpSenderAdspecGuaranteedMinLatency?   int32
+     |     +--ro rsvpSenderAdspecGuaranteedMtu?          int32
+     |     +--ro rsvpSenderAdspecCtrlLoadSvc?            boolean
+     |     +--ro rsvpSenderAdspecCtrlLoadBreak?          boolean
+     |     +--ro rsvpSenderAdspecCtrlLoadHopCount?       int32
+     |     +--ro rsvpSenderAdspecCtrlLoadPathBw?         integrated-services:BitRate
+     |     +--ro rsvpSenderAdspecCtrlLoadMinLatency?     int32
+     |     +--ro rsvpSenderAdspecCtrlLoadMtu?            int32
+     |     +--ro rsvpSenderStatus?                       snmpv2-tc:RowStatus
+     |     +--ro rsvpSenderTTL?                          int32
+     +--ro rsvpSenderOutInterfaceTable
+     |  +--ro rsvpSenderOutInterfaceEntry* [rsvpSessionNumber rsvpSenderNumber ifIndex]
+     |     +--ro rsvpSessionNumber               -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+     |     +--ro rsvpSenderNumber                -&gt; /RSVP-MIB/rsvpSenderTable/rsvpSenderEntry/rsvpSenderNumber
+     |     +--ro ifIndex                         -&gt; /if-mib:IF-MIB/ifTable/ifEntry/ifIndex
+     |     +--ro rsvpSenderOutInterfaceStatus?   snmpv2-tc:RowStatus
+     +--ro rsvpResvTable
+     |  +--ro rsvpResvEntry* [rsvpSessionNumber rsvpResvNumber]
+     |     +--ro rsvpSessionNumber           -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+     |     +--ro rsvpResvNumber              integrated-services:SessionNumber
+     |     +--ro rsvpResvType?               integrated-services:SessionType
+     |     +--ro rsvpResvDestAddr?           binary
+     |     +--ro rsvpResvSenderAddr?         binary
+     |     +--ro rsvpResvDestAddrLength?     int32
+     |     +--ro rsvpResvSenderAddrLength?   int32
+     |     +--ro rsvpResvProtocol?           integrated-services:Protocol
+     |     +--ro rsvpResvDestPort?           integrated-services:Port
+     |     +--ro rsvpResvPort?               integrated-services:Port
+     |     +--ro rsvpResvHopAddr?            binary
+     |     +--ro rsvpResvHopLih?             int32
+     |     +--ro rsvpResvInterface?          if-mib:InterfaceIndex
+     |     +--ro rsvpResvService?            integrated-services:QosService
+     |     +--ro rsvpResvTSpecRate?          integrated-services:BitRate
+     |     +--ro rsvpResvTSpecPeakRate?      integrated-services:BitRate
+     |     +--ro rsvpResvTSpecBurst?         integrated-services:BurstSize
+     |     +--ro rsvpResvTSpecMinTU?         integrated-services:MessageSize
+     |     +--ro rsvpResvTSpecMaxTU?         integrated-services:MessageSize
+     |     +--ro rsvpResvRSpecRate?          integrated-services:BitRate
+     |     +--ro rsvpResvRSpecSlack?         int32
+     |     +--ro rsvpResvInterval?           RSVP-MIB:RefreshInterval
+     |     +--ro rsvpResvScope?              binary
+     |     +--ro rsvpResvShared?             boolean
+     |     +--ro rsvpResvExplicit?           boolean
+     |     +--ro rsvpResvRSVPHop?            boolean
+     |     +--ro rsvpResvLastChange?         yang:timestamp
+     |     +--ro rsvpResvPolicy?             binary
+     |     +--ro rsvpResvStatus?             snmpv2-tc:RowStatus
+     |     +--ro rsvpResvTTL?                int32
+     |     +--ro rsvpResvFlowId?             int32
+     +--ro rsvpResvFwdTable
+     |  +--ro rsvpResvFwdEntry* [rsvpSessionNumber rsvpResvFwdNumber]
+     |     +--ro rsvpSessionNumber              -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+     |     +--ro rsvpResvFwdNumber              integrated-services:SessionNumber
+     |     +--ro rsvpResvFwdType?               integrated-services:SessionType
+     |     +--ro rsvpResvFwdDestAddr?           binary
+     |     +--ro rsvpResvFwdSenderAddr?         binary
+     |     +--ro rsvpResvFwdDestAddrLength?     int32
+     |     +--ro rsvpResvFwdSenderAddrLength?   int32
+     |     +--ro rsvpResvFwdProtocol?           integrated-services:Protocol
+     |     +--ro rsvpResvFwdDestPort?           integrated-services:Port
+     |     +--ro rsvpResvFwdPort?               integrated-services:Port
+     |     +--ro rsvpResvFwdHopAddr?            binary
+     |     +--ro rsvpResvFwdHopLih?             int32
+     |     +--ro rsvpResvFwdInterface?          if-mib:InterfaceIndex
+     |     +--ro rsvpResvFwdService?            integrated-services:QosService
+     |     +--ro rsvpResvFwdTSpecRate?          integrated-services:BitRate
+     |     +--ro rsvpResvFwdTSpecPeakRate?      integrated-services:BitRate
+     |     +--ro rsvpResvFwdTSpecBurst?         integrated-services:BurstSize
+     |     +--ro rsvpResvFwdTSpecMinTU?         integrated-services:MessageSize
+     |     +--ro rsvpResvFwdTSpecMaxTU?         integrated-services:MessageSize
+     |     +--ro rsvpResvFwdRSpecRate?          integrated-services:BitRate
+     |     +--ro rsvpResvFwdRSpecSlack?         int32
+     |     +--ro rsvpResvFwdInterval?           RSVP-MIB:RefreshInterval
+     |     +--ro rsvpResvFwdScope?              binary
+     |     +--ro rsvpResvFwdShared?             boolean
+     |     +--ro rsvpResvFwdExplicit?           boolean
+     |     +--ro rsvpResvFwdRSVPHop?            boolean
+     |     +--ro rsvpResvFwdLastChange?         yang:timestamp
+     |     +--ro rsvpResvFwdPolicy?             binary
+     |     +--ro rsvpResvFwdStatus?             snmpv2-tc:RowStatus
+     |     +--ro rsvpResvFwdTTL?                int32
+     |     +--ro rsvpResvFwdFlowId?             int32
+     +--ro rsvpIfTable
+     |  +--ro rsvpIfEntry* [ifIndex]
+     |     +--ro ifIndex                          -&gt; /if-mib:IF-MIB/ifTable/ifEntry/ifIndex
+     |     +--ro rsvpIfUdpNbrs?                   yang:gauge32
+     |     +--ro rsvpIfIpNbrs?                    yang:gauge32
+     |     +--ro rsvpIfNbrs?                      yang:gauge32
+     |     +--ro rsvpIfRefreshBlockadeMultiple?   int32
+     |     +--ro rsvpIfRefreshMultiple?           int32
+     |     +--ro rsvpIfTTL?                       int32
+     |     +--ro rsvpIfRefreshInterval?           snmpv2-tc:TimeInterval
+     |     +--ro rsvpIfRouteDelay?                snmpv2-tc:TimeInterval
+     |     +--ro rsvpIfEnabled?                   boolean
+     |     +--ro rsvpIfUdpRequired?               boolean
+     |     +--ro rsvpIfStatus?                    snmpv2-tc:RowStatus
+     +--ro rsvpNbrTable
+        +--ro rsvpNbrEntry* [ifIndex rsvpNbrAddress]
+           +--ro ifIndex            -&gt; /if-mib:IF-MIB/ifTable/ifEntry/ifIndex
+           +--ro rsvpNbrAddress     binary
+           +--ro rsvpNbrProtocol?   RSVP-MIB:RsvpEncapsulation
+           +--ro rsvpNbrStatus?     snmpv2-tc:RowStatus
+
+  notifications:
+    +---n newFlow
+    |  +--ro object-1
+    |  |  +--ro intSrvFlowNumber?   -&gt; /integrated-services:INTEGRATED-SERVICES-MIB/intSrvFlowTable/intSrvFlowEntry/intSrvFlowNumber
+    |  |  +--ro intSrvFlowStatus?   -&gt; /integrated-services:INTEGRATED-SERVICES-MIB/intSrvFlowTable/intSrvFlowEntry/intSrvFlowStatus
+    |  +--ro object-2
+    |  |  +--ro rsvpSessionNumber?     -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+    |  |  +--ro rsvpSessionDestAddr?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionDestAddr
+    |  +--ro object-3
+    |  |  +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+    |  |  +--ro rsvpResvFwdNumber?   -&gt; /RSVP-MIB/rsvpResvFwdTable/rsvpResvFwdEntry/rsvpResvFwdNumber
+    |  |  +--ro rsvpResvFwdStatus?   -&gt; /RSVP-MIB/rsvpResvFwdTable/rsvpResvFwdEntry/rsvpResvFwdStatus
+    |  +--ro object-4
+    |  |  +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+    |  |  +--ro rsvpResvNumber?      -&gt; /RSVP-MIB/rsvpResvTable/rsvpResvEntry/rsvpResvNumber
+    |  |  +--ro rsvpResvStatus?      -&gt; /RSVP-MIB/rsvpResvTable/rsvpResvEntry/rsvpResvStatus
+    |  +--ro object-5
+    |     +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+    |     +--ro rsvpSenderNumber?    -&gt; /RSVP-MIB/rsvpSenderTable/rsvpSenderEntry/rsvpSenderNumber
+    |     +--ro rsvpSenderStatus?    -&gt; /RSVP-MIB/rsvpSenderTable/rsvpSenderEntry/rsvpSenderStatus
+    +---n lostFlow
+       +--ro object-1
+       |  +--ro intSrvFlowNumber?   -&gt; /integrated-services:INTEGRATED-SERVICES-MIB/intSrvFlowTable/intSrvFlowEntry/intSrvFlowNumber
+       |  +--ro intSrvFlowStatus?   -&gt; /integrated-services:INTEGRATED-SERVICES-MIB/intSrvFlowTable/intSrvFlowEntry/intSrvFlowStatus
+       +--ro object-2
+       |  +--ro rsvpSessionNumber?     -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+       |  +--ro rsvpSessionDestAddr?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionDestAddr
+       +--ro object-3
+       |  +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+       |  +--ro rsvpResvFwdNumber?   -&gt; /RSVP-MIB/rsvpResvFwdTable/rsvpResvFwdEntry/rsvpResvFwdNumber
+       |  +--ro rsvpResvFwdStatus?   -&gt; /RSVP-MIB/rsvpResvFwdTable/rsvpResvFwdEntry/rsvpResvFwdStatus
+       +--ro object-4
+       |  +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+       |  +--ro rsvpResvNumber?      -&gt; /RSVP-MIB/rsvpResvTable/rsvpResvEntry/rsvpResvNumber
+       |  +--ro rsvpResvStatus?      -&gt; /RSVP-MIB/rsvpResvTable/rsvpResvEntry/rsvpResvStatus
+       +--ro object-5
+          +--ro rsvpSessionNumber?   -&gt; /RSVP-MIB/rsvpSessionTable/rsvpSessionEntry/rsvpSessionNumber
+          +--ro rsvpSenderNumber?    -&gt; /RSVP-MIB/rsvpSenderTable/rsvpSenderEntry/rsvpSenderNumber
+          +--ro rsvpSenderStatus?    -&gt; /RSVP-MIB/rsvpSenderTable/rsvpSenderEntry/rsvpSenderStatus
+</pre>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <p>
+                <strong>About this tree:</strong> This visualization shows the hierarchical structure of the RSVP-MIB MIB YANG module.
+                Generated using <code>pyang -f tree</code> command.
+                • <strong>+--rw</strong> = read-write node
+                • <strong>+--ro</strong> = read-only node
+                • <strong>+--</strong> = configuration data
+                • <strong>x--</strong> = deprecated node
+            </p>
+        </div>
+    </div>
+</body>
+</html>
