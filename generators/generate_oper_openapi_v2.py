@@ -11,7 +11,14 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 class OperToOpenAPI:
-    """Convert Cisco IOS-XE Operational YANG modules to OpenAPI 3.0 with proper YANG parsing"""
+    """Convert Cisco IOS-XE Operational YANG modules to OpenAPI 3.0 with proper YANG parsing
+    
+    Phase 5 Enhancements:
+    - Consolidate by category instead of per-module files
+    - Add production-realistic examples
+    - Add schema validation
+    - Generate quick-start collections
+    """
 
     def __init__(self, yang_dir: str, output_dir: str):
         self.yang_dir = Path(yang_dir)
@@ -20,6 +27,165 @@ class OperToOpenAPI:
         self.groupings_cache = {}
         self.processed_modules = []
         self.total_paths = 0
+        self.all_paths = []  # Phase 5: Store all paths for consolidation
+        
+    def create_example_data(self, schema: Dict[str, Any], property_name: str = '') -> Any:
+        """Generate production-realistic operational examples (Phase 5)"""
+        name_lower = property_name.lower()
+        
+        # CPU and Performance
+        if 'cpu' in name_lower or 'utilization' in name_lower or 'usage' in name_lower:
+            if 'percent' in name_lower:
+                return 8  # 8% CPU utilization
+            return '8%'
+        
+        # Memory
+        if 'memory' in name_lower or 'mem' in name_lower:
+            if 'free' in name_lower:
+                return 8589934592  # 8GB free
+            if 'used' in name_lower:
+                return 4294967296  # 4GB used  
+            if 'total' in name_lower:
+                return 12884901888  # 12GB total
+            if 'percent' in name_lower:
+                return 33  # 33% memory used
+        
+        # Interface statistics
+        if 'packet' in name_lower or 'pkts' in name_lower:
+            if 'input' in name_lower or 'rx' in name_lower or 'received' in name_lower:
+                return 123456789
+            if 'output' in name_lower or 'tx' in name_lower or 'transmitted' in name_lower:
+                return 987654321
+            return 55555555
+        
+        if 'byte' in name_lower or 'octet' in name_lower:
+            if 'input' in name_lower or 'rx' in name_lower:
+                return 98765432100
+            if 'output' in name_lower or 'tx' in name_lower:
+                return 123456789000
+            return 111111111111
+        
+        if 'error' in name_lower:
+            return 0  # No errors
+        
+        if 'drop' in name_lower:
+            return 0  # No drops
+        
+        # Interface status
+        if 'status' in name_lower or 'state' in name_lower:
+            if 'oper' in name_lower:
+                return 'up'
+            if 'admin' in name_lower:
+                return 'up'
+            if 'line' in name_lower:
+                return 'up'
+            return 'active'
+        
+        # BGP
+        if 'bgp' in name_lower:
+            if 'neighbor' in name_lower or 'peer' in name_lower:
+                if 'state' in name_lower:
+                    return 'Established'
+                if 'address' in name_lower or 'ip' in name_lower:
+                    return '10.10.10.1'
+            if 'prefix' in name_lower or 'route' in name_lower:
+                if 'received' in name_lower:
+                    return 150000
+                if 'advertised' in name_lower:
+                    return 50
+            if 'as' in name_lower and 'number' in name_lower:
+                return 65001
+        
+        # Uptime
+        if 'uptime' in name_lower:
+            return '7 days, 14 hours, 23 minutes'
+        
+        # Temperature
+        if 'temperature' in name_lower or 'temp' in name_lower:
+            return 45  # 45°C
+        
+        # Power
+        if 'power' in name_lower:
+            if 'watts' in name_lower or 'consumption' in name_lower:
+                return 250.5  # Watts
+            if 'status' in name_lower:
+                return 'normal'
+        
+        # Speed/Bandwidth
+        if 'speed' in name_lower or 'bandwidth' in name_lower:
+            return 1000  # 1Gbps
+        
+        # MAC address
+        if 'mac' in name_lower and 'address' in name_lower:
+            return 'aa:bb:cc:dd:ee:ff'
+        
+        # IP address
+        if 'ip' in name_lower and ('address' in name_lower or 'addr' in name_lower):
+            return '10.10.10.1'
+        
+        # Interface name
+        if 'interface' in name_lower and 'name' in name_lower:
+            return 'GigabitEthernet1/0/24'
+        
+        # VLAN
+        if 'vlan' in name_lower:
+            if 'id' in name_lower or 'number' in name_lower:
+                return 100
+            if 'name' in name_lower:
+                return 'DATA_VLAN'
+        
+        # Timestamps
+        if 'timestamp' in name_lower or 'time' in name_lower:
+            if 'last' in name_lower:
+                return '2026-02-01T14:30:45Z'
+            return '2026-02-01T15:00:00Z'
+        
+        # Version/Software
+        if 'version' in name_lower or 'software' in name_lower:
+            return '17.18.1'
+        
+        # Serial number
+        if 'serial' in name_lower:
+            return 'FCW2250G0AB'
+        
+        # Model
+        if 'model' in name_lower or 'pid' in name_lower:
+            return 'C9300-48P'
+        
+        # Description
+        if 'description' in name_lower or 'descr' in name_lower:
+            return 'Cisco IOS XE Software'
+        
+        # Counter (generic)
+        if 'count' in name_lower or 'counter' in name_lower:
+            return 12345
+        
+        # Based on schema type
+        if schema.get('type') == 'integer':
+            if 'minimum' in schema and 'maximum' in schema:
+                # Use a reasonable value within range
+                min_val = schema['minimum']
+                max_val = schema['maximum']
+                if max_val == 100 and min_val == 0:  # Percentage
+                    return 25
+                if max_val == 255:  # uint8
+                    return 10
+                if max_val == 65535:  # uint16/port
+                    return 443
+                return min_val + 1
+            return 1
+        
+        if schema.get('type') == 'boolean':
+            return True
+        
+        if schema.get('type') == 'number':
+            return 42.5
+        
+        if schema.get('enum'):
+            return schema['enum'][0] if schema['enum'] else 'value1'
+        
+        # Default string
+        return 'example-value'
 
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
         """Find the end position of balanced braces"""
