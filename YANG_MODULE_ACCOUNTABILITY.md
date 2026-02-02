@@ -21,24 +21,24 @@ This report provides **100% accountability** for every YANG module in the
 
 | Category | Total | With Specs | Coverage | Notes |
 |----------|-------|------------|----------|-------|
-| **oper** | 209 | 203 | 97% |  |
+| **oper** | 200 | 197 | 98% |  |
 | **rpc** | 63 | 50 | 79% |  |
-| **cfg** | 67 | 39 | 58% |  |
-| **openconfig** | 100 | 41 | 41% |  |
+| **cfg** | 60 | 39 | 65% |  |
+| **openconfig** | 95 | 41 | 43% |  |
 | **ietf** | 33 | 21 | 64% |  |
-| **events** | 35 | 34 | 97% |  |
+| **events** | 41 | 40 | 98% |  |
 | **native** | 1 | 0 | 0% |  |
-| **other** | 19 | 3 | 16% |  |
+| **other** | 36 | 4 | 11% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
-| **common** | 20 | 1 | N/A | Excluded by design |
+| **common** | 18 | 0 | N/A | Excluded by design |
 | **native-aug** | 140 | 0 | N/A | Excluded by design |
 
 ---
 
 ## Detailed Module List
 
-### OPER (209 modules)
+### OPER (200 modules)
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
@@ -52,12 +52,10 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-appqoe-sslproxy-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-appqoe-tcpproxy-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-arp-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-aws-common-oper | - | ❌ |
 | Cisco-IOS-XE-aws-cw-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-aws-s3-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-bbu-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-bfd-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-bgp-common-oper | - | ❌ |
 | Cisco-IOS-XE-bgp-nbr-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-bgp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-bgp-rib-oper | swagger-oper-model | ✅ |
@@ -107,11 +105,8 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-hsrp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-identity-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ignition-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-im-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-install-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-interfaces-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-ios-common-oper | - | ❌ |
-| Cisco-IOS-XE-ios-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-ip-arp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ip-sla-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-ipv6-nd-oper | swagger-oper-model | ✅ |
@@ -134,6 +129,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-matm-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-mdt-capabilities-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-mdt-oper | swagger-oper-model | ✅ |
+| Cisco-IOS-XE-mdt-oper-v2 | - | ❌ |
 | Cisco-IOS-XE-mdt-stats-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-memory-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-meraki-connect-oper | swagger-oper-model | ✅ |
@@ -155,8 +151,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-ospf-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-perf-measure-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-pim-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-platform-common-oper | - | ❌ |
-| Cisco-IOS-XE-platform-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-platform-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-platform-software-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-poe-health-oper | swagger-oper-model | ✅ |
@@ -182,10 +176,8 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-sdwan-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-service-chain-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-service-insertion-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-sm-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-spanning-tree-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-stack-member-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-stack-mgr-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-stack-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-stacking-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-steering-policy-oper | swagger-oper-model | ✅ |
@@ -206,8 +198,8 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-udld-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-uidp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-umbrella-oper | swagger-oper-model | ✅ |
+| Cisco-IOS-XE-umbrella-oper-dp | - | ❌ |
 | Cisco-IOS-XE-uplink-autoconfig-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-utd-common-oper | - | ❌ |
 | Cisco-IOS-XE-utd-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-vdsp-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-vlan-oper | swagger-oper-model | ✅ |
@@ -225,7 +217,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-client-global-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-client-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-cts-sxp-oper | swagger-oper-model | ✅ |
-| Cisco-IOS-XE-wireless-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-wireless-general-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-geolocation-oper | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-wireless-hyperlocation-oper | swagger-oper-model | ✅ |
@@ -320,16 +311,14 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-zone-rpc | - | ❌ |
 | cisco-ia | swagger-rpc-model | ✅ |
 
-### CFG (67 modules)
+### CFG (60 modules)
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
 | Cisco-IOS-XE-app-hosting-cfg | swagger-cfg-model | ✅ |
-| Cisco-IOS-XE-aws-common-cfg | - | ❌ |
 | Cisco-IOS-XE-aws-cw-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-aws-s3-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-cloud-services-cfg | swagger-cfg-model | ✅ |
-| Cisco-IOS-XE-controller-shdsl-common | - | ❌ |
 | Cisco-IOS-XE-ctrl-mng-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-eigrp-obsolete | - | ❌ |
 | Cisco-IOS-XE-ethernet-cfm-efp | - | ❌ |
@@ -338,7 +327,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-gnmi-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-grpc-tunnel-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-hsrp | - | ❌ |
-| Cisco-IOS-XE-interface-common | - | ❌ |
 | Cisco-IOS-XE-interfaces | - | ❌ |
 | Cisco-IOS-XE-ip | - | ❌ |
 | Cisco-IOS-XE-ipv6 | - | ❌ |
@@ -346,10 +334,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-location | - | ❌ |
 | Cisco-IOS-XE-logging | - | ❌ |
 | Cisco-IOS-XE-mdt-cfg | swagger-cfg-model | ✅ |
-| Cisco-IOS-XE-mdt-common-defs | - | ❌ |
-| Cisco-IOS-XE-mdt-oper-v2 | - | ❌ |
 | Cisco-IOS-XE-ncch-cfg | swagger-cfg-model | ✅ |
-| Cisco-IOS-XE-ospf-common | - | ❌ |
 | Cisco-IOS-XE-ospf-obsolete | - | ❌ |
 | Cisco-IOS-XE-parser | - | ❌ |
 | Cisco-IOS-XE-qfp-stats | - | ❌ |
@@ -358,7 +343,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-sslproxy-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-transceiver-monitor | - | ❌ |
 | Cisco-IOS-XE-transport | - | ❌ |
-| Cisco-IOS-XE-umbrella-oper-dp | - | ❌ |
 | Cisco-IOS-XE-voice-class | - | ❌ |
 | Cisco-IOS-XE-voice-dspfarm | - | ❌ |
 | Cisco-IOS-XE-voice-register | - | ❌ |
@@ -392,7 +376,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-wlan-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-yang-interfaces-cfg | swagger-cfg-model | ✅ |
 
-### OPENCONFIG (100 modules)
+### OPENCONFIG (95 modules)
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
@@ -402,7 +386,6 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-access-points | swagger-openconfig-model | ✅ |
 | openconfig-acl | swagger-openconfig-model | ✅ |
 | openconfig-aft | swagger-openconfig-model | ✅ |
-| openconfig-aft-common | - | ❌ |
 | openconfig-aft-ethernet | - | ❌ |
 | openconfig-aft-ipv4 | - | ❌ |
 | openconfig-aft-ipv6 | - | ❌ |
@@ -414,9 +397,6 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-ap-manager | swagger-openconfig-model | ✅ |
 | openconfig-bfd | swagger-openconfig-model | ✅ |
 | openconfig-bgp | swagger-openconfig-model | ✅ |
-| openconfig-bgp-common | - | ❌ |
-| openconfig-bgp-common-multiprotocol | - | ❌ |
-| openconfig-bgp-common-structure | - | ❌ |
 | openconfig-bgp-errors | - | ❌ |
 | openconfig-bgp-global | - | ❌ |
 | openconfig-bgp-neighbor | - | ❌ |
@@ -459,7 +439,6 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-ospfv2 | swagger-openconfig-model | ✅ |
 | openconfig-ospfv2-area | - | ❌ |
 | openconfig-ospfv2-area-interface | - | ❌ |
-| openconfig-ospfv2-common | - | ❌ |
 | openconfig-ospfv2-global | - | ❌ |
 | openconfig-ospfv2-lsdb | - | ❌ |
 | openconfig-packet-match | swagger-openconfig-model | ✅ |
@@ -535,7 +514,7 @@ This report provides **100% accountability** for every YANG module in the
 | ietf-yang-smiv2 | - | ❌ |
 | ietf-yang-structure-ext | swagger-ietf-model | ✅ |
 
-### EVENTS (35 modules)
+### EVENTS (41 modules)
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
@@ -549,8 +528,10 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-fib-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-geo-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-hsrp-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-im-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-install-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-interface-bw-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-ios-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-ip-sla-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-line-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-loop-detect-events | swagger-events-model | ✅ |
@@ -560,16 +541,20 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-ngfw-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-ospf-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-perf-measure-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-platform-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-platform-software-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-port-bounce-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-qfp-resource-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-red-app-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-sm-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-spanning-tree-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-stack-mgr-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-tech-support-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-trace-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-udld-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-utd-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-verify-events | swagger-events-model | ✅ |
+| Cisco-IOS-XE-wireless-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-xcopy-events | swagger-events-model | ✅ |
 | cisco-bridge-domain | swagger-rpc-model | ✅ |
 | cisco-pw | - | ❌ |
@@ -581,11 +566,10 @@ This report provides **100% accountability** for every YANG module in the
 |-------------|----------------|----------|
 | Cisco-IOS-XE-native | - | ❌ |
 
-### OTHER (19 modules)
+### OTHER (36 modules)
 
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
-| cisco-bridge-common | - | ❌ |
 | cisco-ethernet | - | ❌ |
 | cisco-evpn-service | - | ❌ |
 | cisco-extensions | - | ❌ |
@@ -599,11 +583,29 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-storm-control | - | ❌ |
 | cisco-xe-ietf-routing-ext | - | ❌ |
 | cisco-xe-ietf-yang-push-ext | - | ❌ |
-| common-mpls-static | - | ❌ |
 | confd_dyncfg | swagger-other-model | ✅ |
 | nvo | swagger-other-model | ✅ |
 | pim | - | ❌ |
 | policy-attr | - | ❌ |
+| tailf-aaa | - | ❌ |
+| tailf-acm | - | ❌ |
+| tailf-cli-extensions | - | ❌ |
+| tailf-common | - | ❌ |
+| tailf-common-monitoring2 | - | ❌ |
+| tailf-common-query | - | ❌ |
+| tailf-confd-monitoring | - | ❌ |
+| tailf-confd-monitoring2 | - | ❌ |
+| tailf-key-rotation | - | ❌ |
+| tailf-kicker | - | ❌ |
+| tailf-meta-extensions | - | ❌ |
+| tailf-netconf-extensions | - | ❌ |
+| tailf-netconf-inactive | - | ❌ |
+| tailf-netconf-monitoring | - | ❌ |
+| tailf-netconf-query | - | ❌ |
+| tailf-netconf-transactions | swagger-rpc-model | ✅ |
+| tailf-rest-query | - | ❌ |
+| tailf-restconf-error | - | ❌ |
+| tailf-yang-patch | - | ❌ |
 
 ### TYPES (63 modules)
 
@@ -790,35 +792,33 @@ This report provides **100% accountability** for every YANG module in the
 
 </details>
 
-### COMMON (20 modules)
+### COMMON (18 modules)
 
-*These modules are excluded by design: Semantic versioning module - metadata only*
+*These modules are excluded by design: Common/shared protocol module*
 
 <details>
-<summary>Click to expand list of 20 common modules</summary>
+<summary>Click to expand list of 18 common modules</summary>
 
 | Module Name | Reason |
 |-------------|--------|
+| Cisco-IOS-XE-aws-common-cfg | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-aws-common-oper | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-bgp-common-oper | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-controller-shdsl-common | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-interface-common | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-ios-common-oper | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-mdt-common-defs | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-ospf-common | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-platform-common-oper | Common/shared type definitions and groupings |
+| Cisco-IOS-XE-utd-common-oper | Common/shared type definitions and groupings |
+| cisco-bridge-common | Common/shared protocol module |
 | cisco-semver | Semantic versioning module - metadata only |
-| tailf-aaa | Tail-f/Cisco infrastructure module - internal use |
-| tailf-acm | Tail-f/Cisco infrastructure module - internal use |
-| tailf-cli-extensions | Tail-f/Cisco infrastructure module - internal use |
-| tailf-common | Tail-f/Cisco infrastructure module - internal use |
-| tailf-common-monitoring2 | Tail-f/Cisco infrastructure module - internal use |
-| tailf-common-query | Tail-f/Cisco infrastructure module - internal use |
-| tailf-confd-monitoring | Tail-f/Cisco infrastructure module - internal use |
-| tailf-confd-monitoring2 | Tail-f/Cisco infrastructure module - internal use |
-| tailf-key-rotation | Tail-f/Cisco infrastructure module - internal use |
-| tailf-kicker | Tail-f/Cisco infrastructure module - internal use |
-| tailf-meta-extensions | Tail-f/Cisco infrastructure module - internal use |
-| tailf-netconf-extensions | Tail-f/Cisco infrastructure module - internal use |
-| tailf-netconf-inactive | Tail-f/Cisco infrastructure module - internal use |
-| tailf-netconf-monitoring | Tail-f/Cisco infrastructure module - internal use |
-| tailf-netconf-query | Tail-f/Cisco infrastructure module - internal use |
-| tailf-netconf-transactions | - |
-| tailf-rest-query | Tail-f/Cisco infrastructure module - internal use |
-| tailf-restconf-error | Tail-f/Cisco infrastructure module - internal use |
-| tailf-yang-patch | Tail-f/Cisco infrastructure module - internal use |
+| common-mpls-static | Common/shared protocol module |
+| openconfig-aft-common | Common/shared protocol module |
+| openconfig-bgp-common | Common/shared protocol module |
+| openconfig-bgp-common-multiprotocol | Common/shared protocol module |
+| openconfig-bgp-common-structure | Common/shared protocol module |
+| openconfig-ospfv2-common | Common/shared protocol module |
 
 </details>
 
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-02-01T18:05:25.046204*
+*Report generated: 2026-02-01T18:48:39.925953*

@@ -641,6 +641,7 @@ class RPCYANGToOpenAPIConverter:
             'title': 'Cisco IOS-XE RPC Operations',
             'description': 'OpenAPI specifications for Cisco IOS-XE NETCONF/RESTCONF RPC operations',
             'apis': results,
+            'modules': [r['file'].replace('.json', '') for r in results],  # For landing page compatibility
             'total_operations': sum(r['operations'] for r in results)
         }
         

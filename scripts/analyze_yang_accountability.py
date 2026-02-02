@@ -64,11 +64,17 @@ def categorize_yang_module(filename: str, content: str = "") -> Tuple[str, str]:
     if name.endswith("-types") or "-types-" in name:
         return "types", "Type definitions only - no API operations"
     
-    # Common/infrastructure modules
-    if name.startswith("tailf-"):
-        return "common", "Tail-f/Cisco infrastructure module - internal use"
+    # Infrastructure modules (Tail-f, ConfD)
+    if name.startswith("tailf-") or name.startswith("Tailf-"):
+        return "other", "Tail-f infrastructure module - internal use"
+    if "confd" in name.lower():
+        return "other", "ConfD infrastructure module - internal use"
+    
+    # Common/shared modules
     if name == "cisco-semver":
         return "common", "Semantic versioning module - metadata only"
+    if "common" in name.lower() and not name.startswith("Cisco-IOS-XE-"):
+        return "common", "Common/shared protocol module"
     if name.startswith("cisco-xe-") and "openconfig" in name.lower():
         return "deviation", "OpenConfig deviation module"
     
@@ -86,21 +92,24 @@ def categorize_yang_module(filename: str, content: str = "") -> Tuple[str, str]:
     
     # Cisco IOS-XE modules
     if name.startswith("Cisco-IOS-XE-"):
-        # Operational
-        if name.endswith("-oper"):
+        # Types
+        if name.endswith("-types") or "-types-" in name:
+            return "types", "Type definitions only - no API operations"
+        # Common/shared modules (including -common-oper which are type defs)
+        if name.endswith("-common") or "-common-" in name:
+            return "common", "Common/shared type definitions and groupings"
+        # Events (check BEFORE oper to catch -events-oper modules)
+        if "-events" in name:
+            return "events", ""
+        # Operational (check for -oper anywhere in name, not just suffix)
+        if "-oper" in name:
             return "oper", ""
         # RPC
         if name.endswith("-rpc"):
             return "rpc", ""
-        # Events
-        if "-events" in name:
-            return "events", ""
         # MIB
         if name.endswith("-mib") or "-mib-" in name:
             return "mib", ""
-        # Types
-        if name.endswith("-types") or "-types-" in name:
-            return "types", "Type definitions only - no API operations"
         # Config (cfg suffix or config-related)
         if name.endswith("-cfg"):
             return "cfg", ""
