@@ -986,6 +986,31 @@ class NativeToOpenAPI:
             category = self.categorize_path(path_info['path'])  # Use 'path' not 'name' for categorization
             categorized_paths[category].append(path_info)
         
+        # PHASE 4: Create Quick-Start Collections (curated subsets from core categories)
+        print("\nCreating quick-start collections...")
+        quick_starts = {
+            'day0': [],
+            'interface-basics': [],
+            'routing-basics': []
+        }
+        
+        # Day-0: Take all paths from 'core' category + select DNS/NTP/logging
+        quick_starts['day0'] = categorized_paths.get('core', [])[:25]
+        quick_starts['day0'].extend(categorized_paths.get('ntp', [])[:3])
+        quick_starts['day0'].extend(categorized_paths.get('dns', [])[:5])
+        quick_starts['day0'].extend(categorized_paths.get('logging', [])[:5])
+        quick_starts['day0'].extend(categorized_paths.get('cli', [])[:7])  # banners
+        
+        # Interface Basics: Sample from interfaces category (first 30 paths)
+        quick_starts['interface-basics'] = categorized_paths.get('interfaces', [])[:30]
+        
+        # Routing Basics: Sample from routing category (first 25 paths)
+        quick_starts['routing-basics'] = categorized_paths.get('routing', [])[:25]
+        
+        print(f"  * day0: {len(quick_starts['day0'])} paths")
+        print(f"  * interface-basics: {len(quick_starts['interface-basics'])} paths")
+        print(f"  * routing-basics: {len(quick_starts['routing-basics'])} paths")
+        
         # Generate specs per category
         print("\nGenerating OpenAPI specs by category:")
         total_specs = 0
@@ -1050,6 +1075,39 @@ class NativeToOpenAPI:
                 module_name = file_prefix.replace("native-", "").replace("-", "")
                 manifest_modules.append(file_prefix.replace("native-", ""))
         
+        # PHASE 4: Write Quick-Start Collections (after regular categories)
+        print("\nGenerating quick-start collections:")
+        for qs_name, qs_paths in quick_starts.items():
+            if not qs_paths:
+                continue
+            
+            # Remove duplicates while preserving order
+            seen_paths = set()
+            unique_paths = []
+            for path_info in qs_paths:
+                if path_info['path'] not in seen_paths:
+                    seen_paths.add(path_info['path'])
+                    unique_paths.append(path_info)
+            
+            # Create spec with special title
+            qs_title_map = {
+                'day0': '⭐ Native - Day-0 Quick Start',
+                'interface-basics': '⭐ Native - Interface Basics Quick Start',
+                'routing-basics': '⭐ Native - Routing Basics Quick Start'
+            }
+            
+            spec = self.create_openapi_spec(qs_name, unique_paths)
+            spec['info']['title'] = qs_title_map.get(qs_name, f"Native - {qs_name.title()}")
+            spec['info']['description'] = f"Curated quick-start collection for {qs_name.replace('-', ' ')}.\n\n" + spec['info']['description']
+            
+            output_file = self.output_dir / f"native-00-{qs_name}.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(spec, f, indent=2)
+            
+            spec_size_mb = len(json.dumps(spec, indent=2).encode('utf-8')) / (1024 * 1024)
+            print(f"  * {qs_name}: {len(unique_paths)} paths ({spec_size_mb:.2f} MB) -> {output_file.name}")
+            total_specs += 1
+            manifest_modules.append(f"00-{qs_name}")
         
         # Generate manifest
         manifest = {
