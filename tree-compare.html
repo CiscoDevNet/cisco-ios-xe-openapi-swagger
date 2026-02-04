@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANG Tree Comparison Tool - IOS-XE 17.18.1</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --accent-color: #0070c9;
+            --accent-hover: #005fa3;
+            --diff-added: #d4edda;
+            --diff-removed: #f8d7da;
+            --diff-changed: #fff3cd;
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #252525;
+            --bg-card: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #4da6ff;
+            --accent-hover: #66b3ff;
+            --diff-added: #1e4620;
+            --diff-removed: #5a1e1e;
+            --diff-changed: #5a4e1e;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #049fd9 0%, #0070c9 100%);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.95;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        
+        .control-group select, .control-group input {
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+        
+        .control-group select:focus, .control-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .compare-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .comparison-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .comparison-container.active {
+            display: block;
+        }
+        
+        .comparison-header {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .module-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .module-info h3 {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .module-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .comparison-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .option-btn {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+        
+        .option-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .option-btn:hover {
+            border-color: var(--accent-color);
+        }
+        
+        .split-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .tree-panel {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .tree-panel-header {
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tree-panel-header .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        
+        .tree-content {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 700px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre;
+            position: relative;
+        }
+        
+        .line {
+            padding: 2px 8px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        
+        .line:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        [data-theme="dark"] .line:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .line.diff-added {
+            background: var(--diff-added);
+            border-left: 3px solid #28a745;
+        }
+        
+        .line.diff-removed {
+            background: var(--diff-removed);
+            border-left: 3px solid #dc3545;
+        }
+        
+        .line.diff-changed {
+            background: var(--diff-changed);
+            border-left: 3px solid #ffc107;
+        }
+        
+        .sync-scroll {
+            overflow-y: scroll;
+        }
+        
+        .stats-bar {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .legend {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border-left: 3px solid;
+        }
+        
+        .legend-color.added {
+            background: var(--diff-added);
+            border-color: #28a745;
+        }
+        
+        .legend-color.removed {
+            background: var(--diff-removed);
+            border-color: #dc3545;
+        }
+        
+        .legend-color.changed {
+            background: var(--diff-changed);
+            border-color: #ffc107;
+        }
+        
+        .quick-compare {
+            background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .quick-compare h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .quick-link {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .quick-link:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .quick-link strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+        
+        .quick-link span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1024px) {
+            .split-view {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🔄 YANG Tree Comparison Tool</h1>
+            <p>Compare YANG module tree structures side-by-side - IOS-XE 17.18.1</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="quick-compare">
+            <h3>⚡ Quick Compare Presets</h3>
+            <div class="quick-links">
+                <div class="quick-link" onclick="quickCompare('Cisco-IOS-XE-interfaces-oper', 'ietf-interfaces')">
+                    <strong>🔵 Interfaces: Cisco vs IETF</strong>
+                    <span>Compare operational interfaces models</span>
+                </div>
+                <div class="quick-link" onclick="quickCompare('Cisco-IOS-XE-bgp-oper', 'openconfig-bgp')">
+                    <strong>🟢 BGP: Cisco vs OpenConfig</strong>
+                    <span>Compare BGP operational models</span>
+                </div>
+                <div class="quick-link" onclick="quickCompare('Cisco-IOS-XE-native', 'Cisco-IOS-XE-aaa')">
+                    <strong>🟣 Config vs Specific: Native vs AAA</strong>
+                    <span>Compare native config with AAA module</span>
+                </div>
+                <div class="quick-link" onclick="quickCompare('Cisco-IOS-XE-platform-oper', 'Cisco-IOS-XE-platform-software-oper')">
+                    <strong>🔴 Platform: Hardware vs Software</strong>
+                    <span>Compare platform monitoring models</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="module1">📄 Left Module (Tree A):</label>
+                    <select id="module1">
+                        <option value="">-- Select a YANG module --</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="module2">📄 Right Module (Tree B):</label>
+                    <select id="module2">
+                        <option value="">-- Select a YANG module --</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="searchLeft">🔍 Filter Left Tree:</label>
+                    <input type="text" id="searchLeft" placeholder="Filter lines (e.g., interface, admin)">
+                </div>
+                <div class="control-group">
+                    <label for="searchRight">🔍 Filter Right Tree:</label>
+                    <input type="text" id="searchRight" placeholder="Filter lines (e.g., interface, admin)">
+                </div>
+            </div>
+            
+            <button class="compare-btn" onclick="compareModules()">🔍 Compare Trees</button>
+        </div>
+        
+        <div class="comparison-container" id="comparisonContainer">
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalLines">0</div>
+                    <div class="stat-label">Total Lines</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="matchedLines">0</div>
+                    <div class="stat-label">Matched</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="addedLines">0</div>
+                    <div class="stat-label">Added</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="removedLines">0</div>
+                    <div class="stat-label">Removed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="changedLines">0</div>
+                    <div class="stat-label">Modified</div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <strong>Legend:</strong>
+                <div class="legend-item">
+                    <div class="legend-color added"></div>
+                    <span>Added (only in right)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color removed"></div>
+                    <span>Removed (only in left)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color changed"></div>
+                    <span>Modified</span>
+                </div>
+            </div>
+            
+            <div class="comparison-header">
+                <div class="module-info" id="leftModuleInfo">
+                    <h3 id="leftModuleName">Module A</h3>
+                    <p id="leftModuleType">Loading...</p>
+                </div>
+                <div class="comparison-options">
+                    <button class="option-btn active" id="syncScrollBtn" onclick="toggleSyncScroll()">🔄 Sync Scroll</button>
+                    <button class="option-btn" id="highlightBtn" onclick="toggleHighlight()">🎨 Highlight Diffs</button>
+                    <button class="option-btn" onclick="exportComparison()">💾 Export</button>
+                </div>
+                <div class="module-info" id="rightModuleInfo">
+                    <h3 id="rightModuleName">Module B</h3>
+                    <p id="rightModuleType">Loading...</p>
+                </div>
+            </div>
+            
+            <div class="split-view">
+                <div class="tree-panel">
+                    <div class="tree-panel-header">
+                        <span id="leftPanelTitle">Tree A</span>
+                        <span class="badge" id="leftLineCount">0 lines</span>
+                    </div>
+                    <div class="tree-content sync-scroll" id="leftTree"></div>
+                </div>
+                <div class="tree-panel">
+                    <div class="tree-panel-header">
+                        <span id="rightPanelTitle">Tree B</span>
+                        <span class="badge" id="rightLineCount">0 lines</span>
+                    </div>
+                    <div class="tree-content sync-scroll" id="rightTree"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
+    
+    <script>
+        let searchIndex = null;
+        let syncScrollEnabled = true;
+        let highlightEnabled = false;
+        let leftTreeData = null;
+        let rightTreeData = null;
+        
+        // Load search index
+        async function loadSearchIndex() {
+            try {
+                const response = await fetch('search-index.json');
+                searchIndex = await response.json();
+                populateModuleSelects();
+            } catch (error) {
+                console.error('Failed to load search index:', error);
+                alert('Failed to load module list. Please refresh the page.');
+            }
+        }
+        
+        // Populate module dropdowns
+        function populateModuleSelects() {
+            const select1 = document.getElementById('module1');
+            const select2 = document.getElementById('module2');
+            
+            // Clear existing options (except first)
+            select1.innerHTML = '<option value="">-- Select a YANG module --</option>';
+            select2.innerHTML = '<option value="">-- Select a YANG module --</option>';
+            
+            // Group modules by category
+            const categories = {};
+            searchIndex.modules.forEach(module => {
+                if (module.yangTreeUrl) {
+                    if (!categories[module.displayCategory]) {
+                        categories[module.displayCategory] = [];
+                    }
+                    categories[module.displayCategory].push(module);
+                }
+            });
+            
+            // Add options grouped by category
+            Object.keys(categories).sort().forEach(category => {
+                const optgroup1 = document.createElement('optgroup');
+                const optgroup2 = document.createElement('optgroup');
+                optgroup1.label = category;
+                optgroup2.label = category;
+                
+                categories[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(module => {
+                    const option1 = document.createElement('option');
+                    const option2 = document.createElement('option');
+                    option1.value = module.name;
+                    option2.value = module.name;
+                    option1.textContent = `${module.emoji} ${module.name}`;
+                    option2.textContent = `${module.emoji} ${module.name}`;
+                    optgroup1.appendChild(option1);
+                    optgroup2.appendChild(option2);
+                });
+                
+                select1.appendChild(optgroup1);
+                select2.appendChild(optgroup2);
+            });
+        }
+        
+        // Quick compare presets
+        function quickCompare(module1, module2) {
+            document.getElementById('module1').value = module1;
+            document.getElementById('module2').value = module2;
+            compareModules();
+        }
+        
+        // Load tree content
+        async function loadTreeContent(moduleName) {
+            try {
+                const module = searchIndex.modules.find(m => m.name === moduleName);
+                if (!module || !module.yangTreeUrl) {
+                    throw new Error('Tree not found');
+                }
+                
+                const response = await fetch(module.yangTreeUrl);
+                const html = await response.text();
+                
+                // Parse HTML to extract tree content
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const preElement = doc.querySelector('.tree-container pre');
+                
+                if (!preElement) {
+                    throw new Error('Tree content not found in HTML');
+                }
+                
+                return {
+                    content: preElement.textContent,
+                    module: module
+                };
+            } catch (error) {
+                console.error('Failed to load tree:', error);
+                throw error;
+            }
+        }
+        
+        // Compare modules
+        async function compareModules() {
+            const module1 = document.getElementById('module1').value;
+            const module2 = document.getElementById('module2').value;
+            
+            if (!module1 || !module2) {
+                alert('Please select both modules to compare');
+                return;
+            }
+            
+            // Show loading
+            const container = document.getElementById('comparisonContainer');
+            container.classList.add('active');
+            document.getElementById('leftTree').innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading tree...</div>';
+            document.getElementById('rightTree').innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading tree...</div>';
+            
+            try {
+                // Load both trees
+                [leftTreeData, rightTreeData] = await Promise.all([
+                    loadTreeContent(module1),
+                    loadTreeContent(module2)
+                ]);
+                
+                // Update headers
+                document.getElementById('leftModuleName').textContent = leftTreeData.module.name;
+                document.getElementById('leftModuleType').textContent = leftTreeData.module.displayCategory;
+                document.getElementById('rightModuleName').textContent = rightTreeData.module.name;
+                document.getElementById('rightModuleType').textContent = rightTreeData.module.displayCategory;
+                
+                // Render comparison
+                renderComparison();
+                
+            } catch (error) {
+                alert('Failed to load trees. Please try again.');
+                container.classList.remove('active');
+            }
+        }
+        
+        // Render comparison
+        function renderComparison() {
+            const leftLines = leftTreeData.content.split('\n');
+            const rightLines = rightTreeData.content.split('\n');
+            
+            const leftFilter = document.getElementById('searchLeft').value.toLowerCase();
+            const rightFilter = document.getElementById('searchRight').value.toLowerCase();
+            
+            // Filter lines
+            const filteredLeft = leftLines.filter(line => 
+                !leftFilter || line.toLowerCase().includes(leftFilter)
+            );
+            const filteredRight = rightLines.filter(line => 
+                !rightFilter || line.toLowerCase().includes(rightFilter)
+            );
+            
+            // Calculate diff statistics
+            const stats = calculateDiff(leftLines, rightLines);
+            updateStats(stats);
+            
+            // Render trees
+            document.getElementById('leftTree').innerHTML = filteredLeft
+                .map((line, i) => `<div class="line">${escapeHtml(line)}</div>`)
+                .join('');
+            document.getElementById('rightTree').innerHTML = filteredRight
+                .map((line, i) => `<div class="line">${escapeHtml(line)}</div>`)
+                .join('');
+            
+            // Update line counts
+            document.getElementById('leftLineCount').textContent = `${filteredLeft.length} lines`;
+            document.getElementById('rightLineCount').textContent = `${filteredRight.length} lines`;
+            document.getElementById('leftPanelTitle').textContent = leftTreeData.module.name;
+            document.getElementById('rightPanelTitle').textContent = rightTreeData.module.name;
+            
+            // Setup scroll sync
+            setupScrollSync();
+        }
+        
+        // Calculate diff
+        function calculateDiff(leftLines, rightLines) {
+            const leftSet = new Set(leftLines.map(l => l.trim()).filter(l => l));
+            const rightSet = new Set(rightLines.map(l => l.trim()).filter(l => l));
+            
+            const added = [...rightSet].filter(l => !leftSet.has(l)).length;
+            const removed = [...leftSet].filter(l => !rightSet.has(l)).length;
+            const matched = [...leftSet].filter(l => rightSet.has(l)).length;
+            
+            return {
+                total: leftLines.length + rightLines.length,
+                matched: matched,
+                added: added,
+                removed: removed,
+                changed: 0 // Simplified - would need more complex diff for this
+            };
+        }
+        
+        // Update statistics
+        function updateStats(stats) {
+            document.getElementById('totalLines').textContent = stats.total;
+            document.getElementById('matchedLines').textContent = stats.matched;
+            document.getElementById('addedLines').textContent = stats.added;
+            document.getElementById('removedLines').textContent = stats.removed;
+            document.getElementById('changedLines').textContent = stats.changed;
+        }
+        
+        // Setup scroll synchronization
+        function setupScrollSync() {
+            const leftTree = document.getElementById('leftTree');
+            const rightTree = document.getElementById('rightTree');
+            
+            leftTree.onscroll = function() {
+                if (syncScrollEnabled) {
+                    rightTree.scrollTop = leftTree.scrollTop;
+                }
+            };
+            
+            rightTree.onscroll = function() {
+                if (syncScrollEnabled) {
+                    leftTree.scrollTop = rightTree.scrollTop;
+                }
+            };
+        }
+        
+        // Toggle sync scroll
+        function toggleSyncScroll() {
+            syncScrollEnabled = !syncScrollEnabled;
+            const btn = document.getElementById('syncScrollBtn');
+            btn.classList.toggle('active');
+        }
+        
+        // Toggle highlight
+        function toggleHighlight() {
+            highlightEnabled = !highlightEnabled;
+            const btn = document.getElementById('highlightBtn');
+            btn.classList.toggle('active');
+            // Would implement actual highlighting here
+        }
+        
+        // Export comparison
+        function exportComparison() {
+            if (!leftTreeData || !rightTreeData) return;
+            
+            const text = `YANG Tree Comparison Report\n` +
+                `Generated: ${new Date().toLocaleString()}\n\n` +
+                `Left Module: ${leftTreeData.module.name}\n` +
+                `Right Module: ${rightTreeData.module.name}\n\n` +
+                `=== LEFT TREE ===\n${leftTreeData.content}\n\n` +
+                `=== RIGHT TREE ===\n${rightTreeData.content}`;
+            
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tree-comparison-${leftTreeData.module.name}-vs-${rightTreeData.module.name}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Dark mode
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // Utility function
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Filter trees
+        document.getElementById('searchLeft').addEventListener('input', renderComparison);
+        document.getElementById('searchRight').addEventListener('input', renderComparison);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSearchIndex();
+            
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const btn = document.querySelector('.dark-mode-toggle');
+            btn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        });
+    </script>
+</body>
+</html>
