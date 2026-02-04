@@ -4,6 +4,13 @@
 let searchIndex = [];
 let fuse = null;
 let activeFilters = new Set(['all']);
+let advancedFilters = {
+    prefix: 'all',
+    hasTree: 'all',
+    hasSpec: 'all'
+};
+let autocompleteIndex = [];
+let selectedSuggestionIndex = -1;
 
 // Load search index
 async function loadSearchIndex() {
@@ -11,6 +18,9 @@ async function loadSearchIndex() {
         const response = await fetch('search-index.json');
         const data = await response.json();
         searchIndex = data.modules;
+        
+        // Build autocomplete index
+        buildAutocompleteIndex();
         
         // Initialize Fuse.js
         fuse = new Fuse(searchIndex, {
@@ -24,6 +34,24 @@ async function loadSearchIndex() {
     } catch (error) {
         console.error('❌ Error loading search index:', error);
     }
+}
+
+// Build autocomplete suggestions index
+function buildAutocompleteIndex() {
+    const suggestions = new Set();
+    
+    // Add module names
+    searchIndex.forEach(module => {
+        suggestions.add(module.name);
+        
+        // Add keywords
+        if (module.keywords) {
+            module.keywords.forEach(keyword => suggestions.add(keyword));
+        }
+    });
+    
+    autocompleteIndex = Array.from(suggestions).sort();
+    console.log(`✅ Built autocomplete index with ${autocompleteIndex.length} terms`);
 }
 
 // Get badge class for module type
@@ -95,14 +123,187 @@ function renderResults(results) {
 
 // Filter results by type
 function filterResults(results) {
-    if (activeFilters.has('all')) {
+    if (activeFilters.has('all') && advancedFilters.prefix === 'all' && 
+        advancedFilters.hasTree === 'all' && advancedFilters.hasSpec === 'all') {
         return results;
     }
     
     return results.filter(result => {
         const module = result.item || result;
-        return activeFilters.has(module.type);
+        
+        // Type filter
+        if (!activeFilters.has('all') && !activeFilters.has(module.type)) {
+            return false;
+        }
+        
+        // Prefix filter
+        if (advancedFilters.prefix !== 'all') {
+            const name = module.name.toLowerCase();
+            if (advancedFilters.prefix === 'cisco' && !name.startsWith('cisco-ios-xe-')) {
+                return false;
+            }
+            if (advancedFilters.prefix === 'ietf' && !name.startsWith('ietf-')) {
+                return false;
+            }
+            if (advancedFilters.prefix === 'openconfig' && !name.startsWith('openconfig-')) {
+                return false;
+            }
+            if (advancedFilters.prefix === 'mib' && module.category !== 'swagger-mib-model') {
+                return false;
+            }
+        }
+        
+        // Has Tree filter
+        if (advancedFilters.hasTree === 'yes' && !module.yangTreeUrl) {
+            return false;
+        }
+        if (advancedFilters.hasTree === 'no' && module.yangTreeUrl) {
+            return false;
+        }
+        
+        // Has Spec filter
+        if (advancedFilters.hasSpec === 'yes' && !module.swaggerUrl) {
+            return false;
+        }
+        if (advancedFilters.hasSpec === 'no' && module.swaggerUrl) {
+            return false;
+        }
+        
+        return true;
     });
+}
+
+// Show autocomplete suggestions
+function showAutocomplete(query) {
+    if (!query || query.length < 2) {
+        hideAutocomplete();
+        return;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    const suggestions = autocompleteIndex
+        .filter(term => term.toLowerCase().includes(lowerQuery))
+        .slice(0, 8);
+    
+    if (suggestions.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+    
+    const autocompleteDiv = document.getElementById('autocomplete');
+    autocompleteDiv.innerHTML = suggestions.map((term, index) => {
+        const highlightedTerm = term.replace(
+            new RegExp(query, 'gi'),
+            match => `<strong>${match}</strong>`
+        );
+        return `<div class="autocomplete-item ${index === selectedSuggestionIndex ? 'selected' : ''}" 
+                     onclick="selectSuggestion('${term.replace(/'/g, "\\'")}')">${highlightedTerm}</div>`;
+    }).join('');
+    
+    autocompleteDiv.classList.add('active');
+}
+
+// Hide autocomplete
+function hideAutocomplete() {
+    const autocompleteDiv = document.getElementById('autocomplete');
+    if (autocompleteDiv) {
+        autocompleteDiv.classList.remove('active');
+        autocompleteDiv.innerHTML = '';
+    }
+    selectedSuggestionIndex = -1;
+}
+
+// Select suggestion
+function selectSuggestion(term) {
+    document.getElementById('universalSearch').value = term;
+    hideAutocomplete();
+    performSearch();
+}
+
+// Handle keyboard navigation in autocomplete
+function handleAutocompleteKeyboard(e) {
+    const autocompleteDiv = document.getElementById('autocomplete');
+    if (!autocompleteDiv || !autocompleteDiv.classList.contains('active')) {
+        return;
+    }
+    
+    const items = autocompleteDiv.querySelectorAll('.autocomplete-item');
+    
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, items.length - 1);
+        updateAutocompleteSelection(items);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+        updateAutocompleteSelection(items);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+        e.preventDefault();
+        items[selectedSuggestionIndex].click();
+    } else if (e.key === 'Escape') {
+        hideAutocomplete();
+    }
+}
+
+// Update autocomplete selection
+function updateAutocompleteSelection(items) {
+    items.forEach((item, index) => {
+        if (index === selectedSuggestionIndex) {
+            item.classList.add('selected');
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+// Toggle advanced filters
+function toggleAdvancedFilters() {
+    const panel = document.getElementById('advancedFilters');
+    panel.classList.toggle('active');
+}
+
+// Apply advanced filter
+function applyAdvancedFilter(filterType, value) {
+    advancedFilters[filterType] = value;
+    
+    // Update button states
+    document.querySelectorAll(`[data-advanced-filter="${filterType}"]`).forEach(btn => {
+        if (btn.dataset.value === value) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    performSearch();
+}
+
+// Reset all filters
+function resetFilters() {
+    // Reset type filters
+    activeFilters.clear();
+    activeFilters.add('all');
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector('[data-filter="all"]').classList.add('active');
+    
+    // Reset advanced filters
+    advancedFilters = {
+        prefix: 'all',
+        hasTree: 'all',
+        hasSpec: 'all'
+    };
+    document.querySelectorAll('[data-advanced-filter]').forEach(btn => {
+        if (btn.dataset.value === 'all') {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    performSearch();
 }
 
 // Perform search
@@ -178,10 +379,47 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSearchIndex();
     setupFilters();
     
-    // Setup search input with debounce
+    // Setup search input with debounce and autocomplete
     let searchTimeout;
-    document.getElementById('universalSearch').addEventListener('input', () => {
+    const searchInput = document.getElementById('universalSearch');
+    
+    searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        // Show autocomplete
+        showAutocomplete(query);
+        
+        // Debounced search
         searchTimeout = setTimeout(performSearch, 300);
     });
+    
+    // Keyboard shortcuts
+    searchInput.addEventListener('keydown', handleAutocompleteKeyboard);
+    
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl/Cmd + K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+        
+        // Escape to clear search and hide results
+        if (e.key === 'Escape' && document.activeElement === searchInput) {
+            searchInput.value = '';
+            document.getElementById('searchResults').classList.remove('active');
+            hideAutocomplete();
+        }
+    });
+    
+    // Click outside to close autocomplete
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+            hideAutocomplete();
+        }
+    });
+    
+    console.log('✅ Search initialized. Press Ctrl+K to search!');
 });

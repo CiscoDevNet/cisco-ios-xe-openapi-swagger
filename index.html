@@ -86,6 +86,28 @@
         .card.openconfig { border-left: 4px solid #009688; }
         .card.configuration { border-left: 4px solid #00BCD4; }
         .card.other { border-left: 4px solid #757575; }
+        
+        /* Autocomplete Styles */
+        .autocomplete { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #1565C0; border-top: none; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; z-index: 1000; display: none; }
+        .autocomplete.active { display: block; }
+        .autocomplete-item { padding: 12px 20px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid #f0f0f0; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item.selected { background: #E3F2FD; }
+        .autocomplete-item strong { color: #1565C0; font-weight: 600; }
+        
+        /* Advanced Filters Styles */
+        .advanced-filter-toggle { padding: 8px 16px; background: #1565C0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
+        .advanced-filter-toggle:hover { background: #0D47A1; }
+        .reset-filters-btn { padding: 8px 16px; background: #666; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
+        .reset-filters-btn:hover { background: #444; }
+        .advanced-filters { display: none; background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 16px 0; border: 1px solid #e0e0e0; }
+        .advanced-filters.active { display: block; }
+        .advanced-filter-row { margin-bottom: 16px; }
+        .advanced-filter-row:last-child { margin-bottom: 0; }
+        .advanced-filter-row label { display: block; font-weight: 500; color: #666; margin-bottom: 8px; font-size: 0.9rem; }
+        .advanced-filter-btn { padding: 6px 14px; border: 2px solid #e0e0e0; background: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; margin-right: 8px; margin-bottom: 8px; }
+        .advanced-filter-btn:hover { border-color: #1565C0; background: #f0f7ff; }
+        .advanced-filter-btn.active { border-color: #1565C0; background: #1565C0; color: white; }
     </style>
 </head>
 <body>
@@ -98,8 +120,48 @@
     <div class="container">
         <!-- Universal Search -->
         <div class="search-container">
-            <h2 style="color: #1565C0; margin-bottom: 16px; font-size: 1.6rem;">🔍 Universal Search</h2>
-            <input type="text" id="universalSearch" class="search-box" placeholder="Search across all 768 YANG modules, APIs, and trees...">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="color: #1565C0; margin: 0; font-size: 1.6rem;">🔍 Universal Search</h2>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="advanced-filter-toggle" onclick="toggleAdvancedFilters()">🎛️ Advanced Filters</button>
+                    <button class="reset-filters-btn" onclick="resetFilters()" title="Reset all filters">🔄 Reset</button>
+                    <span style="font-size: 0.85rem; opacity: 0.7; padding: 4px 8px; background: #E3F2FD; border-radius: 4px;">Ctrl+K</span>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <input type="text" id="universalSearch" class="search-box" placeholder="Search across all 768 YANG modules, APIs, and trees... (Ctrl+K)">
+                <div id="autocomplete" class="autocomplete"></div>
+            </div>
+            
+            <!-- Advanced Filters Panel -->
+            <div id="advancedFilters" class="advanced-filters">
+                <div class="advanced-filter-row">
+                    <label>Module Prefix:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="prefix" data-value="all" onclick="applyAdvancedFilter('prefix', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="cisco" onclick="applyAdvancedFilter('prefix', 'cisco')">Cisco-IOS-XE-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="ietf" onclick="applyAdvancedFilter('prefix', 'ietf')">ietf-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="openconfig" onclick="applyAdvancedFilter('prefix', 'openconfig')">openconfig-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="mib" onclick="applyAdvancedFilter('prefix', 'mib')">MIB Modules</button>
+                    </div>
+                </div>
+                <div class="advanced-filter-row">
+                    <label>Has YANG Tree:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="hasTree" data-value="all" onclick="applyAdvancedFilter('hasTree', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="yes" onclick="applyAdvancedFilter('hasTree', 'yes')">✅ Yes</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="no" onclick="applyAdvancedFilter('hasTree', 'no')">❌ No</button>
+                    </div>
+                </div>
+                <div class="advanced-filter-row">
+                    <label>Has Swagger Spec:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="hasSpec" data-value="all" onclick="applyAdvancedFilter('hasSpec', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="yes" onclick="applyAdvancedFilter('hasSpec', 'yes')">✅ Yes</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="no" onclick="applyAdvancedFilter('hasSpec', 'no')">❌ No</button>
+                    </div>
+                </div>
+            </div>
             
             <div class="search-filters">
                 <div class="filter-group">
