@@ -6,17 +6,41 @@
     <title>Cisco IOS-XE YANG Documentation Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e0e0;
+            --accent-color: #1565C0;
+            --accent-hover: #0D47A1;
+        }
+        
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-card: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #42A5F5;
+            --accent-hover: #1E88E5;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto', sans-serif; background: #f5f5f5; min-height: 100vh; }
-        .header { background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%); color: white; padding: 40px 20px; text-align: center; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg-primary); min-height: 100vh; color: var(--text-primary); transition: background 0.3s, color 0.3s; }
+        .header { background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%); color: white; padding: 40px 20px; text-align: center; position: relative; }
         .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
         .header p { font-size: 1.1rem; opacity: 0.9; }
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .card { background: var(--bg-card); border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s, background 0.3s; }
+        [data-theme="dark"] .card { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
         .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-        .card h3 { color: #1565C0; margin-bottom: 12px; }
-        .card p { color: #666; margin-bottom: 16px; line-height: 1.5; }
+        [data-theme="dark"] .card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .card h3 { color: var(--accent-color); margin-bottom: 12px; }
+        .card p { color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
         .card-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; font-size: 12px; }
         .card-stats span { color: #666; white-space: nowrap; }
         .card-stats strong { color: #1565C0; font-weight: 500; }
@@ -30,9 +54,10 @@
         .stat-label { color: #666; font-size: 0.9rem; }
         
         /* Universal Search Styles */
-        .search-container { background: white; border-radius: 8px; padding: 24px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .search-box { width: 100%; padding: 16px 20px; font-size: 1.1rem; border: 2px solid #e0e0e0; border-radius: 8px; transition: border-color 0.2s; }
-        .search-box:focus { outline: none; border-color: #1565C0; }
+        .search-container { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: background 0.3s; position: sticky; top: 0; z-index: 100; }
+        [data-theme="dark"] .search-container { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .search-box { width: 100%; padding: 16px 20px; font-size: 1.1rem; border: 2px solid var(--border-color); border-radius: 8px; transition: border-color 0.2s, background 0.3s, color 0.3s; background: var(--bg-secondary); color: var(--text-primary); }
+        .search-box:focus { outline: none; border-color: var(--accent-color); }
         .search-box::placeholder { color: #999; }
         .search-filters { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
         .filter-group { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -108,10 +133,64 @@
         .advanced-filter-btn { padding: 6px 14px; border: 2px solid #e0e0e0; background: white; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; margin-right: 8px; margin-bottom: 8px; }
         .advanced-filter-btn:hover { border-color: #1565C0; background: #f0f7ff; }
         .advanced-filter-btn.active { border-color: #1565C0; background: #1565C0; color: white; }
+        
+        /* Dark Mode Toggle */
+        .dark-mode-toggle { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(10px); }
+        .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+        
+        /* Statistics Dashboard */
+        .dashboard-container { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: background 0.3s; }
+        [data-theme="dark"] .dashboard-container { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .dashboard-grid { display: grid; grid-template-columns: 300px 1fr; gap: 40px; align-items: center; }
+        .dashboard-chart { display: flex; justify-content: center; }
+        .dashboard-stats { display: flex; flex-direction: column; gap: 12px; }
+        .dashboard-stat { position: relative; }
+        .stat-bar { height: 30px; background: var(--stat-color); border-radius: 4px; transition: width 0.5s ease; }
+        .stat-label { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: white; font-size: 0.85rem; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .header p { font-size: 0.9rem; }
+            .dark-mode-toggle { width: 40px; height: 40px; font-size: 1.2rem; top: 15px; right: 15px; }
+            .search-container { padding: 16px; position: static; }
+            .search-box { font-size: 1rem; padding: 12px 16px; }
+            .dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
+            .dashboard-chart canvas { max-width: 250px; height: auto; }
+            .filter-btn { font-size: 0.8rem; padding: 5px 10px; }
+            .advanced-filter-toggle, .reset-filters-btn { font-size: 0.8rem; padding: 6px 12px; }
+            .grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 1.5rem; }
+        }
+        
+        /* Stats with dark mode support */
+        .stats { background: var(--bg-card); border-radius: 8px; padding: 24px; margin-top: 20px; transition: background 0.3s; }
+        .stats h3 { color: var(--accent-color); margin-bottom: 16px; }
+        .stat { text-align: center; padding: 16px; background: var(--bg-primary); border-radius: 8px; transition: background 0.3s; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent-color); }
+        .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
+        
+        /* Update other elements for dark mode */
+        .recent-favorites-section { background: var(--bg-card); transition: background 0.3s; }
+        [data-theme="dark"] .recent-favorites-section { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .recent-card { background: var(--bg-primary); transition: background 0.3s; }
+        [data-theme="dark"] .recent-card:hover { background: rgba(66, 165, 245, 0.1); }
+        .search-result-card { background: var(--bg-card); transition: background 0.3s; }
+        [data-theme="dark"] .search-result-card { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .autocomplete { background: var(--bg-card); border-color: var(--accent-color); transition: background 0.3s; }
+        [data-theme="dark"] .autocomplete { box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .autocomplete-item:hover, .autocomplete-item.selected { background: rgba(66, 165, 245, 0.1); }
+        .advanced-filters { background: var(--bg-primary); border-color: var(--border-color); transition: background 0.3s; }
+        .advanced-filter-btn { border-color: var(--border-color); background: var(--bg-card); color: var(--text-primary); transition: all 0.2s; }
+        .filter-btn { border-color: var(--border-color); background: var(--bg-card); color: var(--text-primary); }
     </style>
 </head>
 <body>
     <div class="header">
+        <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle dark mode">
+            <span class="light-icon">🌙</span>
+            <span class="dark-icon" style="display: none;">☀️</span>
+        </button>
         <h1>🌐 Cisco IOS-XE YANG Documentation Hub</h1>
         <p>Interactive OpenAPI/Swagger UI for RESTCONF APIs | IOS-XE 17.18.1</p>
         <p style="font-size: 0.75rem; text-align: right; opacity: 0.7; margin-top: 10px;">Last Updated: February 3, 2026 20:56:00 - Vancouver, BC</p>
@@ -177,6 +256,54 @@
             </div>
             
             <div id="searchResults" class="search-results"></div>
+        </div>
+        
+        <!-- Statistics Dashboard -->
+        <div class="dashboard-container">
+            <h2 style="color: var(--accent-color); margin-bottom: 20px; font-size: 1.8rem;">📊 Module Distribution</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-chart">
+                    <canvas id="moduleChart" width="300" height="300"></canvas>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="dashboard-stat" style="--stat-color: #2196F3;">
+                        <div class="stat-bar" style="width: 34.5%;"></div>
+                        <span class="stat-label">🔵 Operational: 199 (34.5%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #9C27B0;">
+                        <div class="stat-bar" style="width: 25.5%;"></div>
+                        <span class="stat-label">🟣 MIB: 147 (25.5%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #FFC107;">
+                        <div class="stat-bar" style="width: 9.2%;"></div>
+                        <span class="stat-label">🟡 RPC: 53 (9.2%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #FF9800;">
+                        <div class="stat-bar" style="width: 6.6%;"></div>
+                        <span class="stat-label">🔔 Events: 38 (6.6%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #00BCD4;">
+                        <div class="stat-bar" style="width: 6.8%;"></div>
+                        <span class="stat-label">⚙️ Configuration: 39 (6.8%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #009688;">
+                        <div class="stat-bar" style="width: 7.1%;"></div>
+                        <span class="stat-label">🌍 OpenConfig: 41 (7.1%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #4CAF50;">
+                        <div class="stat-bar" style="width: 4.9%;"></div>
+                        <span class="stat-label">🏠 Native: 28 (4.9%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #FF5722;">
+                        <div class="stat-bar" style="width: 3.6%;"></div>
+                        <span class="stat-label">🟠 IETF: 21 (3.6%)</span>
+                    </div>
+                    <div class="dashboard-stat" style="--stat-color: #757575;">
+                        <div class="stat-bar" style="width: 1.7%;"></div>
+                        <span class="stat-label">📦 Other: 10 (1.7%)</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Recent & Favorites -->
@@ -431,6 +558,113 @@
     
     <!-- Fuse.js for fuzzy search -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="search.js"></script>
+    <script src="recent-favorites.js"></script>
+    <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Toggle icon
+            const lightIcon = document.querySelector('.light-icon');
+            const darkIcon = document.querySelector('.dark-icon');
+            if (newTheme === 'dark') {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            } else {
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+            }
+            
+            // Redraw chart with new theme
+            if (window.moduleChart) {
+                drawChart();
+            }
+        }
+        
+        // Load saved theme
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'dark') {
+                const lightIcon = document.querySelector('.light-icon');
+                const darkIcon = document.querySelector('.dark-icon');
+                if (lightIcon && darkIcon) {
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'block';
+                }
+            }
+        })();
+        
+        // Draw Statistics Chart
+        function drawChart() {
+            const ctx = document.getElementById('moduleChart');
+            if (!ctx) return;
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDark ? '#e0e0e0' : '#666';
+            
+            const data = {
+                labels: ['Operational', 'MIB', 'RPC', 'Events', 'Config', 'OpenConfig', 'Native', 'IETF', 'Other'],
+                datasets: [{
+                    data: [199, 147, 53, 38, 39, 41, 28, 21, 10],
+                    backgroundColor: [
+                        '#2196F3',
+                        '#9C27B0',
+                        '#FFC107',
+                        '#FF9800',
+                        '#00BCD4',
+                        '#009688',
+                        '#4CAF50',
+                        '#FF5722',
+                        '#757575'
+                    ],
+                    borderWidth: 2,
+                    borderColor: isDark ? '#2d2d2d' : '#fff'
+                }]
+            };
+            
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Destroy existing chart if it exists
+            if (window.moduleChart) {
+                window.moduleChart.destroy();
+            }
+            
+            window.moduleChart = new Chart(ctx, config);
+        }
+        
+        // Initialize chart on load
+        window.addEventListener('DOMContentLoaded', drawChart);
+    </script>
 </body>
 </html>
