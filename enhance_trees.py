@@ -120,6 +120,33 @@ def create_metadata_section(module_name, metadata):
         if related_items:
             related_html = '<br>'.join(related_items)
     
+    # Generate documentation links based on module type
+    doc_links = []
+    
+    # GitHub source link (all modules)
+    github_path = f"https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/{module_name}.yang"
+    doc_links.append(f'<a href="{github_path}" target="_blank" style="color: #0070c9; text-decoration: none; padding: 6px 12px; background: white; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; margin: 4px;">💻 YANG Source</a>')
+    
+    # YANG Catalog link
+    yang_catalog = f"https://yangcatalog.org/yang-search/module_details/{module_name}"
+    doc_links.append(f'<a href="{yang_catalog}" target="_blank" style="color: #0070c9; text-decoration: none; padding: 6px 12px; background: white; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; margin: 4px;">📖 YANG Catalog</a>')
+    
+    # IETF-specific links
+    if module_name.startswith('ietf-'):
+        # Try to find RFC number (simplified - would need actual mapping)
+        doc_links.append(f'<a href="https://www.rfc-editor.org/search/rfc_search_detail.php?title={module_name}" target="_blank" style="color: #0070c9; text-decoration: none; padding: 6px 12px; background: white; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; margin: 4px;">📋 Search IETF RFC</a>')
+    
+    # OpenConfig-specific links
+    if module_name.startswith('openconfig-'):
+        oc_name = module_name.replace('openconfig-', '')
+        doc_links.append(f'<a href="https://openconfig.net/projects/models/" target="_blank" style="color: #0070c9; text-decoration: none; padding: 6px 12px; background: white; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; margin: 4px;">🌍 OpenConfig Docs</a>')
+    
+    # Cisco DevNet link for Cisco modules
+    if module_name.startswith('Cisco-IOS-XE-'):
+        doc_links.append(f'<a href="https://developer.cisco.com/docs/ios-xe/#!yang-models" target="_blank" style="color: #0070c9; text-decoration: none; padding: 6px 12px; background: white; border-radius: 4px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e0e0e0; margin: 4px;">🌐 DevNet Guide</a>')
+    
+    doc_links_html = ''.join(doc_links)
+    
     html = f'''
     <div style="background: #fff9e6; border-left: 4px solid #FFA726; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
         <p style="color: #E65100; font-size: 14px; margin-bottom: 10px;"><strong>📋 Module Metadata</strong></p>
@@ -127,6 +154,13 @@ def create_metadata_section(module_name, metadata):
             <p style="margin: 8px 0;"><strong>Namespace:</strong> <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{metadata['namespace']}</code></p>
             <p style="margin: 8px 0;"><strong>Prefix:</strong> <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{metadata['prefix']}</code></p>
             {f'<p style="margin: 8px 0;"><strong>Related Modules:</strong><br>{related_html}</p>' if related_html else ''}
+        </div>
+    </div>
+    
+    <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+        <p style="color: #01579b; font-size: 14px; margin-bottom: 10px;"><strong>📚 External Documentation</strong></p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            {doc_links_html}
         </div>
     </div>
     
