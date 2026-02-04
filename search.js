@@ -59,23 +59,26 @@ function renderResults(results) {
     const cardsHtml = results.slice(0, 50).map(result => {
         const module = result.item || result;
         const badgeClass = getBadgeClass(module.type);
-        
-        let linksHtml = '';
-        if (module.swaggerUrl) {
-            linksHtml += `<a href="${module.swaggerUrl}" class="search-result-link">📖 View API Spec</a>`;
-        }
-        if (module.yangTreeUrl) {
-            linksHtml += `<a href="${module.yangTreeUrl}" class="search-result-link">🌳 View YANG Tree</a>`;
-        }
-        
-        return `
-            <div class="search-result-card">
-                <div class="search-result-header">
-                    <span class="search-result-badge ${badgeClass}">${module.emoji} ${module.displayCategory}</span>
-                    <span class="search-result-title">${module.name}</span>
-                </div>
-                <div class="search-result-desc">${module.description}</div>
-                <div class="search-result-links">
+                const isFav = typeof isFavorite !== 'undefined' ? isFavorite(module.name) : false;
+                
+                let linksHtml = '';
+                if (module.swaggerUrl) {
+                    linksHtml += `<a href="${module.swaggerUrl}" class="search-result-link" onclick="trackModuleClick('${module.name}')">📖 View API Spec</a>`;
+                }
+                if (module.yangTreeUrl) {
+                    linksHtml += `<a href="${module.yangTreeUrl}" class="search-result-link" onclick="trackModuleClick('${module.name}')">🌳 View YANG Tree</a>`;
+                }
+                
+                return `
+                    <div class="search-result-card">
+                        <div class="search-result-header">
+                            <span class="search-result-badge ${badgeClass}">${module.emoji} ${module.displayCategory}</span>
+                            <span class="search-result-title">${module.name}</span>
+                            <button class="favorite-btn ${isFav ? 'active' : ''}" 
+                                    onclick="toggleFavoriteUI('${module.name.replace(/'/g, "\\'")}', this)"
+                                    title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+                                ${isFav ? '★' : '☆'}
+                            </button>
                     ${linksHtml}
                 </div>
             </div>
