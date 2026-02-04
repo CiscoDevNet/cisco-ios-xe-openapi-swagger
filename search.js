@@ -1,8 +1,18 @@
 // Universal Search for Cisco IOS-XE YANG Documentation Hub
 // Provides fuzzy search across all 768+ YANG modules
 
+// HTML Sanitization utility to prevent XSS
+function escapeHtml(str) {
+    if (str == null) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 let searchIndex = [];
 let fuse = null;
+let searchReady = false;
+let searchReadyPromise = null;
 let activeFilters = new Set(['all']);
 let advancedFilters = {
     prefix: 'all',
@@ -14,26 +24,36 @@ let selectedSuggestionIndex = -1;
 
 // Load search index
 async function loadSearchIndex() {
-    try {
-        const response = await fetch('search-index.json');
-        const data = await response.json();
-        searchIndex = data.modules;
-        
-        // Build autocomplete index
-        buildAutocompleteIndex();
-        
-        // Initialize Fuse.js
-        fuse = new Fuse(searchIndex, {
-            keys: ['name', 'keywords', 'description', 'displayCategory'],
-            threshold: 0.3,
-            includeScore: true,
-            minMatchCharLength: 2
-        });
-        
-        console.log(`✅ Loaded ${searchIndex.length} modules for search`);
-    } catch (error) {
-        console.error('❌ Error loading search index:', error);
-    }
+    if (searchReadyPromise) return searchReadyPromise;
+    
+    searchReadyPromise = (async () => {
+        try {
+            const response = await fetch('search-index.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            searchIndex = data.modules;
+            
+            // Build autocomplete index
+            buildAutocompleteIndex();
+            
+            // Initialize Fuse.js
+            fuse = new Fuse(searchIndex, {
+                keys: ['name', 'keywords', 'description', 'displayCategory'],
+                threshold: 0.3,
+                includeScore: true,
+                minMatchCharLength: 2
+            });
+            
+            searchReady = true;
+            console.log(`✅ Loaded ${searchIndex.length} modules for search`);
+        } catch (error) {
+            console.error('❌ Error loading search index:', error);
+            showToast('⚠️ Search unavailable. Please refresh the page.', 'error');
+        }
+    })();
+    
+    return searchReadyPromise;
 }
 
 // Build autocomplete suggestions index
@@ -421,5 +441,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Event delegation for search result links (tracking)
+    document.getElementById('searchResults').addEventListener('click', (e) => {
+        const link = e.target.closest('.search-result-link');
+        if (link) {
+            const moduleName = link.dataset.module;
+            if (moduleName && typeof trackModuleClick !== 'undefined') {
+                trackModuleClick(moduleName);
+            }
+        }
+        
+        // Handle favorite button clicks with event delegation
+        const favBtn = e.target.closest('.favorite-btn');
+        if (favBtn) {
+            const moduleName = favBtn.dataset.module;
+            if (moduleName && typeof toggleFavoriteUI !== 'undefined') {
+                toggleFavoriteUI(moduleName, favBtn);
+            }
+        }
+    });
+    
     console.log('✅ Search initialized. Press Ctrl+K to search!');
 });
+
+// Toast notification system for user-visible errors
+function showToast(message, type = 'info') {
+    // Remove existing toast if present
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.textContent = message;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'polite');
+    
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}

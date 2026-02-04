@@ -47,8 +47,17 @@ function addToRecent(module) {
         if (document.getElementById('recentModules')) {
             renderRecentModules();
         }
+        return { success: true };
     } catch (error) {
         console.error('Error adding to recent:', error);
+        if (typeof showToast !== 'undefined') {
+            if (error.name === 'QuotaExceededError') {
+                showToast('⚠️ Cannot save recent modules - storage is full', 'warning');
+            } else {
+                showToast('⚠️ Cannot save recent modules (storage may be disabled)', 'warning');
+            }
+        }
+        return { success: false, error: error.message };
     }
 }
 
@@ -95,6 +104,13 @@ function toggleFavorite(module) {
         return index < 0; // Return true if added, false if removed
     } catch (error) {
         console.error('Error toggling favorite:', error);
+        if (typeof showToast !== 'undefined') {
+            if (error.name === 'QuotaExceededError') {
+                showToast('⚠️ Cannot save favorites - storage is full', 'warning');
+            } else {
+                showToast('⚠️ Cannot save favorites (storage may be disabled)', 'warning');
+            }
+        }
         return false;
     }
 }
