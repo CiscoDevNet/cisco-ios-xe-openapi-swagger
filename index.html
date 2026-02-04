@@ -193,6 +193,46 @@
         .whats-new-banner .close-btn { background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 1.2rem; transition: background 0.2s; }
         .whats-new-banner .close-btn:hover { background: rgba(255,255,255,0.3); }
         .whats-new-banner.hidden { display: none; }
+        
+        /* Breadcrumb Navigation */
+        .breadcrumb { background: var(--bg-card); padding: 12px 20px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: background 0.3s; }
+        .breadcrumb a { color: var(--accent-color); text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: var(--accent-hover); text-decoration: underline; }
+        .breadcrumb-separator { color: var(--text-secondary); margin: 0 8px; }
+        .breadcrumb-current { color: var(--text-primary); font-weight: 500; }
+        
+        /* Code Snippet Generator Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-card); border-radius: 12px; max-width: 800px; width: 90%; max-height: 90vh; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
+        .modal-header { padding: 20px 24px; border-bottom: 2px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { color: var(--accent-color); margin: 0; font-size: 1.4rem; }
+        .modal-close { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; padding: 0; width: 32px; height: 32px; border-radius: 50%; transition: all 0.2s; }
+        .modal-close:hover { background: rgba(255,0,0,0.1); color: #f44336; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .code-gen-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 500; color: var(--text-primary); font-size: 0.9rem; }
+        .form-group input, .form-group select { padding: 10px 14px; border: 2px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; background: var(--bg-secondary); color: var(--text-primary); transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-color); }
+        .code-output { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; white-space: pre; margin-top: 16px; max-height: 300px; overflow-y: auto; position: relative; }
+        [data-theme="dark"] .code-output { background: #0d0d0d; }
+        .code-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); }
+        .code-tab { padding: 10px 20px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); transition: all 0.2s; font-weight: 500; }
+        .code-tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
+        .code-tab:hover { background: rgba(0,0,0,0.05); }
+        [data-theme="dark"] .code-tab:hover { background: rgba(255,255,255,0.05); }
+        .copy-code-btn { position: absolute; top: 8px; right: 8px; padding: 6px 12px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; }
+        .copy-code-btn:hover { background: #1976D2; }
+        .copy-code-btn.copied { background: #4CAF50; }
+        .generate-btn { padding: 12px 24px; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: background 0.2s; margin-top: 8px; }
+        .generate-btn:hover { background: var(--accent-hover); }
+        .snippet-generator-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
+        .snippet-generator-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        @media (max-width: 768px) {
+            .modal-content { width: 95%; max-height: 85vh; }
+            .code-output { font-size: 0.75rem; max-height: 200px; }
+        }
     </style>
 </head>
 <body>
@@ -207,6 +247,13 @@
     </div>
     
     <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav class="breadcrumb">
+            <a href="https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/">🏠 Home</a>
+            <span class="breadcrumb-separator">›</span>
+            <span class="breadcrumb-current">YANG Documentation Hub</span>
+        </nav>
+        
         <!-- What's New Banner -->
         <div class="whats-new-banner" id="whatsNewBanner">
             <div class="icon">✨</div>
@@ -442,7 +489,10 @@
         
         <!-- Quick-Start Collections Section -->
         <div style="background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%); border-radius: 8px; padding: 24px; margin-bottom: 30px; margin-top: 30px; color: white;">
-            <h2 style="margin-bottom: 16px; font-size: 1.8rem;">⭐ Quick-Start Collections</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                <h2 style="margin: 0; font-size: 1.8rem;">⭐ Quick-Start Collections</h2>
+                <a href="#" class="snippet-generator-link" onclick="openCodeGenerator(event)">⚡ Code Snippet Generator</a>
+            </div>
             <p style="opacity: 0.95; margin-bottom: 20px;">Curated endpoints for common workflows - get started quickly!</p>
             <div class="grid">
                 <div style="background: rgba(255,255,255,0.15); border-radius: 6px; padding: 16px; backdrop-filter: blur(10px);">
@@ -581,6 +631,56 @@
         </div>
     </div>
     
+    <!-- Code Snippet Generator Modal -->
+    <div class="modal-overlay" id="codeGenModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚡ API Code Snippet Generator</h2>
+                <button class="modal-close" onclick="closeCodeGenerator()" title="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <form class="code-gen-form" onsubmit="generateCode(event)">
+                    <div class="form-group">
+                        <label for="deviceIp">Device IP/Hostname:</label>
+                        <input type="text" id="deviceIp" placeholder="192.168.1.1 or my-router.example.com" value="192.168.1.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" placeholder="admin" value="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="yangModule">YANG Module:</label>
+                        <input type="text" id="yangModule" placeholder="e.g., Cisco-IOS-XE-interfaces-oper" value="Cisco-IOS-XE-interfaces-oper" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="operation">Operation:</label>
+                        <select id="operation" required>
+                            <option value="GET">GET - Retrieve data</option>
+                            <option value="POST">POST - Create data</option>
+                            <option value="PUT">PUT - Update data</option>
+                            <option value="PATCH">PATCH - Partial update</option>
+                            <option value="DELETE">DELETE - Remove data</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="generate-btn">🔧 Generate Code</button>
+                </form>
+                
+                <div id="codeOutput" style="display: none;">
+                    <div class="code-tabs">
+                        <button class="code-tab active" onclick="switchCodeTab('curl')">cURL</button>
+                        <button class="code-tab" onclick="switchCodeTab('python')">Python</button>
+                        <button class="code-tab" onclick="switchCodeTab('ansible')">Ansible</button>
+                        <button class="code-tab" onclick="switchCodeTab('javascript')">JavaScript</button>
+                    </div>
+                    <div class="code-output" id="codeContent">
+                        <button class="copy-code-btn" onclick="copyCode()">📋 Copy</button>
+                        <code id="generatedCode"></code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Fuse.js for fuzzy search -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -704,6 +804,84 @@
                 if (banner) banner.classList.add('hidden');
             }
         })();
+        
+        // Code Snippet Generator Functions
+        let currentCodeTab = 'curl';
+        let generatedSnippets = {};
+        
+        function openCodeGenerator(e) {
+            if (e) e.preventDefault();
+            document.getElementById('codeGenModal').classList.add('active');
+        }
+        
+        function closeCodeGenerator() {
+            document.getElementById('codeGenModal').classList.remove('active');
+        }
+        
+        function switchCodeTab(tab) {
+            currentCodeTab = tab;
+            document.querySelectorAll('.code-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (generatedSnippets[tab]) {
+                document.getElementById('generatedCode').textContent = generatedSnippets[tab];
+            }
+        }
+        
+        function generateCode(e) {
+            e.preventDefault();
+            
+            const deviceIp = document.getElementById('deviceIp').value;
+            const username = document.getElementById('username').value;
+            const yangModule = document.getElementById('yangModule').value;
+            const operation = document.getElementById('operation').value;
+            
+            const baseUrl = `https://${deviceIp}/restconf/data/${yangModule}`;
+            
+            // Generate cURL
+            generatedSnippets.curl = `# ${operation} request to ${yangModule}\ncurl -X ${operation} \\\n  -H "Content-Type: application/yang-data+json" \\\n  -H "Accept: application/yang-data+json" \\\n  -u ${username}:YOUR_PASSWORD \\\n  --insecure \\\n  ${baseUrl}${operation !== 'GET' ? ' \\\n  -d @payload.json' : ''}`;
+            
+            // Generate Python
+            generatedSnippets.python = `# ${operation} request using Python requests library\nimport requests\nfrom requests.auth import HTTPBasicAuth\nimport json\nimport urllib3\nurllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)\n\n# Configuration\ndevice_ip = "${deviceIp}"\nusername = "${username}"\npassword = "YOUR_PASSWORD"\nyang_module = "${yangModule}"\n\n# RESTCONF endpoint\nurl = f"https://{device_ip}/restconf/data/{yang_module}"\n\n# Headers\nheaders = {\n    "Content-Type": "application/yang-data+json",\n    "Accept": "application/yang-data+json"\n}\n\n# Make request\nresponse = requests.${operation.toLowerCase()}(\n    url,\n    auth=HTTPBasicAuth(username, password),\n    headers=headers,${operation !== 'GET' ? '\n    json=payload,  # Define your payload here' : ''}\n    verify=False\n)\n\nprint(f"Status: {response.status_code}")\nprint(f"Response: {response.json()}")`;
+            
+            // Generate Ansible
+            generatedSnippets.ansible = `# ${operation} request using Ansible uri module\n---\n- name: ${operation} ${yangModule}\n  hosts: localhost\n  gather_facts: no\n  vars:\n    device_ip: "${deviceIp}"\n    username: "${username}"\n    password: "YOUR_PASSWORD"\n    yang_module: "${yangModule}"\n  \n  tasks:\n    - name: ${operation} RESTCONF request\n      uri:\n        url: "https://{{ device_ip }}/restconf/data/{{ yang_module }}"\n        method: ${operation}\n        user: "{{ username }}"\n        password: "{{ password }}"\n        force_basic_auth: yes\n        headers:\n          Content-Type: "application/yang-data+json"\n          Accept: "application/yang-data+json"${operation !== 'GET' ? '\n        body: "{{ payload | to_json }}"  # Define payload variable' : ''}\n        validate_certs: no\n        status_code: [200, 201, 204]\n      register: response\n    \n    - name: Display response\n      debug:\n        var: response.json`;
+            
+            // Generate JavaScript
+            generatedSnippets.javascript = `// ${operation} request using JavaScript fetch API\nconst deviceIp = '${deviceIp}';\nconst username = '${username}';\nconst password = 'YOUR_PASSWORD';\nconst yangModule = '${yangModule}';\n\nconst url = \`https://\${deviceIp}/restconf/data/\${yangModule}\`;\n\nconst headers = {\n  'Content-Type': 'application/yang-data+json',\n  'Accept': 'application/yang-data+json',\n  'Authorization': 'Basic ' + btoa(username + ':' + password)\n};\n\nconst options = {\n  method: '${operation}',\n  headers: headers,${operation !== 'GET' ? '\n  body: JSON.stringify(payload)  // Define your payload' : ''}\n};\n\nfetch(url, options)\n  .then(response => {\n    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);\n    return response.json();\n  })\n  .then(data => console.log('Success:', data))\n  .catch(error => console.error('Error:', error));`;
+            
+            // Display the code
+            document.getElementById('codeOutput').style.display = 'block';
+            document.getElementById('generatedCode').textContent = generatedSnippets[currentCodeTab];
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('generatedCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-code-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCodeGenerator();
+            }
+        });
+        
+        // Close modal on outside click
+        document.getElementById('codeGenModal').addEventListener('click', (e) => {
+            if (e.target.id === 'codeGenModal') {
+                closeCodeGenerator();
+            }
+        });
     </script>
 </body>
 </html>
