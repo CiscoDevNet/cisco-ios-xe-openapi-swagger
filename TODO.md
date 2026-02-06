@@ -38,20 +38,23 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 8 examples (PUT + PATCH for all 4 endpoints with authentication, authorization, accounting method lists)
 
-- [ ] #7: Add examples to native-line.json (4 endpoints)
+- [x] #7: Add examples to native-line.json (4 endpoints)
   - File: swagger-native-config-model/api/native-line.json
   - Description: Add examples for line, line aux, line console, line vty
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 8 examples (PUT + PATCH for all 4 endpoints with console, VTY, AUX configs)
 
-- [ ] #8: Add examples to native-vrf.json (2 endpoints)
+- [x] #8: Add examples to native-vrf.json (2 endpoints)
   - File: swagger-native-config-model/api/native-vrf.json
   - Description: Add examples for vrf, vrf definition
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 4 examples (PUT + PATCH for both endpoints with MPLS VPN, route-target configs)
 
-- [ ] #9: Add examples to native-platform-system.json (15 endpoints)
+- [x] #9: Add examples to native-platform-system.json (15 endpoints)
   - File: swagger-native-config-model/api/native-platform-system.json
   - Description: Add examples for banner, boot, card, clock, default, exception, hw-module, location, memory, module, setup, software, stack-power, system, upgrade
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 30 examples (PUT + PATCH for all 15 endpoints with platform/system configs)
 
 - [ ] #10: Add examples to native-protocols.json (17 endpoints)
   - File: swagger-native-config-model/api/native-protocols.json
