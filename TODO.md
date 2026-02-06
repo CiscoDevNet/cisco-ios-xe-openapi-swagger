@@ -8,10 +8,11 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 13 examples total (hostname already had PUT example, added PATCH + all PUT/PATCH for remaining 7 endpoints)
 
-- [ ] #2: Add examples to native-00-top-level-containers.json (5 endpoints)
+- [x] #2: Add examples to native-00-top-level-containers.json (5 endpoints)
   - File: swagger-native-config-model/api/native-00-top-level-containers.json
   - Description: Add examples for vlan, logging, snmp-server, nat, spanning-tree
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 10 examples (PUT + PATCH for all 5 endpoints with realistic YANG data)
 
 - [ ] #3: Add examples to native-ip.json (8 endpoints)
   - File: swagger-native-config-model/api/native-ip.json
