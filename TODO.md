@@ -20,20 +20,23 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 16 examples (PUT + PATCH for all 8 endpoints with realistic IP configs, ACLs, routes, DHCP pools, DNS, NAT, HTTP, SSH)
 
-- [ ] #4: Add examples to native-router.json (7 endpoints)
+- [x] #4: Add examples to native-router.json (7 endpoints)
   - File: swagger-native-config-model/api/native-router.json
   - Description: Add examples for router, router bgp, router eigrp, router isis, router lisp, router ospf, router rip
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 14 examples (PUT + PATCH for all 7 endpoints with OSPF, BGP, EIGRP, RIP, ISIS, LISP configs)
 
-- [ ] #5: Add examples to native-crypto.json (5 endpoints)
+- [x] #5: Add examples to native-crypto.json (5 endpoints)
   - File: swagger-native-config-model/api/native-crypto.json
   - Description: Add examples for crypto, crypto ikev2, crypto ipsec, crypto keyring, crypto pki
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 10 examples (PUT + PATCH for all 5 endpoints with PKI, IKEv2, IPsec, keyring configs)
 
-- [ ] #6: Add examples to native-aaa.json (4 endpoints)
+- [x] #6: Add examples to native-aaa.json (4 endpoints)
   - File: swagger-native-config-model/api/native-aaa.json
   - Description: Add examples for aaa, aaa accounting, aaa authentication, aaa authorization
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 8 examples (PUT + PATCH for all 4 endpoints with authentication, authorization, accounting method lists)
 
 - [ ] #7: Add examples to native-line.json (4 endpoints)
   - File: swagger-native-config-model/api/native-line.json
