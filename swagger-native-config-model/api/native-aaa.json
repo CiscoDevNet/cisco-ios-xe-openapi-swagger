@@ -1,796 +1,302 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Native - AAA & RADIUS/TACACS",
-    "description": "Cisco IOS-XE Native Configuration - Aaa\n\nExtracted from Cisco-IOS-XE-native YANG module.\n**Category:** Aaa\n**Paths:** 7\n\n**HTTP Methods:**\n- GET: Retrieve configuration\n- PUT: Replace configuration\n- PATCH: Merge/update configuration\n- DELETE: Remove configuration\n\n**YANG Model:** [Native - AAA & RADIUS/TACACS.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Native - AAA & RADIUS/TACACS.yang)",
-    "version": "17.18.1"
+    "title": "Cisco IOS-XE Native Config - AAA (Authentication, Authorization, Accounting)",
+    "description": "AAA configuration for Cisco-IOS-XE-native model. This container includes authentication, authorization, and accounting configurations for device access control.\n\n**What's included:** Complete AAA configuration hierarchy under /native/aaa\n\n**Common use cases:** RADIUS/TACACS+ authentication, command authorization, accounting, login banners, method lists\n\n**Related:** See 'TACACS' and 'RADIUS' for server configuration, 'Line' for access line config",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/docs/ios-xe/"
+    }
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
           "default": "router.example.com",
           "description": "Device IP or hostname"
+        },
+        "port": {
+          "default": "443",
+          "description": "HTTPS port"
         }
       }
     }
   ],
   "paths": {
-    "/data/Cisco-IOS-XE-native:native/enable/use-tacacs": {
-      "get": {
-        "summary": "Get use-tacacs",
-        "description": "Use TACACS to check enable passwords",
-        "operationId": "get-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "example-string"
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Replace use-tacacs",
-        "description": "Replace entire use-tacacs configuration",
-        "operationId": "put-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "string"
-              },
-              "example": "example-string"
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update use-tacacs",
-        "description": "Merge updates to use-tacacs configuration",
-        "operationId": "patch-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "string"
-              },
-              "example": "example-string"
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete use-tacacs",
-        "description": "Remove use-tacacs configuration",
-        "operationId": "delete-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
     "/data/Cisco-IOS-XE-native:native/aaa": {
       "get": {
-        "summary": "Get aaa",
-        "description": "Authentication, Authorization and Accounting.",
-        "operationId": "get-native-aaa",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Get AAA configuration",
+        "description": "Retrieve entire AAA configuration container",
+        "operationId": "get-aaa-all",
+        "tags": ["aaa-root"],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Cisco-IOS-XE-native:aaa": {
+                      "type": "object",
+                      "description": "Complete AAA configuration"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace AAA configuration",
+        "description": "Replace entire AAA configuration",
+        "operationId": "put-aaa-all",
+        "tags": ["aaa-root"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Successfully configured" }
+        }
+      },
+      "patch": {
+        "summary": "Update AAA configuration",
+        "description": "Merge update to AAA configuration",
+        "operationId": "patch-aaa-all",
+        "tags": ["aaa-root"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Successfully updated" }
+        }
+      },
+      "delete": {
+        "summary": "Delete AAA configuration",
+        "description": "Remove all AAA configuration (WARNING: may lock out management access)",
+        "operationId": "delete-aaa-all",
+        "tags": ["aaa-root"],
+        "responses": {
+          "204": { "description": "Successfully deleted" }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/aaa/authentication": {
+      "get": {
+        "summary": "Get authentication configuration",
+        "description": "Retrieve authentication method lists",
+        "operationId": "get-aaa-authentication",
+        "tags": ["authentication"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object"
-                },
-                "example": {}
+                }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
           }
         }
       },
       "put": {
-        "summary": "Replace aaa",
-        "description": "Replace entire aaa configuration",
-        "operationId": "put-native-aaa",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Configure authentication",
+        "description": "Replace authentication configuration",
+        "operationId": "put-aaa-authentication",
+        "tags": ["authentication"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": {}
+              }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully configured" }
         }
       },
       "patch": {
-        "summary": "Update aaa",
-        "description": "Merge updates to aaa configuration",
-        "operationId": "patch-native-aaa",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Update authentication configuration",
+        "description": "Merge update to authentication configuration",
+        "operationId": "patch-aaa-authentication",
+        "tags": ["authentication"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": {}
+              }
             }
           }
         },
         "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully updated" }
         }
       },
       "delete": {
-        "summary": "Delete aaa",
-        "description": "Remove aaa configuration",
-        "operationId": "delete-native-aaa",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Delete authentication configuration",
+        "description": "Remove authentication configuration",
+        "operationId": "delete-aaa-authentication",
+        "tags": ["authentication"],
         "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
+          "204": { "description": "Successfully deleted" }
         }
       }
     },
-    "/data/Cisco-IOS-XE-native:native/tacacs": {
+    "/data/Cisco-IOS-XE-native:native/aaa/authorization": {
       "get": {
-        "summary": "Get tacacs",
-        "description": "TACACS server configuration command",
-        "operationId": "get-native-tacacs",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Get authorization configuration",
+        "description": "Retrieve authorization method lists",
+        "operationId": "get-aaa-authorization",
+        "tags": ["authorization"],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object"
-                },
-                "example": {}
+                }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
           }
         }
       },
       "put": {
-        "summary": "Replace tacacs",
-        "description": "Replace entire tacacs configuration",
-        "operationId": "put-native-tacacs",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Configure authorization",
+        "description": "Replace authorization configuration",
+        "operationId": "put-aaa-authorization",
+        "tags": ["authorization"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": {}
+              }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully configured" }
         }
       },
       "patch": {
-        "summary": "Update tacacs",
-        "description": "Merge updates to tacacs configuration",
-        "operationId": "patch-native-tacacs",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Update authorization configuration",
+        "description": "Merge update to authorization configuration",
+        "operationId": "patch-aaa-authorization",
+        "tags": ["authorization"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": {}
+              }
             }
           }
         },
         "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully updated" }
         }
       },
       "delete": {
-        "summary": "Delete tacacs",
-        "description": "Remove tacacs configuration",
-        "operationId": "delete-native-tacacs",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Delete authorization configuration",
+        "description": "Remove authorization configuration",
+        "operationId": "delete-aaa-authorization",
+        "tags": ["authorization"],
         "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
+          "204": { "description": "Successfully deleted" }
         }
       }
     },
-    "/data/Cisco-IOS-XE-native:native/tacacs-server": {
+    "/data/Cisco-IOS-XE-native:native/aaa/accounting": {
       "get": {
-        "summary": "Get tacacs-server",
-        "description": "Modify TACACS query parameters",
-        "operationId": "get-native-tacacs-server",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Get accounting configuration",
+        "description": "Retrieve accounting method lists",
+        "operationId": "get-aaa-accounting",
+        "tags": ["accounting"],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object"
-                },
-                "example": "tacacs.corp.example.com"
+                }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
           }
         }
       },
       "put": {
-        "summary": "Replace tacacs-server",
-        "description": "Replace entire tacacs-server configuration",
-        "operationId": "put-native-tacacs-server",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Configure accounting",
+        "description": "Replace accounting configuration",
+        "operationId": "put-aaa-accounting",
+        "tags": ["accounting"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": "tacacs.corp.example.com"
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update tacacs-server",
-        "description": "Merge updates to tacacs-server configuration",
-        "operationId": "patch-native-tacacs-server",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": "tacacs.corp.example.com"
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete tacacs-server",
-        "description": "Remove tacacs-server configuration",
-        "operationId": "delete-native-tacacs-server",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/Cisco-IOS-XE-native:native/radius-server": {
-      "get": {
-        "summary": "Get radius-server",
-        "description": "Modify RADIUS query parameters",
-        "operationId": "get-native-radius-server",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": "radius.corp.example.com"
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Replace radius-server",
-        "description": "Replace entire radius-server configuration",
-        "operationId": "put-native-radius-server",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": "radius.corp.example.com"
-            }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully configured" }
         }
       },
       "patch": {
-        "summary": "Update radius-server",
-        "description": "Merge updates to radius-server configuration",
-        "operationId": "patch-native-radius-server",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Update accounting configuration",
+        "description": "Merge update to accounting configuration",
+        "operationId": "patch-aaa-accounting",
+        "tags": ["accounting"],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
                 "type": "object"
-              },
-              "example": "radius.corp.example.com"
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete radius-server",
-        "description": "Remove radius-server configuration",
-        "operationId": "delete-native-radius-server",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/Cisco-IOS-XE-native:native/radius": {
-      "get": {
-        "summary": "Get radius",
-        "description": "RADIUS server configuration command",
-        "operationId": "get-native-radius",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Replace radius",
-        "description": "Replace entire radius configuration",
-        "operationId": "put-native-radius",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update radius",
-        "description": "Merge updates to radius configuration",
-        "operationId": "patch-native-radius",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
+          "204": { "description": "Successfully updated" }
         }
       },
       "delete": {
-        "summary": "Delete radius",
-        "description": "Remove radius configuration",
-        "operationId": "delete-native-radius",
-        "tags": [
-          "aaa"
-        ],
+        "summary": "Delete accounting configuration",
+        "description": "Remove accounting configuration",
+        "operationId": "delete-aaa-accounting",
+        "tags": ["accounting"],
         "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/Cisco-IOS-XE-native:native/use-tacacs": {
-      "get": {
-        "summary": "Get use-tacacs",
-        "description": "Use TACACS to check enable passwords",
-        "operationId": "get-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "example-string"
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Replace use-tacacs",
-        "description": "Replace entire use-tacacs configuration",
-        "operationId": "put-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "string"
-              },
-              "example": "example-string"
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update use-tacacs",
-        "description": "Merge updates to use-tacacs configuration",
-        "operationId": "patch-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "string"
-              },
-              "example": "example-string"
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete use-tacacs",
-        "description": "Remove use-tacacs configuration",
-        "operationId": "delete-native-use-tacacs",
-        "tags": [
-          "aaa"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not found"
-          }
+          "204": { "description": "Successfully deleted" }
         }
       }
     }
@@ -801,26 +307,6 @@
         "type": "http",
         "scheme": "basic"
       }
-    },
-    "schemas": {
-      "native-use-tacacs": {
-        "type": "string"
-      },
-      "native-aaa": {
-        "type": "object"
-      },
-      "native-tacacs": {
-        "type": "object"
-      },
-      "native-tacacs-server": {
-        "type": "object"
-      },
-      "native-radius-server": {
-        "type": "object"
-      },
-      "native-radius": {
-        "type": "object"
-      }
     }
   },
   "security": [
@@ -830,8 +316,20 @@
   ],
   "tags": [
     {
-      "name": "aaa",
-      "description": "Native - AAA & RADIUS/TACACS"
+      "name": "aaa-root",
+      "description": "Root AAA container operations"
+    },
+    {
+      "name": "authentication",
+      "description": "User authentication configuration"
+    },
+    {
+      "name": "authorization",
+      "description": "Command authorization configuration"
+    },
+    {
+      "name": "accounting",
+      "description": "Accounting and auditing configuration"
     }
   ]
 }
