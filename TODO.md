@@ -56,8 +56,9 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 30 examples (PUT + PATCH for all 15 endpoints with platform/system configs)
 
-- [ ] #10: Add examples to native-protocols.json (17 endpoints)
+- [x] #10: Add examples to native-protocols.json (17 endpoints)
   - File: swagger-native-config-model/api/native-protocols.json
+  - Completed: Added 34 examples (PUT + PATCH for all 17 protocol endpoints: BFD, BFD-template, NTP, CDP, MPLS, L2VPN, L2VPN-config, L3VPN, LACP, PPP, multilink, UDLD, MVRP, PTP, CLNS, Frame Relay, xconnect - fixed extra brace in L3VPN PUT)
   - Description: Add examples for bfd, bfd-template, cdp, clns, frame-relay, l2vpn, l2vpn-config, l3vpn, lacp, mpls, multilink, mvrp, ntp, ppp, ptp, udld, xconnect
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
 
