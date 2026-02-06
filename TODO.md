@@ -14,10 +14,11 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 10 examples (PUT + PATCH for all 5 endpoints with realistic YANG data)
 
-- [ ] #3: Add examples to native-ip.json (8 endpoints)
+- [x] #3: Add examples to native-ip.json (8 endpoints)
   - File: swagger-native-config-model/api/native-ip.json
   - Description: Add examples for ip, ip access-list, ip dhcp, ip domain, ip http, ip nat, ip route, ip ssh
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 16 examples (PUT + PATCH for all 8 endpoints with realistic IP configs, ACLs, routes, DHCP pools, DNS, NAT, HTTP, SSH)
 
 - [ ] #4: Add examples to native-router.json (7 endpoints)
   - File: swagger-native-config-model/api/native-router.json
