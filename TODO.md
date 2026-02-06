@@ -100,12 +100,14 @@
 
 ## Fix Existing TODO Comments in Other Models
 
-- [ ] #17: Fix TODO descriptions in cisco-pw.json
+- [x] #17: Fix TODO descriptions in cisco-pw.json
   - File: swagger-other-model/api/cisco-pw.json
   - Description: Replace 7 placeholder "TODO" descriptions with proper documentation (lines 1900, 1916, 1941, 1946, 1960, 1965, 1988)
   - Acceptance: All "description": "TODO" replaced with meaningful descriptions from YANG model
+  - Completed: Replaced 7 TODO descriptions with technical descriptions (direction, address, hostname, resync, status parameters)
 
-- [ ] #18: Fix TODO descriptions in openconfig-mpls.json
+- [x] #18: Fix TODO descriptions in openconfig-mpls.json
   - File: swagger-openconfig-model/api/openconfig-mpls.json
   - Description: Replace 28 placeholder "TODO" descriptions with proper documentation
   - Acceptance: All "description": "TODO" replaced with meaningful descriptions from YANG model
+  - Completed: Replaced 30 TODO descriptions with technical descriptions (path-timeouts and reservation-timeouts for RSVP state events)
