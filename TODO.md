@@ -74,10 +74,11 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 18 examples (PUT + PATCH for all 9 Layer 2 switching endpoints: bridge-domain, ethernet CFM/LMI, MAC table, VTP, port-channel, OTV, L2 VFI/VPN, VXLAN)
 
-- [ ] #13: Add examples to native-qos-policy.json (2 endpoints)
+- [x] #13: Add examples to native-qos-policy.json (2 endpoints)
   - File: swagger-native-config-model/api/native-qos-policy.json
-  - Description: Add examples for parameter-map, qos
+  - Description: Add examples for qos, parameter-map
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 4 examples (PUT + PATCH for QoS queue-softmax/preserve-marking and parameter-map inspect/protocol-info types)
 
 - [ ] #14: Add examples to native-other.json - Part 1 (first 27 endpoints: alarm-contact through fhrp)
   - File: swagger-native-config-model/api/native-other.json
