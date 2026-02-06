@@ -80,20 +80,23 @@
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
   - Completed: Added 4 examples (PUT + PATCH for QoS queue-softmax/preserve-marking and parameter-map inspect/protocol-info types)
 
-- [ ] #14: Add examples to native-other.json - Part 1 (first 27 endpoints: alarm-contact through fhrp)
+- [x] #14: Add examples to native-other.json - Part 1 (first 27 endpoints: alarm-contact through fhrp)
   - File: swagger-native-config-model/api/native-other.json
   - Description: Add examples for alarm-contact, alias, archive, avb, avc, call-home, cisp, controller, control-plane, control-plane-host, cwmp, domain, endpoint-tracker, epm, errdisable, event, fabric, facility-alarm, fallback, fhrp, file, flow, global-address-family, iox, ipv6, key, l2tp
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Part of batch completion of all 82 endpoints in native-other.json (see #16)
 
-- [ ] #15: Add examples to native-other.json - Part 2 (middle 27 endpoints: l2tp-class through route-map)
+- [x] #15: Add examples to native-other.json - Part 2 (middle 27 endpoints: l2tp-class through route-map)
   - File: swagger-native-config-model/api/native-other.json
   - Description: Add examples for l2tp-class, ldap, license, macro, management, md-list, memory-size, metadata, mls, monitor, native, network-clock, object-group, parser, performance, performance-measurement, pfr, pfr-map, platform, process, profile, pseudowire-class, redundancy, redun-management, remote-management, rmon, route-map
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Part of batch completion of all 82 endpoints in native-other.json (see #16)
 
-- [ ] #16: Add examples to native-other.json - Part 3 (last 28 endpoints: route-tag through zone-pair)
+- [x] #16: Add examples to native-other.json - Part 3 (last 28 endpoints: route-tag through zone-pair)
   - File: swagger-native-config-model/api/native-other.json
   - Description: Add examples for route-tag, sampler, scada-gw, scheduler, sdm, segment-routing, service, service-chain, service-insertion, snmp, stackwise-virtual, standby, subscriber-config, table-map, template, tftp-server-config, time-range, tod-clock, track, transport, transport-map, username, user-name, virtual-service, virtual-template, wsma, zone, zone-pair
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 164 examples (PUT + PATCH for all 82 endpoints in native-other.json including native root config)
 
 ## Fix Existing TODO Comments in Other Models
 
