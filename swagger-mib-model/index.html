@@ -196,15 +196,29 @@
         }
         
         // Auto-load spec from hash fragment (for deep linking from search)
-        window.addEventListener('DOMContentLoaded', () => {
+        function checkAndLoadFromHash() {
             const hash = window.location.hash;
             if (hash.startsWith('#spec=')) {
                 const moduleName = hash.replace('#spec=', '');
                 if (moduleName) {
-                    loadSpec(moduleName);
+                    setTimeout(() => loadSpec(moduleName), 100);
                 }
             }
-        });
+        }
+        
+        // Check on page load
+        window.addEventListener('DOMContentLoaded', checkAndLoadFromHash);
+        
+        // Check on hash change (for navigation within the page)
+        window.addEventListener('hashchange', checkAndLoadFromHash);
+        
+        // Also check immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            // Still loading
+        } else {
+            // DOM already loaded
+            checkAndLoadFromHash();
+        }
         
         loadModules();
     </script>
