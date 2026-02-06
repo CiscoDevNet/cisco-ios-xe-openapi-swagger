@@ -62,15 +62,17 @@
   - Description: Add examples for bfd, bfd-template, cdp, clns, frame-relay, l2vpn, l2vpn-config, l3vpn, lacp, mpls, multilink, mvrp, ntp, ppp, ptp, udld, xconnect
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
 
-- [ ] #11: Add examples to native-security-access.json (15 endpoints)
+- [x] #11: Add examples to native-security-access.json (15 endpoints)
   - File: swagger-native-config-model/api/native-security-access.json
   - Description: Add examples for cts, device-tracking, dot1x, eap, enable, identity, login, mab, mka, password, privilege, radius, radius-server, tacacs, tacacs-server
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 30 examples (PUT + PATCH for all 15 security/access endpoints: TACACS, RADIUS, 802.1X, EAP, MAB, Identity, CTS, device-tracking, password, enable, login, privilege, MKA)
 
-- [ ] #12: Add examples to native-switching-l2.json (9 endpoints)
+- [x] #12: Add examples to native-switching-l2.json (9 endpoints)
   - File: swagger-native-config-model/api/native-switching-l2.json
   - Description: Add examples for bridge-domain, ethernet, l2, mac, mac-address-table, otv, port-channel, vtp, vxlan
   - Acceptance: All PUT/PATCH operations have "example" field with valid YANG-conformant data
+  - Completed: Added 18 examples (PUT + PATCH for all 9 Layer 2 switching endpoints: bridge-domain, ethernet CFM/LMI, MAC table, VTP, port-channel, OTV, L2 VFI/VPN, VXLAN)
 
 - [ ] #13: Add examples to native-qos-policy.json (2 endpoints)
   - File: swagger-native-config-model/api/native-qos-policy.json
