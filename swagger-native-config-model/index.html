@@ -20,9 +20,12 @@
         .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
         .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
         .sidebar-header h3 { font-size: 14px; color: #333; }
-        .search-box { padding: 12px 20px; border-bottom: 1px solid #e0e0e0; }
-        .search-box input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
-        .search-box input:focus { outline: none; border-color: #1565c0; }
+        .search-box { padding: 12px 20px; border-bottom: 1px solid #e0e0e0; position: relative; }
+        .search-box input { width: 100%; padding: 8px 32px 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .search-box input:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1); }
+        .search-clear { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 18px; display: none; }
+        .search-clear:hover { color: #333; }
+        .search-results { padding: 8px 20px; font-size: 12px; color: #666; background: #f9f9f9; border-bottom: 1px solid #e0e0e0; }
         .module-list { list-style: none; }
         .module-list li { border-bottom: 1px solid #f0f0f0; }
         .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
@@ -65,8 +68,10 @@
                 <h3>Native Config Categories</h3>
             </div>
             <div class="search-box">
-                <input type="text" id="searchBox" placeholder="Search categories (e.g., hostname)..." onkeyup="filterCategories()">
+                <input type="text" id="searchBox" placeholder="🔍 Search: hostname, bgp, vlan, acl, route-map..." onkeyup="filterCategories()" oninput="updateSearchUI()">
+                <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
             </div>
+            <div class="search-results" id="searchResults"></div>
             <div class="stats">
                 <div class="stat">
                     <div class="stat-value" id="totalModules">14</div>
@@ -126,12 +131,35 @@
         function filterCategories() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const items = document.querySelectorAll('.module-list li');
+            let visibleCount = 0;
+            
             items.forEach(item => {
                 const text = item.textContent.toLowerCase();
                 const keywords = (item.getAttribute('data-keywords') || '').toLowerCase();
-                const matches = text.includes(searchTerm) || keywords.includes(searchTerm);
+                const matches = !searchTerm || text.includes(searchTerm) || keywords.includes(searchTerm);
                 item.style.display = matches ? '' : 'none';
+                if (matches) visibleCount++;
             });
+            
+            const resultsDiv = document.getElementById('searchResults');
+            if (searchTerm) {
+                resultsDiv.textContent = `Found ${visibleCount} of 14 categories`;
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        }
+        
+        function updateSearchUI() {
+            const searchBox = document.getElementById('searchBox');
+            const clearBtn = document.getElementById('searchClear');
+            clearBtn.style.display = searchBox.value ? 'block' : 'none';
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchBox').value = '';
+            updateSearchUI();
+            filterCategories();
         }
         
         function loadSpec(moduleName) {
