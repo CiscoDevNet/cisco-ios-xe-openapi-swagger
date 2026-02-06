@@ -112,28 +112,30 @@
                 document.getElementById('totalOperations').textContent = totalPaths.toLocaleString();
                 renderModuleList(allModules);
                 
-                // Auto-load IF-MIB if available, otherwise first module
-                let moduleToLoad = null;
-                
-                // Check if IF-MIB exists in modules
-                const ifMibModule = allModules.find(mod => {
-                    const modName = typeof mod === 'string' ? mod : mod.name;
-                    return modName === 'IF-MIB';
-                });
-                
-                if (ifMibModule) {
-                    // IF-MIB found
-                    moduleToLoad = typeof ifMibModule === 'string' ? ifMibModule : ifMibModule.name;
-                } else if (allModules.length > 0) {
-                    // Use first module
-                    const firstMod = allModules[0];
-                    moduleToLoad = typeof firstMod === 'string' ? firstMod : firstMod.name;
-                }
-                
-                // Load the selected module
-                if (moduleToLoad) {
-                    console.log('Auto-loading module:', moduleToLoad);
-                    loadSpec(moduleToLoad);
+                // Auto-load IF-MIB if available, otherwise first module (only if no hash specified)
+                if (!window.location.hash.includes('spec')) {
+                    let moduleToLoad = null;
+                    
+                    // Check if IF-MIB exists in modules
+                    const ifMibModule = allModules.find(mod => {
+                        const modName = typeof mod === 'string' ? mod : mod.name;
+                        return modName === 'IF-MIB';
+                    });
+                    
+                    if (ifMibModule) {
+                        // IF-MIB found
+                        moduleToLoad = typeof ifMibModule === 'string' ? ifMibModule : ifMibModule.name;
+                    } else if (allModules.length > 0) {
+                        // Use first module
+                        const firstMod = allModules[0];
+                        moduleToLoad = typeof firstMod === 'string' ? firstMod : firstMod.name;
+                    }
+                    
+                    // Load the selected module
+                    if (moduleToLoad) {
+                        console.log('Auto-loading module:', moduleToLoad);
+                        loadSpec(moduleToLoad);
+                    }
                 }
             } catch (error) {
                 console.error('Error loading manifest:', error);
