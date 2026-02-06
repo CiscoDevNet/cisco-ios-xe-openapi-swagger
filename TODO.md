@@ -6,14 +6,16 @@
 - **Total Files Modified:** 54 (16 native config + 38 events)
 - **Total YANG Examples Added:** 584 (363 PUT/PATCH + 183 GET native + 38 GET events)
 - **Total Descriptions Fixed:** 37
-- **Git Commits:** 13
+- **Git Commits:** 15
 - **Status:** ✅ All tasks completed and pushed to GitHub
 
 ## Latest Updates (Feb 6, 2026)
 - ✅ Added GET response examples to all 183 endpoints across 14 native config files
 - ✅ Fixed corrupted native-other.json file (commit 3d4437b)
 - ✅ Completed native-other.json with PUT/PATCH/GET examples for all 82 endpoints (commit 17bad95)
-- ✅ **Added YANG-aligned GET response examples to all 38 event model files (commit 668885a)**
+- ✅ Added YANG-aligned GET response examples to all 38 event model files (commit 668885a)
+- ✅ **Rebuilt search index with 10,027 endpoints and granular keywords (commit 698fbd9)**
+- ✅ **Fixed deep linking navigation from search results to Swagger specs (commit eda54a1)**
 - **Final Statistics:**
   - **Native Config Models:**
     - 183 endpoints with GET response examples
@@ -21,7 +23,57 @@
     - 182 endpoints with PATCH request examples
   - **Event Models:**
     - 38 event types with YANG-aligned GET response examples
+  - **Search Infrastructure:**
+    - 562 modules indexed
+    - 10,027 endpoints searchable
+    - Hash-based deep linking to all Swagger specs
   - **100% coverage across all native config and event model files**
+
+## Search & Navigation Enhancements
+
+- [x] **#19: Fix search to include endpoint-level keywords (commit 698fbd9)**
+  - **Problem:** Search only indexed 768 modules with basic keywords (aaa, acl), missing endpoint names
+  - **Issue:** Searching "hostname", "interface", "bgp" returned 0 results
+  - **Solution:** Created rebuild_search_index.py to scan all Swagger JSON files
+  - **Implementation:**
+    - Extracts paths, operations, summaries from 10,027 API endpoints
+    - Builds comprehensive keyword sets from path segments and descriptions
+    - Generated search-index.json v2.0 with endpoint-level keywords
+  - **Result:** 
+    - "hostname" now finds 1 module (native-00-top-level-leafs)
+    - "interface" finds 45 modules
+    - "bgp" finds 10 modules
+    - "ospf" finds 4 modules
+    - "vlan" finds 11 modules
+  - **Commit:** 698fbd9 - "Rebuild search index with endpoint-level keywords from all 10,027 API paths"
+
+- [x] **#20: Fix navigation from search results to load specific Swagger specs (commit eda54a1)**
+  - **Problem:** Search results linked to category pages but didn't load the specific spec
+  - **Issue:** User clicks "View API Spec" → navigates to swagger-native-config-model/ → sees welcome message → must manually click module in sidebar
+  - **Root Cause:** Search generated href="category/?url=api/file.json" but category pages expected onclick="loadSpec('module-name')" JavaScript calls
+  - **Solution:** 
+    - Updated search-index.json to use hash fragment URLs (#spec=module-name)
+    - Added auto-load functionality to all 9 Swagger UI index pages
+    - Pages now read window.location.hash on DOMContentLoaded and auto-call loadSpec()
+  - **Files Modified:**
+    - search-index.json (updated swaggerUrl format to use hash fragments)
+    - swagger-oper-model/index.html
+    - swagger-native-config-model/index.html
+    - swagger-rpc-model/index.html
+    - swagger-events-model/index.html
+    - swagger-cfg-model/index.html
+    - swagger-ietf-model/index.html
+    - swagger-openconfig-model/index.html
+    - swagger-mib-model/index.html
+    - swagger-other-model/index.html
+  - **Result:**
+    - Direct navigation: search result → specific API spec (one click)
+    - Bookmarkable URLs: swagger-native-config-model/index.html#spec=native-00-top-level-leafs
+    - Deep linking works from any source (email, docs, external links)
+    - All 10,027 endpoints are now directly linkable
+  - **Commit:** eda54a1 - "Enable deep linking from search results to Swagger specs"
+  - **Documentation:** TEST_DEEP_LINKING.md
+  - **Validation:** test_deep_linking.py (all 562 modules verified)
 
 ## Add YANG-Aligned Example Data to Native Config Model APIs
 
