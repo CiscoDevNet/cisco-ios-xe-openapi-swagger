@@ -1,0 +1,157 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "cisco-pw Event Notifications",
+    "version": "17.18.1",
+    "description": "This module contains YANG definitions for Cisco pseudowire event notifications.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [cisco-pw.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-pw.yang)\n\n**🌳 YANG Tree:** [View cisco-pw structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/cisco-pw.html)"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "sandbox-iosxe-latest-1.cisco.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/ws/event-streams/cisco-pw/vc-up-notification": {
+      "get": {
+        "summary": "Subscribe to vc-up-notification events",
+        "description": "Establishes WebSocket connection for virtual circuit up notifications",
+        "tags": [
+          "pseudowire-events"
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vc-up-notification"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/ws/event-streams/cisco-pw/vc-down-notification": {
+      "get": {
+        "summary": "Subscribe to vc-down-notification events",
+        "description": "Establishes WebSocket connection for virtual circuit down notifications",
+        "tags": [
+          "pseudowire-events"
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/vc-down-notification"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "vc-up-notification": {
+        "type": "object",
+        "description": "Virtual circuit up notification",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "cisco-pw:vc-up-notification": {
+                "type": "object",
+                "properties": {
+                  "vc-list": {
+                    "type": "array",
+                    "description": "List of virtual circuits that came up",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "vc-peer-address": {
+                          "type": "string",
+                          "description": "Peer address of the virtual circuit"
+                        },
+                        "vc-id": {
+                          "type": "integer",
+                          "description": "Virtual circuit identifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "vc-down-notification": {
+        "type": "object",
+        "description": "Virtual circuit down notification",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "cisco-pw:vc-down-notification": {
+                "type": "object",
+                "properties": {
+                  "vc-list": {
+                    "type": "array",
+                    "description": "List of virtual circuits that went down",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "vc-peer-address": {
+                          "type": "string",
+                          "description": "Peer address of the virtual circuit"
+                        },
+                        "vc-id": {
+                          "type": "integer",
+                          "description": "Virtual circuit identifier"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

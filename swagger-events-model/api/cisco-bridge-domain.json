@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "cisco-bridge-domain Event Notifications",
+    "version": "17.18.1",
+    "description": "This module contains YANG definitions for Cisco bridge domain event notifications.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [cisco-bridge-domain.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-bridge-domain.yang)\n\n**🌳 YANG Tree:** [View cisco-bridge-domain structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/cisco-bridge-domain.html)"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "sandbox-iosxe-latest-1.cisco.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/ws/event-streams/cisco-bridge-domain/bd-state-notification": {
+      "get": {
+        "summary": "Subscribe to bd-state-notification events",
+        "description": "Establishes WebSocket connection for bridge domain state change notifications",
+        "tags": [
+          "bridge-domain-events"
+        ],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bd-state-notification"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "bd-state-notification": {
+        "type": "object",
+        "description": "Bridge domain state change notification",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Time when the notification was generated"
+              },
+              "cisco-bridge-domain:bd-state-notification": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Bridge domain identifier"
+                  },
+                  "bd-state": {
+                    "type": "string",
+                    "description": "Current state of the bridge domain"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Timestamp of state change"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

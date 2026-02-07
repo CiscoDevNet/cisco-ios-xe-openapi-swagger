@@ -1,0 +1,85 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "tailf-kicker Event Notifications",
+    "version": "17.18.1",
+    "description": "This module contains YANG definitions for Tail-f kicker event notifications.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [tailf-kicker.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/tailf-kicker.yang)\n\n**🌳 YANG Tree:** [View tailf-kicker structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/tailf-kicker.html)"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "sandbox-iosxe-latest-1.cisco.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/ws/event-streams/tailf-kicker/kicker-triggered": {
+      "get": {
+        "summary": "Subscribe to kicker-triggered events",
+        "description": "Notification when a kicker is triggered by monitored data changes",
+        "tags": ["kicker-events"],
+        "responses": {
+          "101": {
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/kicker-triggered"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "kicker-triggered": {
+        "type": "object",
+        "description": "Kicker triggered notification",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "tailf-kicker:kicker-triggered": {
+                "type": "object",
+                "properties": {
+                  "kicker-id": {
+                    "type": "string",
+                    "description": "Identifier of the kicker that was triggered"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "Path to the monitored node that triggered the kicker"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

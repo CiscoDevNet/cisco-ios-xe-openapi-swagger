@@ -3,9 +3,9 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-641-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-643-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 641 modules, 53 categories, 717 YANG tree files, and interactive code generation** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 643 modules, 53 categories, 717 YANG tree files, and interactive code generation** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
 🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
@@ -17,8 +17,8 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 - ✅ **Native Config:** 18 categories, 172 paths (644 operations with examples)
 - ✅ **Operational Data:** 199 modules across 16 categories (2,652 paths)
-- ✅ **Events:** 117 modules (38 YANG + 79 MIB) (658 notification paths)
-- ✅ **RPC Operations:** 60 modules (57 Cisco + 3 IETF/Tailf) (311 operations)
+- ✅ **Events:** 128 modules (40 YANG + 88 MIB) (715 notification paths)
+- ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
 - ✅ **IETF Standards:** 21 modules (592 paths)
 - ✅ **OpenConfig:** 41 modules (772 paths)
 - ✅ **MIB Translations:** 147 modules (visualizations for SNMP data)
@@ -38,13 +38,13 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 641 | Generated specifications |
-| **API Paths** | 5,769 | RESTCONF endpoints (excl. MIB) |
+| **OpenAPI Specs** | 643 | Generated specifications |
+| **API Paths** | 5,826 | RESTCONF endpoints (excl. MIB) |
 | **Operations** | 10,000+ | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 717 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Coverage** | 75.6% | YANG modules with specs (641/848) |
+| **Coverage** | 75.8% | YANG modules with specs (643/848) |
 | **Accountability** | 100% | All modules mapped |
 
 ## 🗂️ Model Categories
