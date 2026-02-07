@@ -1,0 +1,133 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ietf-routing RPCs",
+    "description": "Routing Management (RFC 8349) - FIB route lookup operations",
+    "version": "2018-03-13"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/ietf-routing:fib-route": {
+      "post": {
+        "tags": ["Routing FIB"],
+        "summary": "Perform FIB route lookup",
+        "description": "Lookup a route in the Forwarding Information Base (FIB) for a given destination address",
+        "operationId": "fibRoute",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "routing-instance-name": {
+                        "type": "string",
+                        "description": "Name of the routing instance"
+                      },
+                      "destination-address": {
+                        "type": "object",
+                        "properties": {
+                          "address-family": {
+                            "type": "string",
+                            "description": "Address family identifier (ipv4, ipv6, etc.)"
+                          }
+                        },
+                        "required": ["address-family"]
+                      }
+                    },
+                    "required": ["routing-instance-name", "destination-address"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "FIB route lookup successful",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "route": {
+                          "type": "object",
+                          "properties": {
+                            "address-family": {
+                              "type": "string",
+                              "description": "Address family"
+                            },
+                            "next-hop": {
+                              "type": "object",
+                              "properties": {
+                                "outgoing-interface": {
+                                  "type": "string",
+                                  "description": "Outgoing interface"
+                                },
+                                "next-hop-address": {
+                                  "type": "string",
+                                  "description": "Next-hop IP address"
+                                },
+                                "special-next-hop": {
+                                  "type": "string",
+                                  "enum": ["blackhole", "unreachable", "prohibit", "receive"],
+                                  "description": "Special next-hop type"
+                                }
+                              }
+                            },
+                            "source-protocol": {
+                              "type": "string",
+                              "description": "Source protocol that installed the route"
+                            },
+                            "active": {
+                              "type": "boolean",
+                              "description": "Whether the route is active"
+                            },
+                            "last-updated": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "When the route was last updated"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

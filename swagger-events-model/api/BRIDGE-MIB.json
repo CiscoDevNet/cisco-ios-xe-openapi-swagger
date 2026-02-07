@@ -1,0 +1,103 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "BRIDGE-MIB SNMP Notifications",
+    "description": "SNMP Trap notifications from BRIDGE-MIB for bridging and spanning tree events",
+    "version": "1.0.0"
+  },
+  "servers": [{"url": "https://{device}", "variables": {"device": {"default": "localhost"}}}],
+  "security": [{"basicAuth": []}],
+  "paths": {
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BRIDGE-MIB:newRoot": {
+      "get": {
+        "summary": "SNMP Trap: New spanning tree root bridge",
+        "description": "Notification when this bridge becomes the new root of the spanning tree",
+        "operationId": "get_newRoot",
+        "tags": ["Spanning Tree Events"],
+        "parameters": [
+          {"$ref": "#/components/parameters/SubscriptionId"},
+          {"$ref": "#/components/parameters/ReceiverName"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/NotificationResponse"}
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BRIDGE-MIB:topologyChange": {
+      "get": {
+        "summary": "SNMP Trap: Spanning tree topology change",
+        "description": "Notification when spanning tree topology change is detected",
+        "operationId": "get_topologyChange",
+        "tags": ["Spanning Tree Events"],
+        "parameters": [
+          {"$ref": "#/components/parameters/SubscriptionId"},
+          {"$ref": "#/components/parameters/ReceiverName"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/NotificationResponse"}
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BRIDGE-MIB:newRootPort": {
+      "get": {
+        "summary": "SNMP Trap: New spanning tree root port",
+        "description": "Notification when a new root port is selected",
+        "operationId": "get_newRootPort",
+        "tags": ["Spanning Tree Events"],
+        "parameters": [
+          {"$ref": "#/components/parameters/SubscriptionId"},
+          {"$ref": "#/components/parameters/ReceiverName"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/NotificationResponse"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "parameters": {
+      "SubscriptionId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Subscription identifier"
+      },
+      "ReceiverName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Receiver name"
+      }
+    },
+    "responses": {
+      "NotificationResponse": {
+        "description": "SNMP Trap notification data",
+        "content": {
+          "application/yang-data+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notification": {
+                  "type": "object",
+                  "description": "Notification event data with timestamp and trap parameters"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,562 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ietf-netconf RPCs",
+    "description": "NETCONF Protocol Operations (RFC 6241) - Core protocol operations for network configuration management",
+    "version": "2011-06-01"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/ietf-netconf:get-config": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Retrieve all or part of a specified configuration datastore",
+        "description": "Retrieve configuration from candidate, running, or startup datastore with optional filtering",
+        "operationId": "getConfig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "null",
+                            "description": "Candidate configuration datastore"
+                          },
+                          "running": {
+                            "type": "null",
+                            "description": "Running configuration datastore"
+                          },
+                          "startup": {
+                            "type": "null",
+                            "description": "Startup configuration datastore"
+                          }
+                        }
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "Subtree or XPath filter"
+                      }
+                    },
+                    "required": ["source"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configuration data retrieved successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "description": "Configuration data"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:edit-config": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Edit a configuration datastore",
+        "description": "Load all or part of a specified configuration to the specified target datastore",
+        "operationId": "editConfig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "null"
+                          },
+                          "running": {
+                            "type": "null"
+                          }
+                        }
+                      },
+                      "default-operation": {
+                        "type": "string",
+                        "enum": ["merge", "replace", "none"]
+                      },
+                      "test-option": {
+                        "type": "string",
+                        "enum": ["test-then-set", "set", "test-only"]
+                      },
+                      "error-option": {
+                        "type": "string",
+                        "enum": ["stop-on-error", "continue-on-error", "rollback-on-error"]
+                      },
+                      "config": {
+                        "type": "object",
+                        "description": "Configuration data"
+                      }
+                    },
+                    "required": ["target"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Configuration edited successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:copy-config": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Copy an entire configuration datastore",
+        "description": "Create or replace an entire configuration datastore with the contents of another complete configuration datastore",
+        "operationId": "copyConfig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {"type": "null"},
+                          "running": {"type": "null"},
+                          "startup": {"type": "null"},
+                          "url": {"type": "string", "format": "uri"}
+                        }
+                      },
+                      "source": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {"type": "null"},
+                          "running": {"type": "null"},
+                          "startup": {"type": "null"},
+                          "url": {"type": "string", "format": "uri"},
+                          "config": {"type": "object"}
+                        }
+                      }
+                    },
+                    "required": ["target", "source"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Configuration copied successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:delete-config": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Delete a configuration datastore",
+        "description": "Delete a configuration datastore (startup or URL)",
+        "operationId": "deleteConfig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "startup": {"type": "null"},
+                          "url": {"type": "string", "format": "uri"}
+                        }
+                      }
+                    },
+                    "required": ["target"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Configuration deleted successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:lock": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Lock a configuration datastore",
+        "description": "The NETCONF lock operation allows the client to lock the entire configuration datastore of a device",
+        "operationId": "lock",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {"type": "null"},
+                          "running": {"type": "null"},
+                          "startup": {"type": "null"}
+                        }
+                      }
+                    },
+                    "required": ["target"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Datastore locked successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:unlock": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Unlock a configuration datastore",
+        "description": "Release a configuration lock previously obtained with the lock operation",
+        "operationId": "unlock",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "target": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {"type": "null"},
+                          "running": {"type": "null"},
+                          "startup": {"type": "null"}
+                        }
+                      }
+                    },
+                    "required": ["target"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Datastore unlocked successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:get": {
+      "post": {
+        "tags": ["NETCONF Core"],
+        "summary": "Retrieve running configuration and device state information",
+        "description": "Retrieve both configuration data and state data with optional filtering",
+        "operationId": "get",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "description": "Subtree or XPath filter"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data retrieved successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "description": "Configuration and state data"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:close-session": {
+      "post": {
+        "tags": ["NETCONF Session"],
+        "summary": "Request graceful termination of a NETCONF session",
+        "description": "Gracefully close the current NETCONF session",
+        "operationId": "closeSession",
+        "responses": {
+          "204": {
+            "description": "Session closed successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:kill-session": {
+      "post": {
+        "tags": ["NETCONF Session"],
+        "summary": "Force the termination of a NETCONF session",
+        "description": "Force termination of another NETCONF session by session ID",
+        "operationId": "killSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "session-id": {
+                        "type": "integer",
+                        "description": "Session identifier of session to terminate"
+                      }
+                    },
+                    "required": ["session-id"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Session killed successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:commit": {
+      "post": {
+        "tags": ["NETCONF Candidate"],
+        "summary": "Commit the candidate configuration to running",
+        "description": "Commit the candidate configuration datastore to the running configuration with optional confirmed commit",
+        "operationId": "commit",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "confirmed": {
+                        "type": "null",
+                        "description": "Request confirmed commit"
+                      },
+                      "confirm-timeout": {
+                        "type": "integer",
+                        "description": "Timeout in seconds for confirmed commit (default 600)"
+                      },
+                      "persist": {
+                        "type": "string",
+                        "description": "Token for persisting confirmed commit"
+                      },
+                      "persist-id": {
+                        "type": "string",
+                        "description": "Token for identifying confirmed commit to persist"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Candidate configuration committed successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:discard-changes": {
+      "post": {
+        "tags": ["NETCONF Candidate"],
+        "summary": "Discard changes from the candidate configuration",
+        "description": "Revert the candidate configuration datastore to the current running configuration",
+        "operationId": "discardChanges",
+        "responses": {
+          "204": {
+            "description": "Candidate changes discarded successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:cancel-commit": {
+      "post": {
+        "tags": ["NETCONF Candidate"],
+        "summary": "Cancel an ongoing confirmed commit",
+        "description": "Cancel a confirmed commit in progress and revert to the state before the commit",
+        "operationId": "cancelCommit",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "persist-id": {
+                        "type": "string",
+                        "description": "Token for identifying confirmed commit to cancel"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Confirmed commit cancelled successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:validate": {
+      "post": {
+        "tags": ["NETCONF Validation"],
+        "summary": "Validate a configuration datastore",
+        "description": "Validate the contents of the specified configuration datastore",
+        "operationId": "validate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {"type": "null"},
+                          "running": {"type": "null"},
+                          "startup": {"type": "null"},
+                          "url": {"type": "string", "format": "uri"},
+                          "config": {"type": "object"}
+                        }
+                      }
+                    },
+                    "required": ["source"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Configuration validated successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

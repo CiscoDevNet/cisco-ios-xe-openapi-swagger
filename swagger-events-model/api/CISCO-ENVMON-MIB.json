@@ -1,0 +1,313 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "CISCO-ENVMON-MIB Notifications",
+    "description": "Environmental Monitoring MIB Notifications (SNMP Traps) - Temperature, voltage, fan, and power supply status alerts. Note: These are SNMP traps, not RESTCONF/YANG Push subscriptions.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/CISCO-ENVMON-MIB:ciscoEnvMonShutdownNotification": {
+      "get": {
+        "tags": ["Environmental - Critical"],
+        "summary": "Device shutdown imminent notification",
+        "description": "SNMP Trap: Critical notification sent when the device is about to shutdown due to environmental failure (temperature, voltage, fan, or power supply)",
+        "operationId": "ciscoEnvMonShutdownNotification",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Subscription ID"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Receiver name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification metadata",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CISCO-ENVMON-MIB:ciscoEnvMonShutdownNotification": {
+                      "type": "object",
+                      "description": "Shutdown notification - no parameters, critical alert"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/CISCO-ENVMON-MIB:ciscoEnvMonVoltStatusChangeNotif": {
+      "get": {
+        "tags": ["Environmental - Voltage"],
+        "summary": "Voltage status change notification",
+        "description": "SNMP Trap: Notification when voltage sensor status changes (normal, warning, critical, shutdown, not-present, not-functioning)",
+        "operationId": "ciscoEnvMonVoltStatusChangeNotif",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Subscription ID"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Receiver name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voltage status notification",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CISCO-ENVMON-MIB:ciscoEnvMonVoltStatusChangeNotif": {
+                      "type": "object",
+                      "properties": {
+                        "ciscoEnvMonVoltageStatusIndex": {
+                          "type": "integer",
+                          "description": "Index of the voltage sensor"
+                        },
+                        "ciscoEnvMonVoltageStatusDescr": {
+                          "type": "string",
+                          "description": "Description of the voltage sensor"
+                        },
+                        "ciscoEnvMonVoltageStatusValue": {
+                          "type": "integer",
+                          "description": "Current voltage value in millivolts"
+                        },
+                        "ciscoEnvMonVoltageState": {
+                          "type": "string",
+                          "enum": ["normal", "warning", "critical", "shutdown", "notPresent", "notFunctioning"],
+                          "description": "Current voltage sensor state"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/CISCO-ENVMON-MIB:ciscoEnvMonTempStatusChangeNotif": {
+      "get": {
+        "tags": ["Environmental - Temperature"],
+        "summary": "Temperature status change notification",
+        "description": "SNMP Trap: Notification when temperature sensor status changes",
+        "operationId": "ciscoEnvMonTempStatusChangeNotif",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Subscription ID"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Receiver name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Temperature status notification",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CISCO-ENVMON-MIB:ciscoEnvMonTempStatusChangeNotif": {
+                      "type": "object",
+                      "properties": {
+                        "ciscoEnvMonTemperatureStatusIndex": {
+                          "type": "integer",
+                          "description": "Index of the temperature sensor"
+                        },
+                        "ciscoEnvMonTemperatureStatusDescr": {
+                          "type": "string",
+                          "description": "Description of the temperature sensor"
+                        },
+                        "ciscoEnvMonTemperatureStatusValue": {
+                          "type": "integer",
+                          "description": "Current temperature in Celsius"
+                        },
+                        "ciscoEnvMonTemperatureState": {
+                          "type": "string",
+                          "enum": ["normal", "warning", "critical", "shutdown", "notPresent", "notFunctioning"],
+                          "description": "Current temperature sensor state"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/CISCO-ENVMON-MIB:ciscoEnvMonFanStatusChangeNotif": {
+      "get": {
+        "tags": ["Environmental - Fan"],
+        "summary": "Fan status change notification",
+        "description": "SNMP Trap: Notification when fan status changes",
+        "operationId": "ciscoEnvMonFanStatusChangeNotif",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Subscription ID"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Receiver name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fan status notification",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CISCO-ENVMON-MIB:ciscoEnvMonFanStatusChangeNotif": {
+                      "type": "object",
+                      "properties": {
+                        "ciscoEnvMonFanStatusIndex": {
+                          "type": "integer",
+                          "description": "Index of the fan"
+                        },
+                        "ciscoEnvMonFanStatusDescr": {
+                          "type": "string",
+                          "description": "Description of the fan"
+                        },
+                        "ciscoEnvMonFanState": {
+                          "type": "string",
+                          "enum": ["normal", "warning", "critical", "shutdown", "notPresent", "notFunctioning"],
+                          "description": "Current fan state"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/CISCO-ENVMON-MIB:ciscoEnvMonSuppStatusChangeNotif": {
+      "get": {
+        "tags": ["Environmental - Power Supply"],
+        "summary": "Power supply status change notification",
+        "description": "SNMP Trap: Notification when redundant power supply status changes",
+        "operationId": "ciscoEnvMonSuppStatusChangeNotif",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Subscription ID"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Receiver name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Power supply status notification",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CISCO-ENVMON-MIB:ciscoEnvMonSuppStatusChangeNotif": {
+                      "type": "object",
+                      "properties": {
+                        "ciscoEnvMonSupplyStatusIndex": {
+                          "type": "integer",
+                          "description": "Index of the power supply"
+                        },
+                        "ciscoEnvMonSupplyStatusDescr": {
+                          "type": "string",
+                          "description": "Description of the power supply"
+                        },
+                        "ciscoEnvMonSupplyState": {
+                          "type": "string",
+                          "enum": ["normal", "warning", "critical", "shutdown", "notPresent", "notFunctioning"],
+                          "description": "Current power supply state"
+                        },
+                        "ciscoEnvMonSupplySource": {
+                          "type": "string",
+                          "enum": ["unknown", "ac", "dc", "externalPowerSupply", "internalRedundant"],
+                          "description": "Power source type"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

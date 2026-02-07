@@ -1,0 +1,95 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ietf-netconf-monitoring RPCs",
+    "description": "NETCONF Monitoring (RFC 6022) - Monitoring and management of NETCONF protocol sessions",
+    "version": "2010-10-04"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/ietf-netconf-monitoring:get-schema": {
+      "post": {
+        "tags": ["NETCONF Monitoring"],
+        "summary": "Retrieve a YANG schema from the device",
+        "description": "Retrieve a schema identified by name, version, and format from the device's schema list",
+        "operationId": "getSchema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "identifier": {
+                        "type": "string",
+                        "description": "Name of the schema to retrieve"
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "Version of the schema (optional)"
+                      },
+                      "format": {
+                        "type": "string",
+                        "description": "Format identifier for the schema (yang, yin, rng, etc.)"
+                      }
+                    },
+                    "required": ["identifier"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Schema retrieved successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "description": "Schema content"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

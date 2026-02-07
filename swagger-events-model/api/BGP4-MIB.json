@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "BGP4-MIB SNMP Notifications",
+    "description": "SNMP Trap notifications from BGP4-MIB for BGP routing protocol events",
+    "version": "1.0.0"
+  },
+  "servers": [{"url": "https://{device}", "variables": {"device": {"default": "localhost"}}}],
+  "security": [{"basicAuth": []}],
+  "paths": {
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BGP4-MIB:bgpEstablished": {
+      "get": {
+        "summary": "SNMP Trap: BGP peer established",
+        "description": "Notification when BGP peer session transitions to Established state",
+        "operationId": "get_bgpEstablished",
+        "tags": ["BGP Peer Events"],
+        "parameters": [
+          {"$ref": "#/components/parameters/SubscriptionId"},
+          {"$ref": "#/components/parameters/ReceiverName"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/NotificationResponse"}
+        }
+      }
+    },
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BGP4-MIB:bgpBackwardTransition": {
+      "get": {
+        "summary": "SNMP Trap: BGP backward transition",
+        "description": "Notification when BGP peer session transitions out of Established state",
+        "operationId": "get_bgpBackwardTransition",
+        "tags": ["BGP Peer Events"],
+        "parameters": [
+          {"$ref": "#/components/parameters/SubscriptionId"},
+          {"$ref": "#/components/parameters/ReceiverName"}
+        ],
+        "responses": {
+          "200": {"$ref": "#/components/responses/NotificationResponse"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "parameters": {
+      "SubscriptionId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Subscription identifier"
+      },
+      "ReceiverName": {
+        "name": "name",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Receiver name"
+      }
+    },
+    "responses": {
+      "NotificationResponse": {
+        "description": "SNMP Trap notification data",
+        "content": {
+          "application/yang-data+json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "notification": {
+                  "type": "object",
+                  "description": "Notification event data with timestamp and trap parameters"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
