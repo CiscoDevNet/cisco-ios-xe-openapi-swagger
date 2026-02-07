@@ -1,0 +1,322 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "tailf-netconf-query RPCs",
+    "description": "Tail-f NETCONF Query - Advanced query operations for efficient large-scale data retrieval with pagination",
+    "version": "2017-01-06"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/tailf-netconf-query:start-query": {
+      "post": {
+        "tags": ["Tail-f Query"],
+        "summary": "Start a query session",
+        "description": "Initialize a query for large-scale data retrieval with sorting and filtering",
+        "operationId": "startQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "foreach": {
+                        "type": "string",
+                        "description": "XPath selecting nodes to iterate over"
+                      },
+                      "select": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "label": {
+                              "type": "string"
+                            },
+                            "expression": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "description": "Fields to select from each node"
+                      },
+                      "sort-by": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Fields to sort results by"
+                      },
+                      "limit": {
+                        "type": "integer",
+                        "description": "Maximum results to return"
+                      },
+                      "offset": {
+                        "type": "integer",
+                        "description": "Number of results to skip"
+                      }
+                    },
+                    "required": ["foreach"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query started",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "query-handle": {
+                          "type": "integer",
+                          "description": "Handle for subsequent query operations"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/tailf-netconf-query:fetch-query-result": {
+      "post": {
+        "tags": ["Tail-f Query"],
+        "summary": "Fetch query results",
+        "description": "Retrieve results from an active query session with pagination",
+        "operationId": "fetchQueryResult",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "query-handle": {
+                        "type": "integer",
+                        "description": "Query handle from start-query"
+                      },
+                      "offset": {
+                        "type": "integer",
+                        "description": "Result offset for pagination"
+                      },
+                      "limit": {
+                        "type": "integer",
+                        "description": "Maximum results to fetch"
+                      }
+                    },
+                    "required": ["query-handle"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query results",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          },
+                          "description": "Query result rows"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/tailf-netconf-query:immediate-query": {
+      "post": {
+        "tags": ["Tail-f Query"],
+        "summary": "Execute immediate query",
+        "description": "Execute a query and return all results immediately without session management",
+        "operationId": "immediateQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "foreach": {
+                        "type": "string",
+                        "description": "XPath selecting nodes to iterate over"
+                      },
+                      "select": {
+                        "type": "array",
+                        "items": {
+                          "type": "object"
+                        },
+                        "description": "Fields to select"
+                      },
+                      "sort-by": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "limit": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": ["foreach"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query results",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "result": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/tailf-netconf-query:reset-query": {
+      "post": {
+        "tags": ["Tail-f Query"],
+        "summary": "Reset query cursor",
+        "description": "Reset the result cursor of an active query to the beginning",
+        "operationId": "resetQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "query-handle": {
+                        "type": "integer",
+                        "description": "Query handle to reset"
+                      }
+                    },
+                    "required": ["query-handle"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Query cursor reset successfully"
+          }
+        }
+      }
+    },
+    "/operations/tailf-netconf-query:stop-query": {
+      "post": {
+        "tags": ["Tail-f Query"],
+        "summary": "Stop query session",
+        "description": "Terminate an active query session and release resources",
+        "operationId": "stopQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "query-handle": {
+                        "type": "integer",
+                        "description": "Query handle to stop"
+                      }
+                    },
+                    "required": ["query-handle"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Query stopped successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

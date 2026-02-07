@@ -1,0 +1,268 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ietf-event-notifications RPCs",
+    "description": "YANG Push Event Subscription Management (RFC 8639) - Dynamic subscription lifecycle management for YANG-based event streams",
+    "version": "2019-09-09"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "10.1.1.1",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/ietf-event-notifications:establish-subscription": {
+      "post": {
+        "tags": ["YANG Push Subscriptions"],
+        "summary": "Establish a dynamic event subscription",
+        "description": "Create a dynamic subscription to YANG data events with filtering and update policies",
+        "operationId": "establishSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "stream": {
+                        "type": "string",
+                        "description": "Event stream name (e.g., NETCONF, yang-push)"
+                      },
+                      "encoding": {
+                        "type": "string",
+                        "enum": ["encode-xml", "encode-json"],
+                        "description": "Encoding format for notifications"
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "Subtree or XPath filter"
+                      },
+                      "stop-time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Optional end time for subscription"
+                      }
+                    },
+                    "required": ["stream"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Subscription identifier"
+                        },
+                        "replay-start-time": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Start time for event replay"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-event-notifications:create-subscription": {
+      "post": {
+        "tags": ["YANG Push Subscriptions"],
+        "summary": "Create a subscription (legacy NETCONF)",
+        "description": "Legacy NETCONF notification subscription (RFC 5277 compatibility)",
+        "operationId": "createSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "stream": {
+                        "type": "string",
+                        "description": "Event stream name"
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "Event filter"
+                      },
+                      "startTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Replay start time"
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Subscription end time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Subscription created successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-event-notifications:modify-subscription": {
+      "post": {
+        "tags": ["YANG Push Subscriptions"],
+        "summary": "Modify an existing subscription",
+        "description": "Update parameters of an active dynamic subscription",
+        "operationId": "modifySubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Subscription identifier to modify"
+                      },
+                      "filter": {
+                        "type": "object",
+                        "description": "New filter criteria"
+                      },
+                      "stop-time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "New stop time"
+                      }
+                    },
+                    "required": ["id"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Subscription modified successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-event-notifications:delete-subscription": {
+      "post": {
+        "tags": ["YANG Push Subscriptions"],
+        "summary": "Delete a subscription",
+        "description": "Terminate an active subscription by ID",
+        "operationId": "deleteSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Subscription identifier to delete"
+                      }
+                    },
+                    "required": ["id"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Subscription deleted successfully"
+          }
+        }
+      }
+    },
+    "/operations/ietf-event-notifications:kill-subscription": {
+      "post": {
+        "tags": ["YANG Push Subscriptions"],
+        "summary": "Forcefully terminate a subscription",
+        "description": "Force termination of a subscription (administrative action)",
+        "operationId": "killSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Subscription identifier to kill"
+                      }
+                    },
+                    "required": ["id"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Subscription terminated successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
