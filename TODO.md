@@ -22,7 +22,7 @@
   - Added 47 missing RPC modules (Cisco IOS-XE: cli, install, wireless, crypto, etc.)
   - Added 11 missing Event modules (cisco-smart-license, ietf-yang-push, ietf-ospf, etc.)
   - Total RPC modules: 58 (290 operations)
-  - Total Event modules: 128 (715 notification paths)
+  - Total Event modules: 128 (455 notification paths)
   - Removed 1 invalid RPC spec (Cisco-IOS-XE-rpc.json - JSON errors)
 - ✅ **UI Enhancement:** Added tree links to all model sidebars for consistent navigation
 - **Final Statistics:**
@@ -31,11 +31,11 @@
     - 183 endpoints with GET response examples
     - 182 endpoints with PUT request examples  
     - 182 endpoints with PATCH request examples
-  - **E28 modules (40 YANG + 88 MIB), 715 notification paths
+  - **Event Models:**
+    - 128 modules (40 YANG + 88 MIB), 455 notification paths
     - All with YANG-aligned GET response examples
   - **RPC Models:**
-    - 58 modules (51 Cisco + 7 IETF/Tailf), 290
-    - 60 modules (57 Cisco + 3 IETF/Tailf), 311 operations
+    - 58 modules (51 Cisco + 7 IETF/Tailf), 290 operations
     - 100% coverage verified with pyang trees
   - **Search Infrastructure:**
     - 643 modules indexed (128 Events + 58 RPC + 199 Oper + 258 others)

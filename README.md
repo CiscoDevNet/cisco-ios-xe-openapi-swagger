@@ -17,7 +17,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 - ✅ **Native Config:** 18 categories, 172 paths (644 operations with examples)
 - ✅ **Operational Data:** 199 modules across 16 categories (2,652 paths)
-- ✅ **Events:** 128 modules (40 YANG + 88 MIB) (715 notification paths)
+- ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
 - ✅ **IETF Standards:** 21 modules (592 paths)
 - ✅ **OpenConfig:** 41 modules (772 paths)
