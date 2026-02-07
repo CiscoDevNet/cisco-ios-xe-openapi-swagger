@@ -8,16 +8,19 @@ Last Updated: February 7, 2026
 ## Executive Summary
 
 **Total Modules:** 848 YANG modules  
-**Notification-Enabled Modules:** 53 modules with 200+ notifications  
+**Notification-Enabled Modules:** 132 modules (53 native YANG + 79 MIBs) with 490+ notifications  
 **RPC-Enabled Modules:** 59 modules with 350+ RPC operations  
 
-### ✅ Coverage in OpenAPI Specs - 100% COMPLETE
+### ✅ Coverage in OpenAPI Specs
 
-| Category | Indexed | Missing | Status |
-|----------|---------|---------|--------|
-| **Event Notifications** | 38 | 0 | ✅ **100% COMPLETE** |
+| Category | Indexed | Not Indexed | Status |
+|----------|---------|-------------|--------|
+| **Event Notifications (Native YANG)** | 38 | 0 | ✅ **100% COMPLETE** |
 | **RPC Operations** | 53 | 0 | ✅ **100% COMPLETE** |
-| **Total Coverage** | 91 | 0 | ✅ **FULLY DOCUMENTED** |
+| **MIB Notifications** | 0 | 79 (293 notifications) | ⚠️ **NOT DOCUMENTED** |
+| **Total Coverage** | 91 | 79 | ⚠️ **MIBs EXCLUDED** |
+
+**Note:** MIB notifications (SNMP traps) are NOT exposed as RESTCONF/YANG Push subscription endpoints. They exist in the YANG models but use SNMP notification mechanisms rather than NETCONF/RESTCONF event streams.
 
 **All critical modules are now indexed, including:**
 - ✅ Cisco-IOS-XE-ios-events-oper (53 notifications)
@@ -589,16 +592,187 @@ cisco-bridge-domain                            3 RPCs ✅ NOW INDEXED
 
 ---
 
+## Part 3: MIB SNMP Notifications (SNMP Traps)
+
+### Overview
+
+**79 MIB modules** contain **293 SNMP notifications** (traps) that are **NOT exposed as RESTCONF/YANG Push subscriptions**. These notifications use traditional SNMP trap mechanisms rather than modern streaming telemetry.
+
+### ⚠️ Why MIB Notifications Are Not in Events Model
+
+MIB-based notifications:
+- Use SNMP trap protocol (UDP port 162)
+- Not subscribable via NETCONF/RESTCONF
+- Not compatible with YANG Push (RFC 8641)
+- Require SNMP manager/trap receiver
+- Cannot be queried via OpenAPI/REST
+
+Native YANG notifications (in Events model):
+- Use NETCONF/RESTCONF event streams
+- Support YANG Push dynamic subscriptions
+- Available via HTTPS/REST APIs
+- Queryable with OpenAPI specs
+
+**Decision:** MIB notifications intentionally excluded from Events model as they use different protocol stack.
+
+### Top 20 MIB Modules by Notification Count
+
+| Rank | MIB Module | Notifications | Category |
+|------|------------|---------------|----------|
+| 1 | CISCO-STACKWISE-MIB | 23 | Stacking |
+| 2 | OSPF-TRAP-MIB | 20 | Routing |
+| 3 | CISCO-IETF-ISIS-MIB | 18 | Routing |
+| 4 | CISCO-LICENSE-MGMT-MIB | 14 | Licensing |
+| 5 | CISCO-OSPF-TRAP-MIB | 14 | Routing |
+| 6 | CISCO-IPSEC-FLOW-MONITOR-MIB | 13 | Security |
+| 7 | CISCO-STACKWISE-VIRTUAL-MIB | 13 | Stacking |
+| 8 | CISCO-VOICE-COMMON-DIAL-CONTROL-MIB | 12 | Voice |
+| 9 | OSPFV3-MIB | 10 | Routing |
+| 10 | CISCO-SONET-MIB | 10 | WAN |
+| 11 | CISCO-ENVMON-MIB | 9 | Environment |
+| 12 | CISCO-DOT11-IF-MIB | 9 | Wireless |
+| 13 | CISCO-LWAPP-DOT11-CLIENT-MIB | 9 | Wireless |
+| 14 | CISCO-PORT-SECURITY-MIB | 8 | Security |
+| 15 | CISCO-LWAPP-AP-MIB | 8 | Wireless |
+| 16 | CISCO-MPLS-TE-STD-EXT-MIB | 7 | MPLS |
+| 17 | CISCO-VOICE-DIAL-CONTROL-MIB | 7 | Voice |
+| 18 | CISCO-BGP4-MIB | 6 | Routing |
+| 19 | CISCO-AAA-SERVER-MIB | 6 | AAA |
+| 20 | CISCO-CONFIG-MAN-MIB | 6 | Management |
+
+### Notification Categories
+
+#### Environmental Monitoring (CISCO-ENVMON-MIB - 9 notifications)
+- ciscoEnvMonShutdownNotification
+- ciscoEnvMonVoltageNotification
+- ciscoEnvMonTemperatureNotification
+- ciscoEnvMonFanNotification
+- ciscoEnvMonRedundantSupplyNotification
+- ciscoEnvMonVoltStatusChangeNotif
+- ciscoEnvMonTempStatusChangeNotif
+- ciscoEnvMonFanStatusChangeNotif
+- ciscoEnvMonSuppStatusChangeNotif
+
+#### Routing Protocols (54 notifications across 5 MIBs)
+- OSPF-TRAP-MIB: 20 notifications
+- CISCO-OSPF-TRAP-MIB: 14 notifications
+- CISCO-IETF-ISIS-MIB: 18 notifications
+- OSPFv3-MIB: 10 notifications
+- CISCO-BGP4-MIB: 6 notifications
+
+#### Stacking & High Availability (36 notifications across 2 MIBs)
+- CISCO-STACKWISE-MIB: 23 notifications (stack member changes, priority, role, port)
+- CISCO-STACKWISE-VIRTUAL-MIB: 13 notifications (dual-active, link failures)
+
+#### Wireless (26 notifications across 3 MIBs)
+- CISCO-LWAPP-DOT11-CLIENT-MIB: 9 notifications
+- CISCO-DOT11-IF-MIB: 9 notifications
+- CISCO-LWAPP-AP-MIB: 8 notifications
+
+#### Security (27 notifications across 3 MIBs)
+- CISCO-IPSEC-FLOW-MONITOR-MIB: 13 notifications
+- CISCO-PORT-SECURITY-MIB: 8 notifications
+- CISCO-AAA-SERVER-MIB: 6 notifications
+
+#### Voice (19 notifications across 2 MIBs)
+- CISCO-VOICE-COMMON-DIAL-CONTROL-MIB: 12 notifications
+- CISCO-VOICE-DIAL-CONTROL-MIB: 7 notifications
+
+### Complete List of MIB Modules with Notifications (79 modules)
+
+```
+CISCO-STACKWISE-MIB                          23 notifications
+OSPF-TRAP-MIB                                20 notifications
+CISCO-IETF-ISIS-MIB                          18 notifications
+CISCO-LICENSE-MGMT-MIB                       14 notifications
+CISCO-OSPF-TRAP-MIB                          14 notifications
+CISCO-IPSEC-FLOW-MONITOR-MIB                 13 notifications
+CISCO-STACKWISE-VIRTUAL-MIB                  13 notifications
+CISCO-VOICE-COMMON-DIAL-CONTROL-MIB          12 notifications
+OSPFV3-MIB                                   10 notifications
+CISCO-SONET-MIB                              10 notifications
+CISCO-ENVMON-MIB                              9 notifications
+CISCO-DOT11-IF-MIB                            9 notifications
+CISCO-LWAPP-DOT11-CLIENT-MIB                  9 notifications
+CISCO-PORT-SECURITY-MIB                       8 notifications
+CISCO-LWAPP-AP-MIB                            8 notifications
+CISCO-MPLS-TE-STD-EXT-MIB                     7 notifications
+CISCO-VOICE-DIAL-CONTROL-MIB                  7 notifications
+CISCO-BGP4-MIB                                6 notifications
+CISCO-AAA-SERVER-MIB                          6 notifications
+CISCO-CONFIG-MAN-MIB                          6 notifications
+CISCO-RTTMON-MIB                              5 notifications
+CISCO-DIAL-CONTROL-MIB                        5 notifications
+CISCO-ENTITY-FRU-CONTROL-MIB                  5 notifications
+CISCO-EIGRP-MIB                               5 notifications
+CISCO-VPDN-MGMT-MIB                           4 notifications
+CISCO-DOCS-EXT-MIB                            4 notifications
+CISCO-RMON-CONFIG-MIB                         4 notifications
+CISCO-CALL-HISTORY-MIB                        4 notifications
+CISCO-FTP-CLIENT-MIB                          3 notifications
+CISCO-FRAME-RELAY-MIB                         3 notifications
+CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB         3 notifications
+CISCO-UNIFIED-COMPUTING-MIB                   3 notifications
+BRIDGE-MIB                                    3 notifications
+DOCS-IETF-BPI2-MIB                            3 notifications
+CISCO-LWAPP-CLIENT-ROAMING-MIB                3 notifications
+CISCO-SWITCH-ENGINE-MIB                       3 notifications
+CISCO-FIREWALL-MIB                            3 notifications
+CISCO-LWAPP-DOT11-CLIENT-CCXV5-REPORTING-MIB  3 notifications
+CISCO-IPSLA-JITTER-MIB                        3 notifications
+CISCO-PTP-MIB                                 3 notifications
+CISCO-IP-URPF-MIB                             2 notifications
+CISCO-L2-TUNNEL-CONFIG-MIB                    2 notifications
+CISCO-EVC-MIB                                 2 notifications
+CISCO-STP-EXTENSIONS-MIB                      2 notifications
+CISCO-PAE-MIB                                 2 notifications
+CISCO-LWAPP-SI-MIB                            2 notifications
+CISCO-QOS-PIB-MIB                             2 notifications
+CISCO-LWAPP-MESH-MIB                          2 notifications
+CISCO-LWAPP-IDS-MIB                           2 notifications
+BGP4-MIB                                      2 notifications
+CISCO-ENHANCED-MEMPOOL-MIB                    2 notifications
+CISCO-FABRIC-MCAST-MIB                        2 notifications
+CISCO-LWAPP-WLAN-MIB                          2 notifications
+CISCO-IMAGE-MIB                               2 notifications
+CISCO-C8500-REDUNDANCY-MIB                    2 notifications
+CISCO-CBQOS-MIB                               2 notifications
+CISCO-RF-MIB                                  2 notifications
+CISCO-LWAPP-DOT11-CLIENT-CALIB-MIB            2 notifications
+CISCO-DOT3-OAM-MIB                            2 notifications
++ 21 more MIBs with 1 notification each
+```
+
+**Total MIB Notifications:** 79 modules, 293 SNMP trap notifications
+
+### Status: ⚠️ MIB Notifications Not Indexed
+
+**Reason:** SNMP traps use different protocol mechanism (SNMP v2c/v3) and are not compatible with RESTCONF/YANG Push event subscriptions. These notifications require SNMP manager configuration, not REST API access.
+
+**Impact:** Users needing environmental monitoring (fans, temperature), stacking events, or legacy SNMP trap functionality must configure SNMP trap receivers separately from YANG Push subscriptions.
+
+---
+
 ## Conclusion - ✅ AUDIT COMPLETE
 
-The Cisco IOS-XE 17.18.1 platform provides extensive event notification and RPC capabilities across 848 YANG modules. 
+The Cisco IOS-XE 17.18.1 platform provides extensive event notification and RPC capabilities across 848 YANG modules.
 
-**✅ 100% COVERAGE ACHIEVED:**
+**✅ RESTCONF/YANG Push Coverage (100% Complete):**
 - **38 Event Notification modules** - All indexed in swagger-events-model/
 - **53 RPC Operation modules** - All indexed in swagger-rpc-model/
 - **Total: 91 modules** with notifications and RPCs fully documented
 
-**Critical Modules Now Available:**
+**⚠️ SNMP-Only Notifications (Not in Events Model):**
+- **79 MIB modules** - 293 SNMP trap notifications
+- **Reason:** Use SNMP protocol, not RESTCONF/YANG Push
+- **Access:** Requires SNMP trap receiver configuration
+
+**Total Notification Inventory:**
+- **Native YANG:** 38 modules, ~200 notifications via YANG Push
+- **MIB/SNMP:** 79 modules, 293 notifications via SNMP traps
+- **Combined:** 132 modules, 490+ total notifications across both protocols
+
+**Critical Modules Now Available (RESTCONF/YANG Push):**
 - ✅ **Cisco-IOS-XE-ios-events-oper** (53 notifications) - Interface, routing, system, security events
 - ✅ **Cisco-IOS-XE-wireless-events-oper** (5 notifications) - Wireless infrastructure events
 - ✅ **cisco-smart-license** (13 RPCs + 24 notifications) - License management
@@ -608,5 +782,6 @@ The Cisco IOS-XE 17.18.1 platform provides extensive event notification and RPC 
 **APIs Available:**
 - Events: https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/
 - RPCs: https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/
+- MIBs: https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/ (data only, no notification subscriptions)
 
-**Documentation Complete:** All modules properly indexed with OpenAPI 3.0 specifications for comprehensive network automation and monitoring capabilities.
+**Documentation Complete:** All RESTCONF/YANG Push modules properly indexed with OpenAPI 3.0 specifications. MIB SNMP notifications documented separately as they use different protocol mechanisms and are not suitable for REST API access.
