@@ -730,7 +730,16 @@
         // Draw Statistics Chart
         function drawChart() {
             const ctx = document.getElementById('moduleChart');
-            if (!ctx) return;
+            if (!ctx) {
+                console.error('Canvas element not found');
+                return;
+            }
+            
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                setTimeout(drawChart, 100);
+                return;
+            }
             
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const textColor = isDark ? '#e0e0e0' : '#333';
@@ -792,11 +801,20 @@
                 window.moduleChart.destroy();
             }
             
-            window.moduleChart = new Chart(ctx, config);
+            try {
+                window.moduleChart = new Chart(ctx, config);
+                console.log('Chart initialized successfully');
+            } catch (error) {
+                console.error('Error creating chart:', error);
+            }
         }
         
-        // Initialize chart on load
-        window.addEventListener('DOMContentLoaded', drawChart);
+        // Initialize chart on load with retry
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', drawChart);
+        } else {
+            drawChart();
+        }
         
         // Close What's New Banner
         function closeWhatsNew() {
