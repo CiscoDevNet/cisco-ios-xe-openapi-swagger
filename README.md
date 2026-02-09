@@ -3,9 +3,9 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-643-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-670-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 643 modules, 53 categories, 717 YANG tree files, and interactive code generation** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 670 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
 🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
@@ -15,11 +15,11 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 **All 9 model categories have been systematically documented:**
 
-- ✅ **Native Config:** 22 categories, 253 paths (1,007 operations with examples)
-- ✅ **Operational Data:** 199 modules across 16 categories (2,652 paths)
+- ✅ **Native Config:** 27 categories, 328 paths (1,307 operations with examples)
+- ✅ **Operational Data:** 199 modules across 16 categories (2,651 paths)
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
-- ✅ **IETF Standards:** 21 modules (592 paths)
+- ✅ **IETF Standards:** 21 modules (505 paths)
 - ✅ **OpenConfig:** 41 modules (772 paths)
 - ✅ **MIB Translations:** 147 modules (visualizations for SNMP data)
 - ✅ **Configuration:** 39 modules (612 paths)
@@ -30,7 +30,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 - 📚 **Comprehensive Docs** - Getting started guide with 15+ examples
 - 🎯 **53 Logical Categories** - Organized by network engineer workflows
 - 📊 **100% Accountability** - Every YANG module mapped and documented
-- 🌳 **717 Tree Files** - Searchable YANG tree visualizations
+- 🌳 **719 Tree Files** - Searchable YANG tree visualizations
 
 📊 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
@@ -38,41 +38,40 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 643 | Generated specifications |
-| **API Paths** | 5,826 | RESTCONF endpoints (excl. MIB) |
-| **Operations** | 10,000+ | Total API operations |
+| **OpenAPI Specs** | 670 | Generated specifications |
+| **API Paths** | 10,557 | RESTCONF endpoints |
+| **Operations** | 17,053 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
-| **Tree Files** | 717 | YANG/MIB visualizations |
+| **Tree Files** | 719 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Coverage** | 75.8% | YANG modules with specs (643/848) |
+| **Coverage** | 79.0% | YANG modules with specs (670/848) |
 | **Accountability** | 100% | All modules mapped |
 
 ## 🗂️ Model Categories
 
 ### ⭐ Primary Models (Categorized & Organized)
 
-#### 📊 Native Configuration (22 categories, 253 paths, 1,007 operations)
+#### 📊 Native Configuration (27 categories, 328 paths, 1,307 operations)
 Full CLI-equivalent configuration organized by network domain.
 - **Categories:** Top-level leafs, containers, IP, IPv6, Router, Crypto, AAA, Line, VRF, Platform & System, Protocols, Security & Access, Switching L2, QoS, Monitor, License, Service, Other, App & Services, L2 Discovery, Routing & Multicast, Security Services, Platform & Diagnostics, WAN & Legacy, Industrial & IoT, Misc Extensions
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
-#### 📈 Operational Data (199 modules, 16 categories, 2,652 paths)
+#### 📈 Operational Data (199 modules, 16 categories, 2,651 paths)
 Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
-- **Quick-Starts:** troubleshooting, performance, inventory
 - [Browse Operational APIs →](swagger-oper-model/)
 
-#### 🔔 Events (117 modules: 38 YANG + 79 MIB, 658 notification paths)
+#### 🔔 Events (128 modules: 40 YANG + 88 MIB, 455 notification paths)
 Event notification modules for YANG-Push telemetry and SNMP trap visualization.
-- **YANG Events:** 38 Cisco-IOS-XE event modules
-- **MIB Notifications:** 79 SNMP trap modules (view-only in Swagger)
+- **YANG Events:** 40 Cisco-IOS-XE event modules
+- **MIB Notifications:** 88 SNMP trap modules (view-only in Swagger)
 - [Browse Events APIs →](swagger-events-model/)
 
-#### ⚡ RPC Operations (60 modules, 311 operations)
+#### ⚡ RPC Operations (58 modules, 290 operations)
 Remote procedure calls for device actions and commands.
-- **Cisco RPCs:** 57 modules for device operations
-- **IETF/Tailf:** 3 modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query)
+- **Cisco RPCs:** 51 modules for device operations
+- **IETF/Tailf:** 7 modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query, and others)
 - [Browse RPC APIs →](swagger-rpc-model/)
 
 ### 📚 Standard Models (Original Structure)
@@ -87,7 +86,7 @@ Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
 
-#### 📜 IETF Standards (21 modules, 592 paths)
+#### 📜 IETF Standards (21 modules, 505 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
 - [Browse IETF APIs →](swagger-ietf-model/)
@@ -182,14 +181,14 @@ python scripts/analyze_yang_accountability.py
 iosxe-1718-yang-swagger/
 ├── index.html                          # Main landing page
 ├── swagger-oper-model/                 # Operational (199 modules)
-├── swagger-rpc-model/                  # RPC (53 modules)
+├── swagger-rpc-model/                  # RPC (58 modules)
 ├── swagger-cfg-model/                  # Config (39 modules)
 ├── swagger-openconfig-model/           # OpenConfig (41 modules)
 ├── swagger-ietf-model/                 # IETF (21 modules)
 ├── swagger-mib-model/                  # MIB (147 modules)
-├── swagger-events-model/               # Events (38 modules)
-├── swagger-native-config-model/        # Native (28 modules)
-├── swagger-other-model/                # Other (8 modules)
+├── swagger-events-model/               # Events (128 modules)
+├── swagger-native-config-model/        # Native (27 modules)
+├── swagger-other-model/                # Other (10 modules)
 ├── swagger-ui-5.11.0/                  # Swagger UI framework
 ├── generators/                         # Python YANG parsers
 ├── scripts/                            # Validation/analysis tools
