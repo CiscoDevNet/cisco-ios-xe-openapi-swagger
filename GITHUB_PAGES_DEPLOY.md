@@ -46,8 +46,9 @@ To use a custom domain:
 
 ## Statistics
 
-- OpenAPI Specifications: 597+
-- API Paths: 15,000+
+- OpenAPI Specifications: 670
+- API Paths: 10,557
+- API Operations: 17,053
 - Model Types: 9
 - IOS-XE Version: 17.18.1
 

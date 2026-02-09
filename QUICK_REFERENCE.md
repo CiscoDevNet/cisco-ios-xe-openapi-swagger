@@ -63,15 +63,15 @@ https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references
 
 | Category | Count | Use Case | Quality |
 |----------|-------|----------|---------|
-| **Operational** | 197 modules, 7,239 ops | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
-| **RPC** | 53 modules, 284 ops | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
-| **Config** | 39 modules, 905 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
-| **Native** | 9 categories, 606 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
-| **OpenConfig** | 41 modules, 364 ops | Vendor-neutral config | ⭐⭐⭐⭐ Stable |
-| **IETF** | 21 modules, 117 ops | Standards-based | ⭐⭐⭐⭐ Stable |
-| **Events** | 32 modules, 89 ops | Notifications | ⭐⭐⭐⭐ Stable |
-| **MIB** | 147 modules, 65 ops | SNMP MIB reference | ⚠️ Reference Only |
-| **Other** | 4 modules, 287 ops | Misc/vendor-specific | ⭐⭐⭐ Variable |
+| **Operational** | 199 modules, 2,651 ops | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
+| **RPC** | 58 modules, 290 ops | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
+| **Config** | 39 modules, 1,992 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
+| **Native** | 27 categories, 1,307 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
+| **OpenConfig** | 41 modules, 2,880 ops | Vendor-neutral config | ⭐⭐⭐⭐ Stable |
+| **IETF** | 21 modules, 1,664 ops | Standards-based | ⭐⭐⭐⭐ Stable |
+| **Events** | 128 modules, 455 ops | Notifications | ⭐⭐⭐⭐ Stable |
+| **MIB** | 147 modules, 4,272 ops | SNMP MIB reference | ⚠️ Reference Only |
+| **Other** | 10 modules, 1,542 ops | Misc/vendor-specific | ⭐⭐⭐ Variable |
 
 ## Tips & Tricks
 

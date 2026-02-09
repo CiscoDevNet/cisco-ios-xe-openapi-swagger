@@ -434,7 +434,7 @@ else:
 
 ## Understanding the Models
 
-### 1. **Native Configuration Model** (28 files, 22 categories)
+### 1. **Native Configuration Model** (27 specs, 328 paths)
 
 **Purpose:** Full CLI-equivalent configuration
 
@@ -442,7 +442,7 @@ else:
 
 **When to use:** For comprehensive device configuration tasks
 
-### 2. **Operational Data Model** (20 files, 16 categories)
+### 2. **Operational Data Model** (199 specs, 2,651 paths)
 
 **Purpose:** Read-only real-time device state
 
@@ -450,7 +450,7 @@ else:
 
 **When to use:** Monitoring, troubleshooting, inventory collection
 
-### 3. **Events Model** (11 files, 10 categories)
+### 3. **Events Model** (128 specs, 455 notifications)
 
 **Purpose:** YANG-Push event notifications
 
@@ -458,7 +458,7 @@ else:
 
 **When to use:** Real-time event subscriptions and monitoring
 
-### 4. **RPC Operations Model** (10 files, 9 categories)
+### 4. **RPC Operations Model** (58 specs, 290 operations)
 
 **Purpose:** Execute operational commands
 
