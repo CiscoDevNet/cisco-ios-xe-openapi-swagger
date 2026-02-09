@@ -63,7 +63,7 @@ https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references
 
 | Category | Count | Use Case | Quality |
 |----------|-------|----------|---------|
-| **Operational** | 199 modules, 2,651 ops | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
+| **Operational** | 200 modules, 2,652 ops | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
 | **RPC** | 58 modules, 290 ops | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
 | **Config** | 39 modules, 1,992 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
 | **Native** | 27 categories, 1,307 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
