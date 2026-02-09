@@ -32,11 +32,11 @@ This project has successfully transformed 289 disparate Swagger/OpenAPI files in
 ### 1. Enhanced OpenAPI Specifications (69 files)
 
 #### Native Configuration Model
-- **Files:** 28 (18 categories + 10 modules + 3 quick-starts)
-- **Categories:** interfaces, routing, security, system, qos, vpn, wireless, switching, multicast, mpls, sdwan, services, platform, nat, voice, aaa, other
+- **Files:** 28 (22 categories + 3 quick-starts + manifest + audit)
+- **Categories:** interfaces, routing, security, system, qos, vpn, wireless, switching, multicast, mpls, sdwan, services, platform, nat, voice, aaa, other, app-services, l2-discovery, routing-multicast, security-services, platform-diag, wan-legacy, industrial-iot, misc-extensions
 - **Quick-Starts:** day0, interface-basics, routing-basics
-- **Paths:** 5,267 configuration endpoints
-- **Reduction:** 1,910 original modules → 28 files (99% reduction)
+- **Paths:** 253 RESTCONF configuration endpoints (1,007 operations)
+- **Coverage:** 151 of 163 native augment modules (93%)
 
 #### Operational Data Model
 - **Files:** 20 (16 categories + 1 manifest + 3 quick-starts)

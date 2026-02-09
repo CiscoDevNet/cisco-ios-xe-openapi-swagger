@@ -1,11 +1,11 @@
 # NATIVE AUGMENT MODULE AUDIT - COMPLETE REPORT
 
-**Date:** February 9, 2026  
+**Date:** February 9, 2026 (Updated: Phase 2 Complete)  
 **Total Modules Audited:** 22  
-**Complete Coverage:** 18/22 (82%)  
-**Missing:** 4/22 (18%)  
-**Current Endpoints:** 183 (across 14 native-*.json files)  
-**Status:** ✅ VERIFIED - kron is confirmed MISSING
+**Complete Coverage:** 20/22 (91%)  
+**Operational-Only (no config YANG):** 2/22 (macsec, trustsec)  
+**Current Endpoints:** 253 (across 22 native-*.json files)  
+**Status:** ✅ PHASE 2 COMPLETE — kron and lldp now covered
 
 ---
 
@@ -37,7 +37,7 @@
 
 ---
 
-## ⚠️ LAYER 2 PROTOCOLS (5/6 - 83% Complete)
+## ✅ LAYER 2 PROTOCOLS (6/6 - 100% Complete)
 
 | Module | YANG Tree | Swagger | Location |
 |--------|-----------|---------|----------|
@@ -46,9 +46,9 @@
 | **lacp** | ✓ | ✓ | native-protocols.json (line 925) |
 | **stp** | ✓ | ✓ | native-00-top-level-containers.json (as `spanning-tree`) |
 | **vtp** | ✓ | ✓ | native-switching-l2.json (line 436) |
-| **lldp** | ✓ (oper) | ❌ | **MISSING** - Cisco-IOS-XE-lldp-oper.html only |
+| **lldp** | ✓ (oper) | ✓ | native-l2-discovery.json (Phase 2) |
 
-**Status:** ⚠️ LLDP missing - may be operational data only
+**Status:** ✅ All Layer 2 protocols documented
 
 ---
 
@@ -66,18 +66,18 @@
 
 ---
 
-## ❌ SCHEDULER / AUTOMATION (1/2 - 50% Complete)
+## ✅ SCHEDULER / AUTOMATION (2/2 - 100% Complete)
 
 | Module | YANG Tree | Swagger | Location |
 |--------|-----------|---------|----------|
 | **scheduler** | ✓ | ✓ | native-other.json (line 5514) - Process scheduling |
-| **kron** | ✓ | ❌ | **MISSING** - Cisco-IOS-XE-kron.html exists |
+| **kron** | ✓ | ✓ | native-app-services.json (Phase 2) |
 
-**Critical Finding:**
+**Note:**
 - `kron` and `scheduler` are **DIFFERENT** modules
 - `kron` = Job/event scheduling (CLI: `kron occurrence`, `kron policy-list`)
 - `scheduler` = Process CPU time allocation (CLI: `scheduler allocate`)
-- **kron HAS config YANG but NO Swagger API**
+- **kron now covered in Phase 2 ✅**
 
 ---
 
@@ -85,31 +85,31 @@
 
 ### Overall Coverage
 - **Total Modules:** 22
-- **Complete:** 18 (82%)
-- **Missing:** 4 (18%)
+- **Complete:** 20 (91%)
+- **Operational-Only (no config YANG):** 2 (macsec, trustsec)
 
 ### By Category
 - **Routing Protocols:** 7/7 (100%) ✅
 - **First-Hop Redundancy:** 3/3 (100%) ✅
-- **Layer 2 Protocols:** 5/6 (83%) ⚠️
-- **Security/TrustSec:** 3/5 (60%) ⚠️
-- **Scheduler/Automation:** 1/2 (50%) ❌
+- **Layer 2 Protocols:** 6/6 (100%) ✅
+- **Security/TrustSec:** 3/5 (60%) ⚠️ (macsec + trustsec are operational-only)
+- **Scheduler/Automation:** 2/2 (100%) ✅
 
 ---
 
-## 🚨 ACTION REQUIRED
+## ✅ ALL ACTIONS COMPLETED (Phase 2)
 
-### PRIORITY 1: Add kron to Native Config Model
+### ~~PRIORITY 1: Add kron to Native Config Model~~ ✅ DONE
 
-**kron is the ONLY config module with YANG but no Swagger API**
+**kron is now covered in `native-app-services.json` (Phase 2, Batch 1)**
 
 - **YANG Module:** Cisco-IOS-XE-kron.yang
 - **Augments:** `/ios:native/` → creates `kron` container
 - **Contains:**
   - `occurrence` - Scheduled events/jobs
   - `policy-list` - CLI commands to execute
-- **Should be added to:** `native-other.json`
-- **Endpoints needed:**
+- **Added to:** `native-app-services.json`
+- **Endpoints:**
   ```
   GET    /data/Cisco-IOS-XE-native:native/kron
   PUT    /data/Cisco-IOS-XE-native:native/kron
@@ -117,50 +117,22 @@
   DELETE /data/Cisco-IOS-XE-native:native/kron
   ```
 
-**Example kron config:**
-```json
-{
-  "Cisco-IOS-XE-native:kron": {
-    "occurrence": [
-      {
-        "name": "backup-config",
-        "at": "02:00",
-        "recurring": true,
-        "policy-list": "backup-policy"
-      }
-    ],
-    "policy-list": [
-      {
-        "name": "backup-policy",
-        "cli": [
-          "copy running-config tftp://server/backup.cfg"
-        ]
-      }
-    ]
-  }
-}
-```
-
 ---
 
-### PRIORITY 2: Investigate lldp/macsec/trustsec
+### ~~PRIORITY 2: Investigate lldp/macsec/trustsec~~ ✅ RESOLVED
 
-**These modules only have operational YANG (read-only data)**
+1. **lldp** - ✅ Now covered in `native-l2-discovery.json` (Phase 2, Batch 2)
+   - Config endpoint added: `/data/Cisco-IOS-XE-native:native/lldp`
 
-1. **lldp** - Cisco-IOS-XE-lldp-oper.html
-   - May not have config YANG
-   - Config might be via `interface` settings only
-   - Verify if Cisco-IOS-XE-lldp.yang (config) exists
+2. **macsec** - ⚠️ Operational data only (no config YANG)
+   - Only Cisco-IOS-XE-macsec-oper.html exists
+   - Config is via `interface macsec` settings (part of interface model)
+   - No standalone config endpoint needed
 
-2. **macsec** - Cisco-IOS-XE-macsec-oper.html
-   - Operational data only
-   - Config might be via `interface macsec` settings
-   - Verify if Cisco-IOS-XE-macsec.yang (config) exists
-
-3. **trustsec** - Cisco-IOS-XE-trustsec-oper.html
-   - Operational data only
-   - Config via `cts` container (already documented)
-   - May not need separate endpoint
+3. **trustsec** - ⚠️ Operational data only (no config YANG)
+   - Only Cisco-IOS-XE-trustsec-oper.html exists
+   - Config via `cts` container (already documented in native-security-access.json)
+   - No standalone config endpoint needed
 
 ---
 
@@ -203,11 +175,11 @@ All 22 modules have YANG tree HTML files:
 
 ## ✅ CONCLUSION
 
-**The Native Config Model has excellent coverage (82%) of native augment modules.**
+**The Native Config Model has comprehensive coverage (91%) of audited native augment modules.**
 
-**Only 1 critical gap:** kron scheduler configuration needs to be added.
+**Phase 2 resolved all critical gaps:**
+- ✅ kron added to native-app-services.json
+- ✅ lldp added to native-l2-discovery.json
+- ⚠️ macsec/trustsec confirmed operational-only (no config YANG exists)
 
-**Next Steps:**
-1. Add kron endpoints to native-other.json
-2. Verify lldp/macsec/trustsec have config YANG modules
-3. Update documentation to reflect complete coverage
+**Full project coverage:** 151 of 163 native augment modules (93%) — see [native-augment-accountability.html](swagger-native-config-model/native-augment-accountability.html) for the complete 163-module report.

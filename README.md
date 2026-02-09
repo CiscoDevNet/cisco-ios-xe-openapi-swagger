@@ -15,7 +15,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 **All 9 model categories have been systematically documented:**
 
-- ✅ **Native Config:** 18 categories, 172 paths (644 operations with examples)
+- ✅ **Native Config:** 22 categories, 253 paths (1,007 operations with examples)
 - ✅ **Operational Data:** 199 modules across 16 categories (2,652 paths)
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
@@ -51,9 +51,9 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 ### ⭐ Primary Models (Categorized & Organized)
 
-#### 📊 Native Configuration (18 categories, 172 paths, 644 operations)
+#### 📊 Native Configuration (22 categories, 253 paths, 1,007 operations)
 Full CLI-equivalent configuration organized by network domain.
-- **Categories:** Top-level leafs, containers, IP, IPv6, Router, Crypto, AAA, Line, VRF, Platform & System, Protocols, Security & Access, Switching L2, QoS, Monitor, License, Service, Other
+- **Categories:** Top-level leafs, containers, IP, IPv6, Router, Crypto, AAA, Line, VRF, Platform & System, Protocols, Security & Access, Switching L2, QoS, Monitor, License, Service, Other, App & Services, L2 Discovery, Routing & Multicast, Security Services, Platform & Diagnostics, WAN & Legacy, Industrial & IoT, Misc Extensions
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
