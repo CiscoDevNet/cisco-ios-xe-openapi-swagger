@@ -1,5 +1,5 @@
 // Universal Search for Cisco IOS-XE YANG Documentation Hub
-// Provides fuzzy search across all 768+ YANG modules
+// Provides fuzzy search across all 670 YANG modules
 
 // HTML Sanitization utility to prevent XSS
 function escapeHtml(str) {
