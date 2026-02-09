@@ -45,7 +45,7 @@ references/17181-YANG-modules/
 
 | Category | Pattern | Swagger Folder | Modules | Description |
 |----------|---------|----------------|---------|-------------|
-| **oper** | `*-oper.yang` | swagger-oper-model/ | 199 | Operational state data (GET only) |
+| **oper** | `*-oper.yang` | swagger-oper-model/ | 200 | Operational state data (GET only) |
 | **rpc** | `*-rpc.yang`, has `rpc` statements | swagger-rpc-model/ | 58 | Remote procedure calls (POST) |
 | **cfg** | `*-cfg.yang`, config containers | swagger-cfg-model/ | 39 | Configuration data (CRUD) |
 | **openconfig** | `openconfig-*.yang` | swagger-openconfig-model/ | 41 | Vendor-neutral standards |
@@ -266,12 +266,12 @@ python prepare_github_pages.py
 ### Quality Targets
 | Metric | Target | Achieved |
 |--------|--------|----------|
-| Total OpenAPI Specs | 550+ | ✅ 670 |
-| Total API Paths | 10,000+ | ✅ 10,557 |
-| Total API Operations | 15,000+ | ✅ 17,053 |
+| Total OpenAPI Specs | 550+ | ✅ 671 |
+| Total API Paths | 10,000+ | ✅ 10,558 |
+| Total API Operations | 15,000+ | ✅ 17,054 |
 | Module Accountability | 100% | ✅ 100% |
 | Link Validation | 0 errors | ✅ 0 errors |
-| YANG Module Coverage | 60%+ | ✅ 46.8% (397/848) |
+| YANG Module Coverage | 60%+ | ✅ 47.1% (399/848) |
 
 ---
 
@@ -297,9 +297,9 @@ python prepare_github_pages.py
 ### ✅ All Requirements Met
 
 **Coverage Achieved:**
-- ✅ 670 OpenAPI specifications generated
-- ✅ 10,557 API paths documented  
-- ✅ 17,053 API operations
+- ✅ 671 OpenAPI specifications generated
+- ✅ 10,558 API paths documented  
+- ✅ 17,054 API operations
 - ✅ 100% YANG module accountability
 - ✅ 9 model categories fully implemented
 - ✅ 53 logical categories for organization
@@ -309,7 +309,7 @@ python prepare_github_pages.py
 
 **Module Breakdown:**
 ```
-Operational:    199 modules (2,651 paths)
+Operational:    200 modules (2,652 paths)
 RPC:             58 modules (290 operations)
 Events:         128 modules (455 notifications)
 Native Config:   27 modules (328 paths)
@@ -319,7 +319,7 @@ OpenConfig:      41 modules (772 paths)
 MIB:            147 modules (4,272 paths)
 Other:           10 modules (672 paths)
 ---------------------------------------------------
-Total:          670 modules (10,557 paths)
+Total:          671 modules (10,558 paths)
 ```
 
 **Quality Validation:**
