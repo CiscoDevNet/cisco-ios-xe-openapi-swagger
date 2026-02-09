@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE Native Config - Security & Access",
-    "description": "Security and access control configuration from Cisco-IOS-XE-native model.\n\n**Includes:** tacacs, tacacs-server, radius, radius-server, dot1x, eap, mab, identity, cts, device-tracking, password, enable, login, privilege, mka\n\n**Key Features:**\n- TACACS+ authentication\n- RADIUS authentication\n- 802.1X port security\n- MAC Authentication Bypass (MAB)\n- Identity services\n- TrustSec (CTS)\n- Device tracking\n- Password and privilege management\n\n**Base Path:** `/data/Cisco-IOS-XE-native:native/`\n\n**Related:** See 'AAA' for authentication/authorization/accounting",
+    "description": "Security and access control configuration from Cisco-IOS-XE-native model.\n\n**Includes:** tacacs, tacacs-server, radius, radius-server, dot1x, eap, mab, identity, cts, device-tracking, device-sensor, password, enable, login, privilege, mka\n\n**Modules covered:** Cisco-IOS-XE-device-sensor (device profiling)\n\n**Key Features:**\n- TACACS+ authentication\n- RADIUS authentication\n- 802.1X port security\n- MAC Authentication Bypass (MAB)\n- Identity services\n- TrustSec (CTS)\n- Device tracking & sensor\n- Password and privilege management\n\n**Base Path:** `/data/Cisco-IOS-XE-native:native/`\n\n**Related:** See 'AAA' for authentication/authorization/accounting",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -1509,6 +1509,109 @@
             "description": "Successfully deleted"
           }
         }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-device-sensor:device-sensor": {
+      "get": {
+        "summary": "Get device-sensor configuration",
+        "description": "Retrieve device sensor (profiling) configuration for automatic device classification.\n\nCLI equivalent: `show running-config | section device-sensor`\n\nYANG module: Cisco-IOS-XE-device-sensor\n\nDevice sensor collects DHCP, CDP, and LLDP attributes from endpoints to build device profiles for policy decisions.",
+        "operationId": "get-device-sensor",
+        "tags": ["security"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-device-sensor:device-sensor": {
+                    "accounting": [null],
+                    "notify": {
+                      "all-changes": [null]
+                    },
+                    "filter-list": {
+                      "dhcp": {
+                        "list": [
+                          {
+                            "name": "DHCP-FILTER",
+                            "option": {
+                              "name": {
+                                "host-name": [null],
+                                "class-identifier": [null],
+                                "client-identifier": [null]
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "cdp": {
+                        "list": [
+                          {
+                            "name": "CDP-FILTER",
+                            "option": {
+                              "name": {
+                                "device-name": [null],
+                                "platform-type": [null]
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace device-sensor configuration",
+        "description": "Replace device sensor profiling configuration.",
+        "operationId": "put-device-sensor",
+        "tags": ["security"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-device-sensor:device-sensor": {
+                  "accounting": [null],
+                  "notify": { "all-changes": [null] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update device-sensor configuration",
+        "description": "Merge update to device sensor configuration.",
+        "operationId": "patch-device-sensor",
+        "tags": ["security"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-device-sensor:device-sensor": {
+                  "notify": { "all-changes": [null] }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete device-sensor configuration",
+        "description": "Remove device sensor configuration.",
+        "operationId": "delete-device-sensor",
+        "tags": ["security"],
+        "responses": { "204": { "description": "Successfully deleted" } }
       }
     }
   },

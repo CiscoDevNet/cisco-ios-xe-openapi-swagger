@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE Native Config - Platform & System",
-    "description": "Platform and system-level configuration from Cisco-IOS-XE-native model.\n\n**Includes:** boot, memory, location, banner, clock, default, hardware, stack-power, upgrade, setup, exception, card, hw-module, module, software, system\n\n**Key Features:**\n- Boot configuration\n- System banners\n- Memory settings\n- Hardware modules\n- Software upgrade\n- Platform settings\n\n**Base Path:** `/data/Cisco-IOS-XE-native:native/`\n\n**Related:** See 'License' for software licensing",
+    "description": "Platform and system-level configuration from Cisco-IOS-XE-native model.\n\n**Includes:** boot, memory, location, banner, clock, default, hardware, stack-power, upgrade, setup, exception, card, hw-module, module, software, system, power\n\n**Modules covered:** Cisco-IOS-XE-power (Power over Ethernet / power supply)\n\n**Key Features:**\n- Boot configuration\n- System banners\n- Memory settings\n- Hardware modules\n- Software upgrade\n- Platform settings\n- PoE power management\n\n**Base Path:** `/data/Cisco-IOS-XE-native:native/`\n\n**Related:** See 'License' for software licensing",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -1556,6 +1556,99 @@
             "description": "Successfully deleted"
           }
         }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-power:power": {
+      "get": {
+        "summary": "Get power configuration",
+        "description": "Retrieve Power over Ethernet (PoE) and power supply configuration.\n\nCLI equivalent: `show running-config | section power`\n\nYANG module: Cisco-IOS-XE-power\n\nControls PoE inline power budgets, default consumption, logging, and power supply redundancy modes (combined, N+1, N+N).",
+        "operationId": "get-power",
+        "tags": ["platform"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-power:power": {
+                    "inline": {
+                      "consumption": {
+                        "default": 15400
+                      },
+                      "logging": {
+                        "global": [null]
+                      }
+                    },
+                    "redundancy-mode-config": {
+                      "combined": [null]
+                    },
+                    "supply": {
+                      "input": [
+                        {
+                          "name": "PS1",
+                          "slot": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace power configuration",
+        "description": "Replace power and PoE configuration.",
+        "operationId": "put-power",
+        "tags": ["platform"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-power:power": {
+                  "inline": {
+                    "consumption": { "default": 30000 },
+                    "logging": { "global": [null] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update power configuration",
+        "description": "Merge update to power configuration.",
+        "operationId": "patch-power",
+        "tags": ["platform"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-power:power": {
+                  "inline": {
+                    "consumption": { "default": 15400 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete power configuration",
+        "description": "Remove power configuration.",
+        "operationId": "delete-power",
+        "tags": ["platform"],
+        "responses": { "204": { "description": "Successfully deleted" } }
       }
     }
   },
