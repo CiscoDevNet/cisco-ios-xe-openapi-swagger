@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE Native Config - Routing & Multicast",
-    "description": "Routing protocol extensions and multicast configuration for Cisco-IOS-XE-native model.\n\n**Modules covered:** ospfv3 (OSPFv3 IPv6), rsvp (Resource Reservation Protocol), nhrp (Next Hop Resolution Protocol), mobileip (Mobile IP), igmp (Internet Group Management Protocol), multicast (IP Multicast), mld (Multicast Listener Discovery)\n\n**YANG Augments:** Cisco-IOS-XE-ospfv3, Cisco-IOS-XE-rsvp, Cisco-IOS-XE-nhrp, Cisco-IOS-XE-mobileip, Cisco-IOS-XE-igmp, Cisco-IOS-XE-multicast, Cisco-IOS-XE-mld",
+    "description": "Routing protocol extensions and multicast configuration for Cisco-IOS-XE-native model.\n\n**Modules covered:** ospfv3 (OSPFv3 IPv6), rsvp (Resource Reservation Protocol), nhrp (Next Hop Resolution Protocol), mobileip (Mobile IP), igmp (Internet Group Management Protocol), multicast (IP Multicast), mld (Multicast Listener Discovery), nd (IPv6 Neighbor Discovery)\n\n**YANG Augments:** Cisco-IOS-XE-ospfv3, Cisco-IOS-XE-rsvp, Cisco-IOS-XE-nhrp, Cisco-IOS-XE-mobileip, Cisco-IOS-XE-igmp, Cisco-IOS-XE-multicast, Cisco-IOS-XE-mld, Cisco-IOS-XE-nd",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -719,6 +719,105 @@
         "tags": ["mld"],
         "responses": { "204": { "description": "Successfully deleted" } }
       }
+    },
+    "/data/Cisco-IOS-XE-native:native/ipv6/Cisco-IOS-XE-nd:nd": {
+      "get": {
+        "summary": "Get IPv6 Neighbor Discovery (ND) configuration",
+        "description": "Retrieve global IPv6 Neighbor Discovery configuration including RA guard, cache management, and NUD parameters.\n\nCLI equivalent: `show running-config | section ipv6 nd`\n\nYANG module: Cisco-IOS-XE-nd\n\nIPv6 ND controls router advertisement handling, neighbour cache behaviour, reachability detection, and RA Guard policies for first-hop security.",
+        "operationId": "get-ipv6-nd",
+        "tags": ["nd"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-nd:nd": {
+                    "cache": {
+                      "expire": 14400
+                    },
+                    "raguard": {
+                      "policy": [
+                        {
+                          "raguard-policy-name": "HOST-POLICY",
+                          "device-role": "host"
+                        },
+                        {
+                          "raguard-policy-name": "ROUTER-POLICY",
+                          "device-role": "router",
+                          "trusted-port": [null]
+                        }
+                      ]
+                    },
+                    "inspection": {
+                      "policy": [
+                        {
+                          "nd-inspection-policy-name": "ND-INSPECT",
+                          "device-role": "host",
+                          "drop-unsecure": [null]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace IPv6 ND configuration",
+        "description": "Replace IPv6 Neighbor Discovery configuration.",
+        "operationId": "put-ipv6-nd",
+        "tags": ["nd"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-nd:nd": {
+                  "cache": { "expire": 7200 },
+                  "raguard": {
+                    "policy": [
+                      { "raguard-policy-name": "HOST-ONLY", "device-role": "host" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update IPv6 ND configuration",
+        "description": "Merge update to IPv6 Neighbor Discovery configuration.",
+        "operationId": "patch-ipv6-nd",
+        "tags": ["nd"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-nd:nd": {
+                  "cache": { "expire": 3600 }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete IPv6 ND configuration",
+        "description": "Remove IPv6 Neighbor Discovery configuration.",
+        "operationId": "delete-ipv6-nd",
+        "tags": ["nd"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
     }
   },
   "components": {
@@ -741,6 +840,7 @@
     { "name": "mobileip", "description": "Mobile IP — home agent and foreign agent for IP mobility" },
     { "name": "igmp", "description": "IGMP — Internet Group Management Protocol snooping, SSM, and profiles" },
     { "name": "multicast", "description": "IP Multicast — global multicast routing, RPF selection, VRF-aware multicast" },
-    { "name": "mld", "description": "MLD — Multicast Listener Discovery for IPv6 multicast" }
+    { "name": "mld", "description": "MLD — Multicast Listener Discovery for IPv6 multicast" },
+    { "name": "nd", "description": "ND — IPv6 Neighbor Discovery (RA guard, cache, NUD, inspection)" }
   ]
 }

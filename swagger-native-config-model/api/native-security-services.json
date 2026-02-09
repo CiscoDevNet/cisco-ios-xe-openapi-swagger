@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE Native Config - Security Services",
-    "description": "Security service extensions for Cisco-IOS-XE-native model.\n\n**Modules covered:** umbrella (Cisco Umbrella / OpenDNS), fqdn (FQDN ACLs), group-policy (group-based policy), pae (802.1X port-access entity), sanet (session-aware networking)\n\n**YANG Augments:** Cisco-IOS-XE-umbrella, Cisco-IOS-XE-fqdn, Cisco-IOS-XE-group-policy, Cisco-IOS-XE-pae, Cisco-IOS-XE-sanet",
+    "description": "Security service extensions for Cisco-IOS-XE-native model.\n\n**Modules covered:** umbrella (Cisco Umbrella / OpenDNS), fqdn (FQDN ACLs), group-policy (group-based policy), pae (802.1X port-access entity), sanet (session-aware networking), eta (Encrypted Traffic Analytics), utd (Unified Threat Defense)\n\n**YANG Augments:** Cisco-IOS-XE-umbrella, Cisco-IOS-XE-fqdn, Cisco-IOS-XE-group-policy, Cisco-IOS-XE-pae, Cisco-IOS-XE-sanet, Cisco-IOS-XE-eta, Cisco-IOS-XE-utd",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -485,6 +485,197 @@
         "tags": ["sanet"],
         "responses": { "204": { "description": "Successfully deleted" } }
       }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-eta:et-analytics": {
+      "get": {
+        "summary": "Get Encrypted Traffic Analytics (ETA) configuration",
+        "description": "Retrieve ETA configuration for encrypted traffic visibility without decryption.\n\nCLI equivalent: `show running-config | section et-analytics`\n\nYANG module: Cisco-IOS-XE-eta\n\nETA uses network telemetry (IDP, SPLT, byte distribution) exported via Netflow/IPFIX to identify malware in encrypted flows.",
+        "operationId": "get-et-analytics",
+        "tags": ["eta"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-eta:et-analytics": {
+                    "ip": {
+                      "flow-export": {
+                        "destination": [
+                          {
+                            "address": "10.1.1.100",
+                            "port": 2055,
+                            "source-interface": "Loopback0"
+                          }
+                        ]
+                      }
+                    },
+                    "inactive-timeout": 15,
+                    "whitelist": {
+                      "acl": "ETA-WHITELIST"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace ETA configuration",
+        "description": "Replace Encrypted Traffic Analytics configuration.",
+        "operationId": "put-et-analytics",
+        "tags": ["eta"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-eta:et-analytics": {
+                  "ip": {
+                    "flow-export": {
+                      "destination": [
+                        { "address": "10.1.1.100", "port": 2055 }
+                      ]
+                    }
+                  },
+                  "inactive-timeout": 30
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update ETA configuration",
+        "description": "Merge update to ETA configuration.",
+        "operationId": "patch-et-analytics",
+        "tags": ["eta"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-eta:et-analytics": {
+                  "inactive-timeout": 60
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete ETA configuration",
+        "description": "Remove Encrypted Traffic Analytics configuration.",
+        "operationId": "delete-et-analytics",
+        "tags": ["eta"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-utd:utd": {
+      "get": {
+        "summary": "Get Unified Threat Defense (UTD) configuration",
+        "description": "Retrieve UTD configuration for IPS/IDS, URL filtering, and web security.\n\nCLI equivalent: `show running-config | section utd`\n\nYANG module: Cisco-IOS-XE-utd\n\nUTD provides integrated security services including Snort IPS/IDS, URL filtering (Webroot/Brightcloud), AMP, and DNS security on IOS-XE routers.",
+        "operationId": "get-utd",
+        "tags": ["utd"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-utd:utd": {
+                    "all-interfaces": [null],
+                    "engine": {
+                      "mode": "standard",
+                      "fail": { "close": [null] }
+                    },
+                    "redirect": {
+                      "interface": {
+                        "VirtualPortGroup": "1"
+                      }
+                    },
+                    "utd-st": {
+                      "utd": {
+                        "web-filter": {
+                          "url": {
+                            "profile": [
+                              {
+                                "id": "URLF-POLICY",
+                                "alert": "all",
+                                "block": {
+                                  "category": ["Adult-and-Pornography", "Gambling"]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace UTD configuration",
+        "description": "Replace Unified Threat Defense configuration.",
+        "operationId": "put-utd",
+        "tags": ["utd"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-utd:utd": {
+                  "all-interfaces": [null],
+                  "engine": {
+                    "mode": "standard",
+                    "fail": { "close": [null] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update UTD configuration",
+        "description": "Merge update to UTD configuration.",
+        "operationId": "patch-utd",
+        "tags": ["utd"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-utd:utd": {
+                  "engine": { "fail": { "close": [null] } }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete UTD configuration",
+        "description": "Remove Unified Threat Defense configuration.",
+        "operationId": "delete-utd",
+        "tags": ["utd"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
     }
   },
   "components": {
@@ -505,6 +696,8 @@
     { "name": "fqdn", "description": "FQDN ACLs — domain name-based access control lists" },
     { "name": "group-policy", "description": "Group-based policy — SGT/SGACL security group access control" },
     { "name": "pae", "description": "802.1X PAE — port-access entity for network access control" },
-    { "name": "sanet", "description": "SANET — session-aware networking (IBNS 2.0) access-session" }
+    { "name": "sanet", "description": "SANET — session-aware networking (IBNS 2.0) access-session" },
+    { "name": "eta", "description": "ETA — Encrypted Traffic Analytics for visibility into encrypted flows" },
+    { "name": "utd", "description": "UTD — Unified Threat Defense (IPS/IDS, URL filtering, web security)" }
   ]
 }

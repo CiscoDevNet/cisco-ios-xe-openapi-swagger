@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE Native Config - IP Configuration",
-    "description": "IP networking configuration for Cisco-IOS-XE-native model. This container includes routing, access-lists, services, DHCP, DNS, NAT, and all IPv4-related configuration.\n\n**What's included:** Complete IP configuration hierarchy under /native/ip\n\n**Common use cases:** Static routing, ACLs, IP services, DHCP server, DNS configuration, source routing, routing protocols access\n\n**Related:** See 'Router' for dynamic routing protocols (OSPF, BGP), 'IPv6' for IPv6 configuration",
+    "description": "IP networking configuration for Cisco-IOS-XE-native model. This container includes routing, access-lists, services, DHCP, DNS, NAT, CEF forwarding, IP SLA, and all IPv4-related configuration.\n\n**What's included:** Complete IP configuration hierarchy under /native/ip, plus /native/cef\n\n**Modules covered:** ip (core), Cisco-IOS-XE-cef (CEF forwarding), Cisco-IOS-XE-sla (IP SLA)\n\n**Common use cases:** Static routing, ACLs, IP services, DHCP server, DNS, CEF table tuning, IP SLA probes\n\n**Related:** See 'Router' for dynamic routing protocols (OSPF, BGP), 'IPv6' for IPv6 configuration",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -1021,6 +1021,207 @@
           }
         }
       }
+    },
+    "/data/Cisco-IOS-XE-native:native/cef": {
+      "get": {
+        "summary": "Get CEF configuration",
+        "description": "Retrieve Cisco Express Forwarding (CEF) table configuration including output-chain build preferences and consistency checks.\n\nCLI equivalent: `show running-config | section cef`\n\nYANG module: Cisco-IOS-XE-cef\n\nCEF is the default switching path on IOS-XE platforms. This container controls forwarding-table build behaviour, load-sharing hash, and table consistency verification.",
+        "operationId": "get-cef",
+        "tags": ["cef"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-native:cef": {
+                    "table": {
+                      "output-chain": {
+                        "build": {
+                          "favor": {
+                            "convergence-speed": [null]
+                          },
+                          "indirection": {
+                            "ipv4-to-mpls": [null],
+                            "ipv6-to-mpls": [null]
+                          }
+                        }
+                      },
+                      "consistency-check": {
+                        "type": "lc",
+                        "settle-time": 65
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace CEF configuration",
+        "description": "Replace CEF forwarding table configuration.",
+        "operationId": "put-cef",
+        "tags": ["cef"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:cef": {
+                  "table": {
+                    "output-chain": {
+                      "build": {
+                        "favor": { "convergence-speed": [null] }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update CEF configuration",
+        "description": "Merge update to CEF configuration.",
+        "operationId": "patch-cef",
+        "tags": ["cef"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:cef": {
+                  "table": {
+                    "consistency-check": { "settle-time": 120 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete CEF configuration",
+        "description": "Remove CEF configuration.",
+        "operationId": "delete-cef",
+        "tags": ["cef"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/ip/Cisco-IOS-XE-sla:sla": {
+      "get": {
+        "summary": "Get IP SLA configuration",
+        "description": "Retrieve IP Service Level Agreement (SLA) probe configuration for measuring network performance.\n\nCLI equivalent: `show running-config | section ip sla`\n\nYANG module: Cisco-IOS-XE-sla\n\nIP SLA operations include ICMP echo, UDP jitter, HTTP, DNS, TCP connect and more. Used for path verification, VoIP readiness, and tracking.",
+        "operationId": "get-ip-sla",
+        "tags": ["sla"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-sla:sla": {
+                    "entry": [
+                      {
+                        "number": 1,
+                        "icmp-echo": {
+                          "destination": "10.0.0.1",
+                          "source-ip": "10.0.0.254",
+                          "frequency": 60,
+                          "timeout": 5000,
+                          "threshold": 3000
+                        }
+                      },
+                      {
+                        "number": 2,
+                        "udp-jitter": {
+                          "dest-addr": "10.0.0.2",
+                          "portno": 16384,
+                          "num-packets": 100,
+                          "interval": 20
+                        }
+                      }
+                    ],
+                    "schedule": [
+                      {
+                        "entry-number": 1,
+                        "start-time": { "now": [null] },
+                        "life": "forever"
+                      }
+                    ],
+                    "responder": [null]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace IP SLA configuration",
+        "description": "Replace IP SLA probe configuration.",
+        "operationId": "put-ip-sla",
+        "tags": ["sla"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-sla:sla": {
+                  "entry": [
+                    {
+                      "number": 10,
+                      "icmp-echo": {
+                        "destination": "192.168.1.1",
+                        "frequency": 30,
+                        "timeout": 2000
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update IP SLA configuration",
+        "description": "Merge update to IP SLA configuration.",
+        "operationId": "patch-ip-sla",
+        "tags": ["sla"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-sla:sla": {
+                  "responder": [null]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete IP SLA configuration",
+        "description": "Remove IP SLA configuration.",
+        "operationId": "delete-ip-sla",
+        "tags": ["sla"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
     }
   },
   "components": {
@@ -1052,6 +1253,14 @@
     {
       "name": "services",
       "description": "IP services (DHCP, DNS, NAT, HTTP, SSH)"
+    },
+    {
+      "name": "cef",
+      "description": "CEF — Cisco Express Forwarding table and output-chain configuration"
+    },
+    {
+      "name": "sla",
+      "description": "IP SLA — Service Level Agreement probes (ICMP echo, UDP jitter, HTTP, DNS)"
     }
   ]
 }
