@@ -3,9 +3,9 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-670-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-671-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 670 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 671 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
 🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
@@ -16,7 +16,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 **All 9 model categories have been systematically documented:**
 
 - ✅ **Native Config:** 27 categories, 328 paths (1,307 operations with examples)
-- ✅ **Operational Data:** 199 modules across 16 categories (2,651 paths)
+- ✅ **Operational Data:** 200 modules across 16 categories (2,652 paths)
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
 - ✅ **IETF Standards:** 21 modules (505 paths)
@@ -38,13 +38,13 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 670 | Generated specifications |
-| **API Paths** | 10,557 | RESTCONF endpoints |
-| **Operations** | 17,053 | Total API operations |
+| **OpenAPI Specs** | 671 | Generated specifications |
+| **API Paths** | 10,558 | RESTCONF endpoints |
+| **Operations** | 17,054 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 719 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Coverage** | 79.0% | YANG modules with specs (670/848) |
+| **Coverage** | 79.1% | YANG modules with specs (671/848) |
 | **Accountability** | 100% | All modules mapped |
 
 ## 🗂️ Model Categories
@@ -57,7 +57,7 @@ Full CLI-equivalent configuration organized by network domain.
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
-#### 📈 Operational Data (199 modules, 16 categories, 2,651 paths)
+#### 📈 Operational Data (200 modules, 16 categories, 2,652 paths)
 Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
@@ -180,7 +180,7 @@ python scripts/analyze_yang_accountability.py
 ```
 iosxe-1718-yang-swagger/
 ├── index.html                          # Main landing page
-├── swagger-oper-model/                 # Operational (199 modules)
+├── swagger-oper-model/                 # Operational (200 modules)
 ├── swagger-rpc-model/                  # RPC (58 modules)
 ├── swagger-cfg-model/                  # Config (39 modules)
 ├── swagger-openconfig-model/           # OpenConfig (41 modules)
