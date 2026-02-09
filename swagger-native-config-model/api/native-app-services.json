@@ -1,0 +1,768 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cisco IOS-XE Native Config - Application Services",
+    "description": "Application services and scheduling configuration for Cisco-IOS-XE-native model.\n\n**Modules covered:** kron (job scheduling), app-hosting (IOx), nbar (application recognition), service-discovery, service-routing, mdns-sd (mDNS gateway), pnp (Plug and Play)\n\n**YANG Augments:** Cisco-IOS-XE-kron, Cisco-IOS-XE-app-hosting, Cisco-IOS-XE-nbar, Cisco-IOS-XE-service-discovery, Cisco-IOS-XE-service-routing, Cisco-IOS-XE-mdns-gateway, Cisco-IOS-XE-pnp",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/docs/ios-xe/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{device}:{port}",
+      "description": "IOS-XE Device RESTCONF API",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com",
+          "description": "Device IP or hostname"
+        },
+        "port": {
+          "default": "443",
+          "description": "HTTPS port"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-native:native/kron": {
+      "get": {
+        "summary": "Get Kron scheduler configuration",
+        "description": "Retrieve kron job scheduler configuration including occurrence definitions and policy lists.\n\nCLI equivalent: `show running-config | section kron`\n\nYANG module: Cisco-IOS-XE-kron",
+        "operationId": "get-kron",
+        "tags": ["kron"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-native:kron": {
+                    "occurrence": [
+                      {
+                        "name": "BACKUP-DAILY",
+                        "at": {
+                          "time": "23:00",
+                          "recurring": true
+                        },
+                        "policy-list": [
+                          { "name": "BACKUP-POLICY" }
+                        ]
+                      },
+                      {
+                        "name": "CLEANUP-WEEKLY",
+                        "at": {
+                          "time": "02:00",
+                          "day": "Sun",
+                          "recurring": true
+                        },
+                        "policy-list": [
+                          { "name": "CLEANUP-POLICY" }
+                        ]
+                      }
+                    ],
+                    "policy-list": [
+                      {
+                        "policy_label": "BACKUP-POLICY",
+                        "cli": "copy running-config tftp://10.0.0.1/backup.cfg"
+                      },
+                      {
+                        "policy_label": "CLEANUP-POLICY",
+                        "cli": "delete /force flash:*.bak"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace Kron scheduler configuration",
+        "description": "Replace all kron scheduler definitions.\n\nCLI equivalent: `kron occurrence BACKUP-DAILY at 23:00 recurring`",
+        "operationId": "put-kron",
+        "tags": ["kron"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:kron": {
+                  "occurrence": [
+                    {
+                      "name": "BACKUP-DAILY",
+                      "at": { "time": "23:00", "recurring": true },
+                      "policy-list": [ { "name": "BACKUP-POLICY" } ]
+                    }
+                  ],
+                  "policy-list": [
+                    {
+                      "policy_label": "BACKUP-POLICY",
+                      "cli": "copy running-config tftp://10.0.0.1/backup.cfg"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update Kron scheduler configuration",
+        "description": "Merge update to kron scheduler definitions.",
+        "operationId": "patch-kron",
+        "tags": ["kron"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:kron": {
+                  "policy-list": [
+                    {
+                      "policy_label": "NEW-POLICY",
+                      "cli": "show version | redirect flash:version.txt"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete Kron scheduler configuration",
+        "description": "Remove all kron scheduler definitions.",
+        "operationId": "delete-kron",
+        "tags": ["kron"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/app-hosting": {
+      "get": {
+        "summary": "Get IOx application hosting configuration",
+        "description": "Retrieve IOx application hosting configuration including app IDs, resource profiles, virtual NICs, and Docker settings.\n\nCLI equivalent: `show running-config | section app-hosting`\n\nYANG module: Cisco-IOS-XE-app-hosting",
+        "operationId": "get-app-hosting",
+        "tags": ["app-hosting"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-native:app-hosting": {
+                    "appid": [
+                      {
+                        "name": "ThousandEyes",
+                        "app-vnic": [
+                          {
+                            "gateway": "0",
+                            "virtualportgroup": 0,
+                            "guest-interface": 0,
+                            "guest-ipaddress": "192.168.1.2"
+                          }
+                        ],
+                        "app-resource": {
+                          "profile": "custom",
+                          "cpu": 1100,
+                          "memory": 512,
+                          "vcpu": 1
+                        },
+                        "app-default-gateway": {
+                          "ip-address": "192.168.1.1",
+                          "guest-interface": 0
+                        },
+                        "name-server0": "8.8.8.8",
+                        "start": [null]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace IOx application hosting configuration",
+        "description": "Replace all application hosting definitions.",
+        "operationId": "put-app-hosting",
+        "tags": ["app-hosting"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:app-hosting": {
+                  "appid": [
+                    {
+                      "name": "MyApp",
+                      "app-resource": {
+                        "profile": "custom",
+                        "cpu": 500,
+                        "memory": 256,
+                        "vcpu": 1
+                      },
+                      "app-vnic": [
+                        {
+                          "gateway": "0",
+                          "virtualportgroup": 0,
+                          "guest-interface": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update IOx application hosting configuration",
+        "description": "Merge update to application hosting definitions.",
+        "operationId": "patch-app-hosting",
+        "tags": ["app-hosting"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:app-hosting": {
+                  "appid": [
+                    {
+                      "name": "MyApp",
+                      "app-resource": {
+                        "docker": {
+                          "run-opts": ["--restart=always"]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete IOx application hosting configuration",
+        "description": "Remove all application hosting definitions.",
+        "operationId": "delete-app-hosting",
+        "tags": ["app-hosting"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/ip/Cisco-IOS-XE-nbar:nbar": {
+      "get": {
+        "summary": "Get NBAR configuration",
+        "description": "Retrieve Network-Based Application Recognition (NBAR) configuration including custom protocol definitions, classification settings, and attribute maps.\n\nCLI equivalent: `show running-config | section ip nbar`\n\nYANG module: Cisco-IOS-XE-nbar",
+        "operationId": "get-nbar",
+        "tags": ["nbar"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-nbar:nbar": {
+                    "classification": {
+                      "auto-learn": {
+                        "top-hosts": true
+                      },
+                      "dns": {
+                        "classify-by-domain": true,
+                        "learning": true
+                      }
+                    },
+                    "custom": [
+                      {
+                        "name": "MY-APP",
+                        "transport": {
+                          "tcp": {
+                            "id": 8443
+                          }
+                        }
+                      }
+                    ],
+                    "attribute-map": [
+                      {
+                        "name": "BUSINESS-APPS",
+                        "attribute": {
+                          "business-relevance": "business-relevant"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace NBAR configuration",
+        "description": "Replace all NBAR configuration.",
+        "operationId": "put-nbar",
+        "tags": ["nbar"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-nbar:nbar": {
+                  "custom": [
+                    {
+                      "name": "CUSTOM-APP",
+                      "transport": {
+                        "tcp": { "id": 9090 }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update NBAR configuration",
+        "description": "Merge update to NBAR configuration.",
+        "operationId": "patch-nbar",
+        "tags": ["nbar"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-nbar:nbar": {
+                  "classification": {
+                    "dns": { "classify-by-domain": true }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete NBAR configuration",
+        "description": "Remove all NBAR configuration.",
+        "operationId": "delete-nbar",
+        "tags": ["nbar"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-service-discovery:service-list": {
+      "get": {
+        "summary": "Get service discovery configuration",
+        "description": "Retrieve service discovery / service-list configuration.\n\nCLI equivalent: `show running-config | section service-list`\n\nYANG module: Cisco-IOS-XE-service-discovery",
+        "operationId": "get-service-discovery",
+        "tags": ["service-discovery"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-service-discovery:service-list": [
+                    {
+                      "service-list-name": "PERMIT-ALL",
+                      "service-list-action": "permit",
+                      "mdns-service-definition-name": "ALL"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace service discovery configuration",
+        "description": "Replace all service-list definitions.",
+        "operationId": "put-service-discovery",
+        "tags": ["service-discovery"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-service-discovery:service-list": [
+                  {
+                    "service-list-name": "MY-SERVICES",
+                    "service-list-action": "permit",
+                    "mdns-service-definition-name": "CUSTOM-SERVICES"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update service discovery configuration",
+        "description": "Merge update to service-list definitions.",
+        "operationId": "patch-service-discovery",
+        "tags": ["service-discovery"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-service-discovery:service-list": [
+                  {
+                    "service-list-name": "MY-SERVICES",
+                    "service-list-action": "deny"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete service discovery configuration",
+        "description": "Remove all service-list definitions.",
+        "operationId": "delete-service-discovery",
+        "tags": ["service-discovery"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-service-routing:service-routing": {
+      "get": {
+        "summary": "Get service routing configuration",
+        "description": "Retrieve service routing configuration.\n\nCLI equivalent: `show running-config | section service-routing`\n\nYANG module: Cisco-IOS-XE-service-routing",
+        "operationId": "get-service-routing",
+        "tags": ["service-routing"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-service-routing:service-routing": {
+                    "mdns-sd": {
+                      "service-peer": {
+                        "group": [
+                          {
+                            "name": "MDNS-PEER-GROUP"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace service routing configuration",
+        "description": "Replace service routing configuration.",
+        "operationId": "put-service-routing",
+        "tags": ["service-routing"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-service-routing:service-routing": {
+                  "mdns-sd": {
+                    "service-peer": {
+                      "group": [
+                        { "name": "NEW-PEER-GROUP" }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update service routing configuration",
+        "description": "Merge update to service routing configuration.",
+        "operationId": "patch-service-routing",
+        "tags": ["service-routing"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-service-routing:service-routing": {
+                  "mdns-sd": {
+                    "service-peer": {
+                      "group": [
+                        { "name": "UPDATED-GROUP" }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete service routing configuration",
+        "description": "Remove service routing configuration.",
+        "operationId": "delete-service-routing",
+        "tags": ["service-routing"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-mdns-gateway:mdns-sd": {
+      "get": {
+        "summary": "Get mDNS-SD gateway configuration",
+        "description": "Retrieve mDNS Service Discovery gateway configuration.\n\nCLI equivalent: `show running-config | section mdns-sd`\n\nYANG module: Cisco-IOS-XE-mdns-gateway",
+        "operationId": "get-mdns-gateway",
+        "tags": ["mdns-gateway"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-mdns-gateway:mdns-sd": {
+                    "gateway": {
+                      "active-query": {
+                        "timer": 60
+                      },
+                      "service-announcement": {
+                        "periodicity": 30
+                      },
+                      "source-interface": "Vlan100"
+                    },
+                    "service-definition": [
+                      {
+                        "name": "ALL",
+                        "service-type": "_tcp.local"
+                      }
+                    ],
+                    "service-list": [
+                      {
+                        "name": "PERMIT-ALL",
+                        "direction": "IN",
+                        "match": {
+                          "service-definition": "ALL"
+                        },
+                        "action": "permit"
+                      }
+                    ],
+                    "service-policy": [
+                      {
+                        "name": "DEFAULT-POLICY",
+                        "service-list": [
+                          {
+                            "name": "PERMIT-ALL",
+                            "direction": "IN"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace mDNS-SD gateway configuration",
+        "description": "Replace all mDNS-SD gateway configuration.",
+        "operationId": "put-mdns-gateway",
+        "tags": ["mdns-gateway"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-mdns-gateway:mdns-sd": {
+                  "gateway": {
+                    "active-query": { "timer": 120 },
+                    "source-interface": "Vlan200"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update mDNS-SD gateway configuration",
+        "description": "Merge update to mDNS-SD gateway configuration.",
+        "operationId": "patch-mdns-gateway",
+        "tags": ["mdns-gateway"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-mdns-gateway:mdns-sd": {
+                  "gateway": {
+                    "active-query": { "timer": 60 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete mDNS-SD gateway configuration",
+        "description": "Remove all mDNS-SD gateway configuration.",
+        "operationId": "delete-mdns-gateway",
+        "tags": ["mdns-gateway"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-pnp:pnp": {
+      "get": {
+        "summary": "Get PnP agent configuration",
+        "description": "Retrieve Plug and Play (PnP) agent configuration for zero-touch provisioning.\n\nCLI equivalent: `show running-config | section pnp`\n\nYANG module: Cisco-IOS-XE-pnp",
+        "operationId": "get-pnp",
+        "tags": ["pnp"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-pnp:pnp": {
+                    "profile": [
+                      {
+                        "profile-name": "pnp-zero-touch",
+                        "transport": {
+                          "https": {
+                            "host": "devicehelper.cisco.com",
+                            "port": 443
+                          }
+                        }
+                      }
+                    ],
+                    "startup-vlan": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace PnP agent configuration",
+        "description": "Replace PnP agent configuration.",
+        "operationId": "put-pnp",
+        "tags": ["pnp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-pnp:pnp": {
+                  "profile": [
+                    {
+                      "profile-name": "custom-pnp",
+                      "transport": {
+                        "https": {
+                          "host": "pnp-server.example.com",
+                          "port": 443
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update PnP agent configuration",
+        "description": "Merge update to PnP agent configuration.",
+        "operationId": "patch-pnp",
+        "tags": ["pnp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-pnp:pnp": {
+                  "startup-vlan": 100
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete PnP agent configuration",
+        "description": "Remove PnP agent configuration.",
+        "operationId": "delete-pnp",
+        "tags": ["pnp"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "kron", "description": "Kron job scheduler — scheduled CLI execution via occurrence/policy-list" },
+    { "name": "app-hosting", "description": "IOx application hosting — container/VM lifecycle, resources, networking" },
+    { "name": "nbar", "description": "Network-Based Application Recognition — protocol classification and custom apps" },
+    { "name": "service-discovery", "description": "Service discovery — service-list definitions for mDNS-SD" },
+    { "name": "service-routing", "description": "Service routing — mDNS-SD peer groups and routing" },
+    { "name": "mdns-gateway", "description": "mDNS-SD Gateway — multicast DNS service discovery gateway" },
+    { "name": "pnp", "description": "Plug and Play — zero-touch provisioning agent" }
+  ]
+}

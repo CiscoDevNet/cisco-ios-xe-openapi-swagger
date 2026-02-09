@@ -1,0 +1,510 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cisco IOS-XE Native Config - Security Services",
+    "description": "Security service extensions for Cisco-IOS-XE-native model.\n\n**Modules covered:** umbrella (Cisco Umbrella / OpenDNS), fqdn (FQDN ACLs), group-policy (group-based policy), pae (802.1X port-access entity), sanet (session-aware networking)\n\n**YANG Augments:** Cisco-IOS-XE-umbrella, Cisco-IOS-XE-fqdn, Cisco-IOS-XE-group-policy, Cisco-IOS-XE-pae, Cisco-IOS-XE-sanet",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/docs/ios-xe/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{device}:{port}",
+      "description": "IOS-XE Device RESTCONF API",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com",
+          "description": "Device IP or hostname"
+        },
+        "port": {
+          "default": "443",
+          "description": "HTTPS port"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-native:native/parameter-map/type/Cisco-IOS-XE-umbrella:umbrella": {
+      "get": {
+        "summary": "Get Cisco Umbrella configuration",
+        "description": "Retrieve Cisco Umbrella (OpenDNS) integration configuration including parameter maps, tokens, and DNS resolution settings.\n\nCLI equivalent: `show running-config | section parameter-map type umbrella`\n\nYANG module: Cisco-IOS-XE-umbrella",
+        "operationId": "get-umbrella",
+        "tags": ["umbrella"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-umbrella:umbrella": {
+                    "global": {
+                      "token": "ABCDEF1234567890ABCDEF1234567890",
+                      "local-domain": [
+                        { "regex": ".*\\.example\\.com" },
+                        { "regex": ".*\\.internal\\.net" }
+                      ],
+                      "dnscrypt": true,
+                      "public-key": "B735:1140:206F:225D:3E2B:D822:D7FD:691E:A1C3:3CC8:D666:8D0C:BE04:BFAB:CA43:FB79",
+                      "resolver": [
+                        { "ipv4-address": "208.67.222.222" },
+                        { "ipv4-address": "208.67.220.220" }
+                      ],
+                      "vrf": [
+                        {
+                          "name": "INET",
+                          "dns-resolver": "208.67.222.222",
+                          "match-local-domain-to-bypass": true
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace Cisco Umbrella configuration",
+        "description": "Replace Umbrella parameter map configuration.\n\nCLI equivalent: `parameter-map type umbrella global`",
+        "operationId": "put-umbrella",
+        "tags": ["umbrella"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-umbrella:umbrella": {
+                  "global": {
+                    "token": "YOUR-UMBRELLA-TOKEN-HERE",
+                    "dnscrypt": true,
+                    "resolver": [
+                      { "ipv4-address": "208.67.222.222" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update Cisco Umbrella configuration",
+        "description": "Merge update to Umbrella configuration.",
+        "operationId": "patch-umbrella",
+        "tags": ["umbrella"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-umbrella:umbrella": {
+                  "global": {
+                    "local-domain": [
+                      { "regex": ".*\\.newdomain\\.com" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete Cisco Umbrella configuration",
+        "description": "Remove Umbrella configuration.\n\nCLI equivalent: `no parameter-map type umbrella global`",
+        "operationId": "delete-umbrella",
+        "tags": ["umbrella"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-fqdn:fqdn": {
+      "get": {
+        "summary": "Get FQDN ACL configuration",
+        "description": "Retrieve FQDN-based access control list configuration.\n\nCLI equivalent: `show running-config | section fqdn`\n\nYANG module: Cisco-IOS-XE-fqdn",
+        "operationId": "get-fqdn",
+        "tags": ["fqdn"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-fqdn:fqdn": {
+                    "ip-name-list": [
+                      {
+                        "id": 1,
+                        "fqdn": "*.cisco.com",
+                        "action": "permit"
+                      },
+                      {
+                        "id": 2,
+                        "fqdn": "malware.example.com",
+                        "action": "deny"
+                      }
+                    ],
+                    "ttl-timeout-factor": 3
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace FQDN ACL configuration",
+        "description": "Replace FQDN ACL configuration.",
+        "operationId": "put-fqdn",
+        "tags": ["fqdn"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-fqdn:fqdn": {
+                  "ip-name-list": [
+                    {
+                      "id": 1,
+                      "fqdn": "*.trusted.com",
+                      "action": "permit"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update FQDN ACL configuration",
+        "description": "Merge update to FQDN ACL configuration.",
+        "operationId": "patch-fqdn",
+        "tags": ["fqdn"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-fqdn:fqdn": {
+                  "ttl-timeout-factor": 5
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete FQDN ACL configuration",
+        "description": "Remove FQDN ACL configuration.",
+        "operationId": "delete-fqdn",
+        "tags": ["fqdn"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-group-policy:group-policy": {
+      "get": {
+        "summary": "Get group-based policy configuration",
+        "description": "Retrieve group-based access policy (SGT/SGACL) configuration.\n\nCLI equivalent: `show running-config | section group-policy`\n\nYANG module: Cisco-IOS-XE-group-policy",
+        "operationId": "get-group-policy",
+        "tags": ["group-policy"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-group-policy:group-policy": {
+                    "access-list": [
+                      {
+                        "name": "SGACL-DENY-ALL",
+                        "access-list-entry": [
+                          { "rule": "deny ip" }
+                        ]
+                      },
+                      {
+                        "name": "SGACL-PERMIT-ALL",
+                        "access-list-entry": [
+                          { "rule": "permit ip" }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace group-based policy configuration",
+        "description": "Replace group-based policy configuration.",
+        "operationId": "put-group-policy",
+        "tags": ["group-policy"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-group-policy:group-policy": {
+                  "access-list": [
+                    {
+                      "name": "MY-SGACL",
+                      "access-list-entry": [
+                        { "rule": "permit tcp dst eq 443" },
+                        { "rule": "deny ip" }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update group-based policy configuration",
+        "description": "Merge update to group-based policy configuration.",
+        "operationId": "patch-group-policy",
+        "tags": ["group-policy"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-group-policy:group-policy": {
+                  "access-list": [
+                    {
+                      "name": "NEW-SGACL",
+                      "access-list-entry": [
+                        { "rule": "permit ip" }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete group-based policy configuration",
+        "description": "Remove group-based policy configuration.",
+        "operationId": "delete-group-policy",
+        "tags": ["group-policy"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-pae:dot1x": {
+      "get": {
+        "summary": "Get 802.1X / PAE configuration",
+        "description": "Retrieve 802.1X port-access entity (PAE) global configuration including system-auth-control and critical VLAN.\n\nCLI equivalent: `show running-config | section dot1x`\n\nYANG module: Cisco-IOS-XE-pae",
+        "operationId": "get-pae",
+        "tags": ["pae"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-pae:dot1x": {
+                    "system-auth-control": [null],
+                    "critical": {
+                      "eapol": true,
+                      "recovery": {
+                        "delay": 2000
+                      }
+                    },
+                    "supplicant": {
+                      "force-multicast": true
+                    },
+                    "logging": {
+                      "verbose": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace 802.1X / PAE configuration",
+        "description": "Replace 802.1X PAE configuration.\n\nCLI equivalent: `dot1x system-auth-control`",
+        "operationId": "put-pae",
+        "tags": ["pae"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-pae:dot1x": {
+                  "system-auth-control": [null],
+                  "critical": {
+                    "recovery": { "delay": 3000 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update 802.1X / PAE configuration",
+        "description": "Merge update to 802.1X PAE configuration.",
+        "operationId": "patch-pae",
+        "tags": ["pae"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-pae:dot1x": {
+                  "logging": { "verbose": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete 802.1X / PAE configuration",
+        "description": "Remove 802.1X PAE configuration.\n\nCLI equivalent: `no dot1x system-auth-control`",
+        "operationId": "delete-pae",
+        "tags": ["pae"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-sanet:access-session": {
+      "get": {
+        "summary": "Get session-aware networking (SANET) configuration",
+        "description": "Retrieve session-aware networking (access-session) configuration for IBNS 2.0.\n\nCLI equivalent: `show running-config | section access-session`\n\nYANG module: Cisco-IOS-XE-sanet",
+        "operationId": "get-sanet",
+        "tags": ["sanet"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-sanet:access-session": {
+                    "attributes": {
+                      "filter-list": [
+                        {
+                          "name": "ACS-FILTER",
+                          "cdp": true,
+                          "dhcp": true,
+                          "lldp": true
+                        }
+                      ]
+                    },
+                    "mac-move": {
+                      "deny": false
+                    },
+                    "interface-template": {
+                      "sticky": {
+                        "timer": 30
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace SANET access-session configuration",
+        "description": "Replace session-aware networking configuration.",
+        "operationId": "put-sanet",
+        "tags": ["sanet"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-sanet:access-session": {
+                  "mac-move": { "deny": false },
+                  "interface-template": {
+                    "sticky": { "timer": 60 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update SANET access-session configuration",
+        "description": "Merge update to session-aware networking configuration.",
+        "operationId": "patch-sanet",
+        "tags": ["sanet"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-sanet:access-session": {
+                  "mac-move": { "deny": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete SANET access-session configuration",
+        "description": "Remove session-aware networking configuration.",
+        "operationId": "delete-sanet",
+        "tags": ["sanet"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "umbrella", "description": "Cisco Umbrella — DNS-layer security via OpenDNS with DNSCrypt and local bypass" },
+    { "name": "fqdn", "description": "FQDN ACLs — domain name-based access control lists" },
+    { "name": "group-policy", "description": "Group-based policy — SGT/SGACL security group access control" },
+    { "name": "pae", "description": "802.1X PAE — port-access entity for network access control" },
+    { "name": "sanet", "description": "SANET — session-aware networking (IBNS 2.0) access-session" }
+  ]
+}

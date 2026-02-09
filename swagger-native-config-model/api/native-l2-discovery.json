@@ -1,0 +1,476 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cisco IOS-XE Native Config - L2 Discovery & Adjacency",
+    "description": "Layer 2 discovery and adjacency protocol configuration for Cisco-IOS-XE-native model.\n\n**Modules covered:** lldp (Link Layer Discovery Protocol), arp (Address Resolution Protocol), icmp (Internet Control Message Protocol), loop-detect, uplink-autoconfig\n\n**YANG Augments:** Cisco-IOS-XE-lldp, Cisco-IOS-XE-arp, Cisco-IOS-XE-icmp, Cisco-IOS-XE-switch, Cisco-IOS-XE-switch",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/docs/ios-xe/"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{device}:{port}",
+      "description": "IOS-XE Device RESTCONF API",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com",
+          "description": "Device IP or hostname"
+        },
+        "port": {
+          "default": "443",
+          "description": "HTTPS port"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/Cisco-IOS-XE-native:native/lldp": {
+      "get": {
+        "summary": "Get LLDP global configuration",
+        "description": "Retrieve global Link Layer Discovery Protocol (LLDP) configuration including timers, TLV selection, and system capabilities.\n\nCLI equivalent: `show running-config | section ^lldp`\n\nYANG module: Cisco-IOS-XE-lldp",
+        "operationId": "get-lldp",
+        "tags": ["lldp"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-native:lldp": {
+                    "run": [null],
+                    "holdtime": 120,
+                    "reinit": 2,
+                    "timer": 30,
+                    "tlv-select": {
+                      "system-name": true,
+                      "system-description": true,
+                      "system-capabilities": true,
+                      "port-description": true,
+                      "management-address": true,
+                      "port-vlan": true,
+                      "power-management": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace LLDP global configuration",
+        "description": "Replace all global LLDP settings.\n\nCLI equivalent: `lldp run` / `lldp holdtime 120`",
+        "operationId": "put-lldp",
+        "tags": ["lldp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:lldp": {
+                  "run": [null],
+                  "holdtime": 120,
+                  "timer": 30,
+                  "tlv-select": {
+                    "system-name": true,
+                    "port-description": true,
+                    "management-address": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update LLDP global configuration",
+        "description": "Merge update to global LLDP settings.",
+        "operationId": "patch-lldp",
+        "tags": ["lldp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:lldp": {
+                  "holdtime": 180,
+                  "timer": 60
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete LLDP global configuration",
+        "description": "Remove global LLDP configuration (disables LLDP).\n\nCLI equivalent: `no lldp run`",
+        "operationId": "delete-lldp",
+        "tags": ["lldp"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/arp": {
+      "get": {
+        "summary": "Get ARP configuration",
+        "description": "Retrieve ARP (Address Resolution Protocol) configuration including static ARP entries and ARP timeout.\n\nCLI equivalent: `show running-config | section ^arp`\n\nYANG module: Cisco-IOS-XE-arp",
+        "operationId": "get-arp",
+        "tags": ["arp"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-native:arp": {
+                    "arp-entry": [
+                      {
+                        "ip": "10.0.0.1",
+                        "hardware-address": "0000.0c07.ac01",
+                        "arp-type": "ARPA"
+                      },
+                      {
+                        "ip": "10.0.0.2",
+                        "hardware-address": "0000.0c07.ac02",
+                        "arp-type": "ARPA"
+                      }
+                    ],
+                    "vrf": [
+                      {
+                        "vrf-name": "MGMT",
+                        "arp-entry": [
+                          {
+                            "ip": "192.168.1.1",
+                            "hardware-address": "aabb.cc00.0100",
+                            "arp-type": "ARPA"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace ARP configuration",
+        "description": "Replace all static ARP entries.\n\nCLI equivalent: `arp 10.0.0.1 0000.0c07.ac01 ARPA`",
+        "operationId": "put-arp",
+        "tags": ["arp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:arp": {
+                  "arp-entry": [
+                    {
+                      "ip": "10.0.0.1",
+                      "hardware-address": "0000.0c07.ac01",
+                      "arp-type": "ARPA"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update ARP configuration",
+        "description": "Merge update to ARP entries.",
+        "operationId": "patch-arp",
+        "tags": ["arp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-native:arp": {
+                  "arp-entry": [
+                    {
+                      "ip": "10.0.0.3",
+                      "hardware-address": "0000.0c07.ac03",
+                      "arp-type": "ARPA"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete ARP configuration",
+        "description": "Remove all static ARP entries.",
+        "operationId": "delete-arp",
+        "tags": ["arp"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/ip/Cisco-IOS-XE-icmp:icmp": {
+      "get": {
+        "summary": "Get ICMP rate-limiting configuration",
+        "description": "Retrieve ICMP rate-limiting configuration.\n\nCLI equivalent: `show running-config | include ip icmp`\n\nYANG module: Cisco-IOS-XE-icmp",
+        "operationId": "get-icmp",
+        "tags": ["icmp"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-icmp:icmp": {
+                    "rate-limit": {
+                      "unreachable": {
+                        "time": 500,
+                        "DF": true
+                      },
+                      "redirect": {
+                        "host": false,
+                        "subnet": false
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace ICMP rate-limiting configuration",
+        "description": "Replace ICMP rate-limiting configuration.\n\nCLI equivalent: `ip icmp rate-limit unreachable 500`",
+        "operationId": "put-icmp",
+        "tags": ["icmp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-icmp:icmp": {
+                  "rate-limit": {
+                    "unreachable": {
+                      "time": 1000,
+                      "DF": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update ICMP rate-limiting configuration",
+        "description": "Merge update to ICMP rate-limiting configuration.",
+        "operationId": "patch-icmp",
+        "tags": ["icmp"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-icmp:icmp": {
+                  "rate-limit": {
+                    "unreachable": { "time": 2000 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete ICMP rate-limiting configuration",
+        "description": "Remove ICMP rate-limiting configuration (revert to defaults).",
+        "operationId": "delete-icmp",
+        "tags": ["icmp"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-switch:loop-detect": {
+      "get": {
+        "summary": "Get loop detection configuration",
+        "description": "Retrieve Layer 2 loop detection configuration.\n\nCLI equivalent: `show running-config | section loop-detect`\n\nYANG module: Cisco-IOS-XE-switch (loop-detect augment)",
+        "operationId": "get-loop-detect",
+        "tags": ["loop-detect"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-switch:loop-detect": {
+                    "interval": 10,
+                    "source-port": true,
+                    "action": "shutdown"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace loop detection configuration",
+        "description": "Replace loop detection configuration.",
+        "operationId": "put-loop-detect",
+        "tags": ["loop-detect"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-switch:loop-detect": {
+                  "interval": 15,
+                  "action": "err-disable"
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update loop detection configuration",
+        "description": "Merge update to loop detection configuration.",
+        "operationId": "patch-loop-detect",
+        "tags": ["loop-detect"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-switch:loop-detect": {
+                  "interval": 20
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete loop detection configuration",
+        "description": "Remove loop detection configuration.",
+        "operationId": "delete-loop-detect",
+        "tags": ["loop-detect"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    },
+    "/data/Cisco-IOS-XE-native:native/Cisco-IOS-XE-switch:uplink-autoconfig": {
+      "get": {
+        "summary": "Get uplink auto-configuration",
+        "description": "Retrieve uplink auto-configuration for switch stacking.\n\nCLI equivalent: `show running-config | include uplink`\n\nYANG module: Cisco-IOS-XE-switch (uplink-autoconfig augment)",
+        "operationId": "get-uplink-autoconfig",
+        "tags": ["uplink-autoconfig"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": { "type": "object" },
+                "example": {
+                  "Cisco-IOS-XE-switch:uplink-autoconfig": {
+                    "enable": true,
+                    "trust": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace uplink auto-configuration",
+        "description": "Replace uplink auto-configuration settings.",
+        "operationId": "put-uplink-autoconfig",
+        "tags": ["uplink-autoconfig"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-switch:uplink-autoconfig": {
+                  "enable": true,
+                  "trust": false
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully configured" } }
+      },
+      "patch": {
+        "summary": "Update uplink auto-configuration",
+        "description": "Merge update to uplink auto-configuration.",
+        "operationId": "patch-uplink-autoconfig",
+        "tags": ["uplink-autoconfig"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": { "type": "object" },
+              "example": {
+                "Cisco-IOS-XE-switch:uplink-autoconfig": {
+                  "trust": true
+                }
+              }
+            }
+          }
+        },
+        "responses": { "204": { "description": "Successfully updated" } }
+      },
+      "delete": {
+        "summary": "Delete uplink auto-configuration",
+        "description": "Remove uplink auto-configuration.",
+        "operationId": "delete-uplink-autoconfig",
+        "tags": ["uplink-autoconfig"],
+        "responses": { "204": { "description": "Successfully deleted" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    { "name": "lldp", "description": "Link Layer Discovery Protocol — neighbor discovery and capability advertisement" },
+    { "name": "arp", "description": "Address Resolution Protocol — static ARP entries and per-VRF ARP tables" },
+    { "name": "icmp", "description": "Internet Control Message Protocol — rate limiting for unreachables and redirects" },
+    { "name": "loop-detect", "description": "Layer 2 loop detection — detect and mitigate switching loops" },
+    { "name": "uplink-autoconfig", "description": "Uplink auto-configuration — automatic uplink trust for stacking" }
+  ]
+}
