@@ -434,7 +434,7 @@ else:
 
 ## Understanding the Models
 
-### 1. **Native Configuration Model** (28 files, 18 categories)
+### 1. **Native Configuration Model** (28 files, 22 categories)
 
 **Purpose:** Full CLI-equivalent configuration
 

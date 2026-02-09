@@ -157,12 +157,12 @@
   - Total Event modules: 128 (455 notification paths)
   - Removed 1 invalid RPC spec (Cisco-IOS-XE-rpc.json - JSON errors)
 - ✅ **UI Enhancement:** Added tree links to all model sidebars for consistent navigation
-- **Final Statistics:**
+- **Final Statistics (updated after Phase 2):**
   - **Native Config Models:**
-    - 18 categories, 172 paths, 644 operations (GET/PUT/PATCH/DELETE)
-    - 183 endpoints with GET response examples
-    - 182 endpoints with PUT request examples  
-    - 182 endpoints with PATCH request examples
+    - 22 categories, 253 paths, 1,007 operations (GET/PUT/PATCH/DELETE)
+    - 253 endpoints with GET response examples
+    - 252 endpoints with PUT request examples  
+    - 252 endpoints with PATCH request examples
   - **Event Models:**
     - 128 modules (40 YANG + 88 MIB), 455 notification paths
     - All with YANG-aligned GET response examples
