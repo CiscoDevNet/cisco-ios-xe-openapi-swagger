@@ -5,8 +5,8 @@
 This project has successfully created a professional, organized, and developer-friendly documentation hub for Cisco IOS-XE RESTCONF APIs. Through multiple comprehensive phases, we've achieved:
 
 - **672 OpenAPI specifications** across 9 model categories
-- **10,563 API paths** organized and documented
-- **17,074 API operations** with production examples
+- **13,840 API paths** organized and documented
+- **24,734 API operations** with production examples
 - **53 logical categories** for easy navigation
 - **6 curated quick-start collections** for common workflows
 
@@ -42,7 +42,7 @@ This project has successfully created a professional, organized, and developer-f
 - **Files:** 200 specifications
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - **Quick-Starts:** troubleshooting, performance, inventory
-- **Paths:** 2,652 operational endpoints
+- **Paths:** 4,222 operational endpoints
 
 #### Events Model
 - **Files:** 128 specifications
@@ -96,8 +96,8 @@ This project has successfully created a professional, organized, and developer-f
    - Category and quick-start counts
 
 4. **Enhancement Summary** (blue info box)
-   - Key metrics: 10,563 paths, 672 specs, 53 categories
-   - 17,074 API operations
+   - Key metrics: 13,840 paths, 672 specs, 53 categories
+   - 24,734 API operations
    - 6 quick-start collections count
 
 ---
@@ -253,15 +253,15 @@ swagger-native-config-model/api/
 | Model | Specs | Paths | Operations |
 |-------|-------|-------|------------|
 | Native Config | 27 | 328 | 1,307 |
-| Operational | 200 | 2,652 | 2,652 |
+| Operational | 200 | 4,222 | 4,222 |
 | Events | 128 | 455 | 455 |
 | RPC | 58 | 290 | 290 |
-| Config | 39 | 612 | 1,992 |
-| IETF | 21 | 505 | 1,664 |
-| OpenConfig | 42 | 777 | 2,900 |
+| Config | 39 | 815 | 2,722 |
+| IETF | 21 | 553 | 1,836 |
+| OpenConfig | 42 | 2,063 | 7,482 |
 | MIB | 147 | 4,272 | 4,272 |
-| Other | 10 | 672 | 1,542 |
-| **Total** | **672** | **10,563** | **17,074** |
+| Other | 10 | 842 | 2,148 |
+| **Total** | **672** | **13,840** | **24,734** |
 
 Note: Native Config covers 139 of 163 native augment modules.
 
@@ -270,15 +270,15 @@ Note: Native Config covers 139 of 163 native augment modules.
 | Model | Specs | Paths | Operations |
 |-------|-------|-------|------------|
 | Native Config | 27 | 328 | 1,307 |
-| Operational | 200 | 2,652 | 2,652 |
+| Operational | 200 | 4,222 | 4,222 |
 | Events | 128 | 455 | 455 |
 | RPC | 58 | 290 | 290 |
-| Config | 39 | 612 | 1,992 |
-| IETF | 21 | 505 | 1,664 |
-| OpenConfig | 42 | 777 | 2,900 |
+| Config | 39 | 815 | 2,722 |
+| IETF | 21 | 553 | 1,836 |
+| OpenConfig | 42 | 2,063 | 7,482 |
 | MIB | 147 | 4,272 | 4,272 |
-| Other | 10 | 672 | 1,542 |
-| **Total** | **672** | **10,563** | **17,074** |
+| Other | 10 | 842 | 2,148 |
+| **Total** | **672** | **13,840** | **24,734** |
 
 ### Code & Documentation
 
@@ -462,8 +462,8 @@ This project has created a professional, organized, and developer-friendly docum
 ✅ **Professional UI** showcasing all models and guiding users
 
 **Key Metrics:**
-- 10,563 API paths organized
-- 17,074 API operations documented
+- 13,840 API paths organized
+- 24,734 API operations documented
 - 672 OpenAPI specifications
 
 **Impact:**
