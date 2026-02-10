@@ -16,13 +16,13 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 **All 9 model categories have been systematically documented:**
 
 - ✅ **Native Config:** 27 categories, 328 paths (1,307 operations with examples)
-- ✅ **Operational Data:** 200 modules across 16 categories (2,652 paths)
+- ✅ **Operational Data:** 200 modules across 16 categories (4,222 paths)
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
-- ✅ **IETF Standards:** 21 modules (505 paths)
-- ✅ **OpenConfig:** 42 modules (777 paths)
+- ✅ **IETF Standards:** 21 modules (553 paths)
+- ✅ **OpenConfig:** 42 modules (2,063 paths)
 - ✅ **MIB Translations:** 147 modules (visualizations for SNMP data)
-- ✅ **Configuration:** 39 modules (612 paths)
+- ✅ **Configuration:** 39 modules (815 paths)
 - ✅ **Other Models:** 10 modules
 
 **Key Features:**
@@ -39,8 +39,8 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 | Metric | Count | Description |
 |--------|-------|-------------|
 | **OpenAPI Specs** | 672 | Generated specifications |
-| **API Paths** | 10,563 | RESTCONF endpoints |
-| **Operations** | 17,074 | Total API operations |
+| **API Paths** | 13,840 | RESTCONF endpoints |
+| **Operations** | 24,734 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 719 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
@@ -57,7 +57,7 @@ Full CLI-equivalent configuration organized by network domain.
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
-#### 📈 Operational Data (200 modules, 16 categories, 2,652 paths)
+#### 📈 Operational Data (200 modules, 16 categories, 4,222 paths)
 Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
@@ -76,17 +76,17 @@ Remote procedure calls for device actions and commands.
 
 ### 📚 Standard Models (Original Structure)
 
-#### ⚙️ Configuration (39 modules, 612 paths)
+#### ⚙️ Configuration (39 modules, 815 paths)
 Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
 - [Browse Config APIs →](swagger-cfg-model/)
 
-#### 🌍 OpenConfig (42 modules, 777 paths)
+#### 🌍 OpenConfig (42 modules, 2,063 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
 
-#### 📜 IETF Standards (21 modules, 505 paths)
+#### 📜 IETF Standards (21 modules, 553 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
 - [Browse IETF APIs →](swagger-ietf-model/)

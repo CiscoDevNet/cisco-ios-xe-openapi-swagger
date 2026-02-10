@@ -442,7 +442,7 @@ else:
 
 **When to use:** For comprehensive device configuration tasks
 
-### 2. **Operational Data Model** (200 specs, 2,652 paths)
+### 2. **Operational Data Model** (200 specs, 4,222 paths)
 
 **Purpose:** Read-only real-time device state
 

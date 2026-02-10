@@ -267,8 +267,8 @@ python prepare_github_pages.py
 | Metric | Target | Achieved |
 |--------|--------|----------|
 | Total OpenAPI Specs | 550+ | ✅ 672 |
-| Total API Paths | 10,000+ | ✅ 10,563 |
-| Total API Operations | 15,000+ | ✅ 17,074 |
+| Total API Paths | 10,000+ | ✅ 13,840 |
+| Total API Operations | 15,000+ | ✅ 24,734 |
 | Module Accountability | 100% | ✅ 100% |
 | Link Validation | 0 errors | ✅ 0 errors |
 | YANG Module Coverage | 60%+ | ✅ 47.5% (403/848) |
@@ -298,8 +298,8 @@ python prepare_github_pages.py
 
 **Coverage Achieved:**
 - ✅ 672 OpenAPI specifications generated
-- ✅ 10,563 API paths documented  
-- ✅ 17,074 API operations
+- ✅ 13,840 API paths documented  
+- ✅ 24,734 API operations
 - ✅ 100% YANG module accountability
 - ✅ 9 model categories fully implemented
 - ✅ 53 logical categories for organization
@@ -309,17 +309,17 @@ python prepare_github_pages.py
 
 **Module Breakdown:**
 ```
-Operational:    200 modules (2,652 paths)
+Operational:    200 modules (4,222 paths)
 RPC:             58 modules (290 operations)
 Events:         128 modules (455 notifications)
 Native Config:   27 modules (328 paths)
-Configuration:   39 modules (612 paths)
-IETF:            21 modules (505 paths)
-OpenConfig:      42 modules (777 paths)
+Configuration:   39 modules (815 paths)
+IETF:            21 modules (553 paths)
+OpenConfig:      42 modules (2,063 paths)
 MIB:            147 modules (4,272 paths)
 Other:           10 modules (672 paths)
 ---------------------------------------------------
-Total:          672 modules (10,563 paths)
+Total:          672 modules (13,840 paths)
 ```
 
 **Quality Validation:**
