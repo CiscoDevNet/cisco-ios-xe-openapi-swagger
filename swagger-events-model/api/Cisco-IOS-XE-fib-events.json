@@ -3,7 +3,7 @@
   "info": {
     "title": "Events - fib",
     "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions\n     for FIB status change notification.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - fib.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - fib.yang)\n\n**\ud83d\udcca YANG Tree:** [View Cisco-IOS-XE-fib-events structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/Cisco-IOS-XE-fib-events.html)"
+    "description": "This module contains a collection of YANG definitions\n     for FIB status change notification.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - fib.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - fib.yang)\n\n**📊 YANG Tree:** [View Cisco-IOS-XE-fib-events structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/Cisco-IOS-XE-fib-events.html)"
   },
   "servers": [
     {
@@ -29,13 +29,20 @@
             "content": {
               "application/yang-data+json": {
                 "example": {
-                  "Cisco-IOS-XE-fib-events:events": {
-                    "fib-event": {
-                      "event-type": "route-added",
-                      "prefix": "192.168.1.0/24",
-                      "next-hop": "10.1.1.1"
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "Cisco-IOS-XE-fib-events:fib-updates": {
+                      "severity-level": "major",
+                      "host-name": "Router1",
+                      "system-ip": "10.1.1.1",
+                      "vrf-name": "default",
+                      "address-family-type": "10.1.1.1",
+                      "fib-last-update-time": "2026-02-10T10:30:00Z"
                     }
                   }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/fib-updates"
                 }
               }
             }
@@ -74,9 +81,20 @@
             "content": {
               "application/yang-data+json": {
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "Cisco-IOS-XE-fib-events:fib-updates": {
+                      "severity-level": "major",
+                      "host-name": "Router1",
+                      "system-ip": "10.1.1.1",
+                      "vrf-name": "default",
+                      "address-family-type": "10.1.1.1",
+                      "fib-last-update-time": "2026-02-10T10:30:00Z"
+                    }
                   }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/fib-updates"
                 }
               }
             }
@@ -90,6 +108,106 @@
       "basicAuth": {
         "type": "http",
         "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "fib-updates": {
+        "type": "object",
+        "description": "Notification payload for fib-updates",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "Cisco-IOS-XE-fib-events:fib-updates": {
+                "type": "object",
+                "properties": {
+                  "severity-level": {
+                    "type": "string"
+                  },
+                  "host-name": {
+                    "type": "string"
+                  },
+                  "system-ip": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "vrf-name": {
+                    "type": "string"
+                  },
+                  "address-family-type": {
+                    "type": "string"
+                  },
+                  "fib-last-update-time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "Cisco-IOS-XE-fib-events:fib-updates": {
+              "severity-level": "major",
+              "host-name": "Router1",
+              "system-ip": "10.1.1.1",
+              "vrf-name": "default",
+              "address-family-type": "10.1.1.1",
+              "fib-last-update-time": "2026-02-10T10:30:00Z"
+            }
+          }
+        }
+      },
+      "fib-default-route-state-change": {
+        "type": "object",
+        "description": "Notification payload for fib-default-route-state-change",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "Cisco-IOS-XE-fib-events:fib-default-route-state-change": {
+                "type": "object",
+                "properties": {
+                  "table-name": {
+                    "type": "string"
+                  },
+                  "vrf-name": {
+                    "type": "string"
+                  },
+                  "af": {
+                    "type": "string"
+                  },
+                  "drh-override": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "Cisco-IOS-XE-fib-events:fib-default-route-state-change": {
+              "table-name": "example-name",
+              "vrf-name": "default",
+              "af": "fib-af",
+              "drh-override": 12345
+            }
+          }
+        }
       }
     }
   },

@@ -20,10 +20,30 @@
       "get": {
         "summary": "Subscribe to push-update events",
         "description": "Periodic push update notification with datastore contents",
-        "tags": ["yang-push-events"],
+        "tags": [
+          "yang-push-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/push-update"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-yang-push:push-update": {
+                      "subscription-id": 2147483650,
+                      "time-of-update": "2026-02-10T10:30:00Z",
+                      "updates-not-sent": true,
+                      "datastore-contents-xml": "example-value"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -32,10 +52,30 @@
       "get": {
         "summary": "Subscribe to push-change-update events",
         "description": "On-change push update notification with datastore changes",
-        "tags": ["yang-push-events"],
+        "tags": [
+          "yang-push-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/push-change-update"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-yang-push:push-change-update": {
+                      "subscription-id": 2147483650,
+                      "time-of-update": "2026-02-10T10:30:00Z",
+                      "updates-not-sent": true,
+                      "datastore-changes-xml": "example-value"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -46,6 +86,98 @@
       "basicAuth": {
         "type": "http",
         "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "push-update": {
+        "type": "object",
+        "description": "Notification payload for push-update",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-yang-push:push-update": {
+                "type": "object",
+                "properties": {
+                  "subscription-id": {
+                    "type": "string"
+                  },
+                  "time-of-update": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updates-not-sent": {
+                    "type": "boolean"
+                  },
+                  "datastore-contents-xml": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-yang-push:push-update": {
+              "subscription-id": 2147483650,
+              "time-of-update": "2026-02-10T10:30:00Z",
+              "updates-not-sent": true,
+              "datastore-contents-xml": "example-value"
+            }
+          }
+        }
+      },
+      "push-change-update": {
+        "type": "object",
+        "description": "Notification payload for push-change-update",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-yang-push:push-change-update": {
+                "type": "object",
+                "properties": {
+                  "subscription-id": {
+                    "type": "string"
+                  },
+                  "time-of-update": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updates-not-sent": {
+                    "type": "boolean"
+                  },
+                  "datastore-changes-xml": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-yang-push:push-change-update": {
+              "subscription-id": 2147483650,
+              "time-of-update": "2026-02-10T10:30:00Z",
+              "updates-not-sent": true,
+              "datastore-changes-xml": "example-value"
+            }
+          }
+        }
       }
     }
   },

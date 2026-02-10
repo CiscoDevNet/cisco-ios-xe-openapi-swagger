@@ -20,10 +20,27 @@
       "get": {
         "summary": "Subscribe to yang-library-update events",
         "description": "Notification when YANG library content is updated",
-        "tags": ["yang-library-events"],
+        "tags": [
+          "yang-library-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/yang-library-update"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-yang-library:yang-library-update": {
+                      "content-id": 12345
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -32,11 +49,26 @@
       "get": {
         "summary": "Subscribe to yang-library-change events (deprecated)",
         "description": "Deprecated notification when YANG library module set changes",
-        "tags": ["yang-library-events"],
+        "tags": [
+          "yang-library-events"
+        ],
         "deprecated": true,
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/yang-library-change"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-yang-library:yang-library-change": {}
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -47,6 +79,66 @@
       "basicAuth": {
         "type": "http",
         "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "yang-library-update": {
+        "type": "object",
+        "description": "Notification payload for yang-library-update",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-yang-library:yang-library-update": {
+                "type": "object",
+                "properties": {
+                  "content-id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-yang-library:yang-library-update": {
+              "content-id": 12345
+            }
+          }
+        }
+      },
+      "yang-library-change": {
+        "type": "object",
+        "description": "Notification payload for yang-library-change",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-yang-library:yang-library-change": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-yang-library:yang-library-change": {}
+          }
+        }
       }
     }
   },
