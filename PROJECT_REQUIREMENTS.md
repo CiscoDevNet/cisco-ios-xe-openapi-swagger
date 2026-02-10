@@ -271,7 +271,7 @@ python prepare_github_pages.py
 | Total API Operations | 15,000+ | ✅ 17,054 |
 | Module Accountability | 100% | ✅ 100% |
 | Link Validation | 0 errors | ✅ 0 errors |
-| YANG Module Coverage | 60%+ | ✅ 47.1% (399/848) |
+| YANG Module Coverage | 60%+ | ✅ 47.3% (401/848) |
 
 ---
 
