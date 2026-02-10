@@ -20,10 +20,36 @@
       "get": {
         "summary": "Subscribe to netconf-config-change events",
         "description": "Notification of configuration changes via NETCONF",
-        "tags": ["netconf-events"],
+        "tags": [
+          "netconf-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-config-change"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-netconf-notifications:netconf-config-change": {
+                      "changed-by": "example-value",
+                      "(server-or-user)": "example-value",
+                      "server": true,
+                      "username": "admin",
+                      "session-id": 12345,
+                      "source-host": "10.1.1.1",
+                      "datastore": "value-1",
+                      "edit": "example-value",
+                      "target": "example-value",
+                      "operation": "edit-operation"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -32,10 +58,41 @@
       "get": {
         "summary": "Subscribe to netconf-capability-change events",
         "description": "Notification of NETCONF capability changes",
-        "tags": ["netconf-events"],
+        "tags": [
+          "netconf-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-capability-change"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-netconf-notifications:netconf-capability-change": {
+                      "changed-by": "example-value",
+                      "(server-or-user)": "example-value",
+                      "server": true,
+                      "username": "admin",
+                      "session-id": 12345,
+                      "source-host": "10.1.1.1",
+                      "added-capability": [
+                        "https://example.com"
+                      ],
+                      "deleted-capability": [
+                        "https://example.com"
+                      ],
+                      "modified-capability": [
+                        "https://example.com"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -44,10 +101,29 @@
       "get": {
         "summary": "Subscribe to netconf-session-start events",
         "description": "Notification when a NETCONF session starts",
-        "tags": ["netconf-events"],
+        "tags": [
+          "netconf-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-session-start"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-netconf-notifications:netconf-session-start": {
+                      "username": "admin",
+                      "session-id": 12345,
+                      "source-host": "10.1.1.1"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -56,10 +132,31 @@
       "get": {
         "summary": "Subscribe to netconf-session-end events",
         "description": "Notification when a NETCONF session ends",
-        "tags": ["netconf-events"],
+        "tags": [
+          "netconf-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-session-end"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-netconf-notifications:netconf-session-end": {
+                      "username": "admin",
+                      "session-id": 12345,
+                      "source-host": "10.1.1.1",
+                      "killed-by": "session-id",
+                      "termination-reason": "configuration-change"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -68,10 +165,31 @@
       "get": {
         "summary": "Subscribe to netconf-confirmed-commit events",
         "description": "Notification of NETCONF confirmed commit operations",
-        "tags": ["netconf-events"],
+        "tags": [
+          "netconf-events"
+        ],
         "responses": {
           "101": {
-            "description": "Switching Protocols - WebSocket connection established"
+            "description": "Switching Protocols - WebSocket connection established",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-confirmed-commit"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ietf-netconf-notifications:netconf-confirmed-commit": {
+                      "username": "admin",
+                      "session-id": 12345,
+                      "source-host": "10.1.1.1",
+                      "confirm-event": "value-1",
+                      "timeout": 1000
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -82,6 +200,300 @@
       "basicAuth": {
         "type": "http",
         "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "netconf-config-change": {
+        "type": "object",
+        "description": "Notification payload for netconf-config-change",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-netconf-notifications:netconf-config-change": {
+                "type": "object",
+                "properties": {
+                  "changed-by": {
+                    "type": "string"
+                  },
+                  "(server-or-user)": {
+                    "type": "string"
+                  },
+                  "server": {
+                    "type": "boolean"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "session-id": {
+                    "type": "string"
+                  },
+                  "source-host": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "datastore": {
+                    "type": "string"
+                  },
+                  "edit": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string"
+                  },
+                  "operation": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-netconf-notifications:netconf-config-change": {
+              "changed-by": "example-value",
+              "(server-or-user)": "example-value",
+              "server": true,
+              "username": "admin",
+              "session-id": 12345,
+              "source-host": "10.1.1.1",
+              "datastore": "value-1",
+              "edit": "example-value",
+              "target": "example-value",
+              "operation": "edit-operation"
+            }
+          }
+        }
+      },
+      "netconf-capability-change": {
+        "type": "object",
+        "description": "Notification payload for netconf-capability-change",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-netconf-notifications:netconf-capability-change": {
+                "type": "object",
+                "properties": {
+                  "changed-by": {
+                    "type": "string"
+                  },
+                  "(server-or-user)": {
+                    "type": "string"
+                  },
+                  "server": {
+                    "type": "boolean"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "session-id": {
+                    "type": "string"
+                  },
+                  "source-host": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "added-capability": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "deleted-capability": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "modified-capability": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-netconf-notifications:netconf-capability-change": {
+              "changed-by": "example-value",
+              "(server-or-user)": "example-value",
+              "server": true,
+              "username": "admin",
+              "session-id": 12345,
+              "source-host": "10.1.1.1",
+              "added-capability": [
+                "https://example.com"
+              ],
+              "deleted-capability": [
+                "https://example.com"
+              ],
+              "modified-capability": [
+                "https://example.com"
+              ]
+            }
+          }
+        }
+      },
+      "netconf-session-start": {
+        "type": "object",
+        "description": "Notification payload for netconf-session-start",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-netconf-notifications:netconf-session-start": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "session-id": {
+                    "type": "string"
+                  },
+                  "source-host": {
+                    "type": "string",
+                    "format": "ipv4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-netconf-notifications:netconf-session-start": {
+              "username": "admin",
+              "session-id": 12345,
+              "source-host": "10.1.1.1"
+            }
+          }
+        }
+      },
+      "netconf-session-end": {
+        "type": "object",
+        "description": "Notification payload for netconf-session-end",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-netconf-notifications:netconf-session-end": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "session-id": {
+                    "type": "string"
+                  },
+                  "source-host": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "killed-by": {
+                    "type": "string"
+                  },
+                  "termination-reason": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-netconf-notifications:netconf-session-end": {
+              "username": "admin",
+              "session-id": 12345,
+              "source-host": "10.1.1.1",
+              "killed-by": "session-id",
+              "termination-reason": "configuration-change"
+            }
+          }
+        }
+      },
+      "netconf-confirmed-commit": {
+        "type": "object",
+        "description": "Notification payload for netconf-confirmed-commit",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "ietf-netconf-notifications:netconf-confirmed-commit": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "session-id": {
+                    "type": "string"
+                  },
+                  "source-host": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "confirm-event": {
+                    "type": "string"
+                  },
+                  "timeout": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ietf-netconf-notifications:netconf-confirmed-commit": {
+              "username": "admin",
+              "session-id": 12345,
+              "source-host": "10.1.1.1",
+              "confirm-event": "value-1",
+              "timeout": 1000
+            }
+          }
+        }
       }
     }
   },

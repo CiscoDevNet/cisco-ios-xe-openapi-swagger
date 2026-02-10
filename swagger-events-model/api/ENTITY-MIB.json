@@ -1,96 +1,145 @@
 {
-    "openapi":  "3.0.0",
-    "info":  {
-                 "title":  "ENTITY-MIB SNMP Notifications",
-                 "description":  "SNMP Trap notifications from ENTITY-MIB for Entity configuration change events",
-                 "version":  "1.0.0"
-             },
-    "servers":  [
-                    {
-                        "url":  "https://{device}",
-                        "variables":  {
-                                          "device":  {
-                                                         "default": "devnetsandboxiosxec9k.cisco.com"
-                                                     }
-                                      }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ENTITY-MIB SNMP Notifications",
+    "description": "SNMP Trap notifications from ENTITY-MIB for Entity configuration change events",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{device}",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/ENTITY-MIB:entConfigChange": {
+      "get": {
+        "description": "Notification for entConfigChange event",
+        "tags": [
+          "Hardware"
+        ],
+        "summary": "SNMP Trap: entConfigChange",
+        "operationId": "get_entConfigChange",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SubscriptionId"
+          },
+          {
+            "$ref": "#/components/parameters/ReceiverName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "entConfigChange notification data",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/entConfigChange"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "ENTITY-MIB:entConfigChange": {
+                      "event-time": "2026-02-10T10:30:00Z"
                     }
-                ],
-    "security":  [
-                     {
-                         "basicAuth":  [
-
-                                       ]
-                     }
-                 ],
-    "paths":  {
-                  "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/ENTITY-MIB:entConfigChange":  {
-                                                                                                                                                   "get":  {
-                                                                                                                                                               "description":  "Notification for entConfigChange event",
-                                                                                                                                                               "tags":  [
-                                                                                                                                                                            "Hardware"
-                                                                                                                                                                        ],
-                                                                                                                                                               "summary":  "SNMP Trap: entConfigChange",
-                                                                                                                                                               "operationId":  "get_entConfigChange",
-                                                                                                                                                               "parameters":  [
-                                                                                                                                                                                  {
-                                                                                                                                                                                      "$ref":  "#/components/parameters/SubscriptionId"
-                                                                                                                                                                                  },
-                                                                                                                                                                                  {
-                                                                                                                                                                                      "$ref":  "#/components/parameters/ReceiverName"
-                                                                                                                                                                                  }
-                                                                                                                                                                              ],
-                                                                                                                                                               "responses":  {
-                                                                                                                                                                                 "200":  {
-                                                                                                                                                                                             "$ref":  "#/components/responses/NotificationResponse"
-                                                                                                                                                                                         }
-                                                                                                                                                                             }
-                                                                                                                                                           }
-                                                                                                                                               }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    },
+    "parameters": {
+      "SubscriptionId": {
+        "description": "Subscription identifier",
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "ReceiverName": {
+        "description": "Receiver name",
+        "name": "name",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      }
+    },
+    "responses": {
+      "NotificationResponse": {
+        "content": {
+          "application/yang-data+json": {
+            "schema": {
+              "properties": {
+                "notification": {
+                  "type": "object",
+                  "description": "Notification event data with timestamp and trap parameters"
+                }
               },
-    "components":  {
-                       "securitySchemes":  {
-                                               "basicAuth":  {
-                                                                 "scheme":  "basic",
-                                                                 "type":  "http"
-                                                             }
-                                           },
-                       "parameters":  {
-                                          "SubscriptionId":  {
-                                                                 "description":  "Subscription identifier",
-                                                                 "name":  "id",
-                                                                 "in":  "path",
-                                                                 "schema":  {
-                                                                                "type":  "string"
-                                                                            },
-                                                                 "required":  true
-                                                             },
-                                          "ReceiverName":  {
-                                                               "description":  "Receiver name",
-                                                               "name":  "name",
-                                                               "in":  "path",
-                                                               "schema":  {
-                                                                              "type":  "string"
-                                                                          },
-                                                               "required":  true
-                                                           }
-                                      },
-                       "responses":  {
-                                         "NotificationResponse":  {
-                                                                      "content":  {
-                                                                                      "application/yang-data+json":  {
-                                                                                                                         "schema":  {
-                                                                                                                                        "properties":  {
-                                                                                                                                                           "notification":  {
-                                                                                                                                                                                "type":  "object",
-                                                                                                                                                                                "description":  "Notification event data with timestamp and trap parameters"
-                                                                                                                                                                            }
-                                                                                                                                                       },
-                                                                                                                                        "type":  "object"
-                                                                                                                                    }
-                                                                                                                     }
-                                                                                  },
-                                                                      "description":  "SNMP Trap notification data"
-                                                                  }
-                                     }
-                   }
+              "type": "object"
+            }
+          }
+        },
+        "description": "SNMP Trap notification data"
+      }
+    },
+    "schemas": {
+      "entConfigChange": {
+        "type": "object",
+        "description": "SNMP trap notification payload for entConfigChange",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the trap was generated"
+              },
+              "ENTITY-MIB:entConfigChange": {
+                "type": "object",
+                "description": "Varbind objects for entConfigChange trap",
+                "properties": {
+                  "event-time": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "ENTITY-MIB:entConfigChange": {
+              "event-time": "2026-02-10T10:30:00Z"
+            }
+          }
+        }
+      }
+    }
+  }
 }

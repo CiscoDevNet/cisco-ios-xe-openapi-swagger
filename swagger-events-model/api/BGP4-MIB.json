@@ -5,21 +5,59 @@
     "description": "SNMP Trap notifications from BGP4-MIB for BGP routing protocol events",
     "version": "1.0.0"
   },
-  "servers": [{"url": "https://{device}", "variables": {"device": {"default": "devnetsandboxiosxec9k.cisco.com"}}}],
-  "security": [{"basicAuth": []}],
+  "servers": [
+    {
+      "url": "https://{device}",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
   "paths": {
     "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/BGP4-MIB:bgpEstablished": {
       "get": {
         "summary": "SNMP Trap: BGP peer established",
         "description": "Notification when BGP peer session transitions to Established state",
         "operationId": "get_bgpEstablished",
-        "tags": ["BGP Peer Events"],
+        "tags": [
+          "BGP Peer Events"
+        ],
         "parameters": [
-          {"$ref": "#/components/parameters/SubscriptionId"},
-          {"$ref": "#/components/parameters/ReceiverName"}
+          {
+            "$ref": "#/components/parameters/SubscriptionId"
+          },
+          {
+            "$ref": "#/components/parameters/ReceiverName"
+          }
         ],
         "responses": {
-          "200": {"$ref": "#/components/responses/NotificationResponse"}
+          "200": {
+            "description": "bgpEstablished notification data",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bgpEstablished"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "BGP4-MIB:bgpEstablished": {
+                      "bgpPeerRemoteAddr": "example-string",
+                      "bgpPeerLastError": "example-string",
+                      "bgpPeerState": "active"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -28,13 +66,38 @@
         "summary": "SNMP Trap: BGP backward transition",
         "description": "Notification when BGP peer session transitions out of Established state",
         "operationId": "get_bgpBackwardTransition",
-        "tags": ["BGP Peer Events"],
+        "tags": [
+          "BGP Peer Events"
+        ],
         "parameters": [
-          {"$ref": "#/components/parameters/SubscriptionId"},
-          {"$ref": "#/components/parameters/ReceiverName"}
+          {
+            "$ref": "#/components/parameters/SubscriptionId"
+          },
+          {
+            "$ref": "#/components/parameters/ReceiverName"
+          }
         ],
         "responses": {
-          "200": {"$ref": "#/components/responses/NotificationResponse"}
+          "200": {
+            "description": "bgpBackwardTransition notification data",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bgpBackwardTransition"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "BGP4-MIB:bgpBackwardTransition": {
+                      "bgpPeerRemoteAddr": "example-string",
+                      "bgpPeerLastError": "example-string",
+                      "bgpPeerState": "active"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -79,6 +142,90 @@
                   "description": "Notification event data with timestamp and trap parameters"
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "bgpEstablished": {
+        "type": "object",
+        "description": "SNMP trap notification payload for bgpEstablished",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the trap was generated"
+              },
+              "BGP4-MIB:bgpEstablished": {
+                "type": "object",
+                "description": "Varbind objects for bgpEstablished trap",
+                "properties": {
+                  "bgpPeerRemoteAddr": {
+                    "type": "string"
+                  },
+                  "bgpPeerLastError": {
+                    "type": "string"
+                  },
+                  "bgpPeerState": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "BGP4-MIB:bgpEstablished": {
+              "bgpPeerRemoteAddr": "example-string",
+              "bgpPeerLastError": "example-string",
+              "bgpPeerState": "active"
+            }
+          }
+        }
+      },
+      "bgpBackwardTransition": {
+        "type": "object",
+        "description": "SNMP trap notification payload for bgpBackwardTransition",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the trap was generated"
+              },
+              "BGP4-MIB:bgpBackwardTransition": {
+                "type": "object",
+                "description": "Varbind objects for bgpBackwardTransition trap",
+                "properties": {
+                  "bgpPeerRemoteAddr": {
+                    "type": "string"
+                  },
+                  "bgpPeerLastError": {
+                    "type": "string"
+                  },
+                  "bgpPeerState": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "BGP4-MIB:bgpBackwardTransition": {
+              "bgpPeerRemoteAddr": "example-string",
+              "bgpPeerLastError": "example-string",
+              "bgpPeerState": "active"
             }
           }
         }

@@ -1,96 +1,154 @@
 {
-    "openapi":  "3.0.0",
-    "info":  {
-                 "title":  "DS1-MIB SNMP Notifications",
-                 "description":  "SNMP Trap notifications from DS1-MIB for DS1/E1 interface events",
-                 "version":  "1.0.0"
-             },
-    "servers":  [
-                    {
-                        "url":  "https://{device}",
-                        "variables":  {
-                                          "device":  {
-                                                         "default": "devnetsandboxiosxec9k.cisco.com"
-                                                     }
-                                      }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "DS1-MIB SNMP Notifications",
+    "description": "SNMP Trap notifications from DS1-MIB for DS1/E1 interface events",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{device}",
+      "variables": {
+        "device": {
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/DS1-MIB:dsx1LineStatusChange": {
+      "get": {
+        "description": "Notification for dsx1LineStatusChange event",
+        "tags": [
+          "Interface"
+        ],
+        "summary": "SNMP Trap: dsx1LineStatusChange",
+        "operationId": "get_dsx1LineStatusChange",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SubscriptionId"
+          },
+          {
+            "$ref": "#/components/parameters/ReceiverName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "dsx1LineStatusChange notification data",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/dsx1LineStatusChange"
+                },
+                "example": {
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "DS1-MIB:dsx1LineStatusChange": {
+                      "dsx1LineIndex": 1,
+                      "dsx1LineStatus": "up",
+                      "dsx1LineStatusLastChange": "up"
                     }
-                ],
-    "security":  [
-                     {
-                         "basicAuth":  [
-
-                                       ]
-                     }
-                 ],
-    "paths":  {
-                  "/data/ietf-subscribed-notifications:subscriptions/subscription={id}/receivers/receiver={name}/DS1-MIB:dsx1LineStatusChange":  {
-                                                                                                                                                     "get":  {
-                                                                                                                                                                 "description":  "Notification for dsx1LineStatusChange event",
-                                                                                                                                                                 "tags":  [
-                                                                                                                                                                              "Interface"
-                                                                                                                                                                          ],
-                                                                                                                                                                 "summary":  "SNMP Trap: dsx1LineStatusChange",
-                                                                                                                                                                 "operationId":  "get_dsx1LineStatusChange",
-                                                                                                                                                                 "parameters":  [
-                                                                                                                                                                                    {
-                                                                                                                                                                                        "$ref":  "#/components/parameters/SubscriptionId"
-                                                                                                                                                                                    },
-                                                                                                                                                                                    {
-                                                                                                                                                                                        "$ref":  "#/components/parameters/ReceiverName"
-                                                                                                                                                                                    }
-                                                                                                                                                                                ],
-                                                                                                                                                                 "responses":  {
-                                                                                                                                                                                   "200":  {
-                                                                                                                                                                                               "$ref":  "#/components/responses/NotificationResponse"
-                                                                                                                                                                                           }
-                                                                                                                                                                               }
-                                                                                                                                                             }
-                                                                                                                                                 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    },
+    "parameters": {
+      "SubscriptionId": {
+        "description": "Subscription identifier",
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "ReceiverName": {
+        "description": "Receiver name",
+        "name": "name",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      }
+    },
+    "responses": {
+      "NotificationResponse": {
+        "content": {
+          "application/yang-data+json": {
+            "schema": {
+              "properties": {
+                "notification": {
+                  "type": "object",
+                  "description": "Notification event data with timestamp and trap parameters"
+                }
               },
-    "components":  {
-                       "securitySchemes":  {
-                                               "basicAuth":  {
-                                                                 "scheme":  "basic",
-                                                                 "type":  "http"
-                                                             }
-                                           },
-                       "parameters":  {
-                                          "SubscriptionId":  {
-                                                                 "description":  "Subscription identifier",
-                                                                 "name":  "id",
-                                                                 "in":  "path",
-                                                                 "schema":  {
-                                                                                "type":  "string"
-                                                                            },
-                                                                 "required":  true
-                                                             },
-                                          "ReceiverName":  {
-                                                               "description":  "Receiver name",
-                                                               "name":  "name",
-                                                               "in":  "path",
-                                                               "schema":  {
-                                                                              "type":  "string"
-                                                                          },
-                                                               "required":  true
-                                                           }
-                                      },
-                       "responses":  {
-                                         "NotificationResponse":  {
-                                                                      "content":  {
-                                                                                      "application/yang-data+json":  {
-                                                                                                                         "schema":  {
-                                                                                                                                        "properties":  {
-                                                                                                                                                           "notification":  {
-                                                                                                                                                                                "type":  "object",
-                                                                                                                                                                                "description":  "Notification event data with timestamp and trap parameters"
-                                                                                                                                                                            }
-                                                                                                                                                       },
-                                                                                                                                        "type":  "object"
-                                                                                                                                    }
-                                                                                                                     }
-                                                                                  },
-                                                                      "description":  "SNMP Trap notification data"
-                                                                  }
-                                     }
-                   }
+              "type": "object"
+            }
+          }
+        },
+        "description": "SNMP Trap notification data"
+      }
+    },
+    "schemas": {
+      "dsx1LineStatusChange": {
+        "type": "object",
+        "description": "SNMP trap notification payload for dsx1LineStatusChange",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the trap was generated"
+              },
+              "DS1-MIB:dsx1LineStatusChange": {
+                "type": "object",
+                "description": "Varbind objects for dsx1LineStatusChange trap",
+                "properties": {
+                  "dsx1LineIndex": {
+                    "type": "string"
+                  },
+                  "dsx1LineStatus": {
+                    "type": "string"
+                  },
+                  "dsx1LineStatusLastChange": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "DS1-MIB:dsx1LineStatusChange": {
+              "dsx1LineIndex": 1,
+              "dsx1LineStatus": "up",
+              "dsx1LineStatusLastChange": "up"
+            }
+          }
+        }
+      }
+    }
+  }
 }

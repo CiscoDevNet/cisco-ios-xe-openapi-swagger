@@ -3,7 +3,7 @@
   "info": {
     "title": "Events - trace",
     "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions\n     for trace action notification for trace decoder events.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - trace.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - trace.yang)\n\n**\ud83d\udcca YANG Tree:** [View Cisco-IOS-XE-trace-events structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/Cisco-IOS-XE-trace-events.html)"
+    "description": "This module contains a collection of YANG definitions\n     for trace action notification for trace decoder events.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - trace.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - trace.yang)\n\n**📊 YANG Tree:** [View Cisco-IOS-XE-trace-events structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/Cisco-IOS-XE-trace-events.html)"
   },
   "servers": [
     {
@@ -29,13 +29,16 @@
             "content": {
               "application/yang-data+json": {
                 "example": {
-                  "Cisco-IOS-XE-trace-events:events": {
-                    "trace-event": {
-                      "trace-type": "packet",
-                      "packet-count": 100,
-                      "duration-seconds": 60
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "Cisco-IOS-XE-trace-events:trace-status": {
+                      "unique-id": 12345,
+                      "percentage": 85
                     }
                   }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/trace-status"
                 }
               }
             }
@@ -74,9 +77,16 @@
             "content": {
               "application/yang-data+json": {
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
+                  "notification": {
+                    "eventTime": "2026-02-10T10:30:00Z",
+                    "Cisco-IOS-XE-trace-events:trace-status": {
+                      "unique-id": 12345,
+                      "percentage": 85
+                    }
                   }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/trace-status"
                 }
               }
             }
@@ -90,6 +100,46 @@
       "basicAuth": {
         "type": "http",
         "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "trace-status": {
+        "type": "object",
+        "description": "Notification payload for trace-status",
+        "properties": {
+          "notification": {
+            "type": "object",
+            "properties": {
+              "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp when the event occurred"
+              },
+              "Cisco-IOS-XE-trace-events:trace-status": {
+                "type": "object",
+                "properties": {
+                  "unique-id": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "percentage": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "notification": {
+            "eventTime": "2026-02-10T10:30:00Z",
+            "Cisco-IOS-XE-trace-events:trace-status": {
+              "unique-id": 12345,
+              "percentage": 85
+            }
+          }
+        }
       }
     }
   },
