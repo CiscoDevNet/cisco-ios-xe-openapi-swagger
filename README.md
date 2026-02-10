@@ -3,9 +3,9 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-671-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-672-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 671 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 672 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
 🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
@@ -20,7 +20,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
 - ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
 - ✅ **IETF Standards:** 21 modules (505 paths)
-- ✅ **OpenConfig:** 41 modules (772 paths)
+- ✅ **OpenConfig:** 42 modules (777 paths)
 - ✅ **MIB Translations:** 147 modules (visualizations for SNMP data)
 - ✅ **Configuration:** 39 modules (612 paths)
 - ✅ **Other Models:** 10 modules
@@ -38,13 +38,13 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 671 | Generated specifications |
-| **API Paths** | 10,558 | RESTCONF endpoints |
-| **Operations** | 17,054 | Total API operations |
+| **OpenAPI Specs** | 672 | Generated specifications |
+| **API Paths** | 10,563 | RESTCONF endpoints |
+| **Operations** | 17,074 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 719 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Coverage** | 79.1% | YANG modules with specs (671/848) |
+| **Coverage** | 79.2% | YANG modules with specs (672/848) |
 | **Accountability** | 100% | All modules mapped |
 
 ## 🗂️ Model Categories
@@ -81,7 +81,7 @@ Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
 - [Browse Config APIs →](swagger-cfg-model/)
 
-#### 🌍 OpenConfig (41 modules, 772 paths)
+#### 🌍 OpenConfig (42 modules, 777 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
