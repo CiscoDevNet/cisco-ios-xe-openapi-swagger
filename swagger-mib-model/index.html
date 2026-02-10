@@ -102,9 +102,11 @@
         // CACHE BUSTER: 20260201-150000 - DO NOT CACHE THIS PAGE
         // Version: 2026-02-01-v2 - Force cache refresh
         let allModules = [];
+        let availableTrees = new Set();
         
         async function loadModules() {
             try {
+                try { const tr = await fetch('../yang-trees/tree-manifest.json'); availableTrees = new Set(await tr.json()); } catch(e) {}
                 const response = await fetch('api/manifest.json?v=' + Date.now());
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
@@ -161,13 +163,15 @@
                 });
                 li.appendChild(a);
                 
-                const treeLink = document.createElement('a');
-                treeLink.href = `../yang-trees/${modName}.html`;
-                treeLink.target = '_blank';
-                treeLink.className = 'tree-link';
-                treeLink.title = 'View YANG Tree';
-                treeLink.textContent = '🌳 Tree';
-                li.appendChild(treeLink);
+                if (availableTrees.has(modName)) {
+                    const treeLink = document.createElement('a');
+                    treeLink.href = `../yang-trees/${modName}.html`;
+                    treeLink.target = '_blank';
+                    treeLink.className = 'tree-link';
+                    treeLink.title = 'View YANG Tree';
+                    treeLink.textContent = '🌳 Tree';
+                    li.appendChild(treeLink);
+                }
                 
                 list.appendChild(li);
             });

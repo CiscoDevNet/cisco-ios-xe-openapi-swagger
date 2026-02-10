@@ -95,9 +95,11 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
     <script>
         let allModules = [];
+        let availableTrees = new Set();
         
         async function loadModules() {
             try {
+                try { const tr = await fetch('../yang-trees/tree-manifest.json'); availableTrees = new Set(await tr.json()); } catch(e) {}
                 const response = await fetch('api/manifest.json');
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
@@ -121,7 +123,7 @@
                 const displayName = mod.replace('Cisco-IOS-XE-', '').replace('-cfg', '');
                 return `<li>
                     <a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${displayName}</a>
-                    <a href="../yang-trees/${mod}.html" target="_blank" class="tree-link" title="View YANG Tree">🌳 Tree</a>
+                    ${availableTrees.has(mod) ? `<a href="../yang-trees/${mod}.html" target="_blank" class="tree-link" title="View YANG Tree">🌳 Tree</a>` : ''}
                 </li>`;
             }).join('');
         }

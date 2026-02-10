@@ -92,9 +92,11 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
     <script>
         let allModules = [];
+        let availableTrees = new Set();
         
         async function loadModules() {
             try {
+                try { const tr = await fetch('../yang-trees/tree-manifest.json'); availableTrees = new Set(await tr.json()); } catch(e) {}
                 const response = await fetch('api/manifest.json');
                 const manifest = await response.json();
                 allModules = manifest.modules || [];
@@ -120,7 +122,7 @@
                 const modName = typeof mod === 'object' ? mod.name : mod;
                 return `<li>
                     <a href="#" onclick="loadSpec('${modName}'); return false;" id="mod-${modName}">${modName}</a>
-                    <a href="../yang-trees/${modName}.html" target="_blank" class="tree-link" title="View YANG Tree">🌳 Tree</a>
+                    ${availableTrees.has(modName) ? `<a href="../yang-trees/${modName}.html" target="_blank" class="tree-link" title="View YANG Tree">🌳 Tree</a>` : ''}
                 </li>`;
             }).join('');
         }
