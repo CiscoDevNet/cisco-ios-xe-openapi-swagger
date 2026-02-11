@@ -5,11 +5,10 @@
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-672-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 672 modules, 53 categories, 719 YANG tree files, and interactive code generation** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 672 modules, 53 categories, and 719 YANG tree files** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
-🛠️ **[Code Generator Tool](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/code-generator.html)**  
-📖 **[Getting Started Guide](docs/GETTING_STARTED.md)**
+ **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
 ## ✨ What's New - Complete API Coverage
 
@@ -26,8 +25,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 - ✅ **Other Models:** 10 modules
 
 **Key Features:**
-- 🔧 **Code Generator** - Auto-generate curl, Python, and Ansible code
-- 📚 **Comprehensive Docs** - Getting started guide with 15+ examples
+-  **Comprehensive Docs** - Getting started guide with 15+ examples
 - 🎯 **53 Logical Categories** - Organized by network engineer workflows
 - 📊 **100% Accountability** - Every YANG module mapped and documented
 - 🌳 **719 Tree Files** - Searchable YANG tree visualizations
@@ -203,7 +201,9 @@ iosxe-1718-yang-swagger/
 
 ## 🔗 Resources
 
-- [Cisco IOS-XE RESTCONF Guide](https://developer.cisco.com/iosxe/#!restconf-api-overview)
+- [Cisco IOS-XE RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
+- [Cisco YANG Suite](https://developer.cisco.com/yangsuite/)
+- [YANG Suite on GitHub](https://github.com/CiscoDevNet/yangsuite/)
 - [YANG Models on GitHub](https://github.com/YangModels/yang)
 - [OpenAPI Specification](https://swagger.io/specification/)
 

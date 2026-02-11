@@ -56,15 +56,10 @@ This project has successfully created a professional, organized, and developer-f
 
 ### 2. Developer Tools
 
-#### Code Generator (code-generator.html)
-- **Purpose:** Automatically generate curl, Python, and Ansible code
-- **Features:**
-  - Interactive form with device, method, path, credentials
-  - Three output tabs (curl, Python, Ansible)
-  - Copy-to-clipboard functionality
-  - Example API paths and help text
-  - Responsive design
-- **Impact:** 97% time savings (3.3 hours → 5 minutes for 10 integrations)
+#### YANG Suite Integration
+- **Cisco YANG Suite:** https://developer.cisco.com/yangsuite/
+- **YANG Suite GitHub:** https://github.com/CiscoDevNet/yangsuite/
+- **Purpose:** YANG model exploration, validation, and RESTCONF/NETCONF testing
 
 #### Getting Started Guide (docs/GETTING_STARTED.md)
 - **Size:** 1,430 lines
@@ -488,7 +483,6 @@ This project has created a professional, organized, and developer-friendly docum
 ```
 iosxe-1718-yang-swagger/
 ├── index.html ⭐ Enhanced landing page
-├── code-generator.html ⭐ NEW - Code generator tool
 ├── 404.html
 ├── PROJECT_REQUIREMENTS.md
 ├── STARTUP_PROMPT.md
