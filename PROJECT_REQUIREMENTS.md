@@ -1,233 +1,667 @@
-# Cisco IOS-XE YANG Model Documentation Hub
-## Project Requirements & Fresh Start Guide
+# Cisco IOS-XE YANG Documentation Hub
+## Project Requirements, Architecture & Decisions
 
-**Version:** 1.0  
-**Date:** February 1, 2026  
-**IOS-XE Version:** 17.18.1
+**Version:** 2.0  
+**Date:** February 11, 2026  
+**IOS-XE Version:** 17.18.1  
+**Author:** Jeremy Cohoe (jcohoe@cisco.com)  
+**Repository:** [github.com/jeremycohoe/cisco-ios-xe-openapi-swagger](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger)  
+**Live Site:** [jeremycohoe.github.io/cisco-ios-xe-openapi-swagger](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+
+---
+
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Architecture & Design Decisions](#2-architecture--design-decisions)
+3. [Module Categories & Classification](#3-module-categories--classification)
+4. [Native Config Model Design](#4-native-config-model-design)
+5. [Events Model Design](#5-events-model-design)
+6. [OpenAPI Spec Structure](#6-openapi-spec-structure)
+7. [Project File Structure](#7-project-file-structure)
+8. [YANG Tree Visualizations](#8-yang-tree-visualizations)
+9. [Quality Enhancements](#9-quality-enhancements)
+10. [External Resources & Links](#10-external-resources--links)
+11. [Scripts & Generators](#11-scripts--generators)
+12. [Deployment](#12-deployment)
+13. [Statistics & Metrics](#13-statistics--metrics)
+14. [Changelog & Git History](#14-changelog--git-history)
+15. [Known Gaps & Future Work](#15-known-gaps--future-work)
 
 ---
 
 ## 1. Project Overview
 
 ### Purpose
-Generate comprehensive OpenAPI 3.0 specifications from Cisco IOS-XE YANG models to provide interactive Swagger UI documentation for RESTCONF API operations.
+
+Generate comprehensive OpenAPI 3.0 specifications from Cisco IOS-XE 17.18.1 YANG models to provide interactive Swagger UI documentation for RESTCONF API operations. The project serves as a one-stop documentation hub for all IOS-XE programmability interfaces.
 
 ### Goals
-1. Create OpenAPI specs for ALL applicable YANG modules
-2. Provide interactive Swagger UI for API exploration and testing
-3. Maintain 100% accountability for every YANG module (documented or excluded with reason)
-4. Support both local development and GitHub Pages deployment
+
+1. Create OpenAPI specs for **all applicable YANG modules** (672 total)
+2. Provide interactive **Swagger UI** for API exploration and testing
+3. Maintain **100% accountability** for every YANG module (documented or excluded with reason)
+4. Organize specs into **9 model categories** aligned with network engineer workflows
+5. Support both local development and **GitHub Pages** deployment
+6. Provide **YANG tree visualizations** for every module with specs (767 tree files)
+
+### Source Materials
+
+| Source | Location | Count |
+|--------|----------|-------|
+| YANG Modules | [YangModels/yang - vendor/cisco/xe/17181](https://github.com/YangModels/yang/tree/main/vendor/cisco/xe/17181) | 848 files |
+| MIB YANG Modules | Subset of above | 147 files |
+| Swagger UI Framework | [swagger-api/swagger-ui](https://github.com/swagger-api/swagger-ui/releases) v5.11.0 (CDN) | - |
 
 ---
 
-## 2. Source Materials Required
+## 2. Architecture & Design Decisions
 
-### YANG Modules Directory
+### Decision: Static GitHub Pages Site
+
+**Rationale:** No server-side processing needed. All specs are pre-generated JSON files served via CDN. This ensures:
+- Zero hosting costs
+- Global CDN distribution
+- No authentication or backend dependencies
+- Version-controlled documentation via Git
+
+### Decision: Per-Module OpenAPI Specs (Not Monolithic)
+
+**Rationale:** Each YANG module gets its own `.json` spec file rather than combining everything into one massive file. This ensures:
+- Fast loading times in Swagger UI (individual specs are 5KB–50KB instead of 100MB+)
+- Granular module-level browsing
+- Easy diffing and version control
+
+### Decision: 9 Model Categories
+
+**Rationale:** YANG modules naturally group by their suffix and purpose:
+
+| Category | Selection Criteria | HTTP Methods |
+|----------|--------------------|-------------|
+| Operational (`*-oper`) | Suffix `-oper.yang`, read-only state | GET only |
+| Configuration (`*-cfg`) | Suffix `-cfg.yang`, writable config | GET, PUT, PATCH, DELETE |
+| RPC (`*-rpc`) | Suffix `-rpc.yang` or contains `rpc` statements | POST only |
+| Events (`*-events`) | Suffix `-events.yang` or notification modules | Schema-only (no HTTP ops) |
+| Native Config | `Cisco-IOS-XE-native.yang` augments | GET, PUT, PATCH, DELETE |
+| OpenConfig (`openconfig-*`) | Prefix `openconfig-` | GET, PUT, PATCH, DELETE |
+| IETF (`ietf-*`, `iana-*`) | Prefix `ietf-` or `iana-` | Varies by module |
+| MIB (`*-MIB`, `*-mib`) | SNMP MIB translations to YANG | GET only |
+| Other | Doesn't fit above patterns | Varies |
+
+### Decision: Manifest-Based Index Pages
+
+Each model folder has an `api/manifest.json` that drives the sub-model `index.html` page:
+
+```json
+{
+  "total_modules": 200,
+  "total_paths": 4222,
+  "total_operations": 4222,
+  "modules": ["Cisco-IOS-XE-aaa-oper", "Cisco-IOS-XE-acl-oper", ...]
+}
 ```
-references/17181-YANG-modules/
-├── *.yang                 # 848 YANG files (main)
-└── MIBS/                  # MIB translation modules (optional subfolder)
+
+The `modules` array contains **plain strings** (module names). The JavaScript in each `index.html` reads `manifest.total_paths` and `manifest.total_operations` directly — it does **not** try to reduce/sum from the modules array.
+
+### Decision: CDN Swagger UI (Not Local)
+
+**Rationale:** Using `unpkg.com/swagger-ui-dist@5.11.0` CDN instead of hosting a local copy of the Swagger UI JavaScript. The `swagger-ui-5.11.0/` folder exists for reference but is not used at runtime. This reduces repo size and ensures the latest patches.
+
+### Decision: Standardized Server URLs
+
+All specs use a parameterized server URL pointing to the Cisco DevNet Always-On Sandbox:
+
+```json
+"servers": [{
+  "url": "https://{device}/restconf",
+  "variables": {
+    "device": {
+      "default": "devnetsandboxiosxec9k.cisco.com",
+      "description": "Device IP or hostname"
+    }
+  }
+}]
 ```
 
-### Required Files
-- All IOS-XE 17.18.1 YANG modules from Cisco GitHub:
-  https://github.com/YangModels/yang/tree/main/vendor/cisco/xe/17181
+**Decision:** Use `devnetsandboxiosxec9k.cisco.com` as the default — it's the publicly accessible Always-On IOS-XE sandbox that requires no reservation.
 
-### Swagger UI Framework
-- Swagger UI 5.11.0 (or latest)
-- Download from: https://github.com/swagger-api/swagger-ui/releases
+### Decision: All External Links Point to `developer.cisco.com/iosxe`
+
+The old URL `developer.cisco.com/docs/ios-xe` is a redirect. All 474 occurrences across the project were updated to `developer.cisco.com/iosxe` (commit `868f13f`).
+
+### Decision: RESTCONF Guide URL
+
+The correct RESTCONF programmability guide URL is:
+```
+https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html
+```
+
+This is the official Cisco.com documentation for RESTCONF on IOS-XE 17.18.
 
 ---
 
 ## 3. Module Categories & Classification
 
-### Swagger-ized Categories (Generate OpenAPI specs)
+### Swagger-ized Categories (672 modules with specs)
 
-| Category | Pattern | Swagger Folder | Modules | Description |
-|----------|---------|----------------|---------|-------------|
-| **oper** | `*-oper.yang` | swagger-oper-model/ | 200 | Operational state data (GET only) |
-| **rpc** | `*-rpc.yang`, has `rpc` statements | swagger-rpc-model/ | 58 | Remote procedure calls (POST) |
-| **cfg** | `*-cfg.yang`, config containers | swagger-cfg-model/ | 39 | Configuration data (CRUD) |
-| **openconfig** | `openconfig-*.yang` | swagger-openconfig-model/ | 41 | Vendor-neutral standards |
-| **ietf** | `ietf-*.yang`, `iana-*.yang` | swagger-ietf-model/ | 21 | IETF RFC standards |
-| **mib** | `*-mib.yang`, `CISCO-*-MIB.yang` | swagger-mib-model/ | 147 | SNMP MIB translations |
-| **events** | `*-events*.yang` | swagger-events-model/ | 128 | Event notifications |
-| **native** | `Cisco-IOS-XE-native.yang` | swagger-native-config-model/ | 27 | Monolithic native config |
-| **other** | Miscellaneous | swagger-other-model/ | 10 | Uncategorized modules |
+| Category | Swagger Folder | Specs | Paths | Operations | Description |
+|----------|----------------|-------|-------|------------|-------------|
+| **Operational** | `swagger-oper-model/` | 200 | 4,222 | 4,222 | Real-time state data (GET only) |
+| **MIB** | `swagger-mib-model/` | 147 | 4,272 | 4,272 | SNMP MIB translations to YANG |
+| **Events** | `swagger-events-model/` | 128 | 455 | 455 | Notification schemas (40 YANG + 88 MIB) |
+| **RPC** | `swagger-rpc-model/` | 58 | 290 | 290 | Remote procedure calls (POST) |
+| **OpenConfig** | `swagger-openconfig-model/` | 42 | 2,063 | 7,482 | Vendor-neutral models (CRUD) |
+| **Configuration** | `swagger-cfg-model/` | 39 | 815 | 2,722 | Config data (CRUD) |
+| **Native Config** | `swagger-native-config-model/` | 27 | 328 | 1,307 | Native IOS-XE config hierarchy |
+| **IETF** | `swagger-ietf-model/` | 21 | 553 | 1,836 | RFC standard models |
+| **Other** | `swagger-other-model/` | 10 | 842 | 2,148 | Miscellaneous models |
+| **TOTAL** | | **672** | **13,840** | **24,734** | |
 
-### Excluded Categories (Do NOT generate specs)
+### Excluded Categories (176 modules — no specs generated)
 
-| Category | Pattern | Count | Reason |
-|----------|---------|-------|--------|
-| **types** | `*-types.yang` | ~80 | Type definitions only, no operations |
-| **common** | `*-common*.yang` | ~25 | Shared groupings/types, no endpoints |
-| **deviation** | `*-deviation*.yang`, `*-devs.yang` | ~15 | Modifies other modules |
-| **augments** | Files that only augment | ~12 | No standalone data nodes |
-| **tailf/infrastructure** | `tailf-*.yang`, `cisco-semver.yang` | ~8 | Infrastructure, no user operations |
-| **deprecated** | Marked obsolete in YANG | ~5 | No longer supported |
+| Category | Count | Reason |
+|----------|-------|--------|
+| **Types** (`*-types.yang`) | ~80 | Type definitions only — no data nodes or operations |
+| **Deviation** (`*-deviation*.yang`, `*-devs.yang`) | ~98 | Modify other modules' constraints — no standalone endpoints |
+| **Common** (`*-common*.yang`) | ~17 | Shared groupings/typedefs, no endpoints |
+| **Infrastructure** (`tailf-*.yang`, `cisco-semver.yang`) | ~8 | Build/version infrastructure |
+| **Deprecated** | ~5 | Marked obsolete in YANG |
 
-**Total Excluded:** ~145 modules  
-**Total With Specs:** 574 modules  
 **Total YANG Modules:** 848  
-**Coverage:** 67.7% (100% of applicable data-bearing modules)
+**With Specs:** 672 (79.2% of total, 100% of data-bearing modules)  
+**Excluded:** 176 (all non-data-bearing)
+
+### Module Accountability
+
+Every single YANG module is tracked in `yang-accountability.json` (6,006 lines) with:
+- Module name, category, assigned swagger folder
+- Whether it has a spec (`has_spec: true/false`)
+- Exclusion reason if applicable
+
+The interactive accountability report is viewable at `yang-accountability.html`.
 
 ---
 
-## 4. Output Structure
+## 4. Native Config Model Design
+
+### The Problem
+
+`Cisco-IOS-XE-native.yang` is a monolithic model with 163+ augment sub-modules. Unlike other categories where each module maps 1:1 to a spec, the native model must be decomposed into logical categories.
+
+### The Solution: 27 Category Specs
+
+The native config model is split into 27 OpenAPI specs based on functional groupings:
+
+| Spec File | Description |
+|-----------|-------------|
+| `native-00-top-level-containers.json` | Top-level containers (hostname, version, etc.) |
+| `native-00-top-level-leafs.json` | Top-level leaf nodes |
+| `native-aaa.json` | Authentication, Authorization, Accounting |
+| `native-app-services.json` | Application services (NBAR, IP SLA, etc.) |
+| `native-crypto.json` | Cryptographic configuration |
+| `native-industrial-iot.json` | Industrial IoT protocols |
+| `native-intf-ethernet.json` | Ethernet interfaces |
+| `native-intf-service.json` | Service instances |
+| `native-intf-virtual.json` | Virtual interfaces (Loopback, Tunnel, BDI, etc.) |
+| `native-intf-wan.json` | WAN interfaces (Serial, Cellular, etc.) |
+| `native-ip.json` | IP configuration (addressing, routing, NAT) |
+| `native-l2-discovery.json` | L2 discovery protocols (CDP, LLDP) |
+| `native-line.json` | Line (console, VTY) configuration |
+| `native-misc-ext.json` | Miscellaneous extensions |
+| `native-other.json` | Remaining native containers (~82 containers) |
+| `native-platform-diag.json` | Platform diagnostics |
+| `native-platform-system.json` | Platform and system configuration |
+| `native-policy.json` | Policy maps and class maps |
+| `native-protocols.json` | Routing protocols (OSPF, BGP, EIGRP, etc.) |
+| `native-qos-policy.json` | QoS and queuing |
+| `native-router.json` | Router-level configuration |
+| `native-routing-multicast.json` | Multicast routing |
+| `native-security-access.json` | Security and access control |
+| `native-security-services.json` | Security services (UTD, Umbrella, etc.) |
+| `native-switching-l2.json` | Layer 2 switching |
+| `native-vrf.json` | VRF configuration |
+| `native-wan-legacy.json` | Legacy WAN technologies |
+
+**Totals:** 328 paths, 1,307 operations (each path supports GET/PUT/PATCH/DELETE)
+
+### Known Gap: `kron` Module
+
+`Cisco-IOS-XE-kron.yang` (job/event scheduling) is the only significant native augment not covered. It was identified during audit but not included in the original Swagger generation batch. Related but different modules (`event` = EEM, `scheduler` = CPU allocation) are documented.
+
+### Native Augment Coverage
+
+- **Documented:** 162/163 augment modules (99.4%)
+- **Missing:** `kron` (1 module)
+- **Operational-only (no config YANG):** `lldp`, `macsec`, `trustsec` — these have oper specs instead
+
+---
+
+## 5. Events Model Design
+
+### The Problem
+
+Event/notification modules don't have traditional RESTCONF operations. They define notification schemas for model-driven telemetry subscriptions.
+
+### The Solution
+
+128 event specs document the notification schemas with:
+- **40 YANG notification modules** (Cisco-IOS-XE-*-events, ietf-*-notifications, etc.)
+- **88 MIB trap modules** (CISCO-*-MIB trap definitions translated to YANG)
+
+Each spec includes the notification schema definitions derived from the YANG model paths, with `total_paths` and `total_operations` both set to the notification count (455 total).
+
+### Events Manifest
+
+The events manifest uses the same format as other models:
+```json
+{
+  "total_modules": 128,
+  "total_paths": 455,
+  "total_operations": 455,
+  "modules": ["BGP4-MIB", "BRIDGE-MIB", ...]
+}
+```
+
+**Important:** The JavaScript reads `manifest.total_paths` and `manifest.total_operations` (not `manifest.total_notifications` which does not exist).
+
+---
+
+## 6. OpenAPI Spec Structure
+
+### Standard Spec Format
+
+Every spec follows this structure:
+
+```json
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Module-Name",
+    "description": "YANG description + category + path count + YANG GitHub link + tree link",
+    "version": "17.18.1"
+  },
+  "servers": [{ "url": "https://{device}/restconf", "variables": {...} }],
+  "externalDocs": {
+    "description": "Cisco IOS-XE Programmability Guide",
+    "url": "https://developer.cisco.com/iosxe/"
+  },
+  "security": [{ "basicAuth": [] }],
+  "paths": {
+    "/data/Module-Name:container": {
+      "get": {
+        "summary": "Get container",
+        "description": "Description of the endpoint",
+        "operationId": "get-container-0",
+        "tags": ["Module-Name"],
+        "responses": {
+          "200": { "description": "Success", "content": {...} },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Resource not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": { ... },
+    "securitySchemes": {
+      "basicAuth": { "type": "http", "scheme": "basic" }
+    }
+  }
+}
+```
+
+### Completeness Requirements (100% achieved)
+
+Every operation in every spec has:
+- ✅ `operationId` — unique identifier (24,734 total)
+- ✅ `tags` — at least one tag per operation
+- ✅ `description` — meaningful description
+- ✅ `summary` — concise summary
+- ✅ `responses` — proper response schemas for GET operations
+
+Every spec has:
+- ✅ `externalDocs` — link to Cisco DevNet
+- ✅ `security` — basicAuth scheme defined
+- ✅ `servers` — parameterized RESTCONF URL
+
+### YANG List Key Parameters
+
+For YANG list nodes, the OpenAPI path includes key parameters:
+
+```json
+"/data/Module:container/list={key1},{key2}": {
+  "get": {
+    "parameters": [
+      { "name": "key1", "in": "path", "required": true, "schema": { "type": "string" } },
+      { "name": "key2", "in": "path", "required": true, "schema": { "type": "string" } }
+    ]
+  }
+}
+```
+
+**8,466 key parameters** were added across 5,434 keyed paths in 264 specs (commit `2df4c78`).
+
+---
+
+## 7. Project File Structure
 
 ```
-project-root/
-├── index.html                      # Main landing page
-├── all-models.html                 # Combined view
-├── README.md                       # Project documentation
-├── .nojekyll                       # GitHub Pages config
-├── 404.html                        # Error page
+cisco-ios-xe-openapi-swagger/
+├── index.html                          # Main landing page (917 lines)
+├── tree-compare.html                   # YANG tree comparison tool
+├── yang-accountability.html            # Module accountability report
+├── code-generator.html                 # Code snippet generator (legacy, de-linked)
+├── 404.html                            # Custom error page
+├── .nojekyll                           # GitHub Pages config
+├── README.md                           # Project README
+├── PROJECT_REQUIREMENTS.md             # This document
+├── QUICK_REFERENCE.md                  # Quick reference card
 │
-├── swagger-oper-model/
-│   ├── index.html                  # Category index
-│   ├── all-operations.html         # Combined view
+├── swagger-oper-model/                 # 200 operational specs
+│   ├── index.html                      # Swagger UI browser for this category
 │   └── api/
-│       ├── manifest.json           # Module registry
-│       ├── all-operations.json     # Combined spec
-│       └── *.json                  # Individual specs
+│       ├── manifest.json               # Module registry (200 modules)
+│       └── *.json                      # 200 spec files
 │
-├── swagger-rpc-model/
-├── swagger-cfg-model/
-├── swagger-openconfig-model/
-├── swagger-ietf-model/
-├── swagger-mib-model/
-├── swagger-events-model/
-├── swagger-native-config-model/
-├── swagger-other-model/
+├── swagger-cfg-model/                  # 39 configuration specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 39 spec files
 │
-├── generators/                     # Python generators
-│   ├── generate_*_openapi_v2.py   # Per-category generators
-│   └── generate_combined_*.py     # Combined view generators
+├── swagger-rpc-model/                  # 58 RPC specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 58 spec files
 │
-├── scripts/                        # Utility scripts
-│   ├── validate_quality.py        # Quality validation
-│   ├── prepare_github_pages.py    # Deployment prep
-│   └── analyze_yang_modules.py    # Module analysis
+├── swagger-events-model/               # 128 event notification specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 128 spec files
 │
-├── docs/                           # User documentation
-├── references/                     # Source YANG modules
-│   └── 17181-YANG-modules/
+├── swagger-native-config-model/        # 27 native config category specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 27 spec files
 │
-└── swagger-ui-5.11.0/             # UI framework
+├── swagger-openconfig-model/           # 42 OpenConfig specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 42 spec files
+│
+├── swagger-ietf-model/                 # 21 IETF/IANA specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 21 spec files
+│
+├── swagger-mib-model/                  # 147 MIB specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 147 spec files
+│
+├── swagger-other-model/                # 10 miscellaneous specs
+│   ├── index.html
+│   └── api/
+│       ├── manifest.json
+│       └── *.json                      # 10 spec files
+│
+├── yang-trees/                         # YANG tree visualizations
+│   ├── tree-manifest.json              # Array of 767 module names
+│   └── *.html                          # 767 tree HTML files
+│
+├── generators/                         # OpenAPI generators (Python)
+│   ├── generate_oper_openapi_v2.py     # Operational model generator
+│   ├── generate_cfg_openapi_v2.py      # Configuration model generator
+│   ├── generate_rpc_openapi_v2.py      # RPC model generator
+│   ├── generate_events_openapi.py      # Events model generator
+│   ├── generate_native_openapi_v2.py   # Native config generator
+│   ├── generate_openconfig_openapi_v2.py
+│   ├── generate_ietf_openapi_v2.py
+│   ├── generate_mib_openapi_v2.py
+│   ├── generate_other_openapi_v2.py
+│   ├── generate_combined_*.py          # Combined view generators (6 files)
+│   └── generate_examples.py            # Example value generator
+│
+├── scripts/                            # 46 utility/enhancement scripts
+│   ├── add_operation_ids.py            # Added 5,939 operationIds
+│   ├── add_top_tags.py                 # Added tags to 149 specs
+│   ├── add_descriptions.py            # Added 982 descriptions
+│   ├── add_external_docs.py            # Added externalDocs to 672 specs
+│   ├── add_key_params.py              # Added 8,466 list key parameters
+│   ├── fix_server_urls.py             # Standardized 252 server URLs
+│   ├── fix_broken_refs.py             # Fixed 122 broken $ref schemas
+│   ├── fix_get_responses.py           # Fixed 5 GET response schemas
+│   ├── fix_devnet_urls.py             # Replaced 474 old DevNet URLs
+│   ├── fix_examples.py               # Fixed 2,048 placeholder values
+│   ├── generate_missing_trees.py      # Generated 48 tree HTML files
+│   ├── generate_pyang_trees.py        # pyang-based tree generation
+│   ├── audit_quality.py              # Quality audit tool
+│   ├── validate_quality.py           # Validation tool
+│   └── ... (32 more utility scripts)
+│
+├── docs/                               # Documentation
+│   ├── GETTING_STARTED.md              # Getting started guide (744 lines)
+│   ├── PROJECT_SUMMARY.md             # Project summary (548 lines)
+│   └── ...
+│
+├── references/                         # Source YANG modules
+│   └── 17181-YANG-modules/            # 848 YANG files
+│
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml           # GitHub Pages CI/CD
+│
+├── archive/                            # Archived/superseded files
+│
+└── swagger-ui-5.11.0/                 # Swagger UI (reference, CDN used)
     └── dist/
 ```
 
 ---
 
-## 5. Generator Requirements
+## 8. YANG Tree Visualizations
 
-### Core Functionality
-Each generator MUST:
-1. **Parse YANG structure** using balanced brace matching (not regex hacks)
-2. **Extract all data nodes** - containers, lists, leaves, leaf-lists
-3. **Generate proper paths** following RESTCONF RFC 8040
-4. **Create schemas** from actual YANG types
-5. **Handle groupings** by resolving `uses` statements
-6. **Support augmentations** where applicable
+### Overview
 
-### Key Methods Required
-```python
-def find_balanced_braces(text: str, start_pos: int) -> int
-def parse_leaf(leaf_content: str, leaf_name: str) -> Dict
-def parse_container_or_grouping(content: str, name: str, depth: int) -> Dict
-def extract_paths(content: str, module_name: str) -> List[Dict]
-def generate_openapi_spec(module_path: str) -> Dict
+Every module with an OpenAPI spec also has a YANG tree visualization — an HTML page showing the hierarchical structure of the YANG model's data nodes.
+
+### Statistics
+
+- **767 tree HTML files** in `yang-trees/`
+- **tree-manifest.json** — flat JSON array of module names that have trees
+- **100% coverage** — all 672 spec modules have tree files (plus extras for sub-modules)
+
+### Tree Generation
+
+- **717 trees** generated using `pyang -f tree` from original YANG source files
+- **48 trees** synthetically generated from API spec paths (for modules where pyang wasn't run: 17 OpenConfig name mismatches, 3 IETF gaps, 1 Other, 27 Native Config)
+- **2 additional trees** from MIB-specific generation
+
+### Tree HTML Format
+
+Each tree HTML file includes:
+- Styled tree output with expandable sections
+- Links to: YANG source on GitHub, YANG Catalog, DevNet Guide
+- Module name, description, and revision date
+- Responsive design matching the main site theme
+
+### Tree Links in Specs
+
+Every spec's `info.description` field includes a link to its tree visualization:
+```
+📊 YANG Tree: View Module-Name structure
+(link to: https://jeremycohoe.github.io/.../yang-trees/Module-Name.html)
 ```
 
-### Output Format
-- OpenAPI 3.0.0 specification
-- JSON format
-- Includes: info, servers, paths, components/schemas
-- RESTCONF-compliant paths: `/data/{module-name}:{path}`
+Specs where no tree file exists have the tree link hidden (21 broken links were fixed in commit `9daa75d`).
 
 ---
 
-## 6. Quality Requirements
+## 9. Quality Enhancements
 
-### Per-Spec Validation
-- [ ] Valid JSON syntax
-- [ ] OpenAPI 3.0 schema compliance
-- [ ] At least 1 path per spec (except type modules)
-- [ ] Proper HTTP methods (GET for oper, POST for RPC, CRUD for config)
-- [ ] Schema definitions for request/response bodies
+### Enhancement Timeline (Commits)
 
-### Project-Level Validation
-- [ ] 100% YANG module accountability (see Module Accountability Report)
-- [ ] All internal links working (zero 404s)
-- [ ] Consistent theming across all pages
-- [ ] GitHub Pages deployment ready
+| Commit | Date | Enhancement | Impact |
+|--------|------|-------------|--------|
+| `cce6350` | Feb 2026 | Replace 2,048 placeholder values with realistic data | All specs |
+| `2df4c78` | Feb 2026 | Add 8,466 YANG list key parameters to 5,434 paths | 264 specs |
+| `2958d2d` | Feb 2026 | Add YANG-derived schemas to 128 event specs | 128 specs |
+| `0a51587` | Feb 2026 | Enhance 83 specs with +6,777 YANG-aligned paths | 83 specs |
+| `4386177` | Feb 2026 | 100% completeness: operationIds, tags, descriptions, externalDocs | All 672 specs |
+| `495ce62` | Feb 2026 | Server URLs, broken $refs, tree links, navigation | 252+ specs |
+| `9b1bcbd` | Feb 2026 | Generate 48 missing YANG tree files | 48 files |
+| `868f13f` | Feb 2026 | Update all DevNet URLs (474 occurrences) | 473 files |
+| `cb22832` | Feb 2026 | Add YANG Suite links, fix RESTCONF guide URL | 5 files |
+
+### Quality Scorecard (All 100%)
+
+| Metric | Count | Coverage |
+|--------|-------|----------|
+| Specs with `operationId` | 24,734 / 24,734 | 100% |
+| Specs with `tags` | 24,734 / 24,734 | 100% |
+| Specs with `description` | 24,734 / 24,734 | 100% |
+| Specs with `summary` | 24,734 / 24,734 | 100% |
+| Specs with `externalDocs` | 672 / 672 | 100% |
+| Specs with `security` | 672 / 672 | 100% |
+| GET responses with schemas | 13,512 / 13,512 | 100% |
+| Tree file coverage | 672 / 672 | 100% |
+| Module accountability | 848 / 848 | 100% |
+
+### Broken $ref Fixes
+
+122 broken schema `$ref` pointers were identified and fixed (commit `495ce62`). These were cross-module references that pointed to non-existent schema definitions.
+
+### Placeholder Value Fixes
+
+2,048 placeholder/incorrect example values (e.g., `"string"`, `0`, `true`) were replaced with YANG-aligned realistic values such as actual IP addresses, interface names, and protocol-appropriate defaults (commit `cce6350`).
 
 ---
 
-## 7. Module Accountability Requirement
+## 10. External Resources & Links
 
-### Every YANG module MUST be:
-1. **Documented** with an OpenAPI spec in the appropriate swagger folder, OR
-2. **Excluded** with documented reason in the accountability report
+### Links Used Across the Project
 
-### Accountability Report Format
-| Module Name | Category | Swagger Folder | Has Spec | Reason if Excluded |
-|-------------|----------|----------------|----------|-------------------|
-| Cisco-IOS-XE-aaa-oper | oper | swagger-oper-model | ✅ | - |
-| Cisco-IOS-XE-types | types | - | ❌ | Type definitions only |
+| Resource | URL | Used In |
+|----------|-----|---------|
+| Cisco DevNet IOS-XE | `https://developer.cisco.com/iosxe/` | All 672 specs (`externalDocs`), index.html |
+| IOS-XE RESTCONF Guide | `https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html` | index.html, README, QUICK_REFERENCE |
+| Cisco YANG Suite | `https://developer.cisco.com/yangsuite/` | index.html, README, QUICK_REFERENCE, GETTING_STARTED |
+| YANG Suite GitHub | `https://github.com/CiscoDevNet/yangsuite/` | index.html, README, QUICK_REFERENCE |
+| YANG Catalog | `https://yangcatalog.org/yang-search/` | index.html, tree HTML files |
+| YANG Source Files | `https://github.com/YangModels/yang/tree/main/vendor/cisco/xe/17181` | index.html, spec descriptions |
+| OpenConfig | `https://www.openconfig.net/` | index.html |
+| IETF RFCs | `https://www.rfc-editor.org/` | index.html |
+| DevNet Sandbox | `devnetsandboxiosxec9k.cisco.com` | All 672 specs (server URL default) |
+
+### Deprecated Links (Removed)
+
+| Old URL | Status | Replaced With |
+|---------|--------|---------------|
+| `developer.cisco.com/docs/ios-xe/` | Redirect | `developer.cisco.com/iosxe/` |
+| `developer.cisco.com/docs/ios-xe/#!restconf-api-overview` | Redirect | Cisco.com RESTCONF guide |
+| `developer.cisco.com/docs/ios-xe/#!working-with-restconf` | Redirect | Cisco.com RESTCONF guide |
+| `developer.cisco.com/docs/ios-xe/#!yang-models` | Redirect | `developer.cisco.com/iosxe/` |
+| Code Generator (`code-generator.html`) | Removed from navigation | Still exists as file but de-linked |
 
 ---
 
-## 8. Deployment Options
+## 11. Scripts & Generators
 
-### Option A: GitHub Pages (Recommended)
+### Generators (`generators/` — 17 files)
+
+Per-category OpenAPI generators that parse YANG files and produce spec JSON:
+
+| Generator | Output | Description |
+|-----------|--------|-------------|
+| `generate_oper_openapi_v2.py` | 200 specs | Operational data modules |
+| `generate_cfg_openapi_v2.py` | 39 specs | Configuration modules |
+| `generate_rpc_openapi_v2.py` | 58 specs | RPC/action modules |
+| `generate_events_openapi.py` | 128 specs | Event notification modules |
+| `generate_native_openapi_v2.py` | 27 specs | Native config categories |
+| `generate_openconfig_openapi_v2.py` | 42 specs | OpenConfig modules |
+| `generate_ietf_openapi_v2.py` | 21 specs | IETF/IANA modules |
+| `generate_mib_openapi_v2.py` | 147 specs | MIB translation modules |
+| `generate_other_openapi_v2.py` | 10 specs | Miscellaneous modules |
+| `generate_combined_*.py` (6 files) | Combined views | Multi-module combined specs |
+| `generate_examples.py` | Examples | Realistic example values |
+
+### Enhancement Scripts (`scripts/` — 46 files)
+
+Scripts that enhance, fix, and validate specs post-generation:
+
+**Adding content:**
+- `add_operation_ids.py` — Added 5,939 operationIds to 204 specs
+- `add_top_tags.py` — Added tags to 149 specs
+- `add_descriptions.py` — Added 982 descriptions to 14 specs
+- `add_external_docs.py` — Added `externalDocs` to all 672 specs
+- `add_key_params.py` — Added 8,466 YANG list key parameters
+- `add_yang_tree_links.py` — Added tree visualization links to spec descriptions
+- `add_yang_github_links.py` — Added YANG source links
+
+**Fixing issues:**
+- `fix_server_urls.py` — Standardized 252 server URLs
+- `fix_broken_refs.py` — Fixed 122 broken `$ref` schemas
+- `fix_get_responses.py` — Fixed 5 GET response schemas
+- `fix_devnet_urls.py` — Replaced 474 old DevNet URLs
+- `fix_examples.py` — Replaced 2,048 placeholder values
+- `fix_quality.py` — General quality fixes
+
+**Auditing/analysis:**
+- `audit_quality.py` — Comprehensive quality audit
+- `audit_refs.py` / `audit_refs_detail.py` — Schema reference auditing
+- `audit_examples.py` — Example value auditing
+- `audit_keys.py` — YANG list key parameter auditing
+- `audit_swagger_vs_tree.py` — Verify tree coverage matches specs
+- `analyze_yang_accountability.py` — Module accountability analysis
+- `validate_quality.py` — Final validation
+- `count_totals.py` — Count all paths/operations across specs
+
+**Tree generation:**
+- `generate_pyang_trees.py` — pyang-based tree generation (717 trees)
+- `generate_mib_pyang_trees.py` — MIB-specific tree generation
+- `generate_missing_trees.py` — Synthetic tree generation from API paths (48 trees)
+
+---
+
+## 12. Deployment
+
+### GitHub Pages (Production)
+
+The site is deployed via GitHub Pages from the `main` branch:
+
+**CI/CD:** `.github/workflows/deploy-pages.yml` handles automatic deployment on push to `main`.
+
+**URL:** `https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/`
+
+**Requirements:**
+- `.nojekyll` file in root (disables Jekyll processing)
+- All paths are relative (no absolute filesystem paths)
+- All resources loaded via CDN or relative URLs
+
+### Local Development
+
 ```bash
-# Prepare for deployment
-python scripts/prepare_github_pages.py
+# Clone the repository
+git clone https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger.git
+cd cisco-ios-xe-openapi-swagger
 
-# Push to GitHub, enable Pages in settings
-# Access: https://username.github.io/repo-name/
-```
-
-### Option B: Local HTTP Server
-```bash
+# Serve locally (any static HTTP server works)
 python -m http.server 8000
 # Access: http://localhost:8000
 ```
 
-### Option C: Production Web Server
+### Regenerating Specs
+
 ```bash
-# Nginx, Apache, or any static file server
-# No server-side processing required
-```
+# Prerequisites: Python 3.x, YANG source files in references/17181-YANG-modules/
 
----
-
-## 9. Development Workflow
-
-### Initial Setup
-```bash
-# 1. Clone/create project directory
-mkdir yang-swagger-docs
-cd yang-swagger-docs
-
-# 2. Copy YANG modules to references/
-cp -r /path/to/17181-YANG-modules references/
-
-# 3. Download Swagger UI
-# Extract to swagger-ui-5.11.0/
-
-# 4. Create directory structure
-mkdir -p swagger-{oper,rpc,cfg,openconfig,ietf,mib,events,native-config,other}-model/api
-mkdir -p generators scripts docs
-```
-
-### Generation Workflow
-```bash
-# 1. Analyze all YANG modules
-python scripts/analyze_yang_modules.py
-
-# 2. Generate specs for each category
+# Generate specs for each category
 cd generators
 python generate_oper_openapi_v2.py
 python generate_rpc_openapi_v2.py
@@ -239,108 +673,117 @@ python generate_events_openapi.py
 python generate_native_openapi_v2.py
 python generate_other_openapi_v2.py
 
-# 3. Generate combined views
-python generate_combined_oper.py
-python generate_combined_rpc.py
-# ... etc
-
-# 4. Validate quality
+# Run quality enhancements
 cd ../scripts
-python validate_quality.py
-
-# 5. Prepare for deployment
-python prepare_github_pages.py
+python add_operation_ids.py
+python add_top_tags.py
+python add_descriptions.py
+python add_external_docs.py
+python add_key_params.py
+python fix_server_urls.py
+python fix_broken_refs.py
 ```
 
 ---
 
-## 10. Success Criteria
+## 13. Statistics & Metrics
 
-### Minimum Requirements
-- [ ] All 9 model type folders created with specs
-- [ ] index.html landing page functional
-- [ ] 100% YANG module accountability documented
-- [ ] Zero broken internal links
-- [ ] GitHub Pages deployment working
+### Final Project Numbers
 
-### Quality Targets
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| Total OpenAPI Specs | 550+ | ✅ 672 |
-| Total API Paths | 10,000+ | ✅ 13,840 |
-| Total API Operations | 15,000+ | ✅ 24,734 |
-| Module Accountability | 100% | ✅ 100% |
-| Link Validation | 0 errors | ✅ 0 errors |
-| YANG Module Coverage | 60%+ | ✅ 47.5% (403/848) |
+| Metric | Value |
+|--------|-------|
+| **OpenAPI Specs** | 672 |
+| **API Paths** | 13,840 |
+| **API Operations** | 24,734 |
+| **YANG Modules (Total)** | 848 |
+| **YANG Modules (With Specs)** | 672 (79.2%) |
+| **YANG Modules (Excluded)** | 176 (non-data-bearing) |
+| **Module Accountability** | 100% (848/848) |
+| **YANG Tree Files** | 767 |
+| **Model Categories** | 9 |
+| **OperationIds** | 24,734 (100% coverage) |
+| **List Key Parameters** | 8,466 across 5,434 paths |
+| **Enhancement Scripts** | 46 Python files |
+| **Generators** | 17 Python files |
+| **Git Commits** | 30+ |
 
----
+### Per-Model Breakdown
 
-## 11. Reference Documentation
+| Model | Modules | Paths | Operations | Avg Paths/Module |
+|-------|---------|-------|------------|-----------------|
+| Operational | 200 | 4,222 | 4,222 | 21.1 |
+| MIB | 147 | 4,272 | 4,272 | 29.1 |
+| Events | 128 | 455 | 455 | 3.6 |
+| RPC | 58 | 290 | 290 | 5.0 |
+| OpenConfig | 42 | 2,063 | 7,482 | 49.1 |
+| Configuration | 39 | 815 | 2,722 | 20.9 |
+| Native Config | 27 | 328 | 1,307 | 12.1 |
+| IETF | 21 | 553 | 1,836 | 26.3 |
+| Other | 10 | 842 | 2,148 | 84.2 |
 
-### Standards
-- [RESTCONF RFC 8040](https://datatracker.ietf.org/doc/html/rfc8040)
-- [YANG RFC 7950](https://datatracker.ietf.org/doc/html/rfc7950)
-- [OpenAPI 3.0 Specification](https://spec.openapis.org/oas/v3.0.0)
+### Operations by HTTP Method (Approximate)
 
-### Cisco Resources
-- [Cisco IOS-XE YANG Models](https://github.com/YangModels/yang/tree/main/vendor/cisco/xe)
-- [Cisco IOS-XE Programmability Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/guide.html)
-
-### Tools
-- [pyang](https://github.com/mbj4668/pyang) - YANG parser and validator
-- [Swagger UI](https://swagger.io/tools/swagger-ui/) - API documentation UI
-
----
-
-## 12. Project Completion Status
-
-### ✅ All Requirements Met
-
-**Coverage Achieved:**
-- ✅ 672 OpenAPI specifications generated
-- ✅ 13,840 API paths documented  
-- ✅ 24,734 API operations
-- ✅ 100% YANG module accountability
-- ✅ 9 model categories fully implemented
-- ✅ 53 logical categories for organization
-- ✅ 6 quick-start collections
-- ✅ Interactive code generator
-- ✅ GitHub Pages deployment
-
-**Module Breakdown:**
-```
-Operational:    200 modules (4,222 paths)
-RPC:             58 modules (290 operations)
-Events:         128 modules (455 notifications)
-Native Config:   27 modules (328 paths)
-Configuration:   39 modules (815 paths)
-IETF:            21 modules (553 paths)
-OpenConfig:      42 modules (2,063 paths)
-MIB:            147 modules (4,272 paths)
-Other:           10 modules (672 paths)
----------------------------------------------------
-Total:          672 modules (13,840 paths)
-```
-
-**Quality Validation:**
-- ✅ All specs validated as proper OpenAPI 3.0
-- ✅ Zero broken links
-- ✅ Consistent theming
-- ✅ Production-ready examples
-- ✅ Comprehensive documentation
-
-**Key Achievements:**
-1. **Systematic Coverage**: All data-bearing YANG modules have OpenAPI specs
-2. **Types-Only Modules**: Correctly identified and excluded 101 types-only modules (ietf-yang-types, openconfig-*-types, etc.)
-3. **Complete Accountability**: HTML report mapping all 848 YANG modules
-4. **Developer Tools**: Code generator, quick-starts, categorization
-5. **Professional Presentation**: Landing page, navigation, search, statistics
+| Method | Usage | Categories |
+|--------|-------|-----------|
+| **GET** | ~13,840 | All categories (read operations) |
+| **PUT** | ~4,500 | cfg, openconfig, ietf, native, other |
+| **PATCH** | ~4,500 | cfg, openconfig, ietf, native, other |
+| **DELETE** | ~1,600 | cfg, openconfig, ietf, native, other |
+| **POST** | ~290 | RPC only |
 
 ---
 
-## 13. Changelog
+## 14. Changelog & Git History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | Feb 1, 2026 | Initial requirements document |
-| 1.1 | Feb 1, 2026 | Updated with completion status and actual achieved metrics |
+| Version | Commit | Date | Changes |
+|---------|--------|------|---------|
+| 2.0 | `cb22832` | Feb 11, 2026 | Add YANG Suite links, fix RESTCONF guide URL, remove Code Generator navigation |
+| 1.9 | `868f13f` | Feb 11, 2026 | Update all 474 DevNet URLs from `/docs/ios-xe` to `/iosxe` across 473 files |
+| 1.8 | `fe60e35` | Feb 10, 2026 | Fix Events page stats (was reading non-existent `total_notifications`) |
+| 1.7 | `6c7e041` | Feb 10, 2026 | Fix stats display in Other, MIB, and Native Config index pages (JS bugs) |
+| 1.6 | `9b1bcbd` | Feb 2026 | Generate 48 missing YANG tree files for 100% coverage (765→767 entries) |
+| 1.5 | `4386177` | Feb 2026 | 100% spec completeness: operationIds, tags, descriptions, externalDocs, response schemas |
+| 1.4 | `495ce62` | Feb 2026 | Server URL standardization (252 specs), broken $ref fixes (122), tree link fixes (21), stale docs |
+| 1.3 | `9daa75d` | Feb 2026 | Fix 21 broken YANG tree links (hide link when no tree exists) |
+| 1.2 | `2df4c78` | Feb 2026 | Add 8,466 YANG list key parameters to 5,434 keyed paths in 264 specs |
+| 1.1 | `cce6350` | Feb 2026 | Replace 2,048 placeholder values with realistic YANG-aligned data |
+| 1.0 | Various | Jan–Feb 2026 | Initial generation of all 672 specs, landing page, documentation |
+
+---
+
+## 15. Known Gaps & Future Work
+
+### Known Gaps
+
+1. **`kron` module** — `Cisco-IOS-XE-kron.yang` (job/event scheduling) is the only significant native augment without a Swagger spec (1 of 163 augments)
+2. **`code-generator.html`** — File still exists in repo but is no longer linked from navigation (removed in `cb22832`)
+3. **`yang-accountability.json` counts** — Shows 403 modules with specs (outdated from when it was generated); actual count is 672
+
+### Potential Future Enhancements
+
+| Phase | Enhancement | Description |
+|-------|-------------|-------------|
+| Phase 8 | Model consolidation | Consolidate cfg/ietf/openconfig/mib into category-based views |
+| Phase 9 | Postman collections | Auto-generate Postman collections from OpenAPI specs |
+| Phase 10 | CI/CD testing | Automated endpoint testing against DevNet sandbox |
+| Phase 11 | Version tracking | Support multiple IOS-XE versions with diff capability |
+
+---
+
+## Reference Standards
+
+| Standard | URL |
+|----------|-----|
+| RESTCONF (RFC 8040) | https://datatracker.ietf.org/doc/html/rfc8040 |
+| YANG (RFC 7950) | https://datatracker.ietf.org/doc/html/rfc7950 |
+| YANG NACM (RFC 8341) | https://datatracker.ietf.org/doc/html/rfc8341 |
+| OpenAPI 3.0 Specification | https://spec.openapis.org/oas/v3.0.0 |
+
+## Tools
+
+| Tool | URL | Usage |
+|------|-----|-------|
+| pyang | https://github.com/mbj4668/pyang | YANG parsing, tree generation |
+| Swagger UI | https://swagger.io/tools/swagger-ui/ | Interactive API documentation |
+| Cisco YANG Suite | https://developer.cisco.com/yangsuite/ | YANG model exploration and testing |
+| YANG Suite GitHub | https://github.com/CiscoDevNet/yangsuite/ | Source and Docker setup |
