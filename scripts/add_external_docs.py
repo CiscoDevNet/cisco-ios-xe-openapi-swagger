@@ -18,11 +18,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXTERNAL_DOCS = {
     'swagger-cfg-model': {
         'description': 'Cisco IOS-XE YANG Configuration Models - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
     'swagger-oper-model': {
         'description': 'Cisco IOS-XE YANG Operational Models - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
     'swagger-openconfig-model': {
         'description': 'OpenConfig YANG Models - GitHub',
@@ -38,19 +38,19 @@ EXTERNAL_DOCS = {
     },
     'swagger-events-model': {
         'description': 'Cisco IOS-XE NETCONF/YANG Event Notifications - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
     'swagger-rpc-model': {
         'description': 'Cisco IOS-XE YANG RPC Operations - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
     'swagger-other-model': {
         'description': 'Cisco IOS-XE YANG Models - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
     'swagger-native-config-model': {
         'description': 'Cisco IOS-XE Native YANG Configuration Guide - Cisco DevNet',
-        'url': 'https://developer.cisco.com/docs/ios-xe/'
+        'url': 'https://developer.cisco.com/iosxe/'
     },
 }
 

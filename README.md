@@ -203,7 +203,7 @@ iosxe-1718-yang-swagger/
 
 ## 🔗 Resources
 
-- [Cisco IOS-XE RESTCONF Guide](https://developer.cisco.com/docs/ios-xe/#!restconf-api-overview)
+- [Cisco IOS-XE RESTCONF Guide](https://developer.cisco.com/iosxe/#!restconf-api-overview)
 - [YANG Models on GitHub](https://github.com/YangModels/yang)
 - [OpenAPI Specification](https://swagger.io/specification/)
 
