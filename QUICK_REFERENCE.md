@@ -104,5 +104,6 @@ https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references
 ## Support & Resources
 
 - **YANG Models:** [Cisco IOS-XE YANG GitHub](https://github.com/YangModels/yang/tree/main/vendor/cisco/xe)
-- **RESTCONF Guide:** [Cisco DevNet RESTCONF](https://developer.cisco.com/iosxe/#!working-with-restconf)
+- **RESTCONF Guide:** [IOS-XE 17.18 RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
+- **YANG Suite:** [Cisco YANG Suite](https://developer.cisco.com/yangsuite/) | [GitHub](https://github.com/CiscoDevNet/yangsuite/)
 - **OpenAPI Specs:** All available at https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/

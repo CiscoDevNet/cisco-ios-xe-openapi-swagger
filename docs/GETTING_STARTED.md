@@ -660,11 +660,7 @@ except json.JSONDecodeError:
     print("Invalid JSON response")
 ```
 
-### 5. Use the Code Generator
-
-Visit [code-generator.html](../code-generator.html) to automatically generate curl, Python, and Ansible code for any endpoint.
-
-### 6. Implement Rate Limiting
+### 5. Implement Rate Limiting
 
 Don't overwhelm the device with rapid API calls. Add delays between requests:
 
@@ -727,8 +723,8 @@ Always test configuration changes in a lab environment before deploying to produ
 ## Next Steps
 
 1. **Explore Quick-Starts:** Visit the [main page](../index.html) and try the 6 quick-start collections
-2. **Generate Code:** Use the [code generator](../code-generator.html) for your specific use case
-3. **Browse Full APIs:** Explore all models to discover additional capabilities
+2. **Browse Full APIs:** Explore all models to discover additional capabilities
+3. **Try YANG Suite:** Use [Cisco YANG Suite](https://developer.cisco.com/yangsuite/) to explore and test YANG models
 4. **Read Documentation:** Check [PROJECT_REQUIREMENTS.md](../PROJECT_REQUIREMENTS.md) for project structure
 5. **Review Examples:** See consolidated files for production-realistic examples
 
