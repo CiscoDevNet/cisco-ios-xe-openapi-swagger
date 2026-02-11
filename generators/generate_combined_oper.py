@@ -55,7 +55,7 @@ def generate_combined_spec():
                           "**Note**: All endpoints are GET-only (read-only operational state data).",
             "contact": {
                 "name": "Cisco IOS-XE RESTCONF API",
-                "url": "https://developer.cisco.com/docs/ios-xe"
+                "url": "https://developer.cisco.com/iosxe"
             }
         },
         "servers": [

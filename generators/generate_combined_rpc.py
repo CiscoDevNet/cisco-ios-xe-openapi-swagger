@@ -50,7 +50,7 @@ def generate_combined_spec():
                           "**Content-Type**: `application/yang-data+json`",
             "contact": {
                 "name": "Cisco IOS-XE RESTCONF API",
-                "url": "https://developer.cisco.com/docs/ios-xe"
+                "url": "https://developer.cisco.com/iosxe"
             }
         },
         "servers": [

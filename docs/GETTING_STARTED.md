@@ -738,7 +738,7 @@ Always test configuration changes in a lab environment before deploying to produ
 
 - **Swagger UI Documentation:** Browse interactive API docs at the main page
 - **YANG Models:** Check `references/17181-YANG-modules/` for source YANG files
-- **Cisco DevNet:** https://developer.cisco.com/docs/ios-xe/
+- **Cisco DevNet:** https://developer.cisco.com/iosxe/
 - **RESTCONF RFC:** https://datatracker.ietf.org/doc/html/rfc8040
 - **YANG RFC:** https://datatracker.ietf.org/doc/html/rfc7950
 
