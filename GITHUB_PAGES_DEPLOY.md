@@ -1,55 +1,73 @@
 # GitHub Pages Deployment
 
-## How to Deploy
+## How It Works
 
-1. **Push to GitHub Repository**
-   ```bash
-   git add .
-   git commit -m "Prepare for GitHub Pages deployment"
-   git push origin main
-   ```
+This site is deployed automatically using **GitHub Actions**. Every push to main triggers the workflow at .github/workflows/deploy-pages.yml.
 
-2. **Enable GitHub Pages**
-   - Go to your repository on GitHub
-   - Navigate to Settings → Pages
-   - Under "Source", select "Deploy from a branch"
-   - Select `main` branch and `/ (root)` folder
-   - Click Save
+### Deployment Flow
 
-3. **Access Your Site**
-   - Your site will be available at: `https://<username>.github.io/<repository-name>/`
-   - It may take a few minutes for the first deployment
+1. **Push to main branch** - triggers GitHub Actions
+2. **Workflow prepares deploy directory** - copies only website-relevant files
+3. **Uploads artifact** - uses ctions/upload-pages-artifact
+4. **Deploys to Pages** - uses ctions/deploy-pages
 
-## What's Included
+No manual setup required. Just push and it deploys.
 
-- **index.html** - Main landing page
-- **all-models.html** - Overview of all model types  
-- **swagger-*/index.html** - Individual model type pages
-- **swagger-*/all-*.html** - Combined views per model type
-- **swagger-*/api/*.json** - OpenAPI 3.0 specifications
-- **swagger-ui-5.11.0/** - Swagger UI framework
-- **.nojekyll** - Disables Jekyll for faster builds
-- **404.html** - Custom error page
+### What Gets Deployed
 
-## Custom Domain (Optional)
+| Included | Description |
+|----------|-------------|
+| swagger-*-model/ | All 9 model directories (HTML + JSON specs) |
+| yang-trees/ | 768 YANG/MIB tree visualizations |
+| docs/ | Getting Started guide, Project Summary |
+| 	ools/ | Postman collection and environment |
+| *.html | Landing page, 404, code generator, tree compare, accountability |
+| *.js | Search engine, recent favorites |
+| *.json | Search index, YANG accountability data |
+| README.md | Repository documentation |
+| .nojekyll | Disables Jekyll processing |
 
-To use a custom domain:
-1. Create a file named `CNAME` in the root directory
-2. Add your domain name (e.g., `docs.example.com`)
-3. Configure DNS to point to GitHub Pages
+| Excluded | Reason |
+|----------|--------|
+| 
+eferences/ | 848 YANG source modules (heavy, not needed for site) |
+| generators/ | Python YANG parsers (dev tools only) |
+| scripts/ | Validation/analysis tools (dev tools only) |
+| rchive/ | Completed TODO/phase tracking docs |
+| .github/ | Workflow configs (not site content) |
 
-## Troubleshooting
+### First-Time Setup
 
-- If pages don't load, check that paths are relative (not starting with `/`)
-- If Swagger UI doesn't load, ensure `swagger-ui-5.11.0/dist/` exists
-- Check browser console for 404 errors on resources
+1. Go to repo **Settings > Pages**
+2. Under **Source**, select **GitHub Actions**
+3. The workflow will handle the rest on next push
+
+## Access Your Site
+
+**Live URL:** https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/
 
 ## Statistics
 
-- OpenAPI Specifications: 672
-- API Paths: 13,840
-- API Operations: 24,734
-- Model Types: 9
-- IOS-XE Version: 17.18.1
+| Metric | Count |
+|--------|-------|
+| OpenAPI Specifications | 672 |
+| API Paths | 13,813 |
+| API Operations | 24,704 |
+| YANG Tree Files | 768 |
+| Model Types | 9 |
+| IOS-XE Version | 17.18.1 |
 
-Last prepared: February 2026
+## Custom Domain (Optional)
+
+1. Create a CNAME file in root with your domain (e.g., docs.example.com)
+2. Configure DNS to point to GitHub Pages
+3. Enable HTTPS in Settings > Pages
+
+## Troubleshooting
+
+- **Pages don't load?** Check Settings > Pages shows "GitHub Actions" as source
+- **Stale content?** Check Actions tab for failed workflow runs
+- **404 errors?** Ensure paths are relative (not starting with /)
+- **Large deploy?** Workflow has 15-minute timeout; should complete in about 2 minutes
+
+Last updated: February 14, 2026
