@@ -92,6 +92,11 @@
                 <p style="margin-top: 10px;"><strong>Note:</strong> MIB translations follow RFC 6643 (SMIv2 to YANG)</p>
                 <p><strong>Base URL:</strong> <code>https://{device}/restconf/data/</code></p>
             </div>
+            <div id="downloadBar" style="display: none; padding: 10px 20px; background: #f0f7ff; border-bottom: 1px solid #e0e0e0; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <button onclick="downloadSpec()" style="padding: 8px 16px; background: #1565C0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#0D47A1'" onmouseout="this.style.background='#1565C0'">📥 Download JSON Spec</button>
+                <span id="downloadLabel" style="color: #666; font-size: 0.85rem;"></span>
+                <button onclick="copySpecUrl()" style="padding: 6px 12px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='#616161'" onmouseout="this.style.background='#757575'" title="Copy spec URL to clipboard">📋 Copy URL</button>
+            </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
     </div>
@@ -186,6 +191,7 @@
         }
         
         function loadSpec(moduleName) {
+            showDownloadBar(typeof moduleName === "object" ? moduleName.name || moduleName : moduleName);
             console.log('loadSpec called with:', moduleName, 'type:', typeof moduleName);
             
             // Ensure we have a string module name
@@ -240,6 +246,40 @@
         }
         
         loadModules();
+
+        // Download / copy spec functions
+        let currentModule = null;
+        
+        function downloadSpec() {
+            if (!currentModule) return;
+            const specUrl = `api/${currentModule}.json`;
+            const a = document.createElement('a');
+            a.href = specUrl;
+            a.download = currentModule + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        function copySpecUrl() {
+            if (!currentModule) return;
+            const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + 'api/' + currentModule + '.json';
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const btn = event.target;
+                const orig = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => { btn.textContent = orig; }, 1500);
+            });
+        }
+        
+        function showDownloadBar(moduleName) {
+            currentModule = moduleName;
+            const bar = document.getElementById('downloadBar');
+            if (bar) {
+                bar.style.display = 'flex';
+                document.getElementById('downloadLabel').textContent = moduleName + '.json';
+            }
+        }
     </script>
 </body>
 </html>
