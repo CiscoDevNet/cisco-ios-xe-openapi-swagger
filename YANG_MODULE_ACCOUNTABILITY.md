@@ -1,9 +1,9 @@
 # YANG Module Accountability Report
 
-**Date:** February 01, 2026
+**Date:** February 14, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 848
-**Modules with OpenAPI Specs:** 397 (46.8%)
+**Modules with OpenAPI Specs:** 404 (47.6%)
 
 ---
 
@@ -22,16 +22,16 @@ This report provides **100% accountability** for every YANG module in the
 | Category | Total | With Specs | Coverage | Notes |
 |----------|-------|------------|----------|-------|
 | **oper** | 200 | 199 | 100% |  |
-| **rpc** | 63 | 50 | 79% |  |
-| **cfg** | 60 | 39 | 65% |  |
-| **openconfig** | 95 | 41 | 43% |  |
-| **ietf** | 33 | 21 | 64% |  |
+| **rpc** | 63 | 49 | 78% |  |
+| **cfg** | 60 | 40 | 67% |  |
+| **openconfig** | 95 | 42 | 44% |  |
+| **ietf** | 33 | 22 | 67% |  |
 | **events** | 41 | 41 | 100% |  |
 | **native** | 1 | 0 | 0% |  |
-| **other** | 36 | 6 | 17% |  |
+| **other** | 36 | 10 | 28% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
-| **common** | 18 | 0 | N/A | Excluded by design |
+| **common** | 18 | 1 | N/A | Excluded by design |
 | **native-aug** | 140 | 0 | N/A | Excluded by design |
 
 ---
@@ -284,7 +284,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-port-security-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-power-supply-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-rescue-config-rpc | swagger-rpc-model | ✅ |
-| Cisco-IOS-XE-rpc | swagger-rpc-model | ✅ |
+| Cisco-IOS-XE-rpc | - | ❌ |
 | Cisco-IOS-XE-sdwan-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-sslproxy-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-stack-power-rpc | swagger-rpc-model | ✅ |
@@ -337,7 +337,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-ncch-cfg | swagger-cfg-model | ✅ |
 | Cisco-IOS-XE-ospf-obsolete | - | ❌ |
 | Cisco-IOS-XE-parser | - | ❌ |
-| Cisco-IOS-XE-qfp-stats | - | ❌ |
+| Cisco-IOS-XE-qfp-stats | swagger-oper-model | ✅ |
 | Cisco-IOS-XE-sip-ua | - | ❌ |
 | Cisco-IOS-XE-sisf | - | ❌ |
 | Cisco-IOS-XE-sslproxy-cfg | swagger-cfg-model | ✅ |
@@ -434,7 +434,7 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-network-instance-l2 | - | ❌ |
 | openconfig-network-instance-l3 | - | ❌ |
 | openconfig-network-instance-policy | - | ❌ |
-| openconfig-openflow | - | ❌ |
+| openconfig-openflow | swagger-openconfig-model | ✅ |
 | openconfig-ospf-policy | - | ❌ |
 | openconfig-ospfv2 | swagger-openconfig-model | ✅ |
 | openconfig-ospfv2-area | - | ❌ |
@@ -509,7 +509,7 @@ This report provides **100% accountability** for every YANG module in the
 | ietf-yang-library | swagger-ietf-model | ✅ |
 | ietf-yang-patch | - | ❌ |
 | ietf-yang-patch-ann | - | ❌ |
-| ietf-yang-push | - | ❌ |
+| ietf-yang-push | swagger-events-model | ✅ |
 | ietf-yang-schema-mount | swagger-ietf-model | ✅ |
 | ietf-yang-smiv2 | - | ❌ |
 | ietf-yang-structure-ext | swagger-ietf-model | ✅ |
@@ -556,9 +556,9 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-verify-events | swagger-events-model | ✅ |
 | Cisco-IOS-XE-wireless-events-oper | swagger-events-model | ✅ |
 | Cisco-IOS-XE-xcopy-events | swagger-events-model | ✅ |
-| cisco-bridge-domain | swagger-rpc-model | ✅ |
-| cisco-pw | swagger-other-model | ✅ |
-| cisco-smart-license | swagger-rpc-model | ✅ |
+| cisco-bridge-domain | swagger-events-model | ✅ |
+| cisco-pw | swagger-events-model | ✅ |
+| cisco-smart-license | swagger-events-model | ✅ |
 
 ### NATIVE (1 modules)
 
@@ -571,7 +571,7 @@ This report provides **100% accountability** for every YANG module in the
 | Module Name | Swagger Folder | Has Spec |
 |-------------|----------------|----------|
 | cisco-ethernet | swagger-other-model | ✅ |
-| cisco-evpn-service | - | ❌ |
+| cisco-evpn-service | swagger-other-model | ✅ |
 | cisco-extensions | - | ❌ |
 | cisco-ospf | - | ❌ |
 | cisco-policy | - | ❌ |
@@ -596,12 +596,12 @@ This report provides **100% accountability** for every YANG module in the
 | tailf-confd-monitoring | - | ❌ |
 | tailf-confd-monitoring2 | - | ❌ |
 | tailf-key-rotation | - | ❌ |
-| tailf-kicker | - | ❌ |
+| tailf-kicker | swagger-events-model | ✅ |
 | tailf-meta-extensions | - | ❌ |
-| tailf-netconf-extensions | - | ❌ |
+| tailf-netconf-extensions | swagger-rpc-model | ✅ |
 | tailf-netconf-inactive | - | ❌ |
 | tailf-netconf-monitoring | - | ❌ |
-| tailf-netconf-query | - | ❌ |
+| tailf-netconf-query | swagger-rpc-model | ✅ |
 | tailf-netconf-transactions | swagger-rpc-model | ✅ |
 | tailf-rest-query | - | ❌ |
 | tailf-restconf-error | - | ❌ |
@@ -813,7 +813,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-utd-common-oper | Common/shared type definitions and groupings |
 | cisco-bridge-common | Common/shared protocol module |
 | cisco-semver | Semantic versioning module - metadata only |
-| common-mpls-static | Common/shared protocol module |
+| common-mpls-static | - |
 | openconfig-aft-common | Common/shared protocol module |
 | openconfig-bgp-common | Common/shared protocol module |
 | openconfig-bgp-common-multiprotocol | Common/shared protocol module |
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-02-01T19:49:21.111623*
+*Report generated: 2026-02-14T22:56:41.582276*
