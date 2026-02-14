@@ -1538,170 +1538,6 @@
       "x-yang-path": "/expObjectTable/expObjectEntry",
       "x-restconf-kind": "container"
     },
-    "/data/EXPRESSION-MIB:expObjectTable/expObjectEntry={expExpressionIndex expObjectIndex}": {
-      "get": {
-        "summary": "Get expObjectEntry entry",
-        "description": "Retrieve specific expObjectEntry entry by key from MIB",
-        "tags": [
-          "EXPRESSION-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "expExpressionIndex expObjectIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expObjectIndex": {
-                      "type": "integer",
-                      "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expObjectID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectSampleType": {
-                      "type": "string",
-                      "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
-                    },
-                    "expObjectDeltaDiscontinuityID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectDiscontinuityIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectDiscontinuityIDType": {
-                      "type": "string",
-                      "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
-                    },
-                    "expObjectConditional": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectConditionalWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
-                    },
-                    "expObjectStatus": {
-                      "type": "string",
-                      "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "EXPRESSION-MIB:expObjectEntry": {
-                    "expExpressionIndex": "example-string",
-                    "expObjectIndex": 1,
-                    "expObjectID": "example-string",
-                    "expObjectIDWildcard": true,
-                    "expObjectSampleType": "ethernetCsmacd(6)",
-                    "expObjectDeltaDiscontinuityID": "example-string",
-                    "expObjectDiscontinuityIDWildcard": true,
-                    "expObjectDiscontinuityIDType": "ethernetCsmacd(6)",
-                    "expObjectConditional": "example-string",
-                    "expObjectConditionalWildcard": true,
-                    "expObjectStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-expObjectEntry-2"
-      },
-      "x-yang-path": "/expObjectTable/expObjectEntry={expExpressionIndex expObjectIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "expExpressionIndex expObjectIndex"
-      ]
-    },
     "/data/EXPRESSION-MIB:expValueTable": {
       "get": {
         "summary": "Get expValueTable data",
@@ -2037,165 +1873,6 @@
       },
       "x-yang-path": "/expValueTable/expValueEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/EXPRESSION-MIB:expValueTable/expValueEntry={expExpressionIndex expValueInstance}": {
-      "get": {
-        "summary": "Get expValueEntry entry",
-        "description": "Retrieve specific expValueEntry entry by key from MIB",
-        "tags": [
-          "EXPRESSION-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "expExpressionIndex expValueInstance",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expValueInstance": {
-                      "type": "string",
-                      "description": "The final instance portion of a value's OID according to\n            the wildcarding in instances of expObjectID for the\n            expression.  The prefix of this OID fragment is 0.0,\n            leading to the following behavior.\n            \n            If there is no wildcarding, the value is 0.0.0.  In other\n            words, there is one value which standing alone would have\n            been a scalar with a 0 at the end of its OID.\n            \n            If there is wildcarding, the value is 0.0 followed by\n            a value that the wildcard can take, thus defining one value\n            instance for each real, possible value of the wildcard.\n            So, for example, if the wildcard worked out to be an\n            ifIndex, there is an expValueInstance for each applicable\n            ifIndex.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expValueCounter32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'counter32'.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expValueUnsigned32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is\n            'unsignedOrGauge32' or 'timeTicks'.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expValueInteger32Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'integer32'.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "expValueIpAddressVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'ipAddress'.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "expValueOctetStringVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'octetString'.",
-                      "format": "binary"
-                    },
-                    "expValueOidVal": {
-                      "type": "string",
-                      "description": "The value when expExpressionValueType is 'objectId'.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expValueCounter64Val": {
-                      "type": "integer",
-                      "description": "The value when expExpressionValueType is 'counter64'.",
-                      "minimum": 0
-                    }
-                  }
-                },
-                "example": {
-                  "EXPRESSION-MIB:expValueEntry": {
-                    "expExpressionIndex": "example-string",
-                    "expValueInstance": "example-string",
-                    "expValueCounter32Val": 1234567890,
-                    "expValueUnsigned32Val": 0,
-                    "expValueInteger32Val": -2147483648,
-                    "expValueIpAddressVal": "192.168.1.1",
-                    "expValueOctetStringVal": "example-string",
-                    "expValueOidVal": "1.3.6.1.2.1.1",
-                    "expValueCounter64Val": 1234567890
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-expValueEntry-2"
-      },
-      "x-yang-path": "/expValueTable/expValueEntry={expExpressionIndex expValueInstance}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "expExpressionIndex expValueInstance"
-      ]
     },
     "/data/EXPRESSION-MIB:expNameEntry": {
       "get": {
@@ -2945,170 +2622,6 @@
       "x-yang-path": "/expObjectEntry",
       "x-restconf-kind": "container"
     },
-    "/data/EXPRESSION-MIB:expObjectEntry={expExpressionIndex expObjectIndex}": {
-      "get": {
-        "summary": "Get expObjectEntry entry",
-        "description": "Retrieve specific expObjectEntry entry by key from MIB",
-        "tags": [
-          "EXPRESSION-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "expExpressionIndex expObjectIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "expExpressionIndex": {
-                      "type": "string",
-                      "description": "expExpressionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "expObjectIndex": {
-                      "type": "integer",
-                      "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "expObjectID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectSampleType": {
-                      "type": "string",
-                      "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
-                    },
-                    "expObjectDeltaDiscontinuityID": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectDiscontinuityIDWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
-                    },
-                    "expObjectDiscontinuityIDType": {
-                      "type": "string",
-                      "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
-                    },
-                    "expObjectConditional": {
-                      "type": "string",
-                      "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
-                      "x-yang-type": "yang:object-identifier-128"
-                    },
-                    "expObjectConditionalWildcard": {
-                      "type": "boolean",
-                      "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
-                    },
-                    "expObjectStatus": {
-                      "type": "string",
-                      "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "EXPRESSION-MIB:expObjectEntry": {
-                    "expExpressionIndex": "example-string",
-                    "expObjectIndex": 1,
-                    "expObjectID": "example-string",
-                    "expObjectIDWildcard": true,
-                    "expObjectSampleType": "ethernetCsmacd(6)",
-                    "expObjectDeltaDiscontinuityID": "example-string",
-                    "expObjectDiscontinuityIDWildcard": true,
-                    "expObjectDiscontinuityIDType": "ethernetCsmacd(6)",
-                    "expObjectConditional": "example-string",
-                    "expObjectConditionalWildcard": true,
-                    "expObjectStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-expObjectEntry-4"
-      },
-      "x-yang-path": "/expObjectEntry={expExpressionIndex expObjectIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "expExpressionIndex expObjectIndex"
-      ]
-    },
     "/data/EXPRESSION-MIB:expValueEntry": {
       "get": {
         "summary": "Get expValueEntry list",
@@ -3262,7 +2775,178 @@
       "x-yang-path": "/expValueEntry",
       "x-restconf-kind": "container"
     },
-    "/data/EXPRESSION-MIB:expValueEntry={expExpressionIndex expValueInstance}": {
+    "/data/EXPRESSION-MIB:expObjectTable/expObjectEntry={expExpressionIndex},{expObjectIndex}": {
+      "get": {
+        "summary": "Get expObjectEntry entry",
+        "description": "Retrieve specific expObjectEntry entry by key from MIB",
+        "tags": [
+          "EXPRESSION-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "expExpressionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expObjectIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expExpressionIndex": {
+                      "type": "string",
+                      "description": "expExpressionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "expObjectIndex": {
+                      "type": "integer",
+                      "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "expObjectID": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectIDWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
+                    },
+                    "expObjectSampleType": {
+                      "type": "string",
+                      "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
+                    },
+                    "expObjectDeltaDiscontinuityID": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectDiscontinuityIDWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
+                    },
+                    "expObjectDiscontinuityIDType": {
+                      "type": "string",
+                      "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
+                    },
+                    "expObjectConditional": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectConditionalWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
+                    },
+                    "expObjectStatus": {
+                      "type": "string",
+                      "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "EXPRESSION-MIB:expObjectEntry": {
+                    "expExpressionIndex": "example-string",
+                    "expObjectIndex": 1,
+                    "expObjectID": "example-string",
+                    "expObjectIDWildcard": true,
+                    "expObjectSampleType": "ethernetCsmacd(6)",
+                    "expObjectDeltaDiscontinuityID": "example-string",
+                    "expObjectDiscontinuityIDWildcard": true,
+                    "expObjectDiscontinuityIDType": "ethernetCsmacd(6)",
+                    "expObjectConditional": "example-string",
+                    "expObjectConditionalWildcard": true,
+                    "expObjectStatus": "up(1)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-expObjectEntry-2"
+      },
+      "x-yang-path": "/expObjectTable/expObjectEntry={expExpressionIndex expObjectIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "expExpressionIndex expObjectIndex"
+      ]
+    },
+    "/data/EXPRESSION-MIB:expValueTable/expValueEntry={expExpressionIndex},{expValueInstance}": {
       "get": {
         "summary": "Get expValueEntry entry",
         "description": "Retrieve specific expValueEntry entry by key from MIB",
@@ -3271,13 +2955,357 @@
         ],
         "parameters": [
           {
-            "name": "expExpressionIndex expValueInstance",
+            "name": "expExpressionIndex",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "example": "1"
+            }
+          },
+          {
+            "name": "expValueInstance",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expExpressionIndex": {
+                      "type": "string",
+                      "description": "expExpressionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "expValueInstance": {
+                      "type": "string",
+                      "description": "The final instance portion of a value's OID according to\n            the wildcarding in instances of expObjectID for the\n            expression.  The prefix of this OID fragment is 0.0,\n            leading to the following behavior.\n            \n            If there is no wildcarding, the value is 0.0.0.  In other\n            words, there is one value which standing alone would have\n            been a scalar with a 0 at the end of its OID.\n            \n            If there is wildcarding, the value is 0.0 followed by\n            a value that the wildcard can take, thus defining one value\n            instance for each real, possible value of the wildcard.\n            So, for example, if the wildcard worked out to be an\n            ifIndex, there is an expValueInstance for each applicable\n            ifIndex.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expValueCounter32Val": {
+                      "type": "integer",
+                      "description": "The value when expExpressionValueType is 'counter32'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "expValueUnsigned32Val": {
+                      "type": "integer",
+                      "description": "The value when expExpressionValueType is\n            'unsignedOrGauge32' or 'timeTicks'.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "expValueInteger32Val": {
+                      "type": "integer",
+                      "description": "The value when expExpressionValueType is 'integer32'.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "expValueIpAddressVal": {
+                      "type": "string",
+                      "description": "The value when expExpressionValueType is 'ipAddress'.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "expValueOctetStringVal": {
+                      "type": "string",
+                      "description": "The value when expExpressionValueType is 'octetString'.",
+                      "format": "binary"
+                    },
+                    "expValueOidVal": {
+                      "type": "string",
+                      "description": "The value when expExpressionValueType is 'objectId'.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expValueCounter64Val": {
+                      "type": "integer",
+                      "description": "The value when expExpressionValueType is 'counter64'.",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "example": {
+                  "EXPRESSION-MIB:expValueEntry": {
+                    "expExpressionIndex": "example-string",
+                    "expValueInstance": "example-string",
+                    "expValueCounter32Val": 1234567890,
+                    "expValueUnsigned32Val": 0,
+                    "expValueInteger32Val": -2147483648,
+                    "expValueIpAddressVal": "192.168.1.1",
+                    "expValueOctetStringVal": "example-string",
+                    "expValueOidVal": "1.3.6.1.2.1.1",
+                    "expValueCounter64Val": 1234567890
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-expValueEntry-2"
+      },
+      "x-yang-path": "/expValueTable/expValueEntry={expExpressionIndex expValueInstance}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "expExpressionIndex expValueInstance"
+      ]
+    },
+    "/data/EXPRESSION-MIB:expObjectEntry={expExpressionIndex},{expObjectIndex}": {
+      "get": {
+        "summary": "Get expObjectEntry entry",
+        "description": "Retrieve specific expObjectEntry entry by key from MIB",
+        "tags": [
+          "EXPRESSION-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "expExpressionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expObjectIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expExpressionIndex": {
+                      "type": "string",
+                      "description": "expExpressionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "expObjectIndex": {
+                      "type": "integer",
+                      "description": "Within an expression, a unique, numeric identification\n            for an object.  Prefixed with a dollar sign ('$') this is\n            used to reference the object in the corresponding\n            expExpression.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "expObjectID": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of this object.  The OID may be\n            fully qualified, meaning it includes a complete instance\n            identifier part (e.g., ifInOctets.1 or sysUpTime.0), or it\n            may not be fully qualified, meaning it may lack all or part\n            of the instance identifier.  If the expObjectID is not fully\n            qualified, then expObjectWildcard must be set to true(1).  \n            The value of the expression will be multiple\n            values, as if done for a GetNext sweep of the object.\n            \n            An object here may itself be the result of an expression but\n            recursion is not allowed.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectIDWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjecID of this row is a\n            wildcard object. False indicates that expObjectID is fully\n            instanced.  If all expObjectWildcard values for a given\n            expression are FALSE, expExpressionPrefix will reflect a\n            scalar object (ie will be 0.0).\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
+                    },
+                    "expObjectSampleType": {
+                      "type": "string",
+                      "description": "The method of sampling the selected variable.\n            \n            An 'absoluteValue' is simply the present value of the\n            object.\n            A 'deltaValue' is the present value minus the previous\n            value, which was sampled expExpressionDeltaInterval\n            seconds ago.  This is intended primarily for use with\n            SNMP counters, which are meaningless as an 'absoluteValue',\n            but may be used with any integer-based value.\n            \n            When an expression contains both delta and absolute values\n            the absolute values are obtained at the end of the delta\n            period."
+                    },
+                    "expObjectDeltaDiscontinuityID": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of a TimeTicks or TimeStamp\n            object that indicates a discontinuity in the value at\n            expObjectID.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            The OID may be for a leaf object (e.g. sysUpTime.0) or may\n            be wildcarded to match expObjectID.\n            \n            This object supports normal checking for a discontinuity\n            in a counter.  Note that if this object does not point to\n            sysUpTime discontinuity checking must still check sysUpTime\n            for an overall discontinuity.\n            \n            If the object identified is not accessible no discontinuity\n            check will be made.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectDiscontinuityIDWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjectDeltaDiscontinuityID\n            of this row is a wildcard object.  False indicates that\n            expObjectDeltaDiscontinuityID is fully instanced.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'.\n            \n            NOTE:  The simplest implementations of this MIB may not\n            allow wildcards."
+                    },
+                    "expObjectDiscontinuityIDType": {
+                      "type": "string",
+                      "description": "The value 'timeTicks' indicates the\n            expObjectDeltaDiscontinuityID of this row is of syntax\n            TimeTicks.  The value 'timeStamp' indicates that\n            expObjectDeltaDiscontinuityID is of syntax TimeStamp.\n            \n            This object is not instantiated if expObject is not\n            'deltaValue'."
+                    },
+                    "expObjectConditional": {
+                      "type": "string",
+                      "description": "The OBJECT IDENTIFIER (OID) of an object that overrides\n            whether the instance of expObjectID is to be considered\n            usable.  If the value of the object at expObjectConditional\n            is 0 or not instantiated, the object at expObjectID is\n            treated as if it is not instantiated.  In other words,\n            expObjectConditional is a filter that controls whether or\n            not to use the value at expObjectID.\n            \n            The OID may be for a leaf object (e.g. sysObjectID.0) or\n            may be wildcarded to match expObjectID.  If expObject is\n            wildcarded and expObjectID in the same row is not, the wild\n            portion of expObjectConditional must match the wildcarding\n            of the rest of the expression.  If no object in the\n            expression is wildcarded but expObjectConditional is, use\n            the lexically first instance (if any) of\n            expObjectConditional.\n            \n            If the value of expObjectConditional is 0.0 operation is\n            as if the value pointed to by expObjectConditional is a\n            non-zero (true) value.\n            \n            Note that expObjectConditional can not trivially use an\n            object of syntax TruthValue, since the underlying value is\n            not 0 or 1.",
+                      "x-yang-type": "yang:object-identifier-128"
+                    },
+                    "expObjectConditionalWildcard": {
+                      "type": "boolean",
+                      "description": "A true value indicates the expObjectConditional of this\n            row is a wildcard object. False indicates that\n            expObjectConditional is fully instanced.\n            \n            NOTE: The simplest implementations of this MIB may not allow\n            wildcards."
+                    },
+                    "expObjectStatus": {
+                      "type": "string",
+                      "description": "The control that allows creation/deletion of entries.\n            \n            Objects in this table may be changed while expObjectStatus\n            is in any state.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "EXPRESSION-MIB:expObjectEntry": {
+                    "expExpressionIndex": "example-string",
+                    "expObjectIndex": 1,
+                    "expObjectID": "example-string",
+                    "expObjectIDWildcard": true,
+                    "expObjectSampleType": "ethernetCsmacd(6)",
+                    "expObjectDeltaDiscontinuityID": "example-string",
+                    "expObjectDiscontinuityIDWildcard": true,
+                    "expObjectDiscontinuityIDType": "ethernetCsmacd(6)",
+                    "expObjectConditional": "example-string",
+                    "expObjectConditionalWildcard": true,
+                    "expObjectStatus": "up(1)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-expObjectEntry-4"
+      },
+      "x-yang-path": "/expObjectEntry={expExpressionIndex expObjectIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "expExpressionIndex expObjectIndex"
+      ]
+    },
+    "/data/EXPRESSION-MIB:expValueEntry={expExpressionIndex},{expValueInstance}": {
+      "get": {
+        "summary": "Get expValueEntry entry",
+        "description": "Retrieve specific expValueEntry entry by key from MIB",
+        "tags": [
+          "EXPRESSION-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "expExpressionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expValueInstance",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "Accept",

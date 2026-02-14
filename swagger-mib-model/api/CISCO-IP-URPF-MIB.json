@@ -797,146 +797,6 @@
       "x-yang-path": "/cipUrpfIfMonTable/cipUrpfIfMonEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-IP-URPF-MIB:cipUrpfIfMonTable/cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}": {
-      "get": {
-        "summary": "Get cipUrpfIfMonEntry entry",
-        "description": "Retrieve specific cipUrpfIfMonEntry entry by key from MIB",
-        "tags": [
-          "CISCO-IP-URPF-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ifIndex cipUrpfIfIpVersion",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ifIndex": {
-                      "type": "string",
-                      "description": "ifIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cipUrpfIfIpVersion": {
-                      "type": "string",
-                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
-                    },
-                    "cipUrpfIfDrops": {
-                      "type": "integer",
-                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfSuppressedDrops": {
-                      "type": "integer",
-                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfDropRate": {
-                      "type": "integer",
-                      "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfDiscontinuityTime": {
-                      "type": "string",
-                      "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                      "x-yang-type": "yang:timestamp"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
-                    "ifIndex": "example-string",
-                    "cipUrpfIfIpVersion": "192.168.1.1",
-                    "cipUrpfIfDrops": 0,
-                    "cipUrpfIfSuppressedDrops": 0,
-                    "cipUrpfIfDropRate": 0,
-                    "cipUrpfIfDiscontinuityTime": "192.168.1.1"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cipUrpfIfMonEntry-2"
-      },
-      "x-yang-path": "/cipUrpfIfMonTable/cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ifIndex cipUrpfIfIpVersion"
-      ]
-    },
     "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfTable": {
       "get": {
         "summary": "Get cipUrpfVrfIfTable data",
@@ -1198,133 +1058,6 @@
       },
       "x-yang-path": "/cipUrpfVrfIfTable/cipUrpfVrfIfEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfTable/cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}": {
-      "get": {
-        "summary": "Get cipUrpfVrfIfEntry entry",
-        "description": "Retrieve specific cipUrpfVrfIfEntry entry by key from MIB",
-        "tags": [
-          "CISCO-IP-URPF-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "cipUrpfVrfName ifIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "cipUrpfVrfName": {
-                      "type": "string",
-                      "description": "cipUrpfVrfName",
-                      "x-yang-type": "leafref"
-                    },
-                    "ifIndex": {
-                      "type": "string",
-                      "description": "ifIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cipUrpfVrfIfDrops": {
-                      "type": "integer",
-                      "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfVrfIfDiscontinuityTime": {
-                      "type": "string",
-                      "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                      "x-yang-type": "yang:timestamp"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
-                    "cipUrpfVrfName": "192.168.1.1",
-                    "ifIndex": "example-string",
-                    "cipUrpfVrfIfDrops": 0,
-                    "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cipUrpfVrfIfEntry-2"
-      },
-      "x-yang-path": "/cipUrpfVrfIfTable/cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "cipUrpfVrfName ifIndex"
-      ]
     },
     "/data/CISCO-IP-URPF-MIB:cipUrpfVrfTable": {
       "get": {
@@ -2022,146 +1755,6 @@
       "x-yang-path": "/cipUrpfIfMonEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-IP-URPF-MIB:cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}": {
-      "get": {
-        "summary": "Get cipUrpfIfMonEntry entry",
-        "description": "Retrieve specific cipUrpfIfMonEntry entry by key from MIB",
-        "tags": [
-          "CISCO-IP-URPF-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ifIndex cipUrpfIfIpVersion",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ifIndex": {
-                      "type": "string",
-                      "description": "ifIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cipUrpfIfIpVersion": {
-                      "type": "string",
-                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
-                    },
-                    "cipUrpfIfDrops": {
-                      "type": "integer",
-                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfSuppressedDrops": {
-                      "type": "integer",
-                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfDropRate": {
-                      "type": "integer",
-                      "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfIfDiscontinuityTime": {
-                      "type": "string",
-                      "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                      "x-yang-type": "yang:timestamp"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
-                    "ifIndex": "example-string",
-                    "cipUrpfIfIpVersion": "192.168.1.1",
-                    "cipUrpfIfDrops": 0,
-                    "cipUrpfIfSuppressedDrops": 0,
-                    "cipUrpfIfDropRate": 0,
-                    "cipUrpfIfDiscontinuityTime": "192.168.1.1"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cipUrpfIfMonEntry-4"
-      },
-      "x-yang-path": "/cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ifIndex cipUrpfIfIpVersion"
-      ]
-    },
     "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
       "get": {
         "summary": "Get cipUrpfVrfIfEntry list",
@@ -2282,133 +1875,6 @@
       },
       "x-yang-path": "/cipUrpfVrfIfEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}": {
-      "get": {
-        "summary": "Get cipUrpfVrfIfEntry entry",
-        "description": "Retrieve specific cipUrpfVrfIfEntry entry by key from MIB",
-        "tags": [
-          "CISCO-IP-URPF-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "cipUrpfVrfName ifIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "cipUrpfVrfName": {
-                      "type": "string",
-                      "description": "cipUrpfVrfName",
-                      "x-yang-type": "leafref"
-                    },
-                    "ifIndex": {
-                      "type": "string",
-                      "description": "ifIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cipUrpfVrfIfDrops": {
-                      "type": "integer",
-                      "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cipUrpfVrfIfDiscontinuityTime": {
-                      "type": "string",
-                      "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                      "x-yang-type": "yang:timestamp"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
-                    "cipUrpfVrfName": "192.168.1.1",
-                    "ifIndex": "example-string",
-                    "cipUrpfVrfIfDrops": 0,
-                    "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cipUrpfVrfIfEntry-4"
-      },
-      "x-yang-path": "/cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "cipUrpfVrfName ifIndex"
-      ]
     },
     "/data/CISCO-IP-URPF-MIB:cipUrpfVrfEntry": {
       "get": {
@@ -2618,6 +2084,568 @@
       "x-restconf-kind": "list-instance",
       "x-list-keys": [
         "cipUrpfVrfName"
+      ]
+    },
+    "/data/CISCO-IP-URPF-MIB:cipUrpfIfMonTable/cipUrpfIfMonEntry={ifIndex},{cipUrpfIfIpVersion}": {
+      "get": {
+        "summary": "Get cipUrpfIfMonEntry entry",
+        "description": "Retrieve specific cipUrpfIfMonEntry entry by key from MIB",
+        "tags": [
+          "CISCO-IP-URPF-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ifIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cipUrpfIfIpVersion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cipUrpfIfIpVersion": {
+                      "type": "string",
+                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                    },
+                    "cipUrpfIfDrops": {
+                      "type": "integer",
+                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfSuppressedDrops": {
+                      "type": "integer",
+                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfDropRate": {
+                      "type": "integer",
+                      "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfDiscontinuityTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
+                    "ifIndex": "example-string",
+                    "cipUrpfIfIpVersion": "192.168.1.1",
+                    "cipUrpfIfDrops": 0,
+                    "cipUrpfIfSuppressedDrops": 0,
+                    "cipUrpfIfDropRate": 0,
+                    "cipUrpfIfDiscontinuityTime": "192.168.1.1"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cipUrpfIfMonEntry-2"
+      },
+      "x-yang-path": "/cipUrpfIfMonTable/cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ifIndex cipUrpfIfIpVersion"
+      ]
+    },
+    "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfTable/cipUrpfVrfIfEntry={cipUrpfVrfName},{ifIndex}": {
+      "get": {
+        "summary": "Get cipUrpfVrfIfEntry entry",
+        "description": "Retrieve specific cipUrpfVrfIfEntry entry by key from MIB",
+        "tags": [
+          "CISCO-IP-URPF-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "cipUrpfVrfName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ifIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cipUrpfVrfName": {
+                      "type": "string",
+                      "description": "cipUrpfVrfName",
+                      "x-yang-type": "leafref"
+                    },
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cipUrpfVrfIfDrops": {
+                      "type": "integer",
+                      "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfVrfIfDiscontinuityTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
+                    "cipUrpfVrfName": "192.168.1.1",
+                    "ifIndex": "example-string",
+                    "cipUrpfVrfIfDrops": 0,
+                    "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cipUrpfVrfIfEntry-2"
+      },
+      "x-yang-path": "/cipUrpfVrfIfTable/cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "cipUrpfVrfName ifIndex"
+      ]
+    },
+    "/data/CISCO-IP-URPF-MIB:cipUrpfIfMonEntry={ifIndex},{cipUrpfIfIpVersion}": {
+      "get": {
+        "summary": "Get cipUrpfIfMonEntry entry",
+        "description": "Retrieve specific cipUrpfIfMonEntry entry by key from MIB",
+        "tags": [
+          "CISCO-IP-URPF-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ifIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cipUrpfIfIpVersion",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cipUrpfIfIpVersion": {
+                      "type": "string",
+                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                    },
+                    "cipUrpfIfDrops": {
+                      "type": "integer",
+                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfSuppressedDrops": {
+                      "type": "integer",
+                      "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfDropRate": {
+                      "type": "integer",
+                      "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfIfDiscontinuityTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
+                    "ifIndex": "example-string",
+                    "cipUrpfIfIpVersion": "192.168.1.1",
+                    "cipUrpfIfDrops": 0,
+                    "cipUrpfIfSuppressedDrops": 0,
+                    "cipUrpfIfDropRate": 0,
+                    "cipUrpfIfDiscontinuityTime": "192.168.1.1"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cipUrpfIfMonEntry-4"
+      },
+      "x-yang-path": "/cipUrpfIfMonEntry={ifIndex cipUrpfIfIpVersion}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ifIndex cipUrpfIfIpVersion"
+      ]
+    },
+    "/data/CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry={cipUrpfVrfName},{ifIndex}": {
+      "get": {
+        "summary": "Get cipUrpfVrfIfEntry entry",
+        "description": "Retrieve specific cipUrpfVrfIfEntry entry by key from MIB",
+        "tags": [
+          "CISCO-IP-URPF-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "cipUrpfVrfName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ifIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cipUrpfVrfName": {
+                      "type": "string",
+                      "description": "cipUrpfVrfName",
+                      "x-yang-type": "leafref"
+                    },
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cipUrpfVrfIfDrops": {
+                      "type": "integer",
+                      "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cipUrpfVrfIfDiscontinuityTime": {
+                      "type": "string",
+                      "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
+                      "x-yang-type": "yang:timestamp"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
+                    "cipUrpfVrfName": "192.168.1.1",
+                    "ifIndex": "example-string",
+                    "cipUrpfVrfIfDrops": 0,
+                    "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cipUrpfVrfIfEntry-4"
+      },
+      "x-yang-path": "/cipUrpfVrfIfEntry={cipUrpfVrfName ifIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "cipUrpfVrfName ifIndex"
       ]
     }
   },

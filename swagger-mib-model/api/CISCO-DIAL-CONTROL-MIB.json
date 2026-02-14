@@ -1071,127 +1071,6 @@
       "x-yang-path": "/cCallHistoryIecTable/cCallHistoryIecEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-DIAL-CONTROL-MIB:cCallHistoryIecTable/cCallHistoryIecEntry={cCallHistoryIndex cCallHistoryIecIndex}": {
-      "get": {
-        "summary": "Get cCallHistoryIecEntry entry",
-        "description": "Retrieve specific cCallHistoryIecEntry entry by key from MIB",
-        "tags": [
-          "CISCO-DIAL-CONTROL-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "cCallHistoryIndex cCallHistoryIecIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "cCallHistoryIndex": {
-                      "type": "string",
-                      "description": "cCallHistoryIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cCallHistoryIecIndex": {
-                      "type": "integer",
-                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cCallHistoryIec": {
-                      "type": "string",
-                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry": {
-                    "cCallHistoryIndex": "example-string",
-                    "cCallHistoryIecIndex": 1,
-                    "cCallHistoryIec": "example-string"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cCallHistoryIecEntry-2"
-      },
-      "x-yang-path": "/cCallHistoryIecTable/cCallHistoryIecEntry={cCallHistoryIndex cCallHistoryIecIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "cCallHistoryIndex cCallHistoryIecIndex"
-      ]
-    },
     "/data/CISCO-DIAL-CONTROL-MIB:cCallHistoryEntry": {
       "get": {
         "summary": "Get cCallHistoryEntry list",
@@ -1743,7 +1622,7 @@
       "x-yang-path": "/cCallHistoryIecEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry={cCallHistoryIndex cCallHistoryIecIndex}": {
+    "/data/CISCO-DIAL-CONTROL-MIB:cCallHistoryIecTable/cCallHistoryIecEntry={cCallHistoryIndex},{cCallHistoryIecIndex}": {
       "get": {
         "summary": "Get cCallHistoryIecEntry entry",
         "description": "Retrieve specific cCallHistoryIecEntry entry by key from MIB",
@@ -1752,13 +1631,148 @@
         ],
         "parameters": [
           {
-            "name": "cCallHistoryIndex cCallHistoryIecIndex",
+            "name": "cCallHistoryIndex",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "example": "1"
+            }
+          },
+          {
+            "name": "cCallHistoryIecIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cCallHistoryIndex": {
+                      "type": "string",
+                      "description": "cCallHistoryIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cCallHistoryIecIndex": {
+                      "type": "integer",
+                      "description": "This object is used to index one or more IECs in the\n            context of a single call.  In most cases there will\n            only be one IEC when a call fails.  However, it is\n            possible for the software processing the call to \n            generate multiple IECs before the call ultimately fails.\n            In that scenario, there will be multiple entries in\n            this table related to a single call (cCallHistoryIndex)\n            and this object will serve to uniquely identify each IEC.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cCallHistoryIec": {
+                      "type": "string",
+                      "description": "This object reflects the Internal Error Code.\n            The format is a string of dotted decimal numbers\n            composed of the following components:\n            \n            Version.Entity.Category.Subsystem.Errorcode.Diagnostic\n            \n            Each component is defined as follows:\n            Version     : The version of IEC software.\n            Entity      : The network entity that originated\n                          the error.\n            Category    : The category of the error (eg, software\n                          error, hardware resource unavailable, ...)\n            Subsystem   : The subsystem in which the error occurred.\n            Errorcode   : A subsytem-specific error code.\n            Diagnostic  : An implementation-specific diagnostic code.",
+                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry": {
+                    "cCallHistoryIndex": "example-string",
+                    "cCallHistoryIecIndex": 1,
+                    "cCallHistoryIec": "example-string"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cCallHistoryIecEntry-2"
+      },
+      "x-yang-path": "/cCallHistoryIecTable/cCallHistoryIecEntry={cCallHistoryIndex cCallHistoryIecIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "cCallHistoryIndex cCallHistoryIecIndex"
+      ]
+    },
+    "/data/CISCO-DIAL-CONTROL-MIB:cCallHistoryIecEntry={cCallHistoryIndex},{cCallHistoryIecIndex}": {
+      "get": {
+        "summary": "Get cCallHistoryIecEntry entry",
+        "description": "Retrieve specific cCallHistoryIecEntry entry by key from MIB",
+        "tags": [
+          "CISCO-DIAL-CONTROL-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "cCallHistoryIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cCallHistoryIecIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "Accept",

@@ -1212,161 +1212,6 @@
       "x-yang-path": "/ciscoFlashChipTable/ciscoFlashChipEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashChipTable/ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashChipEntry entry",
-        "description": "Retrieve specific ciscoFlashChipEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashChipIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashChipIndex": {
-                      "type": "integer",
-                      "description": "Chip sequence number within selected flash device.\n            Used to index within chip info table.\n            Value starts from 1 and should not be greater than\n            ciscoFlashDeviceChipCount for that device.\n            When retrieving chip information for chips within a\n            partition, the sequence number should lie between\n            ciscoFlashPartitionStartChip & ciscoFlashPartitionEndChip\n            (both inclusive).",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashChipCode": {
-                      "type": "string",
-                      "description": "Manufacturer and device code for a chip.\n            Lower byte will contain the device code.\n            Upper byte will contain the manufacturer code.\n            If a chip code is unknown because it could not\n            be queried out of the chip, the value of this\n            object will be 00:00.\n            Since programming algorithms differ from chip type to\n            chip type, this chip code should be used to determine\n            which algorithms to use (and thereby whether the chip\n            is supported in the first place).",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashChipDescr": {
-                      "type": "string",
-                      "description": "Flash chip name corresponding to the chip code.\n            The name will contain the manufacturer and the\n            chip type. It will be of the form :\n              Intel 27F008SA.\n            In the case where a chip code is unknown, this\n            object will be an empty (NULL) string.\n            In the case where the chip code is known but the\n            chip is not supported by the system, this object\n            will be an empty (NULL) string.\n            A management station is therefore expected to use the\n            chip code and the chip description in conjunction\n            to provide additional information whenever the\n            ciscoFlashPartitionStatus object has the readOnly(1)\n            value.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashChipWriteRetries": {
-                      "type": "integer",
-                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of write retries that were done in the chip.\n            If no writes have been done to Flash, the count\n            will be zero. Typically, a maximum of 25 retries are\n            done on a single location before flagging a write\n            error.\n            A management station is expected to get this object\n            for each chip in a partition after a write failure\n            in that partition. To keep a track of retries for\n            a given write operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any write operation.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipEraseRetries": {
-                      "type": "integer",
-                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of erase retries that were done in the chip.\n            Typically, a maximum of 2000 retries are done in a\n            single erase zone (which may be a full chip or a\n            portion, depending on the chip technology) before\n            flagging an erase error.\n            A management station is expected to get this object\n            for each chip in a partition after an erase failure\n            in that partition. To keep a track of retries for\n            a given erase operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any erase operation.\n            Note that erase may be done through an independent\n            command, or through a copy-to-flash command.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipMaxWriteRetries": {
-                      "type": "integer",
-                      "description": "The maximum number of write retries done at any\n            single location before declaring a write failure.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipMaxEraseRetries": {
-                      "type": "integer",
-                      "description": "The maximum number of erase retries done within\n            an erase sector before declaring an erase failure.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashChipEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashChipIndex": 1,
-                    "ciscoFlashChipCode": "192.168.1.1",
-                    "ciscoFlashChipDescr": "192.168.1.1",
-                    "ciscoFlashChipWriteRetries": 0,
-                    "ciscoFlashChipEraseRetries": 0,
-                    "ciscoFlashChipMaxWriteRetries": 0,
-                    "ciscoFlashChipMaxEraseRetries": 0
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashChipEntry-2"
-      },
-      "x-yang-path": "/ciscoFlashChipTable/ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashChipIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashPartitionTable": {
       "get": {
         "summary": "Get ciscoFlashPartitionTable data",
@@ -1801,207 +1646,6 @@
       "x-yang-path": "/ciscoFlashPartitionTable/ciscoFlashPartitionEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashPartitionTable/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashPartitionEntry entry",
-        "description": "Retrieve specific ciscoFlashPartitionEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashPartitionIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "integer",
-                      "description": "Flash partition sequence number used to index within\n            table of initialized flash partitions.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionStartChip": {
-                      "type": "integer",
-                      "description": "Chip sequence number of first chip in partition.\n            Used as an index into the chip table.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionEndChip": {
-                      "type": "integer",
-                      "description": "Chip sequence number of last chip in partition.\n            Used as an index into the chip table.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionSize": {
-                      "type": "integer",
-                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            If the size of the flash partition is greater than the\n            maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionSizeExtended must be used to report the\n            flash partition's size.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionFreeSpace": {
-                      "type": "integer",
-                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            If the free space within a flash partition is greater than\n            the maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionFreeSpaceExtended\n            must be used to report the flash partition's free space.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionFileCount": {
-                      "type": "integer",
-                      "description": "Count of all files in a flash partition. Both\n            good and bad (deleted or invalid checksum) files\n            will be included in this count.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionChecksumAlgorithm": {
-                      "type": "string",
-                      "description": "Checksum algorithm identifier for checksum method\n            used by the file system. Normally, this would be\n            fixed for a particular file system. When a file\n            system writes a file to Flash, it checksums the\n            data written. The checksum then serves as a way\n            to validate the data read back whenever the file\n            is opened for reading.\n            Since there is no way, when using TFTP, to guarantee\n            that a network download has been error free (since\n            UDP checksums may not have been enabled), this\n            object together with the ciscoFlashFileChecksum\n            object provides a method for any management station\n            to regenerate the checksum of the original file\n            on the server and compare checksums to ensure that\n            the file download to Flash was error free.\n            simpleChecksum represents a simple 1s complement\n            addition of short word values. Other algorithm\n            values will be added as necessary."
-                    },
-                    "ciscoFlashPartitionStatus": {
-                      "type": "string",
-                      "description": "Flash partition status can be :\n            \n            * readOnly if device is not programmable either because\n            chips could not be recognized or an erroneous mismatch\n            of chips was detected. Chip recognition may fail either\n            because the chips are not supported by the system,\n            or because the Vpp voltage required to identify chips\n            has been disabled via the programming jumper.\n            The ciscoFlashDeviceProgrammingJumper, ciscoFlashChipCode,\n            and ciscoFlashChipDescr objects can be examined to get\n            more details on the cause of this status\n            * runFromFlash (RFF) if current image is running from\n            this partition.\n            The ciscoFlashPartitionUpgradeMethod object will then\n            indicate whether the Flash Load Helper can be used\n            to write a file to this partition or not.\n            \n            * readWrite if partition is programmable."
-                    },
-                    "ciscoFlashPartitionUpgradeMethod": {
-                      "type": "string",
-                      "description": "Flash partition upgrade method, ie., method by which\n            new files can be downloaded into the partition.\n            FLH stands for Flash Load Helper, a feature provided\n            on run-from-Flash systems for upgrading Flash. This\n            feature uses the bootstrap code in ROMs to help in\n            automatic download.\n            This object should be retrieved if the partition\n            status is runFromFlash(2).\n            If the partition status is readOnly(1), the upgrade\n            method would depend on the reason for the readOnly\n            status. For eg., it may simply be a matter of installing\n            the programming jumper, or it may require execution of a\n            later version of software that supports the Flash chips.\n            \n            unknown      -  the current system image does not know\n                            how Flash can be programmed. A possible\n                            method would be to reload the ROM image\n                            and perform the upgrade manually.\n            rxbootFLH    -  the Flash Load Helper is available to\n                            download files to Flash. A copy-to-flash\n                            command can be used and this system image\n                            will automatically reload the Rxboot image\n                            in ROM and direct it to carry out the\n                            download request.\n            direct       -  will be done directly by this image."
-                    },
-                    "ciscoFlashPartitionName": {
-                      "type": "string",
-                      "description": "Flash partition name used to refer to a partition\n            by the system. This can be any alpha-numeric character\n            string of the form AAAAAAAAnn, where A represents an\n            optional alpha character and n a numeric character.\n            Any numeric characters must always form the trailing\n            part of the string. The system will strip off the alpha\n            characters and use the numeric portion to map to a\n            partition index.\n            Flash operations get directed to a device partition\n            based on this name.\n            The system has a concept of a default partition. This\n            would be the first partition in the device. The system\n            directs an operation to the default partition whenever\n            a partition name is not specified.\n            The partition name is therefore mandatory except when\n            the operation is being done on the default partition, or\n            the device has just one partition (is not partitioned).",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashPartitionNeedErasure": {
-                      "type": "boolean",
-                      "description": "This object indicates whether a partition requires\n            erasure before any write operations can be done in it.\n            A management station should therefore retrieve this\n            object prior to attempting any write operation.\n            A partition requires erasure after it becomes full\n            free space left is less than or equal to the\n            (filesystem file header size).\n            A partition also requires erasure if the system does\n            not find the existence of any file system when it\n            boots up.\n            The partition may be erased explicitly through the\n            erase(5) command, or by using the copyToFlashWithErase(1)\n            command.\n            If a copyToFlashWithoutErase(2) command is issued\n            when this object has the TRUE value, the command\n            will fail."
-                    },
-                    "ciscoFlashPartitionFileNameLength": {
-                      "type": "integer",
-                      "description": "Maximum file name length supported by the file\n            system.\n            Max file name length will depend on the file\n            system implemented. Today, all file systems\n            support a max length of at least 48 bytes.\n            A management entity must use this object when\n            prompting a user for, or deriving the Flash file\n            name length.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionSizeExtended": {
-                      "type": "integer",
-                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            This object is a 64-bit version of ciscoFlashPartitionSize",
-                      "minimum": 0
-                    },
-                    "ciscoFlashPartitionFreeSpaceExtended": {
-                      "type": "integer",
-                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            This object is a 64-bit version of ciscoFlashPartitionFreeSpace",
-                      "minimum": 0
-                    },
-                    "ciscoFlashPartitionLowSpaceNotifThreshold": {
-                      "type": "string",
-                      "description": "This object specifies the minimum threshold value in percentage\n            of free space for each partition. If the free space available\n            goes below this threshold value and if\n            ciscoFlashPartionLowSpaceNotifEnable is set to true,\n            ciscoFlashPartitionLowSpaceNotif will be generated. When the\n            available free space comes back to the threshold value\n            ciscoFlashPartionLowSpaceRecoveryNotif will be generated.",
-                      "x-yang-type": "cisco-qos:Percent"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashPartitionEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": 1,
-                    "ciscoFlashPartitionStartChip": -2147483648,
-                    "ciscoFlashPartitionEndChip": -2147483648,
-                    "ciscoFlashPartitionSize": 0,
-                    "ciscoFlashPartitionFreeSpace": 0,
-                    "ciscoFlashPartitionFileCount": 0,
-                    "ciscoFlashPartitionChecksumAlgorithm": "example-string",
-                    "ciscoFlashPartitionStatus": "up(1)",
-                    "ciscoFlashPartitionUpgradeMethod": "example-string",
-                    "ciscoFlashPartitionName": "interface-1",
-                    "ciscoFlashPartitionNeedErasure": true,
-                    "ciscoFlashPartitionFileNameLength": -2147483648,
-                    "ciscoFlashPartitionSizeExtended": 0,
-                    "ciscoFlashPartitionFreeSpaceExtended": 0,
-                    "ciscoFlashPartitionLowSpaceNotifThreshold": "example-string"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashPartitionEntry-2"
-      },
-      "x-yang-path": "/ciscoFlashPartitionTable/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashFileTable": {
       "get": {
         "summary": "Get ciscoFlashFileTable data",
@@ -2334,163 +1978,6 @@
       "x-yang-path": "/ciscoFlashFileTable/ciscoFlashFileEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashFileTable/ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashFileEntry entry",
-        "description": "Retrieve specific ciscoFlashFileEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashPartitionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileIndex": {
-                      "type": "integer",
-                      "description": "Flash file sequence number used to index within\n            a Flash partition directory table.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileSize": {
-                      "type": "integer",
-                      "description": "Size of the file in bytes. Note that this size does\n            not include the size of the filesystem file header.\n            File size will always be non-zero.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileChecksum": {
-                      "type": "string",
-                      "description": "File checksum stored in the file header. This\n            checksum is computed and stored when the file is\n            written into Flash. It serves to validate the data\n            written into Flash.\n            Whereas the system will generate and store the checksum\n            internally in hexadecimal form, this object will\n            provide the checksum in a string form.\n            The checksum will be available for all valid and\n            invalid-checksum files.",
-                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
-                    },
-                    "ciscoFlashFileStatus": {
-                      "type": "string",
-                      "description": "Status of a file.\n            A file could be explicitly deleted if the file system\n            supports such a user command facility. Alternately,\n            an existing good file would be automatically deleted\n            if another good file with the same name were copied in.\n            Note that deleted files continue to occupy prime\n            Flash real estate.\n            \n            A file is marked as having an invalid checksum if any\n            checksum mismatch was detected while writing or reading\n            the file. Incomplete files (files truncated either\n            because of lack of free space, or a network download\n            failure) are also written with a bad checksum and\n            marked as invalid."
-                    },
-                    "ciscoFlashFileName": {
-                      "type": "string",
-                      "description": "Flash file name as specified by the user copying in\n            the file. The name should not include the colon (:)\n            character as it is a special separator character used\n            to delineate the device name, partition name, and the\n            file name.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashFileType": {
-                      "type": "string",
-                      "description": "Type of the file.",
-                      "x-yang-type": "CISCO-FLASH-MIB:FlashFileType"
-                    },
-                    "ciscoFlashFileDate": {
-                      "type": "string",
-                      "description": "The time at which this file was created.",
-                      "x-yang-type": "snmpv2-tc:DateAndTime"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashFileEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": "example-string",
-                    "ciscoFlashFileIndex": 1,
-                    "ciscoFlashFileSize": 0,
-                    "ciscoFlashFileChecksum": "example-string",
-                    "ciscoFlashFileStatus": "up(1)",
-                    "ciscoFlashFileName": "interface-1",
-                    "ciscoFlashFileType": "ethernetCsmacd(6)",
-                    "ciscoFlashFileDate": "example-string"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashFileEntry-2"
-      },
-      "x-yang-path": "/ciscoFlashFileTable/ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeTable": {
       "get": {
         "summary": "Get ciscoFlashFileByTypeTable data",
@@ -2820,162 +2307,6 @@
       },
       "x-yang-path": "/ciscoFlashFileByTypeTable/ciscoFlashFileByTypeEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeTable/ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashFileByTypeEntry entry",
-        "description": "Retrieve specific ciscoFlashFileByTypeEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashFileType": {
-                      "type": "string",
-                      "description": "ciscoFlashFileType",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashPartitionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashFileIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileByTypeSize": {
-                      "type": "integer",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileSize\n            object in ciscoFlashFileTable.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileByTypeChecksum": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileChecksum\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
-                    },
-                    "ciscoFlashFileByTypeStatus": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileStatus\n            object in ciscoFlashFileTable."
-                    },
-                    "ciscoFlashFileByTypeName": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileName\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashFileByTypeDate": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileDate\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "snmpv2-tc:DateAndTime"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry": {
-                    "ciscoFlashFileType": "ethernetCsmacd(6)",
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": "example-string",
-                    "ciscoFlashFileIndex": "example-string",
-                    "ciscoFlashFileByTypeSize": 0,
-                    "ciscoFlashFileByTypeChecksum": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeStatus": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeName": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeDate": "ethernetCsmacd(6)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashFileByTypeEntry-2"
-      },
-      "x-yang-path": "/ciscoFlashFileByTypeTable/ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
-      ]
     },
     "/data/CISCO-FLASH-MIB:ciscoFlashCopyTable": {
       "get": {
@@ -6113,161 +5444,6 @@
       "x-yang-path": "/ciscoFlashChipEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashChipEntry entry",
-        "description": "Retrieve specific ciscoFlashChipEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashChipIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashChipIndex": {
-                      "type": "integer",
-                      "description": "Chip sequence number within selected flash device.\n            Used to index within chip info table.\n            Value starts from 1 and should not be greater than\n            ciscoFlashDeviceChipCount for that device.\n            When retrieving chip information for chips within a\n            partition, the sequence number should lie between\n            ciscoFlashPartitionStartChip & ciscoFlashPartitionEndChip\n            (both inclusive).",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashChipCode": {
-                      "type": "string",
-                      "description": "Manufacturer and device code for a chip.\n            Lower byte will contain the device code.\n            Upper byte will contain the manufacturer code.\n            If a chip code is unknown because it could not\n            be queried out of the chip, the value of this\n            object will be 00:00.\n            Since programming algorithms differ from chip type to\n            chip type, this chip code should be used to determine\n            which algorithms to use (and thereby whether the chip\n            is supported in the first place).",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashChipDescr": {
-                      "type": "string",
-                      "description": "Flash chip name corresponding to the chip code.\n            The name will contain the manufacturer and the\n            chip type. It will be of the form :\n              Intel 27F008SA.\n            In the case where a chip code is unknown, this\n            object will be an empty (NULL) string.\n            In the case where the chip code is known but the\n            chip is not supported by the system, this object\n            will be an empty (NULL) string.\n            A management station is therefore expected to use the\n            chip code and the chip description in conjunction\n            to provide additional information whenever the\n            ciscoFlashPartitionStatus object has the readOnly(1)\n            value.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashChipWriteRetries": {
-                      "type": "integer",
-                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of write retries that were done in the chip.\n            If no writes have been done to Flash, the count\n            will be zero. Typically, a maximum of 25 retries are\n            done on a single location before flagging a write\n            error.\n            A management station is expected to get this object\n            for each chip in a partition after a write failure\n            in that partition. To keep a track of retries for\n            a given write operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any write operation.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipEraseRetries": {
-                      "type": "integer",
-                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of erase retries that were done in the chip.\n            Typically, a maximum of 2000 retries are done in a\n            single erase zone (which may be a full chip or a\n            portion, depending on the chip technology) before\n            flagging an erase error.\n            A management station is expected to get this object\n            for each chip in a partition after an erase failure\n            in that partition. To keep a track of retries for\n            a given erase operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any erase operation.\n            Note that erase may be done through an independent\n            command, or through a copy-to-flash command.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipMaxWriteRetries": {
-                      "type": "integer",
-                      "description": "The maximum number of write retries done at any\n            single location before declaring a write failure.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashChipMaxEraseRetries": {
-                      "type": "integer",
-                      "description": "The maximum number of erase retries done within\n            an erase sector before declaring an erase failure.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashChipEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashChipIndex": 1,
-                    "ciscoFlashChipCode": "192.168.1.1",
-                    "ciscoFlashChipDescr": "192.168.1.1",
-                    "ciscoFlashChipWriteRetries": 0,
-                    "ciscoFlashChipEraseRetries": 0,
-                    "ciscoFlashChipMaxWriteRetries": 0,
-                    "ciscoFlashChipMaxEraseRetries": 0
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashChipEntry-4"
-      },
-      "x-yang-path": "/ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashChipIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashPartitionEntry": {
       "get": {
         "summary": "Get ciscoFlashPartitionEntry list",
@@ -6463,207 +5639,6 @@
       "x-yang-path": "/ciscoFlashPartitionEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashPartitionEntry entry",
-        "description": "Retrieve specific ciscoFlashPartitionEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashPartitionIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "integer",
-                      "description": "Flash partition sequence number used to index within\n            table of initialized flash partitions.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionStartChip": {
-                      "type": "integer",
-                      "description": "Chip sequence number of first chip in partition.\n            Used as an index into the chip table.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionEndChip": {
-                      "type": "integer",
-                      "description": "Chip sequence number of last chip in partition.\n            Used as an index into the chip table.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionSize": {
-                      "type": "integer",
-                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            If the size of the flash partition is greater than the\n            maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionSizeExtended must be used to report the\n            flash partition's size.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionFreeSpace": {
-                      "type": "integer",
-                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            If the free space within a flash partition is greater than\n            the maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionFreeSpaceExtended\n            must be used to report the flash partition's free space.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionFileCount": {
-                      "type": "integer",
-                      "description": "Count of all files in a flash partition. Both\n            good and bad (deleted or invalid checksum) files\n            will be included in this count.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashPartitionChecksumAlgorithm": {
-                      "type": "string",
-                      "description": "Checksum algorithm identifier for checksum method\n            used by the file system. Normally, this would be\n            fixed for a particular file system. When a file\n            system writes a file to Flash, it checksums the\n            data written. The checksum then serves as a way\n            to validate the data read back whenever the file\n            is opened for reading.\n            Since there is no way, when using TFTP, to guarantee\n            that a network download has been error free (since\n            UDP checksums may not have been enabled), this\n            object together with the ciscoFlashFileChecksum\n            object provides a method for any management station\n            to regenerate the checksum of the original file\n            on the server and compare checksums to ensure that\n            the file download to Flash was error free.\n            simpleChecksum represents a simple 1s complement\n            addition of short word values. Other algorithm\n            values will be added as necessary."
-                    },
-                    "ciscoFlashPartitionStatus": {
-                      "type": "string",
-                      "description": "Flash partition status can be :\n            \n            * readOnly if device is not programmable either because\n            chips could not be recognized or an erroneous mismatch\n            of chips was detected. Chip recognition may fail either\n            because the chips are not supported by the system,\n            or because the Vpp voltage required to identify chips\n            has been disabled via the programming jumper.\n            The ciscoFlashDeviceProgrammingJumper, ciscoFlashChipCode,\n            and ciscoFlashChipDescr objects can be examined to get\n            more details on the cause of this status\n            * runFromFlash (RFF) if current image is running from\n            this partition.\n            The ciscoFlashPartitionUpgradeMethod object will then\n            indicate whether the Flash Load Helper can be used\n            to write a file to this partition or not.\n            \n            * readWrite if partition is programmable."
-                    },
-                    "ciscoFlashPartitionUpgradeMethod": {
-                      "type": "string",
-                      "description": "Flash partition upgrade method, ie., method by which\n            new files can be downloaded into the partition.\n            FLH stands for Flash Load Helper, a feature provided\n            on run-from-Flash systems for upgrading Flash. This\n            feature uses the bootstrap code in ROMs to help in\n            automatic download.\n            This object should be retrieved if the partition\n            status is runFromFlash(2).\n            If the partition status is readOnly(1), the upgrade\n            method would depend on the reason for the readOnly\n            status. For eg., it may simply be a matter of installing\n            the programming jumper, or it may require execution of a\n            later version of software that supports the Flash chips.\n            \n            unknown      -  the current system image does not know\n                            how Flash can be programmed. A possible\n                            method would be to reload the ROM image\n                            and perform the upgrade manually.\n            rxbootFLH    -  the Flash Load Helper is available to\n                            download files to Flash. A copy-to-flash\n                            command can be used and this system image\n                            will automatically reload the Rxboot image\n                            in ROM and direct it to carry out the\n                            download request.\n            direct       -  will be done directly by this image."
-                    },
-                    "ciscoFlashPartitionName": {
-                      "type": "string",
-                      "description": "Flash partition name used to refer to a partition\n            by the system. This can be any alpha-numeric character\n            string of the form AAAAAAAAnn, where A represents an\n            optional alpha character and n a numeric character.\n            Any numeric characters must always form the trailing\n            part of the string. The system will strip off the alpha\n            characters and use the numeric portion to map to a\n            partition index.\n            Flash operations get directed to a device partition\n            based on this name.\n            The system has a concept of a default partition. This\n            would be the first partition in the device. The system\n            directs an operation to the default partition whenever\n            a partition name is not specified.\n            The partition name is therefore mandatory except when\n            the operation is being done on the default partition, or\n            the device has just one partition (is not partitioned).",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashPartitionNeedErasure": {
-                      "type": "boolean",
-                      "description": "This object indicates whether a partition requires\n            erasure before any write operations can be done in it.\n            A management station should therefore retrieve this\n            object prior to attempting any write operation.\n            A partition requires erasure after it becomes full\n            free space left is less than or equal to the\n            (filesystem file header size).\n            A partition also requires erasure if the system does\n            not find the existence of any file system when it\n            boots up.\n            The partition may be erased explicitly through the\n            erase(5) command, or by using the copyToFlashWithErase(1)\n            command.\n            If a copyToFlashWithoutErase(2) command is issued\n            when this object has the TRUE value, the command\n            will fail."
-                    },
-                    "ciscoFlashPartitionFileNameLength": {
-                      "type": "integer",
-                      "description": "Maximum file name length supported by the file\n            system.\n            Max file name length will depend on the file\n            system implemented. Today, all file systems\n            support a max length of at least 48 bytes.\n            A management entity must use this object when\n            prompting a user for, or deriving the Flash file\n            name length.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "ciscoFlashPartitionSizeExtended": {
-                      "type": "integer",
-                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            This object is a 64-bit version of ciscoFlashPartitionSize",
-                      "minimum": 0
-                    },
-                    "ciscoFlashPartitionFreeSpaceExtended": {
-                      "type": "integer",
-                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            This object is a 64-bit version of ciscoFlashPartitionFreeSpace",
-                      "minimum": 0
-                    },
-                    "ciscoFlashPartitionLowSpaceNotifThreshold": {
-                      "type": "string",
-                      "description": "This object specifies the minimum threshold value in percentage\n            of free space for each partition. If the free space available\n            goes below this threshold value and if\n            ciscoFlashPartionLowSpaceNotifEnable is set to true,\n            ciscoFlashPartitionLowSpaceNotif will be generated. When the\n            available free space comes back to the threshold value\n            ciscoFlashPartionLowSpaceRecoveryNotif will be generated.",
-                      "x-yang-type": "cisco-qos:Percent"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashPartitionEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": 1,
-                    "ciscoFlashPartitionStartChip": -2147483648,
-                    "ciscoFlashPartitionEndChip": -2147483648,
-                    "ciscoFlashPartitionSize": 0,
-                    "ciscoFlashPartitionFreeSpace": 0,
-                    "ciscoFlashPartitionFileCount": 0,
-                    "ciscoFlashPartitionChecksumAlgorithm": "example-string",
-                    "ciscoFlashPartitionStatus": "up(1)",
-                    "ciscoFlashPartitionUpgradeMethod": "example-string",
-                    "ciscoFlashPartitionName": "interface-1",
-                    "ciscoFlashPartitionNeedErasure": true,
-                    "ciscoFlashPartitionFileNameLength": -2147483648,
-                    "ciscoFlashPartitionSizeExtended": 0,
-                    "ciscoFlashPartitionFreeSpaceExtended": 0,
-                    "ciscoFlashPartitionLowSpaceNotifThreshold": "example-string"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashPartitionEntry-4"
-      },
-      "x-yang-path": "/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashFileEntry": {
       "get": {
         "summary": "Get ciscoFlashFileEntry list",
@@ -6815,163 +5790,6 @@
       "x-yang-path": "/ciscoFlashFileEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-FLASH-MIB:ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashFileEntry entry",
-        "description": "Retrieve specific ciscoFlashFileEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashPartitionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileIndex": {
-                      "type": "integer",
-                      "description": "Flash file sequence number used to index within\n            a Flash partition directory table.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileSize": {
-                      "type": "integer",
-                      "description": "Size of the file in bytes. Note that this size does\n            not include the size of the filesystem file header.\n            File size will always be non-zero.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileChecksum": {
-                      "type": "string",
-                      "description": "File checksum stored in the file header. This\n            checksum is computed and stored when the file is\n            written into Flash. It serves to validate the data\n            written into Flash.\n            Whereas the system will generate and store the checksum\n            internally in hexadecimal form, this object will\n            provide the checksum in a string form.\n            The checksum will be available for all valid and\n            invalid-checksum files.",
-                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
-                    },
-                    "ciscoFlashFileStatus": {
-                      "type": "string",
-                      "description": "Status of a file.\n            A file could be explicitly deleted if the file system\n            supports such a user command facility. Alternately,\n            an existing good file would be automatically deleted\n            if another good file with the same name were copied in.\n            Note that deleted files continue to occupy prime\n            Flash real estate.\n            \n            A file is marked as having an invalid checksum if any\n            checksum mismatch was detected while writing or reading\n            the file. Incomplete files (files truncated either\n            because of lack of free space, or a network download\n            failure) are also written with a bad checksum and\n            marked as invalid."
-                    },
-                    "ciscoFlashFileName": {
-                      "type": "string",
-                      "description": "Flash file name as specified by the user copying in\n            the file. The name should not include the colon (:)\n            character as it is a special separator character used\n            to delineate the device name, partition name, and the\n            file name.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashFileType": {
-                      "type": "string",
-                      "description": "Type of the file.",
-                      "x-yang-type": "CISCO-FLASH-MIB:FlashFileType"
-                    },
-                    "ciscoFlashFileDate": {
-                      "type": "string",
-                      "description": "The time at which this file was created.",
-                      "x-yang-type": "snmpv2-tc:DateAndTime"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashFileEntry": {
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": "example-string",
-                    "ciscoFlashFileIndex": 1,
-                    "ciscoFlashFileSize": 0,
-                    "ciscoFlashFileChecksum": "example-string",
-                    "ciscoFlashFileStatus": "up(1)",
-                    "ciscoFlashFileName": "interface-1",
-                    "ciscoFlashFileType": "ethernetCsmacd(6)",
-                    "ciscoFlashFileDate": "example-string"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashFileEntry-4"
-      },
-      "x-yang-path": "/ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
-      ]
-    },
     "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry": {
       "get": {
         "summary": "Get ciscoFlashFileByTypeEntry list",
@@ -7121,162 +5939,6 @@
       },
       "x-yang-path": "/ciscoFlashFileByTypeEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}": {
-      "get": {
-        "summary": "Get ciscoFlashFileByTypeEntry entry",
-        "description": "Retrieve specific ciscoFlashFileByTypeEntry entry by key from MIB",
-        "tags": [
-          "CISCO-FLASH-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ciscoFlashFileType": {
-                      "type": "string",
-                      "description": "ciscoFlashFileType",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashDeviceIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashDeviceIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashPartitionIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashPartitionIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileIndex": {
-                      "type": "string",
-                      "description": "ciscoFlashFileIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "ciscoFlashFileByTypeSize": {
-                      "type": "integer",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileSize\n            object in ciscoFlashFileTable.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "ciscoFlashFileByTypeChecksum": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileChecksum\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
-                    },
-                    "ciscoFlashFileByTypeStatus": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileStatus\n            object in ciscoFlashFileTable."
-                    },
-                    "ciscoFlashFileByTypeName": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileName\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "snmpv2-tc:DisplayString"
-                    },
-                    "ciscoFlashFileByTypeDate": {
-                      "type": "string",
-                      "description": "This object represents exactly the\n            same info as ciscoFlashFileDate\n            object in ciscoFlashFileTable.",
-                      "x-yang-type": "snmpv2-tc:DateAndTime"
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry": {
-                    "ciscoFlashFileType": "ethernetCsmacd(6)",
-                    "ciscoFlashDeviceIndex": "example-string",
-                    "ciscoFlashPartitionIndex": "example-string",
-                    "ciscoFlashFileIndex": "example-string",
-                    "ciscoFlashFileByTypeSize": 0,
-                    "ciscoFlashFileByTypeChecksum": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeStatus": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeName": "ethernetCsmacd(6)",
-                    "ciscoFlashFileByTypeDate": "ethernetCsmacd(6)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-ciscoFlashFileByTypeEntry-4"
-      },
-      "x-yang-path": "/ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
-      ]
     },
     "/data/CISCO-FLASH-MIB:ciscoFlashCopyEntry": {
       "get": {
@@ -8126,6 +6788,1448 @@
       "x-restconf-kind": "list-instance",
       "x-list-keys": [
         "ciscoFlashMiscOpSerialNumber"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashChipTable/ciscoFlashChipEntry={ciscoFlashDeviceIndex},{ciscoFlashChipIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashChipEntry entry",
+        "description": "Retrieve specific ciscoFlashChipEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashChipIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashChipIndex": {
+                      "type": "integer",
+                      "description": "Chip sequence number within selected flash device.\n            Used to index within chip info table.\n            Value starts from 1 and should not be greater than\n            ciscoFlashDeviceChipCount for that device.\n            When retrieving chip information for chips within a\n            partition, the sequence number should lie between\n            ciscoFlashPartitionStartChip & ciscoFlashPartitionEndChip\n            (both inclusive).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashChipCode": {
+                      "type": "string",
+                      "description": "Manufacturer and device code for a chip.\n            Lower byte will contain the device code.\n            Upper byte will contain the manufacturer code.\n            If a chip code is unknown because it could not\n            be queried out of the chip, the value of this\n            object will be 00:00.\n            Since programming algorithms differ from chip type to\n            chip type, this chip code should be used to determine\n            which algorithms to use (and thereby whether the chip\n            is supported in the first place).",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashChipDescr": {
+                      "type": "string",
+                      "description": "Flash chip name corresponding to the chip code.\n            The name will contain the manufacturer and the\n            chip type. It will be of the form :\n              Intel 27F008SA.\n            In the case where a chip code is unknown, this\n            object will be an empty (NULL) string.\n            In the case where the chip code is known but the\n            chip is not supported by the system, this object\n            will be an empty (NULL) string.\n            A management station is therefore expected to use the\n            chip code and the chip description in conjunction\n            to provide additional information whenever the\n            ciscoFlashPartitionStatus object has the readOnly(1)\n            value.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashChipWriteRetries": {
+                      "type": "integer",
+                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of write retries that were done in the chip.\n            If no writes have been done to Flash, the count\n            will be zero. Typically, a maximum of 25 retries are\n            done on a single location before flagging a write\n            error.\n            A management station is expected to get this object\n            for each chip in a partition after a write failure\n            in that partition. To keep a track of retries for\n            a given write operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any write operation.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipEraseRetries": {
+                      "type": "integer",
+                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of erase retries that were done in the chip.\n            Typically, a maximum of 2000 retries are done in a\n            single erase zone (which may be a full chip or a\n            portion, depending on the chip technology) before\n            flagging an erase error.\n            A management station is expected to get this object\n            for each chip in a partition after an erase failure\n            in that partition. To keep a track of retries for\n            a given erase operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any erase operation.\n            Note that erase may be done through an independent\n            command, or through a copy-to-flash command.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipMaxWriteRetries": {
+                      "type": "integer",
+                      "description": "The maximum number of write retries done at any\n            single location before declaring a write failure.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipMaxEraseRetries": {
+                      "type": "integer",
+                      "description": "The maximum number of erase retries done within\n            an erase sector before declaring an erase failure.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashChipEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashChipIndex": 1,
+                    "ciscoFlashChipCode": "192.168.1.1",
+                    "ciscoFlashChipDescr": "192.168.1.1",
+                    "ciscoFlashChipWriteRetries": 0,
+                    "ciscoFlashChipEraseRetries": 0,
+                    "ciscoFlashChipMaxWriteRetries": 0,
+                    "ciscoFlashChipMaxEraseRetries": 0
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashChipEntry-2"
+      },
+      "x-yang-path": "/ciscoFlashChipTable/ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashChipIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashPartitionTable/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashPartitionEntry entry",
+        "description": "Retrieve specific ciscoFlashPartitionEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "integer",
+                      "description": "Flash partition sequence number used to index within\n            table of initialized flash partitions.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionStartChip": {
+                      "type": "integer",
+                      "description": "Chip sequence number of first chip in partition.\n            Used as an index into the chip table.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionEndChip": {
+                      "type": "integer",
+                      "description": "Chip sequence number of last chip in partition.\n            Used as an index into the chip table.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionSize": {
+                      "type": "integer",
+                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            If the size of the flash partition is greater than the\n            maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionSizeExtended must be used to report the\n            flash partition's size.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionFreeSpace": {
+                      "type": "integer",
+                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            If the free space within a flash partition is greater than\n            the maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionFreeSpaceExtended\n            must be used to report the flash partition's free space.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionFileCount": {
+                      "type": "integer",
+                      "description": "Count of all files in a flash partition. Both\n            good and bad (deleted or invalid checksum) files\n            will be included in this count.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionChecksumAlgorithm": {
+                      "type": "string",
+                      "description": "Checksum algorithm identifier for checksum method\n            used by the file system. Normally, this would be\n            fixed for a particular file system. When a file\n            system writes a file to Flash, it checksums the\n            data written. The checksum then serves as a way\n            to validate the data read back whenever the file\n            is opened for reading.\n            Since there is no way, when using TFTP, to guarantee\n            that a network download has been error free (since\n            UDP checksums may not have been enabled), this\n            object together with the ciscoFlashFileChecksum\n            object provides a method for any management station\n            to regenerate the checksum of the original file\n            on the server and compare checksums to ensure that\n            the file download to Flash was error free.\n            simpleChecksum represents a simple 1s complement\n            addition of short word values. Other algorithm\n            values will be added as necessary."
+                    },
+                    "ciscoFlashPartitionStatus": {
+                      "type": "string",
+                      "description": "Flash partition status can be :\n            \n            * readOnly if device is not programmable either because\n            chips could not be recognized or an erroneous mismatch\n            of chips was detected. Chip recognition may fail either\n            because the chips are not supported by the system,\n            or because the Vpp voltage required to identify chips\n            has been disabled via the programming jumper.\n            The ciscoFlashDeviceProgrammingJumper, ciscoFlashChipCode,\n            and ciscoFlashChipDescr objects can be examined to get\n            more details on the cause of this status\n            * runFromFlash (RFF) if current image is running from\n            this partition.\n            The ciscoFlashPartitionUpgradeMethod object will then\n            indicate whether the Flash Load Helper can be used\n            to write a file to this partition or not.\n            \n            * readWrite if partition is programmable."
+                    },
+                    "ciscoFlashPartitionUpgradeMethod": {
+                      "type": "string",
+                      "description": "Flash partition upgrade method, ie., method by which\n            new files can be downloaded into the partition.\n            FLH stands for Flash Load Helper, a feature provided\n            on run-from-Flash systems for upgrading Flash. This\n            feature uses the bootstrap code in ROMs to help in\n            automatic download.\n            This object should be retrieved if the partition\n            status is runFromFlash(2).\n            If the partition status is readOnly(1), the upgrade\n            method would depend on the reason for the readOnly\n            status. For eg., it may simply be a matter of installing\n            the programming jumper, or it may require execution of a\n            later version of software that supports the Flash chips.\n            \n            unknown      -  the current system image does not know\n                            how Flash can be programmed. A possible\n                            method would be to reload the ROM image\n                            and perform the upgrade manually.\n            rxbootFLH    -  the Flash Load Helper is available to\n                            download files to Flash. A copy-to-flash\n                            command can be used and this system image\n                            will automatically reload the Rxboot image\n                            in ROM and direct it to carry out the\n                            download request.\n            direct       -  will be done directly by this image."
+                    },
+                    "ciscoFlashPartitionName": {
+                      "type": "string",
+                      "description": "Flash partition name used to refer to a partition\n            by the system. This can be any alpha-numeric character\n            string of the form AAAAAAAAnn, where A represents an\n            optional alpha character and n a numeric character.\n            Any numeric characters must always form the trailing\n            part of the string. The system will strip off the alpha\n            characters and use the numeric portion to map to a\n            partition index.\n            Flash operations get directed to a device partition\n            based on this name.\n            The system has a concept of a default partition. This\n            would be the first partition in the device. The system\n            directs an operation to the default partition whenever\n            a partition name is not specified.\n            The partition name is therefore mandatory except when\n            the operation is being done on the default partition, or\n            the device has just one partition (is not partitioned).",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashPartitionNeedErasure": {
+                      "type": "boolean",
+                      "description": "This object indicates whether a partition requires\n            erasure before any write operations can be done in it.\n            A management station should therefore retrieve this\n            object prior to attempting any write operation.\n            A partition requires erasure after it becomes full\n            free space left is less than or equal to the\n            (filesystem file header size).\n            A partition also requires erasure if the system does\n            not find the existence of any file system when it\n            boots up.\n            The partition may be erased explicitly through the\n            erase(5) command, or by using the copyToFlashWithErase(1)\n            command.\n            If a copyToFlashWithoutErase(2) command is issued\n            when this object has the TRUE value, the command\n            will fail."
+                    },
+                    "ciscoFlashPartitionFileNameLength": {
+                      "type": "integer",
+                      "description": "Maximum file name length supported by the file\n            system.\n            Max file name length will depend on the file\n            system implemented. Today, all file systems\n            support a max length of at least 48 bytes.\n            A management entity must use this object when\n            prompting a user for, or deriving the Flash file\n            name length.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionSizeExtended": {
+                      "type": "integer",
+                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            This object is a 64-bit version of ciscoFlashPartitionSize",
+                      "minimum": 0
+                    },
+                    "ciscoFlashPartitionFreeSpaceExtended": {
+                      "type": "integer",
+                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            This object is a 64-bit version of ciscoFlashPartitionFreeSpace",
+                      "minimum": 0
+                    },
+                    "ciscoFlashPartitionLowSpaceNotifThreshold": {
+                      "type": "string",
+                      "description": "This object specifies the minimum threshold value in percentage\n            of free space for each partition. If the free space available\n            goes below this threshold value and if\n            ciscoFlashPartionLowSpaceNotifEnable is set to true,\n            ciscoFlashPartitionLowSpaceNotif will be generated. When the\n            available free space comes back to the threshold value\n            ciscoFlashPartionLowSpaceRecoveryNotif will be generated.",
+                      "x-yang-type": "cisco-qos:Percent"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashPartitionEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": 1,
+                    "ciscoFlashPartitionStartChip": -2147483648,
+                    "ciscoFlashPartitionEndChip": -2147483648,
+                    "ciscoFlashPartitionSize": 0,
+                    "ciscoFlashPartitionFreeSpace": 0,
+                    "ciscoFlashPartitionFileCount": 0,
+                    "ciscoFlashPartitionChecksumAlgorithm": "example-string",
+                    "ciscoFlashPartitionStatus": "up(1)",
+                    "ciscoFlashPartitionUpgradeMethod": "example-string",
+                    "ciscoFlashPartitionName": "interface-1",
+                    "ciscoFlashPartitionNeedErasure": true,
+                    "ciscoFlashPartitionFileNameLength": -2147483648,
+                    "ciscoFlashPartitionSizeExtended": 0,
+                    "ciscoFlashPartitionFreeSpaceExtended": 0,
+                    "ciscoFlashPartitionLowSpaceNotifThreshold": "example-string"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashPartitionEntry-2"
+      },
+      "x-yang-path": "/ciscoFlashPartitionTable/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashFileTable/ciscoFlashFileEntry={ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex},{ciscoFlashFileIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashFileEntry entry",
+        "description": "Retrieve specific ciscoFlashFileEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashFileIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashPartitionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileIndex": {
+                      "type": "integer",
+                      "description": "Flash file sequence number used to index within\n            a Flash partition directory table.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileSize": {
+                      "type": "integer",
+                      "description": "Size of the file in bytes. Note that this size does\n            not include the size of the filesystem file header.\n            File size will always be non-zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileChecksum": {
+                      "type": "string",
+                      "description": "File checksum stored in the file header. This\n            checksum is computed and stored when the file is\n            written into Flash. It serves to validate the data\n            written into Flash.\n            Whereas the system will generate and store the checksum\n            internally in hexadecimal form, this object will\n            provide the checksum in a string form.\n            The checksum will be available for all valid and\n            invalid-checksum files.",
+                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
+                    },
+                    "ciscoFlashFileStatus": {
+                      "type": "string",
+                      "description": "Status of a file.\n            A file could be explicitly deleted if the file system\n            supports such a user command facility. Alternately,\n            an existing good file would be automatically deleted\n            if another good file with the same name were copied in.\n            Note that deleted files continue to occupy prime\n            Flash real estate.\n            \n            A file is marked as having an invalid checksum if any\n            checksum mismatch was detected while writing or reading\n            the file. Incomplete files (files truncated either\n            because of lack of free space, or a network download\n            failure) are also written with a bad checksum and\n            marked as invalid."
+                    },
+                    "ciscoFlashFileName": {
+                      "type": "string",
+                      "description": "Flash file name as specified by the user copying in\n            the file. The name should not include the colon (:)\n            character as it is a special separator character used\n            to delineate the device name, partition name, and the\n            file name.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashFileType": {
+                      "type": "string",
+                      "description": "Type of the file.",
+                      "x-yang-type": "CISCO-FLASH-MIB:FlashFileType"
+                    },
+                    "ciscoFlashFileDate": {
+                      "type": "string",
+                      "description": "The time at which this file was created.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashFileEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": "example-string",
+                    "ciscoFlashFileIndex": 1,
+                    "ciscoFlashFileSize": 0,
+                    "ciscoFlashFileChecksum": "example-string",
+                    "ciscoFlashFileStatus": "up(1)",
+                    "ciscoFlashFileName": "interface-1",
+                    "ciscoFlashFileType": "ethernetCsmacd(6)",
+                    "ciscoFlashFileDate": "example-string"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashFileEntry-2"
+      },
+      "x-yang-path": "/ciscoFlashFileTable/ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeTable/ciscoFlashFileByTypeEntry={ciscoFlashFileType},{ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex},{ciscoFlashFileIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashFileByTypeEntry entry",
+        "description": "Retrieve specific ciscoFlashFileByTypeEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashFileType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashFileIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashFileType": {
+                      "type": "string",
+                      "description": "ciscoFlashFileType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashPartitionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashFileIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileByTypeSize": {
+                      "type": "integer",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileSize\n            object in ciscoFlashFileTable.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileByTypeChecksum": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileChecksum\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
+                    },
+                    "ciscoFlashFileByTypeStatus": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileStatus\n            object in ciscoFlashFileTable."
+                    },
+                    "ciscoFlashFileByTypeName": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileName\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashFileByTypeDate": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileDate\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry": {
+                    "ciscoFlashFileType": "ethernetCsmacd(6)",
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": "example-string",
+                    "ciscoFlashFileIndex": "example-string",
+                    "ciscoFlashFileByTypeSize": 0,
+                    "ciscoFlashFileByTypeChecksum": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeStatus": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeName": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeDate": "ethernetCsmacd(6)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashFileByTypeEntry-2"
+      },
+      "x-yang-path": "/ciscoFlashFileByTypeTable/ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashChipEntry={ciscoFlashDeviceIndex},{ciscoFlashChipIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashChipEntry entry",
+        "description": "Retrieve specific ciscoFlashChipEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashChipIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashChipIndex": {
+                      "type": "integer",
+                      "description": "Chip sequence number within selected flash device.\n            Used to index within chip info table.\n            Value starts from 1 and should not be greater than\n            ciscoFlashDeviceChipCount for that device.\n            When retrieving chip information for chips within a\n            partition, the sequence number should lie between\n            ciscoFlashPartitionStartChip & ciscoFlashPartitionEndChip\n            (both inclusive).",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashChipCode": {
+                      "type": "string",
+                      "description": "Manufacturer and device code for a chip.\n            Lower byte will contain the device code.\n            Upper byte will contain the manufacturer code.\n            If a chip code is unknown because it could not\n            be queried out of the chip, the value of this\n            object will be 00:00.\n            Since programming algorithms differ from chip type to\n            chip type, this chip code should be used to determine\n            which algorithms to use (and thereby whether the chip\n            is supported in the first place).",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashChipDescr": {
+                      "type": "string",
+                      "description": "Flash chip name corresponding to the chip code.\n            The name will contain the manufacturer and the\n            chip type. It will be of the form :\n              Intel 27F008SA.\n            In the case where a chip code is unknown, this\n            object will be an empty (NULL) string.\n            In the case where the chip code is known but the\n            chip is not supported by the system, this object\n            will be an empty (NULL) string.\n            A management station is therefore expected to use the\n            chip code and the chip description in conjunction\n            to provide additional information whenever the\n            ciscoFlashPartitionStatus object has the readOnly(1)\n            value.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashChipWriteRetries": {
+                      "type": "integer",
+                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of write retries that were done in the chip.\n            If no writes have been done to Flash, the count\n            will be zero. Typically, a maximum of 25 retries are\n            done on a single location before flagging a write\n            error.\n            A management station is expected to get this object\n            for each chip in a partition after a write failure\n            in that partition. To keep a track of retries for\n            a given write operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any write operation.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipEraseRetries": {
+                      "type": "integer",
+                      "description": "This object will provide a cumulative count\n            (since last system boot up or initialization) of\n            the number of erase retries that were done in the chip.\n            Typically, a maximum of 2000 retries are done in a\n            single erase zone (which may be a full chip or a\n            portion, depending on the chip technology) before\n            flagging an erase error.\n            A management station is expected to get this object\n            for each chip in a partition after an erase failure\n            in that partition. To keep a track of retries for\n            a given erase operation, the management station would\n            have to retrieve the values for the concerned chips\n            before and after any erase operation.\n            Note that erase may be done through an independent\n            command, or through a copy-to-flash command.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipMaxWriteRetries": {
+                      "type": "integer",
+                      "description": "The maximum number of write retries done at any\n            single location before declaring a write failure.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashChipMaxEraseRetries": {
+                      "type": "integer",
+                      "description": "The maximum number of erase retries done within\n            an erase sector before declaring an erase failure.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashChipEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashChipIndex": 1,
+                    "ciscoFlashChipCode": "192.168.1.1",
+                    "ciscoFlashChipDescr": "192.168.1.1",
+                    "ciscoFlashChipWriteRetries": 0,
+                    "ciscoFlashChipEraseRetries": 0,
+                    "ciscoFlashChipMaxWriteRetries": 0,
+                    "ciscoFlashChipMaxEraseRetries": 0
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashChipEntry-4"
+      },
+      "x-yang-path": "/ciscoFlashChipEntry={ciscoFlashDeviceIndex ciscoFlashChipIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashChipIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashPartitionEntry={ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashPartitionEntry entry",
+        "description": "Retrieve specific ciscoFlashPartitionEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "integer",
+                      "description": "Flash partition sequence number used to index within\n            table of initialized flash partitions.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionStartChip": {
+                      "type": "integer",
+                      "description": "Chip sequence number of first chip in partition.\n            Used as an index into the chip table.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionEndChip": {
+                      "type": "integer",
+                      "description": "Chip sequence number of last chip in partition.\n            Used as an index into the chip table.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionSize": {
+                      "type": "integer",
+                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            If the size of the flash partition is greater than the\n            maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionSizeExtended must be used to report the\n            flash partition's size.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionFreeSpace": {
+                      "type": "integer",
+                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            If the free space within a flash partition is greater than\n            the maximum value reportable by this object then this object\n            should report its maximum value(4,294,967,295) and\n            ciscoFlashPartitionFreeSpaceExtended\n            must be used to report the flash partition's free space.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionFileCount": {
+                      "type": "integer",
+                      "description": "Count of all files in a flash partition. Both\n            good and bad (deleted or invalid checksum) files\n            will be included in this count.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashPartitionChecksumAlgorithm": {
+                      "type": "string",
+                      "description": "Checksum algorithm identifier for checksum method\n            used by the file system. Normally, this would be\n            fixed for a particular file system. When a file\n            system writes a file to Flash, it checksums the\n            data written. The checksum then serves as a way\n            to validate the data read back whenever the file\n            is opened for reading.\n            Since there is no way, when using TFTP, to guarantee\n            that a network download has been error free (since\n            UDP checksums may not have been enabled), this\n            object together with the ciscoFlashFileChecksum\n            object provides a method for any management station\n            to regenerate the checksum of the original file\n            on the server and compare checksums to ensure that\n            the file download to Flash was error free.\n            simpleChecksum represents a simple 1s complement\n            addition of short word values. Other algorithm\n            values will be added as necessary."
+                    },
+                    "ciscoFlashPartitionStatus": {
+                      "type": "string",
+                      "description": "Flash partition status can be :\n            \n            * readOnly if device is not programmable either because\n            chips could not be recognized or an erroneous mismatch\n            of chips was detected. Chip recognition may fail either\n            because the chips are not supported by the system,\n            or because the Vpp voltage required to identify chips\n            has been disabled via the programming jumper.\n            The ciscoFlashDeviceProgrammingJumper, ciscoFlashChipCode,\n            and ciscoFlashChipDescr objects can be examined to get\n            more details on the cause of this status\n            * runFromFlash (RFF) if current image is running from\n            this partition.\n            The ciscoFlashPartitionUpgradeMethod object will then\n            indicate whether the Flash Load Helper can be used\n            to write a file to this partition or not.\n            \n            * readWrite if partition is programmable."
+                    },
+                    "ciscoFlashPartitionUpgradeMethod": {
+                      "type": "string",
+                      "description": "Flash partition upgrade method, ie., method by which\n            new files can be downloaded into the partition.\n            FLH stands for Flash Load Helper, a feature provided\n            on run-from-Flash systems for upgrading Flash. This\n            feature uses the bootstrap code in ROMs to help in\n            automatic download.\n            This object should be retrieved if the partition\n            status is runFromFlash(2).\n            If the partition status is readOnly(1), the upgrade\n            method would depend on the reason for the readOnly\n            status. For eg., it may simply be a matter of installing\n            the programming jumper, or it may require execution of a\n            later version of software that supports the Flash chips.\n            \n            unknown      -  the current system image does not know\n                            how Flash can be programmed. A possible\n                            method would be to reload the ROM image\n                            and perform the upgrade manually.\n            rxbootFLH    -  the Flash Load Helper is available to\n                            download files to Flash. A copy-to-flash\n                            command can be used and this system image\n                            will automatically reload the Rxboot image\n                            in ROM and direct it to carry out the\n                            download request.\n            direct       -  will be done directly by this image."
+                    },
+                    "ciscoFlashPartitionName": {
+                      "type": "string",
+                      "description": "Flash partition name used to refer to a partition\n            by the system. This can be any alpha-numeric character\n            string of the form AAAAAAAAnn, where A represents an\n            optional alpha character and n a numeric character.\n            Any numeric characters must always form the trailing\n            part of the string. The system will strip off the alpha\n            characters and use the numeric portion to map to a\n            partition index.\n            Flash operations get directed to a device partition\n            based on this name.\n            The system has a concept of a default partition. This\n            would be the first partition in the device. The system\n            directs an operation to the default partition whenever\n            a partition name is not specified.\n            The partition name is therefore mandatory except when\n            the operation is being done on the default partition, or\n            the device has just one partition (is not partitioned).",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashPartitionNeedErasure": {
+                      "type": "boolean",
+                      "description": "This object indicates whether a partition requires\n            erasure before any write operations can be done in it.\n            A management station should therefore retrieve this\n            object prior to attempting any write operation.\n            A partition requires erasure after it becomes full\n            free space left is less than or equal to the\n            (filesystem file header size).\n            A partition also requires erasure if the system does\n            not find the existence of any file system when it\n            boots up.\n            The partition may be erased explicitly through the\n            erase(5) command, or by using the copyToFlashWithErase(1)\n            command.\n            If a copyToFlashWithoutErase(2) command is issued\n            when this object has the TRUE value, the command\n            will fail."
+                    },
+                    "ciscoFlashPartitionFileNameLength": {
+                      "type": "integer",
+                      "description": "Maximum file name length supported by the file\n            system.\n            Max file name length will depend on the file\n            system implemented. Today, all file systems\n            support a max length of at least 48 bytes.\n            A management entity must use this object when\n            prompting a user for, or deriving the Flash file\n            name length.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "ciscoFlashPartitionSizeExtended": {
+                      "type": "integer",
+                      "description": "Flash partition size. It should be an integral\n            multiple of ciscoFlashDeviceMinPartitionSize.\n            If there is a single partition, this size will be equal\n            to ciscoFlashDeviceSize.\n            \n            This object is a 64-bit version of ciscoFlashPartitionSize",
+                      "minimum": 0
+                    },
+                    "ciscoFlashPartitionFreeSpaceExtended": {
+                      "type": "integer",
+                      "description": "Free space within a Flash partition.\n            Note that the actual size of a file in Flash includes\n            a small overhead that represents the file system's\n            file header.\n            Certain file systems may also have a partition or\n            device header overhead to be considered when\n            computing the free space.\n            Free space will be computed as total partition size\n            less size of all existing files (valid/invalid/deleted\n            files and including file header of each file),\n            less size of any partition header, less size of\n            header of next file to be copied in. In short, this\n            object will give the size of the largest file that\n            can be copied in. The management entity will not be\n            expected to know or use any overheads such as file\n            and partition header lengths, since such overheads\n            may vary from file system to file system.\n            Deleted files in Flash do not free up space.\n            A partition may have to be erased in order to reclaim\n            the space occupied by files.\n            \n            This object is a 64-bit version of ciscoFlashPartitionFreeSpace",
+                      "minimum": 0
+                    },
+                    "ciscoFlashPartitionLowSpaceNotifThreshold": {
+                      "type": "string",
+                      "description": "This object specifies the minimum threshold value in percentage\n            of free space for each partition. If the free space available\n            goes below this threshold value and if\n            ciscoFlashPartionLowSpaceNotifEnable is set to true,\n            ciscoFlashPartitionLowSpaceNotif will be generated. When the\n            available free space comes back to the threshold value\n            ciscoFlashPartionLowSpaceRecoveryNotif will be generated.",
+                      "x-yang-type": "cisco-qos:Percent"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashPartitionEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": 1,
+                    "ciscoFlashPartitionStartChip": -2147483648,
+                    "ciscoFlashPartitionEndChip": -2147483648,
+                    "ciscoFlashPartitionSize": 0,
+                    "ciscoFlashPartitionFreeSpace": 0,
+                    "ciscoFlashPartitionFileCount": 0,
+                    "ciscoFlashPartitionChecksumAlgorithm": "example-string",
+                    "ciscoFlashPartitionStatus": "up(1)",
+                    "ciscoFlashPartitionUpgradeMethod": "example-string",
+                    "ciscoFlashPartitionName": "interface-1",
+                    "ciscoFlashPartitionNeedErasure": true,
+                    "ciscoFlashPartitionFileNameLength": -2147483648,
+                    "ciscoFlashPartitionSizeExtended": 0,
+                    "ciscoFlashPartitionFreeSpaceExtended": 0,
+                    "ciscoFlashPartitionLowSpaceNotifThreshold": "example-string"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashPartitionEntry-4"
+      },
+      "x-yang-path": "/ciscoFlashPartitionEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashFileEntry={ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex},{ciscoFlashFileIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashFileEntry entry",
+        "description": "Retrieve specific ciscoFlashFileEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashFileIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashPartitionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileIndex": {
+                      "type": "integer",
+                      "description": "Flash file sequence number used to index within\n            a Flash partition directory table.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileSize": {
+                      "type": "integer",
+                      "description": "Size of the file in bytes. Note that this size does\n            not include the size of the filesystem file header.\n            File size will always be non-zero.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileChecksum": {
+                      "type": "string",
+                      "description": "File checksum stored in the file header. This\n            checksum is computed and stored when the file is\n            written into Flash. It serves to validate the data\n            written into Flash.\n            Whereas the system will generate and store the checksum\n            internally in hexadecimal form, this object will\n            provide the checksum in a string form.\n            The checksum will be available for all valid and\n            invalid-checksum files.",
+                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
+                    },
+                    "ciscoFlashFileStatus": {
+                      "type": "string",
+                      "description": "Status of a file.\n            A file could be explicitly deleted if the file system\n            supports such a user command facility. Alternately,\n            an existing good file would be automatically deleted\n            if another good file with the same name were copied in.\n            Note that deleted files continue to occupy prime\n            Flash real estate.\n            \n            A file is marked as having an invalid checksum if any\n            checksum mismatch was detected while writing or reading\n            the file. Incomplete files (files truncated either\n            because of lack of free space, or a network download\n            failure) are also written with a bad checksum and\n            marked as invalid."
+                    },
+                    "ciscoFlashFileName": {
+                      "type": "string",
+                      "description": "Flash file name as specified by the user copying in\n            the file. The name should not include the colon (:)\n            character as it is a special separator character used\n            to delineate the device name, partition name, and the\n            file name.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashFileType": {
+                      "type": "string",
+                      "description": "Type of the file.",
+                      "x-yang-type": "CISCO-FLASH-MIB:FlashFileType"
+                    },
+                    "ciscoFlashFileDate": {
+                      "type": "string",
+                      "description": "The time at which this file was created.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashFileEntry": {
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": "example-string",
+                    "ciscoFlashFileIndex": 1,
+                    "ciscoFlashFileSize": 0,
+                    "ciscoFlashFileChecksum": "example-string",
+                    "ciscoFlashFileStatus": "up(1)",
+                    "ciscoFlashFileName": "interface-1",
+                    "ciscoFlashFileType": "ethernetCsmacd(6)",
+                    "ciscoFlashFileDate": "example-string"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashFileEntry-4"
+      },
+      "x-yang-path": "/ciscoFlashFileEntry={ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
+      ]
+    },
+    "/data/CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry={ciscoFlashFileType},{ciscoFlashDeviceIndex},{ciscoFlashPartitionIndex},{ciscoFlashFileIndex}": {
+      "get": {
+        "summary": "Get ciscoFlashFileByTypeEntry entry",
+        "description": "Retrieve specific ciscoFlashFileByTypeEntry entry by key from MIB",
+        "tags": [
+          "CISCO-FLASH-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ciscoFlashFileType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashDeviceIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashPartitionIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ciscoFlashFileIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ciscoFlashFileType": {
+                      "type": "string",
+                      "description": "ciscoFlashFileType",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashDeviceIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashDeviceIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashPartitionIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashPartitionIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileIndex": {
+                      "type": "string",
+                      "description": "ciscoFlashFileIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "ciscoFlashFileByTypeSize": {
+                      "type": "integer",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileSize\n            object in ciscoFlashFileTable.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "ciscoFlashFileByTypeChecksum": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileChecksum\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "CISCO-FLASH-MIB:ChecksumString"
+                    },
+                    "ciscoFlashFileByTypeStatus": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileStatus\n            object in ciscoFlashFileTable."
+                    },
+                    "ciscoFlashFileByTypeName": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileName\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "snmpv2-tc:DisplayString"
+                    },
+                    "ciscoFlashFileByTypeDate": {
+                      "type": "string",
+                      "description": "This object represents exactly the\n            same info as ciscoFlashFileDate\n            object in ciscoFlashFileTable.",
+                      "x-yang-type": "snmpv2-tc:DateAndTime"
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-FLASH-MIB:ciscoFlashFileByTypeEntry": {
+                    "ciscoFlashFileType": "ethernetCsmacd(6)",
+                    "ciscoFlashDeviceIndex": "example-string",
+                    "ciscoFlashPartitionIndex": "example-string",
+                    "ciscoFlashFileIndex": "example-string",
+                    "ciscoFlashFileByTypeSize": 0,
+                    "ciscoFlashFileByTypeChecksum": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeStatus": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeName": "ethernetCsmacd(6)",
+                    "ciscoFlashFileByTypeDate": "ethernetCsmacd(6)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-ciscoFlashFileByTypeEntry-4"
+      },
+      "x-yang-path": "/ciscoFlashFileByTypeEntry={ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ciscoFlashFileType ciscoFlashDeviceIndex ciscoFlashPartitionIndex ciscoFlashFileIndex"
       ]
     }
   },

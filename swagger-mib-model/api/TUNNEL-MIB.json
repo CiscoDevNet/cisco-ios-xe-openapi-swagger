@@ -869,145 +869,6 @@
       "x-yang-path": "/tunnelConfigTable/tunnelConfigEntry",
       "x-restconf-kind": "container"
     },
-    "/data/TUNNEL-MIB:tunnelConfigTable/tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}": {
-      "get": {
-        "summary": "Get tunnelConfigEntry entry",
-        "description": "Retrieve specific tunnelConfigEntry entry by key from MIB",
-        "tags": [
-          "TUNNEL-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tunnelConfigLocalAddress": {
-                      "type": "string",
-                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 if the device is free to choose any of its\n            addresses at tunnel establishment time.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigLocalAddress.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tunnelConfigRemoteAddress": {
-                      "type": "string",
-                      "description": "The address of the remote endpoint of the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigRemoteAddress.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tunnelConfigEncapsMethod": {
-                      "type": "string",
-                      "description": "The encapsulation method used by the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigEncapsMethod.",
-                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
-                    },
-                    "tunnelConfigID": {
-                      "type": "integer",
-                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            conflict with an existing row, such as choosing a\n            random number.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigID.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "tunnelConfigIfIndex": {
-                      "type": "string",
-                      "description": "If the value of tunnelConfigStatus for this row is\n            active, then this object contains the value of ifIndex\n            corresponding to the tunnel interface.  A value of 0\n            is not legal in the active state, and means that the\n            interface index has not yet been assigned.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigIfIndex.",
-                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
-                    },
-                    "tunnelConfigStatus": {
-                      "type": "string",
-                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelConfigID of 1, and\n            set tunnelConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelConfigID and\n            set tunnelConfigStatus to createAndGo.  In the event\n            that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigStatus.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "TUNNEL-MIB:tunnelConfigEntry": {
-                    "tunnelConfigLocalAddress": "192.168.1.1",
-                    "tunnelConfigRemoteAddress": "192.168.1.1",
-                    "tunnelConfigEncapsMethod": "example-string",
-                    "tunnelConfigID": -2147483648,
-                    "tunnelConfigIfIndex": "example-string",
-                    "tunnelConfigStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-tunnelConfigEntry-2"
-      },
-      "x-yang-path": "/tunnelConfigTable/tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID"
-      ]
-    },
     "/data/TUNNEL-MIB:tunnelInetConfigTable": {
       "get": {
         "summary": "Get tunnelInetConfigTable data",
@@ -1325,157 +1186,6 @@
       },
       "x-yang-path": "/tunnelInetConfigTable/tunnelInetConfigEntry",
       "x-restconf-kind": "container"
-    },
-    "/data/TUNNEL-MIB:tunnelInetConfigTable/tunnelInetConfigEntry={tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID}": {
-      "get": {
-        "summary": "Get tunnelInetConfigEntry entry",
-        "description": "Retrieve specific tunnelInetConfigEntry entry by key from MIB",
-        "tags": [
-          "TUNNEL-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tunnelInetConfigAddressType": {
-                      "type": "string",
-                      "description": "The address type over which the tunnel encapsulates\n            packets.",
-                      "x-yang-type": "inet-address:InetAddressType"
-                    },
-                    "tunnelInetConfigLocalAddress": {
-                      "type": "string",
-                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 (for IPv4) or :: (for IPv6) if the device is\n            free to choose any of its addresses at tunnel\n            establishment time.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "tunnelInetConfigRemoteAddress": {
-                      "type": "string",
-                      "description": "The address of the remote endpoint of the tunnel.",
-                      "x-yang-type": "inet-address:InetAddress"
-                    },
-                    "tunnelInetConfigEncapsMethod": {
-                      "type": "string",
-                      "description": "The encapsulation method used by the tunnel.",
-                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
-                    },
-                    "tunnelInetConfigID": {
-                      "type": "integer",
-                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            \n            conflict with an existing row, such as choosing a\n            random number.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "tunnelInetConfigIfIndex": {
-                      "type": "string",
-                      "description": "If the value of tunnelInetConfigStatus for this row\n            is active, then this object contains the value of\n            ifIndex corresponding to the tunnel interface.  A\n            value of 0 is not legal in the active state, and means\n            that the interface index has not yet been assigned.",
-                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
-                    },
-                    "tunnelInetConfigStatus": {
-                      "type": "string",
-                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelInetConfigID of 1,\n            and set tunnelInetConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelInetConfigID\n            and set tunnelInetConfigStatus to createAndGo.  In the\n            event that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            \n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    },
-                    "tunnelInetConfigStorageType": {
-                      "type": "string",
-                      "description": "The storage type of this row.  If the row is\n            permanent(4), no objects in the row need be writable.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
-                    }
-                  }
-                },
-                "example": {
-                  "TUNNEL-MIB:tunnelInetConfigEntry": {
-                    "tunnelInetConfigAddressType": "192.168.1.1",
-                    "tunnelInetConfigLocalAddress": "192.168.1.1",
-                    "tunnelInetConfigRemoteAddress": "192.168.1.1",
-                    "tunnelInetConfigEncapsMethod": "example-string",
-                    "tunnelInetConfigID": -2147483648,
-                    "tunnelInetConfigIfIndex": "example-string",
-                    "tunnelInetConfigStatus": "up(1)",
-                    "tunnelInetConfigStorageType": "ethernetCsmacd(6)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-tunnelInetConfigEntry-2"
-      },
-      "x-yang-path": "/tunnelInetConfigTable/tunnelInetConfigEntry={tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID"
-      ]
     },
     "/data/TUNNEL-MIB:tunnelIfEntry": {
       "get": {
@@ -1958,145 +1668,6 @@
       "x-yang-path": "/tunnelConfigEntry",
       "x-restconf-kind": "container"
     },
-    "/data/TUNNEL-MIB:tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}": {
-      "get": {
-        "summary": "Get tunnelConfigEntry entry",
-        "description": "Retrieve specific tunnelConfigEntry entry by key from MIB",
-        "tags": [
-          "TUNNEL-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "tunnelConfigLocalAddress": {
-                      "type": "string",
-                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 if the device is free to choose any of its\n            addresses at tunnel establishment time.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigLocalAddress.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tunnelConfigRemoteAddress": {
-                      "type": "string",
-                      "description": "The address of the remote endpoint of the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigRemoteAddress.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "tunnelConfigEncapsMethod": {
-                      "type": "string",
-                      "description": "The encapsulation method used by the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigEncapsMethod.",
-                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
-                    },
-                    "tunnelConfigID": {
-                      "type": "integer",
-                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            conflict with an existing row, such as choosing a\n            random number.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigID.",
-                      "minimum": -2147483648,
-                      "maximum": 2147483647
-                    },
-                    "tunnelConfigIfIndex": {
-                      "type": "string",
-                      "description": "If the value of tunnelConfigStatus for this row is\n            active, then this object contains the value of ifIndex\n            corresponding to the tunnel interface.  A value of 0\n            is not legal in the active state, and means that the\n            interface index has not yet been assigned.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigIfIndex.",
-                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
-                    },
-                    "tunnelConfigStatus": {
-                      "type": "string",
-                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelConfigID of 1, and\n            set tunnelConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelConfigID and\n            set tunnelConfigStatus to createAndGo.  In the event\n            that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigStatus.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "TUNNEL-MIB:tunnelConfigEntry": {
-                    "tunnelConfigLocalAddress": "192.168.1.1",
-                    "tunnelConfigRemoteAddress": "192.168.1.1",
-                    "tunnelConfigEncapsMethod": "example-string",
-                    "tunnelConfigID": -2147483648,
-                    "tunnelConfigIfIndex": "example-string",
-                    "tunnelConfigStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-tunnelConfigEntry-4"
-      },
-      "x-yang-path": "/tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID"
-      ]
-    },
     "/data/TUNNEL-MIB:tunnelInetConfigEntry": {
       "get": {
         "summary": "Get tunnelInetConfigEntry list",
@@ -2242,7 +1813,169 @@
       "x-yang-path": "/tunnelInetConfigEntry",
       "x-restconf-kind": "container"
     },
-    "/data/TUNNEL-MIB:tunnelInetConfigEntry={tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID}": {
+    "/data/TUNNEL-MIB:tunnelConfigTable/tunnelConfigEntry={tunnelConfigLocalAddress},{tunnelConfigRemoteAddress},{tunnelConfigEncapsMethod},{tunnelConfigID}": {
+      "get": {
+        "summary": "Get tunnelConfigEntry entry",
+        "description": "Retrieve specific tunnelConfigEntry entry by key from MIB",
+        "tags": [
+          "TUNNEL-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "tunnelConfigLocalAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigRemoteAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigEncapsMethod",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tunnelConfigLocalAddress": {
+                      "type": "string",
+                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 if the device is free to choose any of its\n            addresses at tunnel establishment time.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigLocalAddress.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "tunnelConfigRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote endpoint of the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigRemoteAddress.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "tunnelConfigEncapsMethod": {
+                      "type": "string",
+                      "description": "The encapsulation method used by the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigEncapsMethod.",
+                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
+                    },
+                    "tunnelConfigID": {
+                      "type": "integer",
+                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            conflict with an existing row, such as choosing a\n            random number.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigID.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "tunnelConfigIfIndex": {
+                      "type": "string",
+                      "description": "If the value of tunnelConfigStatus for this row is\n            active, then this object contains the value of ifIndex\n            corresponding to the tunnel interface.  A value of 0\n            is not legal in the active state, and means that the\n            interface index has not yet been assigned.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigIfIndex.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "tunnelConfigStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelConfigID of 1, and\n            set tunnelConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelConfigID and\n            set tunnelConfigStatus to createAndGo.  In the event\n            that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigStatus.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "TUNNEL-MIB:tunnelConfigEntry": {
+                    "tunnelConfigLocalAddress": "192.168.1.1",
+                    "tunnelConfigRemoteAddress": "192.168.1.1",
+                    "tunnelConfigEncapsMethod": "example-string",
+                    "tunnelConfigID": -2147483648,
+                    "tunnelConfigIfIndex": "example-string",
+                    "tunnelConfigStatus": "up(1)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-tunnelConfigEntry-2"
+      },
+      "x-yang-path": "/tunnelConfigTable/tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID"
+      ]
+    },
+    "/data/TUNNEL-MIB:tunnelInetConfigTable/tunnelInetConfigEntry={tunnelInetConfigAddressType},{tunnelInetConfigLocalAddress},{tunnelInetConfigRemoteAddress},{tunnelInetConfigEncapsMethod},{tunnelInetConfigID}": {
       "get": {
         "summary": "Get tunnelInetConfigEntry entry",
         "description": "Retrieve specific tunnelInetConfigEntry entry by key from MIB",
@@ -2251,13 +1984,388 @@
         ],
         "parameters": [
           {
-            "name": "tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID",
+            "name": "tunnelInetConfigAddressType",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "example": "1"
+            }
+          },
+          {
+            "name": "tunnelInetConfigLocalAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigRemoteAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigEncapsMethod",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tunnelInetConfigAddressType": {
+                      "type": "string",
+                      "description": "The address type over which the tunnel encapsulates\n            packets.",
+                      "x-yang-type": "inet-address:InetAddressType"
+                    },
+                    "tunnelInetConfigLocalAddress": {
+                      "type": "string",
+                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 (for IPv4) or :: (for IPv6) if the device is\n            free to choose any of its addresses at tunnel\n            establishment time.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "tunnelInetConfigRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote endpoint of the tunnel.",
+                      "x-yang-type": "inet-address:InetAddress"
+                    },
+                    "tunnelInetConfigEncapsMethod": {
+                      "type": "string",
+                      "description": "The encapsulation method used by the tunnel.",
+                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
+                    },
+                    "tunnelInetConfigID": {
+                      "type": "integer",
+                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            \n            conflict with an existing row, such as choosing a\n            random number.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "tunnelInetConfigIfIndex": {
+                      "type": "string",
+                      "description": "If the value of tunnelInetConfigStatus for this row\n            is active, then this object contains the value of\n            ifIndex corresponding to the tunnel interface.  A\n            value of 0 is not legal in the active state, and means\n            that the interface index has not yet been assigned.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "tunnelInetConfigStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelInetConfigID of 1,\n            and set tunnelInetConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelInetConfigID\n            and set tunnelInetConfigStatus to createAndGo.  In the\n            event that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            \n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    },
+                    "tunnelInetConfigStorageType": {
+                      "type": "string",
+                      "description": "The storage type of this row.  If the row is\n            permanent(4), no objects in the row need be writable.",
+                      "x-yang-type": "snmpv2-tc:StorageType"
+                    }
+                  }
+                },
+                "example": {
+                  "TUNNEL-MIB:tunnelInetConfigEntry": {
+                    "tunnelInetConfigAddressType": "192.168.1.1",
+                    "tunnelInetConfigLocalAddress": "192.168.1.1",
+                    "tunnelInetConfigRemoteAddress": "192.168.1.1",
+                    "tunnelInetConfigEncapsMethod": "example-string",
+                    "tunnelInetConfigID": -2147483648,
+                    "tunnelInetConfigIfIndex": "example-string",
+                    "tunnelInetConfigStatus": "up(1)",
+                    "tunnelInetConfigStorageType": "ethernetCsmacd(6)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-tunnelInetConfigEntry-2"
+      },
+      "x-yang-path": "/tunnelInetConfigTable/tunnelInetConfigEntry={tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "tunnelInetConfigAddressType tunnelInetConfigLocalAddress tunnelInetConfigRemoteAddress tunnelInetConfigEncapsMethod tunnelInetConfigID"
+      ]
+    },
+    "/data/TUNNEL-MIB:tunnelConfigEntry={tunnelConfigLocalAddress},{tunnelConfigRemoteAddress},{tunnelConfigEncapsMethod},{tunnelConfigID}": {
+      "get": {
+        "summary": "Get tunnelConfigEntry entry",
+        "description": "Retrieve specific tunnelConfigEntry entry by key from MIB",
+        "tags": [
+          "TUNNEL-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "tunnelConfigLocalAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigRemoteAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigEncapsMethod",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelConfigID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tunnelConfigLocalAddress": {
+                      "type": "string",
+                      "description": "The address of the local endpoint of the tunnel, or\n            0.0.0.0 if the device is free to choose any of its\n            addresses at tunnel establishment time.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigLocalAddress.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "tunnelConfigRemoteAddress": {
+                      "type": "string",
+                      "description": "The address of the remote endpoint of the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigRemoteAddress.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "tunnelConfigEncapsMethod": {
+                      "type": "string",
+                      "description": "The encapsulation method used by the tunnel.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigEncapsMethod.",
+                      "x-yang-type": "ianaiftype-mib:IANAtunnelType"
+                    },
+                    "tunnelConfigID": {
+                      "type": "integer",
+                      "description": "An identifier used to distinguish between multiple\n            tunnels of the same encapsulation method, with the\n            same endpoints.  If the encapsulation protocol only\n            allows one tunnel per set of endpoint addresses (such\n            as for GRE or IP-in-IP), the value of this object is\n            1.  For encapsulation methods (such as L2F) which\n            allow multiple parallel tunnels, the manager is\n            responsible for choosing any ID which does not\n            conflict with an existing row, such as choosing a\n            random number.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigID.",
+                      "minimum": -2147483648,
+                      "maximum": 2147483647
+                    },
+                    "tunnelConfigIfIndex": {
+                      "type": "string",
+                      "description": "If the value of tunnelConfigStatus for this row is\n            active, then this object contains the value of ifIndex\n            corresponding to the tunnel interface.  A value of 0\n            is not legal in the active state, and means that the\n            interface index has not yet been assigned.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigIfIndex.",
+                      "x-yang-type": "if-mib:InterfaceIndexOrZero"
+                    },
+                    "tunnelConfigStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new entries may be\n            created, or old entries deleted from this table.  The\n            agent need not support setting this object to\n            createAndWait or notInService since there are no other\n            writable objects in this table, and writable objects\n            in rows of corresponding tables such as the\n            tunnelIfTable may be modified while this row is\n            active.\n            \n            To create a row in this table for an encapsulation\n            method which does not support multiple parallel\n            tunnels with the same endpoints, the management\n            station should simply use a tunnelConfigID of 1, and\n            set tunnelConfigStatus to createAndGo.  For\n            encapsulation methods such as L2F which allow multiple\n            parallel tunnels, the management station may select a\n            pseudo-random number to use as the tunnelConfigID and\n            set tunnelConfigStatus to createAndGo.  In the event\n            that this ID is already in use and an\n            inconsistentValue is returned in response to the set\n            operation, the management station should simply select\n            a new pseudo-random number and retry the operation.\n            \n            Creating a row in this table will cause an interface\n            index to be assigned by the agent in an\n            implementation-dependent manner, and corresponding\n            rows will be instantiated in the ifTable and the\n            tunnelIfTable.  The status of this row will become\n            active as soon as the agent assigns the interface\n            index, regardless of whether the interface is\n            operationally up.\n            \n            Deleting a row in this table will likewise delete the\n            corresponding row in the ifTable and in the\n            tunnelIfTable.\n            \n            Since this object does not support IPv6, it is\n            deprecated in favor of tunnelInetConfigStatus.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "TUNNEL-MIB:tunnelConfigEntry": {
+                    "tunnelConfigLocalAddress": "192.168.1.1",
+                    "tunnelConfigRemoteAddress": "192.168.1.1",
+                    "tunnelConfigEncapsMethod": "example-string",
+                    "tunnelConfigID": -2147483648,
+                    "tunnelConfigIfIndex": "example-string",
+                    "tunnelConfigStatus": "up(1)"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-tunnelConfigEntry-4"
+      },
+      "x-yang-path": "/tunnelConfigEntry={tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "tunnelConfigLocalAddress tunnelConfigRemoteAddress tunnelConfigEncapsMethod tunnelConfigID"
+      ]
+    },
+    "/data/TUNNEL-MIB:tunnelInetConfigEntry={tunnelInetConfigAddressType},{tunnelInetConfigLocalAddress},{tunnelInetConfigRemoteAddress},{tunnelInetConfigEncapsMethod},{tunnelInetConfigID}": {
+      "get": {
+        "summary": "Get tunnelInetConfigEntry entry",
+        "description": "Retrieve specific tunnelInetConfigEntry entry by key from MIB",
+        "tags": [
+          "TUNNEL-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "tunnelInetConfigAddressType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigLocalAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigRemoteAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigEncapsMethod",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tunnelInetConfigID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "Accept",

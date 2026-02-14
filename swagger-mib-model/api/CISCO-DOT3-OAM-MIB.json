@@ -3066,192 +3066,6 @@
       "x-yang-path": "/cdot3OamEventLogTable/cdot3OamEventLogEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-DOT3-OAM-MIB:cdot3OamEventLogTable/cdot3OamEventLogEntry={ifIndex cdot3OamEventLogIndex}": {
-      "get": {
-        "summary": "Get cdot3OamEventLogEntry entry",
-        "description": "Retrieve specific cdot3OamEventLogEntry entry by key from MIB",
-        "tags": [
-          "CISCO-DOT3-OAM-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "ifIndex cdot3OamEventLogIndex",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "ifIndex": {
-                      "type": "string",
-                      "description": "ifIndex",
-                      "x-yang-type": "leafref"
-                    },
-                    "cdot3OamEventLogIndex": {
-                      "type": "integer",
-                      "description": "An arbitrary integer for identifying individual events\n            within the event log.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogTimestamp": {
-                      "type": "string",
-                      "description": "The value of sysUpTime at the time of the logged event.  For\n            locally generated events, the time of the event can be\n            accurately retrieved from sysUpTime.  For remotely generated\n            events, the time of the event is indicated by the reception of\n            the Event Notification OAMPDU indicating the event occurred on\n            the peer.  A system may attempt to adjust the timestamp value\n            to more accurately reflect the time of the event at the peer\n            OAM entity by using other information, such as that found in\n            the timestamp found of the Event Notification TLVs, which\n            provides an indication of the relative time between events at\n            the peer entity.",
-                      "x-yang-type": "yang:timestamp"
-                    },
-                    "cdot3OamEventLogOui": {
-                      "type": "string",
-                      "description": "The OUI of the entity defining the object type.  All IEEE\n            802.3 defined events (as appearing in [802.3ah] except for the\n            Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of\n            0x0180C2.  Organizations defining their own Event Notification\n            TLVs include their OUI in the Event Notification TLV which\n            gets reflected here.",
-                      "x-yang-type": "CISCO-DOT3-OAM-MIB:Cdot3Oui"
-                    },
-                    "cdot3OamEventLogType": {
-                      "type": "integer",
-                      "description": "The type of event that generated this entry in the event log.\n            \n            When the OUI is the IEEE 802.3 OUI of 0x0180C2, the following\n            event types are defined:\n                erroredSymbolEvent(1), \n                erroredFramePeriodEvent (2), \n                erroredFrameEvent(3),\n                erroredFrameSecondsEvent(4), \n                linkFault(256), \n                dyingGaspEvent(257),\n                criticalLinkEvent(258)\n            The first four are considered threshold crossing events as\n            they are generated when a metric exceeds a given value within\n            a specified window.  The other three are not threshold\n            crossing events.  \n            \n            When the OUI is not 71874 (0x0180C2 in hex), then some other\n            organization has defined the event space.  If event subtyping\n            is known to the implementation, it may be reflected here.\n            Otherwise, this value should return all Fs (2^32 - 1).",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogLocation": {
-                      "type": "string",
-                      "description": "Whether this event occurred locally (local(1)), or was \n            received from the OAM peer via Ethernet OAM (remote(2))."
-                    },
-                    "cdot3OamEventLogWindowHi": {
-                      "type": "integer",
-                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventWindowHi and cdot3OamEventWindowLo form an\n            unsigned 64-bit integer yielding the window over which the\n            value was measured for the threshold crossing event (for\n            example, 5, when 11 occurrences happened in 5 seconds while\n            the threshold was 10).   The two objects are combined as:\n            \n            cdot3OamEventLogWindow = ((2^32) * cdot3OamEventLogWindowHi)\n                                            + cdot3OamEventLogWindowLo\n            \n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and \n            adds no useful information.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogWindowLo": {
-                      "type": "integer",
-                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventWindowHi and cdot3OamEventWindowLo form an\n            unsigned 64-bit integer yielding the window over which the\n            value was measured for the threshold crossing event (for\n            example, 5, when 11 occurrences happened in 5 seconds while\n            the threshold was 10).   The two objects are combined as:\n            \n            cdot3OamEventLogWindow = ((2^32) * cdot3OamEventLogWindowHi)\n                                            + cdot3OamEventLogWindowLo\n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and \n            adds no useful information.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogThresholdHi": {
-                      "type": "integer",
-                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventThresholdHi and cdot3OamEventThresholdLo\n            form an unsigned 64-bit integer yielding the value that was\n            crossed for the threshold crossing event (for example, 10,\n            when 11 occurrences happened in 5 seconds while the threshold\n            was 10).  The two objects are combined as:\n            \n            cdot3OamEventLogThreshold = ((2^32) * cdot3OamEventLogThresholdHi)\n                                             + cdot3OamEventLogThresholdLo\n            \n            Otherwise, this value is returned as all F's (2^32 -1) and \n            adds no useful information.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogThresholdLo": {
-                      "type": "integer",
-                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventThresholdHi and cdot3OamEventThresholdLo\n            form an unsigned 64-bit integer yielding the value that was\n            crossed for the threshold crossing event (for example, 10,\n            when 11 occurrences happened in 5 seconds while the threshold\n            was 10).  The two objects are combined as:\n            \n            cdot3OamEventLogThreshold = ((2^32) * cdot3OamEventLogThresholdHi)\n                                             + cdot3OamEventLogThresholdLo\n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and\n            adds no useful information.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "cdot3OamEventLogValue": {
-                      "type": "integer",
-                      "description": "If the event represents a threshold crossing event, this\n            value indicates the value of the parameter within the given\n            window that generated this event (for example, 11, when 11\n            occurrences happened in 5 seconds while the threshold was 10).  \n            \n            Otherwise, this value is returned as all F's \n            (2^64 - 1) and adds no useful information.",
-                      "minimum": 0
-                    },
-                    "cdot3OamEventLogRunningTotal": {
-                      "type": "integer",
-                      "description": "Each Event Notification TLV contains a running total of the\n            number of times an event has occurred, as well as the number\n            of times an Event Notification for the event has been\n            transmitted.  For non-threshold crossing events, the number of\n            events (cdot3OamLogRunningTotal) and the number of resultant\n            Event Notifications (cdot3OamLogEventTotal) should be\n            identical. \n            \n            For threshold crossing events, since multiple occurrences may\n            be required to cross the threshold, these values are likely\n            different.  This value represents the total number of times\n            this event has happened since the last reset (for example,\n            3253, when 3253 symbol errors have occurred since the last\n            reset, which has resulted in 51 symbol error threshold\n            crossing events since the last reset).",
-                      "minimum": 0
-                    },
-                    "cdot3OamEventLogEventTotal": {
-                      "type": "integer",
-                      "description": "Each Event Notification TLV contains a running total of the\n            number of times an event has occurred, as well as the number\n            of times an Event Notification for the event has been\n            transmitted.  For non-threshold crossing events, the number of\n            events (cdot3OamLogRunningTotal) and the number of resultant\n            Event Notifications (cdot3OamLogEventTotal) should be\n            identical. \n            \n            For threshold crossing events, since multiple occurrences may\n            be required to cross the threshold, these values are likely\n            different.  This value represents the total number of times\n            one or more of these occurrences have resulted in an Event\n            Notification (for example, 51 when 3253 symbol errors have\n            occurred since the last reset, which has resulted in 51 symbol\n            error threshold crossing events since the last reset).",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    }
-                  }
-                },
-                "example": {
-                  "CISCO-DOT3-OAM-MIB:cdot3OamEventLogEntry": {
-                    "ifIndex": "example-string",
-                    "cdot3OamEventLogIndex": 1,
-                    "cdot3OamEventLogTimestamp": "example-string",
-                    "cdot3OamEventLogOui": "example-string",
-                    "cdot3OamEventLogType": 0,
-                    "cdot3OamEventLogLocation": "example-string",
-                    "cdot3OamEventLogWindowHi": 0,
-                    "cdot3OamEventLogWindowLo": 0,
-                    "cdot3OamEventLogThresholdHi": 0,
-                    "cdot3OamEventLogThresholdLo": 0,
-                    "cdot3OamEventLogValue": 0,
-                    "cdot3OamEventLogRunningTotal": 0,
-                    "cdot3OamEventLogEventTotal": 0
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-cdot3OamEventLogEntry-2"
-      },
-      "x-yang-path": "/cdot3OamEventLogTable/cdot3OamEventLogEntry={ifIndex cdot3OamEventLogIndex}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "ifIndex cdot3OamEventLogIndex"
-      ]
-    },
     "/data/CISCO-DOT3-OAM-MIB:cdot3OamEntry": {
       "get": {
         "summary": "Get cdot3OamEntry list",
@@ -5094,7 +4908,7 @@
       "x-yang-path": "/cdot3OamEventLogEntry",
       "x-restconf-kind": "container"
     },
-    "/data/CISCO-DOT3-OAM-MIB:cdot3OamEventLogEntry={ifIndex cdot3OamEventLogIndex}": {
+    "/data/CISCO-DOT3-OAM-MIB:cdot3OamEventLogTable/cdot3OamEventLogEntry={ifIndex},{cdot3OamEventLogIndex}": {
       "get": {
         "summary": "Get cdot3OamEventLogEntry entry",
         "description": "Retrieve specific cdot3OamEventLogEntry entry by key from MIB",
@@ -5103,13 +4917,213 @@
         ],
         "parameters": [
           {
-            "name": "ifIndex cdot3OamEventLogIndex",
+            "name": "ifIndex",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "example": "1"
+            }
+          },
+          {
+            "name": "cdot3OamEventLogIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "required": false,
+            "description": "RESTCONF response media type (RFC 8040)",
+            "schema": {
+              "type": "string",
+              "default": "application/yang-data+json",
+              "enum": [
+                "application/yang-data+json",
+                "application/yang-data+xml"
+              ]
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
+            "schema": {
+              "type": "string",
+              "default": "unbounded"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ifIndex": {
+                      "type": "string",
+                      "description": "ifIndex",
+                      "x-yang-type": "leafref"
+                    },
+                    "cdot3OamEventLogIndex": {
+                      "type": "integer",
+                      "description": "An arbitrary integer for identifying individual events\n            within the event log.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogTimestamp": {
+                      "type": "string",
+                      "description": "The value of sysUpTime at the time of the logged event.  For\n            locally generated events, the time of the event can be\n            accurately retrieved from sysUpTime.  For remotely generated\n            events, the time of the event is indicated by the reception of\n            the Event Notification OAMPDU indicating the event occurred on\n            the peer.  A system may attempt to adjust the timestamp value\n            to more accurately reflect the time of the event at the peer\n            OAM entity by using other information, such as that found in\n            the timestamp found of the Event Notification TLVs, which\n            provides an indication of the relative time between events at\n            the peer entity.",
+                      "x-yang-type": "yang:timestamp"
+                    },
+                    "cdot3OamEventLogOui": {
+                      "type": "string",
+                      "description": "The OUI of the entity defining the object type.  All IEEE\n            802.3 defined events (as appearing in [802.3ah] except for the\n            Organizationally Unique Event TLVs) use the IEEE 802.3 OUI of\n            0x0180C2.  Organizations defining their own Event Notification\n            TLVs include their OUI in the Event Notification TLV which\n            gets reflected here.",
+                      "x-yang-type": "CISCO-DOT3-OAM-MIB:Cdot3Oui"
+                    },
+                    "cdot3OamEventLogType": {
+                      "type": "integer",
+                      "description": "The type of event that generated this entry in the event log.\n            \n            When the OUI is the IEEE 802.3 OUI of 0x0180C2, the following\n            event types are defined:\n                erroredSymbolEvent(1), \n                erroredFramePeriodEvent (2), \n                erroredFrameEvent(3),\n                erroredFrameSecondsEvent(4), \n                linkFault(256), \n                dyingGaspEvent(257),\n                criticalLinkEvent(258)\n            The first four are considered threshold crossing events as\n            they are generated when a metric exceeds a given value within\n            a specified window.  The other three are not threshold\n            crossing events.  \n            \n            When the OUI is not 71874 (0x0180C2 in hex), then some other\n            organization has defined the event space.  If event subtyping\n            is known to the implementation, it may be reflected here.\n            Otherwise, this value should return all Fs (2^32 - 1).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogLocation": {
+                      "type": "string",
+                      "description": "Whether this event occurred locally (local(1)), or was \n            received from the OAM peer via Ethernet OAM (remote(2))."
+                    },
+                    "cdot3OamEventLogWindowHi": {
+                      "type": "integer",
+                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventWindowHi and cdot3OamEventWindowLo form an\n            unsigned 64-bit integer yielding the window over which the\n            value was measured for the threshold crossing event (for\n            example, 5, when 11 occurrences happened in 5 seconds while\n            the threshold was 10).   The two objects are combined as:\n            \n            cdot3OamEventLogWindow = ((2^32) * cdot3OamEventLogWindowHi)\n                                            + cdot3OamEventLogWindowLo\n            \n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and \n            adds no useful information.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogWindowLo": {
+                      "type": "integer",
+                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventWindowHi and cdot3OamEventWindowLo form an\n            unsigned 64-bit integer yielding the window over which the\n            value was measured for the threshold crossing event (for\n            example, 5, when 11 occurrences happened in 5 seconds while\n            the threshold was 10).   The two objects are combined as:\n            \n            cdot3OamEventLogWindow = ((2^32) * cdot3OamEventLogWindowHi)\n                                            + cdot3OamEventLogWindowLo\n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and \n            adds no useful information.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogThresholdHi": {
+                      "type": "integer",
+                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventThresholdHi and cdot3OamEventThresholdLo\n            form an unsigned 64-bit integer yielding the value that was\n            crossed for the threshold crossing event (for example, 10,\n            when 11 occurrences happened in 5 seconds while the threshold\n            was 10).  The two objects are combined as:\n            \n            cdot3OamEventLogThreshold = ((2^32) * cdot3OamEventLogThresholdHi)\n                                             + cdot3OamEventLogThresholdLo\n            \n            Otherwise, this value is returned as all F's (2^32 -1) and \n            adds no useful information.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogThresholdLo": {
+                      "type": "integer",
+                      "description": "If the event represents a threshold crossing event, the two\n            objects cdot3OamEventThresholdHi and cdot3OamEventThresholdLo\n            form an unsigned 64-bit integer yielding the value that was\n            crossed for the threshold crossing event (for example, 10,\n            when 11 occurrences happened in 5 seconds while the threshold\n            was 10).  The two objects are combined as:\n            \n            cdot3OamEventLogThreshold = ((2^32) * cdot3OamEventLogThresholdHi)\n                                             + cdot3OamEventLogThresholdLo\n            \n            Otherwise, this value is returned as all F's (2^32 - 1) and\n            adds no useful information.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "cdot3OamEventLogValue": {
+                      "type": "integer",
+                      "description": "If the event represents a threshold crossing event, this\n            value indicates the value of the parameter within the given\n            window that generated this event (for example, 11, when 11\n            occurrences happened in 5 seconds while the threshold was 10).  \n            \n            Otherwise, this value is returned as all F's \n            (2^64 - 1) and adds no useful information.",
+                      "minimum": 0
+                    },
+                    "cdot3OamEventLogRunningTotal": {
+                      "type": "integer",
+                      "description": "Each Event Notification TLV contains a running total of the\n            number of times an event has occurred, as well as the number\n            of times an Event Notification for the event has been\n            transmitted.  For non-threshold crossing events, the number of\n            events (cdot3OamLogRunningTotal) and the number of resultant\n            Event Notifications (cdot3OamLogEventTotal) should be\n            identical. \n            \n            For threshold crossing events, since multiple occurrences may\n            be required to cross the threshold, these values are likely\n            different.  This value represents the total number of times\n            this event has happened since the last reset (for example,\n            3253, when 3253 symbol errors have occurred since the last\n            reset, which has resulted in 51 symbol error threshold\n            crossing events since the last reset).",
+                      "minimum": 0
+                    },
+                    "cdot3OamEventLogEventTotal": {
+                      "type": "integer",
+                      "description": "Each Event Notification TLV contains a running total of the\n            number of times an event has occurred, as well as the number\n            of times an Event Notification for the event has been\n            transmitted.  For non-threshold crossing events, the number of\n            events (cdot3OamLogRunningTotal) and the number of resultant\n            Event Notifications (cdot3OamLogEventTotal) should be\n            identical. \n            \n            For threshold crossing events, since multiple occurrences may\n            be required to cross the threshold, these values are likely\n            different.  This value represents the total number of times\n            one or more of these occurrences have resulted in an Event\n            Notification (for example, 51 when 3253 symbol errors have\n            occurred since the last reset, which has resulted in 51 symbol\n            error threshold crossing events since the last reset).",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
+                  }
+                },
+                "example": {
+                  "CISCO-DOT3-OAM-MIB:cdot3OamEventLogEntry": {
+                    "ifIndex": "example-string",
+                    "cdot3OamEventLogIndex": 1,
+                    "cdot3OamEventLogTimestamp": "example-string",
+                    "cdot3OamEventLogOui": "example-string",
+                    "cdot3OamEventLogType": 0,
+                    "cdot3OamEventLogLocation": "example-string",
+                    "cdot3OamEventLogWindowHi": 0,
+                    "cdot3OamEventLogWindowLo": 0,
+                    "cdot3OamEventLogThresholdHi": 0,
+                    "cdot3OamEventLogThresholdLo": 0,
+                    "cdot3OamEventLogValue": 0,
+                    "cdot3OamEventLogRunningTotal": 0,
+                    "cdot3OamEventLogEventTotal": 0
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — insufficient access rights (NACM)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/restconf-error"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-cdot3OamEventLogEntry-2"
+      },
+      "x-yang-path": "/cdot3OamEventLogTable/cdot3OamEventLogEntry={ifIndex cdot3OamEventLogIndex}",
+      "x-restconf-kind": "list-instance",
+      "x-list-keys": [
+        "ifIndex cdot3OamEventLogIndex"
+      ]
+    },
+    "/data/CISCO-DOT3-OAM-MIB:cdot3OamEventLogEntry={ifIndex},{cdot3OamEventLogIndex}": {
+      "get": {
+        "summary": "Get cdot3OamEventLogEntry entry",
+        "description": "Retrieve specific cdot3OamEventLogEntry entry by key from MIB",
+        "tags": [
+          "CISCO-DOT3-OAM-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "ifIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cdot3OamEventLogIndex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "Accept",
