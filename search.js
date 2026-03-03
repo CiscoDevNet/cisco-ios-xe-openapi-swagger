@@ -1,5 +1,5 @@
 // Universal Search for Cisco IOS-XE YANG Documentation Hub
-// Provides fuzzy search across all 672 YANG modules
+// Provides fuzzy search across all YANG modules with browse-all capability
 
 // HTML Sanitization utility to prevent XSS
 function escapeHtml(str) {
@@ -21,6 +21,7 @@ let advancedFilters = {
 };
 let autocompleteIndex = [];
 let selectedSuggestionIndex = -1;
+let browseMode = false;
 
 // Load search index
 async function loadSearchIndex() {
@@ -28,6 +29,12 @@ async function loadSearchIndex() {
     
     searchReadyPromise = (async () => {
         try {
+            const searchInput = document.getElementById('universalSearch');
+            if (searchInput) {
+                searchInput.placeholder = '⏳ Loading search index...';
+                searchInput.disabled = true;
+            }
+            
             const response = await fetch('search-index.json');
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
@@ -37,18 +44,40 @@ async function loadSearchIndex() {
             // Build autocomplete index
             buildAutocompleteIndex();
             
-            // Initialize Fuse.js
+            // Initialize Fuse.js with weighted keys
             fuse = new Fuse(searchIndex, {
-                keys: ['name', 'keywords', 'description', 'displayCategory'],
-                threshold: 0.3,
+                keys: [
+                    { name: 'name', weight: 0.4 },
+                    { name: 'keywords', weight: 0.3 },
+                    { name: 'description', weight: 0.2 },
+                    { name: 'displayCategory', weight: 0.1 }
+                ],
+                threshold: 0.35,
                 includeScore: true,
-                minMatchCharLength: 2
+                includeMatches: true,
+                minMatchCharLength: 2,
+                ignoreLocation: true
             });
             
             searchReady = true;
+            
+            // Update filter buttons with counts
+            updateFilterCounts();
+            
+            // Update search input
+            if (searchInput) {
+                searchInput.placeholder = `Search ${searchIndex.length} modules — type a name, keyword, or feature... (Ctrl+K)`;
+                searchInput.disabled = false;
+            }
+            
             console.log(`✅ Loaded ${searchIndex.length} modules for search`);
         } catch (error) {
             console.error('❌ Error loading search index:', error);
+            const searchInput = document.getElementById('universalSearch');
+            if (searchInput) {
+                searchInput.placeholder = '⚠️ Search unavailable — please refresh the page';
+                searchInput.disabled = false;
+            }
             showToast('⚠️ Search unavailable. Please refresh the page.', 'error');
         }
     })();
@@ -56,21 +85,34 @@ async function loadSearchIndex() {
     return searchReadyPromise;
 }
 
-// Build autocomplete suggestions index
-function buildAutocompleteIndex() {
-    const suggestions = new Set();
-    
-    // Add module names
-    searchIndex.forEach(module => {
-        suggestions.add(module.name);
-        
-        // Add keywords
-        if (module.keywords) {
-            module.keywords.forEach(keyword => suggestions.add(keyword));
-        }
+// Update filter buttons with module counts
+function updateFilterCounts() {
+    const typeCounts = {};
+    searchIndex.forEach(m => {
+        typeCounts[m.type] = (typeCounts[m.type] || 0) + 1;
     });
     
-    autocompleteIndex = Array.from(suggestions).sort();
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+        const filterType = btn.dataset.filter;
+        if (filterType === 'all') {
+            const currentText = btn.textContent.replace(/\s*\(\d+\)$/, '');
+            btn.textContent = `${currentText} (${searchIndex.length})`;
+        } else if (typeCounts[filterType] !== undefined) {
+            const currentText = btn.textContent.replace(/\s*\(\d+\)$/, '');
+            btn.textContent = `${currentText} (${typeCounts[filterType]})`;
+        }
+    });
+}
+
+// Build autocomplete suggestions index (module names only for clarity)
+function buildAutocompleteIndex() {
+    autocompleteIndex = searchIndex.map(module => ({
+        name: module.name,
+        category: module.displayCategory,
+        emoji: module.emoji,
+        type: module.type
+    })).sort((a, b) => a.name.localeCompare(b.name));
+    
     console.log(`✅ Built autocomplete index with ${autocompleteIndex.length} terms`);
 }
 
@@ -79,12 +121,13 @@ function getBadgeClass(type) {
     const badgeMap = {
         'operational': 'badge-operational',
         'config': 'badge-config',
+        'configuration': 'badge-configuration',
         'rpc': 'badge-rpc',
         'events': 'badge-events',
         'mib': 'badge-mib',
         'ietf': 'badge-ietf',
         'openconfig': 'badge-openconfig',
-        'configuration': 'badge-configuration',
+        'native': 'badge-native',
         'other': 'badge-other',
         'yang-tree': 'badge-yang-tree',
         'mib-tree': 'badge-mib-tree'
@@ -92,43 +135,83 @@ function getBadgeClass(type) {
     return badgeMap[type] || 'badge-other';
 }
 
+// Get border color for module type
+function getBorderColor(type) {
+    const colorMap = {
+        'operational': '#2196F3',
+        'configuration': '#00BCD4',
+        'native': '#4CAF50',
+        'rpc': '#FFC107',
+        'events': '#FF9800',
+        'mib': '#9C27B0',
+        'ietf': '#FF5722',
+        'openconfig': '#009688',
+        'other': '#757575'
+    };
+    return colorMap[type] || '#1565C0';
+}
+
+// Truncate description for display
+function truncateDescription(desc, maxLen) {
+    if (!desc) return '';
+    // Strip markdown bold markers and normalize whitespace
+    let clean = desc.replace(/\*\*[^*]+\*\*/g, '').replace(/\\n/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+    if (clean.length > maxLen) {
+        return clean.substring(0, maxLen).replace(/\s+\S*$/, '') + '…';
+    }
+    return clean;
+}
+
 // Render search results
 function renderResults(results) {
     const resultsContainer = document.getElementById('searchResults');
     
     if (!results || results.length === 0) {
-        resultsContainer.innerHTML = '<div class="no-results">🔍 No modules found. Try different keywords or filters.</div>';
+        const noResultMsg = browseMode 
+            ? '🔍 No modules match the selected filters.'
+            : '🔍 No modules found. Try different keywords or broaden your filters.';
+        resultsContainer.innerHTML = `<div class="no-results">${noResultMsg}</div>`;
         resultsContainer.classList.add('active');
         return;
     }
     
-    const statsHtml = `<div class="search-stats">✨ Found ${results.length} module${results.length !== 1 ? 's' : ''}</div>`;
+    const totalResults = results.length;
+    const displayLimit = 60;
+    const modeLabel = browseMode ? 'Browsing' : 'Found';
+    const statsHtml = `<div class="search-stats">✨ ${modeLabel} ${totalResults} module${totalResults !== 1 ? 's' : ''}${totalResults > displayLimit ? ` — showing first ${displayLimit}` : ''}</div>`;
     
-    const cardsHtml = results.slice(0, 50).map(result => {
+    const cardsHtml = results.slice(0, displayLimit).map(result => {
         const module = result.item || result;
         const badgeClass = getBadgeClass(module.type);
-                const isFav = typeof isFavorite !== 'undefined' ? isFavorite(module.name) : false;
-                
-                let linksHtml = '';
-                if (module.swaggerUrl) {
-                    linksHtml += `<a href="${module.swaggerUrl}" class="search-result-link" onclick="trackModuleClick('${module.name}')">📖 View API Spec</a>`;
-                }
-                if (module.yangTreeUrl) {
-                    linksHtml += `<a href="${module.yangTreeUrl}" class="search-result-link" onclick="trackModuleClick('${module.name}')">🌳 View YANG Tree</a>`;
-                }
-                
-                return `
-                    <div class="search-result-card">
-                        <div class="search-result-header">
-                            <span class="search-result-badge ${badgeClass}">${module.emoji} ${module.displayCategory}</span>
-                            <span class="search-result-title">${module.name}</span>
-                            <button class="favorite-btn ${isFav ? 'active' : ''}" 
-                                    onclick="toggleFavoriteUI('${module.name.replace(/'/g, "\\'")}', this)"
-                                    title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
-                                ${isFav ? '★' : '☆'}
-                            </button>
-                    ${linksHtml}
+        const borderColor = getBorderColor(module.type);
+        const isFav = typeof isFavorite !== 'undefined' ? isFavorite(module.name) : false;
+        const description = truncateDescription(module.description, 160);
+        const escapedName = escapeHtml(module.name);
+        const escapedDesc = escapeHtml(description);
+        const pathLabel = module.type === 'rpc' ? 'operations' : 'paths';
+        
+        let linksHtml = '';
+        if (module.swaggerUrl) {
+            linksHtml += `<a href="${escapeHtml(module.swaggerUrl)}" class="search-result-link" data-module="${escapedName}">📖 View API Spec</a>`;
+        }
+        if (module.yangTreeUrl) {
+            linksHtml += `<a href="${escapeHtml(module.yangTreeUrl)}" class="search-result-link" data-module="${escapedName}">🌳 View YANG Tree</a>`;
+        }
+        
+        return `
+            <div class="search-result-card" style="border-left-color: ${borderColor}">
+                <div class="search-result-header">
+                    <span class="search-result-badge ${badgeClass}">${escapeHtml(module.emoji)} ${escapeHtml(module.displayCategory)}</span>
+                    <span class="search-result-title">${escapedName}</span>
+                    ${module.pathCount ? `<span class="search-result-paths">${module.pathCount} ${pathLabel}</span>` : ''}
+                    <button class="favorite-btn ${isFav ? 'active' : ''}" 
+                            data-module="${escapedName}"
+                            title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+                        ${isFav ? '★' : '☆'}
+                    </button>
                 </div>
+                ${escapedDesc ? `<div class="search-result-desc">${escapedDesc}</div>` : ''}
+                <div class="search-result-links">${linksHtml}</div>
             </div>
         `;
     }).join('');
@@ -136,8 +219,8 @@ function renderResults(results) {
     resultsContainer.innerHTML = statsHtml + cardsHtml;
     resultsContainer.classList.add('active');
     
-    if (results.length > 50) {
-        resultsContainer.innerHTML += `<div class="search-stats" style="text-align: center; margin-top: 16px;">📌 Showing first 50 results. Refine your search to see more.</div>`;
+    if (totalResults > displayLimit) {
+        resultsContainer.innerHTML += `<div class="search-stats" style="text-align: center; margin-top: 16px;">📌 Refine your search or filters to see more specific results.</div>`;
     }
 }
 
@@ -202,7 +285,7 @@ function showAutocomplete(query) {
     
     const lowerQuery = query.toLowerCase();
     const suggestions = autocompleteIndex
-        .filter(term => term.toLowerCase().includes(lowerQuery))
+        .filter(entry => entry.name.toLowerCase().includes(lowerQuery))
         .slice(0, 8);
     
     if (suggestions.length === 0) {
@@ -211,14 +294,25 @@ function showAutocomplete(query) {
     }
     
     const autocompleteDiv = document.getElementById('autocomplete');
-    autocompleteDiv.innerHTML = suggestions.map((term, index) => {
-        const highlightedTerm = term.replace(
-            new RegExp(query, 'gi'),
+    autocompleteDiv.innerHTML = suggestions.map((entry, index) => {
+        const highlightedTerm = escapeHtml(entry.name).replace(
+            new RegExp(escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
             match => `<strong>${match}</strong>`
         );
         return `<div class="autocomplete-item ${index === selectedSuggestionIndex ? 'selected' : ''}" 
-                     onclick="selectSuggestion('${term.replace(/'/g, "\\'")}')">${highlightedTerm}</div>`;
+                     data-term="${escapeHtml(entry.name)}">
+                    <span>${highlightedTerm}</span>
+                    <span class="autocomplete-category">${entry.emoji} ${escapeHtml(entry.category)}</span>
+                 </div>`;
     }).join('');
+    
+    // Use event delegation for clicks
+    autocompleteDiv.onclick = function(e) {
+        const item = e.target.closest('.autocomplete-item');
+        if (item) {
+            selectSuggestion(item.dataset.term);
+        }
+    };
     
     autocompleteDiv.classList.add('active');
 }
@@ -323,17 +417,54 @@ function resetFilters() {
         }
     });
     
-    performSearch();
+    // Clear search and hide results
+    document.getElementById('universalSearch').value = '';
+    document.getElementById('searchResults').classList.remove('active');
+    browseMode = false;
+}
+
+// Browse all modules (filtered, no search text required)
+function browseAll() {
+    if (!searchReady) return;
+    
+    browseMode = true;
+    
+    // Wrap all modules as results for filtering
+    let results = searchIndex.map(m => ({ item: m }));
+    
+    // Apply filters
+    results = filterResults(results);
+    
+    // Sort by category then name
+    results.sort((a, b) => {
+        const catA = (a.item || a).displayCategory || '';
+        const catB = (b.item || b).displayCategory || '';
+        if (catA !== catB) return catA.localeCompare(catB);
+        return ((a.item || a).name || '').localeCompare((b.item || b).name || '');
+    });
+    
+    renderResults(results);
 }
 
 // Perform search
 function performSearch() {
     const query = document.getElementById('universalSearch').value.trim();
     
-    if (!fuse || query.length === 0) {
+    if (!searchReady) return;
+    
+    // If no search text, check if we should browse by filter
+    if (query.length === 0) {
+        if (!activeFilters.has('all') || advancedFilters.prefix !== 'all' || 
+            advancedFilters.hasTree !== 'all' || advancedFilters.hasSpec !== 'all') {
+            browseAll();
+            return;
+        }
+        browseMode = false;
         document.getElementById('searchResults').classList.remove('active');
         return;
     }
+    
+    browseMode = false;
     
     if (query.length < 2) {
         document.getElementById('searchResults').innerHTML = '<div class="search-stats">⌨️ Type at least 2 characters to search...</div>';
@@ -410,8 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show autocomplete
         showAutocomplete(query);
         
-        // Debounced search
-        searchTimeout = setTimeout(performSearch, 300);
+        // Debounced search (fast 200ms)
+        searchTimeout = setTimeout(performSearch, 200);
     });
     
     // Keyboard shortcuts
@@ -424,6 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             searchInput.focus();
             searchInput.select();
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         
         // Escape to clear search and hide results
@@ -441,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Event delegation for search result links (tracking)
+    // Event delegation for search result links and favorites
     document.getElementById('searchResults').addEventListener('click', (e) => {
         const link = e.target.closest('.search-result-link');
         if (link) {
