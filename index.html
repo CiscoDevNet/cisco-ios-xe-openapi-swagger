@@ -86,13 +86,17 @@
         .badge-other { background: #757575; }
         .badge-yang-tree { background: #4CAF50; }
         .badge-mib-tree { background: #9C27B0; }
-        .search-result-title { font-weight: 500; color: #1565C0; font-size: 1.05rem; }
-        .search-result-desc { color: #666; font-size: 0.9rem; margin-bottom: 8px; }
+        .search-result-title { font-weight: 500; color: var(--accent-color); font-size: 1.05rem; flex: 1; }
+        .search-result-paths { font-size: 0.8rem; color: var(--text-secondary); background: var(--bg-primary); padding: 2px 10px; border-radius: 10px; white-space: nowrap; font-weight: 500; }
+        .search-result-desc { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 10px; line-height: 1.5; }
         .search-result-links { display: flex; gap: 12px; flex-wrap: wrap; }
-        .search-result-link { font-size: 0.85rem; color: #1565C0; text-decoration: none; }
+        .search-result-link { font-size: 0.85rem; color: var(--accent-color); text-decoration: none; padding: 4px 0; }
         .search-result-link:hover { text-decoration: underline; }
-        .search-stats { color: #666; font-size: 0.9rem; margin-bottom: 12px; }
-        .no-results { text-align: center; padding: 40px; color: #999; }
+        .search-stats { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px; }
+        .no-results { text-align: center; padding: 40px; color: var(--text-secondary); }
+        .search-hint { color: var(--text-secondary); font-size: 0.85rem; margin-top: 12px; opacity: 0.8; }
+        .autocomplete-category { float: right; font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7; }
+        .badge-native { background: #4CAF50; }
         
         /* Recent & Favorites Styles */
         .recent-favorites-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 32px; }
@@ -279,8 +283,72 @@
     </div>
     
     <div class="container">
+        <!-- Universal Search -->
+        <div class="search-container" id="searchSection">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                <h2 style="color: var(--accent-color); margin: 0; font-size: 1.6rem;">🔍 Universal Search</h2>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                    <button class="advanced-filter-toggle" onclick="toggleAdvancedFilters()">🎛️ Advanced Filters</button>
+                    <button class="reset-filters-btn" onclick="resetFilters()" title="Reset all filters">🔄 Reset</button>
+                    <span style="font-size: 0.85rem; opacity: 0.7; padding: 4px 8px; background: var(--bg-primary); border-radius: 4px; color: var(--text-secondary);">Ctrl+K</span>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <input type="text" id="universalSearch" class="search-box" placeholder="⏳ Loading search index...">
+                <div id="autocomplete" class="autocomplete"></div>
+            </div>
+            
+            <!-- Advanced Filters Panel -->
+            <div id="advancedFilters" class="advanced-filters">
+                <div class="advanced-filter-row">
+                    <label>Module Prefix:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="prefix" data-value="all" onclick="applyAdvancedFilter('prefix', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="cisco" onclick="applyAdvancedFilter('prefix', 'cisco')">Cisco-IOS-XE-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="ietf" onclick="applyAdvancedFilter('prefix', 'ietf')">ietf-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="openconfig" onclick="applyAdvancedFilter('prefix', 'openconfig')">openconfig-*</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="mib" onclick="applyAdvancedFilter('prefix', 'mib')">MIB Modules</button>
+                    </div>
+                </div>
+                <div class="advanced-filter-row">
+                    <label>Has YANG Tree:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="hasTree" data-value="all" onclick="applyAdvancedFilter('hasTree', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="yes" onclick="applyAdvancedFilter('hasTree', 'yes')">✅ Yes</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="no" onclick="applyAdvancedFilter('hasTree', 'no')">❌ No</button>
+                    </div>
+                </div>
+                <div class="advanced-filter-row">
+                    <label>Has Swagger Spec:</label>
+                    <div class="filter-group">
+                        <button class="advanced-filter-btn active" data-advanced-filter="hasSpec" data-value="all" onclick="applyAdvancedFilter('hasSpec', 'all')">All</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="yes" onclick="applyAdvancedFilter('hasSpec', 'yes')">✅ Yes</button>
+                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="no" onclick="applyAdvancedFilter('hasSpec', 'no')">❌ No</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-filters">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">All Types</button>
+                    <button class="filter-btn" data-filter="operational">📊 Operational</button>
+                    <button class="filter-btn" data-filter="configuration">⚙️ Config</button>
+                    <button class="filter-btn" data-filter="native">🏠 Native</button>
+                    <button class="filter-btn" data-filter="rpc">⚡ RPC</button>
+                    <button class="filter-btn" data-filter="events">🔔 Events</button>
+                    <button class="filter-btn" data-filter="mib">📡 MIB</button>
+                    <button class="filter-btn" data-filter="ietf">📜 IETF</button>
+                    <button class="filter-btn" data-filter="openconfig">🌍 OpenConfig</button>
+                    <button class="filter-btn" data-filter="other">📦 Other</button>
+                </div>
+            </div>
+            <p class="search-hint">💡 Type to search, or click a category filter to browse all modules of that type</p>
+            
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
         <!-- Main Model Cards -->
-        <h2 style="color: #1565C0; margin-bottom: 20px; margin-top: 20px; font-size: 1.8rem;">📚 All Models</h2>
+        <h2 style="color: var(--accent-color); margin-bottom: 20px; margin-top: 20px; font-size: 1.8rem;">📚 All Models</h2>
         <div class="grid">
             <div class="card operational">
                 <h3>📊 Operational Data</h3>
@@ -296,9 +364,9 @@
                 <h3>⚡ RPC Operations</h3>
                 <p>Remote procedure calls and device actions. Organized by operation type (network, wireless, security, system, etc.).</p>
                 <div class="card-stats">
-                    <span><strong>58</strong> modules</span>
+                    <span><strong>59</strong> modules</span>
                     <span><strong>9</strong> categories</span>
-                    <span><strong>290</strong> operations</span>
+                    <span><strong>311</strong> operations</span>
                 </div>
                 <a href="swagger-rpc-model/">Browse RPC →</a>
             </div>
@@ -375,67 +443,6 @@
             </div>
         </div>
         
-        <!-- Universal Search -->
-        <div class="search-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h2 style="color: #1565C0; margin: 0; font-size: 1.6rem;">🔍 Universal Search</h2>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="advanced-filter-toggle" onclick="toggleAdvancedFilters()">🎛️ Advanced Filters</button>
-                    <button class="reset-filters-btn" onclick="resetFilters()" title="Reset all filters">🔄 Reset</button>
-                    <span style="font-size: 0.85rem; opacity: 0.7; padding: 4px 8px; background: #E3F2FD; border-radius: 4px;">Ctrl+K</span>
-                </div>
-            </div>
-            <div style="position: relative;">
-                <input type="text" id="universalSearch" class="search-box" placeholder="Search across all 672 modules, APIs, and trees... (Ctrl+K)">
-                <div id="autocomplete" class="autocomplete"></div>
-            </div>
-            
-            <!-- Advanced Filters Panel -->
-            <div id="advancedFilters" class="advanced-filters">
-                <div class="advanced-filter-row">
-                    <label>Module Prefix:</label>
-                    <div class="filter-group">
-                        <button class="advanced-filter-btn active" data-advanced-filter="prefix" data-value="all" onclick="applyAdvancedFilter('prefix', 'all')">All</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="cisco" onclick="applyAdvancedFilter('prefix', 'cisco')">Cisco-IOS-XE-*</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="ietf" onclick="applyAdvancedFilter('prefix', 'ietf')">ietf-*</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="openconfig" onclick="applyAdvancedFilter('prefix', 'openconfig')">openconfig-*</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="prefix" data-value="mib" onclick="applyAdvancedFilter('prefix', 'mib')">MIB Modules</button>
-                    </div>
-                </div>
-                <div class="advanced-filter-row">
-                    <label>Has YANG Tree:</label>
-                    <div class="filter-group">
-                        <button class="advanced-filter-btn active" data-advanced-filter="hasTree" data-value="all" onclick="applyAdvancedFilter('hasTree', 'all')">All</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="yes" onclick="applyAdvancedFilter('hasTree', 'yes')">✅ Yes</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="hasTree" data-value="no" onclick="applyAdvancedFilter('hasTree', 'no')">❌ No</button>
-                    </div>
-                </div>
-                <div class="advanced-filter-row">
-                    <label>Has Swagger Spec:</label>
-                    <div class="filter-group">
-                        <button class="advanced-filter-btn active" data-advanced-filter="hasSpec" data-value="all" onclick="applyAdvancedFilter('hasSpec', 'all')">All</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="yes" onclick="applyAdvancedFilter('hasSpec', 'yes')">✅ Yes</button>
-                        <button class="advanced-filter-btn" data-advanced-filter="hasSpec" data-value="no" onclick="applyAdvancedFilter('hasSpec', 'no')">❌ No</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="search-filters">
-                <div class="filter-group">
-                    <button class="filter-btn active" data-filter="all">All Types</button>
-                    <button class="filter-btn" data-filter="operational">🔵 Operational</button>
-                    <button class="filter-btn" data-filter="config">🟢 Config</button>
-                    <button class="filter-btn" data-filter="rpc">🟡 RPC</button>
-                    <button class="filter-btn" data-filter="events">🔔 Events</button>
-                    <button class="filter-btn" data-filter="mib">🟣 MIB</button>
-                    <button class="filter-btn" data-filter="ietf">🟠 IETF</button>
-                    <button class="filter-btn" data-filter="openconfig">🌍 OpenConfig</button>
-                </div>
-            </div>
-            
-            <div id="searchResults" class="search-results"></div>
-        </div>
-        
         <!-- Documentation Resources -->
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 24px; margin-bottom: 30px; color: white; box-shadow: 0 4px 12px rgba(102,126,234,0.3);">
             <h2 style="margin-bottom: 16px; font-size: 1.5rem;">📚 External Documentation & Resources</h2>
@@ -493,9 +500,9 @@
                 <a href="tools/IOS-XE-RESTCONF-Complete.postman_collection.json" download style="background: rgba(255,255,255,0.12); padding: 20px; border-radius: 10px; text-decoration: none; color: white; border: 2px solid rgba(255,255,255,0.2); transition: all 0.2s; display: block;" onmouseover="this.style.background='rgba(255,255,255,0.22)'; this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'; this.style.borderColor='rgba(255,255,255,0.2)'">
                     <div style="font-size: 2rem; margin-bottom: 8px;">&#x1F4E6;</div>
                     <div style="font-weight: 600; margin-bottom: 6px; font-size: 1.1rem;">Postman Collection</div>
-                    <div style="opacity: 0.9; font-size: 0.85rem; margin-bottom: 10px;">Complete RESTCONF API collection &mdash; all 672 modules, 24,704 operations organized by model category</div>
+                    <div style="opacity: 0.9; font-size: 0.85rem; margin-bottom: 10px;">Complete RESTCONF API collection &mdash; all 673 modules, 24,725 operations organized by model category</div>
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.78rem; opacity: 0.8;">
-                        <span>&#x1F4CA; 24,704 requests</span>
+                        <span>&#x1F4CA; 24,725 requests</span>
                         <span>&#x1F4C1; 9 folders</span>
                         <span>&#x1F4BE; ~66 MB</span>
                     </div>
@@ -573,9 +580,9 @@
                             </tr>
                             <tr style="background: var(--bg-secondary);">
                                 <td style="padding: 8px 12px; border-bottom: 1px solid var(--border-color);"><span style="display: inline-block; width: 12px; height: 12px; background: #FFC107; border-radius: 3px; margin-right: 8px; vertical-align: middle;"></span><a href="swagger-rpc-model/" style="color: var(--text-primary); text-decoration: none; font-weight: 500;">RPC</a></td>
-                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">58</td>
-                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">290</td>
-                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); font-weight: 600; color: var(--text-primary);">290</td>
+                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">59</td>
+                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">311</td>
+                                <td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--border-color); font-weight: 600; color: var(--text-primary);">311</td>
                             </tr>
                             <tr style="background: var(--bg-primary);">
                                 <td style="padding: 8px 12px; border-bottom: 1px solid var(--border-color);"><span style="display: inline-block; width: 12px; height: 12px; background: #4CAF50; border-radius: 3px; margin-right: 8px; vertical-align: middle;"></span><a href="swagger-native-config-model/" style="color: var(--text-primary); text-decoration: none; font-weight: 500;">Native Config</a> <span title="163 YANG augment modules grouped into 27 category specs" style="cursor: help;">*</span></td>
@@ -611,9 +618,9 @@
                         <tfoot>
                             <tr style="background: var(--accent-color); color: white;">
                                 <td style="padding: 10px 12px; font-weight: 700; font-size: 0.95rem;">Total</td>
-                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">672</td>
-                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">13,813</td>
-                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">24,704</td>
+                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">673</td>
+                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">13,834</td>
+                                <td style="padding: 10px 12px; text-align: right; font-weight: 700; font-size: 0.95rem;">24,725</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -660,8 +667,8 @@
             <div style="background: #E3F2FD; border-left: 4px solid #1565C0; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
                 <p style="color: #0D47A1; margin-bottom: 8px;"><strong>Complete API Coverage</strong></p>
                 <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
-                    • <strong>672 total modules</strong> across all model types<br>
-                    • <strong>13,813 API paths</strong> documented with examples<br>
+                    • <strong>673 total modules</strong> across all model types<br>
+                    • <strong>13,834 API paths</strong> documented with examples<br>
                     • <strong>53 logical categories</strong> for easy navigation<br>
                     • <strong>765 modules (90%)</strong> have YANG tree links<br>
                     • Production-realistic examples throughout
@@ -680,18 +687,18 @@
                 <p style="color: #E65100; margin-bottom: 8px;"><strong>📋 YANG Module Coverage</strong></p>
                 <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
                     • <strong>848 total YANG modules</strong> in IOS-XE 17.18.1<br>
-                    • <strong>672 modules (79.2%)</strong> with OpenAPI specs<br>
+                    • <strong>673 modules (79.4%)</strong> with OpenAPI specs<br>
                     • <strong>176 modules excluded</strong> (types, deviations, identity-only)<br>
                     • <strong>100% accountability</strong> - see <a href="yang-accountability.html" style="color: #FB8C00; text-decoration: underline;">full report</a>
                 </p>
             </div>
             <div class="stats-grid">
                 <div class="stat">
-                    <div class="stat-value">13,813</div>
+                    <div class="stat-value">13,834</div>
                     <div class="stat-label">API Paths</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">672</div>
+                    <div class="stat-value">673</div>
                     <div class="stat-label">OpenAPI Modules</div>
                 </div>
                 <div class="stat">
@@ -834,7 +841,7 @@
             const data = {
                 labels: ['Operational', 'Configuration', 'MIB', 'RPC', 'Native Config', 'OpenConfig', 'Events', 'IETF', 'Other'],
                 datasets: [{
-                    data: [4196, 2722, 4272, 290, 1307, 7482, 455, 1832, 2148],
+                    data: [4196, 2722, 4272, 311, 1307, 7482, 455, 1832, 2148],
                     backgroundColor: [
                         '#2196F3',
                         '#00BCD4',
