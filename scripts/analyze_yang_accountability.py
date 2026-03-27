@@ -36,10 +36,18 @@ SWAGGER_FOLDERS = {
     "other": BASE_DIR / "swagger-other-model" / "api",
 }
 
+# v2 (deep-path) folder mappings
+SWAGGER_V2_FOLDERS = {
+    "oper-v2": BASE_DIR / "swagger-oper-model" / "api-v2",
+    "cfg-v2": BASE_DIR / "swagger-cfg-model" / "api-v2",
+    "openconfig-v2": BASE_DIR / "swagger-openconfig-model" / "api-v2",
+    "native-v2": BASE_DIR / "swagger-native-config-model" / "api-v2",
+}
+
 def get_existing_specs() -> Dict[str, List[str]]:
-    """Get list of existing OpenAPI specs in each swagger folder."""
+    """Get list of existing OpenAPI specs in each swagger folder (v1 + v2)."""
     specs = {}
-    for category, folder in SWAGGER_FOLDERS.items():
+    for category, folder in {**SWAGGER_FOLDERS, **SWAGGER_V2_FOLDERS}.items():
         if folder.exists():
             json_files = [f.stem for f in folder.glob("*.json") 
                          if not f.stem.startswith("manifest") and not f.stem.startswith("all-")]
@@ -215,6 +223,15 @@ def analyze_all_modules():
         # Find spec
         swagger_folder, has_spec = find_spec_for_module(module_name, existing_specs, category)
         
+        # Check v2 availability
+        has_v2 = False
+        v2_folder = None
+        for v2_cat, v2_specs in existing_specs.items():
+            if v2_cat.endswith('-v2') and module_name in v2_specs:
+                has_v2 = True
+                v2_folder = v2_cat
+                break
+        
         # If no spec but should have one, explain why
         if not has_spec and not reason:
             if category in ["types", "deviation", "common", "deprecated", "native-aug"]:
@@ -227,6 +244,8 @@ def analyze_all_modules():
             "category": category,
             "swagger_folder": swagger_folder,
             "has_spec": has_spec,
+            "has_v2": has_v2,
+            "v2_folder": v2_folder,
             "reason_if_excluded": reason if not has_spec else None
         }
         modules.append(module_info)
@@ -248,9 +267,11 @@ def analyze_all_modules():
     
     total_yang = len(modules)
     total_with_spec = sum(1 for m in modules if m["has_spec"])
+    total_with_v2 = sum(1 for m in modules if m.get("has_v2"))
     
     print(f"\nTotal YANG modules: {total_yang}")
     print(f"Modules with specs: {total_with_spec} ({100*total_with_spec/total_yang:.1f}%)")
+    print(f"Modules with v2:    {total_with_v2}")
     print(f"Modules excluded:   {total_yang - total_with_spec}")
     
     print("\nBy Category:")

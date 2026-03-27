@@ -31,6 +31,14 @@ MODEL_DISPLAY = OrderedDict([
     ("swagger-other-model",          "9 - Other"),
 ])
 
+# Models that have v2 (tree-based deep-path) api-v2/ directories
+V2_MODEL_DISPLAY = OrderedDict([
+    ("swagger-cfg-model",            "1b - Configuration v2 (Deep Paths)"),
+    ("swagger-native-config-model",  "2b - Native Configuration v2 (Deep Paths)"),
+    ("swagger-oper-model",           "3b - Operational v2 (Deep Paths)"),
+    ("swagger-openconfig-model",     "5b - OpenConfig v2 (Deep Paths)"),
+])
+
 # HTTP method sort order
 METHOD_ORDER = {"get": 0, "put": 1, "post": 2, "patch": 3, "delete": 4}
 
@@ -316,21 +324,93 @@ def main():
             total_ops += folder_ops
             print(f"  {display_name}: {len(folder_items)} modules, {folder_paths} paths, {folder_ops} ops")
 
-    # Write collection
-    output_path = os.path.join("tools", "IOS-XE-RESTCONF-Complete.postman_collection.json")
+    # Process v2 (tree-based deep-path) spec folders
+    for folder, display_name in V2_MODEL_DISPLAY.items():
+        spec_files = sorted(glob.glob(os.path.join(folder, "api-v2", "*.json")))
+        if not spec_files:
+            continue
+
+        folder_items = []
+        folder_paths = 0
+        folder_ops = 0
+
+        for spec_path in spec_files:
+            if os.path.basename(spec_path) == 'manifest.json':
+                continue
+            try:
+                spec_data = json.load(open(spec_path, "r", encoding="utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                print(f"  WARN: Skipping {spec_path}: {e}")
+                continue
+
+            info = spec_data.get("info", {})
+            yang_module = os.path.splitext(os.path.basename(spec_path))[0]
+            title = info.get("title", yang_module)
+            spec_desc = info.get("description", "")
+
+            paths = spec_data.get("paths", {})
+            if not paths:
+                continue
+
+            items = process_spec(spec_path, spec_data)
+            if not items:
+                continue
+
+            path_count = len(paths)
+            op_count = len(items)
+            folder_paths += path_count
+            folder_ops += op_count
+            total_specs += 1
+
+            module_folder = {
+                "name": yang_module,
+                "description": f"{title}\n\n{spec_desc[:500] if spec_desc else ''}\n\nEndpoints: {path_count} | Operations: {op_count}",
+                "item": items
+            }
+            folder_items.append(module_folder)
+
+        if folder_items:
+            category_folder = {
+                "name": display_name,
+                "description": f"{len(folder_items)} YANG specs | {folder_paths} endpoints | {folder_ops} operations\n\nTree-based deep-path specs with full depth coverage.",
+                "item": folder_items
+            }
+            collection["item"].append(category_folder)
+
+            total_paths += folder_paths
+            total_ops += folder_ops
+            print(f"  {display_name}: {len(folder_items)} specs, {folder_paths} paths, {folder_ops} ops")
+
+    # Split into v1 and v2 collections for GitHub (100MB file limit)
     os.makedirs("tools", exist_ok=True)
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(collection, f, indent=2, ensure_ascii=False)
+    v2_display_names = set(V2_MODEL_DISPLAY.values())
+    v1_items = [f for f in collection["item"] if f["name"] not in v2_display_names]
+    v2_items = [f for f in collection["item"] if f["name"] in v2_display_names]
 
-    file_size = os.path.getsize(output_path)
+    def write_collection(items, suffix, label):
+        coll = dict(collection)
+        coll["info"] = dict(collection["info"])
+        coll["info"]["_postman_id"] = make_id()
+        coll["info"]["name"] = f"Cisco IOS-XE 17.18.1 RESTCONF - {label}"
+        coll["item"] = items
+        path = os.path.join("tools", f"IOS-XE-RESTCONF-{suffix}.postman_collection.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(coll, f, indent=2, ensure_ascii=False)
+        size = os.path.getsize(path)
+        folder_count = len(items)
+        print(f"  {path}: {size/1024/1024:.1f} MB, {folder_count} folders")
+        return path, size
+
     print(f"\n{'=' * 60}")
-    print(f"Collection written: {output_path}")
-    print(f"  Specs processed: {total_specs}")
+    print("Writing split collections...")
+    v1_path, v1_size = write_collection(v1_items, "v1", "v1 (Category Specs)")
+    v2_path, v2_size = write_collection(v2_items, "v2-deep", "v2 (Deep Path Specs)")
+
+    print(f"\n  Specs processed: {total_specs}")
     print(f"  Total paths:     {total_paths}")
     print(f"  Total operations:{total_ops}")
-    print(f"  File size:       {file_size:,} bytes ({file_size/1024/1024:.1f} MB)")
-    print(f"  Model folders:   {len(collection['item'])}")
+    print(f"  Combined size:   {(v1_size+v2_size)/1024/1024:.1f} MB")
     print(f"{'=' * 60}")
 
     return 0

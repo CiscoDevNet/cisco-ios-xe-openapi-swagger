@@ -1,9 +1,9 @@
 # YANG Module Accountability Report
 
-**Date:** February 14, 2026
+**Date:** March 26, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 848
-**Modules with OpenAPI Specs:** 404 (47.6%)
+**Modules with OpenAPI Specs:** 424 (50.0%)
 
 ---
 
@@ -22,9 +22,9 @@ This report provides **100% accountability** for every YANG module in the
 | Category | Total | With Specs | Coverage | Notes |
 |----------|-------|------------|----------|-------|
 | **oper** | 200 | 199 | 100% |  |
-| **rpc** | 63 | 49 | 78% |  |
+| **rpc** | 63 | 50 | 79% |  |
 | **cfg** | 60 | 40 | 67% |  |
-| **openconfig** | 95 | 42 | 44% |  |
+| **openconfig** | 95 | 61 | 64% |  |
 | **ietf** | 33 | 22 | 67% |  |
 | **events** | 41 | 41 | 100% |  |
 | **native** | 1 | 0 | 0% |  |
@@ -284,7 +284,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-port-security-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-power-supply-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-rescue-config-rpc | swagger-rpc-model | ✅ |
-| Cisco-IOS-XE-rpc | - | ❌ |
+| Cisco-IOS-XE-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-sdwan-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-sslproxy-rpc | swagger-rpc-model | ✅ |
 | Cisco-IOS-XE-stack-power-rpc | swagger-rpc-model | ✅ |
@@ -390,7 +390,7 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-aft-ipv4 | - | ❌ |
 | openconfig-aft-ipv6 | - | ❌ |
 | openconfig-aft-mpls | - | ❌ |
-| openconfig-aft-network-instance | - | ❌ |
+| openconfig-aft-network-instance | swagger-openconfig-v2-model | ✅ |
 | openconfig-aft-pf | - | ❌ |
 | openconfig-aft-state-synced | - | ❌ |
 | openconfig-alarms | swagger-openconfig-model | ✅ |
@@ -401,20 +401,20 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-bgp-global | - | ❌ |
 | openconfig-bgp-neighbor | - | ❌ |
 | openconfig-bgp-peer-group | - | ❌ |
-| openconfig-bgp-policy | - | ❌ |
+| openconfig-bgp-policy | swagger-openconfig-v2-model | ✅ |
 | openconfig-ethernet-segments | swagger-openconfig-model | ✅ |
 | openconfig-evpn | swagger-openconfig-model | ✅ |
 | openconfig-extensions | - | ❌ |
-| openconfig-if-aggregate | - | ❌ |
+| openconfig-if-aggregate | swagger-openconfig-v2-model | ✅ |
 | openconfig-if-ethernet | swagger-openconfig-model | ✅ |
-| openconfig-if-ip | - | ❌ |
-| openconfig-if-ip-ext | - | ❌ |
-| openconfig-if-poe | - | ❌ |
+| openconfig-if-ip | swagger-openconfig-v2-model | ✅ |
+| openconfig-if-ip-ext | swagger-openconfig-v2-model | ✅ |
+| openconfig-if-poe | swagger-openconfig-v2-model | ✅ |
 | openconfig-igmp | swagger-openconfig-model | ✅ |
 | openconfig-interfaces | swagger-openconfig-model | ✅ |
 | openconfig-isis | swagger-openconfig-model | ✅ |
 | openconfig-isis-lsp | - | ❌ |
-| openconfig-isis-policy | - | ❌ |
+| openconfig-isis-policy | swagger-openconfig-v2-model | ✅ |
 | openconfig-isis-routing | - | ❌ |
 | openconfig-keychain | swagger-openconfig-model | ✅ |
 | openconfig-lacp | swagger-openconfig-model | ✅ |
@@ -433,9 +433,9 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-network-instance | swagger-openconfig-model | ✅ |
 | openconfig-network-instance-l2 | - | ❌ |
 | openconfig-network-instance-l3 | - | ❌ |
-| openconfig-network-instance-policy | - | ❌ |
+| openconfig-network-instance-policy | swagger-openconfig-v2-model | ✅ |
 | openconfig-openflow | swagger-openconfig-model | ✅ |
-| openconfig-ospf-policy | - | ❌ |
+| openconfig-ospf-policy | swagger-openconfig-v2-model | ✅ |
 | openconfig-ospfv2 | swagger-openconfig-model | ✅ |
 | openconfig-ospfv2-area | - | ❌ |
 | openconfig-ospfv2-area-interface | - | ❌ |
@@ -446,30 +446,30 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-pf-forwarding-policies | - | ❌ |
 | openconfig-pf-interfaces | - | ❌ |
 | openconfig-pf-path-groups | - | ❌ |
-| openconfig-pf-srte | - | ❌ |
+| openconfig-pf-srte | swagger-openconfig-v2-model | ✅ |
 | openconfig-pim | swagger-openconfig-model | ✅ |
 | openconfig-platform | swagger-openconfig-model | ✅ |
-| openconfig-platform-cpu | - | ❌ |
-| openconfig-platform-fan | - | ❌ |
-| openconfig-platform-linecard | - | ❌ |
-| openconfig-platform-port | - | ❌ |
-| openconfig-platform-psu | - | ❌ |
+| openconfig-platform-cpu | swagger-openconfig-v2-model | ✅ |
+| openconfig-platform-fan | swagger-openconfig-v2-model | ✅ |
+| openconfig-platform-linecard | swagger-openconfig-v2-model | ✅ |
+| openconfig-platform-port | swagger-openconfig-v2-model | ✅ |
+| openconfig-platform-psu | swagger-openconfig-v2-model | ✅ |
 | openconfig-platform-transceiver | swagger-openconfig-model | ✅ |
 | openconfig-policy-forwarding | swagger-openconfig-model | ✅ |
 | openconfig-procmon | swagger-openconfig-model | ✅ |
-| openconfig-programming-errors | - | ❌ |
+| openconfig-programming-errors | swagger-openconfig-v2-model | ✅ |
 | openconfig-rib-bgp | swagger-openconfig-model | ✅ |
 | openconfig-rib-bgp-attributes | - | ❌ |
-| openconfig-rib-bgp-ext | - | ❌ |
+| openconfig-rib-bgp-ext | swagger-openconfig-v2-model | ✅ |
 | openconfig-rib-bgp-shared-attributes | - | ❌ |
 | openconfig-rib-bgp-table-attributes | - | ❌ |
 | openconfig-rib-bgp-tables | - | ❌ |
-| openconfig-route-summary | - | ❌ |
+| openconfig-route-summary | swagger-openconfig-v2-model | ✅ |
 | openconfig-routing-policy | swagger-openconfig-model | ✅ |
 | openconfig-segment-routing | swagger-openconfig-model | ✅ |
 | openconfig-spanning-tree | swagger-openconfig-model | ✅ |
 | openconfig-system | swagger-openconfig-model | ✅ |
-| openconfig-system-grpc | - | ❌ |
+| openconfig-system-grpc | swagger-openconfig-v2-model | ✅ |
 | openconfig-system-logging | swagger-openconfig-model | ✅ |
 | openconfig-system-terminal | swagger-openconfig-model | ✅ |
 | openconfig-vlan | swagger-openconfig-model | ✅ |
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-02-14T22:56:41.582276*
+*Report generated: 2026-03-26T18:58:49.739770*

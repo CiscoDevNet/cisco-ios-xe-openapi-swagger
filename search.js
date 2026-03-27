@@ -189,6 +189,7 @@ function renderResults(results) {
         const escapedName = escapeHtml(module.name);
         const escapedDesc = escapeHtml(description);
         const pathLabel = module.type === 'rpc' ? 'operations' : 'paths';
+        const v2Badge = module.version === 'v2' ? '<span style="background:#1565c0;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px;margin-left:6px;vertical-align:middle;">v2</span>' : '';
         
         let linksHtml = '';
         if (module.swaggerUrl) {
@@ -202,7 +203,7 @@ function renderResults(results) {
             <div class="search-result-card" style="border-left-color: ${borderColor}">
                 <div class="search-result-header">
                     <span class="search-result-badge ${badgeClass}">${escapeHtml(module.emoji)} ${escapeHtml(module.displayCategory)}</span>
-                    <span class="search-result-title">${escapedName}</span>
+                    <span class="search-result-title">${escapedName}${v2Badge}</span>
                     ${module.pathCount ? `<span class="search-result-paths">${module.pathCount} ${pathLabel}</span>` : ''}
                     <button class="favorite-btn ${isFav ? 'active' : ''}" 
                             data-module="${escapedName}"

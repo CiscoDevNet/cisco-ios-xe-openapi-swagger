@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Code Generator - Cisco IOS-XE RESTCONF</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:*;">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" crossorigin="anonymous">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -98,6 +98,20 @@
     <div class="container">
         <div class="form-section">
             <h3>🔧 Request Configuration</h3>
+            
+            <div class="form-group">
+                <label>Select Spec (optional — auto-fills path)</label>
+                <select id="specPicker" onchange="onSpecSelected()">
+                    <option value="">— Manual path entry —</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="pathPickerGroup" style="display:none;">
+                <label>Select Path from Spec</label>
+                <select id="pathPicker" onchange="onPathSelected()">
+                    <option value="">— Select a path —</option>
+                </select>
+            </div>
             
             <div class="form-group">
                 <label>Device/Host</label>
@@ -401,7 +415,114 @@ fetch(url, options)
             document.getElementById('body').value = '';
             document.getElementById('bodyGroup').style.display = 'none';
             document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('specPicker').value = '';
+            document.getElementById('pathPickerGroup').style.display = 'none';
         }
+
+        // --- Spec Picker: load specs from search-index.json ---
+        let loadedSpec = null;
+
+        async function loadSpecPicker() {
+            try {
+                const resp = await fetch('search-index.json');
+                const data = await resp.json();
+                const picker = document.getElementById('specPicker');
+                // Group by category
+                const groups = {};
+                data.modules.forEach(m => {
+                    const label = m.displayCategory + (m.version === 'v2' ? ' (v2)' : '');
+                    if (!groups[label]) groups[label] = [];
+                    groups[label].push(m);
+                });
+                for (const [groupLabel, mods] of Object.entries(groups).sort()) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = groupLabel;
+                    mods.sort((a, b) => a.name.localeCompare(b.name)).forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.swaggerUrl;
+                        opt.dataset.category = m.category;
+                        opt.dataset.version = m.version || 'v1';
+                        opt.dataset.name = m.name;
+                        opt.textContent = `${m.name} (${m.pathCount} paths)`;
+                        optgroup.appendChild(opt);
+                    });
+                    picker.appendChild(optgroup);
+                }
+            } catch (e) {
+                console.error('Failed to load search index for spec picker:', e);
+            }
+        }
+
+        async function onSpecSelected() {
+            const picker = document.getElementById('specPicker');
+            const pathPickerGroup = document.getElementById('pathPickerGroup');
+            const pathPicker = document.getElementById('pathPicker');
+
+            if (!picker.value) {
+                pathPickerGroup.style.display = 'none';
+                loadedSpec = null;
+                return;
+            }
+
+            // Determine the JSON URL from swaggerUrl
+            const opt = picker.selectedOptions[0];
+            const category = opt.dataset.category;
+            const version = opt.dataset.version;
+            const name = opt.dataset.name;
+            const apiFolder = version === 'v2' ? 'api-v2' : 'api';
+            const specUrl = `${category}/${apiFolder}/${name}.json`;
+
+            try {
+                const resp = await fetch(specUrl);
+                loadedSpec = await resp.json();
+                // Populate path picker
+                pathPicker.innerHTML = '<option value="">— Select a path —</option>';
+                const paths = Object.keys(loadedSpec.paths).sort();
+                paths.forEach(p => {
+                    const methods = Object.keys(loadedSpec.paths[p])
+                        .filter(m => ['get','put','patch','delete','post'].includes(m))
+                        .map(m => m.toUpperCase()).join(', ');
+                    const opt = document.createElement('option');
+                    opt.value = p;
+                    opt.textContent = `${p}  [${methods}]`;
+                    pathPicker.appendChild(opt);
+                });
+                pathPickerGroup.style.display = 'block';
+            } catch (e) {
+                console.error('Failed to load spec:', e);
+                pathPickerGroup.style.display = 'none';
+            }
+        }
+
+        function onPathSelected() {
+            const pathPicker = document.getElementById('pathPicker');
+            if (pathPicker.value) {
+                document.getElementById('path').value = pathPicker.value;
+                // Try to set method and body from spec
+                if (loadedSpec && loadedSpec.paths[pathPicker.value]) {
+                    const ops = loadedSpec.paths[pathPicker.value];
+                    const methods = Object.keys(ops).filter(m => ['get','put','patch','delete','post'].includes(m));
+                    if (methods.length > 0) {
+                        document.getElementById('method').value = methods[0].toUpperCase();
+                        document.getElementById('method').dispatchEvent(new Event('change'));
+                    }
+                    // Auto-fill example body for PUT/PATCH/POST
+                    const writeMethod = methods.find(m => ['put', 'patch', 'post'].includes(m));
+                    if (writeMethod && ops[writeMethod]) {
+                        const rb = ops[writeMethod].requestBody;
+                        if (rb && rb.content) {
+                            const jsonContent = rb.content['application/yang-data+json'] || rb.content['application/json'];
+                            if (jsonContent && jsonContent.schema && jsonContent.schema.example) {
+                                document.getElementById('body').value = JSON.stringify(jsonContent.schema.example, null, 2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Load spec picker on page load
+        loadSpecPicker();
     </script>
 </body>
 </html>
