@@ -1,11 +1,11 @@
 """
-Generate a complete Postman v2.1 collection from all OpenAPI 3.0 specs.
+Generate Postman v2.1 collections from all OpenAPI 3.0 specs.
 
-Reads all 681 specs across 9 model folders and generates a single Postman
-collection with every path/operation, organized into folders by model category
-and YANG module. Uses the Postman environment variables for device/auth.
+Reads v1 (672 specs) and v2 deep-path (382 specs) across 9+4 model folders
+and generates split Postman collections organized by model category.
 
-Output: tools/IOS-XE-RESTCONF-Complete.postman_collection.json
+Output: tools/IOS-XE-RESTCONF-v1.postman_collection.json
+        tools/IOS-XE-RESTCONF-v2-deep.postman_collection.json
 """
 import json
 import glob
@@ -224,10 +224,10 @@ def main():
             "name": "Cisco IOS-XE 17.18.1 RESTCONF - Complete Collection",
             "description": (
                 "Complete Postman collection for Cisco IOS-XE 17.18.1 RESTCONF APIs.\n\n"
-                "**Auto-generated** from 681 OpenAPI 3.0 specs covering:\n"
-                "- 13,840 RESTCONF endpoints\n"
-                "- 24,734 operations (GET/PUT/POST/PATCH/DELETE)\n"
-                "- 848 YANG modules across 9 categories\n\n"
+                "**Auto-generated** from 747 OpenAPI 3.0 specs covering:\n"
+                "- 34,694 RESTCONF endpoints\n"
+                "- 58,001 operations (GET/PUT/POST/PATCH/DELETE)\n"
+                "- 848 YANG modules across 9 categories (v1 + v2 deep-path)\n\n"
                 "**Setup:**\n"
                 "1. Import the companion environment: `IOS-XE-RESTCONF.postman_environment.json`\n"
                 "2. Set your device IP, username, and password in the environment\n"

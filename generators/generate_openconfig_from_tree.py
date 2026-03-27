@@ -327,23 +327,35 @@ def process_tree_file(html_path, output_dir, max_depth=5):
     if not roots:
         return results
 
+    # Group all roots by module name to avoid duplicates
+    from collections import defaultdict
+    module_roots = defaultdict(list)
     for module_name, root in roots:
-        base = f"/data/{module_name}:{root.name}"
-        deep = collect_deep_paths(root, base, max_depth=max_depth)
-        paths_dict = {}
-        for rp, rn in deep:
-            if rp not in paths_dict:
-                paths_dict[rp] = make_path_ops(rp, rn, root.name, module_name)
-        if not paths_dict:
+        module_roots[module_name].append(root)
+
+    for module_name, root_list in module_roots.items():
+        # Merge paths from all roots with the same module name
+        all_paths = {}
+        root_names = []
+        for root in root_list:
+            base = f"/data/{module_name}:{root.name}"
+            root_names.append(root.name)
+            deep = collect_deep_paths(root, base, max_depth=max_depth)
+            for rp, rn in deep:
+                if rp not in all_paths:
+                    all_paths[rp] = make_path_ops(rp, rn, root.name, module_name)
+        if not all_paths:
             continue
 
-        total_ops = sum(len(o) for o in paths_dict.values())
+        total_ops = sum(len(o) for o in all_paths.values())
         title = f"OpenConfig - {module_name}"
         desc = (f"OpenConfig `{module_name}` module.\n\n"
-                f"**Root:** {root.name} | **Paths:** {len(paths_dict)} | **Ops:** {total_ops}\n\n"
+                f"**Root containers:** {len(root_list)} ({', '.join(root_names[:5])}{'...' if len(root_names) > 5 else ''})\n"
+                f"**Paths:** {len(all_paths)} | **Ops:** {total_ops}\n\n"
                 f"`config` subtrees: GET/PUT/PATCH/DELETE | `state` subtrees: GET only.")
 
-        spec = create_spec(title, desc, root.name, paths_dict, module_name)
+        primary_tag = root_list[0].name
+        spec = create_spec(title, desc, primary_tag, all_paths, module_name)
         spec_json = json.dumps(spec, indent=2)
         if len(spec_json.encode('utf-8')) / 1024 > 2048 and max_depth > 3:
             return process_tree_file(html_path, output_dir, max_depth - 1)
@@ -351,7 +363,7 @@ def process_tree_file(html_path, output_dir, max_depth=5):
         out = output_dir / f"{module_name}.json"
         with open(out, 'w', encoding='utf-8') as f:
             f.write(spec_json)
-        results.append((module_name, len(paths_dict), total_ops))
+        results.append((module_name, len(all_paths), total_ops))
     return results
 
 

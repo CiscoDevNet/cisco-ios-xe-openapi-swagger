@@ -50,9 +50,9 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 
 | Metric | Count |
 |--------|-------|
-| OpenAPI Specifications | 672 |
-| API Paths | 13,813 |
-| API Operations | 24,704 |
+| OpenAPI Specifications | 747 |
+| API Paths | 34,694 |
+| API Operations | 58,001 |
 | YANG Tree Files | 768 |
 | Model Types | 9 |
 | IOS-XE Version | 17.18.1 |
@@ -70,4 +70,4 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 - **404 errors?** Ensure paths are relative (not starting with /)
 - **Large deploy?** Workflow has 15-minute timeout; should complete in about 2 minutes
 
-Last updated: February 14, 2026
+Last updated: March 27, 2026
