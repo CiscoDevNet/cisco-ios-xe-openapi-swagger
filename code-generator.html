@@ -101,14 +101,17 @@
             
             <div class="form-group">
                 <label>Select Spec (optional — auto-fills path)</label>
-                <select id="specPicker" onchange="onSpecSelected()">
+                <input type="text" id="specSearch" placeholder="🔍 Type to filter modules (e.g., interfaces, bgp, aaa)..." oninput="filterSpecPicker()" style="margin-bottom:6px;">
+                <select id="specPicker" onchange="onSpecSelected()" size="1">
                     <option value="">— Manual path entry —</option>
                 </select>
+                <div style="font-size:0.8rem;color:#888;margin-top:4px;" id="specCount"></div>
             </div>
             
             <div class="form-group" id="pathPickerGroup" style="display:none;">
                 <label>Select Path from Spec</label>
-                <select id="pathPicker" onchange="onPathSelected()">
+                <input type="text" id="pathSearch" placeholder="🔍 Filter paths..." oninput="filterPathPicker()" style="margin-bottom:6px;">
+                <select id="pathPicker" onchange="onPathSelected()" size="1">
                     <option value="">— Select a path —</option>
                 </select>
             </div>
@@ -193,6 +196,13 @@
                 <div class="code-block">
                     <button class="copy-btn" onclick="copyCode('ansibleCode')">📋 Copy</button>
                     <code id="ansibleCode"></code>
+                </div>
+            </div>
+            
+            <div id="javascriptTab" class="tab-content">
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode('javascriptCode')">📋 Copy</button>
+                    <code id="javascriptCode"></code>
                 </div>
             </div>
         </div>
@@ -341,39 +351,39 @@ else:
       when: api_response.json is defined`;
 
             // Generate JavaScript (fetch) code
-            let jsCode = // Cisco IOS-XE RESTCONF API Example
-// Generated: 
+            let jsCode = `// Cisco IOS-XE RESTCONF API Example
+// Generated: ${new Date().toISOString()}
 
-const host = "System.Management.Automation.Internal.Host.InternalHost";
-const username = "";
-const password = "";
+const host = "${host}";
+const username = "${username}";
+const password = "${password}";
 
-const url = \https://\System.Management.Automation.Internal.Host.InternalHostSystem.Management.Automation.PSCustomObject /operations/tailf_netconf_transactions:start-transaction=@{post=; x-yang-path=/start-transaction; x-restconf-kind=rpc}\;
+const url = \`https://\${host}${path}\`;
 
 const headers = {
   "Accept": "application/yang-data+json",
   "Content-Type": "application/yang-data+json",
-  "Authorization": "Basic " + btoa(\\:\\)
+  "Authorization": "Basic " + btoa(\`\${username}:\${password}\`)
 };
 
 const options = {
-  method: "",
-  headers: headers,;
+  method: "${method}",
+  headers: headers,`;
 
             if (['POST', 'PUT', 'PATCH'].includes(method) && body) {
-                jsCode += \n  body: JSON.stringify(),;
+                jsCode += `\n  body: JSON.stringify(${body}),`;
             }
 
-            jsCode += \n};
+            jsCode += `\n};
 
 fetch(url, options)
   .then(response => {
-    console.log(\Status: \\);
-    if (!response.ok) throw new Error(\HTTP \\);
+    console.log(\`Status: \${response.status}\`);
+    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
     return response.json();
   })
   .then(data => console.log(JSON.stringify(data, null, 2)))
-  .catch(error => console.error("Error:", error));;
+  .catch(error => console.error("Error:", error));`;
 
             // Update code blocks
             document.getElementById('curlCode').textContent = curlCode;
@@ -416,38 +426,73 @@ fetch(url, options)
             document.getElementById('bodyGroup').style.display = 'none';
             document.getElementById('outputSection').style.display = 'none';
             document.getElementById('specPicker').value = '';
+            document.getElementById('specSearch').value = '';
+            document.getElementById('pathSearch').value = '';
             document.getElementById('pathPickerGroup').style.display = 'none';
+            filterSpecPicker();
         }
 
         // --- Spec Picker: load specs from search-index.json ---
         let loadedSpec = null;
+        let allSpecModules = [];  // Store all modules for filtering
+
+        function filterSpecPicker() {
+            const query = document.getElementById('specSearch').value.toLowerCase().trim();
+            const picker = document.getElementById('specPicker');
+            picker.innerHTML = '<option value="">— Manual path entry —</option>';
+            
+            const filtered = query 
+                ? allSpecModules.filter(m => m.name.toLowerCase().includes(query) || (m.keywords || []).some(k => k.toLowerCase().includes(query)))
+                : allSpecModules;
+            
+            // Group by category
+            const groups = {};
+            filtered.forEach(m => {
+                const label = m.displayCategory + (m.version === 'v2' ? ' (v2)' : '');
+                if (!groups[label]) groups[label] = [];
+                groups[label].push(m);
+            });
+
+            for (const [groupLabel, mods] of Object.entries(groups).sort()) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = groupLabel;
+                mods.sort((a, b) => a.name.localeCompare(b.name)).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.swaggerUrl || '';
+                    opt.dataset.category = m.category;
+                    opt.dataset.version = m.version || 'v1';
+                    opt.dataset.name = m.name;
+                    opt.textContent = `${m.name} (${m.pathCount || 0} paths)`;
+                    optgroup.appendChild(opt);
+                });
+                picker.appendChild(optgroup);
+            }
+            
+            document.getElementById('specCount').textContent = `${filtered.length} of ${allSpecModules.length} modules`;
+        }
+
+        let allPaths = [];  // Store all paths for filtering
+
+        function filterPathPicker() {
+            const query = document.getElementById('pathSearch').value.toLowerCase().trim();
+            const picker = document.getElementById('pathPicker');
+            picker.innerHTML = '<option value="">— Select a path —</option>';
+            
+            const filtered = query ? allPaths.filter(p => p.path.toLowerCase().includes(query)) : allPaths;
+            filtered.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.path;
+                opt.textContent = `${p.path}  [${p.methods}]`;
+                picker.appendChild(opt);
+            });
+        }
 
         async function loadSpecPicker() {
             try {
                 const resp = await fetch('search-index.json');
                 const data = await resp.json();
-                const picker = document.getElementById('specPicker');
-                // Group by category
-                const groups = {};
-                data.modules.forEach(m => {
-                    const label = m.displayCategory + (m.version === 'v2' ? ' (v2)' : '');
-                    if (!groups[label]) groups[label] = [];
-                    groups[label].push(m);
-                });
-                for (const [groupLabel, mods] of Object.entries(groups).sort()) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = groupLabel;
-                    mods.sort((a, b) => a.name.localeCompare(b.name)).forEach(m => {
-                        const opt = document.createElement('option');
-                        opt.value = m.swaggerUrl;
-                        opt.dataset.category = m.category;
-                        opt.dataset.version = m.version || 'v1';
-                        opt.dataset.name = m.name;
-                        opt.textContent = `${m.name} (${m.pathCount} paths)`;
-                        optgroup.appendChild(opt);
-                    });
-                    picker.appendChild(optgroup);
-                }
+                allSpecModules = data.modules;
+                filterSpecPicker();
             } catch (e) {
                 console.error('Failed to load search index for spec picker:', e);
             }
@@ -456,11 +501,11 @@ fetch(url, options)
         async function onSpecSelected() {
             const picker = document.getElementById('specPicker');
             const pathPickerGroup = document.getElementById('pathPickerGroup');
-            const pathPicker = document.getElementById('pathPicker');
 
             if (!picker.value) {
                 pathPickerGroup.style.display = 'none';
                 loadedSpec = null;
+                allPaths = [];
                 return;
             }
 
@@ -475,29 +520,32 @@ fetch(url, options)
             try {
                 const resp = await fetch(specUrl);
                 loadedSpec = await resp.json();
-                // Populate path picker
-                pathPicker.innerHTML = '<option value="">— Select a path —</option>';
-                const paths = Object.keys(loadedSpec.paths).sort();
-                paths.forEach(p => {
+                // Build allPaths for filtering
+                allPaths = Object.keys(loadedSpec.paths).sort().map(p => {
                     const methods = Object.keys(loadedSpec.paths[p])
                         .filter(m => ['get','put','patch','delete','post'].includes(m))
                         .map(m => m.toUpperCase()).join(', ');
-                    const opt = document.createElement('option');
-                    opt.value = p;
-                    opt.textContent = `${p}  [${methods}]`;
-                    pathPicker.appendChild(opt);
+                    return { path: p, methods: methods };
                 });
+                document.getElementById('pathSearch').value = '';
+                filterPathPicker();
                 pathPickerGroup.style.display = 'block';
             } catch (e) {
                 console.error('Failed to load spec:', e);
                 pathPickerGroup.style.display = 'none';
+                allPaths = [];
             }
         }
 
         function onPathSelected() {
             const pathPicker = document.getElementById('pathPicker');
             if (pathPicker.value) {
-                document.getElementById('path').value = pathPicker.value;
+                // Ensure path starts with /restconf
+                let fullPath = pathPicker.value;
+                if (!fullPath.startsWith('/restconf')) {
+                    fullPath = '/restconf' + fullPath;
+                }
+                document.getElementById('path').value = fullPath;
                 // Try to set method and body from spec
                 if (loadedSpec && loadedSpec.paths[pathPicker.value]) {
                     const ops = loadedSpec.paths[pathPicker.value];
@@ -512,8 +560,12 @@ fetch(url, options)
                         const rb = ops[writeMethod].requestBody;
                         if (rb && rb.content) {
                             const jsonContent = rb.content['application/yang-data+json'] || rb.content['application/json'];
-                            if (jsonContent && jsonContent.schema && jsonContent.schema.example) {
-                                document.getElementById('body').value = JSON.stringify(jsonContent.schema.example, null, 2);
+                            if (jsonContent) {
+                                // Check media-level example first, then schema.example
+                                const example = jsonContent.example || (jsonContent.schema && jsonContent.schema.example);
+                                if (example) {
+                                    document.getElementById('body').value = JSON.stringify(example, null, 2);
+                                }
                             }
                         }
                     }
