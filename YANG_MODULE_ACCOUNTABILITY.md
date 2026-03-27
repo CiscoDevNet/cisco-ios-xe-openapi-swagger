@@ -1,6 +1,6 @@
 # YANG Module Accountability Report
 
-**Date:** March 26, 2026
+**Date:** March 27, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 848
 **Modules with OpenAPI Specs:** 424 (50.0%)
@@ -1002,4 +1002,4 @@ Modules that augment native are included in these categorical specs.
 
 ---
 
-*Report generated: 2026-03-26T18:58:49.739770*
+*Report generated: 2026-03-27T10:47:02.037954*

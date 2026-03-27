@@ -3,21 +3,28 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-672-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-747-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 672 modules, 53 categories, and 768 YANG tree files** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 747 specs (v1+v2), 34,694 paths, and 768 YANG tree files** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
-## ✨ What's New - Complete API Coverage
+## ✨ What's New - v2 Deep-Path Specifications
 
-**All 9 model categories have been systematically documented:**
+**Tree-based v2 generators** produce full-depth RESTCONF paths from resolved YANG trees:
+
+- 🆕 **Operational v2:** 205 specs, 20,159 paths (GET-only, up from 200 v1 specs)
+- 🆕 **Config (CFG) v2:** 39 specs, 2,363 paths, 9,452 ops (3x depth vs v1)
+- 🆕 **Native Config v2:** 81 specs, 3,363 paths, 13,452 ops (from 27 v1 specs)
+- 🆕 **OpenConfig v2:** 57 specs, 2,377 paths, 5,920 ops (from 42 v1 specs)
+
+**All 9 model categories documented (v1):**
 
 - ✅ **Native Config:** 27 categories, 328 paths (1,307 operations with examples)
 - ✅ **Operational Data:** 200 modules across 16 categories (4,196 paths)
 - ✅ **Events:** 128 modules (40 YANG + 88 MIB) (455 notification paths)
-- ✅ **RPC Operations:** 58 modules (51 Cisco + 7 IETF/Tailf) (290 operations)
+- ✅ **RPC Operations:** 59 modules (51 Cisco + 7 IETF/Tailf) (311 operations)
 - ✅ **IETF Standards:** 21 modules (552 paths)
 - ✅ **OpenConfig:** 42 modules (2,063 paths)
 - ✅ **MIB Translations:** 147 modules (visualizations for SNMP data)
@@ -36,9 +43,9 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 672 | Generated specifications |
-| **API Paths** | 13,813 | RESTCONF endpoints |
-| **Operations** | 24,704 | Total API operations |
+| **OpenAPI Specs** | 747 | v1 (672) + v2 deep-path (382 unique files) |
+| **API Paths** | 34,694 | RESTCONF endpoints (v2 where available) |
+| **Operations** | 58,001 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 768 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
@@ -178,14 +185,14 @@ python scripts/analyze_yang_accountability.py
 ```
 iosxe-1718-yang-swagger/
 ├── index.html                          # Main landing page
-├── swagger-oper-model/                 # Operational (200 modules)
-├── swagger-rpc-model/                  # RPC (58 modules)
-├── swagger-cfg-model/                  # Config (39 modules)
-├── swagger-openconfig-model/           # OpenConfig (42 modules)
+├── swagger-oper-model/                 # Operational (200 v1 + 205 v2 specs)
+├── swagger-rpc-model/                  # RPC (59 modules)
+├── swagger-cfg-model/                  # Config (39 v1 + 39 v2 specs)
+├── swagger-openconfig-model/           # OpenConfig (42 v1 + 57 v2 specs)
 ├── swagger-ietf-model/                 # IETF (21 modules)
 ├── swagger-mib-model/                  # MIB (147 modules)
 ├── swagger-events-model/               # Events (128 modules)
-├── swagger-native-config-model/        # Native (27 modules)
+├── swagger-native-config-model/        # Native (27 v1 + 81 v2 specs)
 ├── swagger-other-model/                # Other (10 modules)
 ├── generators/                         # Python YANG parsers
 ├── scripts/                            # Validation/analysis tools
@@ -214,4 +221,4 @@ iosxe-1718-yang-swagger/
 
 ---
 
-**Last Updated**: February 2026 | **IOS-XE Version**: 17.18.1 | **OpenAPI**: 3.0.0
+**Last Updated**: March 2026 | **IOS-XE Version**: 17.18.1 | **OpenAPI**: 3.0.0

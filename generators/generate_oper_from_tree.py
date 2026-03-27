@@ -478,33 +478,45 @@ def process_tree_file(html_path, output_dir, max_depth=5):
     if not roots:
         return results
 
+    # Group all roots by module name to avoid duplicates
+    from collections import defaultdict
+    module_roots = defaultdict(list)
     for module_name, root in roots:
-        base_path = f"/data/{module_name}:{root.name}"
-        tag = root.name
+        module_roots[module_name].append(root)
 
-        deep = collect_deep_paths(root, base_path, max_depth=max_depth)
-        paths_dict = {}
-        for rpath, rnode in deep:
-            if rpath not in paths_dict:
-                paths_dict[rpath] = make_get_operation(rpath, rnode, tag, module_name)
+    for module_name, root_list in module_roots.items():
+        # Merge paths from all roots with the same module name
+        all_paths = {}
+        total_descendants = 0
+        root_names = []
+        for root in root_list:
+            base_path = f"/data/{module_name}:{root.name}"
+            tag = root.name
+            root_names.append(root.name)
+            total_descendants += root.descendant_count()
 
-        if not paths_dict:
+            deep = collect_deep_paths(root, base_path, max_depth=max_depth)
+            for rpath, rnode in deep:
+                if rpath not in all_paths:
+                    all_paths[rpath] = make_get_operation(rpath, rnode, tag, module_name)
+
+        if not all_paths:
             continue
 
-        desc_count = root.descendant_count()
         title = f"Cisco IOS-XE Operational - {module_name}"
         desc = (f"Operational data from `{module_name}` module.\n\n"
-                f"**Root container:** {root.name}\n"
-                f"**Paths:** {len(paths_dict)} | **Descendants:** {desc_count}\n\n"
+                f"**Root containers:** {len(root_list)} ({', '.join(root_names[:5])}{'...' if len(root_names) > 5 else ''})\n"
+                f"**Paths:** {len(all_paths)} | **Descendants:** {total_descendants}\n\n"
                 f"All endpoints are read-only (GET).")
 
-        spec = create_spec(title, desc, tag, paths_dict, module_name)
+        # Use first root name as the primary tag
+        primary_tag = root_list[0].name
+        spec = create_spec(title, desc, primary_tag, all_paths, module_name)
 
         # Check size and limit depth if too large
         spec_json = json.dumps(spec, indent=2)
         size_kb = len(spec_json.encode('utf-8')) / 1024
         if size_kb > 2048 and max_depth > 3:
-            # Retry with reduced depth
             return process_tree_file(html_path, output_dir, max_depth=max_depth - 1)
 
         fname = module_name
@@ -512,7 +524,7 @@ def process_tree_file(html_path, output_dir, max_depth=5):
         with open(out_path, 'w', encoding='utf-8') as f:
             f.write(spec_json)
 
-        results.append((fname, len(paths_dict)))
+        results.append((fname, len(all_paths)))
 
     return results
 
