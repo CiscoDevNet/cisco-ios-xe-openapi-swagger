@@ -22,6 +22,11 @@ V2_DIRS = {
     'swagger-oper-model': ('oper-v2', 'Operational v2 (Deep)', '📊'),
     'swagger-cfg-model': ('cfg-v2', 'Configuration v2 (Deep)', '⚙️'),
     'swagger-openconfig-model': ('openconfig-v2', 'OpenConfig v2 (Deep)', '🌐'),
+    'swagger-mib-model': ('mib-v2', 'MIB v2 (Deep)', '📡'),
+    'swagger-ietf-model': ('ietf-v2', 'IETF v2 (Deep)', '📜'),
+    'swagger-rpc-model': ('rpc-v2', 'RPC v2 (Deep)', '🔧'),
+    'swagger-events-model': ('events-v2', 'Events v2 (Deep)', '🔔'),
+    'swagger-other-model': ('other-v2', 'Other v2 (Deep)', '📦'),
 }
 
 modules = []

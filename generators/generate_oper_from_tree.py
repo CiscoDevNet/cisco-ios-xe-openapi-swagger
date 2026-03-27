@@ -65,7 +65,7 @@ def parse_yang_tree_html(html_path: str) -> List[Tuple[str, TreeNode]]:
     tree_text = None
     for pre in reversed(pre_matches):
         cleaned = re.sub(r'<[^>]+>', '', pre)
-        if re.search(r'[+o]--(rw|ro|x)', cleaned):
+        if re.search(r'[+o]-+(rw|ro|x)', cleaned):
             tree_text = cleaned
             break
 
@@ -96,7 +96,7 @@ def parse_yang_tree_html(html_path: str) -> List[Tuple[str, TreeNode]]:
     # First pass: find all tree node lines and their column positions
     node_lines = []
     for i, line in enumerate(lines):
-        marker = re.search(r'[+o]--(rw|ro|x)\s+(\S+)(.*)', line)
+        marker = re.search(r'[+o]-+(rw|ro|x)\s+(\S+)(.*)', line)
         if marker:
             node_lines.append((i, marker.start(), marker))
 
@@ -154,7 +154,7 @@ def parse_yang_tree_html(html_path: str) -> List[Tuple[str, TreeNode]]:
                 node_stack.append((c, node))
                 continue
 
-            m = re.search(r'[+o]--(rw|ro|x)\s+(\S+)(.*)', line)
+            m = re.search(r'[+o]-+(rw|ro|x)\s+(\S+)(.*)', line)
             if not m:
                 continue
 

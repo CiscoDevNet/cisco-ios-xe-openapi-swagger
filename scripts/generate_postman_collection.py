@@ -37,6 +37,11 @@ V2_MODEL_DISPLAY = OrderedDict([
     ("swagger-native-config-model",  "2b - Native Configuration v2 (Deep Paths)"),
     ("swagger-oper-model",           "3b - Operational v2 (Deep Paths)"),
     ("swagger-openconfig-model",     "5b - OpenConfig v2 (Deep Paths)"),
+    ("swagger-ietf-model",           "4b - IETF v2 (Deep Paths)"),
+    ("swagger-mib-model",            "6b - MIB v2 (Deep Paths)"),
+    ("swagger-rpc-model",            "7b - RPC v2 (Deep Paths)"),
+    ("swagger-events-model",         "8b - Event Streams v2 (Deep Paths)"),
+    ("swagger-other-model",          "9b - Other v2 (Deep Paths)"),
 ])
 
 # HTTP method sort order
@@ -405,7 +410,17 @@ def main():
     print(f"\n{'=' * 60}")
     print("Writing split collections...")
     v1_path, v1_size = write_collection(v1_items, "v1", "v1 (Category Specs)")
+
+    # Split v2 further if over 95MB (GitHub 100MB limit)
     v2_path, v2_size = write_collection(v2_items, "v2-deep", "v2 (Deep Path Specs)")
+    if v2_size > 95 * 1024 * 1024:
+        print(f"  v2 collection ({v2_size/1024/1024:.1f} MB) exceeds 95MB, splitting into parts...")
+        os.remove(v2_path)
+        # Split alphabetically by folder name roughly in half
+        mid = len(v2_items) // 2
+        v2a_path, v2a_size = write_collection(v2_items[:mid], "v2-deep-part1", "v2 Part 1 (Deep Path Specs)")
+        v2b_path, v2b_size = write_collection(v2_items[mid:], "v2-deep-part2", "v2 Part 2 (Deep Path Specs)")
+        v2_size = v2a_size + v2b_size
 
     print(f"\n  Specs processed: {total_specs}")
     print(f"  Total paths:     {total_paths}")

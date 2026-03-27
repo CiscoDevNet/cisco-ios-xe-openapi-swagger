@@ -108,7 +108,7 @@ def parse_yang_tree_html(html_path: str) -> TreeNode:
             continue
 
         # Find the [+o]-- marker position first, then extract rw/ro and name
-        marker_match = re.search(r'[+o]--(rw|ro|x)\s+(\S+)(.*)', line)
+        marker_match = re.search(r'[+o]-+(rw|ro|x)\s+(\S+)(.*)', line)
         if not marker_match:
             continue
 

@@ -3,21 +3,26 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-747-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-1317-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 747 specs (v1+v2), 34,694 paths, and 768 YANG tree files** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 1,317 specs (v1+v2), 43,649 paths, and 768 YANG tree files** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
 ## ✨ What's New - v2 Deep-Path Specifications
 
-**Tree-based v2 generators** produce full-depth RESTCONF paths from resolved YANG trees:
+**Tree-based v2 generators** produce full-depth RESTCONF paths from resolved YANG trees. All 9 model types now have v2:
 
 - 🆕 **Operational v2:** 205 specs, 20,159 paths (GET-only, up from 200 v1 specs)
 - 🆕 **Config (CFG) v2:** 39 specs, 2,363 paths, 9,452 ops (3x depth vs v1)
 - 🆕 **Native Config v2:** 81 specs, 3,363 paths, 13,452 ops (from 27 v1 specs)
 - 🆕 **OpenConfig v2:** 57 specs, 2,377 paths, 5,920 ops (from 42 v1 specs)
+- 🆕 **IETF v2:** 19 specs, 438 paths, 1,122 ops (mixed CRUD + RPC)
+- 🆕 **MIB v2:** 149 specs, 12,482 paths (GET-only deep paths)
+- 🆕 **RPC v2:** 48 specs, 232 RPCs (POST to /operations/)
+- 🆕 **Events v2:** 38 specs, 861 paths (notifications + data endpoints)
+- 🆕 **Other v2:** 9 specs, 1,374 paths, 4,593 ops (full CRUD)
 
 **All 9 model categories documented (v1):**
 
@@ -43,9 +48,9 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 747 | v1 (672) + v2 deep-path (382 unique files) |
-| **API Paths** | 34,694 | RESTCONF endpoints (v2 where available) |
-| **Operations** | 58,001 | Total API operations |
+| **OpenAPI Specs** | 1,317 | v1 (672) + v2 deep-path (645 specs across all 9 models) |
+| **API Paths** | 43,649 | RESTCONF endpoints (v2 where available) |
+| **Operations** | 68,273 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 768 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
@@ -67,42 +72,43 @@ Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
 
-#### 🔔 Events (128 modules: 40 YANG + 88 MIB, 455 notification paths)
+#### 🔔 Events (128 v1 modules, 38 v2 specs, 861 paths)
 Event notification modules for YANG-Push telemetry and SNMP trap visualization.
 - **YANG Events:** 40 Cisco-IOS-XE event modules
 - **MIB Notifications:** 88 SNMP trap modules (view-only in Swagger)
-- [Browse Events APIs →](swagger-events-model/)
+- [Browse Events v2 APIs →](swagger-events-model/index-v2.html) | [v1 →](swagger-events-model/)
 
-#### ⚡ RPC Operations (58 modules, 290 operations)
+#### ⚡ RPC Operations (59 v1 modules, 48 v2 specs, 232 RPCs)
 Remote procedure calls for device actions and commands.
 - **Cisco RPCs:** 51 modules for device operations
 - **IETF/Tailf:** 7 modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query, and others)
-- [Browse RPC APIs →](swagger-rpc-model/)
+- [Browse RPC v2 APIs →](swagger-rpc-model/index-v2.html) | [v1 →](swagger-rpc-model/)
 
 ### 📚 Standard Models (Original Structure)
 
-#### ⚙️ Configuration (39 modules, 815 paths)
+#### ⚙️ Configuration (39 v1 + 39 v2 specs, 2,363 paths)
 Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
-- [Browse Config APIs →](swagger-cfg-model/)
+- [Browse Config v2 APIs →](swagger-cfg-model/index-v2.html) | [v1 →](swagger-cfg-model/)
 
-#### 🌍 OpenConfig (42 modules, 2,063 paths)
+#### 🌍 OpenConfig (42 v1 + 57 v2 specs, 2,377 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
-- [Browse OpenConfig APIs →](swagger-openconfig-model/)
+- [Browse OpenConfig v2 APIs →](swagger-openconfig-model/index-v2.html) | [v1 →](swagger-openconfig-model/)
 
-#### 📜 IETF Standards (21 modules, 552 paths)
+#### 📜 IETF Standards (21 v1 + 19 v2 specs, 438 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
-- [Browse IETF APIs →](swagger-ietf-model/)
+- [Browse IETF v2 APIs →](swagger-ietf-model/index-v2.html) | [v1 →](swagger-ietf-model/)
 
-#### 📡 MIB Translations (147 modules)
+#### 📡 MIB Translations (147 v1 + 149 v2 specs, 12,482 paths)
 SNMP MIB modules with YANG tree visualizations.
 - IF-MIB, CISCO-PROCESS-MIB, OSPF-MIB, Entity MIBs
-- [Browse MIB APIs →](swagger-mib-model/)
+- [Browse MIB v2 APIs →](swagger-mib-model/index-v2.html) | [v1 →](swagger-mib-model/)
 
-#### 📦 Other Models (10 modules)
+#### 📦 Other Models (10 v1 + 9 v2 specs, 1,374 paths)
 Standalone and vendor-specific modules.
+- [Browse Other v2 APIs →](swagger-other-model/index-v2.html) | [v1 →](swagger-other-model/)
 - [Browse Other APIs →](swagger-other-model/)
 
 ## 🚀 Quick Start
@@ -186,14 +192,14 @@ python scripts/analyze_yang_accountability.py
 iosxe-1718-yang-swagger/
 ├── index.html                          # Main landing page
 ├── swagger-oper-model/                 # Operational (200 v1 + 205 v2 specs)
-├── swagger-rpc-model/                  # RPC (59 modules)
+├── swagger-rpc-model/                  # RPC (59 v1 + 48 v2 specs)
 ├── swagger-cfg-model/                  # Config (39 v1 + 39 v2 specs)
 ├── swagger-openconfig-model/           # OpenConfig (42 v1 + 57 v2 specs)
-├── swagger-ietf-model/                 # IETF (21 modules)
-├── swagger-mib-model/                  # MIB (147 modules)
-├── swagger-events-model/               # Events (128 modules)
+├── swagger-ietf-model/                 # IETF (21 v1 + 19 v2 specs)
+├── swagger-mib-model/                  # MIB (147 v1 + 149 v2 specs)
+├── swagger-events-model/               # Events (128 v1 + 38 v2 specs)
 ├── swagger-native-config-model/        # Native (27 v1 + 81 v2 specs)
-├── swagger-other-model/                # Other (10 modules)
+├── swagger-other-model/                # Other (10 v1 + 9 v2 specs)
 ├── generators/                         # Python YANG parsers
 ├── scripts/                            # Validation/analysis tools
 └── references/17181-YANG-modules/      # 848 YANG sources
