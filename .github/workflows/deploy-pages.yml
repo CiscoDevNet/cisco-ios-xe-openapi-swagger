@@ -15,7 +15,90 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Validate OpenAPI specs
+        run: |
+          echo "=== OpenAPI Spec Validation ==="
+          errors=0
+          total=0
+          
+          # Validate all JSON specs are parseable
+          for dir in swagger-*-model/api swagger-*-model/api-v2; do
+            if [ -d "$dir" ]; then
+              for f in "$dir"/*.json; do
+                [ -f "$f" ] || continue
+                total=$((total + 1))
+                if ! python3 -c "import json; json.load(open('$f'))" 2>/dev/null; then
+                  echo "❌ Invalid JSON: $f"
+                  errors=$((errors + 1))
+                fi
+              done
+            fi
+          done
+          
+          echo "Validated $total JSON files, $errors errors"
+          
+          if [ $errors -gt 0 ]; then
+            echo "::error::$errors spec files have invalid JSON"
+            exit 1
+          fi
+          echo "✅ All specs valid"
+
+      - name: Validate manifests
+        run: |
+          echo "=== Manifest Validation ==="
+          errors=0
+          
+          for manifest in swagger-*-model/api-v2/manifest.json; do
+            [ -f "$manifest" ] || continue
+            dir=$(dirname "$manifest")
+            model=$(basename $(dirname "$dir"))
+            
+            # Check manifest module count matches file count
+            declared=$(python3 -c "import json; print(json.load(open('$manifest'))['total_modules'])")
+            actual=$(ls "$dir"/*.json 2>/dev/null | grep -v manifest | wc -l)
+            
+            if [ "$declared" != "$actual" ]; then
+              echo "❌ $model: manifest declares $declared modules but found $actual files"
+              errors=$((errors + 1))
+            else
+              echo "✅ $model: $declared modules OK"
+            fi
+          done
+          
+          if [ $errors -gt 0 ]; then
+            echo "::error::Manifest count mismatches found"
+            exit 1
+          fi
+
+      - name: Validate search index
+        run: |
+          echo "=== Search Index Validation ==="
+          python3 -c "
+          import json
+          with open('search-index.json', encoding='utf-8') as f:
+              data = json.load(f)
+          modules = data['modules']
+          stats = data['stats']
+          print(f'Search index: {len(modules)} modules, {stats[\"total_endpoints\"]} endpoints')
+          
+          # Check no duplicates
+          names = [m['name'] + ':' + m.get('version','v1') for m in modules]
+          dupes = [n for n in set(names) if names.count(n) > 1]
+          if dupes:
+              print(f'❌ Duplicates found: {dupes[:5]}')
+              exit(1)
+          print('✅ No duplicates')
+          "
+
   deploy:
+    needs: validate
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
