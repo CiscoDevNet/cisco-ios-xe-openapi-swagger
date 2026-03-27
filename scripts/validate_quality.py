@@ -140,10 +140,14 @@ class QualityValidator:
         
         categories = [
             ('Operational', 'swagger-oper-model/api'),
+            ('Operational v2', 'swagger-oper-model/api-v2'),
             ('RPC', 'swagger-rpc-model/api'),
             ('Config', 'swagger-cfg-model/api'),
+            ('Config v2', 'swagger-cfg-model/api-v2'),
             ('OpenConfig', 'swagger-openconfig-model/api'),
+            ('OpenConfig v2', 'swagger-openconfig-model/api-v2'),
             ('Native', 'swagger-native-config-model/api'),
+            ('Native v2', 'swagger-native-config-model/api-v2'),
             ('IETF', 'swagger-ietf-model/api'),
             ('Events', 'swagger-events-model/api'),
             ('MIB', 'swagger-mib-model/api'),
