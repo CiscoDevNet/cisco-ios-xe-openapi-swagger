@@ -116,6 +116,7 @@
             <div class="download-bar" id="downloadBar">
                 <button class="btn-primary" onclick="downloadSpec()">📥 Download JSON</button>
                 <span id="downloadLabel" style="color: #666; font-size: 12px;"></span>
+                <a id="treeLink" href="#" target="_blank" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
                 <button class="btn-secondary" onclick="copySpecUrl()">📋 Copy URL</button>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
@@ -256,6 +257,17 @@
             deepLinking: true,
             filter: true
         });
+
+        // Update YANG tree link
+        const treeLink = document.getElementById('treeLink');
+        if (treeLink) {
+            const treeUrl = '../yang-trees/' + fname + '.html';
+            treeLink.href = treeUrl;
+            treeLink.style.display = 'none';
+            fetch(treeUrl, { method: 'HEAD' }).then(r => {
+                treeLink.style.display = r.ok ? 'inline-block' : 'none';
+            }).catch(() => { treeLink.style.display = 'none'; });
+        }
     }
 
     function downloadSpec() {

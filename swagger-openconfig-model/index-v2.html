@@ -82,6 +82,7 @@
             <div class="download-bar" id="downloadBar">
                 <button onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
+                <a id="treeLink" href="#" target="_blank" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
             </div>
             <div id="swagger-ui"></div>
         </main>
@@ -129,6 +130,17 @@
         if (el) el.classList.add('selected');
         window.location.hash = '#spec=' + fname;
         SwaggerUIBundle({ url: `${getSpecFolder(fname)}/${fname}.json`, dom_id: '#swagger-ui', presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], layout: 'StandaloneLayout', deepLinking: true, filter: true });
+
+        // Update YANG tree link
+        const treeLink = document.getElementById('treeLink');
+        if (treeLink) {
+            const treeUrl = '../yang-trees/' + fname + '.html';
+            treeLink.href = treeUrl;
+            treeLink.style.display = 'none';
+            fetch(treeUrl, { method: 'HEAD' }).then(r => {
+                treeLink.style.display = r.ok ? 'inline-block' : 'none';
+            }).catch(() => { treeLink.style.display = 'none'; });
+        }
     }
     function downloadSpec() { if (!currentModule) return; const a = document.createElement('a'); a.href = `${getSpecFolder(currentModule)}/${currentModule}.json`; a.download = currentModule+'.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
     function checkHash() { const h = decodeURIComponent(window.location.hash); if (h.startsWith('#spec=')) { const f = h.replace('#spec=',''); if (allModules.find(m=>m.fname===f)) loadSpec(f, document.querySelector(`[data-module="${f}"]`)); } }
