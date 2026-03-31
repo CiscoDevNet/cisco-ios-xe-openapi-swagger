@@ -61,33 +61,33 @@ https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references
 
 ## API Categories Summary
 
-All 9 model types now have **v2 deep-path** specs generated from resolved YANG trees, providing full-depth RESTCONF paths with production-realistic examples.
+All 9 model types have deep-path specs generated from resolved YANG trees, providing full-depth RESTCONF paths with production-realistic examples.
 
-| Category | v1 Specs | v2 Deep Specs | Use Case | Quality |
-|----------|----------|---------------|----------|---------|
-| **Operational** | 200 modules | 205 specs, 20,159 paths | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
-| **Native Config** | 27 categories | 81 specs, 13,452 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
-| **Configuration** | 39 modules | 39 specs, 9,452 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
-| **RPC** | 59 modules | 48 specs, 232 RPCs | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
-| **OpenConfig** | 42 modules | 57 specs, 5,920 ops | Vendor-neutral config | ⭐⭐⭐⭐ Stable |
-| **IETF** | 21 modules | 19 specs, 1,122 ops | Standards-based | ⭐⭐⭐⭐ Stable |
-| **Events** | 128 modules | 38 specs, 861 paths | Notifications | ⭐⭐⭐⭐ Stable |
-| **MIB** | 147 modules | 149 specs, 12,482 paths | SNMP MIB reference | ⚠️ Reference Only |
-| **Other** | 10 modules | 9 specs, 4,593 ops | Misc/vendor-specific | ⭐⭐⭐ Variable |
+| Category | Specs | Paths/Ops | Use Case | Quality |
+|----------|-------|-----------|----------|---------|
+| **Operational** | 205 specs | 20,159 paths | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
+| **Native Config** | 81 specs | 13,452 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
+| **Configuration** | 39 specs | 9,452 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
+| **RPC** | 59 specs | 232 RPCs | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
+| **OpenConfig** | 57 specs | 5,920 ops | Vendor-neutral config | ⭐⭐⭐⭐ Stable |
+| **IETF** | 19 specs | 1,122 ops | Standards-based | ⭐⭐⭐⭐ Stable |
+| **Events** | 38 specs | 861 paths | Notifications | ⭐⭐⭐⭐ Stable |
+| **MIB** | 149 specs | 12,482 paths | SNMP MIB reference | ⚠️ Reference Only |
+| **Other** | 9 specs | 4,593 ops | Misc/vendor-specific | ⭐⭐⭐ Variable |
 
-### v2 Deep-Path Quick Links
+### Quick Links
 
-| Model | v2 Link |
-|-------|---------|
-| Operational | [Browse Oper v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index-v2.html) |
-| Native Config | [Browse Native v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index-v2.html) |
-| Configuration | [Browse Config v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index-v2.html) |
-| OpenConfig | [Browse OpenConfig v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index-v2.html) |
-| IETF | [Browse IETF v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index-v2.html) |
-| MIB | [Browse MIB v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index-v2.html) |
-| RPC | [Browse RPC v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index-v2.html) |
-| Events | [Browse Events v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index-v2.html) |
-| Other | [Browse Other v2](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index-v2.html) |
+| Model | Link |
+|-------|------|
+| Operational | [Browse Oper](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index-v2.html) |
+| Native Config | [Browse Native](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index-v2.html) |
+| Configuration | [Browse Config](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index-v2.html) |
+| OpenConfig | [Browse OpenConfig](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index-v2.html) |
+| IETF | [Browse IETF](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index-v2.html) |
+| MIB | [Browse MIB](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index-v2.html) |
+| RPC | [Browse RPC](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index-v2.html) |
+| Events | [Browse Events](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index-v2.html) |
+| Other | [Browse Other](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index-v2.html) |
 
 ## Tips & Tricks
 

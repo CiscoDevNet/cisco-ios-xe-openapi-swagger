@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cisco IOS-XE 17.18 - Events/Notifications (v2 Deep Paths)</title>
+    <title>Cisco IOS-XE 17.18 - Events/Notifications</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,25 +46,25 @@
 </head>
 <body>
     <div class="header">
-        <h1>Cisco IOS-XE 17.18.1 - Events & Notifications <span class="badge">v2 — Deep Paths</span></h1>
+        <h1>Cisco IOS-XE 17.18.1 - Events & Notifications</h1>
         <p id="headerStats">Loading...</p>
     </div>
     <nav class="nav-bar">
         <a href="../index.html">Home</a>
-        <a href="../swagger-oper-model/index-v2.html">Oper (v2)</a>
-        <a href="../swagger-cfg-model/index-v2.html">Config (v2)</a>
-        <a href="../swagger-native-config-model/index-v2.html">Native (v2)</a>
-        <a href="../swagger-openconfig-model/index-v2.html">OpenConfig (v2)</a>
-        <a href="../swagger-rpc-model/index-v2.html">RPC (v2)</a>
-        <a href="../swagger-ietf-model/index-v2.html">IETF (v2)</a>
-        <a href="../swagger-mib-model/index-v2.html">MIB (v2)</a>
-        <a href="index-v2.html" class="active">Events (v2)</a>
-        <a href="../swagger-other-model/index-v2.html">Other (v2)</a>
+        <a href="../swagger-oper-model/index-v2.html">Operational</a>
+        <a href="../swagger-cfg-model/index-v2.html">Config</a>
+        <a href="../swagger-native-config-model/index-v2.html">Native</a>
+        <a href="../swagger-openconfig-model/index-v2.html">OpenConfig</a>
+        <a href="../swagger-rpc-model/index-v2.html">RPC</a>
+        <a href="../swagger-ietf-model/index-v2.html">IETF</a>
+        <a href="../swagger-mib-model/index-v2.html">MIB</a>
+        <a href="index-v2.html" class="active">Events</a>
+        <a href="../swagger-other-model/index-v2.html">Other</a>
         <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">🌳 Tree Browser</a>
     </nav>
     <div class="container">
         <aside class="sidebar">
-            <div class="sidebar-header"><h3>Events Specs (v2)</h3></div>
+            <div class="sidebar-header"><h3>Events Specs</h3></div>
             <div class="search-box">
                 <input type="text" id="searchBox" placeholder="Search modules..." oninput="filterModules()">
             </div>
@@ -78,7 +78,7 @@
         </aside>
         <main class="main-content">
             <div class="info-box" id="welcomeBox">
-                <h3>Events & Notifications — v2 Deep Paths</h3>
+                <h3>Events & Notifications</h3>
                 <p>YANG notification and event stream endpoints from resolved YANG tree files.</p>
                 <p style="margin-top: 10px;">Select a module from the sidebar to explore its event schemas.</p>
             </div>
@@ -136,6 +136,10 @@
 
     function filterModules() { renderList(document.getElementById('searchBox').value); }
 
+    function getSpecFolder(fname) {
+        return allModules.find(m => m.fname === fname) ? 'api-v2' : 'api';
+    }
+
     function loadSpec(fname, el) {
         currentModule = fname;
         document.getElementById('welcomeBox').style.display = 'none';
@@ -144,8 +148,7 @@
         document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
         window.location.hash = '#spec=' + fname;
-        SwaggerUIBundle({
-            url: `api-v2/${fname}.json`, dom_id: '#swagger-ui',
+        SwaggerUIBundle({ url: `${getSpecFolder(fname)}/${fname}.json`, dom_id: '#swagger-ui',
             presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
             layout: 'StandaloneLayout', deepLinking: true, filter: true
         });
@@ -154,7 +157,7 @@
     function downloadSpec() {
         if (!currentModule) return;
         const a = document.createElement('a');
-        a.href = `api-v2/${currentModule}.json`;
+        a.href = `${getSpecFolder(currentModule)}/${currentModule}.json`;
         a.download = currentModule + '.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
@@ -163,8 +166,12 @@
         const hash = decodeURIComponent(window.location.hash);
         if (hash.startsWith('#spec=')) {
             const fname = hash.replace('#spec=', '');
-            if (allModules.find(m => m.fname === fname))
-                loadSpec(fname, document.querySelector(`[data-module="${fname}"]`));
+            const el = document.querySelector(`[data-module="${fname}"]`);
+            if (el) {
+                loadSpec(fname, el);
+            } else if (fname) {
+                loadSpec(fname, null);
+            }
         }
     }
     window.addEventListener('hashchange', checkHash);
