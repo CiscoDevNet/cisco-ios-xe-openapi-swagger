@@ -1,11 +1,11 @@
 # YANG Module Accountability Report
 
-**Date:** March 30, 2026
+**Date:** March 31, 2026
 **IOS-XE Version:** 17.18.1
-**Total YANG Modules:** 848
-**Modules with OpenAPI Specs:** 425 (50.1%)
-**Modules with YANG Trees:** 589
-**Modules in Multiple Categories:** 18
+**Total YANG Modules:** 1103
+**Modules with OpenAPI Specs:** 680 (61.7%)
+**Modules with YANG Trees:** 765
+**Modules in Multiple Categories:** 98
 
 > **Interactive Report:** [View the HTML accountability report](yang-accountability.html) with search, filtering, and clickable links.
 
@@ -30,8 +30,9 @@ This report provides **100% accountability** for every YANG module in the
 | **cfg** | 61 | 40 | 66% |  |
 | **openconfig** | 95 | 61 | 64% |  |
 | **ietf** | 33 | 23 | 70% |  |
+| **mib** | 149 | 149 | 100% |  |
 | **events** | 41 | 41 | 100% |  |
-| **native** | 1 | 0 | 0% |  |
+| **native** | 107 | 106 | 99% |  |
 | **other** | 32 | 10 | 31% |  |
 | **types** | 64 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
@@ -519,6 +520,160 @@ This report provides **100% accountability** for every YANG module in the
 | ietf-yang-smiv2 | - | ❌ No spec | - |
 | ietf-yang-structure-ext | IETF | [IETF](swagger-ietf-model/index-v2.html#spec=ietf-yang-structure-ext) | [🌳](yang-trees/ietf-yang-structure-ext.html) |
 
+### MIB (149 modules)
+
+| Module | Categories | Spec Links | Tree |
+|--------|------------|------------|------|
+| ATM-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=ATM-MIB) | [🌳](yang-trees/ATM-MIB.html) |
+| BGP4-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=BGP4-MIB) [Events](swagger-events-model/index-v2.html#spec=BGP4-MIB) | [🌳](yang-trees/BGP4-MIB.html) |
+| BRIDGE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=BRIDGE-MIB) [Events](swagger-events-model/index-v2.html#spec=BRIDGE-MIB) | [🌳](yang-trees/BRIDGE-MIB.html) |
+| CISCO-AAA-SERVER-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-AAA-SERVER-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-AAA-SERVER-MIB) | [🌳](yang-trees/CISCO-AAA-SERVER-MIB.html) |
+| CISCO-AAA-SESSION-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-AAA-SESSION-MIB) | [🌳](yang-trees/CISCO-AAA-SESSION-MIB.html) |
+| CISCO-AAL5-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-AAL5-MIB) | [🌳](yang-trees/CISCO-AAL5-MIB.html) |
+| CISCO-ATM-EXT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ATM-EXT-MIB) | [🌳](yang-trees/CISCO-ATM-EXT-MIB.html) |
+| CISCO-ATM-PVCTRAP-EXTN-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ATM-PVCTRAP-EXTN-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ATM-PVCTRAP-EXTN-MIB) | [🌳](yang-trees/CISCO-ATM-PVCTRAP-EXTN-MIB.html) |
+| CISCO-ATM-QOS-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ATM-QOS-MIB) | [🌳](yang-trees/CISCO-ATM-QOS-MIB.html) |
+| CISCO-BGP-POLICY-ACCOUNTING-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-BGP-POLICY-ACCOUNTING-MIB) | [🌳](yang-trees/CISCO-BGP-POLICY-ACCOUNTING-MIB.html) |
+| CISCO-BGP4-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-BGP4-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-BGP4-MIB) | [🌳](yang-trees/CISCO-BGP4-MIB.html) |
+| CISCO-BULK-FILE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-BULK-FILE-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-BULK-FILE-MIB) | [🌳](yang-trees/CISCO-BULK-FILE-MIB.html) |
+| CISCO-CBP-TARGET-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CBP-TARGET-MIB) | [🌳](yang-trees/CISCO-CBP-TARGET-MIB.html) |
+| CISCO-CDP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CDP-MIB) | [🌳](yang-trees/CISCO-CDP-MIB.html) |
+| CISCO-CEF-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CEF-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-CEF-MIB) | [🌳](yang-trees/CISCO-CEF-MIB.html) |
+| CISCO-CONFIG-COPY-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CONFIG-COPY-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-CONFIG-COPY-MIB) | [🌳](yang-trees/CISCO-CONFIG-COPY-MIB.html) |
+| CISCO-CONFIG-MAN-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CONFIG-MAN-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-CONFIG-MAN-MIB) | [🌳](yang-trees/CISCO-CONFIG-MAN-MIB.html) |
+| CISCO-CONTEXT-MAPPING-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-CONTEXT-MAPPING-MIB) | [🌳](yang-trees/CISCO-CONTEXT-MAPPING-MIB.html) |
+| CISCO-DATA-COLLECTION-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-DATA-COLLECTION-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-DATA-COLLECTION-MIB) | [🌳](yang-trees/CISCO-DATA-COLLECTION-MIB.html) |
+| CISCO-DIAL-CONTROL-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-DIAL-CONTROL-MIB) | [🌳](yang-trees/CISCO-DIAL-CONTROL-MIB.html) |
+| CISCO-DOT3-OAM-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-DOT3-OAM-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-DOT3-OAM-MIB) | [🌳](yang-trees/CISCO-DOT3-OAM-MIB.html) |
+| CISCO-DYNAMIC-TEMPLATE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-DYNAMIC-TEMPLATE-MIB) | [🌳](yang-trees/CISCO-DYNAMIC-TEMPLATE-MIB.html) |
+| CISCO-EIGRP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-EIGRP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-EIGRP-MIB) | [🌳](yang-trees/CISCO-EIGRP-MIB.html) |
+| CISCO-EMBEDDED-EVENT-MGR-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-EMBEDDED-EVENT-MGR-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-EMBEDDED-EVENT-MGR-MIB) | [🌳](yang-trees/CISCO-EMBEDDED-EVENT-MGR-MIB.html) |
+| CISCO-ENHANCED-MEMPOOL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENHANCED-MEMPOOL-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENHANCED-MEMPOOL-MIB) | [🌳](yang-trees/CISCO-ENHANCED-MEMPOOL-MIB.html) |
+| CISCO-ENTITY-ALARM-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENTITY-ALARM-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENTITY-ALARM-MIB) | [🌳](yang-trees/CISCO-ENTITY-ALARM-MIB.html) |
+| CISCO-ENTITY-EXT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENTITY-EXT-MIB) | [🌳](yang-trees/CISCO-ENTITY-EXT-MIB.html) |
+| CISCO-ENTITY-FRU-CONTROL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENTITY-FRU-CONTROL-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENTITY-FRU-CONTROL-MIB) | [🌳](yang-trees/CISCO-ENTITY-FRU-CONTROL-MIB.html) |
+| CISCO-ENTITY-QFP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENTITY-QFP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENTITY-QFP-MIB) | [🌳](yang-trees/CISCO-ENTITY-QFP-MIB.html) |
+| CISCO-ENTITY-SENSOR-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENTITY-SENSOR-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENTITY-SENSOR-MIB) | [🌳](yang-trees/CISCO-ENTITY-SENSOR-MIB.html) |
+| CISCO-ENVMON-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ENVMON-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ENVMON-MIB) | [🌳](yang-trees/CISCO-ENVMON-MIB.html) |
+| CISCO-ETHER-CFM-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ETHER-CFM-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-ETHER-CFM-MIB) | [🌳](yang-trees/CISCO-ETHER-CFM-MIB.html) |
+| CISCO-ETHERLIKE-EXT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-ETHERLIKE-EXT-MIB) | [🌳](yang-trees/CISCO-ETHERLIKE-EXT-MIB.html) |
+| CISCO-FLASH-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-FLASH-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-FLASH-MIB) | [🌳](yang-trees/CISCO-FLASH-MIB.html) |
+| CISCO-FTP-CLIENT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-FTP-CLIENT-MIB) | [🌳](yang-trees/CISCO-FTP-CLIENT-MIB.html) |
+| CISCO-HSRP-EXT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-HSRP-EXT-MIB) | [🌳](yang-trees/CISCO-HSRP-EXT-MIB.html) |
+| CISCO-HSRP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-HSRP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-HSRP-MIB) | [🌳](yang-trees/CISCO-HSRP-MIB.html) |
+| CISCO-IETF-ATM2-PVCTRAP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-ATM2-PVCTRAP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-ATM2-PVCTRAP-MIB) | [🌳](yang-trees/CISCO-IETF-ATM2-PVCTRAP-MIB.html) |
+| CISCO-IETF-ATM2-PVCTRAP-MIB-EXTN | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-ATM2-PVCTRAP-MIB-EXTN) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-ATM2-PVCTRAP-MIB-EXTN) | [🌳](yang-trees/CISCO-IETF-ATM2-PVCTRAP-MIB-EXTN.html) |
+| CISCO-IETF-BFD-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-BFD-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-BFD-MIB) | [🌳](yang-trees/CISCO-IETF-BFD-MIB.html) |
+| CISCO-IETF-FRR-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-FRR-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-FRR-MIB) | [🌳](yang-trees/CISCO-IETF-FRR-MIB.html) |
+| CISCO-IETF-ISIS-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-ISIS-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-ISIS-MIB) | [🌳](yang-trees/CISCO-IETF-ISIS-MIB.html) |
+| CISCO-IETF-MPLS-ID-STD-03-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-MPLS-ID-STD-03-MIB) | [🌳](yang-trees/CISCO-IETF-MPLS-ID-STD-03-MIB.html) |
+| CISCO-IETF-MPLS-TE-EXT-STD-03-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-MPLS-TE-EXT-STD-03-MIB) | [🌳](yang-trees/CISCO-IETF-MPLS-TE-EXT-STD-03-MIB.html) |
+| CISCO-IETF-PW-ATM-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-PW-ATM-MIB) | [🌳](yang-trees/CISCO-IETF-PW-ATM-MIB.html) |
+| CISCO-IETF-PW-ENET-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-PW-ENET-MIB) | [🌳](yang-trees/CISCO-IETF-PW-ENET-MIB.html) |
+| CISCO-IETF-PW-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-PW-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IETF-PW-MIB) | [🌳](yang-trees/CISCO-IETF-PW-MIB.html) |
+| CISCO-IETF-PW-MPLS-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-PW-MPLS-MIB) | [🌳](yang-trees/CISCO-IETF-PW-MPLS-MIB.html) |
+| CISCO-IETF-PW-TDM-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IETF-PW-TDM-MIB) | [🌳](yang-trees/CISCO-IETF-PW-TDM-MIB.html) |
+| CISCO-IF-EXTENSION-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IF-EXTENSION-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IF-EXTENSION-MIB) | [🌳](yang-trees/CISCO-IF-EXTENSION-MIB.html) |
+| CISCO-IGMP-FILTER-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IGMP-FILTER-MIB) | [🌳](yang-trees/CISCO-IGMP-FILTER-MIB.html) |
+| CISCO-IMAGE-LICENSE-MGMT-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IMAGE-LICENSE-MGMT-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IMAGE-LICENSE-MGMT-MIB) | [🌳](yang-trees/CISCO-IMAGE-LICENSE-MGMT-MIB.html) |
+| CISCO-IMAGE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IMAGE-MIB) | [🌳](yang-trees/CISCO-IMAGE-MIB.html) |
+| CISCO-IP-LOCAL-POOL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IP-LOCAL-POOL-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IP-LOCAL-POOL-MIB) | [🌳](yang-trees/CISCO-IP-LOCAL-POOL-MIB.html) |
+| CISCO-IP-TAP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IP-TAP-MIB) | [🌳](yang-trees/CISCO-IP-TAP-MIB.html) |
+| CISCO-IP-URPF-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IP-URPF-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IP-URPF-MIB) | [🌳](yang-trees/CISCO-IP-URPF-MIB.html) |
+| CISCO-IPMROUTE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPMROUTE-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IPMROUTE-MIB) | [🌳](yang-trees/CISCO-IPMROUTE-MIB.html) |
+| CISCO-IPSEC-FLOW-MONITOR-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSEC-FLOW-MONITOR-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IPSEC-FLOW-MONITOR-MIB) | [🌳](yang-trees/CISCO-IPSEC-FLOW-MONITOR-MIB.html) |
+| CISCO-IPSEC-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSEC-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-IPSEC-MIB) | [🌳](yang-trees/CISCO-IPSEC-MIB.html) |
+| CISCO-IPSEC-POLICY-MAP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSEC-POLICY-MAP-MIB) | [🌳](yang-trees/CISCO-IPSEC-POLICY-MAP-MIB.html) |
+| CISCO-IPSLA-AUTOMEASURE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSLA-AUTOMEASURE-MIB) | [🌳](yang-trees/CISCO-IPSLA-AUTOMEASURE-MIB.html) |
+| CISCO-IPSLA-ECHO-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSLA-ECHO-MIB) | [🌳](yang-trees/CISCO-IPSLA-ECHO-MIB.html) |
+| CISCO-IPSLA-JITTER-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-IPSLA-JITTER-MIB) | [🌳](yang-trees/CISCO-IPSLA-JITTER-MIB.html) |
+| CISCO-LICENSE-MGMT-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-LICENSE-MGMT-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-LICENSE-MGMT-MIB) | [🌳](yang-trees/CISCO-LICENSE-MGMT-MIB.html) |
+| CISCO-MEDIA-GATEWAY-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-MEDIA-GATEWAY-MIB) | [🌳](yang-trees/CISCO-MEDIA-GATEWAY-MIB.html) |
+| CISCO-MPLS-LSR-EXT-STD-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-MPLS-LSR-EXT-STD-MIB) | [🌳](yang-trees/CISCO-MPLS-LSR-EXT-STD-MIB.html) |
+| CISCO-NBAR-PROTOCOL-DISCOVERY-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-NBAR-PROTOCOL-DISCOVERY-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-NBAR-PROTOCOL-DISCOVERY-MIB) | [🌳](yang-trees/CISCO-NBAR-PROTOCOL-DISCOVERY-MIB.html) |
+| CISCO-NETSYNC-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-NETSYNC-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-NETSYNC-MIB) | [🌳](yang-trees/CISCO-NETSYNC-MIB.html) |
+| CISCO-NTP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-NTP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-NTP-MIB) | [🌳](yang-trees/CISCO-NTP-MIB.html) |
+| CISCO-OSPF-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-OSPF-MIB) | [🌳](yang-trees/CISCO-OSPF-MIB.html) |
+| CISCO-OSPF-TRAP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-OSPF-TRAP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-OSPF-TRAP-MIB) | [🌳](yang-trees/CISCO-OSPF-TRAP-MIB.html) |
+| CISCO-PIM-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-PIM-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-PIM-MIB) | [🌳](yang-trees/CISCO-PIM-MIB.html) |
+| CISCO-PING-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-PING-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-PING-MIB) | [🌳](yang-trees/CISCO-PING-MIB.html) |
+| CISCO-POWER-ETHERNET-EXT-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-POWER-ETHERNET-EXT-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-POWER-ETHERNET-EXT-MIB) | [🌳](yang-trees/CISCO-POWER-ETHERNET-EXT-MIB.html) |
+| CISCO-PROCESS-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-PROCESS-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-PROCESS-MIB) | [🌳](yang-trees/CISCO-PROCESS-MIB.html) |
+| CISCO-PTP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-PTP-MIB) | [🌳](yang-trees/CISCO-PTP-MIB.html) |
+| CISCO-QOS-PIB-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-QOS-PIB-MIB) | [🌳](yang-trees/CISCO-QOS-PIB-MIB.html) |
+| CISCO-RADIUS-EXT-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-RADIUS-EXT-MIB) | [🌳](yang-trees/CISCO-RADIUS-EXT-MIB.html) |
+| CISCO-RF-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-RF-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-RF-MIB) | [🌳](yang-trees/CISCO-RF-MIB.html) |
+| CISCO-RTTMON-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-RTTMON-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-RTTMON-MIB) | [🌳](yang-trees/CISCO-RTTMON-MIB.html) |
+| CISCO-SESS-BORDER-CTRLR-CALL-STATS-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SESS-BORDER-CTRLR-CALL-STATS-MIB) | [🌳](yang-trees/CISCO-SESS-BORDER-CTRLR-CALL-STATS-MIB.html) |
+| CISCO-SESS-BORDER-CTRLR-STATS-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SESS-BORDER-CTRLR-STATS-MIB) | [🌳](yang-trees/CISCO-SESS-BORDER-CTRLR-STATS-MIB.html) |
+| CISCO-SIP-UA-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SIP-UA-MIB) | [🌳](yang-trees/CISCO-SIP-UA-MIB.html) |
+| CISCO-SONET-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SONET-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-SONET-MIB) | [🌳](yang-trees/CISCO-SONET-MIB.html) |
+| CISCO-STACKWISE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-STACKWISE-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-STACKWISE-MIB) | [🌳](yang-trees/CISCO-STACKWISE-MIB.html) |
+| CISCO-STP-EXTENSIONS-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-STP-EXTENSIONS-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-STP-EXTENSIONS-MIB) | [🌳](yang-trees/CISCO-STP-EXTENSIONS-MIB.html) |
+| CISCO-SUBSCRIBER-SESSION-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SUBSCRIBER-SESSION-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-SUBSCRIBER-SESSION-MIB) | [🌳](yang-trees/CISCO-SUBSCRIBER-SESSION-MIB.html) |
+| CISCO-SYSLOG-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-SYSLOG-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-SYSLOG-MIB) | [🌳](yang-trees/CISCO-SYSLOG-MIB.html) |
+| CISCO-TAP2-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-TAP2-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-TAP2-MIB) | [🌳](yang-trees/CISCO-TAP2-MIB.html) |
+| CISCO-UBE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-UBE-MIB) | [🌳](yang-trees/CISCO-UBE-MIB.html) |
+| CISCO-UNIFIED-FIREWALL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-UNIFIED-FIREWALL-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-UNIFIED-FIREWALL-MIB) | [🌳](yang-trees/CISCO-UNIFIED-FIREWALL-MIB.html) |
+| CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB) | [🌳](yang-trees/CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB.html) |
+| CISCO-VLAN-MEMBERSHIP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VLAN-MEMBERSHIP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-VLAN-MEMBERSHIP-MIB) | [🌳](yang-trees/CISCO-VLAN-MEMBERSHIP-MIB.html) |
+| CISCO-VOICE-COMMON-DIAL-CONTROL-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VOICE-COMMON-DIAL-CONTROL-MIB) | [🌳](yang-trees/CISCO-VOICE-COMMON-DIAL-CONTROL-MIB.html) |
+| CISCO-VOICE-DIAL-CONTROL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VOICE-DIAL-CONTROL-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-VOICE-DIAL-CONTROL-MIB) | [🌳](yang-trees/CISCO-VOICE-DIAL-CONTROL-MIB.html) |
+| CISCO-VOICE-DNIS-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VOICE-DNIS-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-VOICE-DNIS-MIB) | [🌳](yang-trees/CISCO-VOICE-DNIS-MIB.html) |
+| CISCO-VPDN-MGMT-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VPDN-MGMT-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-VPDN-MGMT-MIB) | [🌳](yang-trees/CISCO-VPDN-MGMT-MIB.html) |
+| CISCO-VTP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=CISCO-VTP-MIB) [Events](swagger-events-model/index-v2.html#spec=CISCO-VTP-MIB) | [🌳](yang-trees/CISCO-VTP-MIB.html) |
+| DIAL-CONTROL-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=DIAL-CONTROL-MIB) [Events](swagger-events-model/index-v2.html#spec=DIAL-CONTROL-MIB) | [🌳](yang-trees/DIAL-CONTROL-MIB.html) |
+| DIFFSERV-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=DIFFSERV-MIB) | [🌳](yang-trees/DIFFSERV-MIB.html) |
+| DISMAN-EVENT-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=DISMAN-EVENT-MIB) [Events](swagger-events-model/index-v2.html#spec=DISMAN-EVENT-MIB) | [🌳](yang-trees/DISMAN-EVENT-MIB.html) |
+| DISMAN-EXPRESSION-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=DISMAN-EXPRESSION-MIB) | [🌳](yang-trees/DISMAN-EXPRESSION-MIB.html) |
+| DRAFT-MSDP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=DRAFT-MSDP-MIB) [Events](swagger-events-model/index-v2.html#spec=DRAFT-MSDP-MIB) | [🌳](yang-trees/DRAFT-MSDP-MIB.html) |
+| DS1-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=DS1-MIB) [Events](swagger-events-model/index-v2.html#spec=DS1-MIB) | [🌳](yang-trees/DS1-MIB.html) |
+| DS3-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=DS3-MIB) [Events](swagger-events-model/index-v2.html#spec=DS3-MIB) | [🌳](yang-trees/DS3-MIB.html) |
+| ENTITY-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=ENTITY-MIB) [Events](swagger-events-model/index-v2.html#spec=ENTITY-MIB) | [🌳](yang-trees/ENTITY-MIB.html) |
+| ENTITY-SENSOR-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=ENTITY-SENSOR-MIB) | [🌳](yang-trees/ENTITY-SENSOR-MIB.html) |
+| ENTITY-STATE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=ENTITY-STATE-MIB) [Events](swagger-events-model/index-v2.html#spec=ENTITY-STATE-MIB) | [🌳](yang-trees/ENTITY-STATE-MIB.html) |
+| ETHER-WIS | MIB | [MIB](swagger-mib-model/index-v2.html#spec=ETHER-WIS) | [🌳](yang-trees/ETHER-WIS.html) |
+| EXPRESSION-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=EXPRESSION-MIB) | [🌳](yang-trees/EXPRESSION-MIB.html) |
+| EtherLike-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=EtherLike-MIB) | [🌳](yang-trees/EtherLike-MIB.html) |
+| FRAME-RELAY-DTE-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=FRAME-RELAY-DTE-MIB) [Events](swagger-events-model/index-v2.html#spec=FRAME-RELAY-DTE-MIB) | [🌳](yang-trees/FRAME-RELAY-DTE-MIB.html) |
+| IF-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=IF-MIB) [Events](swagger-events-model/index-v2.html#spec=IF-MIB) | [🌳](yang-trees/IF-MIB.html) |
+| IGMP-STD-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=IGMP-STD-MIB) | [🌳](yang-trees/IGMP-STD-MIB.html) |
+| INT-SERV-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=INT-SERV-MIB) | [🌳](yang-trees/INT-SERV-MIB.html) |
+| INTEGRATED-SERVICES-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=INTEGRATED-SERVICES-MIB) | [🌳](yang-trees/INTEGRATED-SERVICES-MIB.html) |
+| IP-FORWARD-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=IP-FORWARD-MIB) | [🌳](yang-trees/IP-FORWARD-MIB.html) |
+| IP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=IP-MIB) | [🌳](yang-trees/IP-MIB.html) |
+| IPMROUTE-STD-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=IPMROUTE-STD-MIB) | [🌳](yang-trees/IPMROUTE-STD-MIB.html) |
+| LLDP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=LLDP-MIB) [Events](swagger-events-model/index-v2.html#spec=LLDP-MIB) | [🌳](yang-trees/LLDP-MIB.html) |
+| MPLS-L3VPN-STD-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-L3VPN-STD-MIB) [Events](swagger-events-model/index-v2.html#spec=MPLS-L3VPN-STD-MIB) | [🌳](yang-trees/MPLS-L3VPN-STD-MIB.html) |
+| MPLS-LDP-GENERIC-STD-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-LDP-GENERIC-STD-MIB) | [🌳](yang-trees/MPLS-LDP-GENERIC-STD-MIB.html) |
+| MPLS-LDP-STD-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-LDP-STD-MIB) [Events](swagger-events-model/index-v2.html#spec=MPLS-LDP-STD-MIB) | [🌳](yang-trees/MPLS-LDP-STD-MIB.html) |
+| MPLS-LSR-STD-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-LSR-STD-MIB) [Events](swagger-events-model/index-v2.html#spec=MPLS-LSR-STD-MIB) | [🌳](yang-trees/MPLS-LSR-STD-MIB.html) |
+| MPLS-TE-STD-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-TE-STD-MIB) [Events](swagger-events-model/index-v2.html#spec=MPLS-TE-STD-MIB) | [🌳](yang-trees/MPLS-TE-STD-MIB.html) |
+| MPLS-VPN-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=MPLS-VPN-MIB) [Events](swagger-events-model/index-v2.html#spec=MPLS-VPN-MIB) | [🌳](yang-trees/MPLS-VPN-MIB.html) |
+| NHRP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=NHRP-MIB) | [🌳](yang-trees/NHRP-MIB.html) |
+| NOTIFICATION-LOG-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=NOTIFICATION-LOG-MIB) | [🌳](yang-trees/NOTIFICATION-LOG-MIB.html) |
+| OSPF-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=OSPF-MIB) | [🌳](yang-trees/OSPF-MIB.html) |
+| OSPF-TRAP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=OSPF-TRAP-MIB) [Events](swagger-events-model/index-v2.html#spec=OSPF-TRAP-MIB) | [🌳](yang-trees/OSPF-TRAP-MIB.html) |
+| P-BRIDGE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=P-BRIDGE-MIB) | [🌳](yang-trees/P-BRIDGE-MIB.html) |
+| PIM-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=PIM-MIB) [Events](swagger-events-model/index-v2.html#spec=PIM-MIB) | [🌳](yang-trees/PIM-MIB.html) |
+| POWER-ETHERNET-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=POWER-ETHERNET-MIB) [Events](swagger-events-model/index-v2.html#spec=POWER-ETHERNET-MIB) | [🌳](yang-trees/POWER-ETHERNET-MIB.html) |
+| Q-BRIDGE-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=Q-BRIDGE-MIB) | [🌳](yang-trees/Q-BRIDGE-MIB.html) |
+| RFC1213-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=RFC1213-MIB) | [🌳](yang-trees/RFC1213-MIB.html) |
+| RFC1315-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=RFC1315-MIB) [Events](swagger-events-model/index-v2.html#spec=RFC1315-MIB) | [🌳](yang-trees/RFC1315-MIB.html) |
+| RMON-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=RMON-MIB) [Events](swagger-events-model/index-v2.html#spec=RMON-MIB) | [🌳](yang-trees/RMON-MIB.html) |
+| RMON2-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=RMON2-MIB) | [🌳](yang-trees/RMON2-MIB.html) |
+| RSVP-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=RSVP-MIB) [Events](swagger-events-model/index-v2.html#spec=RSVP-MIB) | [🌳](yang-trees/RSVP-MIB.html) |
+| SNMP-FRAMEWORK-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=SNMP-FRAMEWORK-MIB) | [🌳](yang-trees/SNMP-FRAMEWORK-MIB.html) |
+| SNMP-PROXY-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=SNMP-PROXY-MIB) | [🌳](yang-trees/SNMP-PROXY-MIB.html) |
+| SNMP-TARGET-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=SNMP-TARGET-MIB) | [🌳](yang-trees/SNMP-TARGET-MIB.html) |
+| SNMPv2-MIB | MIB, Events | [MIB](swagger-mib-model/index-v2.html#spec=SNMPv2-MIB) [Events](swagger-events-model/index-v2.html#spec=SNMPv2-MIB) | [🌳](yang-trees/SNMPv2-MIB.html) |
+| SONET-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=SONET-MIB) | [🌳](yang-trees/SONET-MIB.html) |
+| TCP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=TCP-MIB) | [🌳](yang-trees/TCP-MIB.html) |
+| TOKEN-RING-RMON-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=TOKEN-RING-RMON-MIB) | [🌳](yang-trees/TOKEN-RING-RMON-MIB.html) |
+| TOKENRING-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=TOKENRING-MIB) | [🌳](yang-trees/TOKENRING-MIB.html) |
+| TUNNEL-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=TUNNEL-MIB) | [🌳](yang-trees/TUNNEL-MIB.html) |
+| UDP-MIB | MIB | [MIB](swagger-mib-model/index-v2.html#spec=UDP-MIB) | [🌳](yang-trees/UDP-MIB.html) |
+
 ### EVENTS (41 modules)
 
 | Module | Categories | Spec Links | Tree |
@@ -565,11 +720,117 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-pw | Events, Other | [Events](swagger-events-model/index-v2.html#spec=cisco-pw) [Other](swagger-other-model/index-v2.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Events, Other | [RPC](swagger-rpc-model/index-v2.html#spec=cisco-smart-license) [Events](swagger-events-model/index-v2.html#spec=cisco-smart-license) [Other](swagger-other-model/index-v2.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
 
-### NATIVE (1 modules)
+### NATIVE (107 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
 | Cisco-IOS-XE-native | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-native.html) |
+| native-00-top-level-containers | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-top-level-containers) | [🌳](yang-trees/native-00-top-level-containers.html) |
+| native-00-top-level-leafs | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-top-level-leafs) | [🌳](yang-trees/native-00-top-level-leafs.html) |
+| native-aaa | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-aaa) | [🌳](yang-trees/native-aaa.html) |
+| native-alarm-contact | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-alarm-contact) | - |
+| native-alias | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-alias) | - |
+| native-app-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-app-services) | [🌳](yang-trees/native-app-services.html) |
+| native-archive | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-archive) | - |
+| native-banner | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-banner) | - |
+| native-cisp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cisp) | - |
+| native-clns | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-clns) | - |
+| native-control-plane | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-control-plane) | - |
+| native-control-plane-host | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-control-plane-host) | - |
+| native-crypto | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-crypto) | [🌳](yang-trees/native-crypto.html) |
+| native-cts | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cts) | - |
+| native-cwmp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cwmp) | - |
+| native-default | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-default) | - |
+| native-endpoint-tracker | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-endpoint-tracker) | - |
+| native-epm | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-epm) | - |
+| native-event | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-event) | - |
+| native-fabric | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-fabric) | - |
+| native-facility-alarm | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-facility-alarm) | - |
+| native-fallback | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-fallback) | - |
+| native-frame-relay | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-frame-relay) | - |
+| native-ha | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ha) | - |
+| native-industrial-iot | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-industrial-iot) | [🌳](yang-trees/native-industrial-iot.html) |
+| native-intf-ethernet | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-ethernet) | [🌳](yang-trees/native-intf-ethernet.html) |
+| native-intf-ip-addressing | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-ip-addressing) | - |
+| native-intf-physical | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-physical) | - |
+| native-intf-qos | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-qos) | - |
+| native-intf-routing | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-routing) | - |
+| native-intf-security | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-security) | - |
+| native-intf-service | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-service) | [🌳](yang-trees/native-intf-service.html) |
+| native-intf-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-services) | - |
+| native-intf-switching | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-switching) | - |
+| native-intf-types | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-types) | - |
+| native-intf-virtual | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-virtual) | [🌳](yang-trees/native-intf-virtual.html) |
+| native-intf-wan | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-wan) | [🌳](yang-trees/native-intf-wan.html) |
+| native-ip | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip) | [🌳](yang-trees/native-ip.html) |
+| native-ip-acl | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip-acl) | - |
+| native-ip-multicast | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip-multicast) | - |
+| native-ip-other | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip-other) | - |
+| native-ip-routing | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip-routing) | - |
+| native-ip-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ip-services) | - |
+| native-ipv6 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ipv6) | - |
+| native-l2-discovery | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-l2-discovery) | [🌳](yang-trees/native-l2-discovery.html) |
+| native-ldap | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ldap) | - |
+| native-line | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line) | [🌳](yang-trees/native-line.html) |
+| native-line-async-line | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-async-line) | - |
+| native-line-async-line-range | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-async-line-range) | - |
+| native-line-async-line-single | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-async-line-single) | - |
+| native-line-auto-consolidation | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-auto-consolidation) | - |
+| native-line-aux | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-aux) | - |
+| native-line-console | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-console) | - |
+| native-line-line-list | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-line-list) | - |
+| native-line-vty | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-vty) | - |
+| native-location | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-location) | - |
+| native-macro | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-macro) | - |
+| native-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-management) | - |
+| native-md-list | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-md-list) | - |
+| native-metadata | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-metadata) | - |
+| native-misc-ext | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-misc-ext) | [🌳](yang-trees/native-misc-ext.html) |
+| native-monitoring | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-monitoring) | - |
+| native-mpls-vpn | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-mpls-vpn) | - |
+| native-multilink | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-multilink) | - |
+| native-network-clock | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-network-clock) | - |
+| native-other | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-other) | [🌳](yang-trees/native-other.html) |
+| native-parser | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-parser) | - |
+| native-pfr | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-pfr) | - |
+| native-pfr-map | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-pfr-map) | - |
+| native-platform | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-platform) | - |
+| native-platform-diag | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-platform-diag) | [🌳](yang-trees/native-platform-diag.html) |
+| native-platform-system | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-platform-system) | [🌳](yang-trees/native-platform-system.html) |
+| native-policy | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-policy) | [🌳](yang-trees/native-policy.html) |
+| native-ppp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ppp) | - |
+| native-profile | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-profile) | - |
+| native-protocols | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-protocols) | [🌳](yang-trees/native-protocols.html) |
+| native-qos-policy | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-qos-policy) | [🌳](yang-trees/native-qos-policy.html) |
+| native-redun-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-redun-management) | - |
+| native-remote-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-remote-management) | - |
+| native-router | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-router) | [🌳](yang-trees/native-router.html) |
+| native-routing-multicast | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-routing-multicast) | [🌳](yang-trees/native-routing-multicast.html) |
+| native-routing-protocols | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-routing-protocols) | - |
+| native-scada-gw | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-scada-gw) | - |
+| native-security | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-security) | - |
+| native-security-access | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-security-access) | [🌳](yang-trees/native-security-access.html) |
+| native-security-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-security-services) | [🌳](yang-trees/native-security-services.html) |
+| native-service-chain | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-service-chain) | - |
+| native-service-insertion | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-service-insertion) | - |
+| native-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-services) | - |
+| native-subscriber-config | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-subscriber-config) | - |
+| native-switching | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-switching) | - |
+| native-switching-l2 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-switching-l2) | [🌳](yang-trees/native-switching-l2.html) |
+| native-system | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-system) | - |
+| native-system-core | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-system-core) | - |
+| native-template | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-template) | - |
+| native-tftp-server-config | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-tftp-server-config) | - |
+| native-transport | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-transport) | - |
+| native-transport-map | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-transport-map) | - |
+| native-uncategorized | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-uncategorized) | - |
+| native-virtual-service | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-virtual-service) | - |
+| native-virtual-template | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-virtual-template) | - |
+| native-vrf | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-vrf) | [🌳](yang-trees/native-vrf.html) |
+| native-wan-legacy | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-wan-legacy) | [🌳](yang-trees/native-wan-legacy.html) |
+| native-wsma | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-wsma) | - |
+| native-zone | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone) | - |
+| native-zone-pair | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone-pair) | - |
 
 ### OTHER (32 modules)
 
@@ -980,12 +1241,70 @@ This report provides **100% accountability** for every YANG module in the
 
 ---
 
-## Modules in Multiple Categories (18)
+## Modules in Multiple Categories (98)
 
 These modules appear in more than one swagger category:
 
 | Module | Categories |
 |--------|------------|
+| BGP4-MIB | MIB, Events |
+| BRIDGE-MIB | MIB, Events |
+| CISCO-AAA-SERVER-MIB | MIB, Events |
+| CISCO-ATM-PVCTRAP-EXTN-MIB | MIB, Events |
+| CISCO-BGP4-MIB | MIB, Events |
+| CISCO-BULK-FILE-MIB | MIB, Events |
+| CISCO-CEF-MIB | MIB, Events |
+| CISCO-CONFIG-COPY-MIB | MIB, Events |
+| CISCO-CONFIG-MAN-MIB | MIB, Events |
+| CISCO-DATA-COLLECTION-MIB | MIB, Events |
+| CISCO-DOT3-OAM-MIB | MIB, Events |
+| CISCO-EIGRP-MIB | MIB, Events |
+| CISCO-EMBEDDED-EVENT-MGR-MIB | MIB, Events |
+| CISCO-ENHANCED-MEMPOOL-MIB | MIB, Events |
+| CISCO-ENTITY-ALARM-MIB | MIB, Events |
+| CISCO-ENTITY-FRU-CONTROL-MIB | MIB, Events |
+| CISCO-ENTITY-QFP-MIB | MIB, Events |
+| CISCO-ENTITY-SENSOR-MIB | MIB, Events |
+| CISCO-ENVMON-MIB | MIB, Events |
+| CISCO-ETHER-CFM-MIB | MIB, Events |
+| CISCO-FLASH-MIB | MIB, Events |
+| CISCO-HSRP-MIB | MIB, Events |
+| CISCO-IETF-ATM2-PVCTRAP-MIB | MIB, Events |
+| CISCO-IETF-ATM2-PVCTRAP-MIB-EXTN | MIB, Events |
+| CISCO-IETF-BFD-MIB | MIB, Events |
+| CISCO-IETF-FRR-MIB | MIB, Events |
+| CISCO-IETF-ISIS-MIB | MIB, Events |
+| CISCO-IETF-PW-MIB | MIB, Events |
+| CISCO-IF-EXTENSION-MIB | MIB, Events |
+| CISCO-IMAGE-LICENSE-MGMT-MIB | MIB, Events |
+| CISCO-IP-LOCAL-POOL-MIB | MIB, Events |
+| CISCO-IP-URPF-MIB | MIB, Events |
+| CISCO-IPMROUTE-MIB | MIB, Events |
+| CISCO-IPSEC-FLOW-MONITOR-MIB | MIB, Events |
+| CISCO-IPSEC-MIB | MIB, Events |
+| CISCO-LICENSE-MGMT-MIB | MIB, Events |
+| CISCO-NBAR-PROTOCOL-DISCOVERY-MIB | MIB, Events |
+| CISCO-NETSYNC-MIB | MIB, Events |
+| CISCO-NTP-MIB | MIB, Events |
+| CISCO-OSPF-TRAP-MIB | MIB, Events |
+| CISCO-PIM-MIB | MIB, Events |
+| CISCO-PING-MIB | MIB, Events |
+| CISCO-POWER-ETHERNET-EXT-MIB | MIB, Events |
+| CISCO-PROCESS-MIB | MIB, Events |
+| CISCO-RF-MIB | MIB, Events |
+| CISCO-RTTMON-MIB | MIB, Events |
+| CISCO-SONET-MIB | MIB, Events |
+| CISCO-STACKWISE-MIB | MIB, Events |
+| CISCO-STP-EXTENSIONS-MIB | MIB, Events |
+| CISCO-SUBSCRIBER-SESSION-MIB | MIB, Events |
+| CISCO-SYSLOG-MIB | MIB, Events |
+| CISCO-TAP2-MIB | MIB, Events |
+| CISCO-UNIFIED-FIREWALL-MIB | MIB, Events |
+| CISCO-VLAN-MEMBERSHIP-MIB | MIB, Events |
+| CISCO-VOICE-DIAL-CONTROL-MIB | MIB, Events |
+| CISCO-VOICE-DNIS-MIB | MIB, Events |
+| CISCO-VPDN-MGMT-MIB | MIB, Events |
+| CISCO-VTP-MIB | MIB, Events |
 | Cisco-IOS-XE-im-events-oper | Operational, Events |
 | Cisco-IOS-XE-ios-events-oper | Operational, Events |
 | Cisco-IOS-XE-platform-events-oper | Operational, Events |
@@ -993,6 +1312,28 @@ These modules appear in more than one swagger category:
 | Cisco-IOS-XE-stack-mgr-events-oper | Operational, Events |
 | Cisco-IOS-XE-umbrella-oper-dp | Operational, Events |
 | Cisco-IOS-XE-wireless-events-oper | Operational, Events |
+| DIAL-CONTROL-MIB | MIB, Events |
+| DISMAN-EVENT-MIB | MIB, Events |
+| DRAFT-MSDP-MIB | MIB, Events |
+| DS1-MIB | MIB, Events |
+| DS3-MIB | MIB, Events |
+| ENTITY-MIB | MIB, Events |
+| ENTITY-STATE-MIB | MIB, Events |
+| FRAME-RELAY-DTE-MIB | MIB, Events |
+| IF-MIB | MIB, Events |
+| LLDP-MIB | MIB, Events |
+| MPLS-L3VPN-STD-MIB | MIB, Events |
+| MPLS-LDP-STD-MIB | MIB, Events |
+| MPLS-LSR-STD-MIB | MIB, Events |
+| MPLS-TE-STD-MIB | MIB, Events |
+| MPLS-VPN-MIB | MIB, Events |
+| OSPF-TRAP-MIB | MIB, Events |
+| PIM-MIB | MIB, Events |
+| POWER-ETHERNET-MIB | MIB, Events |
+| RFC1315-MIB | MIB, Events |
+| RMON-MIB | MIB, Events |
+| RSVP-MIB | MIB, Events |
+| SNMPv2-MIB | MIB, Events |
 | cisco-bridge-domain | RPC, Events, Other |
 | cisco-pw | Events, Other |
 | cisco-smart-license | RPC, Events, Other |
@@ -1016,4 +1357,4 @@ These modules appear in more than one swagger category:
 | **common** | Infrastructure modules (tailf-*, cisco-semver) — shared types only |
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 
-*Report generated: 2026-03-30T19:58:43.425676*
+*Report generated: 2026-03-31T10:44:07.951128*

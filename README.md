@@ -42,7 +42,8 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 768 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Coverage** | 77.4% | YANG modules with specs (656/848) |
+| **Total Tracked** | 1,103 | All modules (YANG + spec-only) |
+| **Coverage** | 61.7% | Modules with specs (680/1103) |
 | **Accountability** | 100% | All modules mapped |
 
 ## 🗂️ Model Categories
