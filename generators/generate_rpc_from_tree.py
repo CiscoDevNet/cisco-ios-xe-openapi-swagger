@@ -423,6 +423,27 @@ def generate_all():
     print(f"{'='*70}\n")
 
     tree_files = sorted(tree_dir.glob('Cisco-IOS-XE-*-rpc.html'))
+    # Also include Cisco-IOS-XE-rpc.html (no dash before "rpc") and
+    # non-Cisco modules that contain RPC operations
+    extra_rpc_trees = [
+        'Cisco-IOS-XE-rpc.html',
+        'cisco-bridge-domain.html',
+        'cisco-ia.html',
+        'cisco-smart-license.html',
+        'ietf-event-notifications.html',
+        'ietf-netconf-monitoring.html',
+        'ietf-netconf.html',
+        'ietf-routing.html',
+        'tailf-netconf-extensions.html',
+        'tailf-netconf-query.html',
+        'tailf-netconf-transactions.html',
+    ]
+    existing_names = {f.name for f in tree_files}
+    for extra in extra_rpc_trees:
+        p = tree_dir / extra
+        if p.exists() and extra not in existing_names:
+            tree_files.append(p)
+    tree_files = sorted(tree_files, key=lambda f: f.name)
     print(f"Found {len(tree_files)} RPC tree files\n")
 
     all_generated = []
