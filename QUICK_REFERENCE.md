@@ -51,10 +51,11 @@ references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
 - **API Endpoint:** `/data/ios-events-ios-xe-oper:ios-events`
 
 ### All YANG Modules
-All 848 YANG modules are in:
+All 848 YANG source modules are in:
 ```
 references/17181-YANG-modules/
 ```
+The accountability report tracks 1,103 total modules (848 YANG + 255 spec-only MIB/Native).
 
 **Browse on GitHub:**  
 https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references/17181-YANG-modules

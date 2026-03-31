@@ -171,6 +171,62 @@ def classify_yang_module(filename, content=""):
     return "other", ""
 
 
+def classify_spec_only_module(name, specs):
+    """Classify a module that has a spec but no .yang source file."""
+    # Determine category from spec folder locations
+    folders = set(s["folder"] for s in specs) if specs else set()
+
+    # MIB modules
+    if "swagger-mib-model" in folders or name.endswith("-MIB") or "-MIB-" in name:
+        return "mib", None
+    if name.startswith("CISCO-") or name.startswith("SNMP") or name.startswith("RFC"):
+        return "mib", None
+    # Well-known MIB naming patterns
+    mib_patterns = ["IF-MIB", "IP-MIB", "TCP-MIB", "UDP-MIB", "ENTITY-", "BRIDGE-",
+                    "RMON", "SONET-", "DS1-", "DS3-", "TUNNEL-", "OSPF-", "BGP4-",
+                    "PIM-", "IGMP-", "NHRP-", "LLDP-", "MPLS-", "POWER-", "ETHER",
+                    "FRAME-RELAY", "DRAFT-", "DIFFSERV", "DISMAN-", "INT-SERV",
+                    "INTEGRATED-", "EXPRESSION-", "NOTIFICATION-LOG", "TOKENRING",
+                    "TOKEN-RING", "ATM-", "DIAL-CONTROL", "P-BRIDGE", "Q-BRIDGE"]
+    for pat in mib_patterns:
+        if name.startswith(pat) or name == pat.rstrip("-"):
+            return "mib", None
+
+    # Native split specs
+    if "swagger-native-config-model" in folders or name.startswith("native-"):
+        return "native", None
+
+    # Events
+    if "swagger-events-model" in folders:
+        return "events", None
+
+    # RPC
+    if "swagger-rpc-model" in folders:
+        return "rpc", None
+
+    # Operational
+    if "swagger-oper-model" in folders:
+        return "oper", None
+
+    # Configuration
+    if "swagger-cfg-model" in folders:
+        return "cfg", None
+
+    # OpenConfig
+    if "swagger-openconfig-model" in folders or name.startswith("openconfig-"):
+        return "openconfig", None
+
+    # IETF
+    if "swagger-ietf-model" in folders or name.startswith("ietf-"):
+        return "ietf", None
+
+    # Other
+    if "swagger-other-model" in folders:
+        return "other", None
+
+    return "other", None
+
+
 def build_spec_url(folder, api_dir, spec_name):
     """Build the URL to view this spec in the Swagger UI."""
     # index-v2.html handles both api-v2/ and api/ specs (with fallback)
@@ -247,7 +303,79 @@ def main():
         modules.append(module_info)
         classifications[classification].append(module_info)
 
-    # 4. Print summary
+    # 4. Add modules that have specs but no .yang source file
+    #    (e.g., MIB specs, native split specs, etc.)
+    yang_names = set(m["name"] for m in modules)
+    spec_only_count = 0
+    for spec_name, specs in module_specs.items():
+        if spec_name in yang_names:
+            continue  # Already tracked from YANG source
+
+        # Classify based on spec location and name
+        classification, reason = classify_spec_only_module(spec_name, specs)
+
+        # Build categories
+        categories = []
+        seen_folders = set()
+        for spec in specs:
+            folder = spec["folder"]
+            if folder not in seen_folders:
+                seen_folders.add(folder)
+                api_dirs = [s["api_dir"] for s in specs if s["folder"] == folder]
+                best_api = "api-v2" if "api-v2" in api_dirs else "api"
+                url = build_spec_url(folder, best_api, spec_name)
+                categories.append({
+                    "folder": folder,
+                    "label": MODEL_FOLDERS[folder]["label"],
+                    "api_dir": best_api,
+                    "spec_url": url,
+                })
+
+        tree_url = tree_files.get(spec_name)
+
+        module_info = {
+            "name": spec_name,
+            "classification": classification,
+            "has_spec": True,
+            "categories": categories,
+            "tree_url": tree_url,
+            "reason_excluded": None,
+        }
+        modules.append(module_info)
+        classifications[classification].append(module_info)
+        spec_only_count += 1
+
+    print(f"  Added {spec_only_count} spec-only modules (no .yang source file)")
+
+    # 5. Add tree-only modules (have tree but no spec and no .yang source)
+    all_names = set(m["name"] for m in modules)
+    tree_only_count = 0
+    for tree_name, tree_url_val in tree_files.items():
+        if tree_name in all_names:
+            continue
+        if tree_name in ("index", "mib-trees-index"):
+            continue  # Skip index pages
+
+        classification, reason = classify_spec_only_module(tree_name, [])
+        module_info = {
+            "name": tree_name,
+            "classification": classification,
+            "has_spec": False,
+            "categories": [],
+            "tree_url": tree_url_val,
+            "reason_excluded": reason or "Has tree but no spec",
+        }
+        modules.append(module_info)
+        classifications[classification].append(module_info)
+        tree_only_count += 1
+
+    if tree_only_count:
+        print(f"  Added {tree_only_count} tree-only modules (tree but no spec or .yang source)")
+
+    # 6. Sort modules by name
+    modules.sort(key=lambda m: m["name"].lower())
+
+    # 7. Print summary
     total = len(modules)
     with_spec = sum(1 for m in modules if m["has_spec"])
     with_tree = sum(1 for m in modules if m["tree_url"])
@@ -273,7 +401,7 @@ def main():
         pct = 100 * ws / ct if ct > 0 else 0
         print(f"  {cls:15s} {ct:4d} modules, {ws:4d} with specs ({pct:.0f}%)")
 
-    # 5. Generate reports
+    # 8. Generate reports
     generate_json(modules, classifications, total, with_spec, with_tree, multi_cat)
     generate_markdown(modules, classifications, total, with_spec, with_tree, multi_cat)
 
