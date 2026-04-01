@@ -1,6 +1,6 @@
 # YANG Module Accountability Report
 
-**Date:** March 31, 2026
+**Date:** April 01, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 1103
 **Modules with OpenAPI Specs:** 680 (61.7%)
@@ -26,7 +26,7 @@ This report provides **100% accountability** for every YANG module in the
 | Classification | Total | With Specs | Coverage | Notes |
 |----------------|-------|------------|----------|-------|
 | **oper** | 200 | 199 | 100% |  |
-| **rpc** | 63 | 50 | 79% |  |
+| **rpc** | 55 | 47 | 85% |  |
 | **cfg** | 61 | 40 | 66% |  |
 | **openconfig** | 95 | 61 | 64% |  |
 | **ietf** | 33 | 23 | 70% |  |
@@ -38,6 +38,7 @@ This report provides **100% accountability** for every YANG module in the
 | **deviation** | 98 | 0 | N/A | Excluded by design |
 | **common** | 21 | 1 | N/A | Excluded by design |
 | **native-aug** | 139 | 0 | N/A | Excluded by design |
+| **rpc-aug** | 8 | 3 | N/A | Excluded by design |
 
 ---
 
@@ -248,7 +249,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wpan-oper | Operational | [Operational](swagger-oper-model/index-v2.html#spec=Cisco-IOS-XE-wpan-oper) | [🌳](yang-trees/Cisco-IOS-XE-wpan-oper.html) |
 | Cisco-IOS-XE-yang-interfaces-oper | Operational | [Operational](swagger-oper-model/index-v2.html#spec=Cisco-IOS-XE-yang-interfaces-oper) | [🌳](yang-trees/Cisco-IOS-XE-yang-interfaces-oper.html) |
 
-### RPC (63 modules)
+### RPC (55 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -257,7 +258,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-arp-rpc | - | ❌ No spec | - |
 | Cisco-IOS-XE-bgp-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-bgp-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-bgp-actions-rpc.html) |
 | Cisco-IOS-XE-bgp-rpc | - | ❌ No spec | - |
-| Cisco-IOS-XE-cable-diag-rpc | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-cable-diag-rpc.html) |
 | Cisco-IOS-XE-cellular-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cellular-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cellular-rpc.html) |
 | Cisco-IOS-XE-chassis-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-chassis-rpc) | [🌳](yang-trees/Cisco-IOS-XE-chassis-rpc.html) |
 | Cisco-IOS-XE-cli-preview-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cli-preview-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cli-preview-rpc.html) |
@@ -265,14 +265,11 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-cloud-services-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cloud-services-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cloud-services-rpc.html) |
 | Cisco-IOS-XE-crypto-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-crypto-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-crypto-actions-rpc.html) |
 | Cisco-IOS-XE-crypto-rpc | - | ❌ No spec | - |
-| Cisco-IOS-XE-cts-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cts-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cts-rpc.html) |
 | Cisco-IOS-XE-cwan-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cwan-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cwan-actions-rpc.html) |
 | Cisco-IOS-XE-cwan-fw-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-cwan-fw-rpc) | [🌳](yang-trees/Cisco-IOS-XE-cwan-fw-rpc.html) |
 | Cisco-IOS-XE-dhcp-rpc | - | ❌ No spec | - |
 | Cisco-IOS-XE-embedded-ap-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-embedded-ap-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-embedded-ap-actions-rpc.html) |
 | Cisco-IOS-XE-ethernet-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-ethernet-rpc) | [🌳](yang-trees/Cisco-IOS-XE-ethernet-rpc.html) |
-| Cisco-IOS-XE-factory-reset-secure-rpc | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-factory-reset-secure-rpc.html) |
-| Cisco-IOS-XE-flow-rpc | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-flow-rpc.html) |
 | Cisco-IOS-XE-geo-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-geo-rpc) | [🌳](yang-trees/Cisco-IOS-XE-geo-rpc.html) |
 | Cisco-IOS-XE-install-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-install-rpc) | [🌳](yang-trees/Cisco-IOS-XE-install-rpc.html) |
 | Cisco-IOS-XE-line-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-line-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-line-actions-rpc.html) |
@@ -293,14 +290,11 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-sdwan-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-sdwan-rpc) | [🌳](yang-trees/Cisco-IOS-XE-sdwan-rpc.html) |
 | Cisco-IOS-XE-sslproxy-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-sslproxy-rpc) | [🌳](yang-trees/Cisco-IOS-XE-sslproxy-rpc.html) |
 | Cisco-IOS-XE-stack-power-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-stack-power-rpc) | [🌳](yang-trees/Cisco-IOS-XE-stack-power-rpc.html) |
-| Cisco-IOS-XE-switch-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-switch-rpc) | [🌳](yang-trees/Cisco-IOS-XE-switch-rpc.html) |
 | Cisco-IOS-XE-tech-support-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-tech-support-rpc) | [🌳](yang-trees/Cisco-IOS-XE-tech-support-rpc.html) |
 | Cisco-IOS-XE-trace-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-trace-rpc) | [🌳](yang-trees/Cisco-IOS-XE-trace-rpc.html) |
 | Cisco-IOS-XE-uac-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-uac-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-uac-actions-rpc.html) |
 | Cisco-IOS-XE-ucse-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-ucse-rpc) | [🌳](yang-trees/Cisco-IOS-XE-ucse-rpc.html) |
-| Cisco-IOS-XE-umbrella-rpc | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-umbrella-rpc.html) |
 | Cisco-IOS-XE-utd-actions-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-utd-actions-rpc) | [🌳](yang-trees/Cisco-IOS-XE-utd-actions-rpc.html) |
-| Cisco-IOS-XE-utd-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-utd-rpc) | [🌳](yang-trees/Cisco-IOS-XE-utd-rpc.html) |
 | Cisco-IOS-XE-verify-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-verify-rpc) | [🌳](yang-trees/Cisco-IOS-XE-verify-rpc.html) |
 | Cisco-IOS-XE-voice-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-voice-rpc) | [🌳](yang-trees/Cisco-IOS-XE-voice-rpc.html) |
 | Cisco-IOS-XE-wireless-access-point-cfg-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-wireless-access-point-cfg-rpc) | [🌳](yang-trees/Cisco-IOS-XE-wireless-access-point-cfg-rpc.html) |
@@ -313,7 +307,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-rrm-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-wireless-rrm-rpc) | [🌳](yang-trees/Cisco-IOS-XE-wireless-rrm-rpc.html) |
 | Cisco-IOS-XE-wireless-tech-support-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-wireless-tech-support-rpc) | [🌳](yang-trees/Cisco-IOS-XE-wireless-tech-support-rpc.html) |
 | Cisco-IOS-XE-xcopy-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-xcopy-rpc) | [🌳](yang-trees/Cisco-IOS-XE-xcopy-rpc.html) |
-| Cisco-IOS-XE-zone-rpc | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-zone-rpc.html) |
 | cisco-ia | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=cisco-ia) | [🌳](yang-trees/cisco-ia.html) |
 
 ### CFG (61 modules)
@@ -1239,6 +1232,26 @@ This report provides **100% accountability** for every YANG module in the
 
 </details>
 
+### RPC-AUG (8 modules)
+
+*Augments Cisco-IOS-XE-rpc - included in main RPC spec*
+
+<details>
+<summary>Click to expand 8 rpc-aug modules</summary>
+
+| Module | Tree |
+|--------|------|
+| Cisco-IOS-XE-cable-diag-rpc | [🌳](yang-trees/Cisco-IOS-XE-cable-diag-rpc.html) |
+| Cisco-IOS-XE-cts-rpc | [🌳](yang-trees/Cisco-IOS-XE-cts-rpc.html) |
+| Cisco-IOS-XE-factory-reset-secure-rpc | [🌳](yang-trees/Cisco-IOS-XE-factory-reset-secure-rpc.html) |
+| Cisco-IOS-XE-flow-rpc | [🌳](yang-trees/Cisco-IOS-XE-flow-rpc.html) |
+| Cisco-IOS-XE-switch-rpc | [🌳](yang-trees/Cisco-IOS-XE-switch-rpc.html) |
+| Cisco-IOS-XE-umbrella-rpc | [🌳](yang-trees/Cisco-IOS-XE-umbrella-rpc.html) |
+| Cisco-IOS-XE-utd-rpc | [🌳](yang-trees/Cisco-IOS-XE-utd-rpc.html) |
+| Cisco-IOS-XE-zone-rpc | [🌳](yang-trees/Cisco-IOS-XE-zone-rpc.html) |
+
+</details>
+
 ---
 
 ## Modules in Multiple Categories (98)
@@ -1356,5 +1369,6 @@ These modules appear in more than one swagger category:
 | **deviation** | Modifies other modules' behavior — no standalone API |
 | **common** | Infrastructure modules (tailf-*, cisco-semver) — shared types only |
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
+| **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-03-31T10:44:07.951128*
+*Report generated: 2026-04-01T10:04:25.475262*
