@@ -5,7 +5,7 @@
 **Total YANG Modules:** 1103
 **Modules with OpenAPI Specs:** 680 (61.7%)
 **Modules with YANG Trees:** 765
-**Modules in Multiple Categories:** 98
+**Modules in Multiple Categories:** 99
 
 > **Interactive Report:** [View the HTML accountability report](yang-accountability.html) with search, filtering, and clickable links.
 
@@ -851,7 +851,7 @@ This report provides **100% accountability** for every YANG module in the
 | tailf-confd-monitoring | - | ❌ No spec | [🌳](yang-trees/tailf-confd-monitoring.html) |
 | tailf-confd-monitoring2 | - | ❌ No spec | [🌳](yang-trees/tailf-confd-monitoring2.html) |
 | tailf-key-rotation | - | ❌ No spec | [🌳](yang-trees/tailf-key-rotation.html) |
-| tailf-kicker | Events | [Events](swagger-events-model/index-v2.html#spec=tailf-kicker) | [🌳](yang-trees/tailf-kicker.html) |
+| tailf-kicker | Events, Other | [Events](swagger-events-model/index-v2.html#spec=tailf-kicker) [Other](swagger-other-model/index-v2.html#spec=tailf-kicker) | [🌳](yang-trees/tailf-kicker.html) |
 | tailf-meta-extensions | - | ❌ No spec | - |
 | tailf-netconf-extensions | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=tailf-netconf-extensions) | [🌳](yang-trees/tailf-netconf-extensions.html) |
 | tailf-netconf-inactive | - | ❌ No spec | [🌳](yang-trees/tailf-netconf-inactive.html) |
@@ -1254,7 +1254,7 @@ This report provides **100% accountability** for every YANG module in the
 
 ---
 
-## Modules in Multiple Categories (98)
+## Modules in Multiple Categories (99)
 
 These modules appear in more than one swagger category:
 
@@ -1358,6 +1358,7 @@ These modules appear in more than one swagger category:
 | ietf-routing | IETF, RPC |
 | ietf-yang-library | IETF, Events |
 | ietf-yang-push | IETF, Events |
+| tailf-kicker | Events, Other |
 
 ---
 
@@ -1371,4 +1372,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-04-01T10:04:25.475262*
+*Report generated: 2026-04-01T11:09:07.747020*
