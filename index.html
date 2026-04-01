@@ -278,7 +278,7 @@
     </div>
     
     <!-- Quick Navigation Toolbar -->
-    <div style="background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 10px 20px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; transition: background 0.3s;">
+    <div id="quickNav" style="background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 10px 20px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); z-index: 100; transition: background 0.3s, transform 0.3s, opacity 0.3s; position: sticky; top: 0;">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;">
             <a href="#" style="padding: 6px 14px; background: var(--accent-color); color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;" onclick="document.querySelector('.search-box').focus(); return false;">🔍 Search</a>
             <a href="code-generator.html" style="padding: 6px 14px; background: #667eea; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">⚡ Code Generator</a>
@@ -1030,6 +1030,26 @@
                 closeCodeGenerator();
             }
         });
+
+        // Hide nav bar when scrolled past header, show when at top
+        (function() {
+            const nav = document.getElementById('quickNav');
+            const header = document.querySelector('.header');
+            if (!nav || !header) return;
+            const observer = new IntersectionObserver((entries) => {
+                const e = entries[0];
+                if (e.isIntersecting) {
+                    nav.style.transform = 'translateY(0)';
+                    nav.style.opacity = '1';
+                    nav.style.pointerEvents = 'auto';
+                } else {
+                    nav.style.transform = 'translateY(-100%)';
+                    nav.style.opacity = '0';
+                    nav.style.pointerEvents = 'none';
+                }
+            }, { threshold: 0 });
+            observer.observe(header);
+        })();
     </script>
 </body>
 </html>
