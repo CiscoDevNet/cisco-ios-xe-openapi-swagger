@@ -109,6 +109,11 @@ def classify_yang_module(filename, content=""):
         if content and re.search(r'augment\s+"/ios:', content):
             return "native-aug", "Augments native module - included in native specs"
 
+    # RPC augmentations (augment Cisco-IOS-XE-rpc, not standalone RPCs)
+    if name.startswith("Cisco-IOS-XE-") and name.endswith("-rpc") and name != "Cisco-IOS-XE-rpc":
+        if content and re.search(r'augment\s+"/ios-xe-rpc:', content):
+            return "rpc-aug", "Augments Cisco-IOS-XE-rpc - included in main RPC spec"
+
     # Native module itself
     if name == "Cisco-IOS-XE-native":
         return "native", "Main native module - split into multiple specs"
@@ -391,7 +396,7 @@ def main():
 
     print("\nBy Classification:")
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug"]
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
     for cls in class_order:
         mods = classifications.get(cls, [])
         if not mods:
@@ -413,7 +418,7 @@ def main():
 def generate_json(modules, classifications, total, with_spec, with_tree, multi_cat):
     """Generate the JSON data file for the HTML viewer."""
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug"]
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
 
     cat_stats = {}
     for cls in class_order:
@@ -474,8 +479,8 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
     L.append("|----------------|-------|------------|----------|-------|")
 
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug"]
-    excluded_classes = {"types", "deviation", "common", "native-aug"}
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
+    excluded_classes = {"types", "deviation", "common", "native-aug", "rpc-aug"}
 
     for cls in class_order:
         mods = classifications.get(cls, [])
@@ -564,6 +569,7 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
     L.append("| **deviation** | Modifies other modules' behavior — no standalone API |")
     L.append("| **common** | Infrastructure modules (tailf-*, cisco-semver) — shared types only |")
     L.append("| **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |")
+    L.append("| **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |")
     L.append("")
     L.append(f"*Report generated: {now.isoformat()}*")
 
