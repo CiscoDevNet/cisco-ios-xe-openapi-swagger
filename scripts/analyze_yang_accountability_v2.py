@@ -113,6 +113,8 @@ def classify_yang_module(filename, content=""):
     if name.startswith("Cisco-IOS-XE-") and name.endswith("-rpc") and name != "Cisco-IOS-XE-rpc":
         if content and re.search(r'augment\s+"/ios-xe-rpc:', content):
             return "rpc-aug", "Augments Cisco-IOS-XE-rpc - included in main RPC spec"
+        if content and re.search(r'belongs-to\s+Cisco-IOS-XE-rpc\b', content):
+            return "rpc-aug", "Submodule of Cisco-IOS-XE-rpc - included in parent RPC spec"
 
     # Native module itself
     if name == "Cisco-IOS-XE-native":
