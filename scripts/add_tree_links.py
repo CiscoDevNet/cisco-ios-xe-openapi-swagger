@@ -37,47 +37,51 @@ TREE_JS = """
             }).catch(() => { treeLink.style.display = 'none'; });
         }"""
 
-for filepath in FILES:
-    if not os.path.isfile(filepath):
-        print(f"  SKIP: {filepath} not found")
-        continue
+def main():
+    for filepath in FILES:
+        if not os.path.isfile(filepath):
+            print(f"  SKIP: {filepath} not found")
+            continue
 
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
 
-    modified = False
+        modified = False
 
-    # 1. Add the tree link button in the download bar (after the downloadLabel span)
-    if 'id="treeLink"' not in content:
-        # Find the downloadLabel span and add the tree link after it
-        pattern = r'(<span id="downloadLabel"[^>]*></span>)'
-        replacement = r'\1\n                ' + TREE_LINK_HTML
-        new_content = re.sub(pattern, replacement, content, count=1)
-        if new_content != content:
-            content = new_content
-            modified = True
-            print(f"  Added tree link button to download bar: {os.path.basename(os.path.dirname(filepath))}")
+        # 1. Add the tree link button in the download bar (after the downloadLabel span)
+        if 'id="treeLink"' not in content:
+            # Find the downloadLabel span and add the tree link after it
+            pattern = r'(<span id="downloadLabel"[^>]*></span>)'
+            replacement = r'\1\n                ' + TREE_LINK_HTML
+            new_content = re.sub(pattern, replacement, content, count=1)
+            if new_content != content:
+                content = new_content
+                modified = True
+                print(f"  Added tree link button to download bar: {os.path.basename(os.path.dirname(filepath))}")
+            else:
+                print(f"  WARNING: Could not find downloadLabel span in {filepath}")
+
+        # 2. Add the tree link JS code to loadSpec()
+        if "// Update YANG tree link" not in content:
+            # Find the SwaggerUIBundle call (multi-line) and add tree code after it
+            # Pattern: the }); that ends the SwaggerUIBundle call, followed by the } closing loadSpec
+            # Look for the closing of SwaggerUIBundle: "        });\n    }\n"
+            pattern = r"(layout: 'StandaloneLayout'[^\n]*\n\s*\}\);)"
+            match = re.search(pattern, content)
+            if match:
+                content = content.replace(match.group(0), match.group(0) + TREE_JS)
+                modified = True
+                print(f"  Added tree link JS to loadSpec(): {os.path.basename(os.path.dirname(filepath))}")
+            else:
+                print(f"  WARNING: Could not find SwaggerUIBundle closing in {filepath}")
+
+        if modified:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(content)
         else:
-            print(f"  WARNING: Could not find downloadLabel span in {filepath}")
+            print(f"  No changes needed: {os.path.basename(os.path.dirname(filepath))}")
 
-    # 2. Add the tree link JS code to loadSpec()
-    if "// Update YANG tree link" not in content:
-        # Find the SwaggerUIBundle call (multi-line) and add tree code after it
-        # Pattern: the }); that ends the SwaggerUIBundle call, followed by the } closing loadSpec
-        # Look for the closing of SwaggerUIBundle: "        });\n    }\n"
-        pattern = r"(layout: 'StandaloneLayout'[^\n]*\n\s*\}\);)"
-        match = re.search(pattern, content)
-        if match:
-            content = content.replace(match.group(0), match.group(0) + TREE_JS)
-            modified = True
-            print(f"  Added tree link JS to loadSpec(): {os.path.basename(os.path.dirname(filepath))}")
-        else:
-            print(f"  WARNING: Could not find SwaggerUIBundle closing in {filepath}")
+    print("\nDone! Tree link buttons added to all index-v2.html files.")
 
-    if modified:
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(content)
-    else:
-        print(f"  No changes needed: {os.path.basename(os.path.dirname(filepath))}")
-
-print("\nDone! Tree link buttons added to all index-v2.html files.")
+if __name__ == '__main__':
+    main()

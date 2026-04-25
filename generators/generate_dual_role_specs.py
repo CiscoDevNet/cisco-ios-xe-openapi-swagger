@@ -512,7 +512,7 @@ def generate_config_spec(module_name, nodes, target_folder):
             desc_match = re.search(r'description\s+"([^"]*(?:""[^"]*)*)"', content[:3000])
             if desc_match:
                 module_desc = desc_match.group(1).replace('""', '"')[:300]
-        except:
+        except (OSError, UnicodeDecodeError):
             pass
 
     tree_url = f"{GH_PAGES}/yang-trees/{module_name}.html"
@@ -727,7 +727,7 @@ def update_manifest(folder_path, api_dir="api-v2"):
             total_paths += len(paths)
             for path_ops in paths.values():
                 total_ops += len([k for k in path_ops if k in ('get', 'put', 'post', 'patch', 'delete')])
-        except:
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError):
             pass
 
     manifest = {

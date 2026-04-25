@@ -138,7 +138,7 @@ class MIBToOpenAPI:
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read()
-        except:
+        except (OSError, UnicodeDecodeError):
             return ""
 
     def extract_module_name(self, content: str) -> str:
@@ -233,10 +233,6 @@ class MIBToOpenAPI:
 
         # Parse nested elements
         properties_target = schema["items"]["properties"] if is_list else schema["properties"]
-        
-        # First, check if this container has nested lists or containers
-        # If it does, we should only add those as properties, not the leaves
-        has_nested_structures = bool(re.search(r'\n\s+(list|container)\s+\S+\s*\{', content))
         
         # First, check if this container has nested lists or containers
         # If it does, we should only add those as properties, not the leaves

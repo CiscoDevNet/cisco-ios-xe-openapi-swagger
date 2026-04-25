@@ -26,19 +26,25 @@ def scan_examples(obj, leaf_name=''):
             leaf_generics[leaf_name] += 1
 
 files = sorted(f for f in os.listdir(api_dir) if f.endswith('.json') and f != 'manifest.json')
-for fn in files:
-    with open(os.path.join(api_dir, fn), encoding='utf-8') as fh:
-        spec = json.load(fh)
-    schemas = spec.get('components', {}).get('schemas', {})
-    for name, sch in schemas.items():
-        ex = sch.get('example', {})
-        scan_examples(ex)
 
-print('Generic/placeholder VALUES in examples:')
-for val, count in generic_counter.most_common(20):
-    print(f'  "{val}" => {count} occurrences')
-print(f'\nTotal generic values: {sum(generic_counter.values())}')
+def main():
 
-print(f'\nTop LEAF NAMES with generic values:')
-for leaf, count in leaf_generics.most_common(30):
-    print(f'  {leaf} => {count}')
+    for fn in files:
+        with open(os.path.join(api_dir, fn), encoding='utf-8') as fh:
+            spec = json.load(fh)
+        schemas = spec.get('components', {}).get('schemas', {})
+        for name, sch in schemas.items():
+            ex = sch.get('example', {})
+            scan_examples(ex)
+
+    print('Generic/placeholder VALUES in examples:')
+    for val, count in generic_counter.most_common(20):
+        print(f'  "{val}" => {count} occurrences')
+    print(f'\nTotal generic values: {sum(generic_counter.values())}')
+
+    print(f'\nTop LEAF NAMES with generic values:')
+    for leaf, count in leaf_generics.most_common(30):
+        print(f'  {leaf} => {count}')
+
+if __name__ == '__main__':
+    main()

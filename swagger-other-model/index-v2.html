@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self';">
     <title>Cisco IOS-XE 17.18 - Other APIs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
@@ -85,7 +86,7 @@
             <div class="download-bar" id="downloadBar">
                 <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
-                <a id="treeLink" href="#" target="_blank" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
@@ -93,6 +94,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
     <script>
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     let allModules = [];
     let currentModule = null;
 
@@ -127,8 +129,8 @@
         const items = allModules.filter(m => !fl || m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl));
         list.innerHTML = items.map(m => {
             const sel = currentModule === m.fname ? ' selected' : '';
-            return `<li><a href="#" class="${sel}" data-module="${m.fname}" onclick="loadSpec('${m.fname}',this);return false;">
-                <span>${m.title}</span><span class="path-count">${m.paths} paths</span></a></li>`;
+            return `<li><a href="#" class="${sel}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}',this);return false;">
+                <span>${escapeHtml(m.title)}</span><span class="path-count">${m.paths} paths</span></a></li>`;
         }).join('');
         const info = document.getElementById('searchInfo');
         if (fl) { info.textContent = `${items.length} of ${allModules.length} modules`; info.style.display = 'block'; }
@@ -177,11 +179,9 @@
         const hash = decodeURIComponent(window.location.hash);
         if (hash.startsWith('#spec=')) {
             const fname = hash.replace('#spec=', '');
-            const el = document.querySelector(`[data-module="${fname}"]`);
-            if (el) {
+            if (fname && allModules.find(m => m.fname === fname)) {
+                const el = document.querySelector(`[data-module="${CSS.escape(fname)}"]`);
                 loadSpec(fname, el);
-            } else if (fname) {
-                loadSpec(fname, null);
             }
         }
     }

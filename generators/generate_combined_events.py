@@ -7,10 +7,12 @@ Merges all 32 event notification module specifications into a single unified spe
 import json
 from pathlib import Path
 
+script_dir = Path(__file__).parent
+
 def generate_combined_events():
     """Generate all-events.json combining all event module specs."""
 
-    base_path = Path("/home/tme/Swagger/swagger-events-model/api")
+    base_path = script_dir.parent / 'swagger-events-model' / 'api'
 
     # Base combined spec
     combined = {
@@ -284,7 +286,7 @@ def generate_html_page(stats):
 </html>
 """
 
-    output_path = Path("/home/tme/Swagger/swagger-events-model/all-events.html")
+    output_path = script_dir.parent / 'swagger-events-model' / 'all-events.html'
     with open(output_path, 'w') as f:
         f.write(html_content)
 

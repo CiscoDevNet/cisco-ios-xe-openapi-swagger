@@ -136,7 +136,7 @@ class IETFToOpenAPI:
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read()
-        except:
+        except (OSError, UnicodeDecodeError):
             return ""
 
     def extract_module_name(self, content: str) -> str:

@@ -1,6 +1,6 @@
 # YANG Module Accountability Report
 
-**Date:** April 01, 2026
+**Date:** April 03, 2026
 **IOS-XE Version:** 17.18.1
 **Total YANG Modules:** 1103
 **Modules with OpenAPI Specs:** 680 (61.7%)
@@ -27,18 +27,19 @@ This report provides **100% accountability** for every YANG module in the
 |----------------|-------|------------|----------|-------|
 | **oper** | 200 | 199 | 100% |  |
 | **rpc** | 47 | 47 | 100% |  |
-| **cfg** | 61 | 40 | 66% |  |
-| **openconfig** | 95 | 61 | 64% |  |
+| **cfg** | 42 | 40 | 95% |  |
+| **openconfig** | 66 | 61 | 92% |  |
 | **ietf** | 33 | 23 | 70% |  |
 | **mib** | 149 | 149 | 100% |  |
 | **events** | 41 | 41 | 100% |  |
 | **native** | 107 | 106 | 99% |  |
-| **other** | 32 | 10 | 31% |  |
-| **types** | 64 | 0 | N/A | Excluded by design |
+| **other** | 30 | 10 | 33% |  |
+| **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
-| **common** | 21 | 1 | N/A | Excluded by design |
+| **common** | 16 | 1 | N/A | Excluded by design |
 | **native-aug** | 139 | 0 | N/A | Excluded by design |
-| **rpc-aug** | 16 | 3 | N/A | Excluded by design |
+| **rpc-aug** | 8 | 3 | N/A | Excluded by design |
+| **submodule** | 64 | 0 | N/A | Excluded by design |
 
 ---
 
@@ -301,7 +302,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-xcopy-rpc | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=Cisco-IOS-XE-xcopy-rpc) | [🌳](yang-trees/Cisco-IOS-XE-xcopy-rpc.html) |
 | cisco-ia | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=cisco-ia) | [🌳](yang-trees/cisco-ia.html) |
 
-### CFG (61 modules)
+### CFG (42 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -310,33 +311,14 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-aws-s3-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-aws-s3-cfg) | [🌳](yang-trees/Cisco-IOS-XE-aws-s3-cfg.html) |
 | Cisco-IOS-XE-cloud-services-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-cloud-services-cfg) | [🌳](yang-trees/Cisco-IOS-XE-cloud-services-cfg.html) |
 | Cisco-IOS-XE-ctrl-mng-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-ctrl-mng-cfg) | [🌳](yang-trees/Cisco-IOS-XE-ctrl-mng-cfg.html) |
-| Cisco-IOS-XE-eigrp-obsolete | - | ❌ No spec | - |
-| Cisco-IOS-XE-ethernet-cfm-efp | - | ❌ No spec | - |
-| Cisco-IOS-XE-ethernet-oam | - | ❌ No spec | - |
 | Cisco-IOS-XE-features | - | ❌ No spec | - |
 | Cisco-IOS-XE-gnmi-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-gnmi-cfg) | [🌳](yang-trees/Cisco-IOS-XE-gnmi-cfg.html) |
 | Cisco-IOS-XE-grpc-tunnel-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-grpc-tunnel-cfg) | [🌳](yang-trees/Cisco-IOS-XE-grpc-tunnel-cfg.html) |
-| Cisco-IOS-XE-hsrp | - | ❌ No spec | - |
-| Cisco-IOS-XE-interfaces | - | ❌ No spec | - |
-| Cisco-IOS-XE-ip | - | ❌ No spec | - |
-| Cisco-IOS-XE-ipv6 | - | ❌ No spec | - |
-| Cisco-IOS-XE-license | - | ❌ No spec | - |
-| Cisco-IOS-XE-line | - | ❌ No spec | - |
-| Cisco-IOS-XE-location | - | ❌ No spec | - |
-| Cisco-IOS-XE-logging | - | ❌ No spec | - |
 | Cisco-IOS-XE-mdt-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-mdt-cfg) | [🌳](yang-trees/Cisco-IOS-XE-mdt-cfg.html) |
 | Cisco-IOS-XE-ncch-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-ncch-cfg) | [🌳](yang-trees/Cisco-IOS-XE-ncch-cfg.html) |
-| Cisco-IOS-XE-ospf-obsolete | - | ❌ No spec | - |
-| Cisco-IOS-XE-parser | - | ❌ No spec | - |
 | Cisco-IOS-XE-qfp-stats | Operational | [Operational](swagger-oper-model/index-v2.html#spec=Cisco-IOS-XE-qfp-stats) | [🌳](yang-trees/Cisco-IOS-XE-qfp-stats.html) |
-| Cisco-IOS-XE-sip-ua | - | ❌ No spec | - |
 | Cisco-IOS-XE-sisf | - | ❌ No spec | - |
 | Cisco-IOS-XE-sslproxy-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-sslproxy-cfg) | [🌳](yang-trees/Cisco-IOS-XE-sslproxy-cfg.html) |
-| Cisco-IOS-XE-transceiver-monitor | - | ❌ No spec | - |
-| Cisco-IOS-XE-transport | - | ❌ No spec | - |
-| Cisco-IOS-XE-voice-class | - | ❌ No spec | - |
-| Cisco-IOS-XE-voice-dspfarm | - | ❌ No spec | - |
-| Cisco-IOS-XE-voice-register | - | ❌ No spec | - |
 | Cisco-IOS-XE-wireless-ap-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-wireless-ap-cfg) | [🌳](yang-trees/Cisco-IOS-XE-wireless-ap-cfg.html) |
 | Cisco-IOS-XE-wireless-apf-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-wireless-apf-cfg) | [🌳](yang-trees/Cisco-IOS-XE-wireless-apf-cfg.html) |
 | Cisco-IOS-XE-wireless-cts-sxp-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-wireless-cts-sxp-cfg) | [🌳](yang-trees/Cisco-IOS-XE-wireless-cts-sxp-cfg.html) |
@@ -367,31 +349,19 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-wlan-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-wireless-wlan-cfg) | [🌳](yang-trees/Cisco-IOS-XE-wireless-wlan-cfg.html) |
 | Cisco-IOS-XE-yang-interfaces-cfg | Configuration | [Configuration](swagger-cfg-model/index-v2.html#spec=Cisco-IOS-XE-yang-interfaces-cfg) | [🌳](yang-trees/Cisco-IOS-XE-yang-interfaces-cfg.html) |
 
-### OPENCONFIG (95 modules)
+### OPENCONFIG (66 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
 | openconfig-aaa | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-aaa) | [🌳](yang-trees/openconfig-aaa.html) |
-| openconfig-aaa-radius | - | ❌ No spec | - |
-| openconfig-aaa-tacacs | - | ❌ No spec | - |
 | openconfig-access-points | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-access-points) | [🌳](yang-trees/openconfig-access-points.html) |
 | openconfig-acl | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-acl) | [🌳](yang-trees/openconfig-acl.html) |
 | openconfig-aft | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-aft) | [🌳](yang-trees/openconfig-aft.html) |
-| openconfig-aft-ethernet | - | ❌ No spec | - |
-| openconfig-aft-ipv4 | - | ❌ No spec | - |
-| openconfig-aft-ipv6 | - | ❌ No spec | - |
-| openconfig-aft-mpls | - | ❌ No spec | - |
 | openconfig-aft-network-instance | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-aft-network-instance) | [🌳](yang-trees/openconfig-aft-network-instance.html) |
-| openconfig-aft-pf | - | ❌ No spec | - |
-| openconfig-aft-state-synced | - | ❌ No spec | - |
 | openconfig-alarms | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-alarms) | [🌳](yang-trees/openconfig-alarms.html) |
 | openconfig-ap-manager | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-ap-manager) | [🌳](yang-trees/openconfig-ap-manager.html) |
 | openconfig-bfd | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-bfd) | [🌳](yang-trees/openconfig-bfd.html) |
 | openconfig-bgp | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-bgp) | [🌳](yang-trees/openconfig-bgp.html) |
-| openconfig-bgp-errors | - | ❌ No spec | - |
-| openconfig-bgp-global | - | ❌ No spec | - |
-| openconfig-bgp-neighbor | - | ❌ No spec | - |
-| openconfig-bgp-peer-group | - | ❌ No spec | - |
 | openconfig-bgp-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-bgp-policy) | [🌳](yang-trees/openconfig-bgp-policy.html) |
 | openconfig-ethernet-segments | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-ethernet-segments) | [🌳](yang-trees/openconfig-ethernet-segments.html) |
 | openconfig-evpn | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-evpn) | [🌳](yang-trees/openconfig-evpn.html) |
@@ -404,9 +374,7 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-igmp | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-igmp) | [🌳](yang-trees/openconfig-igmp.html) |
 | openconfig-interfaces | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-interfaces) | [🌳](yang-trees/openconfig-interfaces.html) |
 | openconfig-isis | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-isis) | [🌳](yang-trees/openconfig-isis.html) |
-| openconfig-isis-lsp | - | ❌ No spec | - |
 | openconfig-isis-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-isis-policy) | [🌳](yang-trees/openconfig-isis-policy.html) |
-| openconfig-isis-routing | - | ❌ No spec | - |
 | openconfig-keychain | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-keychain) | [🌳](yang-trees/openconfig-keychain.html) |
 | openconfig-lacp | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-lacp) | [🌳](yang-trees/openconfig-lacp.html) |
 | openconfig-license | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-license) | [🌳](yang-trees/openconfig-license.html) |
@@ -415,28 +383,17 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-macsec | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-macsec) | [🌳](yang-trees/openconfig-macsec.html) |
 | openconfig-messages | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-messages) | [🌳](yang-trees/openconfig-messages.html) |
 | openconfig-mpls | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-mpls) | [🌳](yang-trees/openconfig-mpls.html) |
-| openconfig-mpls-igp | - | ❌ No spec | - |
 | openconfig-mpls-ldp | - | ❌ No spec | - |
 | openconfig-mpls-rsvp | - | ❌ No spec | - |
 | openconfig-mpls-sr | - | ❌ No spec | - |
-| openconfig-mpls-static | - | ❌ No spec | - |
-| openconfig-mpls-te | - | ❌ No spec | - |
 | openconfig-network-instance | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-network-instance) | [🌳](yang-trees/openconfig-network-instance.html) |
-| openconfig-network-instance-l2 | - | ❌ No spec | - |
 | openconfig-network-instance-l3 | - | ❌ No spec | - |
 | openconfig-network-instance-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-network-instance-policy) | [🌳](yang-trees/openconfig-network-instance-policy.html) |
 | openconfig-openflow | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-openflow) | [🌳](yang-trees/openconfig-openflow.html) |
 | openconfig-ospf-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-ospf-policy) | [🌳](yang-trees/openconfig-ospf-policy.html) |
 | openconfig-ospfv2 | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-ospfv2) | [🌳](yang-trees/openconfig-ospfv2.html) |
-| openconfig-ospfv2-area | - | ❌ No spec | - |
-| openconfig-ospfv2-area-interface | - | ❌ No spec | - |
-| openconfig-ospfv2-global | - | ❌ No spec | - |
-| openconfig-ospfv2-lsdb | - | ❌ No spec | - |
 | openconfig-packet-match | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-packet-match) | [🌳](yang-trees/openconfig-packet-match.html) |
 | openconfig-pcep | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-pcep) | [🌳](yang-trees/openconfig-pcep.html) |
-| openconfig-pf-forwarding-policies | - | ❌ No spec | - |
-| openconfig-pf-interfaces | - | ❌ No spec | - |
-| openconfig-pf-path-groups | - | ❌ No spec | - |
 | openconfig-pf-srte | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-pf-srte) | [🌳](yang-trees/openconfig-pf-srte.html) |
 | openconfig-pim | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-pim) | [🌳](yang-trees/openconfig-pim.html) |
 | openconfig-platform | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-platform) | [🌳](yang-trees/openconfig-platform.html) |
@@ -450,11 +407,7 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-procmon | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-procmon) | [🌳](yang-trees/openconfig-procmon.html) |
 | openconfig-programming-errors | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-programming-errors) | [🌳](yang-trees/openconfig-programming-errors.html) |
 | openconfig-rib-bgp | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-rib-bgp) | [🌳](yang-trees/openconfig-rib-bgp.html) |
-| openconfig-rib-bgp-attributes | - | ❌ No spec | - |
 | openconfig-rib-bgp-ext | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-rib-bgp-ext) | [🌳](yang-trees/openconfig-rib-bgp-ext.html) |
-| openconfig-rib-bgp-shared-attributes | - | ❌ No spec | - |
-| openconfig-rib-bgp-table-attributes | - | ❌ No spec | - |
-| openconfig-rib-bgp-tables | - | ❌ No spec | - |
 | openconfig-route-summary | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-route-summary) | [🌳](yang-trees/openconfig-route-summary.html) |
 | openconfig-routing-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-routing-policy) | [🌳](yang-trees/openconfig-routing-policy.html) |
 | openconfig-segment-routing | OpenConfig | [OpenConfig](swagger-openconfig-model/index-v2.html#spec=openconfig-segment-routing) | [🌳](yang-trees/openconfig-segment-routing.html) |
@@ -817,7 +770,7 @@ This report provides **100% accountability** for every YANG module in the
 | native-zone | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone) | - |
 | native-zone-pair | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone-pair) | - |
 
-### OTHER (32 modules)
+### OTHER (30 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -839,12 +792,10 @@ This report provides **100% accountability** for every YANG module in the
 | policy-attr | - | ❌ No spec | - |
 | tailf-aaa | - | ❌ No spec | [🌳](yang-trees/tailf-aaa.html) |
 | tailf-acm | - | ❌ No spec | [🌳](yang-trees/tailf-acm.html) |
-| tailf-cli-extensions | - | ❌ No spec | - |
 | tailf-confd-monitoring | - | ❌ No spec | [🌳](yang-trees/tailf-confd-monitoring.html) |
 | tailf-confd-monitoring2 | - | ❌ No spec | [🌳](yang-trees/tailf-confd-monitoring2.html) |
 | tailf-key-rotation | - | ❌ No spec | [🌳](yang-trees/tailf-key-rotation.html) |
 | tailf-kicker | Events, Other | [Events](swagger-events-model/index-v2.html#spec=tailf-kicker) [Other](swagger-other-model/index-v2.html#spec=tailf-kicker) | [🌳](yang-trees/tailf-kicker.html) |
-| tailf-meta-extensions | - | ❌ No spec | - |
 | tailf-netconf-extensions | RPC | [RPC](swagger-rpc-model/index-v2.html#spec=tailf-netconf-extensions) | [🌳](yang-trees/tailf-netconf-extensions.html) |
 | tailf-netconf-inactive | - | ❌ No spec | [🌳](yang-trees/tailf-netconf-inactive.html) |
 | tailf-netconf-monitoring | - | ❌ No spec | [🌳](yang-trees/tailf-netconf-monitoring.html) |
@@ -854,12 +805,12 @@ This report provides **100% accountability** for every YANG module in the
 | tailf-restconf-error | - | ❌ No spec | - |
 | tailf-yang-patch | - | ❌ No spec | - |
 
-### TYPES (64 modules)
+### TYPES (63 modules)
 
 *Type definitions only*
 
 <details>
-<summary>Click to expand 64 types modules</summary>
+<summary>Click to expand 63 types modules</summary>
 
 | Module | Tree |
 |--------|------|
@@ -890,7 +841,6 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-wireless-types | - |
 | Cisco-IOS-XE-wireless-urwb-common-types | - |
 | Cisco-IOS-XE-wsa-types | - |
-| cisco-smart-license-errors | - |
 | common-mpls-types | - |
 | ietf-inet-types | - |
 | ietf-routing-types | - |
@@ -1040,12 +990,12 @@ This report provides **100% accountability** for every YANG module in the
 
 </details>
 
-### COMMON (21 modules)
+### COMMON (16 modules)
 
 *Common/shared protocol module*
 
 <details>
-<summary>Click to expand 21 common modules</summary>
+<summary>Click to expand 16 common modules</summary>
 
 | Module | Tree |
 |--------|------|
@@ -1062,11 +1012,6 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-bridge-common | - |
 | cisco-semver | - |
 | common-mpls-static | [🌳](yang-trees/common-mpls-static.html) |
-| openconfig-aft-common | - |
-| openconfig-bgp-common | - |
-| openconfig-bgp-common-multiprotocol | - |
-| openconfig-bgp-common-structure | - |
-| openconfig-ospfv2-common | - |
 | tailf-common | - |
 | tailf-common-monitoring2 | - |
 | tailf-common-query | - |
@@ -1224,31 +1169,99 @@ This report provides **100% accountability** for every YANG module in the
 
 </details>
 
-### RPC-AUG (16 modules)
+### RPC-AUG (8 modules)
 
-*Submodule of Cisco-IOS-XE-rpc - included in parent RPC spec*
+*Augments Cisco-IOS-XE-rpc - included in main RPC spec*
 
 <details>
-<summary>Click to expand 16 rpc-aug modules</summary>
+<summary>Click to expand 8 rpc-aug modules</summary>
+
+| Module | Tree |
+|--------|------|
+| Cisco-IOS-XE-cable-diag-rpc | [🌳](yang-trees/Cisco-IOS-XE-cable-diag-rpc.html) |
+| Cisco-IOS-XE-cts-rpc | [🌳](yang-trees/Cisco-IOS-XE-cts-rpc.html) |
+| Cisco-IOS-XE-factory-reset-secure-rpc | [🌳](yang-trees/Cisco-IOS-XE-factory-reset-secure-rpc.html) |
+| Cisco-IOS-XE-flow-rpc | [🌳](yang-trees/Cisco-IOS-XE-flow-rpc.html) |
+| Cisco-IOS-XE-switch-rpc | [🌳](yang-trees/Cisco-IOS-XE-switch-rpc.html) |
+| Cisco-IOS-XE-umbrella-rpc | [🌳](yang-trees/Cisco-IOS-XE-umbrella-rpc.html) |
+| Cisco-IOS-XE-utd-rpc | [🌳](yang-trees/Cisco-IOS-XE-utd-rpc.html) |
+| Cisco-IOS-XE-zone-rpc | [🌳](yang-trees/Cisco-IOS-XE-zone-rpc.html) |
+
+</details>
+
+### SUBMODULE (64 modules)
+
+*Submodule of Cisco-IOS-XE-rpc - included in parent spec*
+
+<details>
+<summary>Click to expand 64 submodule modules</summary>
 
 | Module | Tree |
 |--------|------|
 | Cisco-IOS-XE-aaa-rpc | - |
 | Cisco-IOS-XE-arp-rpc | - |
 | Cisco-IOS-XE-bgp-rpc | - |
-| Cisco-IOS-XE-cable-diag-rpc | [🌳](yang-trees/Cisco-IOS-XE-cable-diag-rpc.html) |
 | Cisco-IOS-XE-crypto-rpc | - |
-| Cisco-IOS-XE-cts-rpc | [🌳](yang-trees/Cisco-IOS-XE-cts-rpc.html) |
 | Cisco-IOS-XE-dhcp-rpc | - |
-| Cisco-IOS-XE-factory-reset-secure-rpc | [🌳](yang-trees/Cisco-IOS-XE-factory-reset-secure-rpc.html) |
-| Cisco-IOS-XE-flow-rpc | [🌳](yang-trees/Cisco-IOS-XE-flow-rpc.html) |
+| Cisco-IOS-XE-eigrp-obsolete | - |
+| Cisco-IOS-XE-ethernet-cfm-efp | - |
+| Cisco-IOS-XE-ethernet-oam | - |
+| Cisco-IOS-XE-hsrp | - |
+| Cisco-IOS-XE-interfaces | - |
+| Cisco-IOS-XE-ip | - |
+| Cisco-IOS-XE-ipv6 | - |
+| Cisco-IOS-XE-license | - |
+| Cisco-IOS-XE-line | - |
+| Cisco-IOS-XE-location | - |
+| Cisco-IOS-XE-logging | - |
 | Cisco-IOS-XE-multicast-rpc | - |
+| Cisco-IOS-XE-ospf-obsolete | - |
 | Cisco-IOS-XE-ospf-rpc | - |
+| Cisco-IOS-XE-parser | - |
 | Cisco-IOS-XE-platform-rpc | - |
-| Cisco-IOS-XE-switch-rpc | [🌳](yang-trees/Cisco-IOS-XE-switch-rpc.html) |
-| Cisco-IOS-XE-umbrella-rpc | [🌳](yang-trees/Cisco-IOS-XE-umbrella-rpc.html) |
-| Cisco-IOS-XE-utd-rpc | [🌳](yang-trees/Cisco-IOS-XE-utd-rpc.html) |
-| Cisco-IOS-XE-zone-rpc | [🌳](yang-trees/Cisco-IOS-XE-zone-rpc.html) |
+| Cisco-IOS-XE-sip-ua | - |
+| Cisco-IOS-XE-transceiver-monitor | - |
+| Cisco-IOS-XE-transport | - |
+| Cisco-IOS-XE-voice-class | - |
+| Cisco-IOS-XE-voice-dspfarm | - |
+| Cisco-IOS-XE-voice-register | - |
+| cisco-smart-license-errors | - |
+| openconfig-aaa-radius | - |
+| openconfig-aaa-tacacs | - |
+| openconfig-aft-common | - |
+| openconfig-aft-ethernet | - |
+| openconfig-aft-ipv4 | - |
+| openconfig-aft-ipv6 | - |
+| openconfig-aft-mpls | - |
+| openconfig-aft-pf | - |
+| openconfig-aft-state-synced | - |
+| openconfig-bgp-common | - |
+| openconfig-bgp-common-multiprotocol | - |
+| openconfig-bgp-common-structure | - |
+| openconfig-bgp-errors | - |
+| openconfig-bgp-global | - |
+| openconfig-bgp-neighbor | - |
+| openconfig-bgp-peer-group | - |
+| openconfig-isis-lsp | - |
+| openconfig-isis-routing | - |
+| openconfig-mpls-igp | - |
+| openconfig-mpls-static | - |
+| openconfig-mpls-te | - |
+| openconfig-network-instance-l2 | - |
+| openconfig-ospfv2-area | - |
+| openconfig-ospfv2-area-interface | - |
+| openconfig-ospfv2-common | - |
+| openconfig-ospfv2-global | - |
+| openconfig-ospfv2-lsdb | - |
+| openconfig-pf-forwarding-policies | - |
+| openconfig-pf-interfaces | - |
+| openconfig-pf-path-groups | - |
+| openconfig-rib-bgp-attributes | - |
+| openconfig-rib-bgp-shared-attributes | - |
+| openconfig-rib-bgp-table-attributes | - |
+| openconfig-rib-bgp-tables | - |
+| tailf-cli-extensions | - |
+| tailf-meta-extensions | - |
 
 </details>
 
@@ -1372,4 +1385,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-04-01T14:01:43.196778*
+*Report generated: 2026-04-03T15:38:35.614156*

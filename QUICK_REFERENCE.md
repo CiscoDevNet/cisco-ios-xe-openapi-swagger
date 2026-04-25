@@ -2,6 +2,19 @@
 
 ## Fixed Issues
 
+### 4. ✅ Empty `{}` and `null` Examples — Fixed
+**Issue:** POST/PUT/PATCH request bodies showed `{}` or stray `null` values, making the examples unusable for real RESTCONF calls.
+**Fix:** [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) now schema-walks, then path-matches, then falls back to `[null]` (RFC 7951 empty-leaf encoding). 48,541 enrichments applied across 657 specs. Verified: 0 empty `{}` and 0 `null` values across all 26,331 config examples.
+**Status:** Fixed and deployed. See [CHANGELOG](CHANGELOG.md) for details.
+
+### 5. ✅ Deep-Link URLs — Fixed
+**Issue:** Copying a search-result URL brought users back to the index page instead of the right module.
+**Fix:** [search.js](search.js) now reads/writes URL hashes:
+- `#search=<query>` — runs the search on load
+- `#module=<name>` — opens the module's swagger page
+- `#spec=<model>/<name>` — opens the spec inside the right model's `index-v2.html`
+**Status:** Fixed and deployed.
+
 ### 1. ✅ Other Model - Fixed [object object] Display
 **Issue:** Other/Misc tab showed `[object object]` instead of module names  
 **Fix:** Updated JavaScript to properly handle module objects from manifest  

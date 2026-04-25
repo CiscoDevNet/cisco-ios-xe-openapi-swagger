@@ -7,10 +7,12 @@ Merges all 147 SNMP MIB (SMIv2-to-YANG) module specifications into a single unif
 import json
 from pathlib import Path
 
+script_dir = Path(__file__).parent
+
 def generate_combined_mib():
     """Generate all-mibs.json combining all MIB module specs."""
 
-    base_path = Path("/home/tme/Swagger/swagger-mib-model/api")
+    base_path = script_dir.parent / 'swagger-mib-model' / 'api'
 
     # Base combined spec
     combined = {

@@ -18,15 +18,19 @@ redirect_snippet = (
     "if(location.search)t+=location.search;window.location.replace(t);</script>"
 )
 
-for m in models:
-    path = base / m / 'index.html'
-    if not path.exists():
-        print(f'{m} - NOT FOUND')
-        continue
-    content = path.read_text(encoding='utf-8')
-    if 'url=index-v2.html' in content:
-        print(f'{m} - already done')
-        continue
-    content = content.replace('<head>', '<head>\n' + redirect_snippet, 1)
-    path.write_text(content, encoding='utf-8')
-    print(f'{m} - redirect added')
+def main():
+    for m in models:
+        path = base / m / 'index.html'
+        if not path.exists():
+            print(f'{m} - NOT FOUND')
+            continue
+        content = path.read_text(encoding='utf-8')
+        if 'url=index-v2.html' in content:
+            print(f'{m} - already done')
+            continue
+        content = content.replace('<head>', '<head>\n' + redirect_snippet, 1)
+        path.write_text(content, encoding='utf-8')
+        print(f'{m} - redirect added')
+
+if __name__ == '__main__':
+    main()

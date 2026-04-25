@@ -79,6 +79,16 @@ def classify_yang_module(filename, content=""):
     Returns (classification, reason_if_excluded)"""
     name = filename.replace(".yang", "")
 
+    # Submodule detection — belongs-to another module, no standalone spec
+    if content:
+        # Match "submodule <name> {" at the top level
+        sub_match = re.match(r'\s*submodule\s+\S+\s*\{', content)
+        if sub_match:
+            bt_match = re.search(r'belongs-to\s+["\']?(\S+?)["\']?\s*\{', content)
+            if bt_match:
+                parent = bt_match.group(1)
+                return "submodule", f"Submodule of {parent} - included in parent spec"
+
     # Deviation modules
     if "-deviation" in name.lower() or name.endswith("-devs") or "-devs-" in name:
         return "deviation", "Deviation module - modifies other modules"
@@ -398,7 +408,7 @@ def main():
 
     print("\nBy Classification:")
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug", "submodule"]
     for cls in class_order:
         mods = classifications.get(cls, [])
         if not mods:
@@ -420,7 +430,7 @@ def main():
 def generate_json(modules, classifications, total, with_spec, with_tree, multi_cat):
     """Generate the JSON data file for the HTML viewer."""
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug", "submodule"]
 
     cat_stats = {}
     for cls in class_order:
@@ -481,8 +491,8 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
     L.append("|----------------|-------|------------|----------|-------|")
 
     class_order = ["oper", "rpc", "cfg", "openconfig", "ietf", "mib", "events",
-                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug"]
-    excluded_classes = {"types", "deviation", "common", "native-aug", "rpc-aug"}
+                   "native", "other", "types", "deviation", "common", "native-aug", "rpc-aug", "submodule"]
+    excluded_classes = {"types", "deviation", "common", "native-aug", "rpc-aug", "submodule"}
 
     for cls in class_order:
         mods = classifications.get(cls, [])

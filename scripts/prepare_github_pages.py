@@ -109,7 +109,7 @@ class GitHubPagesPreparer:
                             with open(json_file, 'r', encoding='utf-8') as f:
                                 spec = json.load(f)
                                 path_count += len(spec.get('paths', {}))
-                        except:
+                        except (json.JSONDecodeError, OSError):
                             pass
         
         print(f"  Total specs: {spec_count}")
