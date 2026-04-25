@@ -296,7 +296,8 @@ def main():
     # Update tree-manifest.json
     if all_new_names:
         manifest_path = os.path.join(TREE_DIR, 'tree-manifest.json')
-        raw = open(manifest_path, encoding='utf-8-sig').read()
+        with open(manifest_path, encoding='utf-8-sig') as f:
+            raw = f.read()
         manifest = json.loads(raw)
         manifest_set = set(manifest)
         for name in all_new_names:

@@ -4,9 +4,7 @@
 // HTML Sanitization utility to prevent XSS
 function escapeHtml(str) {
     if (str == null) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 let searchIndex = [];
@@ -22,6 +20,8 @@ let advancedFilters = {
 let autocompleteIndex = [];
 let selectedSuggestionIndex = -1;
 let browseMode = false;
+let currentSort = 'relevance';
+let lastResults = [];
 
 // Load search index
 async function loadSearchIndex() {
@@ -70,7 +70,7 @@ async function loadSearchIndex() {
                 searchInput.disabled = false;
             }
             
-            console.log(`✅ Loaded ${searchIndex.length} modules for search`);
+            // Search index loaded successfully
         } catch (error) {
             console.error('❌ Error loading search index:', error);
             const searchInput = document.getElementById('universalSearch');
@@ -113,7 +113,7 @@ function buildAutocompleteIndex() {
         type: module.type
     })).sort((a, b) => a.name.localeCompare(b.name));
     
-    console.log(`✅ Built autocomplete index with ${autocompleteIndex.length} terms`);
+    // Autocomplete index built
 }
 
 // Get badge class for module type
@@ -139,7 +139,7 @@ function getBadgeClass(type) {
 function getBorderColor(type) {
     const colorMap = {
         'operational': '#2196F3',
-        'configuration': '#00BCD4',
+        'config': '#00BCD4',
         'native': '#4CAF50',
         'rpc': '#FFC107',
         'events': '#FF9800',
@@ -162,6 +162,59 @@ function truncateDescription(desc, maxLen) {
     return clean;
 }
 
+// Extract core technology keyword from a module name
+function extractCoreKeyword(name) {
+    const lower = name.toLowerCase();
+    // Cisco-IOS-XE-xxx-oper / -events / -rpc / -cfg
+    let m = lower.match(/^cisco-ios-xe-(.+?)-(oper|events|rpc|cfg|common|types|actions-rpc)$/);
+    if (m) return m[1];
+    // Cisco-IOS-XE-xxx (no suffix)
+    m = lower.match(/^cisco-ios-xe-(.+)$/);
+    if (m && m[1].length > 2) return m[1];
+    // openconfig-xxx
+    m = lower.match(/^openconfig-(.+?)(-types)?$/);
+    if (m) return m[1];
+    // ietf-xxx
+    m = lower.match(/^ietf-(.+)$/);
+    if (m) return m[1];
+    // CISCO-XXX-MIB or XXX-MIB or XXX-TRAP-MIB
+    m = lower.match(/^(?:cisco-)?(.+?)(?:-trap)?-mib$/);
+    if (m && m[1].length > 2) return m[1];
+    return null;
+}
+
+// Keyword-to-modules lookup map (built once at load time)
+let relatedModulesMap = null;
+
+function buildRelatedModulesMap() {
+    relatedModulesMap = {};
+    for (const m of searchIndex) {
+        const kw = extractCoreKeyword(m.name);
+        if (kw) {
+            if (!relatedModulesMap[kw]) relatedModulesMap[kw] = [];
+            relatedModulesMap[kw].push(m);
+        }
+    }
+}
+
+// Find related modules in other categories (O(1) lookup)
+function getRelatedModules(module) {
+    if (!relatedModulesMap) buildRelatedModulesMap();
+    const keyword = extractCoreKeyword(module.name);
+    if (!keyword || !relatedModulesMap[keyword]) return [];
+    const related = [];
+    const myCategory = module.category;
+    const seen = new Set();
+    for (const m of relatedModulesMap[keyword]) {
+        if (m.name === module.name || m.category === myCategory) continue;
+        if (!seen.has(m.category)) {
+            seen.add(m.category);
+            related.push(m);
+        }
+    }
+    return related.slice(0, 5);
+}
+
 // Render search results
 function renderResults(results) {
     const resultsContainer = document.getElementById('searchResults');
@@ -174,11 +227,26 @@ function renderResults(results) {
         resultsContainer.classList.add('active');
         return;
     }
+
+    // Apply sorting — save original order, sort a copy
+    lastResults = results;
+    results = [...results];
+    if (currentSort === 'name') {
+        results.sort((a, b) => ((a.item || a).name || '').localeCompare((b.item || b).name || ''));
+    } else if (currentSort === 'paths') {
+        results.sort((a, b) => ((b.item || b).pathCount || 0) - ((a.item || a).pathCount || 0));
+    } else if (currentSort === 'type') {
+        results.sort((a, b) => ((a.item || a).type || '').localeCompare((b.item || b).type || '') || ((a.item || a).name || '').localeCompare((b.item || b).name || ''));
+    }
+    // 'relevance' = default Fuse.js order, no re-sort needed
     
     const totalResults = results.length;
     const displayLimit = 60;
     const modeLabel = browseMode ? 'Browsing' : 'Found';
-    const statsHtml = `<div class="search-stats">✨ ${modeLabel} ${totalResults} module${totalResults !== 1 ? 's' : ''}${totalResults > displayLimit ? ` — showing first ${displayLimit}` : ''}</div>`;
+    const sortBtnStyle = (s) => `cursor:pointer; padding:3px 8px; border:1px solid ${currentSort===s ? '#1565C0' : 'var(--border-color,#ddd)'}; border-radius:4px; background:${currentSort===s ? '#1565C0' : 'var(--bg-card,#fff)'}; color:${currentSort===s ? '#fff' : 'var(--text-secondary,#666)'}; font-size:0.78rem;`;
+    const sortBtn = (key, label) => `<button style="${sortBtnStyle(key)}" aria-pressed="${currentSort===key}" onclick="changeSort('${key}')">${label}</button>`;
+    const sortHtml = `<span style="display:inline-flex;gap:4px;margin-left:12px;align-items:center;" role="group" aria-label="Sort results"><span style="font-size:0.78rem;color:var(--text-secondary,#666);">Sort:</span>${sortBtn('relevance','Relevance')}${sortBtn('name','Name')}${sortBtn('paths','Paths \u2193')}${sortBtn('type','Type')}</span>`;
+    const statsHtml = `<div class="search-stats" style="display:flex;align-items:center;flex-wrap:wrap;">✨ ${modeLabel} ${totalResults} module${totalResults !== 1 ? 's' : ''}${totalResults > displayLimit ? ` — showing first ${displayLimit}` : ''}${sortHtml}</div>`;
     
     const cardsHtml = results.slice(0, displayLimit).map(result => {
         const module = result.item || result;
@@ -198,6 +266,19 @@ function renderResults(results) {
             linksHtml += `<a href="${escapeHtml(module.yangTreeUrl)}" class="search-result-link" data-module="${escapedName}">🌳 View YANG Tree</a>`;
         }
         
+        // Related modules in other categories
+        const related = getRelatedModules(module);
+        let relatedHtml = '';
+        if (related.length > 0) {
+            const relLinks = related.map(r => {
+                const url = r.swaggerUrl ? escapeHtml(r.swaggerUrl) : '#';
+                const badge = escapeHtml(r.displayCategory);
+                const rName = escapeHtml(r.name);
+                return `<a href="${url}" title="${rName}" class="related-link" data-related-search="${rName}">${escapeHtml(r.emoji)} ${badge}</a>`;
+            }).join(' ');
+            relatedHtml = `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="font-size:0.75rem;color:var(--text-secondary,#888);">Also in:</span>${relLinks}</div>`;
+        }
+        
         return `
             <div class="search-result-card" style="border-left-color: ${borderColor}">
                 <div class="search-result-header">
@@ -211,7 +292,7 @@ function renderResults(results) {
                     </button>
                 </div>
                 ${escapedDesc ? `<div class="search-result-desc">${escapedDesc}</div>` : ''}
-                <div class="search-result-links">${linksHtml}</div>
+                <div class="search-result-links">${linksHtml}</div>${relatedHtml}
             </div>
         `;
     }).join('');
@@ -400,8 +481,10 @@ function resetFilters() {
     activeFilters.add('all');
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
     });
     document.querySelector('[data-filter="all"]').classList.add('active');
+    document.querySelector('[data-filter="all"]').setAttribute('aria-pressed', 'true');
     
     // Reset advanced filters
     advancedFilters = {
@@ -446,6 +529,14 @@ function browseAll() {
     renderResults(results);
 }
 
+// Change sort order and re-render
+function changeSort(sort) {
+    currentSort = sort;
+    if (lastResults.length > 0) {
+        renderResults(lastResults);
+    }
+}
+
 // Perform search
 function performSearch() {
     const query = document.getElementById('universalSearch').value.trim();
@@ -454,6 +545,7 @@ function performSearch() {
     
     // If no search text, check if we should browse by filter
     if (query.length === 0) {
+        updateUrlHash('');
         if (!activeFilters.has('all') || advancedFilters.prefix !== 'all' || 
             advancedFilters.hasTree !== 'all' || advancedFilters.hasSpec !== 'all') {
             browseAll();
@@ -478,6 +570,9 @@ function performSearch() {
     // Apply filters
     results = filterResults(results);
     
+    // Update URL hash for deep-linking
+    updateUrlHash(query);
+    
     // Render results
     renderResults(results);
 }
@@ -494,28 +589,35 @@ function setupFilters() {
                 // Clear all filters and activate "All"
                 activeFilters.clear();
                 activeFilters.add('all');
-                filterButtons.forEach(b => b.classList.remove('active'));
+                filterButtons.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
                 btn.classList.add('active');
+                btn.setAttribute('aria-pressed', 'true');
             } else {
                 // Remove "All" filter if active
                 if (activeFilters.has('all')) {
                     activeFilters.clear();
-                    document.querySelector('[data-filter="all"]').classList.remove('active');
+                    const allBtn = document.querySelector('[data-filter="all"]');
+                    allBtn.classList.remove('active');
+                    allBtn.setAttribute('aria-pressed', 'false');
                 }
                 
                 // Toggle this filter
                 if (activeFilters.has(filterValue)) {
                     activeFilters.delete(filterValue);
                     btn.classList.remove('active');
+                    btn.setAttribute('aria-pressed', 'false');
                 } else {
                     activeFilters.add(filterValue);
                     btn.classList.add('active');
+                    btn.setAttribute('aria-pressed', 'true');
                 }
                 
                 // If no filters active, activate "All"
                 if (activeFilters.size === 0) {
                     activeFilters.add('all');
-                    document.querySelector('[data-filter="all"]').classList.add('active');
+                    const allBtn = document.querySelector('[data-filter="all"]');
+                    allBtn.classList.add('active');
+                    allBtn.setAttribute('aria-pressed', 'true');
                 }
             }
             
@@ -525,10 +627,77 @@ function setupFilters() {
     });
 }
 
+// ── Deep-linking: preserve search state in URL hash ─────────────────────────
+
+function updateUrlHash(query) {
+    if (query && query.length >= 2) {
+        history.replaceState(null, '', '#search=' + encodeURIComponent(query));
+    } else if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname);
+    }
+}
+
+function handleDeepLink() {
+    var hash = decodeURIComponent(window.location.hash);
+
+    // #search=query — restore a search
+    if (hash.startsWith('#search=')) {
+        var query = hash.replace('#search=', '');
+        if (query && query.length >= 2) {
+            var searchInput = document.getElementById('universalSearch');
+            if (searchInput) {
+                searchInput.value = query;
+                // Wait for search index to load, then auto-search
+                var checkReady = setInterval(function () {
+                    if (searchReady) {
+                        clearInterval(checkReady);
+                        performSearch();
+                        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+                // Safety timeout — stop waiting after 10s
+                setTimeout(function () { clearInterval(checkReady); }, 10000);
+            }
+        }
+        return;
+    }
+
+    // #module=name — redirect to the module's Swagger UI page
+    if (hash.startsWith('#module=')) {
+        var moduleName = hash.replace('#module=', '');
+        if (moduleName) {
+            var checkReady2 = setInterval(function () {
+                if (searchReady && searchIndex) {
+                    clearInterval(checkReady2);
+                    var found = searchIndex.find(function (m) {
+                        return m.name === moduleName;
+                    });
+                    if (found && found.swaggerUrl) {
+                        window.location.href = found.swaggerUrl;
+                    }
+                }
+            }, 100);
+            setTimeout(function () { clearInterval(checkReady2); }, 10000);
+        }
+        return;
+    }
+
+    // #spec=model/name — redirect to module page (cross-page deep link)
+    if (hash.startsWith('#spec=')) {
+        var specParts = hash.replace('#spec=', '').split('/');
+        if (specParts.length === 2) {
+            var modelDir = specParts[0];
+            var specName = specParts[1];
+            window.location.href = modelDir + '/index-v2.html#spec=' + specName;
+        }
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadSearchIndex();
     setupFilters();
+    handleDeepLink();
     
     // Setup search input with debounce and autocomplete
     let searchTimeout;
@@ -591,9 +760,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleFavoriteUI(moduleName, favBtn);
             }
         }
+        
+        // Handle related module link clicks with event delegation
+        const relatedLink = e.target.closest('.related-link[data-related-search]');
+        if (relatedLink) {
+            e.preventDefault();
+            const searchTerm = relatedLink.dataset.relatedSearch;
+            if (searchTerm) {
+                document.getElementById('universalSearch').value = searchTerm;
+                performSearch();
+            }
+        }
     });
     
-    console.log('✅ Search initialized. Press Ctrl+K to search!');
+    // Search initialized
+    
+    // Handle browser back/forward for deep-linked searches
+    window.addEventListener('hashchange', function () {
+        var hash = decodeURIComponent(window.location.hash);
+        if (hash.startsWith('#search=')) {
+            var q = hash.replace('#search=', '');
+            var si = document.getElementById('universalSearch');
+            if (si && q !== si.value.trim()) {
+                si.value = q;
+                performSearch();
+            }
+        }
+    });
 });
 
 // Toast notification system for user-visible errors

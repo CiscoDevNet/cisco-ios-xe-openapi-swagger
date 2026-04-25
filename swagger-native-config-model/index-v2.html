@@ -4,6 +4,7 @@
     <!-- v2: Tree-based generator - 81 specs, 3,363 paths, 13,452 operations -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self';">
     <title>Cisco IOS-XE 17.18 - Native Configuration APIs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
@@ -57,7 +58,7 @@
 <body>
     <div class="header">
         <h1>Cisco IOS-XE 17.18.1 - Native Configuration APIs</h1>
-        <p>3,363 RESTCONF paths with full depth coverage across 153 top-level containers • Generated from resolved YANG tree</p>
+        <p id="headerStats">Loading...</p>
     </div>
 
     <nav class="nav-bar">
@@ -71,8 +72,6 @@
         <a href="../swagger-mib-model/index-v2.html">MIB</a>
         <a href="../swagger-events-model/index-v2.html">Events</a>
         <a href="../swagger-other-model/index-v2.html">Other</a>
-
-
         <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">🌳 Tree Browser</a>
     </nav>
 
@@ -116,7 +115,7 @@
             <div class="download-bar" id="downloadBar">
                 <button class="btn-primary" onclick="downloadSpec()">📥 Download JSON</button>
                 <span id="downloadLabel" style="color: #666; font-size: 12px;"></span>
-                <a id="treeLink" href="#" target="_blank" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
                 <button class="btn-secondary" onclick="copySpecUrl()">📋 Copy URL</button>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
@@ -126,6 +125,8 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
     <script>
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
     // Section definitions for sidebar grouping
     const SECTION_ORDER = [
         { key: 'intf',      label: 'Interface Features',    match: f => f.startsWith('native-intf') },
@@ -150,8 +151,10 @@
 
         document.getElementById('totalSpecs').textContent = manifest.total_modules;
         document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
-        document.getElementById('totalOps').textContent = (manifest.total_paths * 4).toLocaleString();
+        document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
         document.getElementById('specCount').textContent = manifest.total_modules + ' specs';
+        document.getElementById('headerStats').textContent =
+            `${manifest.total_paths.toLocaleString()} RESTCONF paths, ${manifest.total_operations.toLocaleString()} ops across ${manifest.total_modules} modules — generated from resolved YANG trees`;
 
         // Load each spec's info (title + path count) — fetch in parallel
         const fetches = manifest.modules.map(async fname => {
@@ -195,8 +198,8 @@
             html += `<ul class="module-list">`;
             for (const m of items) {
                 const sel = (currentModule === m.fname) ? ' selected' : '';
-                html += `<li><a href="#" class="${sel}" data-module="${m.fname}" onclick="loadSpec('${m.fname}', this); return false;">
-                    <span>${m.title}</span>
+                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}', this); return false;">
+                    <span>${escapeHtml(m.title)}</span>
                     <span class="path-count">${m.paths} paths</span>
                 </a></li>`;
             }
@@ -284,12 +287,13 @@
         if (!currentModule) return;
         const base = window.location.href.split('/').slice(0, -1).join('/');
         const url = base + '/api-v2/' + currentModule + '.json';
+        const btn = document.querySelector('[onclick*="copySpecUrl"]');
         navigator.clipboard.writeText(url).then(() => {
-            const btn = event.target;
+            if (!btn) return;
             const orig = btn.textContent;
             btn.textContent = '✅ Copied!';
             setTimeout(() => { btn.textContent = orig; }, 1500);
-        });
+        }).catch(() => {});
     }
 
     function checkHash() {
@@ -297,7 +301,7 @@
         if (hash.startsWith('#spec=')) {
             const fname = hash.replace('#spec=', '');
             if (fname && allModules.find(m => m.fname === fname)) {
-                loadSpec(fname, document.querySelector(`[data-module="${fname}"]`));
+                loadSpec(fname, document.querySelector(`[data-module="${CSS.escape(fname)}"]`));
             }
         }
     }

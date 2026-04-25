@@ -7,10 +7,12 @@ Merges all 28 IETF standard module specifications into a single unified spec.
 import json
 from pathlib import Path
 
+script_dir = Path(__file__).parent
+
 def generate_combined_ietf():
     """Generate all-ietf.json combining all IETF module specs."""
 
-    base_path = Path("/home/tme/Swagger/swagger-ietf-model/api")
+    base_path = script_dir.parent / 'swagger-ietf-model' / 'api'
 
     # Base combined spec
     combined = {
@@ -276,7 +278,7 @@ def generate_html_page(stats):
 </html>
 """
 
-    output_path = Path("/home/tme/Swagger/swagger-ietf-model/all-ietf.html")
+    output_path = script_dir.parent / 'swagger-ietf-model' / 'all-ietf.html'
     with open(output_path, 'w') as f:
         f.write(html_content)
 

@@ -8,6 +8,20 @@ const STORAGE_KEYS = {
 
 const MAX_RECENT = 10;
 
+// HTML sanitization to prevent XSS from localStorage data
+function _escapeHtml(str) {
+    if (str == null) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Validate URLs to prevent javascript: protocol injection
+function _sanitizeUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (/^https?:\/\//i.test(str) || str.startsWith('/') || str.startsWith('./') || str.startsWith('../')) return str;
+    return '';
+}
+
 // Get recent modules from localStorage
 function getRecentModules() {
     try {
@@ -153,24 +167,30 @@ function renderRecentModules() {
     
     const html = recent.map(module => {
         const isFav = isFavorite(module.name);
+        const name = _escapeHtml(module.name);
+        const emoji = _escapeHtml(module.emoji);
+        const category = _escapeHtml(module.displayCategory);
+        const swaggerUrl = _sanitizeUrl(module.swaggerUrl);
+        const yangTreeUrl = _sanitizeUrl(module.yangTreeUrl);
         return `
             <div class="recent-card">
                 <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px;">
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                            <span style="font-size: 0.75rem; color: #1565C0;">${module.emoji} ${module.displayCategory}</span>
+                            <span style="font-size: 0.75rem; color: #1565C0;">${emoji} ${category}</span>
                         </div>
-                        <div style="font-weight: 500; color: #333; word-break: break-word;">${module.name}</div>
+                        <div style="font-weight: 500; color: #333; word-break: break-word;">${name}</div>
                     </div>
                     <button class="favorite-btn ${isFav ? 'active' : ''}" 
-                            onclick="toggleFavoriteUI('${module.name.replace(/'/g, "\\'")}', this)"
+                            data-module="${name}"
+                            onclick="toggleFavoriteUI(this.dataset.module, this)"
                             title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
                         ${isFav ? '★' : '☆'}
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${module.swaggerUrl ? `<a href="${module.swaggerUrl}" class="quick-link" onclick="trackModuleClick('${module.name}')">📖 API Spec</a>` : ''}
-                    ${module.yangTreeUrl ? `<a href="${module.yangTreeUrl}" class="quick-link" onclick="trackModuleClick('${module.name}')">🌳 YANG Tree</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">📖 API Spec</a>` : ''}
+                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">🌳 YANG Tree</a>` : ''}
                 </div>
             </div>
         `;
@@ -192,24 +212,30 @@ function renderFavoriteModules() {
     }
     
     const html = favorites.map(module => {
+        const name = _escapeHtml(module.name);
+        const emoji = _escapeHtml(module.emoji);
+        const category = _escapeHtml(module.displayCategory);
+        const swaggerUrl = _sanitizeUrl(module.swaggerUrl);
+        const yangTreeUrl = _sanitizeUrl(module.yangTreeUrl);
         return `
             <div class="recent-card">
                 <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px;">
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                            <span style="font-size: 0.75rem; color: #1565C0;">${module.emoji} ${module.displayCategory}</span>
+                            <span style="font-size: 0.75rem; color: #1565C0;">${emoji} ${category}</span>
                         </div>
-                        <div style="font-weight: 500; color: #333; word-break: break-word;">${module.name}</div>
+                        <div style="font-weight: 500; color: #333; word-break: break-word;">${name}</div>
                     </div>
                     <button class="favorite-btn active" 
-                            onclick="toggleFavoriteUI('${module.name.replace(/'/g, "\\'")}', this)"
+                            data-module="${name}"
+                            onclick="toggleFavoriteUI(this.dataset.module, this)"
                             title="Remove from favorites">
                         ★
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${module.swaggerUrl ? `<a href="${module.swaggerUrl}" class="quick-link" onclick="trackModuleClick('${module.name}')">📖 API Spec</a>` : ''}
-                    ${module.yangTreeUrl ? `<a href="${module.yangTreeUrl}" class="quick-link" onclick="trackModuleClick('${module.name}')">🌳 YANG Tree</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">📖 API Spec</a>` : ''}
+                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">🌳 YANG Tree</a>` : ''}
                 </div>
             </div>
         `;

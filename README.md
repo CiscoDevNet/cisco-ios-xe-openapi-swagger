@@ -3,9 +3,9 @@
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-656-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-657-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 656 OpenAPI specs, 43,725 paths, and 768 YANG tree files** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 657 OpenAPI specs, 43,726 paths, and 767 YANG tree files** for developer productivity.
 
 🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
@@ -20,15 +20,15 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 - **OpenConfig:** 57 specs, 2,377 paths, 5,920 ops (vendor-neutral)
 - **IETF:** 19 specs, 438 paths, 1,122 ops (mixed CRUD + RPC)
 - **MIB:** 149 specs, 12,482 paths (GET-only deep paths)
-- **RPC:** 59 specs, 232 RPCs (POST to /operations/)
+- **RPC:** 59 specs, 308 RPCs (POST to /operations/)
 - **Events:** 38 specs, 861 paths (notifications + data endpoints)
-- **Other:** 9 specs, 1,374 paths, 4,593 ops (full CRUD)
+- **Other:** 10 specs, 1,375 paths, 4,597 ops (full CRUD)
 
 **Key Features:**
 -  **Comprehensive Docs** - Getting started guide with 15+ examples
 - 🎯 **53 Logical Categories** - Organized by network engineer workflows
 - 📊 **100% Accountability** - Every YANG module mapped and documented
-- 🌳 **768 Tree Files** - Searchable YANG tree visualizations
+- 🌳 **767 Tree Files** - Searchable YANG tree visualizations
 
 📊 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
@@ -36,9 +36,9 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 656 | Deep-path specs across all 9 models |
-| **API Paths** | 43,725 | RESTCONF endpoints from resolved YANG trees |
-| **Operations** | 68,349 | Total API operations |
+| **OpenAPI Specs** | 657 | Deep-path specs across all 9 models |
+| **API Paths** | 43,726 | RESTCONF endpoints from resolved YANG trees |
+| **Operations** | 68,353 | Total API operations |
 | **YANG Modules** | 848 | Source modules |
 | **Tree Files** | 768 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
@@ -98,6 +98,13 @@ SNMP MIB modules with YANG tree visualizations.
 #### 📦 Other Models (9 specs, 1,374 paths)
 Standalone and vendor-specific modules.
 - [Browse Other APIs →](swagger-other-model/)
+
+## ✅ Recent Improvements
+
+- **Realistic write-operation examples** — Every POST/PUT/PATCH body across all 657 specs now ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
+- **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
+- **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.
+- **Live-device validation script** — [scripts/validate_examples_c9kv.py](scripts/validate_examples_c9kv.py) verifies examples against a real Catalyst 9000V (or any IOS-XE 17.18.1+ device).
 
 ## 🚀 Quick Start
 
@@ -195,9 +202,15 @@ iosxe-1718-yang-swagger/
 
 ## 📄 Documentation
 
-- [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) - Full requirements
-- [YANG_MODULE_ACCOUNTABILITY.md](YANG_MODULE_ACCOUNTABILITY.md) - Module coverage
-- [GITHUB_PAGES_DEPLOY.md](GITHUB_PAGES_DEPLOY.md) - Deployment guide
+- [AGENTS.md](AGENTS.md) — AI agent guide (build/run, conventions, pitfalls, common tasks)
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution workflow
+- [CHANGELOG.md](CHANGELOG.md) — Release history
+- [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) — RESTCONF API consumer guide (curl, Python, JS)
+- [docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md) — Completion summary by phase
+- [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) — Architecture decisions, full requirements
+- [QUICK_REFERENCE.md](QUICK_REFERENCE.md) — Known fixes, common APIs, support links
+- [YANG_MODULE_ACCOUNTABILITY.md](YANG_MODULE_ACCOUNTABILITY.md) — Module-by-module coverage
+- [GITHUB_PAGES_DEPLOY.md](GITHUB_PAGES_DEPLOY.md) — Deployment workflow details
 
 ## 🔗 Resources
 

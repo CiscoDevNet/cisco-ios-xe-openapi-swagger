@@ -7,10 +7,12 @@ Merges all 10 category specifications into a single unified spec.
 import json
 from pathlib import Path
 
+script_dir = Path(__file__).parent
+
 def generate_combined_native():
     """Generate all-native.json combining all category specs."""
 
-    base_path = Path("/home/tme/Swagger/swagger-native-config-model/api")
+    base_path = script_dir.parent / 'swagger-native-config-model' / 'api'
 
     categories = [
         "native-interfaces",
@@ -280,7 +282,7 @@ def generate_html_page():
 </html>
 """
 
-    output_path = Path("/home/tme/Swagger/swagger-native-config-model/all-native.html")
+    output_path = script_dir.parent / 'swagger-native-config-model' / 'all-native.html'
     with open(output_path, 'w') as f:
         f.write(html_content)
 

@@ -329,6 +329,61 @@ def get_example_for_field(field_name, module_name=""):
     return "configured-value"
 
 
+def build_example_from_schema(schema, module_name="", depth=0, max_depth=6):
+    """Build a realistic example object by walking schema properties.
+
+    Used when the top-level example is empty ({}) but the schema has
+    properties defined. Recursively descends into nested objects and
+    arrays, generating field-appropriate values via get_example_for_field().
+    """
+    if not isinstance(schema, dict) or depth > max_depth:
+        return None
+
+    schema_type = schema.get("type", "object")
+
+    # Leaf types — return a single value
+    if schema_type == "string":
+        return schema.get("example") or "configured-value"
+    if schema_type == "integer":
+        ex = schema.get("example")
+        return ex if isinstance(ex, int) and not isinstance(ex, bool) else 1
+    if schema_type == "number":
+        ex = schema.get("example")
+        return ex if isinstance(ex, (int, float)) and not isinstance(ex, bool) else 1.0
+    if schema_type == "boolean":
+        return schema.get("example", True)
+
+    # Array — build one example item
+    if schema_type == "array":
+        items_schema = schema.get("items", {})
+        item = build_example_from_schema(items_schema, module_name, depth + 1, max_depth)
+        return [item] if item is not None else []
+
+    # Object — walk properties
+    if schema_type == "object":
+        props = schema.get("properties", {})
+        if not props:
+            return None  # can't derive structure without properties
+        result = {}
+        for prop_name, prop_schema in props.items():
+            if not isinstance(prop_schema, dict):
+                continue
+            prop_type = prop_schema.get("type", "object")
+            if prop_type in ("object", "array"):
+                child = build_example_from_schema(prop_schema, module_name, depth + 1, max_depth)
+                if child is not None:
+                    result[prop_name] = child
+                else:
+                    # Empty object for nested objects without properties
+                    result[prop_name] = {} if prop_type == "object" else []
+            else:
+                val = get_example_for_field(prop_name, module_name)
+                result[prop_name] = convert_example(val, prop_type)
+        return result if result else None
+
+    return None
+
+
 def convert_example(example, schema_type):
     """Convert example value to match the schema type."""
     if schema_type == "string":
@@ -475,13 +530,164 @@ def enrich_schema_examples(schema, module_name, path=""):
     return changes
 
 
+# ── Nested empty container fill mapping ──────────────────────────────────────
+# Templates for common YANG containers that appear empty in generated examples.
+# Keys match the JSON property name; values are the filled example content.
+
+CONTAINER_FILL = {
+    # OpenConfig state/config
+    "state": {"enabled": True, "admin-status": "UP", "oper-status": "UP"},
+    "config": {"enabled": True, "description": "Configured via RESTCONF"},
+
+    # Interface features
+    "switchport": {"mode": "access", "access": {"vlan": 100}},
+    "switchport-conf": {"switchport": True},
+    "switchport-config": {"switchport": True},
+    "ip": {"address": {"primary": {"address": "10.1.1.1", "mask": "255.255.255.0"}}},
+    "ipv6": {"address": {"prefix-list": [{"prefix": "2001:db8::1/64"}]}},
+    "bfd": {"interval": 300, "min-rx": 300, "multiplier": 3},
+    "standby": {"standby-list": [{"group-number": 1, "ip": {"address": "10.1.1.254"}}]},
+    "trust": {"device": "cisco-phone"},
+    "storm-control": {"broadcast": {"level": {"threshold": 80.0}}},
+    "bandwidth": {"kilobits": 1000000},
+    "backup": {"interface": {"GigabitEthernet": "1/0/2"}},
+    "arp": {"timeout": 14400},
+    "encapsulation": {"dot1Q": {"vlan-id": 100}},
+    "flowcontrol": {"receive": "on", "send": "on"},
+    "dampening": {"half-life-time": 15},
+    "fair-queue": {"queue-limit": 64},
+    "fair-queue-conf": {"fair-queue": True},
+    "priority-queue": {"out": True},
+    "keepalive-config": {"keepalive": True},
+    "logging": {"event": {"link-status": True}},
+    "mop": {"enabled": False},
+    "mdix": {"auto": True},
+    "domain": {"name": "example.com"},
+    "source": {"address": "10.1.1.1"},
+
+    # Routing protocols
+    "mpls": {"ip": True},
+    "isis": {"tag": "AREA-1"},
+    "ospf": {"id": 1},
+    "bgp": {"asn": 65001},
+
+    # QoS / policy
+    "interface_qos": {"output": {"policy-name": "QOS-POLICY"}},
+    "rcv-queue": {"queue-limit": 40},
+
+    # Redundancy / HA
+    "redundancy": {"mode": "sso"},
+    "uplink": {"name": "GigabitEthernet1/0/1"},
+
+    # L2 protocols
+    "l2protocol-tunnel": {"shutdown-threshold": 1000},
+    "l2protocol": {"peer": {"cdp": True}},
+    "cws-tunnel": {"in": True},
+    "cemoudp": {"reserve": 64},
+    "clns": {"mtu": 1500},
+
+    # Misc interface
+    "subscriber": {"activate": True},
+    "access-session": {"port-control": "auto"},
+    "peer": {"default": {"ip": {"address": "10.1.1.2"}}},
+    "pm-path": {"name": "PM-1"},
+    "stackwise-virtual": {"link": 1},
+    "punt-control": {"punt-enable": True},
+    "srlg": {"value": [100]},
+    "history": {"size": 100},
+
+    # Counters and thresholds
+    "counters": {"in-octets": 0, "out-octets": 0, "in-errors": 0},
+    "threshold": {"value": 80},
+    "include": {"connected": True},
+    "level": {"level-1": True},
+
+    # Crypto / security
+    "authentication": {"type": "md5", "key-chain": "KEY-1"},
+    "authorization": {"exec": {"default": {"group": "tacacs+"}}},
+
+    # Common presence containers
+    "enable": True,
+    "enabled": True,
+
+    # ── High-frequency containers previously mapped to null ──────────
+    # Multicast / routing
+    "multicast": {"routing": True},
+    "global": {"mode": "enable"},
+    "shutdown": False,
+    "permanent": True,
+    "all": True,
+    "ip-vrf": {"forwarding": "MGMT-VRF"},
+    "dhcp": {"snooping": True},
+    "default": {"enabled": True},
+    "default-port": {"enabled": True},
+    "msec": True,
+    "year": True,
+    "localtime": True,
+    "show-timezone": True,
+    "unassociate": True,
+    "stitching": True,
+    "vrf-also": True,
+    "abort-character": True,
+    "discovery": {"enabled": True},
+    "unicast": {"enabled": True},
+    "disable": False,
+    "tcp": {"mss": 1460},
+    "none": True,
+    "log": {"enabled": True},
+    "multitopology": True,
+    "interface-ref": {"config": {"interface": "GigabitEthernet1/0/1"}},
+    "disabled": False,
+    "preserve": True,
+    "output": {"policy-name": "OUTPUT-POLICY"},
+    "passive": True,
+    "ipv4": {"unicast": True},
+    "md5": {"key-chain": "KEY-1"},
+    "local": True,
+    "uptime": True,
+    "autohangup": True,
+    "set-to-5": True,
+    "set-to-6": True,
+    "set-to-7": True,
+    "set-to-8": True,
+}
+
+
 def enrich_top_level_example(example_obj, module_name):
     """Replace placeholder values in a top-level example object."""
     if not isinstance(example_obj, dict):
         return 0
     changes = 0
-    for key, val in example_obj.items():
-        if isinstance(val, dict):
+    for key, val in list(example_obj.items()):
+        if isinstance(val, dict) and not val:
+            # ── Empty {} — fill from mapping, field heuristic, or [null] ──
+            if key in CONTAINER_FILL:
+                example_obj[key] = CONTAINER_FILL[key]
+                changes += 1
+            else:
+                hint = get_example_for_field(key, module_name)
+                if hint != "configured-value":
+                    example_obj[key] = hint
+                    changes += 1
+                else:
+                    # YANG empty leaf / presence container → [null] per RFC 7951
+                    example_obj[key] = [None]
+                    changes += 1
+        elif val is None:
+            # ── null values — replace with known fill or [null] ──
+            if key in CONTAINER_FILL:
+                example_obj[key] = CONTAINER_FILL[key]
+                changes += 1
+            else:
+                hint = get_example_for_field(key, module_name)
+                if hint != "configured-value":
+                    example_obj[key] = hint
+                    changes += 1
+                else:
+                    # YANG empty leaf / presence container → [null] per RFC 7951
+                    example_obj[key] = [None]
+                    changes += 1
+        elif isinstance(val, dict):
             changes += enrich_top_level_example(val, module_name)
         elif isinstance(val, list):
             for item in val:
@@ -516,6 +722,165 @@ def get_resource_label(path, summary=""):
     return "this resource"
 
 
+def _populate_empty_example(example_obj, schema, module_name, restconf_path=""):
+    """Populate empty {} inner values in example objects using schema properties.
+
+    When generators emit examples like {"Cisco-IOS-XE-native:vlan": {}},
+    this function fills in the empty inner object by walking the schema's
+    properties and generating realistic values. Falls back to path-based
+    heuristics when the schema has no properties defined.
+    """
+    if not isinstance(example_obj, dict) or not isinstance(schema, dict):
+        return 0
+    changes = 0
+    for key, val in example_obj.items():
+        if isinstance(val, dict) and not val:
+            # Empty inner object — try to populate from schema
+            built = build_example_from_schema(schema, module_name)
+            if built and isinstance(built, dict):
+                example_obj[key] = built
+                changes += 1
+            else:
+                # Fallback: path-based heuristics when schema has no properties
+                fallback = _build_example_from_path(key, restconf_path, module_name)
+                if fallback:
+                    example_obj[key] = fallback
+                    changes += 1
+        elif isinstance(val, list):
+            for item in val:
+                if isinstance(item, dict) and not item:
+                    built = build_example_from_schema(schema, module_name)
+                    if built and isinstance(built, dict):
+                        item.update(built)
+                        changes += 1
+    return changes
+
+
+def _build_example_from_path(wrapper_key, restconf_path, module_name):
+    """Generate a minimal but syntactically valid example from the RESTCONF path.
+
+    Extracts the resource name from the wrapper key (e.g., "vlan" from
+    "Cisco-IOS-XE-native:vlan") and produces a common-structure example
+    that a device would accept. This is the fallback when schemas lack
+    properties.
+    """
+    # Extract resource name: "Cisco-IOS-XE-native:vlan" -> "vlan"
+    resource = wrapper_key.split(":")[-1] if ":" in wrapper_key else wrapper_key
+    rl = resource.lower().replace("_", "-")
+
+    # Extract path segments for context
+    segments = [s.split(":")[-1] for s in restconf_path.split("/")
+                if s and s != "data" and "=" not in s] if restconf_path else []
+
+    # ── Resource-specific templates ────────────────────────────────────
+    # VLAN configuration  
+    if rl == "vlan":
+        return {
+            "vlan-list": [{"id": 100, "name": "DATA_VLAN"}]
+        }
+
+    # Interface related
+    if rl in ("interface", "interfaces"):
+        return {
+            "GigabitEthernet": [{"name": "1/0/1", "description": "UPLINK"}]
+        }
+
+    # ACL / access-list
+    if "access-list" in rl or "acl" in rl:
+        return {
+            "extended": [{"name": "ACL-PERMIT-ALL"}]
+        }
+
+    # Routing
+    if rl in ("router", "routing"):
+        return {"router": {"id": 1}}
+    if rl in ("route", "ip-route", "static"):
+        return {
+            "ip-route-interface-forwarding-list": [{
+                "prefix": "10.0.0.0",
+                "mask": "255.255.255.0",
+                "fwd-list": [{"fwd": "10.1.1.1"}]
+            }]
+        }
+
+    # BGP
+    if rl == "bgp":
+        return {"asn": 65001, "neighbor": [{"id": "10.1.1.2", "remote-as": 65002}]}
+
+    # OSPF
+    if rl == "ospf":
+        return {"id": 1, "network": [{"ip": "10.0.0.0", "mask": "0.0.0.255", "area": 0}]}
+
+    # AAA
+    if rl == "aaa":
+        return {"authentication": {"login": {}}, "authorization": {"exec": {}}}
+
+    # Spanning tree
+    if "spanning-tree" in rl:
+        return {"mode": "rapid-pvst"}
+
+    # Logging
+    if rl == "logging":
+        return {"buffered": {"severity": "informational"}}
+
+    # NTP
+    if rl == "ntp":
+        return {"server": {"server-list": [{"ip-address": "10.1.1.100"}]}}
+
+    # SNMP
+    if rl in ("snmp", "snmp-server"):
+        return {"community": [{"name": "public", "RO": {}}]}
+
+    # Line (console/vty)
+    if rl == "line":
+        return {"vty": [{"first": 0, "last": 4}]}
+
+    # Banner
+    if rl == "banner":
+        return {"motd": {"banner": "Authorized Access Only"}}
+
+    # Service
+    if rl == "service":
+        return {"timestamps": {"debug": {"datetime": {"msec": {}}}}}
+
+    # Hostname
+    if rl == "hostname":
+        return "Switch-01"
+
+    # Crypto / SSH
+    if "crypto" in rl or "ssh" in rl:
+        return {"key": {"generate": {"rsa": {"general-keys": {"modulus": 2048}}}}}
+
+    # DHCP
+    if "dhcp" in rl:
+        return {"pool": [{"id": "POOL-1", "network": {"number": "10.0.0.0", "mask": "255.255.255.0"}}]}
+
+    # NAT
+    if "nat" in rl:
+        return {"inside": {"source": {"list": [{"id": 1, "pool": "NAT-POOL"}]}}}
+
+    # Policy / policy-map / class-map
+    if "policy" in rl or "class-map" in rl:
+        return {"name": "POLICY-1"}
+
+    # Prefix-list
+    if "prefix-list" in rl:
+        return {"prefixes": [{"name": "PFX-LIST-1"}]}
+
+    # Route-map
+    if "route-map" in rl:
+        return {"route-map-without-order-seq": [{"name": "RMAP-1"}]}
+
+    # Generic containers — produce a minimal but non-empty example
+    # using the resource name as a child-node hint
+    val = get_example_for_field(resource, module_name)
+    if val != "configured-value":
+        return {resource: val}
+
+    # Last resort: minimal but tagged example so users know to fill in
+    return {"_comment": f"Configure {resource} parameters here"}
+
+
 def enrich_operation(method, op, path, module_name):
     """Enrich a single operation with description and improved examples."""
     changes = 0
@@ -541,6 +906,10 @@ def enrich_operation(method, op, path, module_name):
     for media, media_obj in rb.items():
         if "schema" in media_obj:
             changes += enrich_schema_examples(media_obj["schema"], module_name, path)
+        # Populate empty example inner values from schema properties
+        if "example" in media_obj and "schema" in media_obj:
+            changes += _populate_empty_example(media_obj["example"],
+                                               media_obj["schema"], module_name, path)
         if "example" in media_obj:
             changes += enrich_top_level_example(media_obj["example"], module_name)
 
@@ -549,6 +918,10 @@ def enrich_operation(method, op, path, module_name):
         for media, media_obj in resp.get("content", {}).items():
             if "schema" in media_obj:
                 changes += enrich_schema_examples(media_obj["schema"], module_name, path)
+            # Populate empty example inner values from schema properties
+            if "example" in media_obj and "schema" in media_obj:
+                changes += _populate_empty_example(media_obj["example"],
+                                                   media_obj["schema"], module_name, path)
             if "example" in media_obj:
                 changes += enrich_top_level_example(media_obj["example"], module_name)
 

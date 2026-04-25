@@ -103,41 +103,46 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
     return count, endpoints
 
 
-# Index v1 specs (api/ directories)
-for dir_name, (type_name, display_cat, emoji) in MODEL_DIRS.items():
-    api_dir = os.path.join(BASE, dir_name, 'api')
-    if not os.path.isdir(api_dir):
-        continue
-    count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v1')
-    total_endpoints += eps
-    by_category[dir_name] = count
+def main():
+    global total_endpoints
+    # Index v1 specs (api/ directories)
+    for dir_name, (type_name, display_cat, emoji) in MODEL_DIRS.items():
+        api_dir = os.path.join(BASE, dir_name, 'api')
+        if not os.path.isdir(api_dir):
+            continue
+        count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v1')
+        total_endpoints += eps
+        by_category[dir_name] = count
 
-# Index v2 specs (api-v2/ directories)
-for dir_name, (type_name, display_cat, emoji) in V2_DIRS.items():
-    api_dir = os.path.join(BASE, dir_name, 'api-v2')
-    if not os.path.isdir(api_dir):
-        continue
-    count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v2')
-    total_endpoints += eps
-    by_category[dir_name + '/v2'] = count
+    # Index v2 specs (api-v2/ directories)
+    for dir_name, (type_name, display_cat, emoji) in V2_DIRS.items():
+        api_dir = os.path.join(BASE, dir_name, 'api-v2')
+        if not os.path.isdir(api_dir):
+            continue
+        count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v2')
+        total_endpoints += eps
+        by_category[dir_name + '/v2'] = count
 
-index = {
-    'version': '3.0',
-    'generated': datetime.date.today().isoformat(),
-    'stats': {
-        'total_modules': len(modules),
-        'total_endpoints': total_endpoints,
-        'by_category': by_category,
-    },
-    'modules': modules,
-}
+    index = {
+        'version': '3.0',
+        'generated': datetime.date.today().isoformat(),
+        'stats': {
+            'total_modules': len(modules),
+            'total_endpoints': total_endpoints,
+            'by_category': by_category,
+        },
+        'modules': modules,
+    }
 
-out_path = os.path.join(BASE, 'search-index.json')
-with open(out_path, 'w', encoding='utf-8') as f:
-    json.dump(index, f, indent=2, ensure_ascii=False)
-    f.write('\n')
+    out_path = os.path.join(BASE, 'search-index.json')
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+        f.write('\n')
 
-print(f"search-index.json regenerated: {len(modules)} modules, {total_endpoints} endpoints")
-print(f"  v1: {sum(1 for m in modules if m['version'] == 'v1')} modules")
-print(f"  v2: {sum(1 for m in modules if m['version'] == 'v2')} modules")
-print(f"File: {out_path}")
+    print(f"search-index.json regenerated: {len(modules)} modules, {total_endpoints} endpoints")
+    print(f"  v1: {sum(1 for m in modules if m['version'] == 'v1')} modules")
+    print(f"  v2: {sum(1 for m in modules if m['version'] == 'v2')} modules")
+    print(f"File: {out_path}")
+
+if __name__ == '__main__':
+    main()

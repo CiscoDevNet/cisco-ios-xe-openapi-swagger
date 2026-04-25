@@ -214,7 +214,7 @@ def analyze_all_modules():
         # Read content for better categorization
         try:
             content = yang_file.read_text(encoding='utf-8', errors='ignore')
-        except:
+        except OSError:
             content = ""
         
         # Categorize

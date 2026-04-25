@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self';">
     <title>Cisco IOS-XE 17.18 - OpenConfig APIs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
@@ -28,10 +29,11 @@
         .stat-label { font-size: 11px; color: #666; }
         .module-list { list-style: none; }
         .module-list li { border-bottom: 1px solid #f0f0f0; }
-        .module-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; color: #333; text-decoration: none; font-size: 12px; }
+        .module-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; color: #333; text-decoration: none; font-size: 12px; transition: background 0.15s; }
         .module-list a:hover { background: #e0f2f1; }
         .module-list a.selected { background: #e0f2f1; border-left: 3px solid #00695C; }
-        .module-list .path-count { color: #999; font-size: 11px; }
+        .module-list .path-count { color: #999; font-size: 11px; white-space: nowrap; }
+        .swagger-container { flex: 1; overflow-y: auto; }
         .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
         .info-box { padding: 24px; margin: 24px; background: #e0f2f1; border-radius: 8px; }
         .info-box h3 { color: #004D40; margin-bottom: 12px; }
@@ -57,8 +59,6 @@
         <a href="../swagger-mib-model/index-v2.html">MIB</a>
         <a href="../swagger-events-model/index-v2.html">Events</a>
         <a href="../swagger-other-model/index-v2.html">Other</a>
-
-
         <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">🌳 Tree Browser</a>
     </nav>
     <div class="container">
@@ -82,14 +82,15 @@
             <div class="download-bar" id="downloadBar">
                 <button onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
-                <a id="treeLink" href="#" target="_blank" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
             </div>
-            <div id="swagger-ui"></div>
+            <div id="swagger-ui" class="swagger-container"></div>
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
     <script>
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     let allModules = [], currentModule = null;
     async function init() {
         const resp = await fetch('api-v2/manifest.json');
@@ -111,7 +112,7 @@
         const fl = filter.toLowerCase();
         const items = allModules.filter(m => !fl || m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl));
         document.getElementById('moduleList').innerHTML = items.map(m =>
-            `<li><a href="#" class="${currentModule===m.fname?'selected':''}" data-module="${m.fname}" onclick="loadSpec('${m.fname}',this);return false;"><span>${m.title}</span><span class="path-count">${m.paths} paths</span></a></li>`
+            `<li><a href="#" class="${currentModule===m.fname?'selected':''}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}',this);return false;"><span>${escapeHtml(m.title)}</span><span class="path-count">${m.paths} paths</span></a></li>`
         ).join('');
         const info = document.getElementById('searchInfo');
         if (fl) { info.textContent = `${items.length} of ${allModules.length}`; info.style.display = 'block'; } else { info.style.display = 'none'; }
@@ -143,7 +144,7 @@
         }
     }
     function downloadSpec() { if (!currentModule) return; const a = document.createElement('a'); a.href = `${getSpecFolder(currentModule)}/${currentModule}.json`; a.download = currentModule+'.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-    function checkHash() { const h = decodeURIComponent(window.location.hash); if (h.startsWith('#spec=')) { const f = h.replace('#spec=',''); if (allModules.find(m=>m.fname===f)) loadSpec(f, document.querySelector(`[data-module="${f}"]`)); } }
+    function checkHash() { const h = decodeURIComponent(window.location.hash); if (h.startsWith('#spec=')) { const f = h.replace('#spec=',''); if (allModules.find(m=>m.fname===f)) loadSpec(f, document.querySelector(`[data-module="${CSS.escape(f)}"]`)); } }
     window.addEventListener('hashchange', checkHash); init();
     </script>
 </body>
