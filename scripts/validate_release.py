@@ -103,7 +103,9 @@ def gate_search_index(rel: Path, errs: list[str]) -> None:
     seen: set[str] = set()
     dup: list[str] = []
     for m in data.get("modules", []):
-        key = (m.get("category", ""), m.get("name", ""))
+        # Include version (v1/v2) in the dedup key — the same module name can
+        # legitimately appear in both the legacy api/ and the api-v2/ trees.
+        key = (m.get("category", ""), m.get("version", ""), m.get("name", ""))
         skey = "/".join(key)
         if skey in seen:
             dup.append(skey)
