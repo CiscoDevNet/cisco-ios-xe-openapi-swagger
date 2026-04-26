@@ -838,10 +838,12 @@ class OperToOpenAPI:
         print(f"Manifest: {manifest_file}")
 
 def main():
-    """Main entry point"""
+    """Main entry point. Honors --version <ver> for multi-release builds."""
+    import sys
     script_dir = Path(__file__).parent
-    yang_dir = script_dir.parent / 'references' / '17181-YANG-modules'
-    output_dir = script_dir.parent / 'swagger-oper-model' / 'api'
+    sys.path.insert(0, str(script_dir))
+    from _version_args import resolve_paths
+    yang_dir, output_dir, _ver = resolve_paths('oper')
 
     converter = OperToOpenAPI(str(yang_dir), str(output_dir))
     converter.generate_all()

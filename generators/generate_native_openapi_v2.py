@@ -1129,9 +1129,11 @@ class NativeToOpenAPI:
 
 def main():
     """Main entry point"""
+    import sys
     script_dir = Path(__file__).parent
-    yang_dir = script_dir.parent / 'references' / '17181-YANG-modules'
-    output_dir = script_dir.parent / 'swagger-native-config-model' / 'api'
+    sys.path.insert(0, str(script_dir))
+    from _version_args import resolve_paths
+    yang_dir, output_dir, _ver = resolve_paths('native-config')
     
     converter = NativeToOpenAPI(str(yang_dir), str(output_dir))
     converter.generate_all()

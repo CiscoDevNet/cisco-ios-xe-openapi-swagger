@@ -87,6 +87,14 @@
                 <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
                 <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
+                <a id="mibCardToggle" href="#" onclick="toggleMibCard();return false;" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #9C27B0; color: white; text-decoration: none; font-weight: 500;">🗄️ MIB Details</a>
+            </div>
+            <div id="mibCard" style="display:none; margin: 0 0 14px; padding: 12px 14px; border: 1px solid #d0c4e0; border-left: 4px solid #9C27B0; border-radius: 4px; background: #faf6fd;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:#6A1B9A;">MIB Metadata</strong>
+                    <span id="mibCardSource" style="font-size:.72rem; color:#888;"></span>
+                </div>
+                <div id="mibCardBody" style="font-size:.85rem;"></div>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
@@ -165,6 +173,88 @@
                 treeLink.style.display = r.ok ? 'inline-block' : 'none';
             }).catch(() => { treeLink.style.display = 'none'; });
         }
+        // Load MIB metadata side card
+        loadMibMetadata(fname);
+    }
+
+    // === MIB metadata side card ===
+    // Joins releases/<ver>/mib-metadata.json (OID prefix, table/leaf counts,
+    // organization, RFC ref, platform applicability matrix from MIBS.md). Falls
+    // back gracefully when the file is missing.
+    let _mibMetaPromise = null;
+    function loadMibMetaIndex() {
+        if (_mibMetaPromise) return _mibMetaPromise;
+        const ver = (window.parent && window.parent.__IOSXE_ACTIVE_VERSION__) ||
+                    window.__IOSXE_ACTIVE_VERSION__;
+        const candidates = [];
+        if (ver) candidates.push('../releases/' + encodeURIComponent(ver) + '/mib-metadata.json');
+        candidates.push('../mib-metadata.json');
+        _mibMetaPromise = (async () => {
+            for (const url of candidates) {
+                try {
+                    const r = await fetch(url, { cache: 'no-store' });
+                    if (r.ok) return { data: await r.json(), source: url };
+                } catch (_) { /* try next */ }
+            }
+            return null;
+        })();
+        return _mibMetaPromise;
+    }
+
+    async function loadMibMetadata(fname) {
+        const toggle = document.getElementById('mibCardToggle');
+        const card = document.getElementById('mibCard');
+        const body = document.getElementById('mibCardBody');
+        const src = document.getElementById('mibCardSource');
+        if (toggle) toggle.style.display = 'none';
+        if (card) card.style.display = 'none';
+        const idx = await loadMibMetaIndex();
+        if (!idx || !idx.data || !Array.isArray(idx.data.modules)) return;
+        const stem = fname.replace(/\.json$/i, '').toLowerCase();
+        const entry = idx.data.modules.find(m => {
+            const n = (m.name || m.module || '').toLowerCase();
+            return n === stem || stem.includes(n) || n.includes(stem);
+        });
+        if (!entry) return;
+        toggle.style.display = 'inline-block';
+        if (src) src.textContent = 'source: ' + idx.source.split('/').pop();
+        const platformList = entry.platforms || [];
+        body.innerHTML =
+            kv('Module', entry.name || entry.module)
+            + kv('OID prefix', entry.oid_prefix || '—')
+            + kv('Tables / scalars / leafs',
+                 (entry.table_count || 0) + ' / '
+                 + (entry.scalar_count || 0) + ' / '
+                 + (entry.leaf_count || 0))
+            + kv('Indexes', (entry.indexes || []).join(', ') || '—')
+            + kv('Deprecated objects', String(entry.deprecated_object_count || 0))
+            + kv('Latest revision', entry.latest_revision || '—')
+            + kv('Organization', entry.organization || '—')
+            + kv('RFC reference', entry.rfc_reference || '—')
+            + kv('Functional category',
+                 (entry.functional_category && entry.functional_category.category) || '—')
+            + (platformList.length
+                ? kvHtml('Platforms (' + platformList.length + ')',
+                     platformList.map(p =>
+                       '<span style="display:inline-block;padding:1px 7px;margin:0 4px 4px 0;'
+                       + 'background:#ede7f6;border-radius:8px;font-size:.72rem;">'
+                       + escapeHtml(p) + '</span>').join(''))
+                : '');
+    }
+
+    function kv(k, v) {
+        return '<div style="margin:4px 0;"><span style="color:#6A1B9A;font-weight:500;">'
+             + escapeHtml(k) + ':</span> ' + escapeHtml(String(v == null ? '' : v)) + '</div>';
+    }
+    function kvHtml(k, htmlValue) {
+        return '<div style="margin:4px 0;"><span style="color:#6A1B9A;font-weight:500;">'
+             + escapeHtml(k) + ':</span> ' + (htmlValue || '') + '</div>';
+    }
+
+    function toggleMibCard() {
+        const c = document.getElementById('mibCard');
+        if (!c) return;
+        c.style.display = (c.style.display === 'none' || !c.style.display) ? 'block' : 'none';
     }
 
     function downloadSpec() {

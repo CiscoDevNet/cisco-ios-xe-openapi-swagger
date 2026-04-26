@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cisco-IOS-XE-native — Config Capabilities</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root { --bg:#fafafa; --fg:#222; --card:#fff; --border:#e0e0e0; --accent:#4CAF50;
+          --muted:#888; }
+  body.dark { --bg:#181a1f; --fg:#e8e8e8; --card:#23262d; --border:#3a3d44; --accent:#81c784; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--fg); }
+  header { background:linear-gradient(135deg,#388E3C 0%,#4CAF50 100%); color:#fff;
+           padding:24px 20px; text-align:center; }
+  header h1 { margin:0 0 6px; font-size:1.6rem; }
+  header p  { margin:0; opacity:.85; font-size:.9rem; }
+  .nav { padding:10px 20px; background:var(--card); border-bottom:1px solid var(--border);
+         text-align:center; }
+  .nav a { color:var(--accent); text-decoration:none; margin:0 10px; font-weight:500; }
+  main { max-width:1300px; margin:20px auto; padding:0 20px; }
+  .picker { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .picker select, .picker input {
+    padding:6px 10px; border:1px solid var(--border); border-radius:4px;
+    background:var(--card); color:var(--fg);
+  }
+  .totals { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+            gap:10px; margin-bottom:18px; }
+  .total { background:var(--card); border:1px solid var(--border); border-radius:8px;
+           padding:12px 14px; }
+  .total .num { font-size:1.5rem; font-weight:600; color:var(--accent); }
+  .total .lbl { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:8px;
+                overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+  th { background:rgba(76,175,80,.08); position:sticky; top:0; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  td.cat { font-weight:500; color:var(--accent); }
+  a.spec-link { color:var(--accent); text-decoration:none; font-size:.78rem; }
+  .empty { padding:30px; text-align:center; color:var(--muted); }
+  .help { background:rgba(76,175,80,.06); border-left:3px solid var(--accent);
+          padding:10px 14px; border-radius:4px; margin-bottom:18px; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏠 Cisco-IOS-XE-native — Config Capabilities</h1>
+  <p>Per-category leaf/list/choice surface for the native YANG configuration model</p>
+</header>
+<div class="nav">
+  <a href="../index.html">← Hub</a>
+  <a href="index-v2.html">Native Specs (v2)</a>
+  <a href="../yang-accountability.html">YANG Report</a>
+  <a href="../telemetry.html">MDT Telemetry</a>
+  <a href="../exports.html">Exports</a>
+</div>
+<main>
+  <div class="help">
+    Counts are derived from the OpenAPI v2 specs under
+    <code>swagger-native-config-model/api-v2/</code> for the selected release.
+    Leaf/list/choice numbers come from walking the resolved <code>components.schemas</code>
+    tree. Use this view to gauge which native subsystems carry the largest
+    configurable surface and to plan automation coverage.
+  </div>
+  <div class="picker">
+    <label>Release: <select id="release"></select></label>
+    <input id="filter" type="search" placeholder="Filter category…" style="flex:1; min-width:240px;">
+  </div>
+  <div id="totals" class="totals"></div>
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead><tr>
+        <th>Category</th><th>Spec file</th>
+        <th class="num">Paths</th><th class="num">Operations</th>
+        <th class="num">Schemas</th>
+        <th class="num">Leafs</th><th class="num">Lists</th><th class="num">Choices</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="empty" class="empty" style="display:none;">
+      No native-capabilities.json for this release. Run
+      <code>python scripts/build_native_capabilities.py --version &lt;v&gt;</code>.
+    </div>
+  </div>
+</main>
+<script>
+(function () {
+  let DATA = null;
+
+  fetch('../releases/index.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(data => {
+      const releases = (data && data.releases) || [{ ver: '17.18.1' }];
+      const hashVer = (location.hash.match(/(?:^|[#&])ver=([^&]+)/) || [])[1];
+      let stored = null;
+      try { stored = localStorage.getItem('iosxe-active-version'); } catch (_) {}
+      const current = hashVer || stored || (data && data.default) || releases[0].ver;
+      const sel = document.getElementById('release');
+      releases.forEach(r => {
+        const o = document.createElement('option');
+        o.value = r.ver;
+        o.textContent = (r.label || r.ver) + (r.status === 'planned' ? ' (planned)' : '');
+        if (r.status === 'planned') o.disabled = true;
+        if (r.ver === current) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener('change', () => loadRelease(sel.value));
+      document.getElementById('filter').addEventListener('input', drawTable);
+      loadRelease(current);
+    });
+
+  function loadRelease(ver) {
+    const candidates = [
+      '../releases/' + encodeURIComponent(ver) + '/native-capabilities.json',
+      '../native-capabilities.json',
+    ];
+    (async () => {
+      for (const url of candidates) {
+        try {
+          const r = await fetch(url, { cache: 'no-store' });
+          if (r.ok) { DATA = await r.json(); break; }
+        } catch (_) {}
+      }
+      if (!DATA) {
+        document.querySelector('#tbl tbody').innerHTML = '';
+        document.getElementById('totals').innerHTML = '';
+        document.getElementById('empty').style.display = 'block';
+        return;
+      }
+      drawTotals();
+      drawTable();
+    })();
+  }
+
+  function drawTotals() {
+    const t = DATA.totals || {};
+    document.getElementById('totals').innerHTML =
+      total(t.path_count, 'Paths') +
+      total(t.operation_count, 'Operations') +
+      total(t.schema_count, 'Schemas') +
+      total(t.leaf_count, 'Leafs') +
+      total(t.list_count, 'Lists') +
+      total(t.choice_count, 'Choices') +
+      total((DATA.categories || []).length, 'Categories');
+  }
+  function total(n, l) {
+    return '<div class="total"><div class="num">' + (n || 0).toLocaleString() +
+           '</div><div class="lbl">' + escapeHtml(l) + '</div></div>';
+  }
+
+  function drawTable() {
+    if (!DATA) return;
+    document.getElementById('empty').style.display = 'none';
+    const q = document.getElementById('filter').value.trim().toLowerCase();
+    const tbody = document.querySelector('#tbl tbody');
+    tbody.innerHTML = '';
+    const rows = (DATA.categories || []).slice().sort((a, b) =>
+      (b.leaf_count || 0) - (a.leaf_count || 0));
+    rows.forEach(c => {
+      const cat = (c.category || '').toLowerCase();
+      const file = (c.file || '').toLowerCase();
+      if (q && cat.indexOf(q) === -1 && file.indexOf(q) === -1) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="cat">' + escapeHtml(c.category || '') + '</td>' +
+        '<td><a class="spec-link" href="index-v2.html#spec=' + escapeHtml((c.file || '').replace(/\.json$/, '')) + '">'
+        + escapeHtml(c.file || '') + '</a></td>' +
+        '<td class="num">' + (c.path_count || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + (c.operation_count || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + (c.schema_count || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + (c.leaf_count || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + (c.list_count || 0).toLocaleString() + '</td>' +
+        '<td class="num">' + (c.choice_count || 0).toLocaleString() + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+})();
+</script>
+</body>
+</html>

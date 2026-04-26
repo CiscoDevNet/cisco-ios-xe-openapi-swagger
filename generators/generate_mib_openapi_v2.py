@@ -675,9 +675,11 @@ def main():
         sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
         sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
     
+    import sys
     script_dir = Path(__file__).parent
-    yang_dir = script_dir.parent / 'references' / '17181-YANG-modules' / 'MIBS'
-    output_dir = script_dir.parent / 'swagger-mib-model' / 'api'
+    sys.path.insert(0, str(script_dir))
+    from _version_args import resolve_paths
+    yang_dir, output_dir, _ver = resolve_paths('mib', mib_subdir=True)
 
     converter = MIBToOpenAPI(str(yang_dir), str(output_dir))
     modules = converter.process_all_mibs()

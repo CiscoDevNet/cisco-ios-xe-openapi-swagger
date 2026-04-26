@@ -88,6 +88,14 @@
                 <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
                 <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
+                <a id="mdtToggle" href="#" onclick="toggleMdtPanel();return false;" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #1976D2; color: white; text-decoration: none; font-weight: 500;">📡 MDT XPaths <span id="mdtCount"></span></a>
+            </div>
+            <div id="mdtPanel" style="display:none; margin: 0 0 14px; padding: 12px 14px; border: 1px solid #cfd8dc; border-left: 4px solid #1976D2; border-radius: 4px; background: #f5f8fb;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <strong style="color:#1565C0;">Model-Driven Telemetry XPaths for this module</strong>
+                    <a href="../telemetry.html" style="font-size:.78rem; color:#1565C0;">Open full catalog →</a>
+                </div>
+                <div id="mdtList" style="font-size:.82rem;"></div>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
@@ -166,6 +174,74 @@
                 treeLink.style.display = r.ok ? 'inline-block' : 'none';
             }).catch(() => { treeLink.style.display = 'none'; });
         }
+        // Update MDT panel for this spec
+        loadMdtForSpec(fname);
+    }
+
+    // === MDT panel ===
+    // Loads telemetry-index.json (per active release if known, else root) once
+    // and filters entries to those matching the current spec's stem. Renders a
+    // collapsible panel above the Swagger UI with xpath / tier / cadence /
+    // on-change badges.
+    let _mdtIndexPromise = null;
+    function loadMdtIndex() {
+        if (_mdtIndexPromise) return _mdtIndexPromise;
+        const ver = (window.parent && window.parent.__IOSXE_ACTIVE_VERSION__) ||
+                    window.__IOSXE_ACTIVE_VERSION__;
+        const candidates = [];
+        if (ver) candidates.push('../releases/' + encodeURIComponent(ver) + '/telemetry-index.json');
+        candidates.push('../telemetry-index.json');
+        _mdtIndexPromise = (async () => {
+            for (const url of candidates) {
+                try {
+                    const r = await fetch(url, { cache: 'no-store' });
+                    if (r.ok) return await r.json();
+                } catch (_) { /* try next */ }
+            }
+            return null;
+        })();
+        return _mdtIndexPromise;
+    }
+
+    async function loadMdtForSpec(fname) {
+        const toggle = document.getElementById('mdtToggle');
+        const panel = document.getElementById('mdtPanel');
+        const list = document.getElementById('mdtList');
+        const count = document.getElementById('mdtCount');
+        if (toggle) toggle.style.display = 'none';
+        if (panel) panel.style.display = 'none';
+        const idx = await loadMdtIndex();
+        if (!idx || !Array.isArray(idx.entries)) return;
+        const stem = fname.replace(/\.json$/i, '').toLowerCase();
+        const matches = idx.entries.filter(e => {
+            const m = (e.module || e.spec || '').toLowerCase();
+            return m && (m === stem || m.startsWith(stem) || stem.includes(m));
+        });
+        if (!matches.length) return;
+        toggle.style.display = 'inline-block';
+        if (count) count.textContent = '(' + matches.length + ')';
+        list.innerHTML = matches.slice(0, 200).map(e => {
+            const tier = (e.tier || '').toUpperCase();
+            const tierColor = tier === 'HOT' ? '#c62828'
+                            : tier === 'WARM' ? '#f57c00'
+                            : tier === 'COOL' ? '#1976d2' : '#666';
+            return '<div style="padding:4px 0; border-bottom:1px solid #e0e6ec;">'
+                + '<code style="font-size:.78rem; color:#222;">' + escapeHtml(e.xpath || '') + '</code> '
+                + (tier ? '<span style="margin-left:6px; padding:1px 7px; border-radius:8px; font-size:.68rem; background:'
+                       + tierColor + '; color:#fff;">' + escapeHtml(tier) + '</span>' : '')
+                + (e.cadence_seconds ? ' <span style="font-size:.72rem; color:#555;">' + e.cadence_seconds + 's</span>' : '')
+                + (e.on_change_capable ? ' <span style="font-size:.72rem; color:#2e7d32;">on-change</span>' : '')
+                + '</div>';
+        }).join('') + (matches.length > 200
+            ? '<div style="margin-top:6px; font-size:.75rem; color:#888;">Showing first 200 of '
+              + matches.length + ' — use <a href="../telemetry.html">the full catalog</a> for filtering.</div>'
+            : '');
+    }
+
+    function toggleMdtPanel() {
+        const p = document.getElementById('mdtPanel');
+        if (!p) return;
+        p.style.display = (p.style.display === 'none' || !p.style.display) ? 'block' : 'none';
     }
 
     function downloadSpec() {

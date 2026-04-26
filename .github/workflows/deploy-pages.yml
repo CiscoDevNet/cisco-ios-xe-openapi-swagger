@@ -97,8 +97,36 @@ jobs:
           print('✅ No duplicates')
           "
 
-  deploy:
+  validate-releases:
+    # Per-release validation gate (VERSIONING.md §9). Runs only if releases/
+    # is populated. Each release is checked independently; planned releases
+    # are skipped automatically by validate_release.py.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.11"
+
+      - name: Validate release ${{ matrix.version }}
+        run: |
+          if [ ! -d "releases/${{ matrix.version }}" ]; then
+            echo "::notice::releases/${{ matrix.version }} not present yet — skipping."
+            exit 0
+          fi
+          python3 scripts/validate_release.py --version "${{ matrix.version }}"
+
+  deploy:
+    needs: [validate, validate-releases]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -134,6 +162,11 @@ jobs:
           # Copy tools directory (Postman collection, etc.)
           echo "Copying tools..."
           cp -r tools deploy/ 2>/dev/null || true
+
+          # Copy releases tree (multi-version artifacts: per-release specs,
+          # yang-trees, exports, telemetry-index, accountability, etc.)
+          echo "Copying releases/..."
+          cp -r releases deploy/ 2>/dev/null || true
           
           # Exclude heavy directories
           echo "Excluding references, archive, generators, scripts, internal docs from deployment..."

@@ -23,6 +23,21 @@ let browseMode = false;
 let currentSort = 'relevance';
 let lastResults = [];
 
+// Multi-release: try the active-release search index first, then fall back to
+// the root index for backward compatibility with the legacy single-release
+// layout. window.__IOSXE_ACTIVE_VERSION__ is set by index-app.js once the
+// version selector resolves.
+async function loadSearchIndexForActiveVersion() {
+    var ver = (typeof window !== 'undefined') ? window.__IOSXE_ACTIVE_VERSION__ : null;
+    if (ver) {
+        try {
+            var resp = await fetch('releases/' + encodeURIComponent(ver) + '/search-index.json');
+            if (resp.ok) return resp;
+        } catch (_) { /* fall through to root */ }
+    }
+    return fetch('search-index.json');
+}
+
 // Load search index
 async function loadSearchIndex() {
     if (searchReadyPromise) return searchReadyPromise;
@@ -35,7 +50,7 @@ async function loadSearchIndex() {
                 searchInput.disabled = true;
             }
             
-            const response = await fetch('search-index.json');
+            const response = await loadSearchIndexForActiveVersion();
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const data = await response.json();

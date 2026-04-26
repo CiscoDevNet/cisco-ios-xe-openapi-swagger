@@ -1,12 +1,18 @@
 # Cisco IOS-XE YANG Documentation Hub
 ## Project Requirements, Architecture & Decisions
 
-**Version:** 2.0  
-**Date:** February 11, 2026  
-**IOS-XE Version:** 17.18.1  
-**Author:** Jeremy Cohoe (jcohoe@cisco.com)  
-**Repository:** [github.com/jeremycohoe/cisco-ios-xe-openapi-swagger](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger)  
+**Version:** 3.0
+**Date:** April 25, 2026
+**IOS-XE Versions Supported:** 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1
+**Author:** Jeremy Cohoe (jcohoe@cisco.com)
+**Repository:** [github.com/jeremycohoe/cisco-ios-xe-openapi-swagger](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger)
 **Live Site:** [jeremycohoe.github.io/cisco-ios-xe-openapi-swagger](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+
+> **Companion documents (binding):**
+> - [VERSIONING.md](VERSIONING.md) — multi-release folder layout, URL contract, CI gates, release-add runbook.
+> - [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) — MDT/gRPC dial-out filter xpath rule and OpenAPI extensions.
+> - [../MIBS.md](../MIBS.md) — MIB coverage and platform applicability.
+> - [../telemetry-reference-v2.md](../telemetry-reference-v2.md) — per-feature telemetry subscription metadata.
 
 ---
 
@@ -767,6 +773,64 @@ python fix_broken_refs.py
 | Phase 9 | Postman collections | Auto-generate Postman collections from OpenAPI specs |
 | Phase 10 | CI/CD testing | Automated endpoint testing against DevNet sandbox |
 | Phase 11 | Version tracking | Support multiple IOS-XE versions with diff capability |
+
+---
+
+## 16. Multi-Release Phase (April 2026)
+
+This section captures the requirements added in the April 2026 expansion. The detailed contracts live in companion documents; this section is an index and binding requirement set.
+
+### 16.1 Versions
+
+The site simultaneously serves five IOS-XE releases under the same GitHub Pages URL: **17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1**. The version selector at the top of every page switches all per-release data (specs, trees, search, accountability, exports). Folder layout, URL contract, and the runbook for adding additional releases are defined in [VERSIONING.md](VERSIONING.md).
+
+**Requirement:** Adding a new IOS-XE release must be a mechanical operation (fetch → build → register → push), not a code change.
+
+### 16.2 Pyang tree completeness
+
+Every OpenAPI spec on every release must either link to a pyang tree HTML file or have a documented exclusion reason in that release's accountability JSON. A consolidated generator (`scripts/generate_all_pyang_trees.py`) produces trees for all modules of a release in one pass; CI fails the build on any uncovered spec. The spec→tree link is stored as `info.x-yang-tree-url` and rendered in every model viewer.
+
+### 16.3 Accountability across releases
+
+Each release ships its own machine-readable `releases/<ver>/yang_accountability.json` and a re-rendered `YANG_MODULE_ACCOUNTABILITY.md` section. A new comparison page (`yang-accountability-compare.html`) renders a per-module 5-version matrix sourced from `accountability_compare.json`. CI fails on regressions in `with_specs` count vs the prior release unless an entry is added to `releases/<ver>/known_removals.json`.
+
+### 16.4 MDT / gRPC dial-out filter xpaths
+
+Operational-model specs annotate operations with `x-mdt-filter-xpath`, `x-mdt-tier`, `x-mdt-cadence-seconds`, `x-mdt-encoding`, `x-mdt-on-change-capable`, and `x-mdt-feature-section`. The xpath construction rule is `/<module-prefix>:<container-path>` (see [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md)). Three UI surfaces consume this data: per-operation Swagger UI badge, per-viewer MDT panel, and a global `telemetry.html` browser. The annotation source of truth is `telemetry-reference-v2.md` joined with the active release's pyang trees.
+
+### 16.5 Cisco-IOS-XE-native v2 enhancements
+
+The native config model (the largest and most complex YANG module in the source set) ships these enhancements in addition to the existing 28 category specs:
+
+1. **Tier-1 discovery spec** (`native-00-top-level-complete.json`) — ~100 top-level containers/leafs with `x-related-spec` cross-links to category specs. Loads in <1s.
+2. **Depth-3 representative paths** for high-value categories (interfaces by type, BGP per address family, OSPF per process, ISIS, ACL types).
+3. **`x-cli-equivalent` extension** on top operations, sourced from `references/native-cli-mappings.yaml`. Initial coverage ~200 mappings; extends iteratively.
+4. **Canonical example payloads** generated from YANG defaults plus a curated overlay (`references/native-example-overlay.yaml`); replaces residual empty `{}` examples.
+5. **Config Capabilities summary page** (`swagger-native-config-model/capabilities.html`) — leaf/list/choice counts per category; configurable-surface map; sourced from `releases/<ver>/native-capabilities.json`.
+
+### 16.6 MIB YANG detail surfacing
+
+Each MIB YANG module ships enriched metadata in `releases/<ver>/mib-metadata.json` (OID prefix, table/scalar counts, indexes, deprecated objects, RFC/Cisco source, platform applicability joined from [../MIBS.md](../MIBS.md)). The MIB viewer renders this in a side card alongside the active spec and links to the matching pyang tree. Platform applicability comes from the structured parse of `MIBS.md` (no manual duplication).
+
+### 16.7 Postman + Bruno exports
+
+Exports are emitted **per (version, model-category)**, with a hard 50 MB cap per file. Both Postman (`*.postman_collection.json`) and Bruno (`*.bru` directory tree) formats are produced for every release. A new `exports.html` page renders the version × category × format download matrix. CI fails on any single file exceeding 50 MB without an auto-split manifest entry.
+
+### 16.8 Source-of-truth doc set (locked)
+
+The following documents form the binding contract for this and future releases. Code changes that affect their subjects must update them first.
+
+- [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) (this file)
+- [VERSIONING.md](VERSIONING.md)
+- [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md)
+- [AGENTS.md](AGENTS.md)
+- [../MIBS.md](../MIBS.md)
+- [../telemetry-reference-v2.md](../telemetry-reference-v2.md)
+- [CHANGELOG.md](CHANGELOG.md)
+
+### 16.9 Resolved review blockers
+
+The three "Must-Fix Blockers" from [../CODE_REVIEW.md](../CODE_REVIEW.md) (XSS in `search.js`, localStorage silent-fail in `recent-favorites.js`, search-index race condition) are resolved as of this version. See the Resolution Status banner in CODE_REVIEW.md.
 
 ---
 

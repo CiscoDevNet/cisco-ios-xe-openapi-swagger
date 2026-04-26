@@ -3,24 +3,16 @@
   "info": {
     "title": "SNMP-FRAMEWORK-MIB MIB API",
     "version": "1.0.0",
-    "description": "The SNMP Management Architecture MIB\n    \n    Copyright (C) The Internet Society (2002). This\n    version of this MIB module is part of RFC 3411;\n    see the RFC itself for full legal notices.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n\n\n**📊 YANG Tree:** [View SNMP-FRAMEWORK-MIB structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/SNMP-FRAMEWORK-MIB.html)",
+    "description": "The SNMP Management Architecture MIB\n    \n    Copyright (C) The Internet Society (2002). This\n    version of this MIB module is part of RFC 3411;\n    see the RFC itself for full legal notices.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n\n\n**YANG Model:** [SNMP-FRAMEWORK-MIB MIB API.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/SNMP-FRAMEWORK-MIB MIB API.yang)",
     "contact": {
       "name": "Cisco DevNet",
       "url": "https://developer.cisco.com"
-    },
-    "x-yang-module": "SNMP-FRAMEWORK-MIB",
-    "x-model-type": "mib"
+    }
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
-      "description": "RESTCONF server",
-      "variables": {
-        "device": {
-          "default": "10.1.1.1",
-          "description": "Device hostname or IP address"
-        }
-      }
+      "url": "https://10.85.134.65/restconf",
+      "description": "IOS-XE Device (C9300)"
     }
   ],
   "paths": {
@@ -75,72 +67,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-snmpEngine",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/snmpEngine",
-      "x-restconf-kind": "container"
+        }
+      }
     }
   },
   "components": {
@@ -156,101 +85,27 @@
               "snmpEngineID": {
                 "type": "string",
                 "description": "An SNMP engine's administratively-unique identifier.\n          \n          This information SHOULD be stored in non-volatile\n          storage so that it remains constant across\n          re-initializations of the SNMP engine.",
-                "x-yang-type": "SNMP-FRAMEWORK-MIB:SnmpEngineID",
-                "readOnly": true
+                "x-yang-type": "SNMP-FRAMEWORK-MIB:SnmpEngineID"
               },
               "snmpEngineBoots": {
                 "type": "integer",
                 "description": "The number of times that the SNMP engine has\n          (re-)initialized itself since snmpEngineID\n          was last configured.",
                 "minimum": -2147483648,
-                "maximum": 2147483647,
-                "readOnly": true
+                "maximum": 2147483647
               },
               "snmpEngineTime": {
                 "type": "integer",
                 "description": "The number of seconds since the value of\n          the snmpEngineBoots object last changed.\n          When incrementing this object's value would\n          cause it to exceed its maximum,\n          snmpEngineBoots is incremented as if a\n          re-initialization had occurred, and this\n          object's value consequently reverts to zero.",
                 "minimum": -2147483648,
-                "maximum": 2147483647,
-                "readOnly": true
+                "maximum": 2147483647
               },
               "snmpEngineMaxMessageSize": {
                 "type": "integer",
                 "description": "The maximum length in octets of an SNMP message\n          which this SNMP engine can send or receive and\n          process, determined as the minimum of the maximum\n          message size values supported among all of the\n          transports available to and supported by the engine.",
                 "minimum": -2147483648,
-                "maximum": 2147483647,
-                "readOnly": true
-              }
-            },
-            "readOnly": true
-          }
-        }
-      },
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
+                "maximum": 2147483647
               }
             }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
           }
         }
       }

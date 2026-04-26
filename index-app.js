@@ -331,6 +331,79 @@
 
         // Nav bar auto-hide
         initNavBarScroll();
+
+        // Version selector (multi-release dropdown)
+        initVersionSelector();
+    }
+
+    // === Version selector ===
+    // Reads releases/index.json (canonical list) and lets the user pick which
+    // IOS-XE release the documentation should be sourced from. Selection is
+    // persisted in localStorage and reflected in the URL hash as `ver=<v>`.
+    // The "default" release in releases/index.json is the initial selection.
+    function initVersionSelector() {
+        var sel = document.getElementById('versionSelector');
+        var label = document.getElementById('activeVersionLabel');
+        var badge = document.getElementById('versionStatusBadge');
+        if (!sel) return;
+
+        fetch('releases/index.json', { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; })
+            .then(function (data) {
+                var releases = (data && data.releases) || [];
+                if (!releases.length) {
+                    sel.innerHTML = '<option>17.18.1</option>';
+                    return;
+                }
+                var hashVer = (location.hash.match(/(?:^|[#&])ver=([^&]+)/) || [])[1];
+                var stored = null;
+                try { stored = localStorage.getItem('iosxe-active-version'); } catch (_) { /* noop */ }
+                var current = hashVer || stored || data.default
+                    || releases[0].ver;
+                if (!releases.some(function (r) { return r.ver === current; })) {
+                    current = data.default || releases[0].ver;
+                }
+
+                sel.innerHTML = '';
+                releases.forEach(function (r) {
+                    var opt = document.createElement('option');
+                    opt.value = r.ver;
+                    opt.textContent = (r.label || r.ver)
+                        + (r.status === 'planned' ? ' (planned)' : '')
+                        + (r.status === 'archived' ? ' (archived)' : '');
+                    if (r.status === 'planned') opt.disabled = true;
+                    if (r.ver === current) opt.selected = true;
+                    sel.appendChild(opt);
+                });
+                applyVersion(current, releases, label, badge);
+
+                sel.addEventListener('change', function () {
+                    applyVersion(sel.value, releases, label, badge);
+                    try { localStorage.setItem('iosxe-active-version', sel.value); }
+                    catch (_) { /* noop */ }
+                    var hashParts = location.hash.replace(/^#/, '').split('&')
+                        .filter(function (p) { return p && !p.startsWith('ver='); });
+                    hashParts.unshift('ver=' + encodeURIComponent(sel.value));
+                    location.hash = hashParts.join('&');
+                    // Hard reload so search-index and manifests for the new
+                    // release are picked up cleanly.
+                    location.reload();
+                });
+            });
+    }
+
+    function applyVersion(ver, releases, label, badge) {
+        if (label) label.textContent = 'IOS-XE ' + ver;
+        var info = (releases || []).find(function (r) { return r.ver === ver; });
+        if (badge) {
+            badge.textContent = info ? (info.status || 'active') : 'active';
+            badge.style.background = info && info.status === 'planned'
+                ? 'rgba(255, 193, 7, 0.4)'
+                : 'rgba(76, 175, 80, 0.4)';
+        }
+        // Expose for other scripts (search.js reads this).
+        window.__IOSXE_ACTIVE_VERSION__ = ver;
     }
 
     if (document.readyState === 'loading') {
