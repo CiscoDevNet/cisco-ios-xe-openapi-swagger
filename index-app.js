@@ -404,6 +404,19 @@
         }
         // Expose for other scripts (search.js reads this).
         window.__IOSXE_ACTIVE_VERSION__ = ver;
+        // Rewrite category-card links so the chosen version is preserved when
+        // a viewer is opened (also covered by viewer's localStorage fallback,
+        // but the explicit ?ver= makes deep-links + new-tab work cleanly).
+        try {
+            document.querySelectorAll('a[href*="swagger-"][href*="-model/index-v2.html"]')
+                .forEach(function (a) {
+                    var href = a.getAttribute('href');
+                    if (!href) return;
+                    var clean = href.replace(/[?&]ver=[^&#]*/g, '');
+                    var sep = clean.indexOf('?') >= 0 ? '&' : '?';
+                    a.setAttribute('href', clean + sep + 'ver=' + encodeURIComponent(ver));
+                });
+        } catch (_) { /* noop */ }
     }
 
     if (document.readyState === 'loading') {
