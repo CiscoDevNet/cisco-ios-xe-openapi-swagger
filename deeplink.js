@@ -125,11 +125,16 @@
     function tryExpandOp(opId) {
         var el = findOpElement(opId);
         if (!el) return false;
-        var summary = el.querySelector('.opblock-summary');
+        // Swagger UI v5 wires the expand toggle onto the inner <button>
+        // .opblock-summary-control. Clicking the outer .opblock-summary
+        // <div> does NOT fire the handler. Prefer the control, fall back
+        // to the summary if the control isn't there (older themes).
+        var control = el.querySelector('.opblock-summary-control')
+            || el.querySelector('.opblock-summary');
         var alreadyOpen = el.classList.contains('is-open');
-        if (summary && !alreadyOpen && el.getAttribute('data-deeplink-expanded') !== '1') {
+        if (control && !alreadyOpen && el.getAttribute('data-deeplink-expanded') !== '1') {
             el.setAttribute('data-deeplink-expanded', '1');
-            try { summary.click(); } catch (_) { /* ignore */ }
+            try { control.click(); } catch (_) { /* ignore */ }
         }
         try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) { /* old browser */ }
         return true;
