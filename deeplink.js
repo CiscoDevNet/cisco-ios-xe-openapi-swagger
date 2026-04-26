@@ -92,21 +92,30 @@
         if (!opId) return null;
         var ui = document.getElementById('swagger-ui');
         if (!ui) return null;
-        // Preferred: search the operationId span text directly. This is exact
-        // and unambiguous regardless of how Swagger UI mangles the id attr.
+        // Preferred: search the operationId span text directly when present.
         var spans = ui.querySelectorAll('.opblock .opblock-summary-operation-id');
         for (var i = 0; i < spans.length; i++) {
             if ((spans[i].textContent || '').trim() === opId) {
                 return spans[i].closest('.opblock');
             }
         }
-        // Fallback: id-suffix heuristic (Swagger UI emits id="operations-<tag>-<op>").
+        // Tag-prefix path: id format is "operations-<tag>-<operationId>", and
+        // for our generators tag === spec name from the hash.
+        var cur = parseHash();
         var nodes = ui.querySelectorAll('div.opblock[id^="operations-"]');
-        for (var j = 0; j < nodes.length; j++) {
-            var n = nodes[j];
-            var rest = n.id.substring('operations-'.length);
-            if (rest === opId || (rest.length > opId.length + 1
-                && rest.substring(rest.length - opId.length - 1) === ('-' + opId))) {
+        if (cur.spec) {
+            var wantTail = cur.spec + '-' + opId;
+            for (var j = 0; j < nodes.length; j++) {
+                var rest = nodes[j].id.substring('operations-'.length);
+                if (rest === wantTail) return nodes[j];
+            }
+        }
+        // Fallback: id-suffix heuristic.
+        for (var k = 0; k < nodes.length; k++) {
+            var n = nodes[k];
+            var r2 = n.id.substring('operations-'.length);
+            if (r2 === opId || (r2.length > opId.length + 1
+                && r2.substring(r2.length - opId.length - 1) === ('-' + opId))) {
                 return n;
             }
         }
@@ -128,21 +137,27 @@
 
     function extractOpIdFromBlock(opblock) {
         if (!opblock) return null;
-        // Preferred: Swagger UI v5 renders the operationId inside a span
-        // with class .opblock-summary-operation-id — its textContent is the
-        // verbatim operationId (no ambiguity even if it contains hyphens).
+        // Preferred: Swagger UI v5 sometimes renders the operationId inside a
+        // span with class .opblock-summary-operation-id — its textContent is
+        // the verbatim operationId.
         var idSpan = opblock.querySelector('.opblock-summary-operation-id');
         if (idSpan && idSpan.textContent) {
             var v = idSpan.textContent.trim();
             if (v) return v;
         }
-        // Fallback: parse the row id "operations-<tag>-<operationId>".
-        // operationIds may contain hyphens too — last-hyphen heuristic is the
-        // best we can do without the spec.
         if (!opblock.id) return null;
         var rest = opblock.id.indexOf('operations-') === 0
             ? opblock.id.substring('operations-'.length)
             : opblock.id;
+        // Our generators always emit OpenAPI `tags: [<module-name>]` matching
+        // the loaded spec name. So if a current spec is set, strip it as the
+        // tag prefix to recover the operationId verbatim (operationIds may
+        // contain hyphens, colons, slashes, etc.).
+        var cur = parseHash();
+        if (cur.spec && rest.indexOf(cur.spec + '-') === 0) {
+            return rest.substring(cur.spec.length + 1);
+        }
+        // Fallback: last-hyphen heuristic.
         var idx = rest.lastIndexOf('-');
         if (idx === -1) return rest;
         return rest.substring(idx + 1);
