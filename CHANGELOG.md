@@ -14,8 +14,8 @@ selector (see [VERSIONING.md](VERSIONING.md) for the architecture).
 
 | Version | YangModels path | Status | Notes |
 |---------|-----------------|--------|-------|
-| 26.1.1  | `vendor/cisco/xe/2611`  | active | Newest release; default in `releases/index.json` order |
-| 17.18.1 | `vendor/cisco/xe/17181` | active **(default)** | Site default; baseline for legacy in-place artifacts |
+| 26.1.1  | `vendor/cisco/xe/2611`  | active **(default)** | Newest release; site default |
+| 17.18.1 | `vendor/cisco/xe/17181` | active | Baseline for legacy in-place artifacts |
 | 17.15.x | `vendor/cisco/xe/17151` | active | |
 | 17.12.x | `vendor/cisco/xe/17121` | active | |
 | 17.9.x  | `vendor/cisco/xe/1791`  | active | Oldest supported release |
