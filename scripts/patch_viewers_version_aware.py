@@ -126,6 +126,15 @@ def patch(p: Path, helper: str) -> bool:
         src,
     )
 
+    # Remove the now-dead getSpecFolder() helper. After patching, all callers
+    # use __apiBase() directly, so the function is unreachable. Idempotent: a
+    # second run finds nothing to remove.
+    src = re.sub(
+        r"\n\s*function getSpecFolder\(fname\) \{[^}]*\}\n",
+        "\n",
+        src,
+    )
+
     if src != orig:
         p.write_text(src, encoding="utf-8")
         return True

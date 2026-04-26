@@ -1,0 +1,28 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'swagger-*-model/**'
+      - 'releases/**'
+      - 'tests/**'
+      - 'scripts/normalize_manifests.py'
+      - 'scripts/patch_viewers_version_aware.py'
+      - '.github/workflows/tests.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pytest
+        run: pip install --no-cache-dir pytest
+      - name: Run manifest schema tests
+        run: python -X utf8 -m pytest tests/ -v
