@@ -92,17 +92,21 @@
         if (!opId) return null;
         var ui = document.getElementById('swagger-ui');
         if (!ui) return null;
-        // Swagger UI renders rows as id="operations-<tag>-<operationId>".
-        // Tag may contain hyphens; match suffix robustly.
+        // Preferred: search the operationId span text directly. This is exact
+        // and unambiguous regardless of how Swagger UI mangles the id attr.
+        var spans = ui.querySelectorAll('.opblock .opblock-summary-operation-id');
+        for (var i = 0; i < spans.length; i++) {
+            if ((spans[i].textContent || '').trim() === opId) {
+                return spans[i].closest('.opblock');
+            }
+        }
+        // Fallback: id-suffix heuristic (Swagger UI emits id="operations-<tag>-<op>").
         var nodes = ui.querySelectorAll('div.opblock[id^="operations-"]');
-        for (var i = 0; i < nodes.length; i++) {
-            var n = nodes[i];
-            // Strip leading "operations-" then look for the last "-<op>" segment.
+        for (var j = 0; j < nodes.length; j++) {
+            var n = nodes[j];
             var rest = n.id.substring('operations-'.length);
-            // Could be "<tag>-<op>" — exact suffix match (tag may have hyphens too,
-            // so we check that rest ENDS with -opId or equals opId).
-            if (rest === opId || rest.length > opId.length + 1
-                && rest.substring(rest.length - opId.length - 1) === ('-' + opId)) {
+            if (rest === opId || (rest.length > opId.length + 1
+                && rest.substring(rest.length - opId.length - 1) === ('-' + opId))) {
                 return n;
             }
         }
@@ -123,14 +127,22 @@
     }
 
     function extractOpIdFromBlock(opblock) {
-        if (!opblock || !opblock.id) return null;
+        if (!opblock) return null;
+        // Preferred: Swagger UI v5 renders the operationId inside a span
+        // with class .opblock-summary-operation-id — its textContent is the
+        // verbatim operationId (no ambiguity even if it contains hyphens).
+        var idSpan = opblock.querySelector('.opblock-summary-operation-id');
+        if (idSpan && idSpan.textContent) {
+            var v = idSpan.textContent.trim();
+            if (v) return v;
+        }
+        // Fallback: parse the row id "operations-<tag>-<operationId>".
+        // operationIds may contain hyphens too — last-hyphen heuristic is the
+        // best we can do without the spec.
+        if (!opblock.id) return null;
         var rest = opblock.id.indexOf('operations-') === 0
             ? opblock.id.substring('operations-'.length)
             : opblock.id;
-        // tag-op — operationId is the segment after the tag. We don't know tag
-        // boundaries, but Swagger UI always emits "<tag>-<operationId>" with
-        // operationId being the last hyphen-delimited token only when ops have
-        // simple ids. Most generated specs here do, so use the last segment.
         var idx = rest.lastIndexOf('-');
         if (idx === -1) return rest;
         return rest.substring(idx + 1);
