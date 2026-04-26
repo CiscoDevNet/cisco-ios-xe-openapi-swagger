@@ -8,8 +8,8 @@ This site is deployed automatically using **GitHub Actions**. Every push to main
 
 1. **Push to main branch** - triggers GitHub Actions
 2. **Workflow prepares deploy directory** - copies only website-relevant files
-3. **Uploads artifact** - uses ctions/upload-pages-artifact
-4. **Deploys to Pages** - uses ctions/deploy-pages
+3. **Uploads artifact** - uses ctions/upload-pages-artifact
+4. **Deploys to Pages** - uses ctions/deploy-pages
 
 No manual setup required. Just push and it deploys.
 
@@ -33,7 +33,7 @@ No manual setup required. Just push and it deploys.
 eferences/ | 848 YANG source modules (heavy, not needed for site) |
 | generators/ | Python YANG parsers (dev tools only) |
 | scripts/ | Validation/analysis tools (dev tools only) |
-| rchive/ | Completed TODO/phase tracking docs |
+| rchive/ | Completed TODO/phase tracking docs |
 | .github/ | Workflow configs (not site content) |
 
 ### First-Time Setup
