@@ -47,7 +47,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Cisco IOS-XE 17.18.1 - Other APIs</h1>
+        <h1>Cisco IOS-XE <span class="header-version">26.1.1</span> - Other APIs</h1>
         <p id="headerStats">Loading...</p>
     </div>
     <nav class="nav-bar">
@@ -139,6 +139,25 @@
     }
     // Expose for mib-metadata side card and other consumers.
     window.__IOSXE_ACTIVE_VERSION__ = __activeVer();
+    // Update any element flagged with `.header-version` so the viewer's
+    // visible header reflects the active release instead of the static
+    // fallback baked in at HTML build time.
+    (function () {
+        function applyHeaderVersion() {
+            try {
+                var v = __activeVer();
+                document.querySelectorAll('.header-version').forEach(function (el) {
+                    el.textContent = v;
+                });
+            } catch (_) {}
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyHeaderVersion);
+        } else {
+            applyHeaderVersion();
+        }
+    })();
+    // === end version-aware api base ===
     let allModules = [];
     let currentModule = null;
 
