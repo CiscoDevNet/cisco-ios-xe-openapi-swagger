@@ -157,11 +157,25 @@
     }
 
     function attachClickCapture() {
-        // Update hash when user clicks an opblock summary so the URL bar
-        // always reflects the currently-open operation.
+        // Capture-phase listeners fire before any inline onclick handlers and
+        // before the browser's default <a href="#"> navigation.
         document.addEventListener('click', function (e) {
             var target = e.target;
             if (!target || !target.closest) return;
+
+            // (1) Sidebar module links use href="#" with onclick that should
+            // return false. In some environments (programmatic click, certain
+            // event timings) the default action still fires and pushes "#"
+            // into history, wiping our hash. Suppress that default here.
+            var sidebar = target.closest('#moduleList a, .module-list a');
+            if (sidebar && (sidebar.getAttribute('href') === '#' ||
+                    sidebar.getAttribute('href') === '')) {
+                e.preventDefault();
+                // do NOT stopPropagation — onclick="loadSpec(...)" still runs
+            }
+
+            // (2) Update hash when user clicks an opblock summary so the URL
+            // bar always reflects the currently-open operation.
             var summary = target.closest('.opblock-summary');
             if (!summary) return;
             var opblock = summary.closest('.opblock');
@@ -179,6 +193,46 @@
     window.addEventListener('hashchange', function () {
         attachAutoExpand();
     });
+
+    // Defensive guard: if Swagger UI (or anything else) tries to push/replace
+    // a hash that drops our spec= param, merge it back in.
+    (function guardHistory() {
+        function preserveSpec(url) {
+            // url may be null/undefined (means "current URL") — leave alone.
+            if (url == null) return url;
+            try {
+                var u = new URL(url, window.location.href);
+                var cur = parseHash();
+                if (!cur.spec) return url;
+                // parse incoming hash
+                var newRaw = (u.hash || '').replace(/^#/, '');
+                var hasSpec = /(^|&)spec=/.test(newRaw);
+                if (hasSpec) return url;
+                // Re-attach our spec (and op if present) so it isn't lost.
+                var keep = { spec: cur.spec };
+                if (cur.op) keep.op = cur.op;
+                if (cur.ver) keep.ver = cur.ver;
+                // If the incoming hash is empty or just "#", just use ours.
+                if (!newRaw) {
+                    u.hash = buildHash(keep);
+                    return u.pathname + u.search + u.hash;
+                }
+                // Otherwise prepend our params.
+                u.hash = buildHash(keep) + '&' + newRaw;
+                return u.pathname + u.search + u.hash;
+            } catch (_) {
+                return url;
+            }
+        }
+        var origPush = history.pushState;
+        var origRepl = history.replaceState;
+        history.pushState = function (s, t, u) {
+            return origPush.call(this, s, t, preserveSpec(u));
+        };
+        history.replaceState = function (s, t, u) {
+            return origRepl.call(this, s, t, preserveSpec(u));
+        };
+    })();
 
     // Initial wiring after DOM ready.
     if (document.readyState === 'loading') {
