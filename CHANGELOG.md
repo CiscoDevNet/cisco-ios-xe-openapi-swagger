@@ -14,17 +14,59 @@ selector (see [VERSIONING.md](VERSIONING.md) for the architecture).
 
 | Version | YangModels path | Status | Notes |
 |---------|-----------------|--------|-------|
-| 26.1.1  | `vendor/cisco/xe/2611`  | planned (build pending) | Newest release |
-| 17.18.1 | `vendor/cisco/xe/17181` | active                 | Existing baseline; migrating to `releases/17.18.1/` |
-| 17.15.x | `vendor/cisco/xe/17151` | planned (build pending) | |
-| 17.12.x | `vendor/cisco/xe/17121` | planned (build pending) | |
-| 17.9.x  | `vendor/cisco/xe/1791`  | planned (build pending) | Older release |
+| 26.1.1  | `vendor/cisco/xe/2611`  | active | Newest release; default in `releases/index.json` order |
+| 17.18.1 | `vendor/cisco/xe/17181` | active **(default)** | Site default; baseline for legacy in-place artifacts |
+| 17.15.x | `vendor/cisco/xe/17151` | active | |
+| 17.12.x | `vendor/cisco/xe/17121` | active | |
+| 17.9.x  | `vendor/cisco/xe/1791`  | active | Oldest supported release |
+
+Tree-module counts are monotonic across versions: 620 / 637 / 683 / 715 / 742 (17.9.x → 26.1.1).
 
 Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8](VERSIONING.md#8-adding-a-new-release--runbook).
 
 ---
 
 ## [Unreleased]
+
+### Added — Site-wide version awareness & quality hardening (round 4, April 2026)
+
+- **Version-aware viewers** — all 9 `swagger-*-model/index-v2.html` viewers now resolve the active
+  release at runtime via `__activeVer()` / `__apiBase()` / `__treeBase()` helpers injected by
+  [scripts/patch_viewers_version_aware.py](scripts/patch_viewers_version_aware.py). The patcher
+  reads `releases/index.json` once and bakes the default version + active-versions allow-list into
+  each viewer as `__IOSXE_DEFAULT_VER__` / `__IOSXE_ALLOWED_VERS__`. Unknown `?ver=` values are
+  rejected (no more 404 storms on bad URLs). Helper block is regex-replaceable for true idempotency,
+  and the dead `getSpecFolder()` function was removed from all viewers.
+- **[scripts/normalize_manifests.py](scripts/normalize_manifests.py)** — normalises every
+  `manifest.json` (default + 4 release dirs × 9 categories = 45 manifests) to the viewer-expected
+  schema: integer `total_modules` / `total_paths` / `total_operations` / `spec_count` summed from
+  the sibling spec files, and `modules` as a flat list of string basenames. Fixes the viewer crash
+  `Cannot read properties of undefined (reading 'toLocaleString')`.
+- **[scripts/smoke_live.py](scripts/smoke_live.py)** *(new, replaces `_debug_viewer.py`)* —
+  headless Playwright smoke test of the live deployment. Loads version list from
+  `releases/index.json`, walks every active release through the viewer, and exits non-zero on real
+  failures (transient 503s ignored). `--base-url` flag for staging.
+- **[tests/test_manifest_schema.py](tests/test_manifest_schema.py)** *(new)* — 46 parametrized
+  pytest cases (45 manifests + 1 sanity) asserting required integer keys, `modules` as `list[str]`,
+  count agreement, and that every listed module resolves to a sibling `.json` spec.
+- **[.github/workflows/tests.yml](.github/workflows/tests.yml)** *(new)* — runs the manifest-schema
+  test suite on push/PR touching `swagger-*-model/`, `releases/`, `tests/`, the manifest
+  normaliser, the viewer patcher, or itself.
+- **[index-app.js](index-app.js)** — `applyVersion()` now rewrites all
+  `a[href*="swagger-"][href*="-model/index-v2.html"]` hrefs to carry `?ver=<v>` so category-card
+  navigation preserves the active release.
+
+### Fixed (round 4)
+
+- **Manifest schema mismatch** across release directories — old-schema manifests (missing
+  `total_paths` / `total_operations`, `modules` as objects rather than strings) caused the viewer
+  to crash on load. All 45 manifests rewritten via `normalize_manifests.py`.
+- **404 storms on malformed URLs** — `?ver=garbage` previously triggered ~150 spec 404s. Now
+  validated against the allow-list baked into the viewer; falls back silently to the default.
+- **Mojibake repaired in 7 viewers** — `â€"` → `—`, `ðŸŒ³` → `🌳`, `ðŸ—„` → `🗄`, etc., via `ftfy`.
+  CSP meta tags verified present on all 9 viewers.
+- **Patcher fragility** — anchor strings differed across viewers; idempotency previously relied on
+  a substring sentinel. Replaced with a regex-replaceable helper block and a dead-code strip pass.
 
 ### Added — Multi-release foundations (April 2026)
 
@@ -285,6 +327,6 @@ The full 17.18.1 corpus, summarized:
 
 ## Future
 
-- **17.15** and **26.1** YANG releases — multi-version picker
 - Live C9KV validation runs in CI
-- Optional automated `pytest`-based test suite
+- Scheduled `smoke_live.py` cron job (GitHub Actions) for daily deployment regression detection
+- Optional `viewer-bootstrap.js` extraction to retire the 9 inline helper blocks and the patcher script

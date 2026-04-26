@@ -158,6 +158,27 @@ python generate_native_openapi_v2.py --version 26.1.1
 
 Post-processing scripts (`scripts/enrich_v2_specs.py`, `scripts/add_yang_github_links.py`, `scripts/annotate_mdt_xpaths.py`, `scripts/enrich_mib_metadata.py`, `scripts/build_native_capabilities.py`, `scripts/generate_search_index.py`, `scripts/generate_all_pyang_trees.py`, `scripts/generate_postman_collection.py`, `scripts/generate_bruno_collection.py`) all take `--version` and are run by `build_release.py`. Run them individually only when iterating on that step.
 
+### Site-wide post-build steps
+
+After adding a new release or rebuilding manifests/viewers, run:
+
+```powershell
+# Normalize all manifest.json files (default + per-release) to the schema viewers expect.
+python scripts/normalize_manifests.py
+
+# Re-patch all 9 swagger-*-model/index-v2.html viewers with version-aware helpers
+# (reads default + active-versions allow-list from releases/index.json).
+python scripts/patch_viewers_version_aware.py
+
+# Local schema unit tests (also runs in CI via .github/workflows/tests.yml).
+python -X utf8 -m pytest tests/ -v
+
+# Headless smoke test against the live deployment.
+python scripts/smoke_live.py
+# Or against a staging URL:
+python scripts/smoke_live.py --base-url https://example.com/staging
+```
+
 ### Validate examples against a live device
 
 ```powershell
