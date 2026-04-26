@@ -18,9 +18,23 @@ cd cisco-ios-xe-openapi-swagger
 python -m pip install --upgrade pip
 python -m pip install pyang requests
 
+# Optional dev/test tooling (only needed if you run the test suite or live smoke test)
+python -m pip install pytest ftfy playwright
+python -m playwright install chromium
+
 # Preview the site
 python -m http.server 8000
 # → http://localhost:8000
+```
+
+## Verifying the build pipeline
+
+```powershell
+# Schema unit tests for all 45 manifests (also gated in CI via .github/workflows/tests.yml)
+python -X utf8 -m pytest tests/ -v
+
+# Headless smoke test against the live deployment (or a staging URL via --base-url)
+python -X utf8 scripts/smoke_live.py
 ```
 
 ## Workflow
