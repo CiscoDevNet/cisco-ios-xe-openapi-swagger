@@ -120,9 +120,14 @@ def gate_tree_coverage(rel: Path, errs: list[str]) -> None:
     print("\n[gate 4] Tree coverage")
     tree_audit_path = rel / "tree_audit.json"
     if not tree_audit_path.is_file():
-        legacy = PROJECT_ROOT / "tree_audit.json"
-        if legacy.is_file():
-            tree_audit_path = legacy
+        # Fallbacks: repo-root tree_audit.json (older legacy layout) and
+        # releases/17.18.1/tree_audit.json (current per-release artifact even
+        # when specs still live at repo root in legacy in-place mode).
+        for cand in (PROJECT_ROOT / "tree_audit.json",
+                     PROJECT_ROOT / "releases" / "17.18.1" / "tree_audit.json"):
+            if cand.is_file():
+                tree_audit_path = cand
+                break
         else:
             print(f"  ! missing {(rel / 'tree_audit.json').relative_to(PROJECT_ROOT)} "
                   f"— skipping (run generate_all_pyang_trees.py to enable)")
@@ -216,8 +221,13 @@ def gate_export_sizes(rel: Path, errs: list[str]) -> None:
     print("\n[gate 7] Export size cap (50 MB)")
     exports = rel / "exports"
     if not exports.is_dir():
-        ok("no exports directory (skipping)")
-        return
+        # Legacy 17.18.1 keeps specs at repo root but exports under releases/17.18.1/exports.
+        alt = PROJECT_ROOT / "releases" / "17.18.1" / "exports"
+        if alt.is_dir():
+            exports = alt
+        else:
+            ok("no exports directory (skipping)")
+            return
     over: list[tuple[str, int]] = []
     n = 0
     for f in exports.rglob("*"):

@@ -187,7 +187,7 @@ def generate_one(yang_file: Path, out_dir: Path, version: str) -> dict:
     return {"module": module, "status": "generated", "reason": None}
 
 
-def generate_for_version(version: str) -> int:
+def generate_for_version(version: str, include_mibs: bool = True) -> int:
     src_dir = PROJECT_ROOT / "references" / version
     if not src_dir.is_dir():
         # Fall back to legacy 17.18.1 layout if user hasn't migrated yet.
@@ -210,6 +210,11 @@ def generate_for_version(version: str) -> int:
     }
 
     yang_files = sorted(src_dir.glob("*.yang"))
+    if include_mibs:
+        for sub in ("MIBS", "BIC"):
+            sub_dir = src_dir / sub
+            if sub_dir.is_dir():
+                yang_files.extend(sorted(sub_dir.rglob("*.yang")))
     print(f"[trees] {version}: {len(yang_files)} YANG files → {out_dir}")
     generated: list[str] = []
     for f in yang_files:
@@ -246,10 +251,16 @@ def main() -> int:
     g.add_argument("--version", help="Single release to process (e.g. 26.1.1)")
     g.add_argument("--all", action="store_true",
                    help="Process every release listed in releases/index.json")
+    parser.add_argument("--include-mibs", dest="include_mibs",
+                        action="store_true", default=True,
+                        help="Include MIBS/ and BIC/ subdirectories (default).")
+    parser.add_argument("--no-mibs", dest="include_mibs",
+                        action="store_false",
+                        help="Skip MIBS/BIC subdirectories.")
     args = parser.parse_args()
 
     if args.version:
-        return generate_for_version(args.version)
+        return generate_for_version(args.version, include_mibs=args.include_mibs)
 
     if not RELEASES_INDEX.is_file():
         sys.stderr.write(f"[trees] missing {RELEASES_INDEX}\n")
@@ -261,7 +272,7 @@ def main() -> int:
         if entry.get("status") not in ("active", None):
             print(f"[trees] {ver}: status={entry.get('status')}, skipping.")
             continue
-        rc = generate_for_version(ver) or rc
+        rc = generate_for_version(ver, include_mibs=args.include_mibs) or rc
     return rc
 
 
