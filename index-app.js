@@ -412,7 +412,12 @@
                 .forEach(function (a) {
                     var href = a.getAttribute('href');
                     if (!href) return;
-                    var clean = href.replace(/[?&]ver=[^&#]*/g, '');
+                    // Strip any existing ver= param plus a trailing '?' or '&' it leaves behind.
+                    var clean = href
+                        .replace(/[?&]ver=[^&#]*/g, '')
+                        .replace(/\?(?=&)/, '?')   // collapse '?&' -> '?'
+                        .replace(/\?$/, '')         // drop dangling trailing '?'
+                        .replace(/\?&/, '?');
                     var sep = clean.indexOf('?') >= 0 ? '&' : '?';
                     a.setAttribute('href', clean + sep + 'ver=' + encodeURIComponent(ver));
                 });
