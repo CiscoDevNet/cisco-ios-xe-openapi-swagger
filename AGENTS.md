@@ -7,9 +7,26 @@ This file describes **how to work in this codebase safely and productively**. Re
 
 ---
 
+## 0. Source-of-truth docs (read these first)
+
+When making non-trivial changes, the following documents are authoritative. Update them when behavior changes; do not duplicate their content elsewhere.
+
+| Doc | Authoritative for |
+|-----|-------------------|
+| [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) | High-level scope, model categories, accountability rules |
+| [VERSIONING.md](VERSIONING.md) | Multi-release folder layout, URL contract, CI gates, "add a new release" runbook |
+| [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) | MDT/gRPC dial-out filter xpath rule + OpenAPI extensions |
+| [../MIBS.md](../MIBS.md) | MIB coverage and platform applicability matrix |
+| [../telemetry-reference-v2.md](../telemetry-reference-v2.md) | Per-feature telemetry subscription metadata (feature → xpath, tier, cadence) |
+| [CHANGELOG.md](CHANGELOG.md) | Versions Supported table; release-by-release deltas |
+
+If a request conflicts with these docs, prefer updating the doc first (with rationale) and then code.
+
+---
+
 ## 1. Project Overview
 
-**What this is:** A static documentation site for **Cisco IOS-XE 17.18.1 RESTCONF APIs**, generated from 848 source YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime.
+**What this is:** A static documentation site for **Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1)**, generated from upstream YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime. Per-release artifacts live under `releases/<ver>/`; shared UI lives at the repo root and reads the active release based on the `#ver=` URL hash. See [VERSIONING.md](VERSIONING.md) for the full layout.
 
 **What ships:**
 
@@ -118,34 +135,28 @@ python -m http.server 8000
 
 ### Regenerate everything (full pipeline)
 
+The supported pipeline is **per-release** and orchestrated by `scripts/build_release.py`. Do not invoke individual generators ad-hoc unless you are iterating on the generator itself — the orchestrator runs them in dependency order and writes manifests, search index, telemetry index, MIB metadata, native capabilities, and Postman/Bruno exports atomically.
+
 ```powershell
-# 1. Run generators (YANG trees → OpenAPI specs)
-cd generators
-python generate_oper_openapi_v2.py
-python generate_cfg_openapi_v2.py
-python generate_native_openapi_v2.py
-python generate_openconfig_openapi_v2.py
-python generate_ietf_openapi_v2.py
-python generate_mib_openapi_v2.py
-python generate_rpc_openapi_v2.py
-python generate_events_openapi.py
-python generate_other_openapi_v2.py
-cd ..
+# Build a single release (all model categories + trees + manifests + exports)
+python scripts/build_release.py --version 26.1.1
 
-# 2. Post-process (examples, descriptions, links)
-python scripts/enrich_v2_specs.py
-python scripts/add_yang_github_links.py
-python scripts/add_external_docs.py
-
-# 3. Build search index
-python scripts/generate_search_index.py
-
-# 4. Build YANG tree visualizations
-python scripts/generate_pyang_trees.py
-
-# 5. Stage deploy directory (optional — CI does this on push)
-python scripts/prepare_github_pages.py
+# Build all registered releases (matrix)
+python scripts/build_all_releases.py
 ```
+
+To add a new IOS-XE release, follow the runbook in [VERSIONING.md §8](VERSIONING.md#8-adding-a-new-release--runbook). Do not hand-edit per-release artifacts.
+
+If you must invoke a single generator directly (debugging only), pass `--version <ver>` so it writes into `releases/<ver>/`:
+
+```powershell
+cd generators
+python generate_oper_openapi_v2.py --version 26.1.1
+python generate_native_openapi_v2.py --version 26.1.1
+# etc.
+```
+
+Post-processing scripts (`scripts/enrich_v2_specs.py`, `scripts/add_yang_github_links.py`, `scripts/annotate_mdt_xpaths.py`, `scripts/enrich_mib_metadata.py`, `scripts/build_native_capabilities.py`, `scripts/generate_search_index.py`, `scripts/generate_all_pyang_trees.py`, `scripts/generate_postman_collection.py`, `scripts/generate_bruno_collection.py`) all take `--version` and are run by `build_release.py`. Run them individually only when iterating on that step.
 
 ### Validate examples against a live device
 

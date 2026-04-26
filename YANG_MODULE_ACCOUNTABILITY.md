@@ -1,9 +1,9 @@
 # YANG Module Accountability Report
 
-**Date:** April 03, 2026
+**Date:** April 25, 2026
 **IOS-XE Version:** 17.18.1
-**Total YANG Modules:** 1103
-**Modules with OpenAPI Specs:** 680 (61.7%)
+**Total YANG Modules:** 1125
+**Modules with OpenAPI Specs:** 702 (62.4%)
 **Modules with YANG Trees:** 765
 **Modules in Multiple Categories:** 99
 
@@ -32,7 +32,7 @@ This report provides **100% accountability** for every YANG module in the
 | **ietf** | 33 | 23 | 70% |  |
 | **mib** | 149 | 149 | 100% |  |
 | **events** | 41 | 41 | 100% |  |
-| **native** | 107 | 106 | 99% |  |
+| **native** | 129 | 128 | 99% |  |
 | **other** | 30 | 10 | 33% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
@@ -658,11 +658,15 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-pw | Events, Other | [Events](swagger-events-model/index-v2.html#spec=cisco-pw) [Other](swagger-other-model/index-v2.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Events, Other | [RPC](swagger-rpc-model/index-v2.html#spec=cisco-smart-license) [Events](swagger-events-model/index-v2.html#spec=cisco-smart-license) [Other](swagger-other-model/index-v2.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
 
-### NATIVE (107 modules)
+### NATIVE (129 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
 | Cisco-IOS-XE-native | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-native.html) |
+| native-00-core | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-core) | - |
+| native-00-day0 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-day0) | - |
+| native-00-interface-basics | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-interface-basics) | - |
+| native-00-routing-basics | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-routing-basics) | - |
 | native-00-top-level-containers | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-top-level-containers) | [🌳](yang-trees/native-00-top-level-containers.html) |
 | native-00-top-level-leafs | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-00-top-level-leafs) | [🌳](yang-trees/native-00-top-level-leafs.html) |
 | native-aaa | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-aaa) | [🌳](yang-trees/native-aaa.html) |
@@ -672,6 +676,7 @@ This report provides **100% accountability** for every YANG module in the
 | native-archive | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-archive) | - |
 | native-banner | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-banner) | - |
 | native-cisp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cisp) | - |
+| native-cli | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cli) | - |
 | native-clns | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-clns) | - |
 | native-control-plane | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-control-plane) | - |
 | native-control-plane-host | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-control-plane-host) | - |
@@ -679,6 +684,8 @@ This report provides **100% accountability** for every YANG module in the
 | native-cts | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cts) | - |
 | native-cwmp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-cwmp) | - |
 | native-default | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-default) | - |
+| native-dhcp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-dhcp) | - |
+| native-dns | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-dns) | - |
 | native-endpoint-tracker | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-endpoint-tracker) | - |
 | native-epm | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-epm) | - |
 | native-event | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-event) | - |
@@ -688,6 +695,7 @@ This report provides **100% accountability** for every YANG module in the
 | native-frame-relay | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-frame-relay) | - |
 | native-ha | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ha) | - |
 | native-industrial-iot | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-industrial-iot) | [🌳](yang-trees/native-industrial-iot.html) |
+| native-interfaces | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-interfaces) | - |
 | native-intf-ethernet | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-ethernet) | [🌳](yang-trees/native-intf-ethernet.html) |
 | native-intf-ip-addressing | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-ip-addressing) | - |
 | native-intf-physical | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-intf-physical) | - |
@@ -709,6 +717,7 @@ This report provides **100% accountability** for every YANG module in the
 | native-ipv6 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ipv6) | - |
 | native-l2-discovery | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-l2-discovery) | [🌳](yang-trees/native-l2-discovery.html) |
 | native-ldap | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ldap) | - |
+| native-license | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-license) | - |
 | native-line | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line) | [🌳](yang-trees/native-line.html) |
 | native-line-async-line | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-async-line) | - |
 | native-line-async-line-range | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-async-line-range) | - |
@@ -719,15 +728,19 @@ This report provides **100% accountability** for every YANG module in the
 | native-line-line-list | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-line-list) | - |
 | native-line-vty | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-line-vty) | - |
 | native-location | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-location) | - |
+| native-logging | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-logging) | - |
 | native-macro | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-macro) | - |
 | native-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-management) | - |
 | native-md-list | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-md-list) | - |
 | native-metadata | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-metadata) | - |
 | native-misc-ext | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-misc-ext) | [🌳](yang-trees/native-misc-ext.html) |
+| native-monitor | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-monitor) | - |
 | native-monitoring | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-monitoring) | - |
+| native-mpls | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-mpls) | - |
 | native-mpls-vpn | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-mpls-vpn) | - |
 | native-multilink | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-multilink) | - |
 | native-network-clock | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-network-clock) | - |
+| native-ntp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ntp) | - |
 | native-other | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-other) | [🌳](yang-trees/native-other.html) |
 | native-parser | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-parser) | - |
 | native-pfr | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-pfr) | - |
@@ -739,10 +752,12 @@ This report provides **100% accountability** for every YANG module in the
 | native-ppp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-ppp) | - |
 | native-profile | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-profile) | - |
 | native-protocols | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-protocols) | [🌳](yang-trees/native-protocols.html) |
+| native-qos | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-qos) | - |
 | native-qos-policy | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-qos-policy) | [🌳](yang-trees/native-qos-policy.html) |
 | native-redun-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-redun-management) | - |
 | native-remote-management | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-remote-management) | - |
 | native-router | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-router) | [🌳](yang-trees/native-router.html) |
+| native-routing | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-routing) | - |
 | native-routing-multicast | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-routing-multicast) | [🌳](yang-trees/native-routing-multicast.html) |
 | native-routing-protocols | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-routing-protocols) | - |
 | native-scada-gw | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-scada-gw) | - |
@@ -752,6 +767,10 @@ This report provides **100% accountability** for every YANG module in the
 | native-service-chain | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-service-chain) | - |
 | native-service-insertion | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-service-insertion) | - |
 | native-services | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-services) | - |
+| native-services-1 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-services-1) | - |
+| native-services-2 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-services-2) | - |
+| native-services-3 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-services-3) | - |
+| native-snmp | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-snmp) | - |
 | native-subscriber-config | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-subscriber-config) | - |
 | native-switching | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-switching) | - |
 | native-switching-l2 | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-switching-l2) | [🌳](yang-trees/native-switching-l2.html) |
@@ -764,8 +783,11 @@ This report provides **100% accountability** for every YANG module in the
 | native-uncategorized | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-uncategorized) | - |
 | native-virtual-service | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-virtual-service) | - |
 | native-virtual-template | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-virtual-template) | - |
+| native-voice | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-voice) | - |
+| native-vpn | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-vpn) | - |
 | native-vrf | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-vrf) | [🌳](yang-trees/native-vrf.html) |
 | native-wan-legacy | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-wan-legacy) | [🌳](yang-trees/native-wan-legacy.html) |
+| native-wireless | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-wireless) | - |
 | native-wsma | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-wsma) | - |
 | native-zone | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone) | - |
 | native-zone-pair | Native Config | [Native Config](swagger-native-config-model/index-v2.html#spec=native-zone-pair) | - |
@@ -1385,4 +1407,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-04-03T15:38:35.614156*
+*Report generated: 2026-04-25T17:38:10.447001*

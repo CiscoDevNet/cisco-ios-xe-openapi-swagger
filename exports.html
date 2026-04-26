@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Postman / Bruno Exports — Cisco IOS-XE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root { --bg:#fafafa; --fg:#222; --card:#fff; --border:#e0e0e0; --accent:#6A1B9A;
+          --muted:#888; --ok:#2e7d32; --warn:#f57c00; }
+  body.dark { --bg:#181a1f; --fg:#e8e8e8; --card:#23262d; --border:#3a3d44; --accent:#ba68c8; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--fg); }
+  header { background:linear-gradient(135deg,#6A1B9A 0%,#8E24AA 100%); color:#fff;
+           padding:24px 20px; text-align:center; }
+  header h1 { margin:0 0 6px; font-size:1.6rem; }
+  header p  { margin:0; opacity:.85; font-size:.9rem; }
+  .nav { padding:10px 20px; background:var(--card); border-bottom:1px solid var(--border);
+         text-align:center; }
+  .nav a { color:var(--accent); text-decoration:none; margin:0 10px; font-weight:500; }
+  main { max-width:1300px; margin:20px auto; padding:0 20px; }
+  .release-block { background:var(--card); border:1px solid var(--border); border-radius:8px;
+                   padding:16px; margin-bottom:20px; }
+  .release-block h2 { margin:0 0 4px; font-size:1.2rem; color:var(--accent); }
+  .release-block .gen { font-size:.78rem; color:var(--muted); margin-bottom:12px; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+  th { background:rgba(106,27,154,.08); }
+  .size { font-family:"SF Mono",Consolas,monospace; }
+  .size.warn { color:var(--warn); }
+  .size.ok   { color:var(--ok); }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.7rem;
+           background:var(--border); color:var(--fg); margin-right:4px; }
+  .empty { padding:30px; text-align:center; color:var(--muted); }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .help { background:rgba(106,27,154,.06); border-left:3px solid var(--accent);
+          padding:10px 14px; border-radius:4px; margin-bottom:18px; font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📦 Postman & Bruno Exports</h1>
+  <p>Per-(release, model-category) collections — split to stay under 50 MB</p>
+</header>
+<div class="nav">
+  <a href="index.html">← Hub</a>
+  <a href="yang-accountability.html">YANG Report</a>
+  <a href="yang-accountability-compare.html">Compare Versions</a>
+  <a href="telemetry.html">MDT Telemetry</a>
+</div>
+<main>
+  <div class="help">
+    Each release ships split collections — one per model category — to stay
+    importable in Postman/Bruno (they slow down past ~50 MB). Import the
+    matching environment file (<code>IOS-XE-&lt;ver&gt;.postman_environment.json</code>)
+    to populate <code>{{host}}</code>, <code>{{port}}</code>, and credentials.
+    Bruno collections are folders containing <code>.bru</code> files; clone the
+    full repository to use them, or download via the GitHub UI.
+  </div>
+  <div id="releases"></div>
+  <div id="empty" class="empty" style="display:none;">
+    No exports manifests found. Run <code>python scripts/build_release.py --version &lt;v&gt;</code>
+    to populate <code>releases/&lt;v&gt;/exports/</code>.
+  </div>
+</main>
+<script>
+(function () {
+  fetch('releases/index.json', { cache:'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (data) {
+      var releases = (data && data.releases) || [];
+      var active = releases.filter(function (r) { return r.status !== 'planned'; });
+      if (!active.length) {
+        document.getElementById('empty').style.display = 'block';
+        return;
+      }
+      Promise.all(active.map(loadRelease)).then(function () {
+        if (!document.querySelector('#releases > .release-block')) {
+          document.getElementById('empty').style.display = 'block';
+        }
+      });
+    });
+
+  function loadRelease(rel) {
+    var ver = rel.ver;
+    var prefix = 'releases/' + encodeURIComponent(ver);
+    return Promise.all([
+      fetch(prefix + '/exports/postman-manifest.json', { cache:'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      fetch(prefix + '/exports/bruno-manifest.json', { cache:'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+    ]).then(function (results) {
+      var pm = results[0], br = results[1];
+      if (!pm && !br) return;
+      var block = document.createElement('div');
+      block.className = 'release-block';
+      var when = (pm && pm.generated) || (br && br.generated) || '';
+      block.innerHTML =
+        '<h2>IOS-XE ' + escapeHtml(ver) + '</h2>'
+        + '<div class="gen">Generated: ' + escapeHtml(when || '—') + '</div>';
+      block.appendChild(buildTable('Postman', pm, prefix));
+      block.appendChild(buildTable('Bruno', br, prefix));
+      document.getElementById('releases').appendChild(block);
+    });
+  }
+
+  function buildTable(label, manifest, prefix) {
+    var wrap = document.createElement('div');
+    wrap.style.marginTop = '14px';
+    var h3 = document.createElement('h3');
+    h3.style.fontSize = '.95rem';
+    h3.style.margin = '8px 0';
+    h3.textContent = label + (manifest ? '' : ' — not built');
+    wrap.appendChild(h3);
+    if (!manifest) return wrap;
+
+    var t = document.createElement('table');
+    t.innerHTML = '<thead><tr><th>Collection</th><th>Requests</th>'
+                + '<th>Size</th><th>Path</th></tr></thead><tbody></tbody>';
+    var tbody = t.querySelector('tbody');
+    var max = manifest.max_bytes || (50 * 1024 * 1024);
+    (manifest.collections || []).forEach(function (c) {
+      var tr = document.createElement('tr');
+      var pct = (c.size_bytes || 0) / max;
+      var sizeClass = pct > 0.9 ? 'warn' : 'ok';
+      tr.innerHTML =
+        '<td>' + escapeHtml(c.name || '') + '</td>'
+        + '<td>' + (c.request_count || 0) + '</td>'
+        + '<td class="size ' + sizeClass + '">' + formatBytes(c.size_bytes || 0) + '</td>'
+        + '<td><a href="' + escapeHtml(c.path) + '" download>'
+        + escapeHtml(c.path) + '</a></td>';
+      tbody.appendChild(tr);
+    });
+    if (manifest.environment) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td colspan="3"><span class="badge">environment</span></td>'
+        + '<td><a href="' + escapeHtml(manifest.environment) + '" download>'
+        + escapeHtml(manifest.environment) + '</a></td>';
+      tbody.appendChild(tr);
+    }
+    wrap.appendChild(t);
+    return wrap;
+  }
+
+  function formatBytes(n) {
+    if (!n) return '0 B';
+    var u = ['B', 'KB', 'MB', 'GB'];
+    var i = 0;
+    while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+    return n.toFixed(i ? 1 : 0) + ' ' + u[i];
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+})();
+</script>
+</body>
+</html>

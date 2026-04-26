@@ -3,24 +3,16 @@
   "info": {
     "title": "DRAFT-MSDP-MIB MIB API",
     "version": "1.0.0",
-    "description": "An experimental MIB module for MSDP Management.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n\n\n**📊 YANG Tree:** [View DRAFT-MSDP-MIB structure](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/DRAFT-MSDP-MIB.html)",
+    "description": "An experimental MIB module for MSDP Management.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n\n\n**YANG Model:** [DRAFT-MSDP-MIB MIB API.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/DRAFT-MSDP-MIB MIB API.yang)",
     "contact": {
       "name": "Cisco DevNet",
       "url": "https://developer.cisco.com"
-    },
-    "x-yang-module": "DRAFT-MSDP-MIB",
-    "x-model-type": "mib"
+    }
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
-      "description": "RESTCONF server",
-      "variables": {
-        "device": {
-          "default": "10.1.1.1",
-          "description": "Device hostname or IP address"
-        }
-      }
+      "url": "https://10.85.134.65/restconf",
+      "description": "IOS-XE Device (C9300)"
     }
   ],
   "paths": {
@@ -73,72 +65,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdp",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdp",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpRequestsTable": {
       "get": {
@@ -213,72 +142,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpRequestsTable",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpRequestsTable",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpRequestsTable/msdpRequestsEntry": {
       "get": {
@@ -333,72 +199,71 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
+          }
+        }
+      }
+    },
+    "/data/DRAFT-MSDP-MIB:msdpRequestsTable/msdpRequestsEntry={msdpRequestsGroupAddress msdpRequestsGroupMask}": {
+      "get": {
+        "summary": "Get msdpRequestsEntry entry",
+        "description": "Retrieve specific msdpRequestsEntry entry by key from MIB",
+        "tags": [
+          "DRAFT-MSDP-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "msdpRequestsGroupAddress msdpRequestsGroupMask",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
+                  "type": "object",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "DRAFT-MSDP-MIB:msdpRequestsEntry": {
+                    "msdpRequestsGroupAddress": "192.168.1.1",
+                    "msdpRequestsGroupMask": "example-string",
+                    "msdpRequestsPeer": "example-string",
+                    "msdpRequestsStatus": "up(1)"
+                  }
                 }
               }
             }
           }
-        },
-        "operationId": "get-msdpRequestsEntry",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpRequestsTable/msdpRequestsEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpPeerTable": {
       "get": {
@@ -717,72 +582,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpPeerTable",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpPeerTable",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpPeerTable/msdpPeerEntry": {
       "get": {
@@ -1025,72 +827,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpPeerEntry",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpPeerTable/msdpPeerEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpPeerTable/msdpPeerEntry={msdpPeerRemoteAddress}": {
       "get": {
@@ -1108,54 +847,6 @@
               "type": "string"
             },
             "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
           }
         ],
         "responses": {
@@ -1386,25 +1077,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpPeerEntry-2"
-      },
-      "x-yang-path": "/msdpPeerTable/msdpPeerEntry={msdpPeerRemoteAddress}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpPeerRemoteAddress"
-      ]
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpSACacheTable": {
       "get": {
@@ -1529,72 +1204,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpSACacheTable",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpSACacheTable",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpSACacheTable/msdpSACacheEntry": {
       "get": {
@@ -1687,72 +1299,109 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
+          }
+        }
+      }
+    },
+    "/data/DRAFT-MSDP-MIB:msdpSACacheTable/msdpSACacheEntry={msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP}": {
+      "get": {
+        "summary": "Get msdpSACacheEntry entry",
+        "description": "Retrieve specific msdpSACacheEntry entry by key from MIB",
+        "tags": [
+          "DRAFT-MSDP-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
+                  "type": "object",
+                  "properties": {
+                    "msdpSACacheGroupAddr": {
+                      "type": "string",
+                      "description": "The group address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheSourceAddr": {
+                      "type": "string",
+                      "description": "The source address of the SA Cache entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheOriginRP": {
+                      "type": "string",
+                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACachePeerLearnedFrom": {
+                      "type": "string",
+                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheRPFPeer": {
+                      "type": "string",
+                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpSACacheInSAs": {
+                      "type": "integer",
+                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheInDataPackets": {
+                      "type": "integer",
+                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "msdpSACacheUpTime": {
+                      "type": "string",
+                      "description": "The time since this entry was placed in the SA\n            cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheExpiryTime": {
+                      "type": "string",
+                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
+                      "x-yang-type": "yang:timeticks"
+                    },
+                    "msdpSACacheStatus": {
+                      "type": "string",
+                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "DRAFT-MSDP-MIB:msdpSACacheEntry": {
+                    "msdpSACacheGroupAddr": "192.168.1.1",
+                    "msdpSACacheSourceAddr": "192.168.1.1",
+                    "msdpSACacheOriginRP": "example-string",
+                    "msdpSACachePeerLearnedFrom": "example-string",
+                    "msdpSACacheRPFPeer": "example-string",
+                    "msdpSACacheInSAs": 0,
+                    "msdpSACacheInDataPackets": 1234567890,
+                    "msdpSACacheUpTime": "example-string",
+                    "msdpSACacheExpiryTime": "example-string",
+                    "msdpSACacheStatus": "up(1)"
+                  }
                 }
               }
             }
           }
-        },
-        "operationId": "get-msdpSACacheEntry",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpSACacheTable/msdpSACacheEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpRequestsEntry": {
       "get": {
@@ -1807,72 +1456,71 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
+          }
+        }
+      }
+    },
+    "/data/DRAFT-MSDP-MIB:msdpRequestsEntry={msdpRequestsGroupAddress msdpRequestsGroupMask}": {
+      "get": {
+        "summary": "Get msdpRequestsEntry entry",
+        "description": "Retrieve specific msdpRequestsEntry entry by key from MIB",
+        "tags": [
+          "DRAFT-MSDP-MIB"
+        ],
+        "parameters": [
+          {
+            "name": "msdpRequestsGroupAddress msdpRequestsGroupMask",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
+                  "type": "object",
+                  "properties": {
+                    "msdpRequestsGroupAddress": {
+                      "type": "string",
+                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsGroupMask": {
+                      "type": "string",
+                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsPeer": {
+                      "type": "string",
+                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
+                      "format": "inet:ipv4-address"
+                    },
+                    "msdpRequestsStatus": {
+                      "type": "string",
+                      "description": "The status of this row, by which new rows may be\n            added to the table.",
+                      "x-yang-type": "snmpv2-tc:RowStatus"
+                    }
+                  }
+                },
+                "example": {
+                  "DRAFT-MSDP-MIB:msdpRequestsEntry": {
+                    "msdpRequestsGroupAddress": "192.168.1.1",
+                    "msdpRequestsGroupMask": "example-string",
+                    "msdpRequestsPeer": "example-string",
+                    "msdpRequestsStatus": "up(1)"
+                  }
                 }
               }
             }
           }
-        },
-        "operationId": "get-msdpRequestsEntry-3",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpRequestsEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpPeerEntry": {
       "get": {
@@ -2115,72 +1763,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpPeerEntry-3",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpPeerEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpPeerEntry={msdpPeerRemoteAddress}": {
       "get": {
@@ -2198,54 +1783,6 @@
               "type": "string"
             },
             "example": "1"
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
           }
         ],
         "responses": {
@@ -2476,25 +2013,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpPeerEntry-4"
-      },
-      "x-yang-path": "/msdpPeerEntry={msdpPeerRemoteAddress}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpPeerRemoteAddress"
-      ]
+        }
+      }
     },
     "/data/DRAFT-MSDP-MIB:msdpSACacheEntry": {
       "get": {
@@ -2587,207 +2108,11 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpSACacheEntry-3",
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/msdpSACacheEntry",
-      "x-restconf-kind": "container"
+        }
+      }
     },
-    "/data/DRAFT-MSDP-MIB:msdpRequestsTable/msdpRequestsEntry={msdpRequestsGroupAddress},{msdpRequestsGroupMask}": {
-      "get": {
-        "summary": "Get msdpRequestsEntry entry",
-        "description": "Retrieve specific msdpRequestsEntry entry by key from MIB",
-        "tags": [
-          "DRAFT-MSDP-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "msdpRequestsGroupAddress",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "msdpRequestsGroupMask",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "msdpRequestsGroupAddress": {
-                      "type": "string",
-                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsGroupMask": {
-                      "type": "string",
-                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsPeer": {
-                      "type": "string",
-                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsStatus": {
-                      "type": "string",
-                      "description": "The status of this row, by which new rows may be\n            added to the table.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "DRAFT-MSDP-MIB:msdpRequestsEntry": {
-                    "msdpRequestsGroupAddress": "192.168.1.1",
-                    "msdpRequestsGroupMask": "example-string",
-                    "msdpRequestsPeer": "example-string",
-                    "msdpRequestsStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-msdpRequestsEntry-2"
-      },
-      "x-yang-path": "/msdpRequestsTable/msdpRequestsEntry={msdpRequestsGroupAddress msdpRequestsGroupMask}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpRequestsGroupAddress msdpRequestsGroupMask"
-      ]
-    },
-    "/data/DRAFT-MSDP-MIB:msdpSACacheTable/msdpSACacheEntry={msdpSACacheGroupAddr},{msdpSACacheSourceAddr},{msdpSACacheOriginRP}": {
+    "/data/DRAFT-MSDP-MIB:msdpSACacheEntry={msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP}": {
       "get": {
         "summary": "Get msdpSACacheEntry entry",
         "description": "Retrieve specific msdpSACacheEntry entry by key from MIB",
@@ -2796,76 +2121,13 @@
         ],
         "parameters": [
           {
-            "name": "msdpSACacheGroupAddr",
+            "name": "msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "msdpSACacheSourceAddr",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "msdpSACacheOriginRP",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
+            },
+            "example": "1"
           }
         ],
         "responses": {
@@ -2946,337 +2208,9 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
           }
-        },
-        "operationId": "get-msdpSACacheEntry-2"
-      },
-      "x-yang-path": "/msdpSACacheTable/msdpSACacheEntry={msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP"
-      ]
-    },
-    "/data/DRAFT-MSDP-MIB:msdpRequestsEntry={msdpRequestsGroupAddress},{msdpRequestsGroupMask}": {
-      "get": {
-        "summary": "Get msdpRequestsEntry entry",
-        "description": "Retrieve specific msdpRequestsEntry entry by key from MIB",
-        "tags": [
-          "DRAFT-MSDP-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "msdpRequestsGroupAddress",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "msdpRequestsGroupMask",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "msdpRequestsGroupAddress": {
-                      "type": "string",
-                      "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsGroupMask": {
-                      "type": "string",
-                      "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsPeer": {
-                      "type": "string",
-                      "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpRequestsStatus": {
-                      "type": "string",
-                      "description": "The status of this row, by which new rows may be\n            added to the table.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "DRAFT-MSDP-MIB:msdpRequestsEntry": {
-                    "msdpRequestsGroupAddress": "192.168.1.1",
-                    "msdpRequestsGroupMask": "example-string",
-                    "msdpRequestsPeer": "example-string",
-                    "msdpRequestsStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-msdpRequestsEntry-4"
-      },
-      "x-yang-path": "/msdpRequestsEntry={msdpRequestsGroupAddress msdpRequestsGroupMask}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpRequestsGroupAddress msdpRequestsGroupMask"
-      ]
-    },
-    "/data/DRAFT-MSDP-MIB:msdpSACacheEntry={msdpSACacheGroupAddr},{msdpSACacheSourceAddr},{msdpSACacheOriginRP}": {
-      "get": {
-        "summary": "Get msdpSACacheEntry entry",
-        "description": "Retrieve specific msdpSACacheEntry entry by key from MIB",
-        "tags": [
-          "DRAFT-MSDP-MIB"
-        ],
-        "parameters": [
-          {
-            "name": "msdpSACacheGroupAddr",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "msdpSACacheSourceAddr",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "msdpSACacheOriginRP",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "depth",
-            "in": "query",
-            "required": false,
-            "description": "Limit the depth of returned sub-tree data (RFC 8040 Section 4.8.2). Use 'unbounded' for full depth.",
-            "schema": {
-              "type": "string",
-              "default": "unbounded"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "required": false,
-            "description": "Select specific fields to return (RFC 8040 Section 4.8.3). Example: fields=name;status",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "content",
-            "in": "query",
-            "required": false,
-            "description": "Filter by config state: 'config' (config true only), 'nonconfig' (config false only), or 'all'.",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "config",
-                "nonconfig",
-                "all"
-              ],
-              "default": "all"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "msdpSACacheGroupAddr": {
-                      "type": "string",
-                      "description": "The group address of the SA Cache entry.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpSACacheSourceAddr": {
-                      "type": "string",
-                      "description": "The source address of the SA Cache entry.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpSACacheOriginRP": {
-                      "type": "string",
-                      "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpSACachePeerLearnedFrom": {
-                      "type": "string",
-                      "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpSACacheRPFPeer": {
-                      "type": "string",
-                      "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
-                      "format": "inet:ipv4-address"
-                    },
-                    "msdpSACacheInSAs": {
-                      "type": "integer",
-                      "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "msdpSACacheInDataPackets": {
-                      "type": "integer",
-                      "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
-                      "minimum": 0,
-                      "maximum": 4294967295
-                    },
-                    "msdpSACacheUpTime": {
-                      "type": "string",
-                      "description": "The time since this entry was placed in the SA\n            cache.",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "msdpSACacheExpiryTime": {
-                      "type": "string",
-                      "description": "The time remaining before this entry will expire from\n            the SA cache.",
-                      "x-yang-type": "yang:timeticks"
-                    },
-                    "msdpSACacheStatus": {
-                      "type": "string",
-                      "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
-                    }
-                  }
-                },
-                "example": {
-                  "DRAFT-MSDP-MIB:msdpSACacheEntry": {
-                    "msdpSACacheGroupAddr": "192.168.1.1",
-                    "msdpSACacheSourceAddr": "192.168.1.1",
-                    "msdpSACacheOriginRP": "example-string",
-                    "msdpSACachePeerLearnedFrom": "example-string",
-                    "msdpSACacheRPFPeer": "example-string",
-                    "msdpSACacheInSAs": 0,
-                    "msdpSACacheInDataPackets": 1234567890,
-                    "msdpSACacheUpTime": "example-string",
-                    "msdpSACacheExpiryTime": "example-string",
-                    "msdpSACacheStatus": "up(1)"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden — insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "operationId": "get-msdpSACacheEntry-4"
-      },
-      "x-yang-path": "/msdpSACacheEntry={msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP}",
-      "x-restconf-kind": "list-instance",
-      "x-list-keys": [
-        "msdpSACacheGroupAddr msdpSACacheSourceAddr msdpSACacheOriginRP"
-      ]
+        }
+      }
     }
   },
   "components": {
@@ -3294,30 +2228,25 @@
                 "msdpRequestsGroupAddress": {
                   "type": "string",
                   "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpRequestsGroupMask": {
                   "type": "string",
                   "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpRequestsPeer": {
                   "type": "string",
                   "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpRequestsStatus": {
                   "type": "string",
                   "description": "The status of this row, by which new rows may be\n            added to the table.",
-                  "x-yang-type": "snmpv2-tc:RowStatus",
-                  "readOnly": true
+                  "x-yang-type": "snmpv2-tc:RowStatus"
                 }
               }
-            },
-            "readOnly": true
+            }
           },
           "msdpPeerEntry": {
             "type": "array",
@@ -3328,218 +2257,185 @@
                 "msdpPeerRemoteAddress": {
                   "type": "string",
                   "description": "The address of the remote MSDP peer.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpPeerState": {
                   "type": "string",
-                  "description": "The state of the MSDP TCP connection with this peer.",
-                  "readOnly": true
+                  "description": "The state of the MSDP TCP connection with this peer."
                 },
                 "msdpPeerRPFFailures": {
                   "type": "integer",
                   "description": "The number of RPF failures on SA messages received\n            from this peer.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInSAs": {
                   "type": "integer",
                   "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutSAs": {
                   "type": "integer",
                   "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInSARequests": {
                   "type": "integer",
                   "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutSARequests": {
                   "type": "integer",
                   "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInSAResponses": {
                   "type": "integer",
                   "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutSAResponses": {
                   "type": "integer",
                   "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInControlMessages": {
                   "type": "integer",
                   "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutControlMessages": {
                   "type": "integer",
                   "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInDataPackets": {
                   "type": "integer",
                   "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutDataPackets": {
                   "type": "integer",
                   "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerFsmEstablishedTransitions": {
                   "type": "integer",
                   "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerFsmEstablishedTime": {
                   "type": "integer",
                   "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInMessageElapsedTime": {
                   "type": "integer",
                   "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerLocalAddress": {
                   "type": "string",
                   "description": "The local IP address of this entry's MSDP\n            connection.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpPeerSAAdvPeriod": {
                   "type": "integer",
                   "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerConnectRetryInterval": {
                   "type": "integer",
                   "description": "Time interval in seconds for the ConnectRetry timer.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerHoldTimeConfigured": {
                   "type": "integer",
                   "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerKeepAliveConfigured": {
                   "type": "integer",
                   "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerDataTtl": {
                   "type": "integer",
                   "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerProcessRequestsFrom": {
                   "type": "boolean",
-                  "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0.",
-                  "readOnly": true
+                  "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
                 },
                 "msdpPeerStatus": {
                   "type": "string",
                   "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
-                  "x-yang-type": "snmpv2-tc:RowStatus",
-                  "readOnly": true
+                  "x-yang-type": "snmpv2-tc:RowStatus"
                 },
                 "msdpPeerRemotePort": {
                   "type": "integer",
                   "description": "The remote port for the TCP connection between the\n            MSDP peers.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerLocalPort": {
                   "type": "integer",
                   "description": "The local port for the TCP connection between the\n            MSDP peers.",
                   "minimum": -2147483648,
-                  "maximum": 2147483647,
-                  "readOnly": true
+                  "maximum": 2147483647
                 },
                 "msdpPeerEncapsulationState": {
                   "type": "string",
-                  "description": "The status of the encapsulation negotiation state\n            machine.",
-                  "readOnly": true
+                  "description": "The status of the encapsulation negotiation state\n            machine."
                 },
                 "msdpPeerEncapsulationType": {
                   "type": "string",
-                  "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer.",
-                  "readOnly": true
+                  "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
                 },
                 "msdpPeerConnectionAttempts": {
                   "type": "integer",
                   "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerInNotifications": {
                   "type": "integer",
                   "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerOutNotifications": {
                   "type": "integer",
                   "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpPeerLastError": {
                   "type": "string",
                   "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
-                  "format": "binary",
-                  "readOnly": true
+                  "format": "binary"
                 }
               }
-            },
-            "readOnly": true
+            }
           },
           "msdpSACacheEntry": {
             "type": "array",
@@ -3550,68 +2446,57 @@
                 "msdpSACacheGroupAddr": {
                   "type": "string",
                   "description": "The group address of the SA Cache entry.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpSACacheSourceAddr": {
                   "type": "string",
                   "description": "The source address of the SA Cache entry.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpSACacheOriginRP": {
                   "type": "string",
                   "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpSACachePeerLearnedFrom": {
                   "type": "string",
                   "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpSACacheRPFPeer": {
                   "type": "string",
                   "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
-                  "format": "inet:ipv4-address",
-                  "readOnly": true
+                  "format": "inet:ipv4-address"
                 },
                 "msdpSACacheInSAs": {
                   "type": "integer",
                   "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpSACacheInDataPackets": {
                   "type": "integer",
                   "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
                   "minimum": 0,
-                  "maximum": 4294967295,
-                  "readOnly": true
+                  "maximum": 4294967295
                 },
                 "msdpSACacheUpTime": {
                   "type": "string",
                   "description": "The time since this entry was placed in the SA\n            cache.",
-                  "x-yang-type": "yang:timeticks",
-                  "readOnly": true
+                  "x-yang-type": "yang:timeticks"
                 },
                 "msdpSACacheExpiryTime": {
                   "type": "string",
                   "description": "The time remaining before this entry will expire from\n            the SA cache.",
-                  "x-yang-type": "yang:timeticks",
-                  "readOnly": true
+                  "x-yang-type": "yang:timeticks"
                 },
                 "msdpSACacheStatus": {
                   "type": "string",
                   "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
-                  "x-yang-type": "snmpv2-tc:RowStatus",
-                  "readOnly": true
+                  "x-yang-type": "snmpv2-tc:RowStatus"
                 }
               }
-            },
-            "readOnly": true
+            }
           },
           "msdp": {
             "type": "object",
@@ -3619,31 +2504,26 @@
             "properties": {
               "msdpEnabled": {
                 "type": "boolean",
-                "description": "The state of MSDP on this MSDP speaker - globally\n          enabled or disabled.",
-                "readOnly": true
+                "description": "The state of MSDP on this MSDP speaker - globally\n          enabled or disabled."
               },
               "msdpCacheLifetime": {
                 "type": "string",
                 "description": "The lifetime given to SA cache entries when created\n          or refreshed.  A value of 0 means no SA caching is\n          done by this MSDP speaker.",
-                "x-yang-type": "yang:timeticks",
-                "readOnly": true
+                "x-yang-type": "yang:timeticks"
               },
               "msdpNumSACacheEntries": {
                 "type": "integer",
                 "description": "The total number of entries in the SA Cache table.",
                 "minimum": 0,
-                "maximum": 4294967295,
-                "readOnly": true
+                "maximum": 4294967295
               },
               "msdpSAHoldDownPeriod": {
                 "type": "integer",
                 "description": "The number of seconds in the MSDP SA Hold-down\n          period",
                 "minimum": -2147483648,
-                "maximum": 2147483647,
-                "readOnly": true
+                "maximum": 2147483647
               }
-            },
-            "readOnly": true
+            }
           },
           "msdpRequestsTable": {
             "type": "object",
@@ -3658,33 +2538,27 @@
                     "msdpRequestsGroupAddress": {
                       "type": "string",
                       "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpRequestsGroupMask": {
                       "type": "string",
                       "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpRequestsPeer": {
                       "type": "string",
                       "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpRequestsStatus": {
                       "type": "string",
                       "description": "The status of this row, by which new rows may be\n            added to the table.",
-                      "x-yang-type": "snmpv2-tc:RowStatus",
-                      "readOnly": true
+                      "x-yang-type": "snmpv2-tc:RowStatus"
                     }
                   }
-                },
-                "readOnly": true
+                }
               }
-            },
-            "readOnly": true
+            }
           },
           "msdpPeerTable": {
             "type": "object",
@@ -3699,221 +2573,187 @@
                     "msdpPeerRemoteAddress": {
                       "type": "string",
                       "description": "The address of the remote MSDP peer.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpPeerState": {
                       "type": "string",
-                      "description": "The state of the MSDP TCP connection with this peer.",
-                      "readOnly": true
+                      "description": "The state of the MSDP TCP connection with this peer."
                     },
                     "msdpPeerRPFFailures": {
                       "type": "integer",
                       "description": "The number of RPF failures on SA messages received\n            from this peer.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInSAs": {
                       "type": "integer",
                       "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutSAs": {
                       "type": "integer",
                       "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInSARequests": {
                       "type": "integer",
                       "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutSARequests": {
                       "type": "integer",
                       "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInSAResponses": {
                       "type": "integer",
                       "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutSAResponses": {
                       "type": "integer",
                       "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInControlMessages": {
                       "type": "integer",
                       "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutControlMessages": {
                       "type": "integer",
                       "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInDataPackets": {
                       "type": "integer",
                       "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutDataPackets": {
                       "type": "integer",
                       "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerFsmEstablishedTransitions": {
                       "type": "integer",
                       "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerFsmEstablishedTime": {
                       "type": "integer",
                       "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInMessageElapsedTime": {
                       "type": "integer",
                       "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerLocalAddress": {
                       "type": "string",
                       "description": "The local IP address of this entry's MSDP\n            connection.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpPeerSAAdvPeriod": {
                       "type": "integer",
                       "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerConnectRetryInterval": {
                       "type": "integer",
                       "description": "Time interval in seconds for the ConnectRetry timer.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerHoldTimeConfigured": {
                       "type": "integer",
                       "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerKeepAliveConfigured": {
                       "type": "integer",
                       "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerDataTtl": {
                       "type": "integer",
                       "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerProcessRequestsFrom": {
                       "type": "boolean",
-                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0.",
-                      "readOnly": true
+                      "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
                     },
                     "msdpPeerStatus": {
                       "type": "string",
                       "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
-                      "x-yang-type": "snmpv2-tc:RowStatus",
-                      "readOnly": true
+                      "x-yang-type": "snmpv2-tc:RowStatus"
                     },
                     "msdpPeerRemotePort": {
                       "type": "integer",
                       "description": "The remote port for the TCP connection between the\n            MSDP peers.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerLocalPort": {
                       "type": "integer",
                       "description": "The local port for the TCP connection between the\n            MSDP peers.",
                       "minimum": -2147483648,
-                      "maximum": 2147483647,
-                      "readOnly": true
+                      "maximum": 2147483647
                     },
                     "msdpPeerEncapsulationState": {
                       "type": "string",
-                      "description": "The status of the encapsulation negotiation state\n            machine.",
-                      "readOnly": true
+                      "description": "The status of the encapsulation negotiation state\n            machine."
                     },
                     "msdpPeerEncapsulationType": {
                       "type": "string",
-                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer.",
-                      "readOnly": true
+                      "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
                     },
                     "msdpPeerConnectionAttempts": {
                       "type": "integer",
                       "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerInNotifications": {
                       "type": "integer",
                       "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerOutNotifications": {
                       "type": "integer",
                       "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpPeerLastError": {
                       "type": "string",
                       "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
-                      "format": "binary",
-                      "readOnly": true
+                      "format": "binary"
                     }
                   }
-                },
-                "readOnly": true
+                }
               }
-            },
-            "readOnly": true
+            }
           },
           "msdpSACacheTable": {
             "type": "object",
@@ -3928,71 +2768,59 @@
                     "msdpSACacheGroupAddr": {
                       "type": "string",
                       "description": "The group address of the SA Cache entry.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpSACacheSourceAddr": {
                       "type": "string",
                       "description": "The source address of the SA Cache entry.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpSACacheOriginRP": {
                       "type": "string",
                       "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpSACachePeerLearnedFrom": {
                       "type": "string",
                       "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpSACacheRPFPeer": {
                       "type": "string",
                       "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
-                      "format": "inet:ipv4-address",
-                      "readOnly": true
+                      "format": "inet:ipv4-address"
                     },
                     "msdpSACacheInSAs": {
                       "type": "integer",
                       "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpSACacheInDataPackets": {
                       "type": "integer",
                       "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
                       "minimum": 0,
-                      "maximum": 4294967295,
-                      "readOnly": true
+                      "maximum": 4294967295
                     },
                     "msdpSACacheUpTime": {
                       "type": "string",
                       "description": "The time since this entry was placed in the SA\n            cache.",
-                      "x-yang-type": "yang:timeticks",
-                      "readOnly": true
+                      "x-yang-type": "yang:timeticks"
                     },
                     "msdpSACacheExpiryTime": {
                       "type": "string",
                       "description": "The time remaining before this entry will expire from\n            the SA cache.",
-                      "x-yang-type": "yang:timeticks",
-                      "readOnly": true
+                      "x-yang-type": "yang:timeticks"
                     },
                     "msdpSACacheStatus": {
                       "type": "string",
                       "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
-                      "x-yang-type": "snmpv2-tc:RowStatus",
-                      "readOnly": true
+                      "x-yang-type": "snmpv2-tc:RowStatus"
                     }
                   }
-                },
-                "readOnly": true
+                }
               }
-            },
-            "readOnly": true
+            }
           }
         }
       },
@@ -4003,14 +2831,12 @@
           "msdpPeerRemoteAddress": {
             "type": "string",
             "description": "msdpPeerRemoteAddress",
-            "x-yang-type": "leafref",
-            "readOnly": true
+            "x-yang-type": "leafref"
           },
           "msdpPeerState": {
             "type": "string",
             "description": "msdpPeerState",
-            "x-yang-type": "leafref",
-            "readOnly": true
+            "x-yang-type": "leafref"
           }
         }
       },
@@ -4023,26 +2849,22 @@
             "msdpRequestsGroupAddress": {
               "type": "string",
               "description": "The group address that, when combined with the mask\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpRequestsGroupMask": {
               "type": "string",
               "description": "The mask that, when combined with the group address\n            in this entry, represents the group range for which\n            this peer will service MSDP SA Requests.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpRequestsPeer": {
               "type": "string",
               "description": "The peer to which MSDP SA Requests for groups\n            matching this entry's group range will be sent.  Must\n            match the INDEX of a row in the msdpPeerTable.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpRequestsStatus": {
               "type": "string",
               "description": "The status of this row, by which new rows may be\n            added to the table.",
-              "x-yang-type": "snmpv2-tc:RowStatus",
-              "readOnly": true
+              "x-yang-type": "snmpv2-tc:RowStatus"
             }
           }
         }
@@ -4056,214 +2878,182 @@
             "msdpPeerRemoteAddress": {
               "type": "string",
               "description": "The address of the remote MSDP peer.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpPeerState": {
               "type": "string",
-              "description": "The state of the MSDP TCP connection with this peer.",
-              "readOnly": true
+              "description": "The state of the MSDP TCP connection with this peer."
             },
             "msdpPeerRPFFailures": {
               "type": "integer",
               "description": "The number of RPF failures on SA messages received\n            from this peer.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInSAs": {
               "type": "integer",
               "description": "The number of MSDP SA messages received on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutSAs": {
               "type": "integer",
               "description": "The number of MSDP SA messages transmitted on this\n            connection.  This object should be initialized to zero\n            when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInSARequests": {
               "type": "integer",
               "description": "The number of MSDP SA-Request messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutSARequests": {
               "type": "integer",
               "description": "The number of MSDP SA-Request messages transmitted on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInSAResponses": {
               "type": "integer",
               "description": "The number of MSDP SA-Response messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutSAResponses": {
               "type": "integer",
               "description": "The number of MSDP SA Response messages transmitted\n            on this TCP connection.  This object should be\n            initialized to zero when the connection is\n            established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInControlMessages": {
               "type": "integer",
               "description": "The total number of MSDP messages received on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutControlMessages": {
               "type": "integer",
               "description": "The total number of MSDP messages transmitted on this\n            TCP connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInDataPackets": {
               "type": "integer",
               "description": "The total number of encapsulated data packets\n            received from this peer.  This object should be\n            initialized to zero when the connection is\n            established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutDataPackets": {
               "type": "integer",
               "description": "The total number of encapsulated data packets sent to\n            this peer.  This object should be initialized to zero\n            when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerFsmEstablishedTransitions": {
               "type": "integer",
               "description": "The total number of times the MSDP FSM transitioned\n            into the established state.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerFsmEstablishedTime": {
               "type": "integer",
               "description": "This timer indicates how long (in seconds) this peer\n            has been in the Established state or how long since\n            this peer was last in the Established state.  It is\n            set to zero when a new peer is configured or the MSDP\n            speaker is booted.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInMessageElapsedTime": {
               "type": "integer",
               "description": "Elapsed time in seconds since the last MSDP message\n            was received from the peer.  Each time\n            msdpPeerInControlMessages is incremented, the value of\n            this object is set to zero (0).",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerLocalAddress": {
               "type": "string",
               "description": "The local IP address of this entry's MSDP\n            connection.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpPeerSAAdvPeriod": {
               "type": "integer",
               "description": "Time interval in seconds for the\n            MinSAAdvertisementInterval MSDP timer.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerConnectRetryInterval": {
               "type": "integer",
               "description": "Time interval in seconds for the ConnectRetry timer.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerHoldTimeConfigured": {
               "type": "integer",
               "description": "Time interval in seconds for the Hold Timer\n            configured for this MSDP speaker with this peer.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerKeepAliveConfigured": {
               "type": "integer",
               "description": "Time interval in seconds for the KeepAlive timer\n            configured for this MSDP speaker with this peer.  A\n            reasonable maximum value for this timer would be\n            configured to be one third of that of\n            msdpPeerHoldTimeConfigured.  If the value of this\n            object is zero (0), no periodic KEEPALIVE messages are\n            sent to the peer after the MSDP connection has been\n            established.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerDataTtl": {
               "type": "integer",
               "description": "The minimum TTL a packet is required to have before\n            it may be forwarded using SA encapsulation to this\n            peer.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerProcessRequestsFrom": {
               "type": "boolean",
-              "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0.",
-              "readOnly": true
+              "description": "This object indicates whether or not to process MSDP\n            SA Request messages from this peer.  If True(1), MSDP\n            SA Request messages from this peer are processed and\n            replied to (if appropriate) with SA Response messages.\n            If False(2), MSDP SA Request messages from this peer\n            are silently ignored.  It defaults to False when\n            msdpCacheLifetime is 0 and True when msdpCacheLifetime\n            is non-0."
             },
             "msdpPeerStatus": {
               "type": "string",
               "description": "The RowStatus object by which peers can be added and\n            deleted.  A transition to 'active' will cause the MSDP\n            Start Event to be generated.  A transition out of the\n            'active' state will cause the MSDP Stop Event to be\n            generated.  Care should be used in providing write\n            access to this object without adequate\n            authentication.",
-              "x-yang-type": "snmpv2-tc:RowStatus",
-              "readOnly": true
+              "x-yang-type": "snmpv2-tc:RowStatus"
             },
             "msdpPeerRemotePort": {
               "type": "integer",
               "description": "The remote port for the TCP connection between the\n            MSDP peers.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerLocalPort": {
               "type": "integer",
               "description": "The local port for the TCP connection between the\n            MSDP peers.",
               "minimum": -2147483648,
-              "maximum": 2147483647,
-              "readOnly": true
+              "maximum": 2147483647
             },
             "msdpPeerEncapsulationState": {
               "type": "string",
-              "description": "The status of the encapsulation negotiation state\n            machine.",
-              "readOnly": true
+              "description": "The status of the encapsulation negotiation state\n            machine."
             },
             "msdpPeerEncapsulationType": {
               "type": "string",
-              "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer.",
-              "readOnly": true
+              "description": "The encapsulation in use when encapsulating data in\n            SA messages to this peer."
             },
             "msdpPeerConnectionAttempts": {
               "type": "integer",
               "description": "The number of times the state machine has\n            transitioned from inactive to connecting.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerInNotifications": {
               "type": "integer",
               "description": "The number of MSDP Notification messages received on\n            this connection.  This object should be initialized to\n            zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerOutNotifications": {
               "type": "integer",
               "description": "The number of MSDP Notification messages transmitted\n            on this connection.  This object should be initialized\n            to zero when the connection is established.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpPeerLastError": {
               "type": "string",
               "description": "The last error code and subcode seen by this peer on\n            this connection.  If no error has occurred, this field\n            is zero.  Otherwise, the first byte of this two byte\n            OCTET STRING contains the error code, and the second\n            byte contains the subcode.",
-              "format": "binary",
-              "readOnly": true
+              "format": "binary"
             }
           }
         }
@@ -4277,134 +3067,55 @@
             "msdpSACacheGroupAddr": {
               "type": "string",
               "description": "The group address of the SA Cache entry.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpSACacheSourceAddr": {
               "type": "string",
               "description": "The source address of the SA Cache entry.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpSACacheOriginRP": {
               "type": "string",
               "description": "The address of the RP which originated the last SA\n            message accepted for this entry.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpSACachePeerLearnedFrom": {
               "type": "string",
               "description": "The peer from which this SA Cache entry was last\n            accepted.  This address must correspond to the\n            msdpPeerRemoteAddress value for a row in the MSDP Peer\n            Table.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpSACacheRPFPeer": {
               "type": "string",
               "description": "The peer from which an SA message corresponding to\n            this cache entry would be accepted (i.e. the RPF peer\n            for msdpSACacheOriginRP).  This may be different than\n            msdpSACachePeerLearnedFrom if this entry was created\n            by an MSDP SA-Response.  This address must correspond\n            to the msdpPeerRemoteAddress value for a row in the\n            MSDP Peer Table.",
-              "format": "inet:ipv4-address",
-              "readOnly": true
+              "format": "inet:ipv4-address"
             },
             "msdpSACacheInSAs": {
               "type": "integer",
               "description": "The number of MSDP SA messages received relevant to\n            this cache entry.  This object must be initialized to\n            zero when creating a cache entry.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpSACacheInDataPackets": {
               "type": "integer",
               "description": "The number of MSDP encapsulated data packets received\n            relevant to this cache entry.  This object must be\n            initialized to zero when creating a cache entry.",
               "minimum": 0,
-              "maximum": 4294967295,
-              "readOnly": true
+              "maximum": 4294967295
             },
             "msdpSACacheUpTime": {
               "type": "string",
               "description": "The time since this entry was placed in the SA\n            cache.",
-              "x-yang-type": "yang:timeticks",
-              "readOnly": true
+              "x-yang-type": "yang:timeticks"
             },
             "msdpSACacheExpiryTime": {
               "type": "string",
               "description": "The time remaining before this entry will expire from\n            the SA cache.",
-              "x-yang-type": "yang:timeticks",
-              "readOnly": true
+              "x-yang-type": "yang:timeticks"
             },
             "msdpSACacheStatus": {
               "type": "string",
               "description": "The status of this row in the table.  The only\n            allowable actions are to retreive the status, which\n            will be `active', or to set the status to `destroy' in\n            order to remove this entry from the cache.",
-              "x-yang-type": "snmpv2-tc:RowStatus",
-              "readOnly": true
+              "x-yang-type": "snmpv2-tc:RowStatus"
             }
-          }
-        }
-      },
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
           }
         }
       }

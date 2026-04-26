@@ -3,11 +3,13 @@
 
 import json
 import re
+import sys
 from pathlib import Path
 
 script_dir = Path(__file__).parent
-yang_dir = script_dir.parent / 'references' / '17181-YANG-modules'
-output_dir = script_dir.parent / 'swagger-events-model' / 'api'
+sys.path.insert(0, str(script_dir))
+from _version_args import resolve_paths  # noqa: E402
+yang_dir, output_dir, _ver = resolve_paths('events')
 
 def main():
     output_dir.mkdir(parents=True, exist_ok=True)

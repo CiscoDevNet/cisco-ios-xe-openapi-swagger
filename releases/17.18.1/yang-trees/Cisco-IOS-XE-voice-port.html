@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cisco-IOS-XE-voice-port — YANG Tree (17.18.1)</title>
+<style>
+body { font-family: 'Courier New', monospace; background:#f5f5f5; padding:20px; margin:0; }
+.header { background:linear-gradient(135deg,#049fd9,#0070c9); color:#fff; padding:20px; border-radius:8px; margin-bottom:20px; }
+.header h1 { margin:0 0 6px 0; font-size:22px; }
+.header p { margin:0; opacity:.9; font-size:13px; }
+.header a { color:#fff; }
+.nav { background:#e3f2fd; padding:14px; border-radius:8px; border-left:4px solid #0070c9; margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; }
+.nav a { background:#0070c9; color:#fff; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:13px; }
+.nav a.alt { background:#fff; color:#0070c9; border:1px solid #cfd8dc; }
+.tree { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.08); overflow-x:auto; }
+pre { font-size:13px; line-height:1.4; margin:0; color:#333; }
+.footer { margin-top:18px; padding:12px; background:#fff; border-radius:8px; text-align:center; font-size:12px; color:#666; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Cisco-IOS-XE-voice-port</h1>
+  <p>YANG tree — IOS-XE 17.18.1</p>
+</div>
+<div class="nav">
+  <a href="../swagger-other-model/index-v2.html#ver=17.18.1&amp;spec=swagger-other-model/Cisco-IOS-XE-voice-port">📄 OpenAPI Spec</a>
+  <a class="alt" href="../swagger-other-model/index-v2.html#ver=17.18.1">📂 Other/Vendor APIs</a>
+  <a class="alt" href="index.html">🌳 All Trees (17.18.1)</a>
+  <a class="alt" href="../../index.html">🏠 Hub</a>
+</div>
+<div class="tree"><pre>module: Cisco-IOS-XE-voice-port
+
+  augment /ios:native/ios:monitor:
+    +--rw pcm-tracer?          empty
+    +--rw pcm-tracer-config
+       +--rw pcm-tracer
+          +--rw capture-destination?   string
+          +--rw capture-duration?      uint8
+          +--rw delayed-start?         uint32
+          +--rw profile* [id]
+             +--rw id             uint8
+             +--rw capture-tdm
+                +--rw (port-type-choice)?
+                   +--:(T1-port-case)
+                   |  +--rw T1-config
+                   |     +--rw T1?    ios-types:voice-port-num-type
+                   |     +--rw ds0?   uint8
+                   +--:(E1-port-case)
+                   |  +--rw E1-config
+                   |     +--rw E1?    ios-types:voice-port-num-type
+                   |     +--rw ds0?   uint8
+                   +--:(analog-port-case)
+                      +--rw analog-voice-port?   ios-types:voice-port-num-type
+  augment /ios:native:
+    +--rw voice-port* [id]
+       +--rw id                         string
+       +--rw description?               string
+       +--rw signal
+       |  +--rw (signal-choice)?
+       |     +--:(groundStart)
+       |     |  +--rw groundStart?        empty
+       |     +--:(loopStart-config)
+       |     |  +--rw loopStart-config
+       |     |     +--rw (loopStart-choice)?
+       |     |        +--:(loopStart-conf)
+       |     |        |  +--rw loopStart-conf
+       |     |        |     +--rw loopStart
+       |     |        |        +--rw live-feed?   empty
+       |     |        +--:(loopStart)
+       |     |           +--rw loopStart?        boolean
+       |     +--:(did)
+       |        +--rw did
+       |           +--rw did-type?   enumeration
+       +--rw compand-type?              enumeration
+       +--rw busyout
+       |  +--rw (busyout-choice)?
+       |     +--:(forced)
+       |     |  +--rw forced?     empty
+       |     +--:(graceful)
+       |        +--rw graceful?   empty
+       +--rw caller-id
+       |  +--rw enable?     empty
+       |  +--rw block?      empty
+       |  +--rw format
+       |  |  +--rw e911?   empty
+       |  +--rw mode
+       |  |  +--rw (mode-choice)?
+       |  |     +--:(BT-case)
+       |  |     |  +--rw BT?     empty
+       |  |     +--:(FSK-case)
+       |  |     |  +--rw FSK?    empty
+       |  |     +--:(DTMF-case)
+       |  |        +--rw DTMF!
+       |  |           +--rw start?   caller-id-start-end-type
+       |  |           +--rw end?     caller-id-start-end-type
+       |  +--rw alerting
+       |     +--rw (alerting-choice)?
+       |        +--:(line-reversal-dsp-case)
+       |        |  +--rw line-reversal?      empty
+       |        |  +--rw dsp-pre-allocate?   empty
+       |        +--:(pre-ring-case)
+       |        |  +--rw pre-ring?           empty
+       |        +--:(ring-case)
+       |           +--rw ring?               uint8
+       +--rw connection
+       |  +--rw (conn-choice)?
+       |     +--:(tie-line-case)
+       |     |  +--rw tie-line?   string
+       |     +--:(trunk-case)
+       |     |  +--rw trunk
+       |     |     +--rw trunk-num?           string
+       |     |     +--rw (additional-choice)?
+       |     |        +--:(answer-mode)
+       |     |        |  +--rw answer-mode?   empty
+       |     |        +--:(retry-timer)
+       |     |           +--rw retry-timer?   uint8
+       |     +--:(plar-case)
+       |        +--rw plar
+       |           +--rw (plar-choice)?
+       |              +--:(plar-num)
+       |              |  +--rw plar-num?   string
+       |              +--:(opx)
+       |                 +--rw opx
+       |                    +--rw (opx-choice)?
+       |                       +--:(immediate-case)
+       |                       |  +--rw immediate?          string
+       |                       +--:(opx-num-only-case)
+       |                       |  +--rw opx-num-only?       string
+       |                       +--:(opx-cut-through-case)
+       |                          +--rw opx-num?            string
+       |                          +--rw cut-through-wait?   uint16
+       +--rw cptone?                    enumeration
+       +--rw impedance
+       |  +--rw imp-type?   enumeration
+       +--rw battery-reversal-config
+       |  +--rw (battery-reversal-choice)?
+       |     +--:(battery-reversal-conf)
+       |     |  +--rw battery-reversal-conf
+       |     |     +--rw battery-reversal
+       |     |        +--rw answer?            empty
+       |     |        +--rw detection-delay?   uint16
+       |     +--:(battery-reversal)
+       |        +--rw battery-reversal?        boolean
+       +--rw dial-type?                 enumeration
+       +--rw echo-cancel
+       |  +--rw enable?   boolean
+       +--rw input
+       |  +--rw gain?   int8
+       +--rw loop-length?               enumeration
+       +--rw output
+       |  +--rw attenuation?   int8
+       +--rw pre-dial-delay?            uint8
+       +--rw pulse-digit-detection?     boolean
+       +--rw trunk-group
+       |  +--rw trunk-group-label?        string
+       |  +--rw trunk-group-preference?   uint8
+       +--rw ren?                       uint8
+       +--rw ring
+       |  +--rw frequency?   enumeration
+       |  +--rw dc-offset?   enumeration
+       +--rw idle-detection
+       |  +--rw code?       string
+       |  +--rw duration?   uint8
+       +--rw secondary
+       |  +--rw dialtone?   empty
+       +--rw station-id
+       |  +--rw name?     string
+       |  +--rw number?   string
+       +--rw supervisory
+       |  +--rw custom-cptone?            string
+       |  +--rw disconnect
+       |  |  +--rw (disconnect-type)?
+       |  |     +--:(anytone)
+       |  |     |  +--rw anytone?    empty
+       |  |     +--:(dualtone)
+       |  |     |  +--rw dualtone?   enumeration
+       |  |     +--:(signal)
+       |  |        +--rw signal?     empty
+       |  +--rw dualtone-detect-params?   uint32
+       +--rw timing
+       |  +--rw delay-connect?       uint8
+       |  +--rw hookflash-in
+       |  |  +--rw max-value?   uint16
+       |  |  +--rw min-value?   uint16
+       |  +--rw guard-out?           uint16
+       |  +--rw hookflash-out?       uint16
+       |  +--rw pulse-inter-digit?   uint16
+       |  +--rw sup-disconnect?      uint16
+       |  +--rw answer-winkwidth?    uint16
+       |  +--rw clear-wait?          uint16
+       |  +--rw dialout-delay?       uint16
+       |  +--rw delay-duration?      uint16
+       |  +--rw delay-start?         uint16
+       |  +--rw dial-pulse
+       |  |  +--rw min-delay?   uint16
+       |  +--rw wait-wink?           uint16
+       |  +--rw wink-duration?       uint16
+       |  +--rw wink-wait?           uint16
+       +--rw translation-profile
+       |  +--rw incoming?   string
+       |  +--rw outgoing?   string
+       +--rw vad?                       boolean
+       +--rw shutdown?                  boolean
+       +--rw timeouts
+       |  +--rw interdigit?   uint8
+       +--rw mwi?                       boolean
+</pre></div>
+<div class="footer">Generated with pyang · IOS-XE 17.18.1</div>
+</body>
+</html>

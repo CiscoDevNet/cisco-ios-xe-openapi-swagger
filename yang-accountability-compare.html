@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>YANG Module Accountability — Cross-Version Comparison</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root { --bg:#fafafa; --fg:#222; --card:#fff; --border:#e0e0e0; --accent:#1565C0;
+          --ok:#2e7d32; --warn:#f57c00; --bad:#c62828; --muted:#888; }
+  body.dark { --bg:#181a1f; --fg:#e8e8e8; --card:#23262d; --border:#3a3d44; --accent:#64b5f6;
+              --ok:#81c784; --warn:#ffb74d; --bad:#e57373; --muted:#888; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--fg); }
+  header { background:linear-gradient(135deg,#1565C0 0%,#1976D2 100%); color:#fff;
+           padding:24px 20px; text-align:center; }
+  header h1 { margin:0 0 6px; font-size:1.6rem; }
+  header p  { margin:0; opacity:.85; font-size:.9rem; }
+  .nav { padding:10px 20px; background:var(--card); border-bottom:1px solid var(--border);
+         text-align:center; }
+  .nav a { color:var(--accent); text-decoration:none; margin:0 10px; font-weight:500; }
+  main { max-width:1400px; margin:20px auto; padding:0 20px; }
+  .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                  gap:14px; margin-bottom:24px; }
+  .summary-card { background:var(--card); border:1px solid var(--border); border-radius:8px;
+                  padding:14px; }
+  .summary-card h3 { margin:0 0 8px; font-size:.95rem; color:var(--accent); }
+  .summary-card .num { font-size:1.4rem; font-weight:600; }
+  .summary-card .sub { font-size:.78rem; color:var(--muted); }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+  .controls input, .controls select { padding:6px 10px; border:1px solid var(--border);
+                                       border-radius:4px; background:var(--card); color:var(--fg); }
+  .matrix-wrap { overflow-x:auto; background:var(--card); border:1px solid var(--border);
+                 border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:6px 10px; border-bottom:1px solid var(--border); text-align:left; }
+  th { position:sticky; top:0; background:var(--card); z-index:2; }
+  td.module { font-family:"SF Mono",Consolas,monospace; font-size:.8rem; max-width:340px;
+              overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cell { display:inline-flex; gap:4px; align-items:center; }
+  .pip { display:inline-block; width:16px; height:16px; border-radius:50%;
+         font-size:.65rem; line-height:16px; text-align:center; color:#fff; }
+  .pip.spec { background:var(--ok); }
+  .pip.tree { background:var(--accent); }
+  .pip.absent { background:#bbb; }
+  .deltas { background:var(--card); border:1px solid var(--border); border-radius:8px;
+            padding:14px; margin-top:24px; }
+  .delta-row { padding:8px 0; border-bottom:1px solid var(--border); }
+  .delta-row:last-child { border-bottom:none; }
+  .added { color:var(--ok); }
+  .removed { color:var(--bad); }
+  details summary { cursor:pointer; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 YANG Module Accountability — Cross-Version</h1>
+  <p>Compare module coverage across all supported IOS-XE releases</p>
+</header>
+<div class="nav">
+  <a href="index.html">← Hub</a>
+  <a href="yang-accountability.html">Single-version Report</a>
+  <a href="tree-compare.html">Tree Compare</a>
+  <a href="telemetry.html">MDT Telemetry</a>
+  <a href="exports.html">Exports</a>
+</div>
+<main>
+  <div id="summary" class="summary-grid"></div>
+  <div class="controls">
+    <input id="filter" type="search" placeholder="Filter modules…" style="flex:1;min-width:240px;">
+    <select id="presence">
+      <option value="all">All modules</option>
+      <option value="any">Any version present</option>
+      <option value="all-versions">Present in all versions</option>
+      <option value="diff">Differing across versions</option>
+    </select>
+    <span id="count" style="color:var(--muted);"></span>
+  </div>
+  <div class="matrix-wrap">
+    <table id="matrix">
+      <thead><tr id="header-row"><th>Module</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div id="deltas" class="deltas"></div>
+</main>
+<script>
+(function () {
+  var DATA;
+  fetch('accountability_compare.json', { cache:'no-store' })
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function (data) { DATA = data; render(); })
+    .catch(function (e) {
+      document.querySelector('main').innerHTML =
+        '<p style="color:var(--bad);">Failed to load <code>accountability_compare.json</code>: '
+        + (e && e.message) + '. Run <code>python scripts/build_accountability_compare.py</code> first.</p>';
+    });
+
+  function render() {
+    var versions = DATA.versions || [];
+    // Header row
+    var hr = document.getElementById('header-row');
+    versions.forEach(function (v) {
+      var th = document.createElement('th');
+      th.textContent = v;
+      hr.appendChild(th);
+    });
+    // Summary cards
+    var sg = document.getElementById('summary');
+    versions.forEach(function (v) {
+      var s = (DATA.summary && DATA.summary[v]) || {};
+      var c = document.createElement('div');
+      c.className = 'summary-card';
+      c.innerHTML = '<h3>' + escapeHtml(v) + '</h3>'
+        + '<div class="num">' + (s.total_modules || 0) + '</div>'
+        + '<div class="sub">specs ' + (s.with_specs || 0)
+        + ' / trees ' + (s.with_trees || 0) + '</div>';
+      sg.appendChild(c);
+    });
+    // Deltas
+    var d = document.getElementById('deltas');
+    if ((DATA.deltas || []).length) {
+      d.innerHTML = '<h3 style="margin-top:0;">Version-to-version deltas</h3>';
+      DATA.deltas.forEach(function (delta) {
+        var row = document.createElement('div');
+        row.className = 'delta-row';
+        row.innerHTML = '<strong>' + escapeHtml(delta.from) + ' → '
+          + escapeHtml(delta.to) + '</strong> · '
+          + '<span class="added">+' + delta.added_count + ' added</span> · '
+          + '<span class="removed">−' + delta.removed_count + ' removed</span>'
+          + (delta.added_count + delta.removed_count > 0
+            ? '<details><summary>details</summary>'
+              + '<div><span class="added">Added:</span> '
+              + escapeHtml((delta.added || []).join(', ') || '—') + '</div>'
+              + '<div><span class="removed">Removed:</span> '
+              + escapeHtml((delta.removed || []).join(', ') || '—') + '</div>'
+              + '</details>'
+            : '');
+        d.appendChild(row);
+      });
+    } else {
+      d.style.display = 'none';
+    }
+    bindControls();
+    drawTable();
+  }
+
+  function bindControls() {
+    document.getElementById('filter').addEventListener('input', drawTable);
+    document.getElementById('presence').addEventListener('change', drawTable);
+  }
+
+  function drawTable() {
+    var versions = DATA.versions || [];
+    var matrix = DATA.matrix || [];
+    var q = document.getElementById('filter').value.trim().toLowerCase();
+    var presence = document.getElementById('presence').value;
+    var tbody = document.querySelector('#matrix tbody');
+    tbody.innerHTML = '';
+    var shown = 0;
+    matrix.forEach(function (row) {
+      if (q && row.module.toLowerCase().indexOf(q) === -1) return;
+      var presents = versions.map(function (v) {
+        return row.by_version[v] && row.by_version[v].present;
+      });
+      if (presence === 'any' && !presents.some(Boolean)) return;
+      if (presence === 'all-versions' && !presents.every(Boolean)) return;
+      if (presence === 'diff') {
+        var first = JSON.stringify(row.by_version[versions[0]] || {});
+        var same = versions.every(function (v) {
+          return JSON.stringify(row.by_version[v] || {}) === first;
+        });
+        if (same) return;
+      }
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.className = 'module';
+      td.title = row.module;
+      td.textContent = row.module;
+      tr.appendChild(td);
+      versions.forEach(function (v) {
+        var c = row.by_version[v] || {};
+        var cell = document.createElement('td');
+        if (!c.present) {
+          cell.innerHTML = '<span class="pip absent" title="not in this release">·</span>';
+        } else {
+          cell.innerHTML = '<span class="cell">'
+            + (c.has_spec ? '<span class="pip spec" title="OpenAPI spec">S</span>' : '')
+            + (c.has_tree ? '<span class="pip tree" title="YANG tree">T</span>' : '')
+            + (!c.has_spec && !c.has_tree ? '<span class="pip absent">·</span>' : '')
+            + '</span>';
+        }
+        tr.appendChild(cell);
+      });
+      tbody.appendChild(tr);
+      shown++;
+    });
+    document.getElementById('count').textContent =
+      shown + ' / ' + matrix.length + ' modules shown';
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+})();
+</script>
+</body>
+</html>

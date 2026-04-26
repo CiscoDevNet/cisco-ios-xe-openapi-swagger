@@ -88,6 +88,8 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # 6. Manifests + accountability + search
     ("manifests",           ["python", str(SCRIPTS / "update_manifests.py"),
                              "--version", "$VER"]),
+    ("stamp-spec-count",    ["python", str(SCRIPTS / "stamp_spec_count.py"),
+                             "--version", "$VER"]),
     ("accountability",      ["python", str(SCRIPTS / "analyze_yang_accountability_v2.py"),
                              "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),

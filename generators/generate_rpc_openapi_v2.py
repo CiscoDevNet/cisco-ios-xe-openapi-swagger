@@ -656,9 +656,13 @@ class RPCYANGToOpenAPIConverter:
         print(f"\nCreated manifest: {self.output_dir / 'manifest.json'}")
 
 if __name__ == '__main__':
+    import sys
     script_dir = Path(__file__).parent
+    sys.path.insert(0, str(script_dir))
+    from _version_args import resolve_paths
+    yang_dir, output_dir, _ver = resolve_paths('rpc')
     converter = RPCYANGToOpenAPIConverter(
-        yang_dir=str(script_dir.parent / 'references' / '17181-YANG-modules'),
-        output_dir=str(script_dir.parent / 'swagger-rpc-model' / 'api')
+        yang_dir=str(yang_dir),
+        output_dir=str(output_dir),
     )
     converter.run()
