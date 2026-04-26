@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -61,7 +61,7 @@
         <a href="index-v2.html" class="active">MIB</a>
         <a href="../swagger-events-model/index-v2.html">Events</a>
         <a href="../swagger-other-model/index-v2.html">Other</a>
-        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">🌳 Tree Browser</a>
+        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">ðŸŒ³ Tree Browser</a>
     </nav>
     <div class="container">
         <aside class="sidebar">
@@ -71,9 +71,9 @@
             </div>
             <div class="search-info" id="searchInfo"></div>
             <div class="stats-bar">
-                <div class="stat"><div class="stat-value" id="totalSpecs">—</div><div class="stat-label">Specs</div></div>
-                <div class="stat"><div class="stat-value" id="totalPaths">—</div><div class="stat-label">Paths</div></div>
-                <div class="stat"><div class="stat-value" id="totalOps">—</div><div class="stat-label">GET Ops</div></div>
+                <div class="stat"><div class="stat-value" id="totalSpecs">â€”</div><div class="stat-label">Specs</div></div>
+                <div class="stat"><div class="stat-value" id="totalPaths">â€”</div><div class="stat-label">Paths</div></div>
+                <div class="stat"><div class="stat-value" id="totalOps">â€”</div><div class="stat-label">GET Ops</div></div>
             </div>
             <ul class="module-list" id="moduleList">Loading...</ul>
         </aside>
@@ -86,8 +86,8 @@
             <div class="download-bar" id="downloadBar">
                 <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
                 <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
-                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">🌳 View YANG Tree</a>
-                <a id="mibCardToggle" href="#" onclick="toggleMibCard();return false;" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #9C27B0; color: white; text-decoration: none; font-weight: 500;">🗄️ MIB Details</a>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">ðŸŒ³ View YANG Tree</a>
+                <a id="mibCardToggle" href="#" onclick="toggleMibCard();return false;" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #9C27B0; color: white; text-decoration: none; font-weight: 500;">ðŸ—„ï¸ MIB Details</a>
             </div>
             <div id="mibCard" style="display:none; margin: 0 0 14px; padding: 12px 14px; border: 1px solid #d0c4e0; border-left: 4px solid #9C27B0; border-radius: 4px; background: #faf6fd;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -104,21 +104,52 @@
     <script src="../deeplink.js"></script>
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    
+    // === version-aware api base (added by patch_viewers_version_aware.py) ===
+    function __activeVer() {
+        // Priority: ?ver= query param > #ver= hash > localStorage > parent window
+        try {
+            const qs = new URLSearchParams(location.search);
+            if (qs.get('ver')) return qs.get('ver');
+            const hm = location.hash.match(/[#&]ver=([^&]+)/);
+            if (hm) return decodeURIComponent(hm[1]);
+            const ls = localStorage.getItem('iosxe-active-version');
+            if (ls) return ls;
+        } catch (_) {}
+        if (window.parent && window.parent !== window && window.parent.__IOSXE_ACTIVE_VERSION__) {
+            return window.parent.__IOSXE_ACTIVE_VERSION__;
+        }
+        return window.__IOSXE_ACTIVE_VERSION__ || null;
+    }
+    function __apiBase() {
+        const ver = __activeVer();
+        if (!ver || ver === '17.18.1') return 'api-v2';
+        const m = location.pathname.match(/\/(swagger-[^/]+-model)\//);
+        const cat = m ? m[1] : '';
+        return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api-v2';
+    }
+    function __treeBase() {
+        const ver = __activeVer();
+        if (!ver || ver === '17.18.1') return '../yang-trees';
+        return '../releases/' + encodeURIComponent(ver) + '/yang-trees';
+    }
+    // Expose for mib-metadata side card and other consumers.
+    window.__IOSXE_ACTIVE_VERSION__ = __activeVer();
     let allModules = [];
     let currentModule = null;
 
     async function init() {
-        const resp = await fetch('api-v2/manifest.json');
+        const resp = await fetch(__apiBase() + '/manifest.json');
         const manifest = await resp.json();
         document.getElementById('totalSpecs').textContent = manifest.total_modules;
         document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
         document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
         document.getElementById('headerStats').textContent =
-            `${manifest.total_paths.toLocaleString()} GET endpoints across ${manifest.total_modules} modules — generated from resolved YANG trees`;
+            `${manifest.total_paths.toLocaleString()} GET endpoints across ${manifest.total_modules} modules â€” generated from resolved YANG trees`;
 
         const fetches = manifest.modules.map(async fname => {
             try {
-                const r = await fetch(`api-v2/${fname}.json`);
+                const r = await fetch(`${__apiBase()}/${fname}.json`);
                 const spec = await r.json();
                 const title = (spec.info.title || fname).replace('Cisco IOS-XE MIB - ', '');
                 return { fname, title, paths: Object.keys(spec.paths).length };
@@ -160,14 +191,14 @@
         document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
         if (window.__DeepLink) { window.__DeepLink.setSpec(fname); } else { window.location.hash = '#spec=' + fname; }
-        SwaggerUIBundle({ url: `${getSpecFolder(fname)}/${fname}.json`, dom_id: '#swagger-ui',
+        SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui',
             presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
             layout: 'StandaloneLayout', deepLinking: false, filter: true
         });
         // Update YANG tree link
         const treeLink = document.getElementById('treeLink');
         if (treeLink) {
-            const treeUrl = '../yang-trees/' + fname + '.html';
+            const treeUrl = __treeBase() + '/' + fname + '.html';
             treeLink.href = treeUrl;
             treeLink.style.display = 'none';
             fetch(treeUrl, { method: 'HEAD' }).then(r => {
@@ -222,18 +253,18 @@
         const platformList = entry.platforms || [];
         body.innerHTML =
             kv('Module', entry.name || entry.module)
-            + kv('OID prefix', entry.oid_prefix || '—')
+            + kv('OID prefix', entry.oid_prefix || 'â€”')
             + kv('Tables / scalars / leafs',
                  (entry.table_count || 0) + ' / '
                  + (entry.scalar_count || 0) + ' / '
                  + (entry.leaf_count || 0))
-            + kv('Indexes', (entry.indexes || []).join(', ') || '—')
+            + kv('Indexes', (entry.indexes || []).join(', ') || 'â€”')
             + kv('Deprecated objects', String(entry.deprecated_object_count || 0))
-            + kv('Latest revision', entry.latest_revision || '—')
-            + kv('Organization', entry.organization || '—')
-            + kv('RFC reference', entry.rfc_reference || '—')
+            + kv('Latest revision', entry.latest_revision || 'â€”')
+            + kv('Organization', entry.organization || 'â€”')
+            + kv('RFC reference', entry.rfc_reference || 'â€”')
             + kv('Functional category',
-                 (entry.functional_category && entry.functional_category.category) || '—')
+                 (entry.functional_category && entry.functional_category.category) || 'â€”')
             + (platformList.length
                 ? kvHtml('Platforms (' + platformList.length + ')',
                      platformList.map(p =>
@@ -261,7 +292,7 @@
     function downloadSpec() {
         if (!currentModule) return;
         const a = document.createElement('a');
-        a.href = `${getSpecFolder(currentModule)}/${currentModule}.json`;
+        a.href = `${__apiBase()}/${currentModule}.json`;
         a.download = currentModule + '.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
