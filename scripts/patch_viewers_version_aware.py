@@ -78,12 +78,37 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
     }}
     // Expose for mib-metadata side card and other consumers.
     window.__IOSXE_ACTIVE_VERSION__ = __activeVer();
+    // Update any element flagged with `.header-version` so the viewer's
+    // visible header reflects the active release instead of the static
+    // fallback baked in at HTML build time.
+    (function () {{
+        function applyHeaderVersion() {{
+            try {{
+                var v = __activeVer();
+                document.querySelectorAll('.header-version').forEach(function (el) {{
+                    el.textContent = v;
+                }});
+            }} catch (_) {{}}
+        }}
+        if (document.readyState === 'loading') {{
+            document.addEventListener('DOMContentLoaded', applyHeaderVersion);
+        }} else {{
+            applyHeaderVersion();
+        }}
+    }})();
+    // === end version-aware api base ===
 """
 
 
 # Matches an existing helper block so we can replace it on re-runs without
-# accumulating duplicates.
+# accumulating duplicates. Newer blocks are terminated by an explicit END
+# marker; older blocks (pre-header-version-rebind) ended at the
+# window.__IOSXE_ACTIVE_VERSION__ assignment line.
 HELPER_BLOCK_RE = re.compile(
+    r"\n\s*// === version-aware api base.*?// === end version-aware api base ===\s*\n",
+    re.DOTALL,
+)
+HELPER_BLOCK_OLD_RE = re.compile(
     r"\n\s*// === version-aware api base.*?window\.__IOSXE_ACTIVE_VERSION__ = __activeVer\(\);\s*\n",
     re.DOTALL,
 )
@@ -94,8 +119,11 @@ def patch(p: Path, helper: str) -> bool:
     orig = src
 
     if HELPER_BLOCK_RE.search(src):
-        # Already patched: refresh the helper in place.
+        # Already on the new schema: refresh the helper in place.
         src = HELPER_BLOCK_RE.sub("\n" + helper, src, count=1)
+    elif HELPER_BLOCK_OLD_RE.search(src):
+        # Migrate older patched files (no END marker) to the new schema.
+        src = HELPER_BLOCK_OLD_RE.sub("\n" + helper, src, count=1)
     else:
         # Insert before the first allModules declaration we recognise.
         anchors = [
