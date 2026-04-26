@@ -353,7 +353,7 @@
             .then(function (data) {
                 var releases = (data && data.releases) || [];
                 if (!releases.length) {
-                    sel.innerHTML = '<option>17.18.1</option>';
+                    sel.innerHTML = '<option>26.1.1</option>';
                     return;
                 }
                 var hashVer = (location.hash.match(/(?:^|[#&])ver=([^&]+)/) || [])[1];
