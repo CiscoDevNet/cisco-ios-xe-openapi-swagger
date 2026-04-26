@@ -38,8 +38,8 @@ def fix_manifest(mf_path: Path) -> bool:
     existing["total_modules"] = len(spec_files)
     existing["total_paths"] = total_paths
     existing["total_operations"] = total_ops
-    if "modules" not in existing or not existing["modules"]:
-        existing["modules"] = module_names
+    # Viewer expects modules to be a flat array of string basenames.
+    existing["modules"] = module_names
     existing["spec_count"] = len(spec_files)
     mf_path.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")
     return True
