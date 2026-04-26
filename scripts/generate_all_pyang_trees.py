@@ -21,9 +21,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -167,7 +169,7 @@ def generate_one(yang_file: Path, out_dir: Path, version: str) -> dict:
     yang_text = yang_file.read_text(encoding="utf-8", errors="replace")
     try:
         proc = subprocess.run(
-            ["pyang", "-f", "tree", str(yang_file)],
+            [sys.executable, "-m", "pyang", "-f", "tree", str(yang_file)],
             cwd=yang_file.parent,
             capture_output=True, text=True, encoding="utf-8",
         )
@@ -215,16 +217,23 @@ def generate_for_version(version: str, include_mibs: bool = True) -> int:
             sub_dir = src_dir / sub
             if sub_dir.is_dir():
                 yang_files.extend(sorted(sub_dir.rglob("*.yang")))
-    print(f"[trees] {version}: {len(yang_files)} YANG files → {out_dir}")
+    workers = max(2, (os.cpu_count() or 4))
+    print(f"[trees] {version}: {len(yang_files)} YANG files → {out_dir} (workers={workers})")
     generated: list[str] = []
-    for f in yang_files:
-        r = generate_one(f, out_dir, version)
-        audit["results"].append(r)
-        if r["status"] == "generated":
-            generated.append(r["module"])
-        elif r["reason"] == "pyang-not-installed":
-            sys.stderr.write("[trees] pyang not installed; aborting.\n")
-            return 2
+    completed = 0
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(generate_one, f, out_dir, version): f for f in yang_files}
+        for fut in as_completed(futs):
+            r = fut.result()
+            audit["results"].append(r)
+            completed += 1
+            if r["status"] == "generated":
+                generated.append(r["module"])
+            elif r["reason"] == "pyang-not-installed":
+                sys.stderr.write("[trees] pyang not installed; aborting.\n")
+                return 2
+            if completed % 100 == 0:
+                print(f"[trees] {version}: {completed}/{len(yang_files)} done", flush=True)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "index.html").write_text(
