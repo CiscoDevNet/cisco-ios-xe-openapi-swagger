@@ -102,6 +102,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
+    <script src="../deeplink.js"></script>
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     let allModules = [];
@@ -159,7 +160,7 @@
         document.getElementById('downloadLabel').textContent = fname + '.json';
         document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
-        window.location.hash = '#spec=' + fname;
+        if (window.__DeepLink) { window.__DeepLink.setSpec(fname); } else { window.location.hash = '#spec=' + fname; }
         SwaggerUIBundle({ url: `${getSpecFolder(fname)}/${fname}.json`, dom_id: '#swagger-ui',
             presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
             layout: 'StandaloneLayout', deepLinking: true, filter: true
@@ -253,13 +254,12 @@
     }
 
     function checkHash() {
-        const hash = decodeURIComponent(window.location.hash);
-        if (hash.startsWith('#spec=')) {
-            const fname = hash.replace('#spec=', '');
-            if (fname && allModules.find(m => m.fname === fname)) {
-                const el = document.querySelector(`[data-module="${CSS.escape(fname)}"]`);
-                loadSpec(fname, el);
-            }
+        const params = (window.__DeepLink && window.__DeepLink.parseHash())
+            || (function () { var h = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); var o = {}; h.split('&').forEach(function (s) { var i = s.indexOf('='); if (i > 0) o[s.substring(0, i)] = s.substring(i + 1); }); return o; })();
+        if (params.spec && allModules.find(m => m.fname === params.spec)) {
+            const el = document.querySelector(`[data-module="${CSS.escape(params.spec)}"]`);
+            if (currentModule !== params.spec) loadSpec(params.spec, el);
+            if (params.op && window.__DeepLink) window.__DeepLink.tryExpandOp(params.op);
         }
     }
     window.addEventListener('hashchange', checkHash);
