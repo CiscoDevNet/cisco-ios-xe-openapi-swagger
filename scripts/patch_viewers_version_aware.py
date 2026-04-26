@@ -88,6 +88,11 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
                 document.querySelectorAll('.header-version').forEach(function (el) {{
                     el.textContent = v;
                 }});
+                // Also keep the browser tab title in sync.
+                if (document.title) {{
+                    document.title = document.title.replace(
+                        /Cisco IOS-XE [0-9.x]+/, 'Cisco IOS-XE ' + v);
+                }}
             }} catch (_) {{}}
         }}
         if (document.readyState === 'loading') {{
