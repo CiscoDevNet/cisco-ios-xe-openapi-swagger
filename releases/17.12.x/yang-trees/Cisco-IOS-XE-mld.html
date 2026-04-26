@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cisco-IOS-XE-mld — YANG Tree (17.12.x)</title>
+<style>
+body { font-family: 'Courier New', monospace; background:#f5f5f5; padding:20px; margin:0; }
+.header { background:linear-gradient(135deg,#049fd9,#0070c9); color:#fff; padding:20px; border-radius:8px; margin-bottom:20px; }
+.header h1 { margin:0 0 6px 0; font-size:22px; }
+.header p { margin:0; opacity:.9; font-size:13px; }
+.header a { color:#fff; }
+.nav { background:#e3f2fd; padding:14px; border-radius:8px; border-left:4px solid #0070c9; margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; }
+.nav a { background:#0070c9; color:#fff; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:13px; }
+.nav a.alt { background:#fff; color:#0070c9; border:1px solid #cfd8dc; }
+.tree { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.08); overflow-x:auto; }
+pre { font-size:13px; line-height:1.4; margin:0; color:#333; }
+.footer { margin-top:18px; padding:12px; background:#fff; border-radius:8px; text-align:center; font-size:12px; color:#666; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Cisco-IOS-XE-mld</h1>
+  <p>YANG tree — IOS-XE 17.12.x</p>
+</div>
+<div class="nav">
+  <a href="../swagger-other-model/index-v2.html#ver=17.12.x&amp;spec=swagger-other-model/Cisco-IOS-XE-mld">📄 OpenAPI Spec</a>
+  <a class="alt" href="../swagger-other-model/index-v2.html#ver=17.12.x">📂 Other/Vendor APIs</a>
+  <a class="alt" href="index.html">🌳 All Trees (17.12.x)</a>
+  <a class="alt" href="../../index.html">🏠 Hub</a>
+</div>
+<div class="tree"><pre>module: Cisco-IOS-XE-mld
+
+  augment /ios:native/ios:ipv6:
+    +--rw mld
+       +--rw snooping-conf
+       |  +--rw snooping?   empty
+       +--rw snooping-container
+       |  +--rw snooping
+       |     +--rw last-listener-query-count?      uint8
+       |     +--rw last-listener-query-interval?   uint16
+       |     +--rw querier-conf
+       |     |  +--rw querier?   empty
+       |     +--rw querier-entry
+       |     |  +--rw address?             inet:ipv6-address
+       |     |  +--rw max-response-time?   uint8
+       |     |  +--rw query-interval?      uint16
+       |     |  +--rw tcn
+       |     |  |  +--rw query
+       |     |  |     +--rw count?      uint8
+       |     |  |     +--rw interval?   uint8
+       |     |  +--rw timer
+       |     |  |  +--rw expiry?   uint16
+       |     |  +--rw version?             uint8
+       |     +--rw listener-message-suppression?   boolean
+       |     +--rw robustness-variable?            uint8
+       |     +--rw tcn
+       |     |  +--rw flood
+       |     |  |  +--rw query
+       |     |  |     +--rw count?   uint8
+       |     |  +--rw query
+       |     |     +--rw solicit?   boolean
+       |     +--rw mld-snooping-vlans* [vlan]
+       |        +--rw vlan                            uint16
+       |        +--rw immediate-leave?                empty
+       |        +--rw last-listener-query-interval?   uint16
+       |        +--rw last-listener-query-count?      uint8
+       |        +--rw querier-conf
+       |        |  +--rw querier?   empty
+       |        +--rw querier-entry
+       |        |  +--rw address?             inet:ipv6-address
+       |        |  +--rw max-response-time?   uint8
+       |        |  +--rw query-interval?      uint16
+       |        |  +--rw tcn
+       |        |  |  +--rw query
+       |        |  |     +--rw count?      uint8
+       |        |  |     +--rw interval?   uint8
+       |        |  +--rw timer
+       |        |  |  +--rw expiry?   uint16
+       |        |  +--rw version?             uint8
+       |        +--rw mrouter
+       |        |  +--rw interface?   string
+       |        +--rw robustness-variable?            uint8
+       |        +--rw static* [gaddr interface]
+       |           +--rw gaddr        inet:ipv6-address
+       |           +--rw interface    string
+       +--rw ssm-map
+          +--rw enable?   empty
+          +--rw query
+          |  +--rw dns-leaf?   boolean
+          |  o--rw dns?        empty
+          +--rw static
+             +--rw acl?         string
+             +--rw source-ip?   inet:ipv6-address
+  augment /ios:native/ios:interface/ios:FastEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:GigabitEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:TwoGigabitEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:FiveGigabitEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:TenGigabitEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:TwentyFiveGigE/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:FortyGigabitEthernet/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:HundredGigE/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Port-channel/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Loopback/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Tunnel/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Vlan/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:LISP/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Multilink/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Cellular/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:Port-channel-subinterface/ios:Port-channel/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:BDI/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+  augment /ios:native/ios:interface/ios:VirtualPortGroup/ios:ipv6:
+    +--rw mld
+       +--rw static-group* [gaddr]
+       |  +--rw gaddr                      inet:ipv6-address
+       |  +--rw (choice-source)?
+       |     +--:(case-source)
+       |     |  +--rw (source-or-source-list)?
+       |     |     +--:(case-source)
+       |     |     |  +--rw source?        inet:ipv6-address
+       |     |     +--:(case-source-list)
+       |     |        +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(include-source)
+       |     |  +--rw include
+       |     |     +--rw (source-or-source-list)?
+       |     |        +--:(case-source)
+       |     |        |  +--rw source?        inet:ipv6-address
+       |     |        +--:(case-source-list)
+       |     |           +--rw source-list?   ios-types:ext-acl-type
+       |     +--:(exclude-source)
+       |        +--rw exclude
+       |           +--rw (source-or-source-list)?
+       |              +--:(case-source)
+       |              |  +--rw source?        inet:ipv6-address
+       |              +--:(case-source-list)
+       |                 +--rw source-list?   ios-types:ext-acl-type
+       +--rw robustness-variable?   uint8
+</pre></div>
+<div class="footer">Generated with pyang · IOS-XE 17.12.x</div>
+</body>
+</html>

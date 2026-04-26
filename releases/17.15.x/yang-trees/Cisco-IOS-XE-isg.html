@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cisco-IOS-XE-isg — YANG Tree (17.15.x)</title>
+<style>
+body { font-family: 'Courier New', monospace; background:#f5f5f5; padding:20px; margin:0; }
+.header { background:linear-gradient(135deg,#049fd9,#0070c9); color:#fff; padding:20px; border-radius:8px; margin-bottom:20px; }
+.header h1 { margin:0 0 6px 0; font-size:22px; }
+.header p { margin:0; opacity:.9; font-size:13px; }
+.header a { color:#fff; }
+.nav { background:#e3f2fd; padding:14px; border-radius:8px; border-left:4px solid #0070c9; margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap; }
+.nav a { background:#0070c9; color:#fff; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:13px; }
+.nav a.alt { background:#fff; color:#0070c9; border:1px solid #cfd8dc; }
+.tree { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.08); overflow-x:auto; }
+pre { font-size:13px; line-height:1.4; margin:0; color:#333; }
+.footer { margin-top:18px; padding:12px; background:#fff; border-radius:8px; text-align:center; font-size:12px; color:#666; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Cisco-IOS-XE-isg</h1>
+  <p>YANG tree — IOS-XE 17.15.x</p>
+</div>
+<div class="nav">
+  <a href="../swagger-other-model/index-v2.html#ver=17.15.x&amp;spec=swagger-other-model/Cisco-IOS-XE-isg">📄 OpenAPI Spec</a>
+  <a class="alt" href="../swagger-other-model/index-v2.html#ver=17.15.x">📂 Other/Vendor APIs</a>
+  <a class="alt" href="index.html">🌳 All Trees (17.15.x)</a>
+  <a class="alt" href="../../index.html">🏠 Hub</a>
+</div>
+<div class="tree"><pre>module: Cisco-IOS-XE-isg
+
+  augment /ios:native/ios:policy/ios-pol:policy-map:
+    +--rw isg-class
+       +--rw control-class* [name event]
+          +--rw name      union
+          +--rw event     enumeration
+          +--rw type?     enumeration
+          +--rw action* [action-number]
+             +--rw action-number                     uint8
+             +--rw (action-param)?
+                +--:(authenticate-case)
+                |  +--rw authenticate
+                |     +--rw authenticate-only?   empty
+                |     +--rw aaa
+                |        +--rw list
+                |           +--rw (method)?
+                |              +--:(method-list-name)
+                |              |  +--rw method-list-name?   string
+                |              +--:(default)
+                |                 +--rw default?            empty
+                +--:(authorize-case)
+                |  +--rw authorize
+                |     +--rw aaa
+                |     |  +--rw (list-name)?
+                |     |  |  +--:(named-list-case)
+                |     |  |  |  +--rw name?   string
+                |     |  |  +--:(method-list-case)
+                |     |  |     +--rw list
+                |     |  |        +--rw (method)?
+                |     |  |           +--:(method-name-case)
+                |     |  |           |  +--rw name?      string
+                |     |  |           +--:(default-case)
+                |     |  |              +--rw default?   empty
+                |     |  +--rw password?     string
+                |     |  +--rw identifier?   enumeration
+                |     +--rw identifier?   enumeration
+                +--:(collect-case)
+                |  +--rw collect
+                |     +--rw identifier?   enumeration
+                +--:(default-apply-case)
+                |  +--rw default-apply?              empty
+                +--:(default-exit-case)
+                |  +--rw default-exit?               empty
+                +--:(post-account-logon-delay-case)
+                |  +--rw post-account-logon-delay
+                |     +--rw timer?   uint32
+                +--:(service-case)
+                |  +--rw service
+                |     +--rw disconnect?   empty
+                +--:(service-policy-case)
+                |  +--rw service-policy
+                |     +--rw type?      enumeration
+                |     +--rw unapply?   empty
+                |     +--rw name?      string
+                +--:(set-timer-case)
+                   +--rw set-timer
+                      +--rw timer?         string
+                      +--rw timer-value?   uint16
+  augment /ios:native/ios:interface/ios:FastEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:GigabitEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:TenGigabitEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:FiveGigabitEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:TwentyFiveGigE/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:TwoGigabitEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:FortyGigabitEthernet/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:HundredGigE/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:Port-channel/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:Tunnel/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+  augment /ios:native/ios:interface/ios:BDI/ios:ip:
+    +--rw subscriber
+       +--rw l2-connected!
+       |  +--rw initiator
+       |     +--rw dhcp
+       |     |  +--rw (dhcp-choice)?
+       |     |     +--:(dhcp-case)
+       |     |     |  +--rw dhcp-node?     empty
+       |     |     +--:(dhcp-class-aware-case)
+       |     |        +--rw class-aware?   empty
+       |     +--rw radius-proxy?   empty
+       |     +--rw unclassified
+       |        +--rw mac-address
+       |           +--rw mac-address-node?   empty
+       |           +--rw ipv4?               empty
+       |           +--rw ipv6?               empty
+       +--rw routed!
+          +--rw initiator
+             +--rw dhcp
+             |  +--rw (dhcp-choice)?
+             |     +--:(dhcp-case)
+             |     |  +--rw dhcp-node?     empty
+             |     +--:(dhcp-class-aware-case)
+             |        +--rw class-aware?   empty
+             +--rw radius-proxy?   empty
+             +--rw unclassified
+                +--rw ip-address
+                   +--rw ip-address-node?   empty
+                   +--rw ipv4?              empty
+                   +--rw ipv6
+                      +--rw ipv6-node?   empty
+</pre></div>
+<div class="footer">Generated with pyang · IOS-XE 17.15.x</div>
+</body>
+</html>
