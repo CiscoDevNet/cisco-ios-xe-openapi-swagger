@@ -105,11 +105,12 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # search box. Older releases keep the legacy chunk-only sidebar search.
     ("paths-index",         ["python", str(SCRIPTS / "build_paths_index.py"),
                              "--version", "$VER"]),
-    # Path-depth audit: writes <release>/path_depth_audit.json. Non-strict
-    # by default so existing builds aren't broken while we migrate cfg/oper/
-    # events to tree-based generators.
+    # Path-depth audit: writes <release>/path_depth_audit.json. Strict mode
+    # blocks the build if any category drops below MIN_MAX_DEPTH (now that
+    # cfg/oper/events have been migrated to tree-based generators, all 9
+    # categories meet their floors on 26.1.1).
     ("path-depth-audit",    ["python", str(SCRIPTS / "audit_path_depth.py"),
-                             "--version", "$VER"]),
+                             "--version", "$VER", "--strict"]),
     # 7. Exports
     ("postman",             ["python", str(SCRIPTS / "generate_postman_v2_collection.py"),
                              "--version", "$VER", "--per-category", "--max-mb", "50"]),

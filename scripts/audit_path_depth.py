@@ -41,13 +41,13 @@ CATEGORIES = (
 # Per-category minimum max-depth required for a release to pass the audit.
 # These are floors, not goals — bumping them tightens the gate.
 MIN_MAX_DEPTH = {
-    "cfg":           3,
+    "cfg":           5,
     "events":        2,
     "ietf":          3,
     "mib":           2,
     "native-config": 6,
     "openconfig":    3,
-    "oper":          3,
+    "oper":          5,
     "other":         3,
     "rpc":           1,
 }
