@@ -273,7 +273,7 @@ def build_schema(node, max_depth=6, depth=0):
 # Path collection & operations
 # ---------------------------------------------------------------------------
 
-def collect_deep_paths(node, base_path, max_depth=5, depth=0):
+def collect_deep_paths(node, base_path, max_depth=6, depth=0):
     paths = [(base_path, node)]
     if depth >= max_depth:
         return paths
@@ -414,7 +414,7 @@ def create_spec(title, description, tag, paths, module_name, version='17.18.1'):
 # Main generator
 # ---------------------------------------------------------------------------
 
-def process_tree_file(html_path, output_dir, max_depth=5):
+def process_tree_file(html_path, output_dir, max_depth=6):
     results = []
     roots = parse_yang_tree_html(html_path)
     if not roots:
