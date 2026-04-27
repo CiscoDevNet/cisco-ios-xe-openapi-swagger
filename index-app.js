@@ -482,7 +482,17 @@
                 var key = el.getAttribute('data-stat-summary');
                 if (key === 'specs') el.textContent = fmtNum(totals.specs);
                 else if (key === 'paths') el.textContent = fmtNum(totals.paths);
+                else if (key === 'operations' || key === 'ops') el.textContent = fmtNum(totals.operations);
                 else if (key === 'modules_total') el.textContent = fmtNum(totals.modules_total);
+                else if (key === 'modules_with_specs') el.textContent = fmtNum(totals.modules_with_specs);
+                else if (key === 'modules_with_trees') el.textContent = fmtNum(totals.modules_with_trees);
+                else if (key === 'version_label') el.textContent = ver;
+                else if (key === 'tree_coverage_pct') {
+                    var tpct = totals.modules_total
+                        ? Math.round(100 * totals.modules_with_trees / totals.modules_total)
+                        : 0;
+                    el.textContent = tpct + '%';
+                }
                 else if (key === 'modules_with_specs_pct') {
                     var pct = totals.modules_total
                         ? (100 * totals.modules_with_specs / totals.modules_total).toFixed(1)
