@@ -1,0 +1,194 @@
+/* yang-tree-sidebar.js — shared recursive YANG container tree sidebar.
+ *
+ * Each path /data/<module>:<root>/<container>/<container>/.../<leaf>
+ * (or /streams/..., /operations/...) is broken into:
+ *   prefix    = "data" | "streams" | "operations"      (NOT shown)
+ *   root      = "<module>:<root>"                       (top-level node)
+ *   segs[]    = the YANG container/list chain under root
+ * RESTCONF list keys (e.g. `interface={name}`) are stripped so the tree
+ * mirrors the YANG schema rather than the URL form.
+ *
+ * Public API:
+ *   window.YangTreeSidebar.build(allModules)
+ *     → containerTree root node { name:'', children:Map, ... }
+ *     allModules: [{ fname, pathList:[string], pathOps:{[path]:opId} }]
+ *
+ *   window.YangTreeSidebar.render(containerTree, hostEl, opts)
+ *     opts = {
+ *       filter: 'substring',         // case-insensitive
+ *       currentModule: 'fname',      // for .selected highlight
+ *       onLoad: (fname, el, opId) => void,   // click handler
+ *       collapseAllByDefault: true,  // recommended for multi-root viewers
+ *     }
+ *     → { visibleTops, matched }     // for the "x of y" label
+ *
+ *   window.YangTreeSidebar.toggle(rowEl, evt)  — invoked from inline onclick
+ */
+(function () {
+    'use strict';
+
+    function _escape(s) {
+        return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function _emptyNode(name) {
+        return { name: name, children: new Map(), ownPathSpec: null, ownPathOpId: null, totalPaths: 0 };
+    }
+
+    function _splitPath(p) {
+        // Returns { prefix, root, segs } or null when the path is unrecognised.
+        if (!p || p[0] !== '/') return null;
+        var raw = p.slice(1);
+        if (!raw) return null;
+        var parts = raw.split('/');
+        var prefix = parts[0]; // data | streams | operations
+        if (prefix !== 'data' && prefix !== 'streams' && prefix !== 'operations') return null;
+        if (parts.length < 2) return null;
+        var root = parts[1].replace(/=.*/, '');
+        var segs = parts.slice(2).map(function (s) { return s.replace(/=.*/, ''); }).filter(Boolean);
+        return { prefix: prefix, root: root, segs: segs };
+    }
+
+    function build(allModules) {
+        var root = _emptyNode('');
+        // Sort specs by name so the *first* spec to claim a node wins
+        // deterministically across reloads.
+        var sorted = allModules.slice().sort(function (a, b) { return a.fname.localeCompare(b.fname); });
+        for (var i = 0; i < sorted.length; i++) {
+            var m = sorted[i];
+            var paths = m.pathList || [];
+            for (var j = 0; j < paths.length; j++) {
+                var p = paths[j];
+                var s = _splitPath(p);
+                if (!s) continue;
+                root.totalPaths++;
+                // Top level: the root container (e.g. wlan-cfg-data, native, etc.)
+                if (!root.children.has(s.root)) {
+                    root.children.set(s.root, _emptyNode(s.root));
+                }
+                var node = root.children.get(s.root);
+                node.totalPaths++;
+                if (s.segs.length === 0) {
+                    // The path *is* the root itself.
+                    if (!node.ownPathSpec) {
+                        node.ownPathSpec = m.fname;
+                        node.ownPathOpId = (m.pathOps || {})[p] || null;
+                    }
+                    continue;
+                }
+                for (var k = 0; k < s.segs.length; k++) {
+                    var seg = s.segs[k];
+                    if (!node.children.has(seg)) {
+                        node.children.set(seg, _emptyNode(seg));
+                    }
+                    node = node.children.get(seg);
+                    node.totalPaths++;
+                }
+                if (!node.ownPathSpec) {
+                    node.ownPathSpec = m.fname;
+                    node.ownPathOpId = (m.pathOps || {})[p] || null;
+                }
+            }
+        }
+        return root;
+    }
+
+    function _renderNode(node, depth, pathSoFar, filterRe, expandAll, currentModule) {
+        var fullPath = pathSoFar ? pathSoFar + '/' + node.name : node.name;
+        var selfMatch = !filterRe || filterRe.test(fullPath);
+        var childrenHtml = '';
+        var descendantMatch = false;
+        if (node.children.size) {
+            var sortedChildren = [];
+            node.children.forEach(function (v) { sortedChildren.push(v); });
+            sortedChildren.sort(function (a, b) { return a.name.localeCompare(b.name); });
+            for (var i = 0; i < sortedChildren.length; i++) {
+                var r = _renderNode(sortedChildren[i], depth + 1, fullPath, filterRe, expandAll, currentModule);
+                if (r) {
+                    childrenHtml += r.html;
+                    if (r.matched) descendantMatch = true;
+                }
+            }
+        }
+        if (filterRe && !selfMatch && !descendantMatch) return null;
+        var hasKids = node.children.size > 0;
+        var fname = node.ownPathSpec;
+        var opId = node.ownPathOpId;
+        // Auto-expand when filtering and a descendant matched, or when caller
+        // forces expandAll. Never auto-expand the top container in multi-root
+        // viewers — caller passes expandAll=false.
+        var expanded = (filterRe && descendantMatch) || expandAll;
+        var collapsedClass = hasKids ? (expanded ? '' : ' collapsed') : '';
+        var arrow = hasKids
+            ? '<span class="tree-arrow">&#9660;</span>'
+            : '<span class="tree-arrow tree-arrow-empty"></span>';
+        var toggleAttr = hasKids ? 'onclick="YangTreeSidebar.toggle(this, event)"' : '';
+        var selected = (fname && currentModule === fname) ? ' selected' : '';
+        var opArg = opId ? "'" + _escape(opId) + "'" : 'null';
+        var loadAttr = fname
+            ? 'data-module="' + _escape(fname) + '" onclick="event.stopPropagation(); YangTreeSidebar._click(\'' + _escape(fname) + '\', this, ' + opArg + '); return false;"'
+            : 'onclick="event.stopPropagation(); return false;"';
+        var labelAttr = fname ? loadAttr : '';
+        var indent = depth * 12;
+        var pathBadge = node.totalPaths > 1 ? '<span class="path-count">' + node.totalPaths + '</span>' : '';
+        var fnameBadge = fname ? '<span class="leaf-spec">' + _escape(fname) + '</span>' : '';
+        var html =
+            '<div class="tree-row' + collapsedClass + selected + '" data-depth="' + depth + '" style="padding-left:' + indent + 'px" ' + toggleAttr + '>' +
+                arrow +
+                '<span class="tree-label" ' + labelAttr + '><code>' + _escape(node.name) + '</code>' + fnameBadge + '</span>' +
+                pathBadge +
+            '</div>' +
+            '<div class="tree-children' + collapsedClass + '">' + childrenHtml + '</div>';
+        return { html: html, matched: selfMatch || descendantMatch };
+    }
+
+    function render(containerTree, hostEl, opts) {
+        opts = opts || {};
+        var filter = (opts.filter || '').trim();
+        var filterRe = null;
+        if (filter) {
+            var safe = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filterRe = new RegExp(safe, 'i');
+        }
+        // Click handler — stash on the namespace so the inline onclick can find it.
+        window.YangTreeSidebar._currentOnLoad = opts.onLoad || function () {};
+        var html = '';
+        var visibleTops = 0;
+        var tops = [];
+        containerTree.children.forEach(function (v) { tops.push(v); });
+        tops.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        // expandAll: when filtering OR when caller didn't ask to collapse. For
+        // single-root viewers (native), top is auto-expanded. For multi-root,
+        // pass collapseAllByDefault=true.
+        var expandAllTop = !!filterRe || !opts.collapseAllByDefault;
+        for (var i = 0; i < tops.length; i++) {
+            var r = _renderNode(tops[i], 0, '', filterRe, expandAllTop, opts.currentModule);
+            if (r) { html += r.html; visibleTops++; }
+        }
+        hostEl.innerHTML = html;
+        var matched = hostEl.querySelectorAll('.tree-row').length;
+        return { visibleTops: visibleTops, matched: matched };
+    }
+
+    function toggle(rowEl, evt) {
+        if (evt) evt.stopPropagation();
+        rowEl.classList.toggle('collapsed');
+        var kids = rowEl.nextElementSibling;
+        if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+    }
+
+    function _click(fname, el, opId) {
+        var fn = window.YangTreeSidebar._currentOnLoad;
+        if (typeof fn === 'function') fn(fname, el, opId);
+    }
+
+    window.YangTreeSidebar = {
+        build: build,
+        render: render,
+        toggle: toggle,
+        _click: _click,
+        _currentOnLoad: null,
+    };
+})();
