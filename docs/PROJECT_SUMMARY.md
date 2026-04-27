@@ -4,17 +4,17 @@
 
 This project has successfully created a professional, organized, and developer-friendly documentation hub for Cisco IOS-XE RESTCONF APIs. Through multiple comprehensive phases, we've achieved:
 
-- **656 OpenAPI specifications** across 9 model categories with deep-path coverage
-- **43,725 API paths** organized and documented from resolved YANG trees
-- **68,349 API operations** with production examples
+- **608 OpenAPI specifications** across 9 model categories with deep-path coverage (default release: 26.1.1; the project tracks 5 releases from 17.9.x through 26.1.1 — see [version-stats.json](../version-stats.json) for per-release counts)
+- **37,072 API paths** organized and documented from resolved YANG trees
+- **63,541 API operations** with production examples
 - **53 logical categories** for easy navigation
 - **6 curated quick-start collections** for common workflows
 
-### Deep-Path Specifications (All 9 Models)
+### Deep-Path Specifications (All 9 Models, default release 26.1.1)
 Tree-based generators produce full-depth RESTCONF paths from resolved YANG trees:
-- Operational: 205 specs, 20,159 paths | Config: 39 specs, 9,452 ops | Native: 81 specs, 13,452 ops
-- OpenConfig: 57 specs, 5,920 ops | IETF: 19 specs, 1,122 ops | MIB: 149 specs, 12,482 paths
-- RPC: 59 specs, 232 RPCs | Events: 38 specs, 861 paths | Other: 9 specs, 4,593 ops
+- Operational: 216 specs, 22,144 paths | Config: 41 specs, 10,083 ops | Native: 29 specs, 19,728 ops
+- OpenConfig: 43 specs, 2,904 ops | IETF: 22 specs, 1,664 ops | MIB: 148 specs, 4,272 paths
+- RPC: 57 specs, 302 RPCs | Events: 43 specs, 910 paths | Other: 9 specs, 1,534 ops
 
 ---
 
