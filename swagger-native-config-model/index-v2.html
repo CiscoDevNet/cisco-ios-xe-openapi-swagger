@@ -343,8 +343,9 @@
         const indent = depth * 12;
         const pathBadge = node.totalPaths > 1 ? `<span class="path-count">${node.totalPaths}</span>` : '';
         const fnameBadge = fname ? `<span class="leaf-spec">${escapeHtml(fname)}</span>` : '';
+        const pathAttr = hasKids ? ` data-tree-path="${escapeHtml(fullPath)}"` : '';
         const html = `
-<div class="tree-row${collapsedClass}${selected}" data-depth="${depth}" style="padding-left:${indent}px" ${toggleAttr}>
+<div class="tree-row${collapsedClass}${selected}" data-depth="${depth}"${pathAttr} style="padding-left:${indent}px" ${toggleAttr}>
     ${arrow}
     <span class="tree-label" ${labelAttr}><code>${escapeHtml(node.name)}</code>${fnameBadge}</span>
     ${pathBadge}
@@ -374,6 +375,23 @@
         }
         container.innerHTML = html;
 
+        // Restore persisted expand/collapse state when no filter is active.
+        if (!fl) {
+            const saved = readTreeState();
+            if (saved) {
+                container.querySelectorAll('.tree-row[data-tree-path]').forEach(row => {
+                    const p = row.getAttribute('data-tree-path');
+                    if (!(p in saved)) return;
+                    const wantCollapsed = !!saved[p];
+                    if (wantCollapsed !== row.classList.contains('collapsed')) {
+                        row.classList.toggle('collapsed');
+                        const kids = row.nextElementSibling;
+                        if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+                    }
+                });
+            }
+        }
+
         const info = document.getElementById('searchInfo');
         if (fl) {
             const matchedRows = container.querySelectorAll('.tree-row').length;
@@ -384,11 +402,29 @@
         }
     }
 
+    const TREE_STATE_KEY = 'YangTreeSidebar:native';
+    function readTreeState() {
+        try {
+            const raw = window.localStorage.getItem(TREE_STATE_KEY);
+            if (!raw) return null;
+            const o = JSON.parse(raw);
+            return (o && typeof o === 'object') ? o : null;
+        } catch (_) { return null; }
+    }
+    function writeTreeState(state) {
+        try { window.localStorage.setItem(TREE_STATE_KEY, JSON.stringify(state)); } catch (_) {}
+    }
+
     function toggleTreeNode(rowEl, evt) {
         if (evt) evt.stopPropagation();
         rowEl.classList.toggle('collapsed');
         const kids = rowEl.nextElementSibling;
         if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+        const path = rowEl.getAttribute('data-tree-path');
+        if (!path) return;
+        const state = readTreeState() || {};
+        state[path] = rowEl.classList.contains('collapsed');
+        writeTreeState(state);
     }
 
     function filterModules() {
