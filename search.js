@@ -87,13 +87,13 @@ async function loadSearchIndex() {
             
             // Search index loaded successfully
         } catch (error) {
-            console.error('❌ Error loading search index:', error);
+            console.error('Error loading search index:', error);
             const searchInput = document.getElementById('universalSearch');
             if (searchInput) {
-                searchInput.placeholder = '⚠️ Search unavailable — please refresh the page';
+                searchInput.placeholder = 'Search unavailable — please refresh the page';
                 searchInput.disabled = false;
             }
-            showToast('⚠️ Search unavailable. Please refresh the page.', 'error');
+            showToast('Search unavailable. Please refresh the page.', 'error');
         }
     })();
     
@@ -236,8 +236,8 @@ function renderResults(results) {
     
     if (!results || results.length === 0) {
         const noResultMsg = browseMode 
-            ? '🔍 No modules match the selected filters.'
-            : '🔍 No modules found. Try different keywords or broaden your filters.';
+            ? 'No modules match the selected filters.'
+            : 'No modules found. Try different keywords or broaden your filters.';
         resultsContainer.innerHTML = `<div class="no-results">${noResultMsg}</div>`;
         resultsContainer.classList.add('active');
         return;
@@ -261,7 +261,7 @@ function renderResults(results) {
     const sortBtnStyle = (s) => `cursor:pointer; padding:3px 8px; border:1px solid ${currentSort===s ? '#1565C0' : 'var(--border-color,#ddd)'}; border-radius:4px; background:${currentSort===s ? '#1565C0' : 'var(--bg-card,#fff)'}; color:${currentSort===s ? '#fff' : 'var(--text-secondary,#666)'}; font-size:0.78rem;`;
     const sortBtn = (key, label) => `<button style="${sortBtnStyle(key)}" aria-pressed="${currentSort===key}" onclick="changeSort('${key}')">${label}</button>`;
     const sortHtml = `<span style="display:inline-flex;gap:4px;margin-left:12px;align-items:center;" role="group" aria-label="Sort results"><span style="font-size:0.78rem;color:var(--text-secondary,#666);">Sort:</span>${sortBtn('relevance','Relevance')}${sortBtn('name','Name')}${sortBtn('paths','Paths \u2193')}${sortBtn('type','Type')}</span>`;
-    const statsHtml = `<div class="search-stats" style="display:flex;align-items:center;flex-wrap:wrap;">✨ ${modeLabel} ${totalResults} module${totalResults !== 1 ? 's' : ''}${totalResults > displayLimit ? ` — showing first ${displayLimit}` : ''}${sortHtml}</div>`;
+    const statsHtml = `<div class="search-stats" style="display:flex;align-items:center;flex-wrap:wrap;">${modeLabel} ${totalResults} module${totalResults !== 1 ? 's' : ''}${totalResults >displayLimit ? ` — showing first ${displayLimit}` : ''}${sortHtml}</div>`;
     
     const cardsHtml = results.slice(0, displayLimit).map(result => {
         const module = result.item || result;
@@ -275,10 +275,10 @@ function renderResults(results) {
         
         let linksHtml = '';
         if (module.swaggerUrl) {
-            linksHtml += `<a href="${escapeHtml(module.swaggerUrl)}" class="search-result-link" data-module="${escapedName}">📖 View API Spec</a>`;
+            linksHtml += `<a href="${escapeHtml(module.swaggerUrl)}" class="search-result-link" data-module="${escapedName}">View API Spec</a>`;
         }
         if (module.yangTreeUrl) {
-            linksHtml += `<a href="${escapeHtml(module.yangTreeUrl)}" class="search-result-link" data-module="${escapedName}">🌳 View YANG Tree</a>`;
+            linksHtml += `<a href="${escapeHtml(module.yangTreeUrl)}" class="search-result-link" data-module="${escapedName}">View YANG Tree</a>`;
         }
         
         // Related modules in other categories
@@ -316,7 +316,7 @@ function renderResults(results) {
     resultsContainer.classList.add('active');
     
     if (totalResults > displayLimit) {
-        resultsContainer.innerHTML += `<div class="search-stats" style="text-align: center; margin-top: 16px;">📌 Refine your search or filters to see more specific results.</div>`;
+        resultsContainer.innerHTML += `<div class="search-stats" style="text-align: center; margin-top: 16px;">Refine your search or filters to see more specific results.</div>`;
     }
 }
 
