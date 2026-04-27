@@ -8,9 +8,20 @@ Comprehensive accountability for every YANG module:
 - Direct links to pyang tree HTML files
 - Classification: types, deviation, native-aug, common, etc.
 
-Usage: python analyze_yang_accountability_v2.py
+Usage:
+    python analyze_yang_accountability_v2.py                # legacy 17.18.1, root
+    python analyze_yang_accountability_v2.py --version 26.1.1
+
+When --version is supplied, sources the YANG modules from
+``references/<ver>/`` (with the legacy ``references/17181-YANG-modules`` fallback
+for 17.18.1), the trees from ``releases/<ver>/yang-trees/``, and the specs from
+``releases/<ver>/swagger-*-model/api-v2/``. Outputs are written to
+``releases/<ver>/yang_accountability.json`` (and YANG_MODULE_ACCOUNTABILITY.md
+at the repo root for the default release only, to avoid noisy churn on the
+flagship doc when re-running per-release).
 """
 
+import argparse
 import os
 import json
 import re
@@ -19,10 +30,58 @@ from collections import defaultdict
 from datetime import datetime
 
 BASE_DIR = Path(__file__).parent.parent
+
+# These four are populated by configure_paths() once we know the version.
 YANG_DIR = BASE_DIR / "references" / "17181-YANG-modules"
 TREE_DIR = BASE_DIR / "yang-trees"
 OUTPUT_MD = BASE_DIR / "YANG_MODULE_ACCOUNTABILITY.md"
 OUTPUT_JSON = BASE_DIR / "yang_accountability.json"
+SPEC_BASE_DIR = BASE_DIR  # parent of the swagger-*-model dirs
+IOS_XE_VERSION = "17.18.1"
+WRITE_MD = True
+
+
+def configure_paths(version: str | None) -> None:
+    """Resolve the per-release paths and toggle markdown emission.
+
+    Legacy behaviour (no --version flag): identical to the original script.
+    Per-release behaviour: read YANG/trees/specs from releases/<ver>/ and
+    write the JSON output there too.
+    """
+    global YANG_DIR, TREE_DIR, OUTPUT_JSON, OUTPUT_MD, SPEC_BASE_DIR
+    global IOS_XE_VERSION, WRITE_MD
+    if not version:
+        return
+    IOS_XE_VERSION = version
+    if version == "17.18.1":
+        # Legacy 17.18.1 keeps the per-version YANG location and writes the
+        # canonical root accountability file (the flagship doc).
+        YANG_DIR = BASE_DIR / "references" / "17181-YANG-modules"
+    else:
+        cand = BASE_DIR / "references" / version
+        if cand.is_dir():
+            YANG_DIR = cand
+        else:
+            # Fall back to legacy YANG tree if the per-release source is
+            # missing (e.g. older 17.x releases share the same YANG set).
+            YANG_DIR = BASE_DIR / "references" / "17181-YANG-modules"
+    release_root = BASE_DIR / "releases" / version
+    release_trees = release_root / "yang-trees"
+    if release_trees.is_dir():
+        TREE_DIR = release_trees
+    else:
+        TREE_DIR = BASE_DIR / "yang-trees"
+    # Per-release specs live under releases/<ver>/swagger-*-model/api-v2/.
+    if (release_root / "swagger-oper-model").is_dir():
+        SPEC_BASE_DIR = release_root
+    else:
+        SPEC_BASE_DIR = BASE_DIR
+    release_root.mkdir(parents=True, exist_ok=True)
+    OUTPUT_JSON = release_root / "yang_accountability.json"
+    # Only the default flagship release rewrites the root markdown report;
+    # other releases just emit JSON for the growth view.
+    WRITE_MD = (version == "17.18.1")
+
 
 # GitHub Pages base URL
 GH_PAGES = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger"
@@ -47,7 +106,7 @@ def scan_all_specs():
     module_specs = defaultdict(list)
 
     for folder_name in MODEL_FOLDERS:
-        folder_path = BASE_DIR / folder_name
+        folder_path = SPEC_BASE_DIR / folder_name
         for api_dir_name in ["api-v2", "api"]:
             api_path = folder_path / api_dir_name
             if not api_path.exists():
@@ -420,11 +479,13 @@ def main():
 
     # 8. Generate reports
     generate_json(modules, classifications, total, with_spec, with_tree, multi_cat)
-    generate_markdown(modules, classifications, total, with_spec, with_tree, multi_cat)
+    if WRITE_MD:
+        generate_markdown(modules, classifications, total, with_spec, with_tree, multi_cat)
 
     print(f"\nReports generated:")
     print(f"  - {OUTPUT_JSON}")
-    print(f"  - {OUTPUT_MD}")
+    if WRITE_MD:
+        print(f"  - {OUTPUT_MD}")
 
 
 def generate_json(modules, classifications, total, with_spec, with_tree, multi_cat):
@@ -445,7 +506,7 @@ def generate_json(modules, classifications, total, with_spec, with_tree, multi_c
 
     report = {
         "generated": datetime.now().isoformat(),
-        "ios_xe_version": "17.18.1",
+        "ios_xe_version": IOS_XE_VERSION,
         "total_modules": total,
         "modules_with_specs": with_spec,
         "modules_with_trees": with_tree,
@@ -465,7 +526,7 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
     L.append("# YANG Module Accountability Report")
     L.append("")
     L.append(f"**Date:** {now.strftime('%B %d, %Y')}")
-    L.append(f"**IOS-XE Version:** 17.18.1")
+    L.append(f"**IOS-XE Version:** {IOS_XE_VERSION}")
     L.append(f"**Total YANG Modules:** {total}")
     L.append(f"**Modules with OpenAPI Specs:** {with_spec} ({100*with_spec/total:.1f}%)")
     L.append(f"**Modules with YANG Trees:** {with_tree}")
@@ -589,4 +650,10 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
+    parser.add_argument("--version", default=None,
+                        help="IOS-XE release tag (e.g. 26.1.1). "
+                             "When omitted, uses the legacy root layout.")
+    args = parser.parse_args()
+    configure_paths(args.version)
     main()
