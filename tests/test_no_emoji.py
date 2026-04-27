@@ -71,3 +71,31 @@ def test_no_decorative_emoji(path: Path):
             f"({unique}). Run `python -X utf8 scripts/strip_emoji.py .` "
             f"or remove them by hand. See AGENTS.md."
         )
+
+
+# Common mojibake fingerprints: UTF-8 bytes re-decoded as cp1252/Latin-1.
+# Each entry is the literal characters that appear when this happens.
+MOJIBAKE_NEEDLES = [
+    "\u00E2\u2013\u00BC",   # ▼ written as UTF-8 then read as cp1252
+    "\u00E2\u2013\u00BA",   # ►
+    "\u00E2\u20AC\u0099",   # ’
+    "\u00E2\u20AC\u009C",   # “
+    "\u00E2\u20AC\u009D",   # ”
+    "\u00E2\u20AC\u201C",   # –
+    "\u00E2\u20AC\u201D",   # —
+    "\u2261\u0192",          # cp437 misread of 4-byte emoji lead
+]
+
+
+@pytest.mark.parametrize("path", _all_targets(), ids=lambda p: str(p.relative_to(REPO)))
+def test_no_mojibake(path: Path):
+    text = path.read_text(encoding="utf-8")
+    found = [n for n in MOJIBAKE_NEEDLES if n in text]
+    if found:
+        pytest.fail(
+            f"{path.relative_to(REPO)}: mojibake sequence(s) present "
+            f"{[ [hex(ord(c)) for c in n] for n in found ]}. "
+            f"This usually means a file was written via PowerShell "
+            f"`Set-Content -Encoding utf8` (which double-encodes). "
+            f"Use Python `Path.write_text(..., encoding='utf-8', newline='\\n')` instead."
+        )
