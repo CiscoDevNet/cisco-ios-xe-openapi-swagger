@@ -21,8 +21,17 @@ KEEP = {"\u2605", "\u2606", "\u2713", "\u2715"}
 # Build a regex matching any code point we want to drop.
 def _ranges():
     out = []
+    # Misc Technical (U+2300-23FF: includes hourglass, keyboard, etc.)
+    for cp in range(0x2300, 0x2400):
+        out.append(chr(cp))
     # Misc Symbols + Dingbats + Misc Symbols & Arrows
     for cp in range(0x2600, 0x27C0):
+        ch = chr(cp)
+        if ch in KEEP:
+            continue
+        out.append(ch)
+    # Misc Symbols & Arrows (U+2B00-2BFF: stars, arrows)
+    for cp in range(0x2B00, 0x2C00):
         ch = chr(cp)
         if ch in KEEP:
             continue
@@ -55,6 +64,13 @@ def strip(text: str) -> str:
         if old == line:
             out_lines.append(line)
             continue
+        # If the original line had no leading whitespace but the stripped line
+        # now does (because the line started with an emoji prefix that left a
+        # trailing space behind), drop that orphan leading space.
+        old_lead = re.match(r"^[ \t]*", old).group(0)
+        new_lead = re.match(r"^[ \t]*", line).group(0)
+        if len(new_lead) > len(old_lead):
+            line = line[len(new_lead) - len(old_lead):]
         m = re.match(r"^([ \t]*)(.*?)(\r?\n?)$", line, re.DOTALL)
         if not m:
             out_lines.append(line)
@@ -85,6 +101,9 @@ def main(root: Path) -> int:
     for d in root.glob("swagger-*-model"):
         for ext in ("*.html", "*.js"):
             files.extend(d.glob(ext))
+    # Repository-root markdown files (skip archive/, releases/, references/, tests/)
+    for md in root.glob("*.md"):
+        files.append(md)
 
     for fp in files:
         try:

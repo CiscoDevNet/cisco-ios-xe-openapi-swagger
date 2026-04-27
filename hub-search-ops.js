@@ -117,7 +117,7 @@
         var s = ensureSection();
         if (!s) return;
         s.innerHTML = '<div class="search-stats" style="padding:8px 12px;">'
-            + '⏳ Loading operation index for ' + escHtml(activeVersion()) + ' ...'
+            + 'Loading operation index for ' + escHtml(activeVersion()) + ' ...'
             + '</div>';
     }
 

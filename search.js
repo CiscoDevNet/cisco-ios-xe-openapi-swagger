@@ -46,7 +46,7 @@ async function loadSearchIndex() {
         try {
             const searchInput = document.getElementById('universalSearch');
             if (searchInput) {
-                searchInput.placeholder = '⏳ Loading search index...';
+                searchInput.placeholder = 'Loading search index...';
                 searchInput.disabled = true;
             }
             
@@ -574,7 +574,7 @@ function performSearch() {
     browseMode = false;
     
     if (query.length < 2) {
-        document.getElementById('searchResults').innerHTML = '<div class="search-stats">⌨️ Type at least 2 characters to search...</div>';
+        document.getElementById('searchResults').innerHTML = '<div class="search-stats">Type at least 2 characters to search...</div>';
         document.getElementById('searchResults').classList.add('active');
         return;
     }

@@ -151,7 +151,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   to crash on load. All 45 manifests rewritten via `normalize_manifests.py`.
 - **404 storms on malformed URLs** — `?ver=garbage` previously triggered ~150 spec 404s. Now
   validated against the allow-list baked into the viewer; falls back silently to the default.
-- **Mojibake repaired in 7 viewers** — `â€"` → `—`, `ðŸŒ³` → `🌳`, `ðŸ—„` → `🗄`, etc., via `ftfy`.
+- **Mojibake repaired in 7 viewers** — `â€"` → `—`, `ðŸŒ³` → ``, `ðŸ—„` → ``, etc., via `ftfy`.
   CSP meta tags verified present on all 9 viewers.
 - **Patcher fragility** — anchor strings differed across viewers; idempotency previously relied on
   a substring sentinel. Replaced with a regex-replaceable helper block and a dead-code strip pass.
@@ -274,13 +274,13 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 - **[swagger-oper-model/index-v2.html](swagger-oper-model/index-v2.html)** — when an oper spec is
   loaded, fetches the active release's `telemetry-index.json`, filters entries to that module, and
-  exposes them via a 📡 toolbar toggle that opens an inline panel listing each XPath with HOT /
+  exposes them via a toolbar toggle that opens an inline panel listing each XPath with HOT /
   WARM / COOL tier badges, cadence, and on-change indicators. Falls back gracefully when no
   telemetry index is present.
 
 #### Visible UI surfaces (round 3)
 
-- **[swagger-mib-model/index-v2.html](swagger-mib-model/index-v2.html)** — added a 🗄️ MIB Details
+- **[swagger-mib-model/index-v2.html](swagger-mib-model/index-v2.html)** — added a MIB Details
   toolbar toggle. When opened it loads the active release's `mib-metadata.json` (with fallback to
   the legacy in-place file) and renders the loaded spec's MIB record: module / OID prefix /
   table-scalar-leaf counts / indexes / deprecated flag / latest revision / organization / RFC /
@@ -291,7 +291,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   lists / choices / categories) and a sortable & filterable per-category table with deep-links into
   each category's spec in the Swagger UI viewer. Includes the standard release picker.
 - **[swagger-native-config-model/index-v2.html](swagger-native-config-model/index-v2.html)** —
-  added a 📊 Capabilities Report link in the toolbar.
+  added a Capabilities Report link in the toolbar.
 - **[references/native-cli-mappings.yaml](references/native-cli-mappings.yaml)** *(new)* — curated
   YAML mapping table (~25 prefixes covering hostname, interfaces, BGP / OSPF, VLANs, AAA, SNMP,
   NTP, logging, spanning-tree, ACLs, NAT) of `path → cli` so every native operation can advertise
