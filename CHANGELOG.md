@@ -28,6 +28,66 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 ## [Unreleased]
 
+### Added — Hub-level cross-category operation search & d8 spec depth (round 8, 2026)
+
+- **[hub-search-ops.js](hub-search-ops.js)** — augments the universal search box on the
+  landing page (`#universalSearch`) with a new "Operations matching" section that surfaces
+  individual API operations across all 9 viewer categories. Lazy-loads each category's
+  `_paths_index.json` (built by [scripts/build_paths_index.py](scripts/build_paths_index.py))
+  on the first user query and caches in memory. Each hit renders HTTP-method badges
+  (GET/POST/PUT/PATCH/DELETE colour-coded) and clicks deep-link to
+  `swagger-<cat>-model/index-v2.html#spec=<module>&op=<operationId>`, handled by
+  [deeplink.js](deeplink.js) in each viewer (auto-loads spec, expands the operation row).
+  CSP-strict (same-origin script, no `eval`, no inline handlers).
+- **Depth-d8 cfg / oper specs (26.1.1)** — `generate_cfg_from_tree.py` and
+  `generate_oper_from_tree.py` `max_depth` raised from 6 → 8 in both `collect_deep_paths()`
+  and `process_tree_file()`. 26.1.1 now publishes:
+  - cfg : 2559 paths, 10083 operations, 40 specs (+25 paths at d7 + d8)
+  - oper: 22144 paths, 215 specs (+566 paths at d7 + d8)
+- **Audit floor tightened** — [scripts/audit_path_depth.py](scripts/audit_path_depth.py)
+  `MIN_MAX_DEPTH` raised cfg / oper 6 → 7. Strict mode now blocks any future regression
+  below d7 for those two categories.
+- **17.x backport (deferred)** — the from-tree generators already support 17.18.1, 17.15.x,
+  17.12.x and 17.9.x via `_resolve_paths(version)` (legacy top-level `yang-trees/` for
+  17.18.1, `releases/<ver>/yang-trees/` otherwise). A subsequent operations cycle should
+  run `python scripts/build_release.py --version <ver>` for each 17.x release to materialise
+  the deeper specs and re-run downstream overlays. Audit floor was kept conservative on
+  cfg / oper (d7) so the bump is achievable on older trees too.
+
+### Added — Path-depth audit, tree-based generators & cross-chunk operation search (rounds 6–7, 2026)
+
+- **Tree-based generators for cfg / oper / events** —
+  [generators/generate_cfg_from_tree.py](generators/generate_cfg_from_tree.py),
+  [generators/generate_oper_from_tree.py](generators/generate_oper_from_tree.py) and
+  [generators/generate_events_from_tree.py](generators/generate_events_from_tree.py)
+  replace the older regex-based generators in [scripts/build_release.py](scripts/build_release.py)'s
+  `cfg-specs`, `oper-specs` and `events-specs` steps. Tree parsers walk the pyang HTML
+  output and emit one operation per node up to the configured `max_depth`, mirroring the
+  same approach already used by the `native_from_tree` and `openconfig_from_tree`
+  generators. On 26.1.1 this produced ~4× more cfg paths, ~7.8× more oper paths and ~10.8×
+  more events paths versus the previous regex passes.
+- **[scripts/audit_path_depth.py](scripts/audit_path_depth.py)** — new build step that
+  walks every `releases/<ver>/swagger-<cat>-model/api-v2/*.json`, computes a per-category
+  depth distribution + `max-depth`, writes `releases/<ver>/path_depth_audit.json` and (in
+  `--strict` mode, used by `build_release.py`) fails the build if any category is below its
+  `MIN_MAX_DEPTH` floor. Floors at end of round 7: cfg=6, oper=6, native-config=6, ietf=3,
+  openconfig=3, other=3, events=2, mib=2, rpc=1.
+- **Cross-chunk operation search in all 9 viewers** — `paths-search.js` (canonical copy in
+  [swagger-native-config-model/paths-search.js](swagger-native-config-model/paths-search.js))
+  is wired into every viewer (`cfg`, `events`, `ietf`, `mib`, `native-config`, `openconfig`,
+  `oper`, `other`, `rpc`). The IIFE hooks the viewer's `#searchBox` and queries the
+  category-scoped `_paths_index.json`, so a path/op search resolves across **all** spec
+  chunks in the category, not just the one currently rendered. 80 ms input debounce,
+  `MIN_QUERY=2`, `MAX_HITS=60`. The hook self-skips on releases other than 26.1.1.
+- **Spec-count manifest fixes** — both [scripts/stamp_spec_count.py](scripts/stamp_spec_count.py)
+  and [scripts/update_manifests.py](scripts/update_manifests.py) now exclude `manifest.json`
+  and `_paths_index.json` when counting specs, so the published counts stay correct after
+  the paths-index file landed in `api-v2/`.
+- **Multi-root merge in `generate_cfg_from_tree.py`** — earlier the cfg generator emitted
+  separate spec files per `data` root, causing 40 files vs 90 modules. The from-tree port
+  now merges roots per module name (matching the oper generator), restoring 1-spec-per-module
+  parity.
+
 ### Added — Module-driven Telemetry XPath Builder (round 5, April 2026)
 
 - **[telemetry.html](telemetry.html) rewrite** — formerly a static dump of the 61 curated
