@@ -3,25 +3,18 @@
  * Implements the formula documented in MDT_XPATH_SPEC.md:
  *   filter xpath = "/" + <prefix> + ":" + <path-without-leading-slash>
  *
- * Two modes:
- *  (1) "Module XPath Builder" — pick ANY release / category / module and we
- *      compute the MDT filter xpath for every operation_path in that spec
- *      using the per-release yang-prefix-map.json. Curated tier / cadence
- *      annotations from telemetry-index.json (when present) are folded in
- *      as enrichment, but the xpath itself is always derived live from the
- *      formula — there is no requirement that the entry exist in any
- *      curated catalog.
- *  (2) "Curated Catalog" — preserves the original telemetry-index.json
- *      table for the legacy 61 annotated subscriptions on 17.18.1.
+ * Pick any release / category / module and we compute the MDT
+ * filter xpath for every operation in that spec, derived live from the
+ * formula. The xpath is always derived; there is no curated catalog.
  */
 (function () {
   'use strict';
 
   // --- Static configuration --------------------------------------------------
 
-  // Categories rendered in the builder's category dropdown. Order is the
-  // order shown to the user; "oper" is the default because MDT subscriptions
-  // are overwhelmingly against operational state.
+  // Categories rendered in the builder's category dropdown. "oper" is the
+  // default because MDT subscriptions are overwhelmingly against
+  // operational state.
   var CATEGORIES = [
     { id: 'oper',          label: 'Operational state (oper)' },
     { id: 'cfg',           label: 'Configuration (cfg)' },
@@ -35,9 +28,7 @@
   ];
 
   // For 17.18.1 (legacy in-place layout) the prefix map sits at the repo
-  // root; every other release gets a per-release file. Returning ``null``
-  // for unsupported releases lets the builder render a friendly notice
-  // instead of a broken table.
+  // root; every other release gets a per-release file.
   function prefixMapUrl(ver) {
     if (ver === '17.18.1') return 'yang-prefix-map.json';
     return 'releases/' + encodeURIComponent(ver) + '/yang-prefix-map.json';
@@ -48,18 +39,11 @@
     return 'releases/' + encodeURIComponent(ver) + '/swagger-' + cat + '-model/api-v2/';
   }
 
-  function telemetryIndexUrl(ver) {
-    if (ver === '17.18.1') return 'releases/17.18.1/telemetry-index.json';
-    return 'releases/' + encodeURIComponent(ver) + '/telemetry-index.json';
-  }
-
   // --- State -----------------------------------------------------------------
 
   var state = {
     ver: null,
-    prefixes: {},        // { moduleName: prefix }
-    catalog: null,       // telemetry-index.json (curated)
-    catalogByXpath: {},  // xpath -> entry, for builder enrichment
+    prefixes: {},   // { moduleName: prefix }
     cat: null,
     manifest: null,
     spec: null,
@@ -101,19 +85,6 @@
     });
     rsel.addEventListener('change', function () { loadRelease(rsel.value); });
 
-    // Tab wiring
-    var tabs = document.querySelectorAll('.tabs button');
-    tabs.forEach(function (t) {
-      t.addEventListener('click', function () {
-        tabs.forEach(function (x) { x.classList.remove('active'); });
-        t.classList.add('active');
-        document.querySelectorAll('.pane').forEach(function (p) { p.classList.remove('active'); });
-        $(t.getAttribute('data-pane')).classList.add('active');
-      });
-    });
-
-    // Category dropdown — populated once; module dropdown is repopulated per
-    // category load.
     var csel = $('b-cat');
     CATEGORIES.forEach(function (c) {
       var o = document.createElement('option');
@@ -130,11 +101,6 @@
       copyText($('b-snippet').textContent, btn);
     });
 
-    // Catalog pane filter handlers
-    ['c-filter', 'c-tier', 'c-onchange'].forEach(function (id) {
-      $(id).addEventListener('input', renderCatalog);
-    });
-
     loadRelease(current);
   }
 
@@ -143,34 +109,16 @@
   function loadRelease(ver) {
     state.ver = ver;
     state.prefixes = {};
-    state.catalog = null;
-    state.catalogByXpath = {};
     state.spec = null;
     state.specName = null;
 
-    var pPrefixes = fetch(prefixMapUrl(ver), { cache: 'no-store' })
+    fetch(prefixMapUrl(ver), { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .catch(function () { return null; });
-
-    var pCatalog = fetch(telemetryIndexUrl(ver), { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .catch(function () { return null; });
-
-    Promise.all([pPrefixes, pCatalog]).then(function (results) {
-      var pm = results[0];
-      var cat = results[1];
-      state.prefixes = (pm && pm.modules) || {};
-      state.catalog = cat;
-      state.catalogByXpath = {};
-      var entries = (cat && cat.entries) || [];
-      entries.forEach(function (e) {
-        if (e && e.filter_xpath) state.catalogByXpath[e.filter_xpath] = e;
+      .catch(function () { return null; })
+      .then(function (pm) {
+        state.prefixes = (pm && pm.modules) || {};
+        loadCategory($('b-cat').value);
       });
-      // Kick off the default category for the builder, and refresh catalog pane.
-      loadCategory($('b-cat').value);
-      renderCatalogStats();
-      renderCatalog();
-    });
   }
 
   function loadCategory(cat) {
@@ -244,35 +192,30 @@
   //    /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization
   // per MDT_XPATH_SPEC.md §1.
   //
-  // List keys on the FIRST segment (e.g. ``foo=KEY``) are dropped because MDT
-  // subscriptions take an unkeyed root xpath. Subsequent ``=...`` selectors
-  // are likewise stripped to keep the result a structural xpath. Returns
-  // ``null`` if the path can't be normalised (no ``/data/`` prefix, no
-  // module qualifier, or unknown module prefix).
+  // List keys (e.g. ``foo=KEY``) are dropped because MDT subscriptions take
+  // an unkeyed root xpath. Returns ``null`` if the path can't be normalised
+  // (no ``/data/`` prefix, no module qualifier, or unknown module prefix).
   function deriveXpath(opPath, prefixes) {
     if (!opPath) return null;
     var p = opPath;
-    // Strip the RESTCONF data root.
     if (p.indexOf('/data/') === 0) p = p.substring('/data/'.length);
     else if (p.indexOf('/restconf/data/') === 0) p = p.substring('/restconf/data/'.length);
     else if (p.charAt(0) === '/') p = p.substring(1);
-    // First segment must carry the module qualifier ``Module:container``.
     var firstSlash = p.indexOf('/');
     var first = firstSlash === -1 ? p : p.substring(0, firstSlash);
-    var rest  = firstSlash === -1 ? '' : p.substring(firstSlash); // keeps leading "/"
+    var rest  = firstSlash === -1 ? '' : p.substring(firstSlash);
     var colon = first.indexOf(':');
     if (colon === -1) return null;
     var moduleName = first.substring(0, colon);
     var head = first.substring(colon + 1);
     var prefix = prefixes[moduleName];
     if (!prefix) return null;
-    // Drop list keys: ``container=KEY,KEY2`` -> ``container``.
     head = head.replace(/=[^/]*$/, '');
     var tail = rest.replace(/=[^/]*(?=\/|$)/g, '');
     return '/' + prefix + ':' + head + tail;
   }
 
-  // --- Rendering: builder ----------------------------------------------------
+  // --- Rendering -------------------------------------------------------------
 
   function renderModuleInfo(name) {
     var el = $('b-info');
@@ -325,15 +268,7 @@
       Object.keys(ops).forEach(function (method) {
         if (['get','post','put','patch','delete'].indexOf(method) === -1) return;
         var xpath = deriveXpath(apiPath, state.prefixes);
-        var enriched = (xpath && state.catalogByXpath[xpath]) || null;
-        rows.push({
-          method: method.toUpperCase(),
-          api: apiPath,
-          xpath: xpath,
-          tier: enriched && enriched.tier,
-          cadence: enriched && enriched.cadence_seconds,
-          onChange: enriched && enriched.on_change_capable
-        });
+        rows.push({ method: method.toUpperCase(), api: apiPath, xpath: xpath });
       });
     });
 
@@ -356,29 +291,21 @@
       var xpathCell = r.xpath
         ? '<td class="xpath">' + escapeHtml(r.xpath) + '</td>'
         : '<td class="xpath" style="color:var(--muted);">(can\'t derive — unknown module prefix)</td>';
-      var tierCell = r.tier
-        ? '<td><span class="tier ' + escapeHtml(String(r.tier).toUpperCase()) + '">'
-            + escapeHtml(r.tier) + '</span></td>'
-        : '<td></td>';
-      var cadenceCell = r.cadence ? '<td>' + escapeHtml(r.cadence + 's') + '</td>' : '<td></td>';
-      var onChangeCell = '<td>' + (r.onChange ? '\u2713' : '') + '</td>';
       var copyCell = r.xpath
         ? '<td><button class="copy-btn" type="button" data-xp="' + escapeHtml(r.xpath) + '">Use</button></td>'
         : '<td></td>';
       tr.innerHTML =
         '<td><span class="method ' + r.method + '">' + r.method + '</span></td>' +
         '<td class="api">' + escapeHtml(r.api) + '</td>' +
-        xpathCell + tierCell + cadenceCell + onChangeCell + copyCell;
+        xpathCell + copyCell;
       tbody.appendChild(tr);
     });
 
-    // Wire "Use" buttons to populate the subscription template.
     Array.prototype.forEach.call(tbody.querySelectorAll('button[data-xp]'),
       function (btn) {
         btn.addEventListener('click', function () {
           var xp = btn.getAttribute('data-xp');
           $('b-snippet').textContent = buildSubscriptionSnippet(xp);
-          // Visual confirmation; reset after a moment.
           btn.classList.add('ok');
           btn.textContent = 'Used';
           setTimeout(function () {
@@ -424,79 +351,5 @@
     ta.select();
     try { document.execCommand('copy'); } catch (_) {}
     document.body.removeChild(ta);
-  }
-
-  // --- Rendering: curated catalog (legacy view) ------------------------------
-
-  function renderCatalogStats() {
-    var s = $('c-stats');
-    var entries = (state.catalog && state.catalog.entries) || [];
-    if (!entries.length) {
-      s.innerHTML = '<div class="stat"><div class="num">&mdash;</div>' +
-        '<div class="lbl">No telemetry-index.json for ' + escapeHtml(state.ver) + '</div></div>';
-      return;
-    }
-    var byTier = { HOT: 0, WARM: 0, COOL: 0, OTHER: 0 };
-    var onChange = 0, modules = {};
-    entries.forEach(function (e) {
-      var t = (e.tier || '').toUpperCase();
-      if (byTier[t] !== undefined) byTier[t]++; else byTier.OTHER++;
-      if (e.on_change_capable) onChange++;
-      if (e.module) modules[e.module] = true;
-    });
-    s.innerHTML =
-      stat(entries.length, 'XPaths annotated') +
-      stat(byTier.HOT,  'HOT') +
-      stat(byTier.WARM, 'WARM') +
-      stat(byTier.COOL, 'COOL') +
-      stat(onChange,    'on-change') +
-      stat(Object.keys(modules).length, 'modules');
-  }
-  function stat(n, l) {
-    return '<div class="stat"><div class="num">' + n +
-           '</div><div class="lbl">' + escapeHtml(l) + '</div></div>';
-  }
-
-  function renderCatalog() {
-    var tb = document.querySelector('#c-tbl tbody');
-    var emp = $('c-empty');
-    clearChildren(tb);
-    var entries = (state.catalog && state.catalog.entries) || [];
-    var q = $('c-filter').value.trim().toLowerCase();
-    var tier = $('c-tier').value;
-    var oc = $('c-onchange').value;
-    var shown = 0;
-    entries.forEach(function (e) {
-      if (tier && (e.tier || '').toUpperCase() !== tier) return;
-      if (oc === 'true' && !e.on_change_capable) return;
-      if (oc === 'false' && e.on_change_capable) return;
-      var xp = e.filter_xpath || e.xpath || '';
-      if (q) {
-        var hay = (xp + ' ' + (e.module || '') + ' ' + (e.feature_title || '')
-                 + ' ' + (e.feature_section || '')).toLowerCase();
-        if (hay.indexOf(q) === -1) return;
-      }
-      shown++;
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td class="xpath">' + escapeHtml(xp) + '</td>' +
-        '<td>' + escapeHtml(e.module || '') + '</td>' +
-        '<td>' + (e.tier ? '<span class="tier ' + escapeHtml((e.tier || '').toUpperCase()) +
-                         '">' + escapeHtml(e.tier) + '</span>' : '') + '</td>' +
-        '<td>' + (e.cadence_seconds ? escapeHtml(e.cadence_seconds + 's') : '') + '</td>' +
-        '<td><span class="badge">' + escapeHtml(e.encoding || 'kvGPB') + '</span></td>' +
-        '<td>' + (e.on_change_capable ? '\u2713' : '') + '</td>' +
-        '<td>' + (e.feature_section
-          ? '<a class="spec-link" href="' + escapeHtml(e.feature_section) + '">view</a>'
-          : '') + '</td>';
-      tb.appendChild(tr);
-    });
-    emp.style.display = shown ? 'none' : 'block';
-    if (!shown && !entries.length) {
-      emp.textContent = 'No curated telemetry-index.json is published for this release yet. '
-        + 'Use the Module XPath Builder tab to derive xpaths on the fly.';
-    } else if (!shown) {
-      emp.textContent = 'No telemetry XPaths match the current filters.';
-    }
   }
 })();
