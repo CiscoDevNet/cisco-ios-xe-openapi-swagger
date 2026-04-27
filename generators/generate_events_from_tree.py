@@ -496,7 +496,12 @@ def process_tree_file(html_path, output_dir, max_depth=5):
 
 def _resolve_paths(version: str):
     project_root = Path(__file__).resolve().parent.parent
-    if version == '17.18.1':
+    release_tree = project_root / 'releases' / version / 'yang-trees'
+    if release_tree.is_dir():
+        tree_dir = release_tree
+        output_dir = (project_root / 'releases' / version
+                      / 'swagger-events-model' / 'api-v2')
+    elif version == '17.18.1':
         tree_dir = project_root / 'yang-trees'
         output_dir = project_root / 'swagger-events-model' / 'api-v2'
     else:

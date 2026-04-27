@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cisco-IOS-XE-cli-preview-rpc - RPC Operations",
+    "description": "This module contains a collection of YANG definitions\n     for the Configuration CLI Preview RPC.\n     Copyright (c) 2023 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `Cisco-IOS-XE-cli-preview-rpc`\n**Version:** 2023-11-01\n**Operations:** 1",
+    "version": "2023-11-01"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/operations/cli_preview_rpc:cli-preview": {
+      "post": {
+        "summary": "The configuration CLI preview RPC accepts NETCONF XML encoded\n       configuration based on YANG model schemas. It will return a\n       preview of the IOS-XE command-line interface (CLI) configuration\n       commands needed to apply the configuration. The returned commands\n       depend on the device's current configuration state and will vary\n       if the device's configuration changes. The configuration will not\n       be applied to the device.",
+        "description": "The configuration CLI preview RPC accepts NETCONF XML encoded\n       configuration based on YANG model schemas. It will return a\n       preview of the IOS-XE command-line interface (CLI) configuration\n       commands needed to apply the configuration. The returned commands\n       depend on the device's current configuration state and will vary\n       if the device's configuration changes. The configuration will not\n       be applied to the device.\n\n**Endpoint:** `POST /restconf/operations/cli_preview_rpc:cli-preview`",
+        "operationId": "cli-preview",
+        "tags": [
+          "Cisco-IOS-XE-cli-preview-rpc"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cli_preview_rpc:cli-preview": {
+                    "type": "object",
+                    "properties": {
+                      "config-xml": {
+                        "type": "string",
+                        "description": "This leaf accepts a NETCONF XML <config> tag holding configuration\n         data corresponding to the device's YANG models similar to the\n         <edit-config> RPC.\n\n         For example:\n         <config>\n         ...\n         </config>\n\n         The target datastore is the 'running' datastore. The 'candidate'\n         datastore is not supported.\n\n         This leaf is defined to be of type 'string' and the input XML will\n         need to be escaped when this RPC is executed using NETCONF."
+                      },
+                      "custom-timeout": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 600,
+                        "description": "The time required to generate a configuration CLI preview will\n         vary with the input configuration. This leaf allows the client\n         to specify how long it is willing to wait for a preview operation\n         to complete up to a maximum of 600 seconds. If this leaf is not\n         explicitly set the default value of 60 seconds will apply.",
+                        "default": "60"
+                      },
+                      "netconf-xml": {
+                        "type": "object",
+                        "properties": {
+                          "config-xml": {
+                            "type": "string",
+                            "description": "This leaf accepts a NETCONF XML <config> tag holding configuration\n         data corresponding to the device's YANG models similar to the\n         <edit-config> RPC.\n\n         For example:\n         <config>\n         ...\n         </config>\n\n         The target datastore is the 'running' datastore. The 'candidate'\n         datastore is not supported.\n\n         This leaf is defined to be of type 'string' and the input XML will\n         need to be escaped when this RPC is executed using NETCONF."
+                          }
+                        },
+                        "required": [
+                          "config-xml"
+                        ],
+                        "description": "NETCONF XML encoded configuration input"
+                      }
+                    },
+                    "required": [
+                      "config-xml"
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "cli_preview_rpc:cli-preview": {
+                  "config-xml": "example-string",
+                  "custom-timeout": 30,
+                  "netconf-xml": {
+                    "config-xml": "example-string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC executed successfully",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "config-cli": {
+                      "type": "string",
+                      "description": "A preview of the IOS-XE command-line interface (CLI) configuration\n         commands needed to apply the input configuration. The returned\n         commands depend on the device's current configuration state and will\n         vary if the device's configuration changes."
+                    }
+                  }
+                },
+                "example": {
+                  "config-cli": "GigabitEthernet1/0/1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
