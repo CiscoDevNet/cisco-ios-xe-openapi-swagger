@@ -30,7 +30,8 @@
         .stat { text-align: center; }
         .stat-value { font-size: 20px; font-weight: bold; color: #1565c0; }
         .stat-label { font-size: 11px; color: #666; }
-        .section-header { padding: 10px 16px; background: #e8eaf6; font-size: 12px; font-weight: 600; color: #283593; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #c5cae9; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+        .section-header { padding: 10px 16px; background: #e8eaf6; font-size: 12px; font-weight: 600; color: #283593; letter-spacing: 0; border-bottom: 1px solid #c5cae9; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+        .section-header code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #283593; }
         .section-header:hover { background: #c5cae9; }
         .section-header .count { font-weight: normal; color: #5c6bc0; font-size: 11px; }
         .section-header .arrow { transition: transform 0.2s; }
@@ -130,19 +131,13 @@
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    // Section definitions for sidebar grouping
-    const SECTION_ORDER = [
-        { key: 'intf',      label: 'Interface Features',    match: f => f.startsWith('native-intf') },
-        { key: 'ip',        label: 'IP Configuration',      match: f => f.startsWith('native-ip') || f === 'native-ipv6' },
-        { key: 'line',      label: 'Line & CLI',            match: f => f.startsWith('native-line') || ['native-banner','native-parser','native-alias','native-macro','native-template','native-event','native-transport','native-transport-map','native-wsma','native-archive'].includes(f) },
-        { key: 'security',  label: 'Security & AAA',        match: f => f === 'native-security' || f === 'native-crypto' },
-        { key: 'switching', label: 'Switching & L2',        match: f => f === 'native-switching' },
-        { key: 'routing',   label: 'Routing & MPLS',        match: f => f === 'native-routing-protocols' || f === 'native-mpls-vpn' },
-        { key: 'monitor',   label: 'Monitoring & Logging',  match: f => f === 'native-monitoring' },
-        { key: 'platform',  label: 'Platform & System',     match: f => ['native-platform','native-system-core'].includes(f) },
-        { key: 'services',  label: 'Services',              match: f => f === 'native-services' || f === 'native-ha' },
-    ];
-    const OTHER_SECTION = { key: 'other', label: 'Other Containers' };
+    // Sidebar layout = the actual YANG container tree under
+    // /data/Cisco-IOS-XE-native:native/. Top-level YANG containers (e.g.
+    // interface, ip, vlan, line, router) are the section headers; their
+    // immediate child YANG nodes are the items underneath. The map is
+    // built dynamically from each spec's path list at init time.
+    const NATIVE_PREFIX = '/data/Cisco-IOS-XE-native:native/';
+    let containerTree = {}; // { topContainer: { subs: {sub:fname}, specs: Set, leafSpec: fname|null, totalPaths } }
 
     // === version-aware api base (added by patch_viewers_version_aware.py) ===
     // Default version + allow-list are baked from releases/index.json at
@@ -225,52 +220,112 @@
         document.getElementById('headerStats').textContent =
             `${manifest.total_paths.toLocaleString()} RESTCONF paths, ${manifest.total_operations.toLocaleString()} ops across ${manifest.total_modules} modules — generated from resolved YANG trees`;
 
-        // Load each spec's info (title + path count) — fetch in parallel
+        // Load each spec's info (title + path count + path list) — fetch in parallel.
+        // Path list is used to build the YANG container tree for the sidebar.
         const fetches = manifest.modules.map(async fname => {
             try {
                 const r = await fetch(`${__apiBase()}/${fname}.json`);
                 const spec = await r.json();
                 const title = spec.info.title.replace('Cisco IOS-XE Native Config - ', '');
-                const paths = Object.keys(spec.paths).length;
-                // Determine section
-                let section = OTHER_SECTION.key;
-                for (const s of SECTION_ORDER) {
-                    if (s.match(fname)) { section = s.key; break; }
-                }
-                return { fname, title, paths, section };
+                const pathList = Object.keys(spec.paths || {});
+                return { fname, title, paths: pathList.length, pathList };
             } catch(e) {
-                return { fname, title: fname, paths: 0, section: OTHER_SECTION.key };
+                return { fname, title: fname, paths: 0, pathList: [] };
             }
         });
 
         allModules = await Promise.all(fetches);
+        buildContainerTree();
         renderSidebar();
         checkHash();
     }
 
+    // Walk every spec's paths and build a 2-level tree keyed on the YANG
+    // top-level container (immediate child of native:native) and its
+    // immediate child node. The owning spec for each (top, sub) is the
+    // first spec that references that path.
+    function buildContainerTree() {
+        const tree = {};
+        for (const m of allModules) {
+            for (const p of m.pathList) {
+                if (!p.startsWith(NATIVE_PREFIX)) continue;
+                const rest = p.slice(NATIVE_PREFIX.length); // top[/sub[/...]]
+                if (!rest) continue;
+                const segs = rest.split('/');
+                const top = segs[0];
+                if (!top) continue;
+                if (!tree[top]) tree[top] = { subs: {}, specs: new Set(), leafSpec: null, totalPaths: 0 };
+                const node = tree[top];
+                node.specs.add(m.fname);
+                node.totalPaths++;
+                // Top-level path itself (e.g. /native/aaa) -> leaf section
+                if (segs.length === 1 && !node.leafSpec) node.leafSpec = m.fname;
+                if (segs.length >= 2) {
+                    const sub = segs[1];
+                    if (!(sub in node.subs)) node.subs[sub] = m.fname;
+                }
+            }
+        }
+        containerTree = tree;
+    }
+
     function renderSidebar(filter = '') {
         const container = document.getElementById('sidebarContent');
-        let html = '';
         const fl = filter.toLowerCase();
+        let html = '';
 
-        const sections = [...SECTION_ORDER, OTHER_SECTION];
-        for (const sec of sections) {
-            const items = allModules.filter(m => m.section === sec.key &&
-                (!fl || m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl)));
-            if (items.length === 0) continue;
+        const tops = Object.keys(containerTree).sort();
+        let visibleTops = 0;
+        let visibleLeaves = 0;
 
-            const totalPaths = items.reduce((s, m) => s + m.paths, 0);
-            html += `<div class="section-header" onclick="toggleSection(this)">
-                <span>${sec.label} <span class="count">(${totalPaths})</span></span>
+        for (const top of tops) {
+            const node = containerTree[top];
+            const subs = Object.keys(node.subs).sort();
+
+            // Filter: keep this group if the top-level name matches OR any sub matches
+            // OR any of its specs' titles/fnames match.
+            const topMatch = !fl || top.toLowerCase().includes(fl);
+            const subMatches = subs.filter(s => !fl || topMatch || s.toLowerCase().includes(fl));
+            const specHit = !fl || [...node.specs].some(fn => {
+                const m = allModules.find(x => x.fname === fn);
+                return m && (m.fname.toLowerCase().includes(fl) || m.title.toLowerCase().includes(fl));
+            });
+            if (fl && !topMatch && subMatches.length === 0 && !specHit) continue;
+            visibleTops++;
+
+            // Section header always toggles. Spec loading is done via the
+            // items below it so the interaction stays uniform. With 162 top
+            // containers we collapse by default, and auto-expand when the
+            // user is filtering.
+            const collapsedClass = fl ? '' : ' collapsed';
+            html += `<div class="section-header${collapsedClass}" onclick="toggleSection(this)">
+                <span><code>${escapeHtml(top)}</code> <span class="count">(${node.totalPaths})</span></span>
                 <span class="arrow">&#9660;</span>
             </div>`;
-            html += `<ul class="module-list">`;
-            for (const m of items) {
-                const sel = (currentModule === m.fname) ? ' selected' : '';
-                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}', this); return false;">
-                    <span>${escapeHtml(m.title)}</span>
-                    <span class="path-count">${m.paths} paths</span>
+
+            // Items under this top-level container.
+            html += `<ul class="module-list${collapsedClass}">`;
+            // If filtering and the top didn't match, only show matched subs.
+            // Otherwise show all subs. If there are no subs, render a single
+            // self row for the leaf spec.
+            const showSubs = fl && !topMatch ? subMatches : subs;
+            if (showSubs.length === 0 && node.leafSpec) {
+                const fname = node.leafSpec;
+                const sel = (currentModule === fname) ? ' selected' : '';
+                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(fname)}" onclick="loadSpec('${escapeHtml(fname)}', this); return false;">
+                    <span><em>open spec</em></span>
+                    <span class="path-count">${escapeHtml(fname)}</span>
                 </a></li>`;
+                visibleLeaves++;
+            }
+            for (const sub of showSubs) {
+                const fname = node.subs[sub];
+                const sel = (currentModule === fname) ? ' selected' : '';
+                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(fname)}" onclick="loadSpec('${escapeHtml(fname)}', this); return false;">
+                    <span><code>${escapeHtml(sub)}</code></span>
+                    <span class="path-count">${escapeHtml(fname)}</span>
+                </a></li>`;
+                visibleLeaves++;
             }
             html += `</ul>`;
         }
@@ -280,8 +335,7 @@
         // Search info
         const info = document.getElementById('searchInfo');
         if (fl) {
-            const visible = allModules.filter(m => m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl));
-            info.textContent = `${visible.length} of ${allModules.length} specs match`;
+            info.textContent = `${visibleTops} containers, ${visibleLeaves} sub-nodes match`;
             info.style.display = 'block';
         } else {
             info.style.display = 'none';
