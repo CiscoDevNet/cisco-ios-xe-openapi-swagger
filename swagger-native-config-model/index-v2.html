@@ -235,17 +235,29 @@
         document.getElementById('headerStats').textContent =
             `${manifest.total_paths.toLocaleString()} RESTCONF paths, ${manifest.total_operations.toLocaleString()} ops across ${manifest.total_modules} modules — generated from resolved YANG trees`;
 
-        // Load each spec's info (title + path count + path list) — fetch in parallel.
-        // Path list is used to build the YANG container tree for the sidebar.
+        // Load each spec's info (title + path count + per-path operations)
+        // — fetch in parallel. Path list and op map are used to build the
+        // YANG container tree and to deep-link into Swagger UI ops.
         const fetches = manifest.modules.map(async fname => {
             try {
                 const r = await fetch(`${__apiBase()}/${fname}.json`);
                 const spec = await r.json();
                 const title = spec.info.title.replace('Cisco IOS-XE Native Config - ', '');
-                const pathList = Object.keys(spec.paths || {});
-                return { fname, title, paths: pathList.length, pathList };
+                const paths = spec.paths || {};
+                const pathList = Object.keys(paths);
+                // Per-path canonical operationId, preferring GET, then PUT,
+                // PATCH, POST, DELETE. Used when a tree leaf is clicked.
+                const opOrder = ['get', 'put', 'patch', 'post', 'delete'];
+                const pathOps = {};
+                for (const p of pathList) {
+                    const ops = paths[p] || {};
+                    for (const m of opOrder) {
+                        if (ops[m] && ops[m].operationId) { pathOps[p] = ops[m].operationId; break; }
+                    }
+                }
+                return { fname, title, paths: pathList.length, pathList, pathOps };
             } catch(e) {
-                return { fname, title: fname, paths: 0, pathList: [] };
+                return { fname, title: fname, paths: 0, pathList: [], pathOps: {} };
             }
         });
 
@@ -260,7 +272,7 @@
     // container node so the tree mirrors the YANG schema rather than the
     // RESTCONF URL form.
     function buildContainerTree() {
-        const root = { name: '', children: new Map(), ownPathSpec: null, totalPaths: 0 };
+        const root = { name: '', children: new Map(), ownPathSpec: null, ownPathOpId: null, totalPaths: 0 };
         // Sort specs by name so the *first* spec to claim a node wins
         // deterministically across reloads.
         const sorted = [...allModules].sort((a, b) => a.fname.localeCompare(b.fname));
@@ -276,12 +288,15 @@
                 root.totalPaths++;
                 for (const s of segs) {
                     if (!node.children.has(s)) {
-                        node.children.set(s, { name: s, children: new Map(), ownPathSpec: null, totalPaths: 0 });
+                        node.children.set(s, { name: s, children: new Map(), ownPathSpec: null, ownPathOpId: null, totalPaths: 0 });
                     }
                     node = node.children.get(s);
                     node.totalPaths++;
                 }
-                if (!node.ownPathSpec) node.ownPathSpec = m.fname;
+                if (!node.ownPathSpec) {
+                    node.ownPathSpec = m.fname;
+                    node.ownPathOpId = m.pathOps[p] || null;
+                }
             }
         }
         containerTree = root;
@@ -312,6 +327,7 @@
 
         const hasKids = node.children.size > 0;
         const fname = node.ownPathSpec;
+        const opId = node.ownPathOpId;
         // Auto-expand if filtering and a descendant matched, or if this is
         // the top level (depth 0) and openByDefault is true.
         const expanded = (filterRe && descendantMatch) || (openByDefault && depth === 0);
@@ -319,8 +335,9 @@
         const arrow = hasKids ? `<span class="tree-arrow">&#9660;</span>` : `<span class="tree-arrow tree-arrow-empty"></span>`;
         const toggleAttr = hasKids ? `onclick="toggleTreeNode(this, event)"` : '';
         const selected = (fname && currentModule === fname) ? ' selected' : '';
+        const opArg = opId ? `'${escapeHtml(opId)}'` : 'null';
         const loadAttr = fname
-            ? `data-module="${escapeHtml(fname)}" onclick="event.stopPropagation(); loadSpec('${escapeHtml(fname)}', this); return false;"`
+            ? `data-module="${escapeHtml(fname)}" onclick="event.stopPropagation(); loadSpec('${escapeHtml(fname)}', this, ${opArg}); return false;"`
             : 'onclick="event.stopPropagation(); return false;"';
         const labelAttr = fname ? loadAttr : '';
         const indent = depth * 12;
@@ -386,25 +403,46 @@
         renderSidebar();
     }
 
-    function loadSpec(fname, el) {
+    function loadSpec(fname, el, opId) {
+        const sameSpec = (currentModule === fname);
         currentModule = fname;
         document.getElementById('welcomeBox').style.display = 'none';
         document.getElementById('downloadBar').style.display = 'flex';
         document.getElementById('downloadLabel').textContent = fname + '.json';
 
-        // Highlight selected
-        document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
+        // Highlight selected. Tree rows live outside .module-list, so clear
+        // both classes; the new sidebar uses .tree-row.selected.
+        document.querySelectorAll('.module-list a, .tree-row').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
+        // tree-label was clicked but the visual row is the parent .tree-row.
+        if (el && el.classList.contains('tree-label')) {
+            const row = el.closest('.tree-row');
+            if (row) row.classList.add('selected');
+        }
 
-        if (window.__DeepLink) { window.__DeepLink.setSpec(fname); } else { window.location.hash = '#spec=' + fname; }
+        // Update hash. setSpecOp lets the deeplink auto-expand observer find
+        // and open the matching operation once Swagger UI renders.
+        if (window.__DeepLink) {
+            if (opId) { window.__DeepLink.setSpecOp(fname, opId); }
+            else { window.__DeepLink.setSpec(fname); }
+        } else {
+            window.location.hash = '#spec=' + fname + (opId ? '&op=' + encodeURIComponent(opId) : '');
+        }
 
-        SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`,
-            dom_id: '#swagger-ui',
-            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-            layout: 'StandaloneLayout',
-            deepLinking: false,
-            filter: true
-        });
+        // Re-mounting Swagger UI on the same spec just to land on a different
+        // op is wasteful — the auto-expand observer will pick up the hash
+        // change and scroll to the right opblock instead.
+        if (!sameSpec) {
+            SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`,
+                dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout',
+                deepLinking: false,
+                filter: true
+            });
+        } else if (opId && window.__DeepLink && window.__DeepLink.tryExpandOp) {
+            window.__DeepLink.tryExpandOp(opId);
+        }
 
         // Update YANG tree link
         const treeLink = document.getElementById('treeLink');
