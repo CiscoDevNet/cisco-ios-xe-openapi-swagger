@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Cisco-IOS-XE-hsrp-oper",
-    "description": "This module contains a collection of YANG definitions\n     for HSRP operational data.\n     Copyright (c) 2020, 2022 by Cisco Systems, Inc.\n     All rights reserved.\n\nCisco IOS-XE operational state data (read-only).\n**Category:** Network Services\n**Paths:** 9",
-    "version": "17.18.1"
+    "title": "Cisco IOS-XE Operational - Cisco-IOS-XE-hsrp-oper",
+    "description": "Operational data from `Cisco-IOS-XE-hsrp-oper` module.\n\n**Root containers:** 1 (hsrp-oper-data)\n**Paths:** 19 | **Descendants:** 18\n\nAll endpoints are read-only (GET).",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-hsrp-oper",
+    "x-model-type": "operational"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -20,27 +29,146 @@
     "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data": {
       "get": {
         "summary": "Get hsrp-oper-data",
-        "description": "HSRP operational data",
-        "operationId": "get-hsrp-oper-data-0",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-oper-data"
+                  "type": "object",
+                  "properties": {
+                    "hsrp-group-info": {
+                      "type": "object",
+                      "properties": {
+                        "priority": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295
+                        },
+                        "preempt": {
+                          "type": "boolean"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "active-ip": {
+                          "type": "string"
+                        },
+                        "standby-ip": {
+                          "type": "string"
+                        },
+                        "virtual-ip": {
+                          "type": "string"
+                        },
+                        "group-id": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 65535
+                        },
+                        "if-name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "hsrp-neighbor": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "if-name": {
+                            "type": "string"
+                          },
+                          "neighbor": {
+                            "type": "object",
+                            "properties": {
+                              "address": {
+                                "type": "string"
+                              },
+                              "active-list": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                }
+                              },
+                              "standby-list": {
+                                "type": "array",
+                                "items": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 255
+                                }
+                              },
+                              "passive": {
+                                "type": "boolean"
+                              },
+                              "passive-timer-remaining": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 65535
+                              },
+                              "bfd-enabled": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:hsrp-oper-data": {
+                    "hsrp-group-info": {
+                      "priority": 1,
+                      "preempt": true,
+                      "state": "up",
+                      "active-ip": "example",
+                      "standby-ip": "example",
+                      "virtual-ip": "example",
+                      "group-id": "C9300-48T",
+                      "if-name": "GigabitEthernet1/0/1"
+                    },
+                    "hsrp-neighbor": [
+                      {
+                        "if-name": "GigabitEthernet1/0/1",
+                        "neighbor": {
+                          "address": "10.10.10.1",
+                          "active-list": [
+                            1
+                          ],
+                          "standby-list": [
+                            1
+                          ],
+                          "passive": true,
+                          "passive-timer-remaining": 1,
+                          "bfd-enabled": true
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
@@ -48,55 +176,390 @@
     "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info": {
       "get": {
         "summary": "Get hsrp-group-info",
-        "description": "HSRP group information (collection)",
-        "operationId": "get-hsrp-group-info-1",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-group-info"
+                  "type": "object",
+                  "properties": {
+                    "priority": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "preempt": {
+                      "type": "boolean"
+                    },
+                    "state": {
+                      "type": "string"
+                    },
+                    "active-ip": {
+                      "type": "string"
+                    },
+                    "standby-ip": {
+                      "type": "string"
+                    },
+                    "virtual-ip": {
+                      "type": "string"
+                    },
+                    "group-id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    },
+                    "if-name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:hsrp-group-info": {
+                    "priority": 1,
+                    "preempt": true,
+                    "state": "up",
+                    "active-ip": "example",
+                    "standby-ip": "example",
+                    "virtual-ip": "example",
+                    "group-id": "C9300-48T",
+                    "if-name": "GigabitEthernet1/0/1"
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
+          }
+        },
+        "x-mdt-filter-xpath": "/hsrp-ios-xe-oper:hsrp-oper-data/hsrp-group-info",
+        "x-mdt-tier": "WARM",
+        "x-mdt-cadence-seconds": 60,
+        "x-mdt-encoding": "kvGPB",
+        "x-mdt-on-change-capable": false,
+        "x-mdt-feature-section": "telemetry-reference-v2.md#\u00a735-hsrp-state"
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/priority": {
+      "get": {
+        "summary": "Get priority",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-priority",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:priority": 1
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info={group-id if-name}": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/preempt": {
       "get": {
-        "summary": "Get hsrp-group-info-item",
-        "description": "HSRP group information",
-        "operationId": "get-hsrp-group-info-item-2",
+        "summary": "Get preempt",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-preempt",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-group-info-item"
+                  "type": "boolean"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:preempt": true
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/state": {
+      "get": {
+        "summary": "Get state",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-state",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:state": "up"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/active-ip": {
+      "get": {
+        "summary": "Get active-ip",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-active-ip",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:active-ip": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/standby-ip": {
+      "get": {
+        "summary": "Get standby-ip",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-standby-ip",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:standby-ip": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/virtual-ip": {
+      "get": {
+        "summary": "Get virtual-ip",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-virtual-ip",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:virtual-ip": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/group-id": {
+      "get": {
+        "summary": "Get group-id",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-group-id",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:group-id": "C9300-48T"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-group-info/if-name": {
+      "get": {
+        "summary": "Get if-name",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-group-info-if-name",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:if-name": "GigabitEthernet1/0/1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
@@ -104,167 +567,459 @@
     "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor": {
       "get": {
         "summary": "Get hsrp-neighbor",
-        "description": "HSRP Neighbor information (collection)",
-        "operationId": "get-hsrp-neighbor-3",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-neighbor"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "if-name": {
+                        "type": "string"
+                      },
+                      "neighbor": {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "string"
+                          },
+                          "active-list": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 255
+                            }
+                          },
+                          "standby-list": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 255
+                            }
+                          },
+                          "passive": {
+                            "type": "boolean"
+                          },
+                          "passive-timer-remaining": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                          },
+                          "bfd-enabled": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:hsrp-neighbor": [
+                    {
+                      "if-name": "GigabitEthernet1/0/1",
+                      "neighbor": {
+                        "address": "10.10.10.1",
+                        "active-list": [
+                          1
+                        ],
+                        "standby-list": [
+                          1
+                        ],
+                        "passive": true,
+                        "passive-timer-remaining": 1,
+                        "bfd-enabled": true
+                      }
+                    }
+                  ]
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor={if-name}": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/if-name": {
       "get": {
-        "summary": "Get hsrp-neighbor-item",
-        "description": "HSRP Neighbor information",
-        "operationId": "get-hsrp-neighbor-item-4",
+        "summary": "Get if-name",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-if-name",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-neighbor-item"
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:if-name": "GigabitEthernet1/0/1"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-group-info": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor": {
       "get": {
-        "summary": "Get hsrp-group-info",
-        "description": "HSRP group information (collection)",
-        "operationId": "get-hsrp-group-info-5",
+        "summary": "Get neighbor",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-group-info"
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "type": "string"
+                    },
+                    "active-list": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                      }
+                    },
+                    "standby-list": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255
+                      }
+                    },
+                    "passive": {
+                      "type": "boolean"
+                    },
+                    "passive-timer-remaining": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    },
+                    "bfd-enabled": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:neighbor": {
+                    "address": "10.10.10.1",
+                    "active-list": [
+                      1
+                    ],
+                    "standby-list": [
+                      1
+                    ],
+                    "passive": true,
+                    "passive-timer-remaining": 1,
+                    "bfd-enabled": true
+                  }
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-group-info={group-id if-name}": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/address": {
       "get": {
-        "summary": "Get hsrp-group-info-item",
-        "description": "HSRP group information",
-        "operationId": "get-hsrp-group-info-item-6",
+        "summary": "Get address",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-address",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-group-info-item"
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:address": "10.10.10.1"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-neighbor": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/active-list": {
       "get": {
-        "summary": "Get hsrp-neighbor",
-        "description": "HSRP Neighbor information (collection)",
-        "operationId": "get-hsrp-neighbor-7",
+        "summary": "Get active-list",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-active-list",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-neighbor"
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:active-list": [
+                    1
+                  ]
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-neighbor={if-name}": {
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/standby-list": {
       "get": {
-        "summary": "Get hsrp-neighbor-item",
-        "description": "HSRP Neighbor information",
-        "operationId": "get-hsrp-neighbor-item-8",
+        "summary": "Get standby-list",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-standby-list",
         "tags": [
-          "Cisco-IOS-XE-hsrp-oper"
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-hsrp-oper-hsrp-neighbor-item"
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:standby-list": [
+                    1
+                  ]
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/passive": {
+      "get": {
+        "summary": "Get passive",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-passive",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:passive": true
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/passive-timer-remaining": {
+      "get": {
+        "summary": "Get passive-timer-remaining",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-passive-timer-remaining",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:passive-timer-remaining": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-hsrp-oper:hsrp-oper-data/hsrp-neighbor/neighbor/bfd-enabled": {
+      "get": {
+        "summary": "Get bfd-enabled",
+        "operationId": "get-Cisco-IOS-XE-hsrp-oper:hsrp-oper-data-hsrp-neighbor-neighbor-bfd-enabled",
+        "tags": [
+          "hsrp-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": {
+                  "Cisco-IOS-XE-hsrp-oper:bfd-enabled": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
@@ -274,263 +1029,28 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "Cisco-IOS-XE-hsrp-oper-hsrp-oper-data": {
-        "type": "object",
-        "properties": {
-          "priority": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4294967295,
-            "description": "Priority"
-          },
-          "preempt": {
-            "type": "boolean",
-            "description": "Preempt enabled"
-          },
-          "state": {
-            "type": "string",
-            "description": "HSRP group state"
-          },
-          "active-ip": {
-            "type": "string",
-            "description": "Active device IP"
-          },
-          "standby-ip": {
-            "type": "string",
-            "description": "Standby device IP"
-          },
-          "virtual-ip": {
-            "type": "string",
-            "description": "Virtual IP"
-          },
-          "group-id": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HSRP group identifier"
-          },
-          "if-name": {
-            "type": "string",
-            "description": "Interface name"
-          },
-          "address": {
-            "type": "string",
-            "description": "Neighbor IP address"
-          },
-          "passive": {
-            "type": "boolean",
-            "description": "Boolean indicating whether this neighbor is HSRP passive"
-          },
-          "passive-timer-remaining": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "Timer remaining for the passive neighbor to expire"
-          },
-          "bfd-enabled": {
-            "type": "boolean",
-            "description": "BFD enabled"
-          },
-          "active-list": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 255,
-              "description": "List of groups for which this address is Active"
-            }
-          },
-          "standby-list": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 255,
-              "description": "List of groups for which this address is Standby"
-            }
-          }
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       },
-      "Cisco-IOS-XE-hsrp-oper-hsrp-group-info": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "priority": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 4294967295,
-              "description": "Priority"
-            },
-            "preempt": {
-              "type": "boolean",
-              "description": "Preempt enabled"
-            },
-            "state": {
-              "type": "string",
-              "description": "HSRP group state"
-            },
-            "active-ip": {
-              "type": "string",
-              "description": "Active device IP"
-            },
-            "standby-ip": {
-              "type": "string",
-              "description": "Standby device IP"
-            },
-            "virtual-ip": {
-              "type": "string",
-              "description": "Virtual IP"
-            },
-            "group-id": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 65535,
-              "description": "HSRP group identifier"
-            },
-            "if-name": {
-              "type": "string",
-              "description": "Interface name"
-            }
-          }
-        }
-      },
-      "Cisco-IOS-XE-hsrp-oper-hsrp-group-info-item": {
-        "type": "object",
-        "properties": {
-          "priority": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4294967295,
-            "description": "Priority"
-          },
-          "preempt": {
-            "type": "boolean",
-            "description": "Preempt enabled"
-          },
-          "state": {
-            "type": "string",
-            "description": "HSRP group state"
-          },
-          "active-ip": {
-            "type": "string",
-            "description": "Active device IP"
-          },
-          "standby-ip": {
-            "type": "string",
-            "description": "Standby device IP"
-          },
-          "virtual-ip": {
-            "type": "string",
-            "description": "Virtual IP"
-          },
-          "group-id": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HSRP group identifier"
-          },
-          "if-name": {
-            "type": "string",
-            "description": "Interface name"
-          }
-        }
-      },
-      "Cisco-IOS-XE-hsrp-oper-hsrp-neighbor": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "address": {
-              "type": "string",
-              "description": "Neighbor IP address"
-            },
-            "passive": {
-              "type": "boolean",
-              "description": "Boolean indicating whether this neighbor is HSRP passive"
-            },
-            "passive-timer-remaining": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 65535,
-              "description": "Timer remaining for the passive neighbor to expire"
-            },
-            "bfd-enabled": {
-              "type": "boolean",
-              "description": "BFD enabled"
-            },
-            "active-list": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "List of groups for which this address is Active"
-              }
-            },
-            "standby-list": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "List of groups for which this address is Standby"
-              }
-            },
-            "if-name": {
-              "type": "string",
-              "description": "Interface name"
-            }
-          }
-        }
-      },
-      "Cisco-IOS-XE-hsrp-oper-hsrp-neighbor-item": {
-        "type": "object",
-        "properties": {
-          "address": {
-            "type": "string",
-            "description": "Neighbor IP address"
-          },
-          "passive": {
-            "type": "boolean",
-            "description": "Boolean indicating whether this neighbor is HSRP passive"
-          },
-          "passive-timer-remaining": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "Timer remaining for the passive neighbor to expire"
-          },
-          "bfd-enabled": {
-            "type": "boolean",
-            "description": "BFD enabled"
-          },
-          "active-list": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 255,
-              "description": "List of groups for which this address is Active"
-            }
-          },
-          "standby-list": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 255,
-              "description": "List of groups for which this address is Standby"
-            }
-          },
-          "if-name": {
-            "type": "string",
-            "description": "Interface name"
-          }
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
         }
       }
     }
@@ -538,12 +1058,6 @@
   "security": [
     {
       "basicAuth": []
-    }
-  ],
-  "tags": [
-    {
-      "name": "Cisco-IOS-XE-hsrp-oper",
-      "description": "This module contains a collection of YANG definitions\n     for HSRP operational data.\n     Copyright (c) 2020, 2022 by Cisco Systems, Inc.\n     All rights reserved."
     }
   ]
 }
