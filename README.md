@@ -1,28 +1,28 @@
-# Cisco IOS-XE 17.18.1 OpenAPI/Swagger Documentation
+# Cisco IOS-XE OpenAPI/Swagger Documentation
 
-[![IOS-XE Version](https://img.shields.io/badge/IOS--XE-17.18.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
+[![IOS-XE Version](https://img.shields.io/badge/IOS--XE-26.1.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
-[![Modules](https://img.shields.io/badge/Modules-657-brightgreen)](docs/PROJECT_SUMMARY.md)
+[![Modules](https://img.shields.io/badge/Modules-608-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 657 OpenAPI specs, 43,726 paths, and 767 YANG tree files** for developer productivity.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1). The site defaults to the newest release (26.1.1) with **608 OpenAPI specs, 37,072 paths, and 765 YANG tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
 ## Deep-Path Specifications
 
-**Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All 9 model types covered:
+**Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All 9 model types covered (counts shown for the default 26.1.1 release):
 
-- **Operational:** 205 specs, 20,159 paths (GET-only read endpoints)
-- **Configuration:** 39 specs, 2,363 paths, 9,452 ops (full CRUD)
-- **Native Config:** 81 specs, 3,363 paths, 13,452 ops (full depth CRUD)
-- **OpenConfig:** 57 specs, 2,377 paths, 5,920 ops (vendor-neutral)
-- **IETF:** 19 specs, 438 paths, 1,122 ops (mixed CRUD + RPC)
-- **MIB:** 149 specs, 12,482 paths (GET-only deep paths)
-- **RPC:** 59 specs, 308 RPCs (POST to /operations/)
-- **Events:** 38 specs, 861 paths (notifications + data endpoints)
-- **Other:** 10 specs, 1,375 paths, 4,597 ops (full CRUD)
+- **Operational:** 216 specs, 22,144 paths (GET-only read endpoints)
+- **Configuration:** 41 specs, 2,559 paths, 10,083 ops (full CRUD)
+- **Native Config:** 29 specs, 4,932 paths, 19,728 ops (full depth CRUD)
+- **OpenConfig:** 43 specs, 778 paths, 2,904 ops (vendor-neutral)
+- **IETF:** 22 specs, 505 paths, 1,664 ops (mixed CRUD + RPC)
+- **MIB:** 148 specs, 4,272 paths (GET-only deep paths)
+- **RPC:** 57 specs, 302 RPCs (POST to /operations/)
+- **Events:** 43 specs, 910 paths (notifications + data endpoints)
+- **Other:** 9 specs, 670 paths, 1,534 ops (full CRUD)
 
 **Key Features:**
 -  **Comprehensive Docs** - Getting started guide with 15+ examples
@@ -32,19 +32,20 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
-## Quick Stats
+## Quick Stats (default release: 26.1.1)
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 657 | Deep-path specs across all 9 models |
-| **API Paths** | 43,726 | RESTCONF endpoints from resolved YANG trees |
-| **Operations** | 68,353 | Total API operations |
-| **YANG Modules** | 848 | Source modules |
-| **Tree Files** | 768 | YANG/MIB visualizations |
+| **OpenAPI Specs** | 608 | Deep-path specs across all 9 models |
+| **API Paths** | 37,072 | RESTCONF endpoints from resolved YANG trees |
+| **Operations** | 63,541 | Total API operations |
+| **YANG Modules (tracked)** | 1,125 | All modules (YANG + spec-only) |
+| **Modules with specs** | 702 | 62.4% coverage |
+| **Tree Files** | 765 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Total Tracked** | 1,103 | All modules (YANG + spec-only) |
-| **Coverage** | 61.7% | Modules with specs (680/1103) |
-| **Accountability** | 100% | All modules mapped |
+| **Releases covered** | 5 | 17.9.x → 26.1.1 |
+
+For the per-release growth curve (specs/paths/operations across all 5 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
 
 ## Model Categories
 
@@ -101,7 +102,7 @@ Standalone and vendor-specific modules.
 
 ## Recent Improvements
 
-- **Realistic write-operation examples** — Every POST/PUT/PATCH body across all 657 specs now ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
+- **Realistic write-operation examples** — Every POST/PUT/PATCH body across the spec set ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
 - **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.
 - **Live-device validation script** — [scripts/validate_examples_c9kv.py](scripts/validate_examples_c9kv.py) verifies examples against a real Catalyst 9000V (or any IOS-XE 17.18.1+ device).
