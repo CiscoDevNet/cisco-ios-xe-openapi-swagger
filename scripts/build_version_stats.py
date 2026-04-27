@@ -78,15 +78,38 @@ def _module_counts(version: str) -> dict:
     release scaffold)."""
     rp = ReleasePaths(version=version, legacy=True)
     acc_path = rp.accountability_json()
-    out = {"modules_total": 0, "modules_with_specs": 0, "modules_with_trees": 0}
-    if acc_path.is_file():
-        try:
-            d = json.loads(acc_path.read_text(encoding="utf-8"))
-            out["modules_total"] = int(d.get("total_modules") or 0)
-            out["modules_with_specs"] = int(d.get("modules_with_specs") or 0)
-            out["modules_with_trees"] = int(d.get("modules_with_trees") or 0)
-        except Exception:
-            pass
+    out = {
+        "modules_total": 0, "modules_with_specs": 0, "modules_with_trees": 0,
+        "yang_modules": 0, "mib_modules": 0,
+        "yang_tree_files": 0, "mib_tree_files": 0, "total_tree_files": 0,
+        "modules_excluded": 0, "spec_only_modules": 0,
+    }
+    if not acc_path.is_file():
+        return out
+    try:
+        d = json.loads(acc_path.read_text(encoding="utf-8"))
+    except Exception:
+        return out
+    out["modules_total"] = int(d.get("total_modules") or 0)
+    out["modules_with_specs"] = int(d.get("modules_with_specs") or 0)
+    out["modules_with_trees"] = int(d.get("modules_with_trees") or 0)
+    mib_modules = mib_with_trees = excluded = 0
+    for m in d.get("modules") or []:
+        cls = (m.get("classification") or "").lower()
+        has_tree = bool(m.get("tree_url"))
+        if cls == "mib":
+            mib_modules += 1
+            if has_tree:
+                mib_with_trees += 1
+        if m.get("reason_excluded"):
+            excluded += 1
+    out["mib_modules"] = mib_modules
+    out["yang_modules"] = max(out["modules_total"] - mib_modules, 0)
+    out["mib_tree_files"] = mib_with_trees
+    out["yang_tree_files"] = max(out["modules_with_trees"] - mib_with_trees, 0)
+    out["total_tree_files"] = out["modules_with_trees"]
+    out["modules_excluded"] = excluded
+    out["spec_only_modules"] = max(out["modules_total"] - out["modules_with_trees"], 0)
     return out
 
 
