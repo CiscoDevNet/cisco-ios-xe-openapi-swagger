@@ -94,7 +94,52 @@
                 }
             }
         }
+        _groupSiblingsByModule(root);
         return root;
+    }
+
+    // Some modules (notably YANG `notifications` modules like
+    // Cisco-IOS-XE-ios-events-oper) produce dozens of sibling top-level paths
+    // shaped `/data/<module>:<leaf>` with no shared parent container. The
+    // builder above keys each top-level entry by `<module>:<leaf>`, so they
+    // would otherwise appear as a long flat list of unrelated siblings.
+    //
+    // Walk the tree and, at each level, find sibling nodes whose names share
+    // a `<module>:` prefix. When 2+ siblings share that prefix, wrap them in
+    // a synthetic node named `<module>` so the sidebar groups them under a
+    // single disclosure.
+    function _groupSiblingsByModule(node) {
+        if (!node.children || !node.children.size) return;
+        // Recurse first so deeper levels are also grouped.
+        node.children.forEach(function (child) { _groupSiblingsByModule(child); });
+        // Bucket children by `<module>:` prefix (only the leading qualifier
+        // before the first `:`). Children that don't have a `:` go into a
+        // null bucket and are left alone.
+        var buckets = new Map();
+        node.children.forEach(function (child, key) {
+            var idx = key.indexOf(':');
+            if (idx <= 0) return;
+            var mod = key.substring(0, idx);
+            if (!buckets.has(mod)) buckets.set(mod, []);
+            buckets.get(mod).push(key);
+        });
+        buckets.forEach(function (keys, mod) {
+            if (keys.length < 2) return;
+            // Build a synthetic group node containing the bucketed children.
+            var group = _emptyNode(mod);
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                var child = node.children.get(key);
+                // Strip the `<module>:` prefix from the child's display name
+                // so the grouped row reads cleanly (e.g. `severity-level`
+                // instead of `Cisco-IOS-XE-ios-events-oper:severity-level`).
+                child.name = key.substring(mod.length + 1) || key;
+                group.children.set(child.name, child);
+                group.totalPaths += child.totalPaths;
+                node.children.delete(key);
+            }
+            node.children.set(mod, group);
+        });
     }
 
     function _renderNode(node, depth, pathSoFar, filterRe, expandAll, currentModule) {
