@@ -101,8 +101,8 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),
                              "--version", "$VER"]),
-    # 26.1.1 only: per-category cross-chunk operation index for the viewer
-    # search box. Older releases keep the legacy chunk-only sidebar search.
+    # Per-category cross-chunk operation index for the viewer search box and
+    # the hub-level global operation search. Built for every active release.
     ("paths-index",         ["python", str(SCRIPTS / "build_paths_index.py"),
                              "--version", "$VER"]),
     # Path-depth audit: writes <release>/path_depth_audit.json. Strict mode
