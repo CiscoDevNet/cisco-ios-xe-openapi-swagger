@@ -34,6 +34,19 @@
         .module-list a:hover { background: #FBE9E7; }
         .module-list a.selected { background: #FBE9E7; border-left: 3px solid #E65100; }
         .module-list .path-count { color: #999; font-size: 11px; white-space: nowrap; }
+        /* Recursive YANG container tree (shared with native viewer) */
+        .tree-row { display: flex; align-items: center; padding: 4px 12px 4px 4px; font-size: 12px; color: #333; cursor: pointer; user-select: none; border-bottom: 1px solid #f5f5f5; gap: 4px; }
+        .tree-row:hover { background: #FBE9E7; }
+        .tree-row.selected { background: #FBE9E7; border-left: 3px solid #E65100; }
+        .tree-row code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #E65100; }
+        .tree-row .tree-arrow { display: inline-block; width: 12px; flex: 0 0 12px; color: #E65100; font-size: 9px; transition: transform 0.15s; }
+        .tree-row.collapsed .tree-arrow { transform: rotate(-90deg); }
+        .tree-arrow-empty { visibility: hidden; }
+        .tree-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tree-label[data-module], .tree-label[onclick] { cursor: pointer; }
+        .tree-label .leaf-spec { color: #999; font-size: 10px; margin-left: 6px; font-style: italic; }
+        .tree-row .path-count { color: #E65100; font-size: 10px; background: #FBE9E7; border-radius: 8px; padding: 0 6px; min-width: 22px; text-align: center; }
+        .tree-children.collapsed { display: none; }
         .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
         .swagger-container { flex: 1; overflow-y: auto; }
         .info-box { padding: 24px; margin: 24px; background: #FBE9E7; border-radius: 8px; }
@@ -75,7 +88,7 @@
                 <div class="stat"><div class="stat-value" id="totalPaths">—</div><div class="stat-label">Paths</div></div>
                 <div class="stat"><div class="stat-value" id="totalOps">—</div><div class="stat-label">GET Ops</div></div>
             </div>
-            <ul class="module-list" id="moduleList">Loading...</ul>
+            <div id="sidebarContent">Loading...</div>
         </aside>
         <main class="main-content">
             <div class="info-box" id="welcomeBox">
@@ -102,6 +115,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
     <script src="../deeplink.js"></script>
+    <script src="../yang-tree-sidebar.js"></script>
     <script src="paths-search.js"></script>
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -174,6 +188,7 @@
     // === end version-aware api base ===
     let allModules = [];
     let currentModule = null;
+    let containerTree = null;
 
     async function init() {
         const resp = await fetch(__apiBase() + '/manifest.json');
@@ -182,52 +197,80 @@
         document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
         document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
         document.getElementById('headerStats').textContent =
-            `${manifest.total_paths.toLocaleString()} GET endpoints across ${manifest.total_modules} modules — generated from resolved YANG trees`;
+            `${manifest.total_paths.toLocaleString()} endpoints across ${manifest.total_modules} modules \u2014 generated from resolved YANG trees`;
 
         const fetches = manifest.modules.map(async fname => {
             try {
                 const r = await fetch(`${__apiBase()}/${fname}.json`);
                 const spec = await r.json();
                 const title = (spec.info.title || fname).replace('Cisco IOS-XE MIB - ', '');
-                return { fname, title, paths: Object.keys(spec.paths).length };
+                const paths = spec.paths || {};
+                const pathList = Object.keys(paths);
+                const opOrder = ['get','put','patch','post','delete'];
+                const pathOps = {};
+                for (const p of pathList) {
+                    const ops = paths[p] || {};
+                    for (const mth of opOrder) {
+                        if (ops[mth] && ops[mth].operationId) { pathOps[p] = ops[mth].operationId; break; }
+                    }
+                }
+                return { fname, title, paths: pathList.length, pathList, pathOps };
             } catch(e) {
-                return { fname, title: fname, paths: 0 };
+                return { fname, title: fname, paths: 0, pathList: [], pathOps: {} };
             }
         });
         allModules = await Promise.all(fetches);
         allModules.sort((a, b) => a.title.localeCompare(b.title));
-        renderList();
+        containerTree = YangTreeSidebar.build(allModules);
+        renderSidebar();
         checkHash();
     }
 
-    function renderList(filter = '') {
-        const list = document.getElementById('moduleList');
-        const fl = filter.toLowerCase();
-        const items = allModules.filter(m => !fl || m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl));
-        list.innerHTML = items.map(m => {
-            const sel = currentModule === m.fname ? ' selected' : '';
-            return `<li><a href="#" class="${sel}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}',this);return false;">
-                <span>${escapeHtml(m.title)}</span><span class="path-count">${m.paths} paths</span></a></li>`;
-        }).join('');
+    function renderSidebar(filter = '') {
+        const host = document.getElementById('sidebarContent');
+        const r = YangTreeSidebar.render(containerTree, host, {
+            filter: filter,
+            currentModule: currentModule,
+            collapseAllByDefault: true,
+            onLoad: loadSpec,
+        });
         const info = document.getElementById('searchInfo');
-        if (fl) { info.textContent = `${items.length} of ${allModules.length} modules`; info.style.display = 'block'; }
-        else { info.style.display = 'none'; }
+        if (filter && filter.trim()) {
+            info.textContent = `${r.visibleTops} top containers, ${r.matched} nodes match`;
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
     }
 
-    function filterModules() { renderList(document.getElementById('searchBox').value); }
+    function filterModules() { renderSidebar(document.getElementById('searchBox').value); }
 
-    function loadSpec(fname, el) {
+    function loadSpec(fname, el, opId) {
+        const sameSpec = (currentModule === fname);
         currentModule = fname;
         document.getElementById('welcomeBox').style.display = 'none';
         document.getElementById('downloadBar').style.display = 'flex';
         document.getElementById('downloadLabel').textContent = fname + '.json';
-        document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
+        document.querySelectorAll('.module-list a, .tree-row').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
-        if (window.__DeepLink) { window.__DeepLink.setSpec(fname); } else { window.location.hash = '#spec=' + fname; }
-        SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui',
-            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-            layout: 'StandaloneLayout', deepLinking: false, filter: true
-        });
+        if (el && el.classList.contains('tree-label')) {
+            const row = el.closest('.tree-row');
+            if (row) row.classList.add('selected');
+        }
+        if (window.__DeepLink) {
+            if (opId) { window.__DeepLink.setSpecOp(fname, opId); }
+            else { window.__DeepLink.setSpec(fname); }
+        } else {
+            window.location.hash = '#spec=' + fname + (opId ? '&op=' + encodeURIComponent(opId) : '');
+        }
+        if (!sameSpec) {
+            SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout', deepLinking: false, filter: true
+            });
+        } else if (opId && window.__DeepLink && window.__DeepLink.tryExpandOp) {
+            window.__DeepLink.tryExpandOp(opId);
+        }
         // Update YANG tree link
         const treeLink = document.getElementById('treeLink');
         if (treeLink) {
@@ -238,8 +281,6 @@
                 treeLink.style.display = r.ok ? 'inline-block' : 'none';
             }).catch(() => { treeLink.style.display = 'none'; });
         }
-        // Load MIB metadata side card
-        loadMibMetadata(fname);
     }
 
     // === MIB metadata side card ===
@@ -335,8 +376,8 @@
             || (function () { var h = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); var o = {}; h.split('&').forEach(function (s) { var i = s.indexOf('='); if (i > 0) o[s.substring(0, i)] = s.substring(i + 1); }); return o; })();
         if (params.spec && allModules.find(m => m.fname === params.spec)) {
             const el = document.querySelector(`[data-module="${CSS.escape(params.spec)}"]`);
-            if (currentModule !== params.spec) loadSpec(params.spec, el);
-            if (params.op && window.__DeepLink) window.__DeepLink.tryExpandOp(params.op);
+            if (currentModule !== params.spec) loadSpec(params.spec, el, params.op);
+            else if (params.op && window.__DeepLink) window.__DeepLink.tryExpandOp(params.op);
         }
     }
     window.addEventListener('hashchange', checkHash);
