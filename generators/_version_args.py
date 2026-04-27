@@ -8,7 +8,7 @@ Layout:
 - 17.18.1 ("legacy"): inputs ``references/17181-YANG-modules/``, outputs
   ``swagger-<cat>-model/api/`` (preserves existing behaviour).
 - Any other version: inputs ``releases/<ver>/yang-source/``, outputs
-  ``releases/<ver>/swagger-<cat>-model/api-v2/``.
+  ``releases/<ver>/swagger-<cat>-model/api/``.
 
 Backward compatible: invoked with no ``--version`` argv it returns the legacy paths
 unchanged, so generators called directly (without the orchestrator) keep working.
@@ -62,7 +62,7 @@ def resolve_paths(model_category: str, *, mib_subdir: bool = False) -> tuple[Pat
     version = _parse_version_arg()
     # Distinguish "no flag passed" (= legacy default, top-level api/ output)
     # from "explicit --version 17.18.1" (= re-normalize 17.18.1 with the
-    # current generator stack into releases/17.18.1/swagger-*-model/api-v2/).
+    # current generator stack into releases/17.18.1/swagger-*-model/api/).
     if version == LEGACY_VERSION and not _VERSION_FLAG_SUPPLIED:
         yang_dir = PROJECT_ROOT / "references" / "17181-YANG-modules"
         if mib_subdir:
@@ -76,7 +76,7 @@ def resolve_paths(model_category: str, *, mib_subdir: bool = False) -> tuple[Pat
         if mib_subdir:
             yang_dir = yang_dir / "MIBS"
         output_dir = (PROJECT_ROOT / "releases" / version
-                      / f"swagger-{model_category}-model" / "api-v2")
+                      / f"swagger-{model_category}-model" / "api")
     else:
         # fetch_yang_release.py drops the upstream YANG tree at
         # ``references/<ver>/`` (the same convention legacy 17.18.1 uses,
@@ -89,6 +89,6 @@ def resolve_paths(model_category: str, *, mib_subdir: bool = False) -> tuple[Pat
         if mib_subdir:
             yang_dir = yang_dir / "MIBS"
         output_dir = (PROJECT_ROOT / "releases" / version
-                      / f"swagger-{model_category}-model" / "api-v2")
+                      / f"swagger-{model_category}-model" / "api")
     output_dir.mkdir(parents=True, exist_ok=True)
     return yang_dir, output_dir, version

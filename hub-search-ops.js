@@ -4,7 +4,7 @@
 // individual API operations across all 9 viewer categories. Lazy-loads each
 // category's `_paths_index.json` (built by scripts/build_paths_index.py) on
 // first user query, caches in memory, and renders deep-link hits that target
-// `swagger-<cat>-model/index-v2.html#spec=<module>&op=<operationId>` (handled
+// `swagger-<cat>-model/index.html#spec=<module>&op=<operationId>` (handled
 // by deeplink.js in each viewer).
 //
 // CSP: same-origin script, no eval, no inline. Strict 'self' compatible.
@@ -51,7 +51,7 @@
 
     function indexUrl(cat) {
         return 'releases/' + encodeURIComponent(activeVersion())
-            + '/swagger-' + cat + '-model/api-v2/_paths_index.json';
+            + '/swagger-' + cat + '-model/api/_paths_index.json';
     }
 
     function ensureSection() {
@@ -148,7 +148,7 @@
             var methods = (row.ms || []).map(function (m, i) {
                 var opId = (row.ids && row.ids[i]) || '';
                 var color = METHOD_COLOR[m] || '#6B7280';
-                var url = 'swagger-' + cat + '-model/index-v2.html#spec='
+                var url = 'swagger-' + cat + '-model/index.html#spec='
                     + encodeURIComponent(row.s)
                     + (opId ? '&op=' + encodeURIComponent(opId) : '');
                 return '<a href="' + escHtml(url) + '" '

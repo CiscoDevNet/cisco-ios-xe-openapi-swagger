@@ -36,7 +36,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   `_paths_index.json` (built by [scripts/build_paths_index.py](scripts/build_paths_index.py))
   on the first user query and caches in memory. Each hit renders HTTP-method badges
   (GET/POST/PUT/PATCH/DELETE colour-coded) and clicks deep-link to
-  `swagger-<cat>-model/index-v2.html#spec=<module>&op=<operationId>`, handled by
+  `swagger-<cat>-model/index.html#spec=<module>&op=<operationId>`, handled by
   [deeplink.js](deeplink.js) in each viewer (auto-loads spec, expands the operation row).
   CSP-strict (same-origin script, no `eval`, no inline handlers).
 - **Depth-d8 cfg / oper specs (26.1.1)** — `generate_cfg_from_tree.py` and
@@ -71,7 +71,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   generators. On 26.1.1 this produced ~4× more cfg paths, ~7.8× more oper paths and ~10.8×
   more events paths versus the previous regex passes.
 - **[scripts/audit_path_depth.py](scripts/audit_path_depth.py)** — new build step that
-  walks every `releases/<ver>/swagger-<cat>-model/api-v2/*.json`, computes a per-category
+  walks every `releases/<ver>/swagger-<cat>-model/api/*.json`, computes a per-category
   depth distribution + `max-depth`, writes `releases/<ver>/path_depth_audit.json` and (in
   `--strict` mode, used by `build_release.py`) fails the build if any category is below its
   `MIN_MAX_DEPTH` floor. Floors at end of round 7: cfg=6, oper=6, native-config=6, ietf=3,
@@ -86,7 +86,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 - **Spec-count manifest fixes** — both [scripts/stamp_spec_count.py](scripts/stamp_spec_count.py)
   and [scripts/update_manifests.py](scripts/update_manifests.py) now exclude `manifest.json`
   and `_paths_index.json` when counting specs, so the published counts stay correct after
-  the paths-index file landed in `api-v2/`.
+  the paths-index file landed in `api/`.
 - **Multi-root merge in `generate_cfg_from_tree.py`** — earlier the cfg generator emitted
   separate spec files per `data` root, causing 40 files vs 90 modules. The from-tree port
   now merges roots per module name (matching the oper generator), restoring 1-spec-per-module
@@ -118,7 +118,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 ### Added — Site-wide version awareness & quality hardening (round 4, April 2026)
 
-- **Version-aware viewers** — all 9 `swagger-*-model/index-v2.html` viewers now resolve the active
+- **Version-aware viewers** — all 9 `swagger-*-model/index.html` viewers now resolve the active
   release at runtime via `__activeVer()` / `__apiBase()` / `__treeBase()` helpers injected by
   [scripts/patch_viewers_version_aware.py](scripts/patch_viewers_version_aware.py). The patcher
   reads `releases/index.json` once and bakes the default version + active-versions allow-list into
@@ -141,7 +141,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   test suite on push/PR touching `swagger-*-model/`, `releases/`, `tests/`, the manifest
   normaliser, the viewer patcher, or itself.
 - **[index-app.js](index-app.js)** — `applyVersion()` now rewrites all
-  `a[href*="swagger-"][href*="-model/index-v2.html"]` hrefs to carry `?ver=<v>` so category-card
+  `a[href*="swagger-"][href*="-model/index.html"]` hrefs to carry `?ver=<v>` so category-card
   navigation preserves the active release.
 
 ### Fixed (round 4)
@@ -195,7 +195,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   every new version-aware script; centralises `releases/<ver>/...` path resolution and provides
   `list_active_releases()` / `all_releases()` against `releases/index.json`.
 - **[scripts/annotate_mdt_xpaths.py](scripts/annotate_mdt_xpaths.py)** — parses
-  [`telemetry-reference-v2.md`](telemetry-reference-v2.md) and stamps `x-mdt-filter-xpath`,
+  [`telemetry-reference.md`](telemetry-reference.md) and stamps `x-mdt-filter-xpath`,
   `x-mdt-tier`, `x-mdt-cadence-seconds`, `x-mdt-encoding`, `x-mdt-on-change-capable`,
   and `x-mdt-feature-section` onto matching oper-spec operations. Emits
   `releases/<ver>/telemetry-index.json` and `releases/<ver>/telemetry-skipped.json`.
@@ -258,7 +258,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   `resolve_paths(category, mib_subdir=False)` helper that strips `--version <ver>` from `sys.argv`
   and returns the correct `(yang_dir, output_dir, version)` tuple. Legacy 17.18.1 maps to
   `references/17181-YANG-modules/` + `swagger-<cat>-model/api/`; any other version maps to
-  `releases/<ver>/yang-source/` + `releases/<ver>/swagger-<cat>-model/api-v2/`. Backward compatible:
+  `releases/<ver>/yang-source/` + `releases/<ver>/swagger-<cat>-model/api/`. Backward compatible:
   generators called without `--version` retain their original behaviour.
 - All 9 v2 spec generators (`generate_oper_openapi_v2.py`, `generate_cfg_openapi_v2.py`,
   `generate_native_openapi_v2.py`, `generate_openconfig_openapi_v2.py`, `generate_ietf_openapi_v2.py`,
@@ -272,7 +272,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 #### Per-spec MDT panel
 
-- **[swagger-oper-model/index-v2.html](swagger-oper-model/index-v2.html)** — when an oper spec is
+- **[swagger-oper-model/index.html](swagger-oper-model/index.html)** — when an oper spec is
   loaded, fetches the active release's `telemetry-index.json`, filters entries to that module, and
   exposes them via a toolbar toggle that opens an inline panel listing each XPath with HOT /
   WARM / COOL tier badges, cadence, and on-change indicators. Falls back gracefully when no
@@ -280,7 +280,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 #### Visible UI surfaces (round 3)
 
-- **[swagger-mib-model/index-v2.html](swagger-mib-model/index-v2.html)** — added a MIB Details
+- **[swagger-mib-model/index.html](swagger-mib-model/index.html)** — added a MIB Details
   toolbar toggle. When opened it loads the active release's `mib-metadata.json` (with fallback to
   the legacy in-place file) and renders the loaded spec's MIB record: module / OID prefix /
   table-scalar-leaf counts / indexes / deprecated flag / latest revision / organization / RFC /
@@ -290,7 +290,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   `releases/<ver>/native-capabilities.json`, shows totals (paths / operations / schemas / leafs /
   lists / choices / categories) and a sortable & filterable per-category table with deep-links into
   each category's spec in the Swagger UI viewer. Includes the standard release picker.
-- **[swagger-native-config-model/index-v2.html](swagger-native-config-model/index-v2.html)** —
+- **[swagger-native-config-model/index.html](swagger-native-config-model/index.html)** —
   added a Capabilities Report link in the toolbar.
 - **[references/native-cli-mappings.yaml](references/native-cli-mappings.yaml)** *(new)* — curated
   YAML mapping table (~25 prefixes covering hostname, interfaces, BGP / OSPF, VLANs, AAA, SNMP,
@@ -321,8 +321,8 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   `lists=3,252` across 81 categories / 3,363 paths / 13,452 operations.
 - **[scripts/validate_release.py](scripts/validate_release.py)** — gates now tolerate the legacy
   17.18.1 in-place layout (specs at repo root, `releases/17.18.1/` either missing or partially
-  populated). Detects "no specs under `releases/<ver>/swagger-*-model/api-v2/`" and re-roots to
-  `PROJECT_ROOT` for 17.18.1 only. Gates 1, 4, 5 now glob `swagger-*-model/api-v2/*.json`
+  populated). Detects "no specs under `releases/<ver>/swagger-*-model/api/`" and re-roots to
+  `PROJECT_ROOT` for 17.18.1 only. Gates 1, 4, 5 now glob `swagger-*-model/api/*.json`
   (eliminating false hits in `archive/` and other releases). Search-index, tree-audit and
   accountability files fall back to repo-root copies. Manifests without a declared `spec_count`
   emit a warning instead of failing. Verified: `validate_release.py --version 17.18.1` exits 0
@@ -350,7 +350,7 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
   - `handleDeepLink()` parses three URL hash patterns on load:
     - `#search=<query>` — runs the search
     - `#module=<name>` — redirects to the module's swagger page
-    - `#spec=<model>/<name>` — redirects to the model's `index-v2.html#spec=<name>`
+    - `#spec=<model>/<name>` — redirects to the model's `index.html#spec=<name>`
   - Added `hashchange` listener for browser back/forward sync.
 
 ### Added

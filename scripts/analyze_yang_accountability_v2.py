@@ -15,7 +15,7 @@ Usage:
 When --version is supplied, sources the YANG modules from
 ``references/<ver>/`` (with the legacy ``references/17181-YANG-modules`` fallback
 for 17.18.1), the trees from ``releases/<ver>/yang-trees/``, and the specs from
-``releases/<ver>/swagger-*-model/api-v2/``. Outputs are written to
+``releases/<ver>/swagger-*-model/api/``. Outputs are written to
 ``releases/<ver>/yang_accountability.json`` (and YANG_MODULE_ACCOUNTABILITY.md
 at the repo root for the default release only, to avoid noisy churn on the
 flagship doc when re-running per-release).
@@ -71,7 +71,7 @@ def configure_paths(version: str | None) -> None:
         TREE_DIR = release_trees
     else:
         TREE_DIR = BASE_DIR / "yang-trees"
-    # Per-release specs live under releases/<ver>/swagger-*-model/api-v2/.
+    # Per-release specs live under releases/<ver>/swagger-*-model/api/.
     if (release_root / "swagger-oper-model").is_dir():
         SPEC_BASE_DIR = release_root
     else:
@@ -101,13 +101,13 @@ MODEL_FOLDERS = {
 
 
 def scan_all_specs():
-    """Scan api/ and api-v2/ folders to find every spec file and which modules they contain."""
+    """Scan api/ and api/ folders to find every spec file and which modules they contain."""
     # Returns: dict[module_name] -> list of {folder, api_version, spec_name}
     module_specs = defaultdict(list)
 
     for folder_name in MODEL_FOLDERS:
         folder_path = SPEC_BASE_DIR / folder_name
-        for api_dir_name in ["api-v2", "api"]:
+        for api_dir_name in ["api", "api"]:
             api_path = folder_path / api_dir_name
             if not api_path.exists():
                 continue
@@ -305,8 +305,8 @@ def classify_spec_only_module(name, specs):
 
 def build_spec_url(folder, api_dir, spec_name):
     """Build the URL to view this spec in the Swagger UI."""
-    # index-v2.html handles both api-v2/ and api/ specs (with fallback)
-    return f"{folder}/index-v2.html#spec={spec_name}"
+    # index.html handles both api/ and api/ specs (with fallback)
+    return f"{folder}/index.html#spec={spec_name}"
 
 
 def main():
@@ -314,7 +314,7 @@ def main():
     print("YANG Module Accountability Analyzer v2")
     print("=" * 60)
 
-    # 1. Scan all specs in all api/ and api-v2/ folders
+    # 1. Scan all specs in all api/ and api/ folders
     print("\nScanning all OpenAPI spec files...")
     module_specs = scan_all_specs()
     print(f"  Found {len(module_specs)} unique spec names across all folders")
@@ -345,7 +345,7 @@ def main():
         specs_found = module_specs.get(name, [])
 
         # Determine which swagger categories have this module
-        # Prefer api-v2 (deep-path) over api (legacy)
+        # Prefer api (deep-path) over api (legacy)
         categories = []
         seen_folders = set()
         for spec in specs_found:
@@ -354,7 +354,7 @@ def main():
                 seen_folders.add(folder)
                 # Pick the best api_dir for this folder
                 api_dirs = [s["api_dir"] for s in specs_found if s["folder"] == folder]
-                best_api = "api-v2" if "api-v2" in api_dirs else "api"
+                best_api = "api" if "api" in api_dirs else "api"
                 url = build_spec_url(folder, best_api, name)
                 categories.append({
                     "folder": folder,
@@ -398,7 +398,7 @@ def main():
             if folder not in seen_folders:
                 seen_folders.add(folder)
                 api_dirs = [s["api_dir"] for s in specs if s["folder"] == folder]
-                best_api = "api-v2" if "api-v2" in api_dirs else "api"
+                best_api = "api" if "api" in api_dirs else "api"
                 url = build_spec_url(folder, best_api, spec_name)
                 categories.append({
                     "folder": folder,

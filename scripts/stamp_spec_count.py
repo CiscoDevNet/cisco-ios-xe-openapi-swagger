@@ -4,8 +4,8 @@ stamp_spec_count.py — Stamp ``spec_count`` field on every manifest.json so
 ``validate_release.py`` gate 2 has a declared count to compare against the
 on-disk file count.
 
-Walks both the legacy in-place layout (``swagger-*-model/api-v2/``) and the
-per-release layout (``releases/<v>/swagger-*-model/api-v2/``). Idempotent.
+Walks both the legacy in-place layout (``swagger-*-model/api/``) and the
+per-release layout (``releases/<v>/swagger-*-model/api/``). Idempotent.
 
 Usage:
     python scripts/stamp_spec_count.py                # stamp every manifest
@@ -52,10 +52,10 @@ def main() -> int:
     args = p.parse_args()
 
     targets: list[Path] = []
-    # Legacy in-place api-v2 layout
+    # Legacy in-place api layout
     if not args.version or args.version == "17.18.1":
         targets.extend(
-            PROJECT_ROOT.glob("swagger-*-model/api-v2/manifest.json")
+            PROJECT_ROOT.glob("swagger-*-model/api/manifest.json")
         )
     # Per-release layout
     rel_root = PROJECT_ROOT / "releases"
@@ -63,12 +63,12 @@ def main() -> int:
         if args.version:
             targets.extend(
                 (rel_root / args.version).glob(
-                    "swagger-*-model/api-v2/manifest.json"
+                    "swagger-*-model/api/manifest.json"
                 )
             )
         else:
             targets.extend(
-                rel_root.glob("*/swagger-*-model/api-v2/manifest.json")
+                rel_root.glob("*/swagger-*-model/api/manifest.json")
             )
 
     changed = 0

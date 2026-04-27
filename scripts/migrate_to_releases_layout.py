@@ -42,15 +42,15 @@ LEGACY_FILE_MAP = [
 # (legacy-dir-glob, new-subdir-relative-to-release-root). Whole subtree copied.
 LEGACY_DIR_MAP = [
     ("yang-trees", "yang-trees"),
-    ("swagger-cfg-model/api-v2", "swagger-cfg-model/api-v2"),
-    ("swagger-events-model/api-v2", "swagger-events-model/api-v2"),
-    ("swagger-ietf-model/api-v2", "swagger-ietf-model/api-v2"),
-    ("swagger-mib-model/api-v2", "swagger-mib-model/api-v2"),
-    ("swagger-native-config-model/api-v2", "swagger-native-config-model/api-v2"),
-    ("swagger-openconfig-model/api-v2", "swagger-openconfig-model/api-v2"),
-    ("swagger-oper-model/api-v2", "swagger-oper-model/api-v2"),
-    ("swagger-other-model/api-v2", "swagger-other-model/api-v2"),
-    ("swagger-rpc-model/api-v2", "swagger-rpc-model/api-v2"),
+    ("swagger-cfg-model/api", "swagger-cfg-model/api"),
+    ("swagger-events-model/api", "swagger-events-model/api"),
+    ("swagger-ietf-model/api", "swagger-ietf-model/api"),
+    ("swagger-mib-model/api", "swagger-mib-model/api"),
+    ("swagger-native-config-model/api", "swagger-native-config-model/api"),
+    ("swagger-openconfig-model/api", "swagger-openconfig-model/api"),
+    ("swagger-oper-model/api", "swagger-oper-model/api"),
+    ("swagger-other-model/api", "swagger-other-model/api"),
+    ("swagger-rpc-model/api", "swagger-rpc-model/api"),
     # Postman exports
     ("tools", "exports/postman-legacy"),
 ]

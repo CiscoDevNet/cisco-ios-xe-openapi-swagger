@@ -2,7 +2,7 @@
 """
 annotate_mdt_xpaths.py — Annotate operational specs with MDT/gRPC dial-out filter xpaths.
 
-Parses ``telemetry-reference-v2.md`` (workspace root) and the active release's oper-model
+Parses ``telemetry-reference.md`` (workspace root) and the active release's oper-model
 OpenAPI specs, then injects the ``x-mdt-*`` extensions defined in MDT_XPATH_SPEC.md onto
 the matching operations. Also emits ``releases/<ver>/telemetry-index.json`` consumed by
 the global telemetry browser.
@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _release_paths import PROJECT_ROOT, ReleasePaths  # type: ignore  # noqa: E402
 
 WORKSPACE_ROOT = PROJECT_ROOT.parent
-TELEMETRY_REF = WORKSPACE_ROOT / "telemetry-reference-v2.md"
+TELEMETRY_REF = WORKSPACE_ROOT / "telemetry-reference.md"
 
 # §N section header. Captures section number + title text.
 RE_SECTION = re.compile(r"^### §(\d+)\.\s+(.+?)\s*$", re.MULTILINE)
@@ -93,7 +93,7 @@ def parse_telemetry_reference() -> list[dict]:
         entries.append({
             "section_number": int(sec_num),
             "feature_title": title,
-            "feature_section": f"telemetry-reference-v2.md#{anchor}",
+            "feature_section": f"telemetry-reference.md#{anchor}",
             "yang_module": yang_module,
             "filter_xpath": xpath,
             "tier": tier,
@@ -245,7 +245,7 @@ def annotate(version: str, dry_run: bool) -> int:
                 "version": version,
                 "generated": datetime.now(timezone.utc).replace(microsecond=0)
                     .isoformat().replace("+00:00", "Z"),
-                "source": "telemetry-reference-v2.md",
+                "source": "telemetry-reference.md",
                 "entries": annotated_ops,
             }, indent=2) + "\n",
             encoding="utf-8",

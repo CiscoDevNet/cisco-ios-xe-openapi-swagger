@@ -36,15 +36,15 @@ cisco-ios-xe-openapi-swagger/
 │   ├── 17.9.x/
 │   │   ├── meta.json                           # release metadata (see §5)
 │   │   ├── manifests/                          # per-model manifest.json + accountability.json
-│   │   ├── swagger-cfg-model/api-v2/*.json     # OpenAPI specs
-│   │   ├── swagger-native-config-model/api-v2/*.json
-│   │   ├── swagger-oper-model/api-v2/*.json
-│   │   ├── swagger-rpc-model/api-v2/*.json
-│   │   ├── swagger-events-model/api-v2/*.json
-│   │   ├── swagger-ietf-model/api-v2/*.json
-│   │   ├── swagger-openconfig-model/api-v2/*.json
-│   │   ├── swagger-mib-model/api-v2/*.json
-│   │   ├── swagger-other-model/api-v2/*.json
+│   │   ├── swagger-cfg-model/api/*.json     # OpenAPI specs
+│   │   ├── swagger-native-config-model/api/*.json
+│   │   ├── swagger-oper-model/api/*.json
+│   │   ├── swagger-rpc-model/api/*.json
+│   │   ├── swagger-events-model/api/*.json
+│   │   ├── swagger-ietf-model/api/*.json
+│   │   ├── swagger-openconfig-model/api/*.json
+│   │   ├── swagger-mib-model/api/*.json
+│   │   ├── swagger-other-model/api/*.json
 │   │   ├── yang-trees/*.html                   # pyang tree HTML, one per module
 │   │   ├── search-index.json                   # Fuse.js index for this release
 │   │   ├── yang_accountability.json            # accountability report (machine-readable)
@@ -65,10 +65,10 @@ cisco-ios-xe-openapi-swagger/
 │   ├── 17.15.x/
 │   ├── 17.18.1/
 │   └── 26.1.1/
-└── (shared UI: index.html, *.js, swagger-*-model/index-v2.html, etc.)
+└── (shared UI: index.html, *.js, swagger-*-model/index.html, etc.)
 ```
 
-The `swagger-*-model/index-v2.html` viewers, `index.html` landing page, accountability viewer, telemetry browser, exports page, and all JavaScript are **shared across releases**. They load per-release data based on the active version.
+The `swagger-*-model/index.html` viewers, `index.html` landing page, accountability viewer, telemetry browser, exports page, and all JavaScript are **shared across releases**. They load per-release data based on the active version.
 
 ## 4. `releases/index.json` schema
 
@@ -124,13 +124,13 @@ The UI uses URL hash fragments for client-side routing.
 Implementations:
 - [cisco-ios-xe-openapi-swagger/index-app.js](index-app.js) — landing page version selector + initial load.
 - [cisco-ios-xe-openapi-swagger/search.js](search.js) — version-aware index loading.
-- All `swagger-*-model/index-v2.html` — read `ver` from hash, load `releases/<ver>/...` paths.
+- All `swagger-*-model/index.html` — read `ver` from hash, load `releases/<ver>/...` paths.
 
 When a user changes version in the selector, the `ver` query param is updated and dependent state (search index, sidebar, currently-displayed spec if applicable) is reloaded; recent/favorites keys are namespaced as `iosxe-<ver>-recent-modules` and `iosxe-<ver>-favorite-modules`.
 
 ## 7. Manifest contract (per model, per release)
 
-Every `releases/<ver>/swagger-<type>-model/api-v2/manifest.json`:
+Every `releases/<ver>/swagger-<type>-model/api/manifest.json`:
 
 ```json
 {

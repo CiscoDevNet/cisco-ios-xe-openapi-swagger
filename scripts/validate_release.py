@@ -53,7 +53,7 @@ def ok(msg: str) -> None:
 def gate_json_validity(rel: Path, errs: list[str]) -> None:
     print("\n[gate 1] JSON validity")
     n = 0
-    for spec in rel.glob("swagger-*-model/api-v2/*.json"):
+    for spec in rel.glob("swagger-*-model/api/*.json"):
         try:
             json.loads(spec.read_text(encoding="utf-8"))
             n += 1
@@ -64,7 +64,7 @@ def gate_json_validity(rel: Path, errs: list[str]) -> None:
 
 def gate_manifests(rel: Path, errs: list[str]) -> None:
     print("\n[gate 2] Manifest accuracy")
-    for manifest in rel.glob("swagger-*-model/api-v2/manifest.json"):
+    for manifest in rel.glob("swagger-*-model/api/manifest.json"):
         try:
             data = json.loads(manifest.read_text(encoding="utf-8"))
         except Exception as e:
@@ -104,7 +104,7 @@ def gate_search_index(rel: Path, errs: list[str]) -> None:
     dup: list[str] = []
     for m in data.get("modules", []):
         # Include version (v1/v2) in the dedup key — the same module name can
-        # legitimately appear in both the legacy api/ and the api-v2/ trees.
+        # legitimately appear in both the legacy api/ and the api/ trees.
         key = (m.get("category", ""), m.get("version", ""), m.get("name", ""))
         skey = "/".join(key)
         if skey in seen:
@@ -147,7 +147,7 @@ def gate_tree_coverage(rel: Path, errs: list[str]) -> None:
             excluded.add(m.get("name") or m.get("module") or "")
 
     missing: list[str] = []
-    for spec in rel.glob("swagger-*-model/api-v2/*.json"):
+    for spec in rel.glob("swagger-*-model/api/*.json"):
         if spec.name == "manifest.json":
             continue
         module = spec.stem
@@ -170,7 +170,7 @@ def gate_spec_tree_links(rel: Path, errs: list[str]) -> None:
     print("\n[gate 5] Spec→tree linkage")
     broken: list[str] = []
     n = 0
-    for spec in rel.glob("swagger-*-model/api-v2/*.json"):
+    for spec in rel.glob("swagger-*-model/api/*.json"):
         if spec.name == "manifest.json":
             continue
         try:
@@ -194,7 +194,7 @@ def gate_mdt_xpaths(rel: Path, errs: list[str]) -> None:
     print("\n[gate 6] MDT xpath sanity")
     bad: list[str] = []
     n = 0
-    for spec in (rel / "swagger-oper-model" / "api-v2").glob("*.json"):
+    for spec in (rel / "swagger-oper-model" / "api").glob("*.json"):
         try:
             data = json.loads(spec.read_text(encoding="utf-8"))
         except Exception:
@@ -254,13 +254,13 @@ def main() -> int:
 
     rel = release_root(args.version)
     legacy_inplace = False
-    has_release_specs = any(rel.glob("swagger-*-model/api-v2/*.json")) if rel.is_dir() else False
+    has_release_specs = any(rel.glob("swagger-*-model/api/*.json")) if rel.is_dir() else False
     if not has_release_specs:
         # The 17.18.1 baseline still lives at repo root (not yet migrated to
         # releases/17.18.1/). Treat the repo root as the release root so the
         # gates can validate the legacy in-place layout. For other versions
         # this remains a hard error.
-        if args.version == "17.18.1" and (PROJECT_ROOT / "swagger-oper-model" / "api-v2").is_dir():
+        if args.version == "17.18.1" and (PROJECT_ROOT / "swagger-oper-model" / "api").is_dir():
             rel = PROJECT_ROOT
             legacy_inplace = True
             print(f"[validate] {args.version} not migrated; using legacy "

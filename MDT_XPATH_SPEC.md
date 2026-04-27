@@ -3,7 +3,7 @@
 **Status:** Active (Phase 0 of multi-version rollout)
 **Scope:** Defines how the project derives, stores, and surfaces Model-Driven Telemetry (MDT) filter xpaths for gRPC dial-out subscriptions. Companion to [VERSIONING.md](VERSIONING.md) and [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md).
 
-The authoritative reference for human-curated subscription metadata is `telemetry-reference-v2.md` at the workspace root.
+The authoritative reference for human-curated subscription metadata is `telemetry-reference.md` at the workspace root.
 
 ---
 
@@ -15,7 +15,7 @@ For an operational YANG container at module-prefix `<prefix>` and absolute path 
 filter xpath /<prefix>:<path-without-leading-slash>
 ```
 
-Worked examples (taken from `telemetry-reference-v2.md`):
+Worked examples (taken from `telemetry-reference.md`):
 
 | Feature | YANG container path | Filter xpath |
 |---------|---------------------|--------------|
@@ -49,11 +49,11 @@ Operational-model OpenAPI specs annotate operations with the following vendor ex
 | Key | Type | Description |
 |-----|------|-------------|
 | `x-mdt-filter-xpath` | string | The filter xpath produced by §1 (one operation may be the recommended subscription root for multiple xpaths; in that case the annotation is on the closest matching operation). |
-| `x-mdt-tier` | enum: `HOT` \| `WARM` \| `COOL` | Subscription tier from `telemetry-reference-v2.md`. |
+| `x-mdt-tier` | enum: `HOT` \| `WARM` \| `COOL` | Subscription tier from `telemetry-reference.md`. |
 | `x-mdt-cadence-seconds` | integer | Recommended sample interval. Conventional values: `30` (HOT), `60` (WARM), `300` (COOL). Use `0` to denote on-change. |
 | `x-mdt-encoding` | enum: `kvGPB` \| `JSON_IETF` | Wire encoding. Default `kvGPB`. |
 | `x-mdt-on-change-capable` | boolean | True if this xpath supports on-change (subscribe interval `0`). |
-| `x-mdt-feature-section` | string | Anchor link back to the matching `§N` section in `telemetry-reference-v2.md`, e.g. `#§1-cpu-utilization`. |
+| `x-mdt-feature-section` | string | Anchor link back to the matching `§N` section in `telemetry-reference.md`, e.g. `#§1-cpu-utilization`. |
 
 Example fragment in an oper-model spec operation:
 
@@ -66,7 +66,7 @@ Example fragment in an oper-model spec operation:
     "x-mdt-cadence-seconds": 60,
     "x-mdt-encoding": "kvGPB",
     "x-mdt-on-change-capable": false,
-    "x-mdt-feature-section": "telemetry-reference-v2.md#§1-cpu-utilization"
+    "x-mdt-feature-section": "telemetry-reference.md#§1-cpu-utilization"
   }
 }
 ```
@@ -82,9 +82,9 @@ The annotation pass also emits `releases/<ver>/telemetry-index.json` consumed by
   "entries": [
     {
       "module": "Cisco-IOS-XE-process-cpu-oper",
-      "spec": "swagger-oper-model/api-v2/Cisco-IOS-XE-process-cpu-oper.json",
+      "spec": "swagger-oper-model/api/Cisco-IOS-XE-process-cpu-oper.json",
       "operation_id": "get-cpu-usage-cpu-utilization",
-      "feature_section": "telemetry-reference-v2.md#§1-cpu-utilization",
+      "feature_section": "telemetry-reference.md#§1-cpu-utilization",
       "feature_title": "CPU Utilization",
       "filter_xpath": "/process-cpu-ios-xe-oper:cpu-usage/cpu-utilization",
       "tier": "WARM",
@@ -100,17 +100,17 @@ The annotation pass also emits `releases/<ver>/telemetry-index.json` consumed by
 
 The annotation pipeline (`scripts/annotate_mdt_xpaths.py`) joins three inputs:
 
-1. **`telemetry-reference-v2.md`** — provides the authoritative `feature → xpath, tier, cadence, on-change-capable` mapping. The script parses each `§N` section and the "Subscription Summary Table" in Part IV.
+1. **`telemetry-reference.md`** — provides the authoritative `feature → xpath, tier, cadence, on-change-capable` mapping. The script parses each `§N` section and the "Subscription Summary Table" in Part IV.
 2. **The OpenAPI spec for that module** — locates the operation whose path most closely matches the YANG container path, and writes the extensions onto that operation.
 3. **The pyang tree** (`releases/<ver>/yang-trees/<module>.html`) — used as a fallback to confirm the prefix and that the container exists in the source YANG; if the tree disagrees with the reference doc, the build emits a warning and skips the annotation rather than emitting a wrong xpath.
 
-If a feature in `telemetry-reference-v2.md` references a module not present in the active release (e.g. a 26.1.1-only module annotating into a 17.9.x build), the annotator records it in the per-release `telemetry-skipped.json` with reason `module-not-in-release`. This is allowed and not a CI failure.
+If a feature in `telemetry-reference.md` references a module not present in the active release (e.g. a 26.1.1-only module annotating into a 17.9.x build), the annotator records it in the per-release `telemetry-skipped.json` with reason `module-not-in-release`. This is allowed and not a CI failure.
 
 ## 6. UI surfaces
 
 Three surfaces, all reading the data above (no separate copy):
 
-1. **Per-operation badge** — Swagger UI plugin in `swagger-oper-model/index-v2.html` reads `x-mdt-filter-xpath` from the rendered operation and injects an "MDT" badge with copy-to-clipboard.
+1. **Per-operation badge** — Swagger UI plugin in `swagger-oper-model/index.html` reads `x-mdt-filter-xpath` from the rendered operation and injects an "MDT" badge with copy-to-clipboard.
 2. **Per-viewer MDT panel** — collapsible side panel listing every `x-mdt-filter-xpath` in the currently loaded oper spec; searchable; jumps to the matching operation when clicked.
 3. **Global telemetry browser** (`telemetry.html`) — loads `releases/<ver>/telemetry-index.json`; filters by tier (HOT/WARM/COOL), encoding, on-change-capable; deep-links into the appropriate oper-model viewer with `#ver=<v>&spec=swagger-oper-model/<module>` and scrolls to the matching operation.
 

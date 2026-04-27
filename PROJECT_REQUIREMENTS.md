@@ -12,7 +12,7 @@
 > - [VERSIONING.md](VERSIONING.md) — multi-release folder layout, URL contract, CI gates, release-add runbook.
 > - [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) — MDT/gRPC dial-out filter xpath rule and OpenAPI extensions.
 > - [../MIBS.md](../MIBS.md) — MIB coverage and platform applicability.
-> - [../telemetry-reference-v2.md](../telemetry-reference-v2.md) — per-feature telemetry subscription metadata.
+> - [../telemetry-reference.md](../telemetry-reference.md) — per-feature telemetry subscription metadata.
 
 ---
 
@@ -796,7 +796,7 @@ Each release ships its own machine-readable `releases/<ver>/yang_accountability.
 
 ### 16.4 MDT / gRPC dial-out filter xpaths
 
-Operational-model specs annotate operations with `x-mdt-filter-xpath`, `x-mdt-tier`, `x-mdt-cadence-seconds`, `x-mdt-encoding`, `x-mdt-on-change-capable`, and `x-mdt-feature-section`. The xpath construction rule is `/<module-prefix>:<container-path>` (see [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md)). Three UI surfaces consume this data: per-operation Swagger UI badge, per-viewer MDT panel, and a global `telemetry.html` browser. The annotation source of truth is `telemetry-reference-v2.md` joined with the active release's pyang trees.
+Operational-model specs annotate operations with `x-mdt-filter-xpath`, `x-mdt-tier`, `x-mdt-cadence-seconds`, `x-mdt-encoding`, `x-mdt-on-change-capable`, and `x-mdt-feature-section`. The xpath construction rule is `/<module-prefix>:<container-path>` (see [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md)). Three UI surfaces consume this data: per-operation Swagger UI badge, per-viewer MDT panel, and a global `telemetry.html` browser. The annotation source of truth is `telemetry-reference.md` joined with the active release's pyang trees.
 
 ### 16.5 Cisco-IOS-XE-native v2 enhancements
 
@@ -825,7 +825,7 @@ The following documents form the binding contract for this and future releases. 
 - [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md)
 - [AGENTS.md](AGENTS.md)
 - [../MIBS.md](../MIBS.md)
-- [../telemetry-reference-v2.md](../telemetry-reference-v2.md)
+- [../telemetry-reference.md](../telemetry-reference.md)
 - [CHANGELOG.md](CHANGELOG.md)
 
 ### 16.9 Resolved review blockers

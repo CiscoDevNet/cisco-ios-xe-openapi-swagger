@@ -709,7 +709,7 @@ def generate_events_spec(module_name, notifications):
     return spec, len(paths), len(paths)
 
 
-def update_manifest(folder_path, api_dir="api-v2"):
+def update_manifest(folder_path, api_dir="api"):
     """Regenerate manifest.json for a swagger model folder."""
     api_path = folder_path / api_dir
     if not api_path.exists():
@@ -778,14 +778,14 @@ def main():
 
         spec, path_count, op_count = result
 
-        # Write to api-v2/
-        output_dir = BASE / target_folder / "api-v2"
+        # Write to api/
+        output_dir = BASE / target_folder / "api"
         output_dir.mkdir(parents=True, exist_ok=True)
         output_file = output_dir / f"{module_name}.json"
         output_file.write_text(json.dumps(spec, indent=2, ensure_ascii=False), encoding='utf-8')
         affected_folders.add(target_folder)
         config_generated += 1
-        print(f"  Generated {target_folder}/api-v2/{module_name}.json ({path_count} paths, {op_count} ops, {len(nodes)} nodes)")
+        print(f"  Generated {target_folder}/api/{module_name}.json ({path_count} paths, {op_count} ops, {len(nodes)} nodes)")
 
     # 2. Generate missing events specs
     print(f"\n--- Generating {len(MISSING_EVENTS_SPECS)} events specs ---")
@@ -797,7 +797,7 @@ def main():
             continue
 
         # Check if events spec already exists
-        existing_v2 = BASE / target_folder / "api-v2" / f"{module_name}.json"
+        existing_v2 = BASE / target_folder / "api" / f"{module_name}.json"
         existing_v1 = BASE / target_folder / "api" / f"{module_name}.json"
         if existing_v2.exists() or existing_v1.exists():
             print(f"  SKIP {module_name}: events spec already exists")
@@ -833,8 +833,8 @@ def main():
     print(f"\n--- Updating manifests ---")
     for folder in sorted(affected_folders):
         folder_path = BASE / folder
-        if (folder_path / "api-v2").exists():
-            update_manifest(folder_path, "api-v2")
+        if (folder_path / "api").exists():
+            update_manifest(folder_path, "api")
 
     print(f"\n{'=' * 60}")
     print(f"SUMMARY")

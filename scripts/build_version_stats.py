@@ -2,7 +2,7 @@
 """
 build_version_stats.py — Per-release rollup of API path/operation/spec counts.
 
-Walks every release's swagger-*-model/api-v2/*.json files and writes
+Walks every release's swagger-*-model/api/*.json files and writes
 ``cisco-ios-xe-openapi-swagger/version-stats.json`` consumed by the home page
 summary table and the cross-version comparison view, so users can see how
 coverage has grown release-over-release.
@@ -49,7 +49,7 @@ OP_METHODS = ("get", "post", "put", "patch", "delete")
 
 
 def _scan_category(spec_dir: Path) -> dict:
-    """Return {specs, paths, operations} for one swagger-<cat>-model/api-v2 dir."""
+    """Return {specs, paths, operations} for one swagger-<cat>-model/api dir."""
     if not spec_dir.is_dir():
         return {"specs": 0, "paths": 0, "operations": 0}
     specs = paths = ops = 0

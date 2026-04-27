@@ -597,7 +597,7 @@ def process_tree_file(html_path, output_dir, max_depth=5):
 def generate_all():
     script_dir = Path(__file__).parent
     tree_dir = script_dir.parent / 'yang-trees'
-    output_dir = script_dir.parent / 'swagger-ietf-model' / 'api-v2'
+    output_dir = script_dir.parent / 'swagger-ietf-model' / 'api'
 
     if output_dir.exists():
         for f in output_dir.glob('*.json'):

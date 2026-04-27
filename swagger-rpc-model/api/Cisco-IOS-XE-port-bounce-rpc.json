@@ -1,62 +1,50 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Cisco-IOS-XE-port-bounce-rpc - RPC Operations",
-    "description": "Copyright (c) 2024 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `Cisco-IOS-XE-port-bounce-rpc`\n**Version:** 2025-03-01\n**Operations:** 1\n\n**YANG Model:** [Cisco-IOS-XE-port-bounce-rpc - RPC Operations.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Cisco-IOS-XE-port-bounce-rpc - RPC Operations.yang)",
-    "version": "2025-03-01"
+    "title": "Cisco IOS-XE RPC - Cisco-IOS-XE-port-bounce-rpc",
+    "description": "RPC operations from `Cisco-IOS-XE-port-bounce-rpc` module.\n\n**RPCs:** 1 (port-bounce)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-port-bounce-rpc",
+    "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/operations/port_bounce_rpc:port-bounce": {
+    "/operations/Cisco-IOS-XE-port-bounce-rpc:port-bounce": {
       "post": {
-        "summary": "RPC request message for port bounce",
-        "description": "RPC request message for port bounce\n\n**Endpoint:** `POST /restconf/operations/port_bounce_rpc:port-bounce`",
-        "operationId": "port-bounce",
+        "summary": "Execute port-bounce",
+        "operationId": "post-Cisco-IOS-XE-port-bounce-rpc-port-bounce",
         "tags": [
           "Cisco-IOS-XE-port-bounce-rpc"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "port_bounce_rpc:port-bounce": {
-                    "type": "object",
-                    "properties": {
-                      "if-name": {
-                        "type": "string",
-                        "pattern": "(((((Ten|Forty|Two|Five|Four|App|Fifty)?Gigabit)|Fast)?Ethernet(0|[1-9][0-9]*)(/(0|[1-9][0-9]*))*)|(((TwentyFive|Hundred|TwoHundred)GigE)(0|[1-9][0-9]*)(/(0|[1-9][0-9]*))*))",
-                        "description": "Name of the interface that is to be bounced. Port bounce can\n         be performed only on the following interface -\n          Ethernet, Fast Ethernet, Gigabit Ethernet,\n          Two Gigabit Ethernet, Four Gigabit Ethernet,\n          Five Gigabit Ethernet, Ten Gigabit Ethernet,\n          Twenty Five Gigabit Ethernet, Forty Gigabit Ethernet,\n          Fifty Gigabit Ethernet, Hundred Gigabit Ethernet,\n          Two Hundred Gigabit Ethernet and App Gigabit Ethernet"
-                      }
-                    },
-                    "required": [
-                      "if-name"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "port_bounce_rpc:port-bounce": {
-                  "if-name": "GigabitEthernet1/0/1"
-                }
-              }
-            }
-          }
-        },
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -64,36 +52,54 @@
                   "properties": {
                     "if-name": {
                       "type": "string",
-                      "description": "Name of the interface which the user requested to be bounced."
+                      "example": "GigabitEthernet1/0/1"
                     },
                     "status": {
                       "type": "string",
-                      "description": "Status of port bounce operation"
+                      "example": "active",
+                      "description": "Current status"
                     },
                     "reason": {
                       "type": "string",
-                      "description": "Reason for port-bounce to fail, if there is any failure."
+                      "example": "administrative"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "if-name": "GigabitEthernet1/0/1",
-                  "status": "example-string",
-                  "reason": "example-string"
+                  "Cisco-IOS-XE-port-bounce-rpc:output": {
+                    "if-name": "GigabitEthernet1/0/1",
+                    "status": "active",
+                    "reason": "administrative"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "if-name": {
+                    "type": "string",
+                    "example": "GigabitEthernet1/0/1"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "Cisco-IOS-XE-port-bounce-rpc:input": {
+                  "if-name": "GigabitEthernet1/0/1"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **port-bounce** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
       }
     }
   },
@@ -101,7 +107,19 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       }
     }
   },
@@ -109,9 +127,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

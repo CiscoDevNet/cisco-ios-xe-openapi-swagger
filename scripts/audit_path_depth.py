@@ -112,9 +112,9 @@ def main() -> int:
     summary = {"version": args.version, "min_max_depth": MIN_MAX_DEPTH, "categories": {}}
     failures: list[str] = []
     for cat in CATEGORIES:
-        api_dir = base / f"swagger-{cat}-model" / "api-v2"
+        api_dir = base / f"swagger-{cat}-model" / "api"
         if not api_dir.is_dir():
-            print(f"  {cat:14s} {'-':>6s}  {'-':>4s}  -    SKIP    (no api-v2 dir)")
+            print(f"  {cat:14s} {'-':>6s}  {'-':>4s}  -    SKIP    (no api dir)")
             summary["categories"][cat] = {"missing": True}
             continue
         stat = audit_category(api_dir)

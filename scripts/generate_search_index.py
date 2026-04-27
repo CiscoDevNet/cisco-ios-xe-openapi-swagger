@@ -16,7 +16,7 @@ MODEL_DIRS = {
     'swagger-other-model': ('other', 'Other Models', '📦'),
 }
 
-# Models that also have a v2 (tree-based deep-path) api-v2/ directory
+# Models that also have a v2 (tree-based deep-path) api/ directory
 V2_DIRS = {
     'swagger-native-config-model': ('native-v2', 'Native Config v2 (Deep)', '🏠'),
     'swagger-oper-model': ('oper-v2', 'Operational v2 (Deep)', '📊'),
@@ -83,7 +83,7 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
                 keywords.add(tag_name.lower())
 
         if version == 'v2':
-            swagger_url = f"{dir_name}/index-v2.html#spec={module_name}"
+            swagger_url = f"{dir_name}/index.html#spec={module_name}"
         else:
             swagger_url = f"{dir_name}/index.html#spec={module_name}"
 
@@ -114,9 +114,9 @@ def main():
         total_endpoints += eps
         by_category[dir_name] = count
 
-    # Index v2 specs (api-v2/ directories)
+    # Index v2 specs (api/ directories)
     for dir_name, (type_name, display_cat, emoji) in V2_DIRS.items():
-        api_dir = os.path.join(BASE, dir_name, 'api-v2')
+        api_dir = os.path.join(BASE, dir_name, 'api')
         if not os.path.isdir(api_dir):
             continue
         count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v2')

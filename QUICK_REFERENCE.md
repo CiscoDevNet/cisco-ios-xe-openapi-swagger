@@ -12,7 +12,7 @@
 **Fix:** [search.js](search.js) now reads/writes URL hashes:
 - `#search=<query>` — runs the search on load
 - `#module=<name>` — opens the module's swagger page
-- `#spec=<model>/<name>` — opens the spec inside the right model's `index-v2.html`
+- `#spec=<model>/<name>` — opens the spec inside the right model's `index.html`
 **Status:** Fixed and deployed.
 
 ### 1. Other Model - Fixed [object object] Display
@@ -93,15 +93,15 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 
 | Model | Link |
 |-------|------|
-| Operational | [Browse Oper](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index-v2.html) |
-| Native Config | [Browse Native](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index-v2.html) |
-| Configuration | [Browse Config](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index-v2.html) |
-| OpenConfig | [Browse OpenConfig](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index-v2.html) |
-| IETF | [Browse IETF](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index-v2.html) |
-| MIB | [Browse MIB](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index-v2.html) |
-| RPC | [Browse RPC](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index-v2.html) |
-| Events | [Browse Events](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index-v2.html) |
-| Other | [Browse Other](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index-v2.html) |
+| Operational | [Browse Oper](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index.html) |
+| Native Config | [Browse Native](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index.html) |
+| Configuration | [Browse Config](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index.html) |
+| OpenConfig | [Browse OpenConfig](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index.html) |
+| IETF | [Browse IETF](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index.html) |
+| MIB | [Browse MIB](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html) |
+| RPC | [Browse RPC](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index.html) |
+| Events | [Browse Events](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index.html) |
+| Other | [Browse Other](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index.html) |
 
 ## Tips & Tricks
 

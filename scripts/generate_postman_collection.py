@@ -31,7 +31,7 @@ MODEL_DISPLAY = OrderedDict([
     ("swagger-other-model",          "9 - Other"),
 ])
 
-# Models that have v2 (tree-based deep-path) api-v2/ directories
+# Models that have v2 (tree-based deep-path) api/ directories
 V2_MODEL_DISPLAY = OrderedDict([
     ("swagger-cfg-model",            "1b - Configuration v2 (Deep Paths)"),
     ("swagger-native-config-model",  "2b - Native Configuration v2 (Deep Paths)"),
@@ -331,7 +331,7 @@ def main():
 
     # Process v2 (tree-based deep-path) spec folders
     for folder, display_name in V2_MODEL_DISPLAY.items():
-        spec_files = sorted(glob.glob(os.path.join(folder, "api-v2", "*.json")))
+        spec_files = sorted(glob.glob(os.path.join(folder, "api", "*.json")))
         if not spec_files:
             continue
 

@@ -2,7 +2,7 @@
 """
 build_native_capabilities.py — Summarize the Cisco-IOS-XE-native config surface.
 
-Walks every spec under ``releases/<ver>/swagger-native-config-model/api-v2/`` and
+Walks every spec under ``releases/<ver>/swagger-native-config-model/api/`` and
 counts paths/operations/leafs/lists/choices per category file. Emits
 ``releases/<ver>/native-capabilities.json`` consumed by the Config Capabilities
 summary page.

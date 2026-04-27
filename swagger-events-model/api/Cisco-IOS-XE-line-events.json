@@ -1,77 +1,177 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Events - line",
+    "title": "Cisco IOS-XE Events - Cisco-IOS-XE-line-events",
+    "description": "Event/notification data from `Cisco-IOS-XE-line-events` module.\n\n**Endpoints:** 4 | **Notifications:** 1\n\nData endpoints use GET. Notifications are delivered via RESTCONF SSE subscriptions.",
     "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions for line event notification.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - line.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - line.yang)"
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-line-events",
+    "x-model-type": "events"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "sandbox-iosxe-latest-1.cisco.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/data/Cisco-IOS-XE-line-events:events": {
+    "/streams/Cisco-IOS-XE-line-events:line-state-event": {
       "get": {
-        "summary": "Get Cisco-IOS-XE-line-events event subscriptions",
-        "description": "Retrieve active event subscriptions for Cisco-IOS-XE-line-events",
+        "summary": "Notification: line-state-event",
+        "description": "YANG notification `line-state-event` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-line-events:line-state-event",
         "tags": [
-          "events"
+          "notifications"
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "type": "string",
+                      "example": "informational",
+                      "description": "Log severity level"
+                    },
+                    "host-name": {
+                      "type": "string",
+                      "example": "example-1"
+                    },
+                    "state-event-list": {
+                      "type": "object",
+                      "properties": {
+                        "number": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295,
+                          "example": 10
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "default"
+                        }
+                      },
+                      "example": "active"
+                    }
+                  },
+                  "example": "active"
+                },
                 "example": {
-                  "Cisco-IOS-XE-line-events:events": {
-                    "description": "Event notification stream"
+                  "Cisco-IOS-XE-line-events:line-state-event": {
+                    "severity": "informational",
+                    "host-name": "example-1",
+                    "state-event-list": {
+                      "number": 10,
+                      "type": "default"
+                    }
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/operations/ietf-subscribed-notifications:establish-subscription": {
-      "post": {
-        "summary": "Create event subscription",
-        "description": "Establish a subscription to Cisco-IOS-XE-line-events events",
+    "/streams/Cisco-IOS-XE-line-events:line-state-event/severity": {
+      "get": {
+        "summary": "Notification: severity",
+        "description": "YANG notification `severity` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-line-events:line-state-event-severity",
         "tags": [
-          "events"
+          "notifications"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "example": {
-                "input": {
-                  "stream": "Cisco-IOS-XE-line-events:events",
-                  "encoding": "encode-json",
-                  "update-trigger": "periodic",
-                  "period": 6000
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "informational",
+                  "description": "Log severity level"
+                },
+                "example": {
+                  "Cisco-IOS-XE-line-events:severity": "configured-value"
                 }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-line-events:line-state-event/host-name": {
+      "get": {
+        "summary": "Notification: host-name",
+        "description": "YANG notification `host-name` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-line-events:line-state-event-host-name",
+        "tags": [
+          "notifications"
+        ],
         "responses": {
           "200": {
-            "description": "Subscription created",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "example-1"
+                },
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
+                  "Cisco-IOS-XE-line-events:host-name": "example-1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-line-events:line-state-event/state-event-list": {
+      "get": {
+        "summary": "Notification: state-event-list",
+        "description": "YANG notification `state-event-list` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-line-events:line-state-event-state-event-list",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "number": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295,
+                      "example": 10
+                    },
+                    "type": {
+                      "type": "string",
+                      "example": "default"
+                    }
+                  },
+                  "example": "active"
+                },
+                "example": {
+                  "Cisco-IOS-XE-line-events:state-event-list": {
+                    "number": 10,
+                    "type": "default"
                   }
                 }
               }
@@ -85,7 +185,29 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
@@ -93,15 +215,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "events",
-      "description": "Model-driven telemetry event subscriptions"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE NETCONF/YANG Event Notifications - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

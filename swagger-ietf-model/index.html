@@ -1,235 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0;url=index-v2.html">
-    <script>
-        // Redirect to deep-path specs, preserving any hash/query params
-        var target = 'index-v2.html';
-        if (location.hash) target += location.hash;
-        if (location.search) target += location.search;
-        window.location.replace(target);
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cisco IOS-XE 17.18 - IETF Standard APIs</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self';">
+    <title>Cisco IOS-XE 26.1.1 - IETF APIs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #fafafa; }
-        .header { background: linear-gradient(135deg, #00838f 0%, #006064 100%); color: white; padding: 20px 40px; }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { opacity: 0.9; font-size: 14px; }
-        .nav-bar { background: #1b1b1b; padding: 10px 40px; display: flex; gap: 20px; flex-wrap: wrap; }
-        .nav-bar a { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; }
+        .header { background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%); color: white; padding: 20px 40px; }
+        .header h1 { font-size: 24px; margin-bottom: 6px; }
+        .header p { opacity: 0.9; font-size: 13px; }
+        .header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px; }
+        .nav-bar { background: #1b1b1b; padding: 8px 40px; display: flex; gap: 16px; flex-wrap: wrap; }
+        .nav-bar a { color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
         .nav-bar a:hover { background: #333; }
-        .nav-bar a.active { background: #00838f; }
-        .container { display: flex; min-height: calc(100vh - 140px); }
-        .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
-        .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
+        .nav-bar a.active { background: #6A1B9A; }
+        .container { display: flex; min-height: calc(100vh - 120px); }
+        .sidebar { width: 340px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-header { padding: 14px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
         .sidebar-header h3 { font-size: 14px; color: #333; }
-        .search-box { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-top: 10px; }
+        .search-box { padding: 10px 16px; border-bottom: 1px solid #e0e0e0; }
+        .search-box input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .search-box input:focus { outline: none; border-color: #6A1B9A; }
+        .stats-bar { display: flex; gap: 20px; padding: 10px 16px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #6A1B9A; }
+        .stat-label { font-size: 11px; color: #666; }
         .module-list { list-style: none; }
-        .module-list li { border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; }
-        .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; flex: 1; }
-        .module-list a:hover { background: #e0f7fa; }
-        .module-list a.selected { background: #e0f7fa; border-left: 3px solid #00838f; }
-        .tree-link { padding: 8px 12px; color: #4CAF50; text-decoration: none; font-size: 11px; white-space: nowrap; transition: color 0.2s; }
-        .tree-link:hover { color: #388E3C; text-decoration: underline; }
+        .module-list li { border-bottom: 1px solid #f0f0f0; }
+        .module-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; color: #333; text-decoration: none; font-size: 12px; transition: background 0.15s; }
+        .module-list a:hover { background: #F3E5F5; }
+        .module-list a.selected { background: #F3E5F5; border-left: 3px solid #6A1B9A; }
+        .module-list .path-count { color: #999; font-size: 11px; white-space: nowrap; }
+        /* Recursive YANG container tree (shared with native viewer) */
+        .tree-row { display: flex; align-items: center; padding: 4px 12px 4px 4px; font-size: 12px; color: #333; cursor: pointer; user-select: none; border-bottom: 1px solid #f5f5f5; gap: 4px; }
+        .tree-row:hover { background: #F3E5F5; }
+        .tree-row.selected { background: #F3E5F5; border-left: 3px solid #6A1B9A; }
+        .tree-row code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #6A1B9A; }
+        .tree-row .tree-arrow { display: inline-block; width: 12px; flex: 0 0 12px; color: #6A1B9A; font-size: 9px; transition: transform 0.15s; }
+        .tree-row.collapsed .tree-arrow { transform: rotate(-90deg); }
+        .tree-arrow-empty { visibility: hidden; }
+        .tree-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tree-label[data-module], .tree-label[onclick] { cursor: pointer; }
+        .tree-label .leaf-spec { color: #999; font-size: 10px; margin-left: 6px; font-style: italic; }
+        .tree-row .path-count { color: #6A1B9A; font-size: 10px; background: #F3E5F5; border-radius: 8px; padding: 0 6px; min-width: 22px; text-align: center; }
+        .tree-children.collapsed { display: none; }
         .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
         .swagger-container { flex: 1; overflow-y: auto; }
-        .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #00838f; }
-        .stat-label { font-size: 12px; color: #666; }
-        .info-box { padding: 20px; margin: 20px; background: #e0f7fa; border-radius: 8px; }
-        .info-box h3 { color: #006064; margin-bottom: 10px; }
-        .info-box p { color: #333; line-height: 1.6; }
+        .info-box { padding: 24px; margin: 24px; background: #F3E5F5; border-radius: 8px; }
+        .info-box h3 { color: #4A148C; margin-bottom: 12px; }
+        .info-box p { color: #333; line-height: 1.7; font-size: 14px; }
+        .download-bar { display: none; padding: 8px 20px; background: #F3E5F5; border-bottom: 1px solid #e0e0e0; align-items: center; gap: 12px; }
+        .download-bar button { padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-primary { background: #6A1B9A; color: white; }
+        .search-info { padding: 6px 16px; font-size: 11px; color: #666; background: #f9f9f9; border-bottom: 1px solid #e0e0e0; display: none; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Cisco IOS-XE 17.18.1 - IETF Standard APIs</h1>
-        <p>RFC-compliant standard models for interfaces, routing, and network management</p>
+        <h1>Cisco IOS-XE <span class="header-version">26.1.1</span> - IETF Standard APIs</h1>
+        <p id="headerStats">Loading...</p>
     </div>
-    
     <nav class="nav-bar">
         <a href="../index.html">Home</a>
         <a href="../swagger-oper-model/index.html">Operational</a>
-        <a href="../swagger-rpc-model/index.html">RPC</a>
         <a href="../swagger-cfg-model/index.html">Config</a>
         <a href="../swagger-native-config-model/index.html">Native</a>
         <a href="../swagger-openconfig-model/index.html">OpenConfig</a>
-        <a href="../swagger-ietf-model/index.html" class="active">IETF</a>
+        <a href="../swagger-rpc-model/index.html">RPC</a>
+        <a href="index.html" class="active">IETF</a>
         <a href="../swagger-mib-model/index.html">MIB</a>
         <a href="../swagger-events-model/index.html">Events</a>
         <a href="../swagger-other-model/index.html">Other</a>
-        <a href="index-v2.html" style="background: #1565C0; color: white; padding: 6px 14px; border-radius: 4px; font-size: 13px; text-decoration: none;">IETF v2 ?</a>
-        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">?? Tree Browser</a>
+        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">Tree Browser</a>
     </nav>
-    
     <div class="container">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3>IETF Modules</h3>
-                <input type="text" class="search-box" id="moduleSearch" placeholder="Search modules..." oninput="filterModules()">
+            <div class="sidebar-header"><h3>IETF Specs</h3></div>
+            <div class="search-box">
+                <input type="text" id="searchBox" placeholder="Search modules..." oninput="filterModules()">
             </div>
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-value" id="totalModules">0</div>
-                    <div class="stat-label">Modules</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalPaths">0</div>
-                    <div class="stat-label">Paths</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalOperations">0</div>
-                    <div class="stat-label">Operations</div>
-                </div>
+            <div class="search-info" id="searchInfo"></div>
+            <div class="stats-bar">
+                <div class="stat"><div class="stat-value" id="totalSpecs">—</div><div class="stat-label">Specs</div></div>
+                <div class="stat"><div class="stat-value" id="totalPaths">—</div><div class="stat-label">Paths</div></div>
+                <div class="stat"><div class="stat-value" id="totalOps">—</div><div class="stat-label">Ops</div></div>
             </div>
-            <ul class="module-list" id="moduleList"></ul>
+            <div id="sidebarContent">Loading...</div>
         </aside>
-        
         <main class="main-content">
             <div class="info-box" id="welcomeBox">
-                <h3>Welcome to IETF Standard API Documentation</h3>
-                <p>Select a module from the sidebar. IETF models are defined by RFC standards and provide interoperable APIs.</p>
-                <p style="margin-top: 10px;"><strong>Key RFCs:</strong> RFC 8040 (RESTCONF), RFC 7950 (YANG), RFC 8341 (NACM)</p>
-                <p><strong>Base URL:</strong> <code>https://{device}/restconf/data/</code></p>
+                <h3>IETF Standard API</h3>
+                <p>CRUD endpoints for IETF standard YANG modules with full-depth coverage.</p>
+                <p style="margin-top: 10px;">Select a module from the sidebar to explore its endpoints.</p>
             </div>
-            <div id="downloadBar" style="display: none; padding: 10px 20px; background: #f0f7ff; border-bottom: 1px solid #e0e0e0; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <button onclick="downloadSpec()" style="padding: 8px 16px; background: #1565C0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#0D47A1'" onmouseout="this.style.background='#1565C0'">?? Download JSON Spec</button>
-                <span id="downloadLabel" style="color: #666; font-size: 0.85rem;"></span>
-                <button onclick="copySpecUrl()" style="padding: 6px 12px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='#616161'" onmouseout="this.style.background='#757575'" title="Copy spec URL to clipboard">?? Copy URL</button>
+            <div class="download-bar" id="downloadBar">
+                <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
+                <span id="downloadLabel" style="color:#666;font-size:12px;"></span>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">View YANG Tree</a>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
+    <script src="../deeplink.js"></script>
+    <script src="../yang-tree-sidebar.js"></script>
+    <script src="paths-search.js"></script>
     <script>
-        let allModules = [];
-        let availableTrees = new Set();
-        
-        async function loadModules() {
-            try {
-                try { const tr = await fetch('../yang-trees/tree-manifest.json'); availableTrees = new Set(await tr.json()); } catch(e) {}
-                const response = await fetch('api/manifest.json');
-                const manifest = await response.json();
-                allModules = manifest.modules || [];
-                const totalPaths = manifest.total_paths || 0;
-                document.getElementById('totalModules').textContent = allModules.length;
-                document.getElementById('totalPaths').textContent = totalPaths.toLocaleString();
-                document.getElementById('totalOperations').textContent = (manifest.total_operations || 0).toLocaleString();
-                renderModuleList(allModules);
-                
-                // Auto-load first module if available (only if no hash specified)
-                if (allModules.length > 0 && !window.location.hash.includes('spec')) {
-                    loadSpec(allModules[0]);
-                }
-            } catch (error) {
-                console.error('Error loading manifest:', error);
-            }
-        }
-        
-        function renderModuleList(modules) {
-            const list = document.getElementById('moduleList');
-            list.innerHTML = modules.map(mod => {
-                const displayName = mod.replace('ietf-', '');
-                return `<li>
-                    <a href="#" onclick="loadSpec('${mod}')" id="mod-${mod}">${displayName}</a>
-                    ${availableTrees.has(mod) ? `<a href="../yang-trees/${mod}.html" target="_blank" rel="noopener noreferrer" class="tree-link" title="View YANG Tree">?? Tree</a>` : ''}
-                </li>`;
-            }).join('');
-        }
-        
-        function filterModules() {
-            const search = document.getElementById('moduleSearch').value.toLowerCase();
-            const filtered = allModules.filter(mod => mod.toLowerCase().includes(search));
-            renderModuleList(filtered);
-        }
-        
-        function loadSpec(moduleName) {
-            showDownloadBar(typeof moduleName === "object" ? moduleName.name || moduleName : moduleName);
-            document.getElementById('welcomeBox').style.display = 'none';
-            document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
-            const link = document.getElementById('mod-' + moduleName);
-            if (link) link.classList.add('selected');
-            
-            SwaggerUIBundle({
-                url: `api/${moduleName}.json`,
-                dom_id: '#swagger-ui',
-                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-                layout: 'StandaloneLayout',
-                deepLinking: true
-            });
-        }
-        
-        // Auto-load spec from hash fragment (for deep linking from search)
-        function checkAndLoadFromHash() {
-            let hash = decodeURIComponent(window.location.hash);
-            // Remove leading # and any slashes
-            hash = hash.replace(/^#\/?/, '#');
-            if (hash.startsWith('#spec=')) {
-                const moduleName = hash.replace('#spec=', '');
-                if (moduleName) {
-                    console.log('Deep linking to module:', moduleName);
-                    setTimeout(() => loadSpec(moduleName), 100);
-                }
-            }
-        }
-        
-        // Check on page load
-        window.addEventListener('DOMContentLoaded', checkAndLoadFromHash);
-        
-        // Check on hash change (for navigation within the page)
-        window.addEventListener('hashchange', checkAndLoadFromHash);
-        
-        // Also check immediately in case DOM is already loaded
-        if (document.readyState === 'loading') {
-            // Still loading
-        } else {
-            // DOM already loaded
-            checkAndLoadFromHash();
-        }
-        
-        loadModules();
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-        // Download / copy spec functions
-        let currentModule = null;
-        
-        function downloadSpec() {
-            if (!currentModule) return;
-            const specUrl = `api/${currentModule}.json`;
-            const a = document.createElement('a');
-            a.href = specUrl;
-            a.download = currentModule + '.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-        
-        function copySpecUrl() {
-            if (!currentModule) return;
-            const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + 'api/' + currentModule + '.json';
-            const btn = document.querySelector(chr(39)+chr(91)+chr(111)+chr(110)+chr(99)+chr(108)+chr(105)+chr(99)+chr(107)+chr(42)+chr(61)+chr(34)+chr(99)+chr(111)+chr(112)+chr(121)+chr(83)+chr(112)+chr(101)+chr(99)+chr(85)+chr(114)+chr(108)+chr(34)+chr(93)+chr(39));
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                if (!btn) return;
-                const orig = btn.textContent;
-                btn.textContent = '? Copied!';
-                setTimeout(() => { btn.textContent = orig; }, 1500);
-            }).catch(() => {});
-        }
-        
-        function showDownloadBar(moduleName) {
-            currentModule = moduleName;
-            const bar = document.getElementById('downloadBar');
-            if (bar) {
-                bar.style.display = 'flex';
-                document.getElementById('downloadLabel').textContent = moduleName + '.json';
+    // === version-aware api base (added by patch_viewers_version_aware.py) ===
+    // Default version + allow-list are baked from releases/index.json at
+    // patch time. Re-run scripts/patch_viewers_version_aware.py after editing
+    // releases/index.json to refresh these.
+    var __IOSXE_DEFAULT_VER__ = '26.1.1';
+    var __IOSXE_ALLOWED_VERS__ = ["26.1.1", "17.18.1", "17.15.x", "17.12.x", "17.9.x"];
+    function __activeVer() {
+        // Priority: ?ver= query > #ver= hash > localStorage > parent window.
+        // Always returns a valid version from the allow-list (falls back to
+        // __IOSXE_DEFAULT_VER__ for unknown/missing input).
+        var raw = null;
+        try {
+            var qs = new URLSearchParams(location.search);
+            if (qs.get('ver')) raw = qs.get('ver');
+            if (!raw) {
+                var hm = location.hash.match(/[#&]ver=([^&]+)/);
+                if (hm) raw = decodeURIComponent(hm[1]);
             }
+            if (!raw) raw = localStorage.getItem('iosxe-active-version');
+        } catch (_) {}
+        if (!raw && window.parent && window.parent !== window
+                 && window.parent.__IOSXE_ACTIVE_VERSION__) {
+            raw = window.parent.__IOSXE_ACTIVE_VERSION__;
         }
+        if (!raw) raw = window.__IOSXE_ACTIVE_VERSION__;
+        if (raw && __IOSXE_ALLOWED_VERS__.indexOf(raw) >= 0) return raw;
+        return __IOSXE_DEFAULT_VER__;
+    }
+    function __apiBase() {
+        var ver = __activeVer();
+        if (ver === __IOSXE_DEFAULT_VER__) return 'api';
+        var m = location.pathname.match(/\/(swagger-[^/]+-model)\//);
+        var cat = m ? m[1] : '';
+        return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api';
+    }
+    function __treeBase() {
+        var ver = __activeVer();
+        if (ver === __IOSXE_DEFAULT_VER__) return '../yang-trees';
+        return '../releases/' + encodeURIComponent(ver) + '/yang-trees';
+    }
+    // Expose for mib-metadata side card and other consumers.
+    window.__IOSXE_ACTIVE_VERSION__ = __activeVer();
+    // Update any element flagged with `.header-version` so the viewer's
+    // visible header reflects the active release instead of the static
+    // fallback baked in at HTML build time.
+    (function () {
+        function applyHeaderVersion() {
+            try {
+                var v = __activeVer();
+                document.querySelectorAll('.header-version').forEach(function (el) {
+                    el.textContent = v;
+                });
+                // Also keep the browser tab title in sync.
+                if (document.title) {
+                    document.title = document.title.replace(
+                        /Cisco IOS-XE [0-9.x]+/, 'Cisco IOS-XE ' + v);
+                }
+            } catch (_) {}
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyHeaderVersion);
+        } else {
+            applyHeaderVersion();
+        }
+    })();
+    // === end version-aware api base ===
+    let allModules = [];
+    let currentModule = null;
+    let containerTree = null;
+
+    async function init() {
+        const resp = await fetch(__apiBase() + '/manifest.json');
+        const manifest = await resp.json();
+        document.getElementById('totalSpecs').textContent = manifest.total_modules;
+        document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
+        document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
+        document.getElementById('headerStats').textContent =
+            `${manifest.total_paths.toLocaleString()} endpoints across ${manifest.total_modules} modules \u2014 generated from resolved YANG trees`;
+
+        const fetches = manifest.modules.map(async fname => {
+            try {
+                const r = await fetch(`${__apiBase()}/${fname}.json`);
+                const spec = await r.json();
+                const title = (spec.info.title || fname).replace('Cisco IOS-XE IETF - ', '');
+                const paths = spec.paths || {};
+                const pathList = Object.keys(paths);
+                const opOrder = ['get','put','patch','post','delete'];
+                const pathOps = {};
+                for (const p of pathList) {
+                    const ops = paths[p] || {};
+                    for (const mth of opOrder) {
+                        if (ops[mth] && ops[mth].operationId) { pathOps[p] = ops[mth].operationId; break; }
+                    }
+                }
+                return { fname, title, paths: pathList.length, pathList, pathOps };
+            } catch(e) {
+                return { fname, title: fname, paths: 0, pathList: [], pathOps: {} };
+            }
+        });
+        allModules = await Promise.all(fetches);
+        allModules.sort((a, b) => a.title.localeCompare(b.title));
+        containerTree = YangTreeSidebar.build(allModules);
+        renderSidebar();
+        checkHash();
+    }
+
+    function renderSidebar(filter = '') {
+        const host = document.getElementById('sidebarContent');
+        const r = YangTreeSidebar.render(containerTree, host, {
+            filter: filter,
+            currentModule: currentModule,
+            collapseAllByDefault: true,
+            storageKey: 'ietf',
+            onLoad: loadSpec,
+        });
+        const info = document.getElementById('searchInfo');
+        if (filter && filter.trim()) {
+            info.textContent = `${r.visibleTops} top containers, ${r.matched} nodes match`;
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
+    }
+
+    function filterModules() { renderSidebar(document.getElementById('searchBox').value); }
+
+    function loadSpec(fname, el, opId) {
+        const sameSpec = (currentModule === fname);
+        currentModule = fname;
+        document.getElementById('welcomeBox').style.display = 'none';
+        document.getElementById('downloadBar').style.display = 'flex';
+        document.getElementById('downloadLabel').textContent = fname + '.json';
+        document.querySelectorAll('.module-list a, .tree-row').forEach(a => a.classList.remove('selected'));
+        if (el) el.classList.add('selected');
+        if (el && el.classList.contains('tree-label')) {
+            const row = el.closest('.tree-row');
+            if (row) row.classList.add('selected');
+        }
+        if (window.__DeepLink) {
+            if (opId) { window.__DeepLink.setSpecOp(fname, opId); }
+            else { window.__DeepLink.setSpec(fname); }
+        } else {
+            window.location.hash = '#spec=' + fname + (opId ? '&op=' + encodeURIComponent(opId) : '');
+        }
+        if (!sameSpec) {
+            SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout', deepLinking: false, filter: true
+            });
+        } else if (opId && window.__DeepLink && window.__DeepLink.tryExpandOp) {
+            window.__DeepLink.tryExpandOp(opId);
+        }
+        // Update YANG tree link
+        const treeLink = document.getElementById('treeLink');
+        if (treeLink) {
+            const treeUrl = __treeBase() + '/' + fname + '.html';
+            treeLink.href = treeUrl;
+            treeLink.style.display = 'none';
+            fetch(treeUrl, { method: 'HEAD' }).then(r => {
+                treeLink.style.display = r.ok ? 'inline-block' : 'none';
+            }).catch(() => { treeLink.style.display = 'none'; });
+        }
+    }
+
+    function downloadSpec() {
+        if (!currentModule) return;
+        const a = document.createElement('a');
+        a.href = `${__apiBase()}/${currentModule}.json`;
+        a.download = currentModule + '.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function checkHash() {
+        const params = (window.__DeepLink && window.__DeepLink.parseHash())
+            || (function () { var h = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); var o = {}; h.split('&').forEach(function (s) { var i = s.indexOf('='); if (i > 0) o[s.substring(0, i)] = s.substring(i + 1); }); return o; })();
+        if (params.spec && allModules.find(m => m.fname === params.spec)) {
+            const el = document.querySelector(`[data-module="${CSS.escape(params.spec)}"]`);
+            if (currentModule !== params.spec) loadSpec(params.spec, el, params.op);
+            else if (params.op && window.__DeepLink) window.__DeepLink.tryExpandOp(params.op);
+        }
+    }
+    window.addEventListener('hashchange', checkHash);
+    init();
     </script>
 </body>
 </html>

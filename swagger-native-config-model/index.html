@@ -1,153 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0;url=index-v2.html">
-    <script>
-        // Redirect to deep-path specs, preserving any hash/query params
-        var target = 'index-v2.html';
-        if (location.hash) target += location.hash;
-        if (location.search) target += location.search;
-        window.location.replace(target);
-    </script>
-    <!-- Cache-busting version: 20260210-1100 - 27 categories, 328 paths, 1,307 operations -->
+    <!-- v2: Tree-based generator (counts now reflect the active release) -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cisco IOS-XE 17.18 - Native Configuration APIs</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self';">
+    <title>Cisco IOS-XE 26.1.1 - Native Configuration APIs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui.css" integrity="sha384-KX9Rx9vM1AmUNAn07bPAiZhFD4C8jdNgG6f5MRNvR+EfAxs2PmMFtUUazui7ryZQ" crossorigin="anonymous">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #fafafa; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; }
         .header { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 20px 40px; }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .header p { opacity: 0.9; font-size: 14px; }
-        .nav-bar { background: #1b1b1b; padding: 10px 40px; display: flex; gap: 20px; flex-wrap: wrap; }
-        .nav-bar a { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
+        .header h1 { font-size: 24px; margin-bottom: 6px; }
+        .header p { opacity: 0.9; font-size: 13px; }
+        .header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px; }
+        .nav-bar { background: #1b1b1b; padding: 8px 40px; display: flex; gap: 16px; flex-wrap: wrap; }
+        .nav-bar a { color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; transition: background 0.2s; }
         .nav-bar a:hover { background: #333; }
         .nav-bar a.active { background: #1565c0; }
-        .container { display: flex; min-height: calc(100vh - 140px); }
-        .sidebar { width: 320px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; }
-        .sidebar-header { padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
+        .container { display: flex; min-height: calc(100vh - 120px); }
+        .sidebar { width: 340px; background: white; border-right: 1px solid #e0e0e0; overflow-y: auto; flex-shrink: 0; }
+        .sidebar-header { padding: 14px 20px; background: #f5f5f5; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
         .sidebar-header h3 { font-size: 14px; color: #333; }
-        .search-box { padding: 12px 20px; border-bottom: 1px solid #e0e0e0; position: relative; }
-        .search-box input { width: 100%; padding: 8px 32px 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
-        .search-box input:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1); }
-        .search-clear { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 18px; display: none; }
-        .search-clear:hover { color: #333; }
-        .search-results { padding: 8px 20px; font-size: 12px; color: #666; background: #f9f9f9; border-bottom: 1px solid #e0e0e0; }
+        .search-box { padding: 10px 16px; border-bottom: 1px solid #e0e0e0; position: relative; }
+        .search-box input { width: 100%; padding: 8px 30px 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .search-box input:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 2px rgba(21,101,192,0.1); }
+        .search-clear { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #999; font-size: 16px; display: none; }
+        .stats-bar { display: flex; gap: 20px; padding: 10px 16px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; color: #1565c0; }
+        .stat-label { font-size: 11px; color: #666; }
+        .section-header { padding: 10px 16px; background: #e8eaf6; font-size: 12px; font-weight: 600; color: #283593; letter-spacing: 0; border-bottom: 1px solid #c5cae9; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+        .section-header code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #283593; }
+        .section-header:hover { background: #c5cae9; }
+        .section-header .count { font-weight: normal; color: #5c6bc0; font-size: 11px; }
+        .section-header .arrow { transition: transform 0.2s; }
+        .section-header.collapsed .arrow { transform: rotate(-90deg); }
         .module-list { list-style: none; }
+        .module-list.collapsed { display: none; }
         .module-list li { border-bottom: 1px solid #f0f0f0; }
-        .module-list a { display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 13px; transition: background 0.2s; }
+        .module-list a { display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; color: #333; text-decoration: none; font-size: 12px; transition: background 0.15s; }
         .module-list a:hover { background: #e3f2fd; }
         .module-list a.selected { background: #e3f2fd; border-left: 3px solid #1565c0; }
+        .module-list .path-count { color: #999; font-size: 11px; white-space: nowrap; }
+        /* Recursive YANG container tree */
+        .tree-row { display: flex; align-items: center; padding: 4px 12px 4px 4px; font-size: 12px; color: #333; cursor: pointer; user-select: none; border-bottom: 1px solid #f5f5f5; gap: 4px; }
+        .tree-row:hover { background: #e3f2fd; }
+        .tree-row.selected { background: #e3f2fd; border-left: 3px solid #1565c0; }
+        .tree-row code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #1a237e; }
+        .tree-row .tree-arrow { display: inline-block; width: 12px; flex: 0 0 12px; color: #5c6bc0; font-size: 9px; transition: transform 0.15s; }
+        .tree-row.collapsed .tree-arrow { transform: rotate(-90deg); }
+        .tree-arrow-empty { visibility: hidden; }
+        .tree-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tree-label[data-module], .tree-label[onclick] { cursor: pointer; }
+        .tree-label .leaf-spec { color: #999; font-size: 10px; margin-left: 6px; font-style: italic; }
+        .tree-row .path-count { color: #5c6bc0; font-size: 10px; background: #e8eaf6; border-radius: 8px; padding: 0 6px; min-width: 22px; text-align: center; }
+        .tree-children { }
+        .tree-children.collapsed { display: none; }
         .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
         .swagger-container { flex: 1; overflow-y: auto; }
-        .stats { display: flex; gap: 30px; padding: 16px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #1565c0; }
-        .stat-label { font-size: 12px; color: #666; }
-        .info-box { padding: 20px; margin: 20px; background: #e3f2fd; border-radius: 8px; }
-        .info-box h3 { color: #0d47a1; margin-bottom: 10px; }
-        .info-box p { color: #333; line-height: 1.6; }
+        .info-box { padding: 24px; margin: 24px; background: #e3f2fd; border-radius: 8px; }
+        .info-box h3 { color: #0d47a1; margin-bottom: 12px; font-size: 18px; }
+        .info-box p { color: #333; line-height: 1.7; font-size: 14px; }
+        .info-box code { background: #fff; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+        .download-bar { display: none; padding: 8px 20px; background: #f0f7ff; border-bottom: 1px solid #e0e0e0; align-items: center; gap: 12px; }
+        .download-bar button { padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-primary { background: #1565C0; color: white; }
+        .btn-secondary { background: #757575; color: white; }
+        .search-results-info { padding: 6px 16px; font-size: 11px; color: #666; background: #f9f9f9; border-bottom: 1px solid #e0e0e0; display: none; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Cisco IOS-XE 17.18.1 - Native Configuration APIs</h1>
-        <p>Cisco-IOS-XE-native module - Full device configuration organized by category</p>
+        <h1>Cisco IOS-XE <span class="header-version">26.1.1</span> - Native Configuration APIs</h1>
+        <p id="headerStats">Loading...</p>
     </div>
-    
+
     <nav class="nav-bar">
         <a href="../index.html">Home</a>
         <a href="../swagger-oper-model/index.html">Operational</a>
-        <a href="../swagger-rpc-model/index.html">RPC</a>
         <a href="../swagger-cfg-model/index.html">Config</a>
         <a href="../swagger-native-config-model/index.html" class="active">Native</a>
-        <a href="index-v2.html" style="background: #1565c0;">Native v2 ?</a>
         <a href="../swagger-openconfig-model/index.html">OpenConfig</a>
+        <a href="../swagger-rpc-model/index.html">RPC</a>
         <a href="../swagger-ietf-model/index.html">IETF</a>
         <a href="../swagger-mib-model/index.html">MIB</a>
         <a href="../swagger-events-model/index.html">Events</a>
         <a href="../swagger-other-model/index.html">Other</a>
-        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">?? Tree Browser</a>
+        <a href="../yang-trees/" style="margin-left: auto; background: #4CAF50;">Tree Browser</a>
     </nav>
-    
+
     <div class="container">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3>Native Config Categories</h3>
+                <h3>Native Config Specs</h3>
+                <span style="font-size: 12px; color: #666;" id="specCount">Loading...</span>
             </div>
             <div class="search-box">
-                <input type="text" id="searchBox" placeholder="?? Search: hostname, bgp, vlan, acl, route-map..." onkeyup="filterCategories()" oninput="updateSearchUI()">
-                <span class="search-clear" id="searchClear" onclick="clearSearch()">?</span>
+                <input type="text" id="searchBox" placeholder="Search: hostname, bgp, vlan, switchport..." oninput="filterModules()">
+                <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
             </div>
-            <div class="search-results" id="searchResults"></div>
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-value" id="totalModules">27</div>
-                    <div class="stat-label">Categories</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalPaths">328</div>
-                    <div class="stat-label">Paths</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="totalOperations">1,307</div>
-                    <div class="stat-label">Operations</div>
-                </div>
+            <div class="search-results-info" id="searchInfo"></div>
+            <div class="stats-bar">
+                <div class="stat"><div class="stat-value" id="totalSpecs">—</div><div class="stat-label">Specs</div></div>
+                <div class="stat"><div class="stat-value" id="totalPaths">—</div><div class="stat-label">Paths</div></div>
+                <div class="stat"><div class="stat-value" id="totalOps">—</div><div class="stat-label">Operations</div></div>
             </div>
-            <ul class="module-list" id="moduleList">
-                <li data-keywords="hostname version config-register aqm-register-fnf boot-end-marker boot-start-marker captive-portal-bypass disable-eadi call-home enable password secret"><a href="#" onclick="loadSpec('native-00-top-level-leafs')">? Top-Level Leafs (8 endpoints)</a></li>
-                <li data-keywords="banner boot vlan logging snmp snmp-server nat spanning-tree multicast ntp"><a href="#" onclick="loadSpec('native-00-top-level-containers')">?? Small Containers (5 endpoints)</a></li>
-                <li data-keywords="ip route access-list acl dhcp dns source-route domain routing http ssh nat cef sla"><a href="#" onclick="loadSpec('native-ip')">?? IP Configuration (10 endpoints)</a></li>
-                <li data-keywords="router ospf bgp eigrp rip isis babel lisp mpls rtr routing"><a href="#" onclick="loadSpec('native-router')">?? Routing Protocols (7 endpoints)</a></li>
-                <li data-keywords="crypto pki certificate ipsec ikev2 ssl vpn gdoi key keyring"><a href="#" onclick="loadSpec('native-crypto')">?? Cryptography & PKI (5 endpoints)</a></li>
-                <li data-keywords="aaa authentication authorization accounting tacacs radius 802.1x dot1x"><a href="#" onclick="loadSpec('native-aaa')">?? AAA (Auth/Authz/Acct) (4 endpoints)</a></li>
-                <li data-keywords="line console vty aux terminal"><a href="#" onclick="loadSpec('native-line')">?? Line Access (4 endpoints)</a></li>
-                <li data-keywords="vrf virtual routing forwarding rd rt definition"><a href="#" onclick="loadSpec('native-vrf')">?? VRF (Virtual Routing) (2 endpoints)</a></li>
-                <li data-keywords="platform system hardware boot diagnostic prompt banner clock default exception hw-module location memory module setup software stack-power upgrade card power poe inline"><a href="#" onclick="loadSpec('native-platform-system')">??? Platform & System (16 endpoints)</a></li>
-                <li data-keywords="bfd bfd-template ntp cdp mpls l2vpn l2vpn-config l3vpn lacp ppp multilink udld mvrp ptp clns frame-relay xconnect lldp"><a href="#" onclick="loadSpec('native-protocols')">?? Protocols (17 endpoints)</a></li>
-                <li data-keywords="tacacs tacacs-server radius radius-server dot1x eap mab identity cts device-tracking password enable login privilege mka port-security trustsec device-sensor"><a href="#" onclick="loadSpec('native-security-access')">?? Security & Access (16 endpoints)</a></li>
-                <li data-keywords="vlan trunk port-channel etherchannel bridge-domain switchport stp spanning-tree ethernet mac mac-address-table vtp otv l2 vxlan"><a href="#" onclick="loadSpec('native-switching-l2')">?? Switching L2 (9 endpoints)</a></li>
-                <li data-keywords="qos policy-map class-map queue marking policing shaping parameter-map"><a href="#" onclick="loadSpec('native-qos-policy')">?? QoS (2 endpoints)</a></li>
-                <li data-keywords="native alarm-contact alias archive avb avc call-home cisp controller control-plane cwmp domain endpoint-tracker epm errdisable event fabric facility-alarm fallback fhrp file flow global-address-family iox ipv6 key l2tp l2tp-class ldap license macro management md-list memory-size metadata mls monitor network-clock object-group parser performance performance-measurement pfr pfr-map platform process profile pseudowire-class redundancy redun-management remote-management rmon route-map route-tag sampler scada-gw scheduler sdm segment-routing service service-chain service-insertion snmp stackwise-virtual standby subscriber-config table-map template tftp-server-config time-range tod-clock track transport transport-map username user-name virtual-service virtual-template wsma zone zone-pair"><a href="#" onclick="loadSpec('native-other')">?? Other (82 endpoints)</a></li>
-                <li data-keywords="kron app-hosting nbar service-discovery service-routing mdns-gateway pnp scheduling job cron application recognition service-list plug-and-play provisioning"><a href="#" onclick="loadSpec('native-app-services')">?? App & Services (7 endpoints)</a></li>
-                <li data-keywords="lldp arp icmp loop-detect uplink-autoconfig discovery adjacency neighbor l2 layer2"><a href="#" onclick="loadSpec('native-l2-discovery')">?? L2 Discovery (5 endpoints)</a></li>
-                <li data-keywords="ospfv3 rsvp nhrp mobileip igmp multicast mld routing dmvpn mobile-ip ipv6-routing nd neighbor-discovery ra-guard"><a href="#" onclick="loadSpec('native-routing-multicast')">?? Routing & Multicast (8 endpoints)</a></li>
-                <li data-keywords="umbrella fqdn group-policy pae sanet 802.1x dot1x dns-security access-session session-aware eta et-analytics utd threat-defense web-filter"><a href="#" onclick="loadSpec('native-security-services')">??? Security Services (7 endpoints)</a></li>
-                <li data-keywords="alarm-profile diagnostics buffers dying-gasp geo gnss synce qfp-stats ida rmi-dad ethinternal-subslot ucse mmode hardware platform gold gps network-clock maintenance"><a href="#" onclick="loadSpec('native-platform-diag')">?? Platform & Diagnostics (13 endpoints)</a></li>
-                <li data-keywords="adsl atm bba-group dialer isdn pppoe vpdn isg ipc ipmux l2nat l3nat-iox broadband wan legacy dsl"><a href="#" onclick="loadSpec('native-wan-legacy')">?? WAN & Legacy (12 endpoints)</a></li>
-                <li data-keywords="cellular coap dapr digitalio dlr irig lorawan lte450 mrp prp rawsocket industrial iot internet-of-things edge"><a href="#" onclick="loadSpec('native-industrial-iot')">?? Industrial & IoT (11 endpoints)</a></li>
-                <li data-keywords="wccp vstack vservice ezpm iwanfabric pathmgr perf-measure site-manager voice-port interfaces web-cache smartinstall performance sd-wan"><a href="#" onclick="loadSpec('native-misc-ext')">?? Misc Extensions (10 endpoints)</a></li>
-                <li data-keywords="policy class-map policy-map parameter-map service-group control-plane service-policy copp"><a href="#" onclick="loadSpec('native-policy')">?? Policy Framework (5 endpoints)</a></li>
-                <li data-keywords="interface ethernet fastethernet gigabitethernet tengigabitethernet twentyfivegige fortygigabitethernet hundredgige twohundredgige fourhundredgige appgigabitethernet twogigabitethernet fivegigabitethernet fiftygigabitethernet physical"><a href="#" onclick="loadSpec('native-intf-ethernet')">?? Interfaces: Ethernet (13 endpoints)</a></li>
-                <li data-keywords="interface loopback tunnel virtual-template virtual-ppp virtualportgroup vasileft vasiright vif vlan bdi bd-vif lisp nve overlay pseudowire virtual"><a href="#" onclick="loadSpec('native-intf-virtual')">?? Interfaces: Virtual (18 endpoints)</a></li>
-                <li data-keywords="interface serial atm cem dialer cellular multilink group-async async mfr port-channel wan aggregation"><a href="#" onclick="loadSpec('native-intf-wan')">?? Interfaces: WAN (17 endpoints)</a></li>
-                <li data-keywords="interface appnav-compress appnav-uncompress embedded-service-engine service-engine ucse wlan-gigabitethernet sm gmpls prp-channel bundle lorawan wpan virtual-wpan vmi iot service specialty"><a href="#" onclick="loadSpec('native-intf-service')">??? Interfaces: Service (15 endpoints)</a></li>
-            </ul>
+            <div id="sidebarContent">Loading...</div>
         </aside>
-        
+
         <main class="main-content">
             <div class="info-box" id="welcomeBox">
-                <h3>?? Native Configuration API - Category-Based Organization</h3>
-                <p>The native model is organized into 27 focused categories for optimal performance and discoverability. Select a category from the sidebar to explore API endpoints.</p>
-                <p style="margin-top: 10px;"><strong>? Top-Level Leafs:</strong> Simple values (hostname, version, config-register)</p>
-                <p><strong>?? Small Containers:</strong> Miscellaneous containers (vlan, logging, snmp, nat, spanning-tree)</p>
-                <p><strong>?? IP/IPv6:</strong> Routing, ACLs, DHCP, DNS, NAT, neighbor discovery</p>
-                <p><strong>?? Router:</strong> OSPF, BGP, EIGRP, RIP, ISIS, MPLS, L2VPN/L3VPN</p>
-                <p><strong>?? Crypto & Security:</strong> PKI, IPsec, IKEv2, TACACS, RADIUS, 802.1X, TrustSec</p>
-                <p><strong>?? Line & AAA:</strong> Console/VTY access, authentication, authorization</p>
-                <p><strong>?? Switching & QoS:</strong> VLANs, bridge domains, MAC tables, VTP, QoS</p>
-                <p><strong>??? Platform & System:</strong> Boot, banners, memory, hardware modules</p>
-                <p><strong>?? Protocols:</strong> BFD, NTP, CDP, LACP, UDLD, MVRP, PTP</p>
-                <p><strong>?? Other:</strong> 82 additional containers (call-home, archive, track, etc.)</p>
-                <p style="margin-top: 10px; padding: 8px; background: #e8f5e9; border-radius: 4px;"><strong>?? Phase 2 (Feb 2026):</strong> App Services, L2 Discovery, Routing & Multicast, Security Services, Platform & Diagnostics, WAN & Legacy, Industrial & IoT, Misc Extensions</p>
-                <p style="margin-top: 10px; padding: 8px; background: #e3f2fd; border-radius: 4px;"><strong>?? Phase 3 (Feb 2026):</strong> Policy Framework, Interfaces (Ethernet/Virtual/WAN/Service — 63 interface types), plus gap coverage for CEF, SLA, Device-Sensor, ETA, UTD, ND, Power</p>
-                <p style="margin-top: 10px;"><strong>Base URL:</strong> <code>https://{device}/restconf/data/Cisco-IOS-XE-native:native/</code></p>
+                <h3>Native Configuration API</h3>
+                <p>This is the <strong>v2 container-driven</strong> API with full-depth RESTCONF paths parsed directly from the resolved YANG tree.</p>
+                <p style="margin-top: 10px;">
+                    <strong>What's new in v2:</strong><br>
+                    • <strong>Thousands of paths</strong> (vs 328 in v1) — full RESTCONF coverage<br>
+                    • <strong>83% of paths at depth 3+</strong> — real feature-level endpoints<br>
+                    • <strong>Interface features</strong> split by function (IP, switchport, QoS, security, etc.)<br>
+                    • <strong>IP container</strong> split into routing, ACLs, services, multicast<br>
+                    • <strong>Line container</strong> split into console, vty, aux, async<br>
+                    • <strong>Every path has working examples</strong> with realistic data
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Base URL:</strong> <code>https://{device}/restconf/data/Cisco-IOS-XE-native:native/</code>
+                </p>
+                <p style="margin-top: 10px;">Select a spec from the sidebar to explore endpoints.</p>
             </div>
-            <div id="downloadBar" style="display: none; padding: 10px 20px; background: #f0f7ff; border-bottom: 1px solid #e0e0e0; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <button onclick="downloadSpec()" style="padding: 8px 16px; background: #1565C0; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#0D47A1'" onmouseout="this.style.background='#1565C0'">?? Download JSON Spec</button>
-                <span id="downloadLabel" style="color: #666; font-size: 0.85rem;"></span>
-                <button onclick="copySpecUrl()" style="padding: 6px 12px; background: #757575; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;" onmouseover="this.style.background='#616161'" onmouseout="this.style.background='#757575'" title="Copy spec URL to clipboard">?? Copy URL</button>
+            <div class="download-bar" id="downloadBar">
+                <button class="btn-primary" onclick="downloadSpec()">Download JSON</button>
+                <span id="downloadLabel" style="color: #666; font-size: 12px;"></span>
+                <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">View YANG Tree</a>
+                <a href="capabilities.html" style="padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #388E3C; color: white; text-decoration: none; font-weight: 500;">Capabilities Report</a>
+                <button class="btn-secondary" onclick="copySpecUrl()">Copy URL</button>
             </div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
@@ -155,121 +140,392 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-bundle.js" integrity="sha384-cxafBeQ+zYROeFafGFxtFbnp1ICqeS9mG7+f0WWSHzhnrUvwg9Za5CCw6wgrHA7K" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
+    <script src="../deeplink.js"></script>
+    <script src="paths-search.js"></script>
     <script>
-        function filterCategories() {
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            const items = document.querySelectorAll('.module-list li');
-            let visibleCount = 0;
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                const keywords = (item.getAttribute('data-keywords') || '').toLowerCase();
-                const matches = !searchTerm || text.includes(searchTerm) || keywords.includes(searchTerm);
-                item.style.display = matches ? '' : 'none';
-                if (matches) visibleCount++;
-            });
-            
-            const resultsDiv = document.getElementById('searchResults');
-            if (searchTerm) {
-                resultsDiv.textContent = `Found ${visibleCount} of 27 categories`;
-                resultsDiv.style.display = 'block';
-            } else {
-                resultsDiv.style.display = 'none';
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+    // Sidebar = the FULL recursive YANG container tree under
+    // /data/Cisco-IOS-XE-native:native/. Every container/list node from
+    // every spec is rendered, regardless of which JSON file it lives in
+    // (since the spec-file split is a generation artifact, not part of
+    // YANG). Each tree node knows the spec that owns its API path so
+    // clicks still load the right Swagger UI document.
+    const NATIVE_PREFIX = '/data/Cisco-IOS-XE-native:native/';
+    let containerTree = null; // root node: { name, children: Map, ownPathSpec, totalPaths }
+
+    // === version-aware api base (added by patch_viewers_version_aware.py) ===
+    // Default version + allow-list are baked from releases/index.json at
+    // patch time. Re-run scripts/patch_viewers_version_aware.py after editing
+    // releases/index.json to refresh these.
+    var __IOSXE_DEFAULT_VER__ = '26.1.1';
+    var __IOSXE_ALLOWED_VERS__ = ["26.1.1", "17.18.1", "17.15.x", "17.12.x", "17.9.x"];
+    function __activeVer() {
+        // Priority: ?ver= query > #ver= hash > localStorage > parent window.
+        // Always returns a valid version from the allow-list (falls back to
+        // __IOSXE_DEFAULT_VER__ for unknown/missing input).
+        var raw = null;
+        try {
+            var qs = new URLSearchParams(location.search);
+            if (qs.get('ver')) raw = qs.get('ver');
+            if (!raw) {
+                var hm = location.hash.match(/[#&]ver=([^&]+)/);
+                if (hm) raw = decodeURIComponent(hm[1]);
             }
+            if (!raw) raw = localStorage.getItem('iosxe-active-version');
+        } catch (_) {}
+        if (!raw && window.parent && window.parent !== window
+                 && window.parent.__IOSXE_ACTIVE_VERSION__) {
+            raw = window.parent.__IOSXE_ACTIVE_VERSION__;
         }
-        
-        function updateSearchUI() {
-            const searchBox = document.getElementById('searchBox');
-            const clearBtn = document.getElementById('searchClear');
-            clearBtn.style.display = searchBox.value ? 'block' : 'none';
+        if (!raw) raw = window.__IOSXE_ACTIVE_VERSION__;
+        if (raw && __IOSXE_ALLOWED_VERS__.indexOf(raw) >= 0) return raw;
+        return __IOSXE_DEFAULT_VER__;
+    }
+    function __apiBase() {
+        var ver = __activeVer();
+        if (ver === __IOSXE_DEFAULT_VER__) return 'api';
+        var m = location.pathname.match(/\/(swagger-[^/]+-model)\//);
+        var cat = m ? m[1] : '';
+        return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api';
+    }
+    function __treeBase() {
+        var ver = __activeVer();
+        if (ver === __IOSXE_DEFAULT_VER__) return '../yang-trees';
+        return '../releases/' + encodeURIComponent(ver) + '/yang-trees';
+    }
+    // Expose for mib-metadata side card and other consumers.
+    window.__IOSXE_ACTIVE_VERSION__ = __activeVer();
+    // Update any element flagged with `.header-version` so the viewer's
+    // visible header reflects the active release instead of the static
+    // fallback baked in at HTML build time.
+    (function () {
+        function applyHeaderVersion() {
+            try {
+                var v = __activeVer();
+                document.querySelectorAll('.header-version').forEach(function (el) {
+                    el.textContent = v;
+                });
+                // Also keep the browser tab title in sync.
+                if (document.title) {
+                    document.title = document.title.replace(
+                        /Cisco IOS-XE [0-9.x]+/, 'Cisco IOS-XE ' + v);
+                }
+            } catch (_) {}
         }
-        
-        function clearSearch() {
-            document.getElementById('searchBox').value = '';
-            updateSearchUI();
-            filterCategories();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyHeaderVersion);
+        } else {
+            applyHeaderVersion();
         }
-        
-        function loadSpec(moduleName) {
-            showDownloadBar(typeof moduleName === "object" ? moduleName.name || moduleName : moduleName);
-            document.getElementById('welcomeBox').style.display = 'none';
-            document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
-            if (typeof event !== 'undefined' && event && event.target) {
-                event.target.classList.add('selected');
+    })();
+    // === end version-aware api base ===
+    let allModules = [];  // [{fname, title, paths, section}]
+    let currentModule = null;
+
+    async function init() {
+        // Load manifest
+        const resp = await fetch(__apiBase() + '/manifest.json');
+        const manifest = await resp.json();
+
+        document.getElementById('totalSpecs').textContent = manifest.total_modules;
+        document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
+        document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
+        document.getElementById('specCount').textContent = manifest.total_modules + ' specs';
+        document.getElementById('headerStats').textContent =
+            `${manifest.total_paths.toLocaleString()} RESTCONF paths, ${manifest.total_operations.toLocaleString()} ops across ${manifest.total_modules} modules — generated from resolved YANG trees`;
+
+        // Load each spec's info (title + path count + per-path operations)
+        // — fetch in parallel. Path list and op map are used to build the
+        // YANG container tree and to deep-link into Swagger UI ops.
+        const fetches = manifest.modules.map(async fname => {
+            try {
+                const r = await fetch(`${__apiBase()}/${fname}.json`);
+                const spec = await r.json();
+                const title = spec.info.title.replace('Cisco IOS-XE Native Config - ', '');
+                const paths = spec.paths || {};
+                const pathList = Object.keys(paths);
+                // Per-path canonical operationId, preferring GET, then PUT,
+                // PATCH, POST, DELETE. Used when a tree leaf is clicked.
+                const opOrder = ['get', 'put', 'patch', 'post', 'delete'];
+                const pathOps = {};
+                for (const p of pathList) {
+                    const ops = paths[p] || {};
+                    for (const m of opOrder) {
+                        if (ops[m] && ops[m].operationId) { pathOps[p] = ops[m].operationId; break; }
+                    }
+                }
+                return { fname, title, paths: pathList.length, pathList, pathOps };
+            } catch(e) {
+                return { fname, title: fname, paths: 0, pathList: [], pathOps: {} };
             }
-            
-            SwaggerUIBundle({
-                url: `api/${moduleName}.json`,
-                dom_id: '#swagger-ui',
-                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-                layout: 'StandaloneLayout',
-                deepLinking: true,
-                filter: true
-            });
-        }
-        
-        // Auto-load spec from hash fragment (for deep linking from search)
-        function checkAndLoadFromHash() {
-            let hash = decodeURIComponent(window.location.hash);
-            // Remove leading # and any slashes
-            hash = hash.replace(/^#\/?/, '#');
-            if (hash.startsWith('#spec=')) {
-                const moduleName = hash.replace('#spec=', '');
-                if (moduleName) {
-                    console.log('Deep linking to module:', moduleName);
-                    setTimeout(() => loadSpec(moduleName), 100);
+        });
+
+        allModules = await Promise.all(fetches);
+        buildContainerTree();
+        renderSidebar();
+        checkHash();
+    }
+
+    // Walk every spec's paths and build a full N-ary YANG container tree.
+    // List keys (e.g. `interface={name}`) collapse onto their parent
+    // container node so the tree mirrors the YANG schema rather than the
+    // RESTCONF URL form.
+    function buildContainerTree() {
+        const root = { name: '', children: new Map(), ownPathSpec: null, ownPathOpId: null, totalPaths: 0 };
+        // Sort specs by name so the *first* spec to claim a node wins
+        // deterministically across reloads.
+        const sorted = [...allModules].sort((a, b) => a.fname.localeCompare(b.fname));
+        for (const m of sorted) {
+            for (const p of m.pathList) {
+                if (!p.startsWith(NATIVE_PREFIX)) continue;
+                const rest = p.slice(NATIVE_PREFIX.length);
+                if (!rest) continue;
+                // Strip RESTCONF list keys: `interface={name}` -> `interface`
+                const segs = rest.split('/').map(s => s.replace(/=.*/, '')).filter(Boolean);
+                if (!segs.length) continue;
+                let node = root;
+                root.totalPaths++;
+                for (const s of segs) {
+                    if (!node.children.has(s)) {
+                        node.children.set(s, { name: s, children: new Map(), ownPathSpec: null, ownPathOpId: null, totalPaths: 0 });
+                    }
+                    node = node.children.get(s);
+                    node.totalPaths++;
+                }
+                if (!node.ownPathSpec) {
+                    node.ownPathSpec = m.fname;
+                    node.ownPathOpId = m.pathOps[p] || null;
                 }
             }
         }
-        
-        // Check on page load
-        window.addEventListener('DOMContentLoaded', checkAndLoadFromHash);
-        
-        // Check on hash change (for navigation within the page)
-        window.addEventListener('hashchange', checkAndLoadFromHash);
-        
-        // Also check immediately in case DOM is already loaded
-        if (document.readyState === 'loading') {
-            // Still loading
-        } else {
-            // DOM already loaded
-            checkAndLoadFromHash();
-        }
+        containerTree = root;
+    }
 
-        // Download / copy spec functions
-        let currentModule = null;
-        
-        function downloadSpec() {
-            if (!currentModule) return;
-            const specUrl = `api/${currentModule}.json`;
-            const a = document.createElement('a');
-            a.href = specUrl;
-            a.download = currentModule + '.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-        
-        function copySpecUrl() {
-            if (!currentModule) return;
-            const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + 'api/' + currentModule + '.json';
-            const btn = document.querySelector('[onclick*="copySpecUrl"]');
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                if (!btn) return;
-                const orig = btn.textContent;
-                btn.textContent = '? Copied!';
-                setTimeout(() => { btn.textContent = orig; }, 1500);
-            }).catch(() => {});
-        }
-        
-        function showDownloadBar(moduleName) {
-            currentModule = moduleName;
-            const bar = document.getElementById('downloadBar');
-            if (bar) {
-                bar.style.display = 'flex';
-                document.getElementById('downloadLabel').textContent = moduleName + '.json';
+    // Recursive renderer. Builds an indented list with a disclosure
+    // triangle on every node that has children. Leaf nodes (and any node
+    // that has an addressable path) load the owning spec on click.
+    // `filterRe` is a compiled regex (or null). When filtering, we keep a
+    // node only if its full path matches OR any descendant matches; the
+    // matched ancestors auto-expand.
+    function renderNode(node, depth, pathSoFar, filterRe, openByDefault) {
+        const fullPath = pathSoFar ? pathSoFar + '/' + node.name : node.name;
+        const selfMatch = !filterRe || filterRe.test(fullPath);
+        let childrenHtml = '';
+        let descendantMatch = false;
+        if (node.children.size) {
+            const sortedChildren = [...node.children.values()].sort((a, b) => a.name.localeCompare(b.name));
+            for (const c of sortedChildren) {
+                const r = renderNode(c, depth + 1, fullPath, filterRe, openByDefault);
+                if (r) {
+                    childrenHtml += r.html;
+                    if (r.matched) descendantMatch = true;
+                }
             }
         }
+        if (filterRe && !selfMatch && !descendantMatch) return null;
+
+        const hasKids = node.children.size > 0;
+        const fname = node.ownPathSpec;
+        const opId = node.ownPathOpId;
+        // Auto-expand if filtering and a descendant matched, or if this is
+        // the top level (depth 0) and openByDefault is true.
+        const expanded = (filterRe && descendantMatch) || (openByDefault && depth === 0);
+        const collapsedClass = hasKids ? (expanded ? '' : ' collapsed') : '';
+        const arrow = hasKids ? `<span class="tree-arrow">&#9660;</span>` : `<span class="tree-arrow tree-arrow-empty"></span>`;
+        const toggleAttr = hasKids ? `onclick="toggleTreeNode(this, event)"` : '';
+        const selected = (fname && currentModule === fname) ? ' selected' : '';
+        const opArg = opId ? `'${escapeHtml(opId)}'` : 'null';
+        const loadAttr = fname
+            ? `data-module="${escapeHtml(fname)}" onclick="event.stopPropagation(); loadSpec('${escapeHtml(fname)}', this, ${opArg}); return false;"`
+            : 'onclick="event.stopPropagation(); return false;"';
+        const labelAttr = fname ? loadAttr : '';
+        const indent = depth * 12;
+        const pathBadge = node.totalPaths > 1 ? `<span class="path-count">${node.totalPaths}</span>` : '';
+        const fnameBadge = fname ? `<span class="leaf-spec">${escapeHtml(fname)}</span>` : '';
+        const pathAttr = hasKids ? ` data-tree-path="${escapeHtml(fullPath)}"` : '';
+        const html = `
+<div class="tree-row${collapsedClass}${selected}" data-depth="${depth}"${pathAttr} style="padding-left:${indent}px" ${toggleAttr}>
+    ${arrow}
+    <span class="tree-label" ${labelAttr}><code>${escapeHtml(node.name)}</code>${fnameBadge}</span>
+    ${pathBadge}
+</div>
+<div class="tree-children${collapsedClass}">${childrenHtml}</div>`;
+        return { html, matched: selfMatch || descendantMatch };
+    }
+
+    function renderSidebar(filter = '') {
+        const container = document.getElementById('sidebarContent');
+        const fl = filter.trim();
+        let filterRe = null;
+        if (fl) {
+            // Treat search text as a case-insensitive substring (escape regex specials).
+            const safe = fl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filterRe = new RegExp(safe, 'i');
+        }
+        // Render each top-level container as its own subtree. We expand
+        // top-level by default ONLY when filtering; otherwise everything
+        // starts collapsed.
+        let html = '';
+        let visibleTops = 0;
+        const tops = [...containerTree.children.values()].sort((a, b) => a.name.localeCompare(b.name));
+        for (const t of tops) {
+            const r = renderNode(t, 0, '', filterRe, !!filterRe);
+            if (r) { html += r.html; visibleTops++; }
+        }
+        container.innerHTML = html;
+
+        // Restore persisted expand/collapse state when no filter is active.
+        if (!fl) {
+            const saved = readTreeState();
+            if (saved) {
+                container.querySelectorAll('.tree-row[data-tree-path]').forEach(row => {
+                    const p = row.getAttribute('data-tree-path');
+                    if (!(p in saved)) return;
+                    const wantCollapsed = !!saved[p];
+                    if (wantCollapsed !== row.classList.contains('collapsed')) {
+                        row.classList.toggle('collapsed');
+                        const kids = row.nextElementSibling;
+                        if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+                    }
+                });
+            }
+        }
+
+        const info = document.getElementById('searchInfo');
+        if (fl) {
+            const matchedRows = container.querySelectorAll('.tree-row').length;
+            info.textContent = `${visibleTops} top containers, ${matchedRows} nodes match`;
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
+    }
+
+    const TREE_STATE_KEY = 'YangTreeSidebar:native';
+    function readTreeState() {
+        try {
+            const raw = window.localStorage.getItem(TREE_STATE_KEY);
+            if (!raw) return null;
+            const o = JSON.parse(raw);
+            return (o && typeof o === 'object') ? o : null;
+        } catch (_) { return null; }
+    }
+    function writeTreeState(state) {
+        try { window.localStorage.setItem(TREE_STATE_KEY, JSON.stringify(state)); } catch (_) {}
+    }
+
+    function toggleTreeNode(rowEl, evt) {
+        if (evt) evt.stopPropagation();
+        rowEl.classList.toggle('collapsed');
+        const kids = rowEl.nextElementSibling;
+        if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+        const path = rowEl.getAttribute('data-tree-path');
+        if (!path) return;
+        const state = readTreeState() || {};
+        state[path] = rowEl.classList.contains('collapsed');
+        writeTreeState(state);
+    }
+
+    function filterModules() {
+        const val = document.getElementById('searchBox').value;
+        document.getElementById('searchClear').style.display = val ? 'block' : 'none';
+        renderSidebar(val);
+    }
+
+    function clearSearch() {
+        document.getElementById('searchBox').value = '';
+        document.getElementById('searchClear').style.display = 'none';
+        renderSidebar();
+    }
+
+    function loadSpec(fname, el, opId) {
+        const sameSpec = (currentModule === fname);
+        currentModule = fname;
+        document.getElementById('welcomeBox').style.display = 'none';
+        document.getElementById('downloadBar').style.display = 'flex';
+        document.getElementById('downloadLabel').textContent = fname + '.json';
+
+        // Highlight selected. Tree rows live outside .module-list, so clear
+        // both classes; the new sidebar uses .tree-row.selected.
+        document.querySelectorAll('.module-list a, .tree-row').forEach(a => a.classList.remove('selected'));
+        if (el) el.classList.add('selected');
+        // tree-label was clicked but the visual row is the parent .tree-row.
+        if (el && el.classList.contains('tree-label')) {
+            const row = el.closest('.tree-row');
+            if (row) row.classList.add('selected');
+        }
+
+        // Update hash. setSpecOp lets the deeplink auto-expand observer find
+        // and open the matching operation once Swagger UI renders.
+        if (window.__DeepLink) {
+            if (opId) { window.__DeepLink.setSpecOp(fname, opId); }
+            else { window.__DeepLink.setSpec(fname); }
+        } else {
+            window.location.hash = '#spec=' + fname + (opId ? '&op=' + encodeURIComponent(opId) : '');
+        }
+
+        // Re-mounting Swagger UI on the same spec just to land on a different
+        // op is wasteful — the auto-expand observer will pick up the hash
+        // change and scroll to the right opblock instead.
+        if (!sameSpec) {
+            SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`,
+                dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout',
+                deepLinking: false,
+                filter: true
+            });
+        } else if (opId && window.__DeepLink && window.__DeepLink.tryExpandOp) {
+            window.__DeepLink.tryExpandOp(opId);
+        }
+
+        // Update YANG tree link
+        const treeLink = document.getElementById('treeLink');
+        if (treeLink) {
+            const treeUrl = __treeBase() + '/' + fname + '.html';
+            treeLink.href = treeUrl;
+            treeLink.style.display = 'none';
+            fetch(treeUrl, { method: 'HEAD' }).then(r => {
+                treeLink.style.display = r.ok ? 'inline-block' : 'none';
+            }).catch(() => { treeLink.style.display = 'none'; });
+        }
+    }
+
+    function downloadSpec() {
+        if (!currentModule) return;
+        const a = document.createElement('a');
+        a.href = `${__apiBase()}/${currentModule}.json`;
+        a.download = currentModule + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function copySpecUrl() {
+        if (!currentModule) return;
+        const base = window.location.href.split('/').slice(0, -1).join('/');
+        const url = base + '/api/' + currentModule + '.json';
+        const btn = document.querySelector('[onclick*="copySpecUrl"]');
+        navigator.clipboard.writeText(url).then(() => {
+            if (!btn) return;
+            const orig = btn.textContent;
+            btn.textContent = ' Copied!';
+            setTimeout(() => { btn.textContent = orig; }, 1500);
+        }).catch(() => {});
+    }
+
+    function checkHash() {
+        const params = (window.__DeepLink && window.__DeepLink.parseHash())
+            || (function () { var h = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); var o = {}; h.split('&').forEach(function (s) { var i = s.indexOf('='); if (i > 0) o[s.substring(0, i)] = s.substring(i + 1); }); return o; })();
+        if (params.spec && allModules.find(m => m.fname === params.spec)) {
+            if (currentModule !== params.spec) loadSpec(params.spec, document.querySelector(`[data-module="${CSS.escape(params.spec)}"]`));
+            if (params.op && window.__DeepLink) window.__DeepLink.tryExpandOp(params.op);
+        }
+    }
+
+    window.addEventListener('hashchange', checkHash);
+    init();
     </script>
 </body>
 </html>

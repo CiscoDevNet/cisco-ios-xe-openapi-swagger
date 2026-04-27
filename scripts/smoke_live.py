@@ -47,7 +47,7 @@ async def run(base_url: str) -> int:
                 lambda m: errors.append(f"{m.type}: {m.text}") if m.type == "error" else None,
             )
             page.on("pageerror", lambda e: errors.append(f"PAGEERROR: {e}"))
-            url = f"{base_url}/swagger-mib-model/index-v2.html?ver={ver}"
+            url = f"{base_url}/swagger-mib-model/index.html?ver={ver}"
             try:
                 await page.goto(url, wait_until="networkidle", timeout=30_000)
                 await asyncio.sleep(2)

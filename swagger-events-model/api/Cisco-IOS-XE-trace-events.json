@@ -1,78 +1,123 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Events - trace",
+    "title": "Cisco IOS-XE Events - Cisco-IOS-XE-trace-events",
+    "description": "Event/notification data from `Cisco-IOS-XE-trace-events` module.\n\n**Endpoints:** 3 | **Notifications:** 1\n\nData endpoints use GET. Notifications are delivered via RESTCONF SSE subscriptions.",
     "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions\n     for trace action notification for trace decoder events.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - trace.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - trace.yang)"
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-trace-events",
+    "x-model-type": "events"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "sandbox-iosxe-latest-1.cisco.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/data/Cisco-IOS-XE-trace-events:events": {
+    "/streams/Cisco-IOS-XE-trace-events:trace-status": {
       "get": {
-        "summary": "Get Cisco-IOS-XE-trace-events event subscriptions",
-        "description": "Retrieve active event subscriptions for Cisco-IOS-XE-trace-events",
+        "summary": "Notification: trace-status",
+        "description": "YANG notification `trace-status` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-trace-events:trace-status",
         "tags": [
-          "events"
+          "notifications"
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unique-id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295,
+                      "example": 1
+                    },
+                    "percentage": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 255,
+                      "example": 50
+                    }
+                  },
+                  "example": "active"
+                },
                 "example": {
-                  "Cisco-IOS-XE-trace-events:events": {
-                    "description": "Event notification stream"
+                  "Cisco-IOS-XE-trace-events:trace-status": {
+                    "unique-id": 1,
+                    "percentage": 50
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/operations/ietf-subscribed-notifications:establish-subscription": {
-      "post": {
-        "summary": "Create event subscription",
-        "description": "Establish a subscription to Cisco-IOS-XE-trace-events events",
+    "/streams/Cisco-IOS-XE-trace-events:trace-status/unique-id": {
+      "get": {
+        "summary": "Notification: unique-id",
+        "description": "YANG notification `unique-id` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-trace-events:trace-status-unique-id",
         "tags": [
-          "events"
+          "notifications"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "example": {
-                "input": {
-                  "stream": "Cisco-IOS-XE-trace-events:events",
-                  "encoding": "encode-json",
-                  "update-trigger": "periodic",
-                  "period": 6000
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295,
+                  "example": 1
+                },
+                "example": {
+                  "Cisco-IOS-XE-trace-events:unique-id": 1
                 }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-trace-events:trace-status/percentage": {
+      "get": {
+        "summary": "Notification: percentage",
+        "description": "YANG notification `percentage` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-trace-events:trace-status-percentage",
+        "tags": [
+          "notifications"
+        ],
         "responses": {
           "200": {
-            "description": "Subscription created",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255,
+                  "example": 50
+                },
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
-                  }
+                  "Cisco-IOS-XE-trace-events:percentage": 50
                 }
               }
             }
@@ -85,7 +130,29 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
@@ -93,15 +160,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "events",
-      "description": "Model-driven telemetry event subscriptions"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE NETCONF/YANG Event Notifications - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

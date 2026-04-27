@@ -11,7 +11,7 @@ def main():
     with open(base / 'search-index.json', encoding='utf-8') as f:
         data = json.load(f)
 
-    with open(base / 'swagger-rpc-model' / 'api-v2' / 'manifest.json') as f:
+    with open(base / 'swagger-rpc-model' / 'api' / 'manifest.json') as f:
         manifest = json.load(f)
 
     v2_modules = set(manifest['modules'])
@@ -20,7 +20,7 @@ def main():
 
     added = 0
     for mod_name in sorted(missing):
-        spec_path = base / 'swagger-rpc-model' / 'api-v2' / f'{mod_name}.json'
+        spec_path = base / 'swagger-rpc-model' / 'api' / f'{mod_name}.json'
         if not spec_path.exists():
             continue
         with open(spec_path, encoding='utf-8') as f:
@@ -48,7 +48,7 @@ def main():
             'displayCategory': 'RPC v2 (Deep)',
             'emoji': '\U0001f527',
             'description': desc[:200],
-            'swaggerUrl': f'swagger-rpc-model/index-v2.html#spec={mod_name}',
+            'swaggerUrl': f'swagger-rpc-model/index.html#spec={mod_name}',
             'keywords': sorted(list(keywords))[:30],
             'pathCount': path_count,
             'version': 'v2'

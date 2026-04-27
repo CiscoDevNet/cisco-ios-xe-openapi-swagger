@@ -3,7 +3,7 @@
 Enrich v2 deep-path OpenAPI specs with production-realistic examples,
 operation descriptions, and property descriptions.
 
-Targets all 9 api-v2/ directories. Replaces placeholder "example" string
+Targets all 9 api/ directories. Replaces placeholder "example" string
 values and generic integers with field-name-matched realistic values.
 """
 
@@ -979,9 +979,9 @@ def main():
     grand_changes = 0
 
     for model_dir in V2_DIRS:
-        api_v2 = root / model_dir / "api-v2"
+        api_v2 = root / model_dir / "api"
         if not api_v2.exists():
-            print(f"\n⚠  {model_dir}/api-v2 not found — skipping")
+            print(f"\n⚠  {model_dir}/api not found — skipping")
             continue
 
         specs = sorted(f for f in api_v2.glob("*.json") if f.name != "manifest.json")

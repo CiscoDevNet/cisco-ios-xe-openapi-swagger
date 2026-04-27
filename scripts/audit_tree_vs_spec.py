@@ -36,7 +36,7 @@ def main():
     all_spec_modules = set()
     spec_to_cats = {}
     for cat, folder in model_folders.items():
-        for api_dir in ["api-v2", "api"]:
+        for api_dir in ["api", "api"]:
             p = os.path.join(BASE, folder, api_dir)
             if os.path.isdir(p):
                 for fn in os.listdir(p):

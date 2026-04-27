@@ -2,7 +2,7 @@
 """Normalize manifest.json across all releases to the schema viewers expect.
 
 Adds total_modules / total_paths / total_operations to every manifest under
-releases/<ver>/swagger-*-model/api-v2/ (and the default sibling dirs) so the
+releases/<ver>/swagger-*-model/api/ (and the default sibling dirs) so the
 version-aware viewers don't crash on missing keys.
 """
 from __future__ import annotations
@@ -55,8 +55,8 @@ def fix_manifest(mf_path: Path) -> dict | None:
 
 def main() -> int:
     targets: list[Path] = []
-    targets.extend(sorted(ROOT.glob("releases/*/swagger-*-model/api-v2/manifest.json")))
-    targets.extend(sorted(ROOT.glob("swagger-*-model/api-v2/manifest.json")))
+    targets.extend(sorted(ROOT.glob("releases/*/swagger-*-model/api/manifest.json")))
+    targets.extend(sorted(ROOT.glob("swagger-*-model/api/manifest.json")))
     fixed = 0
     for mf in targets:
         result = fix_manifest(mf)

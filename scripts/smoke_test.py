@@ -42,7 +42,7 @@ async def run():
         all_garbled = []
         for ver in ["17.18.1", "17.9.x"]:
             page2 = await ctx.new_page()
-            mib_url = BASE + "swagger-mib-model/index-v2.html#ver=" + ver
+            mib_url = BASE + "swagger-mib-model/index.html#ver=" + ver
             await page2.goto(mib_url, wait_until="domcontentloaded")
             await page2.wait_for_selector("#moduleList li a", timeout=30000)
             # debug: confirm deeplink.js loaded

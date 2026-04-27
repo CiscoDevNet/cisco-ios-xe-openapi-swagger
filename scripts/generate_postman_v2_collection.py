@@ -165,7 +165,7 @@ def write_collection(target_dir: Path, version: str, category: str,
                 "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
                 "description": f"Generated {datetime.now(timezone.utc).isoformat()}\n"
                                f"Source: cisco-ios-xe-openapi-swagger / "
-                               f"releases/{version}/swagger-{category}-model/api-v2/",
+                               f"releases/{version}/swagger-{category}-model/api/",
                 "version": "1.0.0",
             },
             "item": [],

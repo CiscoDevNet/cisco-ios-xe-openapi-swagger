@@ -1,19 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "tailf-netconf-extensions RPCs",
-    "description": "Tail-f NETCONF Extensions - Additional NETCONF capabilities for enhanced device management\n\n**YANG Model:** [tailf-netconf-extensions RPCs.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/tailf-netconf-extensions RPCs.yang)",
-    "version": "2020-06-29",
+    "title": "Cisco IOS-XE RPC - tailf-netconf-extensions",
+    "description": "RPC operations from `tailf-netconf-extensions` module.\n\n**RPCs:** 2 (has-children, get-attributes)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
     "x-yang-module": "tailf-netconf-extensions",
     "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,12 +28,44 @@
   "paths": {
     "/operations/tailf-netconf-extensions:has-children": {
       "post": {
+        "summary": "Execute has-children",
+        "operationId": "post-tailf-netconf-extensions-has-children",
         "tags": [
-          "Tail-f Extensions"
+          "tailf-netconf-extensions"
         ],
-        "summary": "Check if a node has child elements",
-        "description": "Determine whether a specific data node has child elements without retrieving full data",
-        "operationId": "hasChildren",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  },
+                  "example": true
+                },
+                "example": {
+                  "tailf-netconf-extensions:output": {
+                    "result": "default"
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -34,98 +73,64 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "path": {
-                        "type": "string",
-                        "description": "XPath to the node to check"
-                      }
-                    },
-                    "required": [
-                      "path"
-                    ]
+                  "path": {
+                    "type": "string",
+                    "example": "/data/example"
                   }
+                },
+                "example": true
+              },
+              "example": {
+                "tailf-netconf-extensions:input": {
+                  "path": "/data/example"
                 }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Check completed",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "has-children": {
-                          "type": "boolean",
-                          "description": "True if node has children"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/has-children",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **has-children** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     },
     "/operations/tailf-netconf-extensions:get-attributes": {
       "post": {
+        "summary": "Execute get-attributes",
+        "operationId": "post-tailf-netconf-extensions-get-attributes",
         "tags": [
-          "Tail-f Extensions"
+          "tailf-netconf-extensions"
         ],
-        "summary": "Retrieve node attributes",
-        "description": "Get metadata attributes for data nodes (tags, annotations, etc.)",
-        "operationId": "getAttributes",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "tailf-netconf-extensions:output": {
+                    "result": "default"
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -133,183 +138,41 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "path": {
-                        "type": "string",
-                        "description": "XPath to the node"
-                      },
-                      "attribute-names": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        },
-                        "description": "List of attribute names to retrieve"
-                      }
-                    },
-                    "required": [
-                      "path"
-                    ]
+                  "path": {
+                    "type": "string",
+                    "example": "/data/example"
                   }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "tailf-netconf-extensions:input": {
+                  "path": "/data/example"
                 }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Attributes retrieved",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "attributes": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "name": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/get-attributes",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **get-attributes** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
-          }
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       }
     }
@@ -318,15 +181,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "Tail-f Extensions",
-      "description": "RPC operations for Tail-f Extensions"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

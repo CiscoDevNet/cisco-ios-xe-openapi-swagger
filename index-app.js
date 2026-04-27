@@ -410,7 +410,7 @@
         // a viewer is opened (also covered by viewer's localStorage fallback,
         // but the explicit ?ver= makes deep-links + new-tab work cleanly).
         try {
-            document.querySelectorAll('a[href*="swagger-"][href*="-model/index-v2.html"]')
+            document.querySelectorAll('a[href*="swagger-"][href*="-model/index.html"]')
                 .forEach(function (a) {
                     var href = a.getAttribute('href');
                     if (!href) return;

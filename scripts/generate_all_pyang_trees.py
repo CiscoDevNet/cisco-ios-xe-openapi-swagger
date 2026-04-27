@@ -111,8 +111,8 @@ pre {{ font-size:13px; line-height:1.4; margin:0; color:#333; }}
   <p>YANG tree — IOS-XE {version}</p>
 </div>
 <div class=\"nav\">
-  <a href=\"../{swagger_dir}/index-v2.html#ver={version}&amp;spec={swagger_dir}/{module}\">📄 OpenAPI Spec</a>
-  <a class=\"alt\" href=\"../{swagger_dir}/index-v2.html#ver={version}\">📂 {swagger_label}</a>
+  <a href=\"../{swagger_dir}/index.html#ver={version}&amp;spec={swagger_dir}/{module}\">📄 OpenAPI Spec</a>
+  <a class=\"alt\" href=\"../{swagger_dir}/index.html#ver={version}\">📂 {swagger_label}</a>
   <a class=\"alt\" href=\"index.html\">🌳 All Trees ({version})</a>
   <a class=\"alt\" href=\"../../index.html\">🏠 Hub</a>
 </div>

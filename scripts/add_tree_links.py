@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Add a 'View YANG Tree' link button to the download bar of all 9 index-v2.html files.
+Add a 'View YANG Tree' link button to the download bar of all 9 index.html files.
 The button dynamically links to ../yang-trees/{moduleName}.html and only shows when the tree exists.
 """
 
@@ -10,15 +10,15 @@ import re
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 FILES = [
-    os.path.join(BASE, "swagger-oper-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-cfg-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-native-config-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-openconfig-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-ietf-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-mib-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-rpc-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-events-model", "index-v2.html"),
-    os.path.join(BASE, "swagger-other-model", "index-v2.html"),
+    os.path.join(BASE, "swagger-oper-model", "index.html"),
+    os.path.join(BASE, "swagger-cfg-model", "index.html"),
+    os.path.join(BASE, "swagger-native-config-model", "index.html"),
+    os.path.join(BASE, "swagger-openconfig-model", "index.html"),
+    os.path.join(BASE, "swagger-ietf-model", "index.html"),
+    os.path.join(BASE, "swagger-mib-model", "index.html"),
+    os.path.join(BASE, "swagger-rpc-model", "index.html"),
+    os.path.join(BASE, "swagger-events-model", "index.html"),
+    os.path.join(BASE, "swagger-other-model", "index.html"),
 ]
 
 # The tree link HTML to add in the download bar
@@ -81,7 +81,7 @@ def main():
         else:
             print(f"  No changes needed: {os.path.basename(os.path.dirname(filepath))}")
 
-    print("\nDone! Tree link buttons added to all index-v2.html files.")
+    print("\nDone! Tree link buttons added to all index.html files.")
 
 if __name__ == '__main__':
     main()

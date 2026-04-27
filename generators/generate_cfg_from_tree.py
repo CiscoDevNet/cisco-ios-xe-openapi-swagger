@@ -484,14 +484,14 @@ def _resolve_paths(version: str):
     if release_tree.is_dir():
         tree_dir = release_tree
         output_dir = (project_root / 'releases' / version
-                      / 'swagger-cfg-model' / 'api-v2')
+                      / 'swagger-cfg-model' / 'api')
     elif version == '17.18.1':
         tree_dir = project_root / 'yang-trees'
-        output_dir = project_root / 'swagger-cfg-model' / 'api-v2'
+        output_dir = project_root / 'swagger-cfg-model' / 'api'
     else:
         tree_dir = project_root / 'releases' / version / 'yang-trees'
         output_dir = (project_root / 'releases' / version
-                      / 'swagger-cfg-model' / 'api-v2')
+                      / 'swagger-cfg-model' / 'api')
     return tree_dir, output_dir
 
 

@@ -150,7 +150,7 @@ def main():
 
     all_spec_modules = {}
     for label, folder in model_folders.items():
-        for api in ['api-v2', 'api']:
+        for api in ['api', 'api']:
             p = os.path.join(BASE, folder, api)
             if os.path.isdir(p):
                 for fn in os.listdir(p):

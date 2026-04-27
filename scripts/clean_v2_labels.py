@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remove v2/v1 labels from all index-v2.html pages to make them the default."""
+"""Remove v2/v1 labels from all index.html pages to make them the default."""
 import re
 from pathlib import Path
 
@@ -19,7 +19,7 @@ models = [
 
 def main():
     for folder, label in models:
-        path = base / folder / 'index-v2.html'
+        path = base / folder / 'index.html'
         if not path.exists():
             print(f'{folder} - NOT FOUND')
             continue

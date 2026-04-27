@@ -244,7 +244,7 @@
         var category = opt.dataset.category;
         var version = opt.dataset.version;
         var name = opt.dataset.name;
-        var apiFolder = version === 'v1' ? 'api' : 'api-v2';
+        var apiFolder = version === 'v1' ? 'api' : 'api';
         var specUrl = category + '/' + apiFolder + '/' + name + '.json';
 
         try {

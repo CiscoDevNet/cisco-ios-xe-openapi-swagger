@@ -1,125 +1,50 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "cisco-smart-license - RPC Operations",
-    "description": "Smart licensing configuration, RPC, notification and operational data.\n\n     Copyright (c) 2016-2020 by Cisco Systems, Inc.\n     All rights reserved.\n\n**Module:** `cisco-smart-license`\n**Version:** 2021-03-01\n**Operations:** 13\n\n**YANG Model:** [cisco-smart-license - RPC Operations.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-smart-license - RPC Operations.yang)",
-    "version": "2021-03-01"
+    "title": "Cisco IOS-XE RPC - cisco-smart-license",
+    "description": "RPC operations from `cisco-smart-license` module.\n\n**RPCs:** 13 (register-id-token, de-register, renew-id, renew-auth, id-token-trust...)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "cisco-smart-license",
+    "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/operations/cisco_smart_license:register-id-token": {
+    "/operations/cisco-smart-license:register-id-token": {
       "post": {
-        "summary": "Register with an ID token.\n       This will begin the registration process. Since the registration\n       process will take somewhere between seconds and hours you must get the\n       registration-success or registration-fail notifications\n       or check the registration status in smart-license:state\n       to know the status of the registration.",
-        "description": "Register with an ID token.\n       This will begin the registration process. Since the registration\n       process will take somewhere between seconds and hours you must get the\n       registration-success or registration-fail notifications\n       or check the registration status in smart-license:state\n       to know the status of the registration.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:register-id-token`",
-        "operationId": "register-id-token",
+        "summary": "Execute register-id-token",
+        "operationId": "post-cisco-smart-license-register-id-token",
         "tags": [
           "cisco-smart-license"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:register-id-token": {
-                    "type": "object",
-                    "properties": {
-                      "id-token": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 255,
-                        "description": "The ID token used to register."
-                      },
-                      "force": {
-                        "type": "string",
-                        "description": "Force the registration if set.",
-                        "default": "false"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:register-id-token": {
-                  "id-token": "example-string",
-                  "force": "example-string"
-                }
-              }
-            }
-          }
-        },
         "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "return-code": {
-                      "type": "string",
-                      "description": "The return code.\n           If smart licensing is not enabled (status:enabled)\n           then the error will be error-enum:notenabled.\n           On success the return code will be\n           error-enum:registrationinprogress."
-                    }
-                  }
-                },
-                "example": {
-                  "return-code": "example-string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:de-register": {
-      "post": {
-        "summary": "De-register. This will immediately de-register the device.",
-        "description": "De-register. This will immediately de-register the device.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:de-register`",
-        "operationId": "de-register",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:de-register": {
-                    "type": "object",
-                    "properties": {}
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:de-register": {}
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -127,58 +52,69 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code for the de-register process."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 1
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id-token": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "force": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "example": 1
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "id-token": "1",
+                  "force": true
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **register-id-token** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:de-register": {
+      "post": {
+        "summary": "Execute de-register",
+        "operationId": "post-cisco-smart-license-de-register",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:renew-id": {
-      "post": {
-        "summary": "Under normal operations smart licensing will automatically renew\n       the ID certificates used for regsitration. This command can\n       be used if he customer wants to initiate a manual\n       registration renewal.",
-        "description": "Under normal operations smart licensing will automatically renew\n       the ID certificates used for regsitration. This command can\n       be used if he customer wants to initiate a manual\n       registration renewal.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:renew-id`",
-        "operationId": "renew-id",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:renew-id": {
-                    "type": "object",
-                    "properties": {}
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:renew-id": {}
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -186,58 +122,42 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "description": "Execute the **de-register** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:renew-id": {
+      "post": {
+        "summary": "Execute renew-id",
+        "operationId": "post-cisco-smart-license-renew-id",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:renew-auth": {
-      "post": {
-        "summary": "Under normal operations smart licensing will automatically renew\n       the license authorization every 30 days. This command can\n       be used if he customer wants to iinitiate a manual\n       renewal.",
-        "description": "Under normal operations smart licensing will automatically renew\n       the license authorization every 30 days. This command can\n       be used if he customer wants to iinitiate a manual\n       renewal.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:renew-auth`",
-        "operationId": "renew-auth",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:renew-auth": {
-                    "type": "object",
-                    "properties": {}
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:renew-auth": {}
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -245,82 +165,42 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 1
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "description": "Execute the **renew-id** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:renew-auth": {
+      "post": {
+        "summary": "Execute renew-auth",
+        "operationId": "post-cisco-smart-license-renew-auth",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:id-token-trust": {
-      "post": {
-        "summary": "Establish trust with the Cisco Smart Software Manager (CSSM)\n       using an ID token.\n       This will begin the trust establishment process. Since the\n       process will take somewhere between seconds and hours you\n       must get the trust-success or trust-fail notifications\n       or check the trust status in smart-license:state.",
-        "description": "Establish trust with the Cisco Smart Software Manager (CSSM)\n       using an ID token.\n       This will begin the trust establishment process. Since the\n       process will take somewhere between seconds and hours you\n       must get the trust-success or trust-fail notifications\n       or check the trust status in smart-license:state.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:id-token-trust`",
-        "operationId": "id-token-trust",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:id-token-trust": {
-                    "type": "object",
-                    "properties": {
-                      "id-token": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 255,
-                        "description": "The ID token used to establish trust."
-                      },
-                      "all-ha": {
-                        "type": "string",
-                        "description": "If true, perform the operation for all devices\n           in an HA configuration. If false, then only establish\n           trust for the active device.",
-                        "default": "false"
-                      },
-                      "force": {
-                        "type": "string",
-                        "description": "Force the trust establishment even if the product\n           instance has already establish trust with the CSSM.",
-                        "default": "false"
-                      }
-                    },
-                    "required": [
-                      "id-token"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:id-token-trust": {
-                  "id-token": "example-string",
-                  "all-ha": "example-string",
-                  "force": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -328,70 +208,42 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code.\n           On success the return code will be\n           error-enum:registrationinprogress."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "description": "Execute the **renew-auth** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:id-token-trust": {
+      "post": {
+        "summary": "Execute id-token-trust",
+        "operationId": "post-cisco-smart-license-id-token-trust",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:rum-save-usage-all": {
-      "post": {
-        "summary": "Save all RUM reports in the file path specified.\n       Can be a local path or a network path.\n       This could create a file that is a few MB in size.",
-        "description": "Save all RUM reports in the file path specified.\n       Can be a local path or a network path.\n       This could create a file that is a few MB in size.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:rum-save-usage-all`",
-        "operationId": "rum-save-usage-all",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:rum-save-usage-all": {
-                    "type": "object",
-                    "properties": {
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to write the RUM\n           reports to."
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:rum-save-usage-all": {
-                  "file-path": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -399,70 +251,74 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 1
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id-token": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "all-ha": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "force": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "example": 1
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "id-token": "1",
+                  "all-ha": true,
+                  "force": true
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **id-token-trust** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:rum-save-usage-all": {
+      "post": {
+        "summary": "Execute rum-save-usage-all",
+        "operationId": "post-cisco-smart-license-rum-save-usage-all",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:rum-save-usage-unreported": {
-      "post": {
-        "summary": "Save unreported RUM reports in the file path specified.\n       Can be a local path or a network path",
-        "description": "Save unreported RUM reports in the file path specified.\n       Can be a local path or a network path\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:rum-save-usage-unreported`",
-        "operationId": "rum-save-usage-unreported",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:rum-save-usage-unreported": {
-                    "type": "object",
-                    "properties": {
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to write the RUM reports to."
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:rum-save-usage-unreported": {
-                  "file-path": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -470,75 +326,64 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "file-path": "/data/example"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **rum-save-usage-all** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:rum-save-usage-unreported": {
+      "post": {
+        "summary": "Execute rum-save-usage-unreported",
+        "operationId": "post-cisco-smart-license-rum-save-usage-unreported",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:rum-save-usage-days": {
-      "post": {
-        "summary": "Save all RUM reports in the file path specified.\n       Can be a local path or a network path",
-        "description": "Save all RUM reports in the file path specified.\n       Can be a local path or a network path\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:rum-save-usage-days`",
-        "operationId": "rum-save-usage-days",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:rum-save-usage-days": {
-                    "type": "object",
-                    "properties": {
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to write the RUM reports to."
-                      },
-                      "days": {
-                        "type": "string",
-                        "description": "Save RUM reports that include measurements in the\n           specified number of days"
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:rum-save-usage-days": {
-                  "file-path": "flash:/config.txt",
-                  "days": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -546,70 +391,64 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "file-path": "/data/example"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **rum-save-usage-unreported** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:rum-save-usage-days": {
+      "post": {
+        "summary": "Execute rum-save-usage-days",
+        "operationId": "post-cisco-smart-license-rum-save-usage-days",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:trust-request-save": {
-      "post": {
-        "summary": "Save the trust request in the file path specified.\n       Can be a local path or a network path",
-        "description": "Save the trust request in the file path specified.\n       Can be a local path or a network path\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:trust-request-save`",
-        "operationId": "trust-request-save",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:trust-request-save": {
-                    "type": "object",
-                    "properties": {
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to write the trust request to."
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:trust-request-save": {
-                  "file-path": "flash:/config.txt"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -617,82 +456,71 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
+                  },
+                  "days": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295,
+                    "example": 1
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "file-path": "/data/example",
+                  "days": 1
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **rum-save-usage-days** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:trust-request-save": {
+      "post": {
+        "summary": "Execute trust-request-save",
+        "operationId": "post-cisco-smart-license-trust-request-save",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:authorization-request-online": {
-      "post": {
-        "summary": "Queues the request to fetch a node-locked authorization code\n       from the CSSM or CSLU. If the Product is not connected to the\n       CSLU or CSSM this command will fail. Command is non-blocking and\n       will return an immediate failure or an OperationInProgress status.\n       Later one of these notifications will be sent to indicate the\n       status of the request:\n       authorization-code-installed, authorization-code-request-failed ",
-        "description": "Queues the request to fetch a node-locked authorization code\n       from the CSSM or CSLU. If the Product is not connected to the\n       CSLU or CSSM this command will fail. Command is non-blocking and\n       will return an immediate failure or an OperationInProgress status.\n       Later one of these notifications will be sent to indicate the\n       status of the request:\n       authorization-code-installed, authorization-code-request-failed \n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:authorization-request-online`",
-        "operationId": "authorization-request-online",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:authorization-request-online": {
-                    "type": "object",
-                    "properties": {
-                      "feature-name": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 255,
-                        "description": "The feature name to get the authorization code for.\n           The smart agent will look this up in it's mapping table\n           and get the proper entitlement tag for it."
-                      },
-                      "local": {
-                        "type": "string",
-                        "description": "Applies to an HA configuration. If true, the authroization\n           request will only be for the active device. If False, the\n           authorization request will apply to all devices in the\n           HA configuration.",
-                        "default": "true"
-                      },
-                      "add": {
-                        "type": "string",
-                        "description": "Applies to an HA configuration. If true, the authroization\n           request will add the license to the existing authorization code\n           If false, the authorization request will replace the existing\n           authorization code with a new authorization code that\n           contains only a license for the feature requested.",
-                        "default": "true"
-                      }
-                    },
-                    "required": [
-                      "feature-name"
-                    ]
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:authorization-request-online": {
-                  "feature-name": "example-string",
-                  "local": "example-string",
-                  "add": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -700,66 +528,64 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code. Under normal operations this will return\n           OperationInProgress."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "file-path": "/data/example"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **trust-request-save** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:authorization-request-online": {
+      "post": {
+        "summary": "Execute authorization-request-online",
+        "operationId": "post-cisco-smart-license-authorization-request-online",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
           },
           "401": {
             "description": "Unauthorized"
           },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:authorization-code-return-online": {
-      "post": {
-        "summary": "Returns a currently installed authorization code.\n       If an entitlement tag is in use and was authorized\n       by the current authorization code then the return will fail.\n       If the Product is not connected to the CSLU or CSSM this command will fail.\n       The authorization code will first be removed from the product.\n       Next it will make one attempt to send a message to the CSLU\n       or CSSM to return the license to the virtural account.",
-        "description": "Returns a currently installed authorization code.\n       If an entitlement tag is in use and was authorized\n       by the current authorization code then the return will fail.\n       If the Product is not connected to the CSLU or CSSM this command will fail.\n       The authorization code will first be removed from the product.\n       Next it will make one attempt to send a message to the CSLU\n       or CSSM to return the license to the virtural account.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:authorization-code-return-online`",
-        "operationId": "authorization-code-return-online",
-        "tags": [
-          "cisco-smart-license"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_smart_license:authorization-code-return-online": {
-                    "type": "object",
-                    "properties": {
-                      "local": {
-                        "type": "string",
-                        "description": "Applies to an HA configuration. If true, the authroization\n           return will only be for the active device.\n           If false, the authorization return will apply to all devices in the\n           HA configuration.",
-                        "default": "true"
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "cisco_smart_license:authorization-code-return-online": {
-                  "local": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -767,41 +593,100 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code. Under normal operations this will return OperationInProgress"
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feature-name": {
+                    "type": "string",
+                    "example": "example-1"
+                  },
+                  "local": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "add": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "feature-name": "example-1",
+                  "local": true,
+                  "add": true
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **authorization-request-online** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:authorization-code-return-online": {
+      "post": {
+        "summary": "Execute authorization-code-return-online",
+        "operationId": "post-cisco-smart-license-authorization-code-return-online",
+        "tags": [
+          "cisco-smart-license"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "return-code": {
+                      "type": "string",
+                      "example": "configured-value"
                     },
                     "authorization-return-string": {
                       "type": "string",
-                      "description": "The authorization return string that was sent to the CSSM in the message."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string",
-                  "authorization-return-string": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value",
+                    "authorization-return-string": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:authorization-code-return-offline": {
-      "post": {
-        "summary": "Returns a currently installed authorization code.\n       If an entitlement tag is in use and was authorized\n       by the current authorization code then the return will fail.\n       The authorization code will first be removed from the product.\n       Next it write the return code to the file specified.",
-        "description": "Returns a currently installed authorization code.\n       If an entitlement tag is in use and was authorized\n       by the current authorization code then the return will fail.\n       The authorization code will first be removed from the product.\n       Next it write the return code to the file specified.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:authorization-code-return-offline`",
-        "operationId": "authorization-code-return-offline",
-        "tags": [
-          "cisco-smart-license"
-        ],
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -809,39 +694,43 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "cisco_smart_license:authorization-code-return-offline": {
-                    "type": "object",
-                    "properties": {
-                      "local": {
-                        "type": "string",
-                        "description": "Applies to an HA configuration. If true, the authroization\n           return will only be for the active device.\n           If false, the authorization return will apply to all\n           devices in the HA configuration.",
-                        "default": "true"
-                      },
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to write the return code to.\n           This is optional. If included the authorization return string\n           will be written to the named file. In either case the\n           authorization return string will be returned in the output"
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
+                  "local": {
+                    "type": "boolean",
+                    "example": true
                   }
-                }
+                },
+                "example": "configured-value"
               },
               "example": {
-                "cisco_smart_license:authorization-code-return-offline": {
-                  "local": "example-string",
-                  "file-path": "flash:/config.txt"
+                "cisco-smart-license:input": {
+                  "local": true
                 }
               }
             }
           }
         },
+        "description": "Execute the **authorization-code-return-online** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:authorization-code-return-offline": {
+      "post": {
+        "summary": "Execute authorization-code-return-offline",
+        "operationId": "post-cisco-smart-license-authorization-code-return-offline",
+        "tags": [
+          "cisco-smart-license"
+        ],
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -849,41 +738,25 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code. Under normal operations this will\n           return OperationInProgress"
+                      "example": "configured-value"
                     },
                     "authorization-return-string": {
                       "type": "string",
-                      "description": "The authorization return string."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string",
-                  "authorization-return-string": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value",
+                    "authorization-return-string": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
-      }
-    },
-    "/operations/cisco_smart_license:import-file": {
-      "post": {
-        "summary": "Import any of the various XML codes supported by smart\n       Licensing from a file. This includes; authorization codes, policies,\n       trust codes, RUM ACK response, SLR authorization codes, conversion ACK.",
-        "description": "Import any of the various XML codes supported by smart\n       Licensing from a file. This includes; authorization codes, policies,\n       trust codes, RUM ACK response, SLR authorization codes, conversion ACK.\n\n**Endpoint:** `POST /restconf/operations/cisco_smart_license:import-file`",
-        "operationId": "import-file",
-        "tags": [
-          "cisco-smart-license"
-        ],
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -891,33 +764,48 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "cisco_smart_license:import-file": {
-                    "type": "object",
-                    "properties": {
-                      "file-path": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 127,
-                        "description": "The local or network file path to read from"
-                      }
-                    },
-                    "required": [
-                      "file-path"
-                    ]
+                  "local": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
                   }
-                }
+                },
+                "example": "configured-value"
               },
               "example": {
-                "cisco_smart_license:import-file": {
-                  "file-path": "flash:/config.txt"
+                "cisco-smart-license:input": {
+                  "local": true,
+                  "file-path": "/data/example"
                 }
               }
             }
           }
         },
+        "description": "Execute the **authorization-code-return-offline** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-smart-license:import-file": {
+      "post": {
+        "summary": "Execute import-file",
+        "operationId": "post-cisco-smart-license-import-file",
+        "tags": [
+          "cisco-smart-license"
+        ],
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -925,31 +813,48 @@
                   "properties": {
                     "return-code": {
                       "type": "string",
-                      "description": "The return code."
+                      "example": "configured-value"
                     },
                     "confirmation-codes": {
                       "type": "string",
-                      "description": "If the import command installed authorization codes and\n           that install overwrote older authorization codes this list\n           will contain the confirmation codes that must be returned\n           to the Cisco Smart Software Manager (CSSM)."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "return-code": "example-string",
-                  "confirmation-codes": "example-string"
+                  "cisco-smart-license:output": {
+                    "return-code": "configured-value",
+                    "confirmation-codes": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file-path": {
+                    "type": "string",
+                    "example": "/data/example"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "cisco-smart-license:input": {
+                  "file-path": "/data/example"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **import-file** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
       }
     }
   },
@@ -957,7 +862,19 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       }
     }
   },
@@ -965,9 +882,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }
