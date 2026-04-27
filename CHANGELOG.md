@@ -28,6 +28,30 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 ## [Unreleased]
 
+### Added — Module-driven Telemetry XPath Builder (round 5, April 2026)
+
+- **[telemetry.html](telemetry.html) rewrite** — formerly a static dump of the 61 curated
+  `telemetry-index.json` entries; now a two-tab tool. The default tab, **Module XPath Builder**,
+  lets the user pick any release / category / module and renders the MDT
+  `filter xpath` for **every** operation in that spec, derived live with the formula from
+  [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) (`/<prefix>:<path-without-leading-slash>`). Each row
+  has a "Use" button that drops the xpath into a ready-to-paste `telemetry ietf subscription`
+  config snippet. Curated tier / cadence / on-change annotations from `telemetry-index.json`
+  are folded in as enrichment when the derived xpath matches a catalogued entry. The original
+  filterable curated table is preserved as the **Curated Catalog** tab.
+- **[scripts/build_yang_prefix_map.py](scripts/build_yang_prefix_map.py)** — new build step that
+  scans every `*.yang` file under each release's source directory, extracts the `prefix`
+  statement, and emits `releases/<ver>/yang-prefix-map.json` (and a top-level
+  `yang-prefix-map.json` for the legacy 17.18.1 in-place layout). Output schema:
+  `{version, yang_source, module_count, modules: {moduleName: prefix}}`. Built today for all
+  five active releases: 26.1.1 (887), 17.18.1 (848), 17.15.x (799), 17.12.x (719), 17.9.x (701).
+- **Formula verified** against the existing curated 17.18.1 catalog: 60/61 entries match
+  exactly; the single "mismatch" is a curator-chosen deeper xpath
+  (`/interfaces-ios-xe-oper:interfaces/interface`) rooted on the same operation, not a
+  formula bug.
+- **[telemetry.js](telemetry.js)** — new external script (CSP `script-src 'self'` compliant);
+  no inline JS in `telemetry.html`.
+
 ### Added — Site-wide version awareness & quality hardening (round 4, April 2026)
 
 - **Version-aware viewers** — all 9 `swagger-*-model/index-v2.html` viewers now resolve the active

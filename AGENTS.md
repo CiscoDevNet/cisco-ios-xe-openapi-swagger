@@ -170,6 +170,11 @@ python scripts/normalize_manifests.py
 # (reads default + active-versions allow-list from releases/index.json).
 python scripts/patch_viewers_version_aware.py
 
+# Build the YANG module -> prefix map per release. Required by the
+# Module XPath Builder in telemetry.html. Re-run whenever YANG sources
+# change for any release.
+python scripts/build_yang_prefix_map.py
+
 # Local schema unit tests (also runs in CI via .github/workflows/tests.yml).
 python -X utf8 -m pytest tests/ -v
 
