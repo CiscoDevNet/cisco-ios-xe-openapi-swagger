@@ -174,44 +174,89 @@
         }
     })();
     // === end version-aware api base ===
-    let allModules = [], currentModule = null;
+    let allModules = [], currentModule = null, containerTree = null;
     async function init() {
         const resp = await fetch(__apiBase() + '/manifest.json');
-        const m = await resp.json();
-        document.getElementById('totalSpecs').textContent = m.total_modules;
-        document.getElementById('totalPaths').textContent = m.total_paths.toLocaleString();
-        document.getElementById('totalOps').textContent = m.total_operations.toLocaleString();
-        document.getElementById('headerStats').textContent = `${m.total_paths.toLocaleString()} paths, ${m.total_operations.toLocaleString()} ops across ${m.total_modules} modules`;
-        const fetches = m.modules.map(async fname => {
-            try {
-                const r = await fetch(`${__apiBase()}/${fname}.json`); const spec = await r.json();
-                return { fname, title: (spec.info.title||fname).replace('Cisco IOS-XE OpenConfig - ',''), paths: Object.keys(spec.paths).length };
-            } catch(e) { return { fname, title: fname, paths: 0 }; }
-        });
-        allModules = (await Promise.all(fetches)).sort((a,b) => a.title.localeCompare(b.title));
-        renderList(); checkHash();
-    }
-    function renderList(filter='') {
-        const fl = filter.toLowerCase();
-        const items = allModules.filter(m => !fl || m.title.toLowerCase().includes(fl) || m.fname.toLowerCase().includes(fl));
-        document.getElementById('moduleList').innerHTML = items.map(m =>
-            `<li><a href="#" class="${currentModule===m.fname?'selected':''}" data-module="${escapeHtml(m.fname)}" onclick="loadSpec('${escapeHtml(m.fname)}',this);return false;"><span>${escapeHtml(m.title)}</span><span class="path-count">${m.paths} paths</span></a></li>`
-        ).join('');
-        const info = document.getElementById('searchInfo');
-        if (fl) { info.textContent = `${items.length} of ${allModules.length}`; info.style.display = 'block'; } else { info.style.display = 'none'; }
-    }
-    function filterModules() { renderList(document.getElementById('searchBox').value); }
+        const manifest = await resp.json();
+        document.getElementById('totalSpecs').textContent = manifest.total_modules;
+        document.getElementById('totalPaths').textContent = manifest.total_paths.toLocaleString();
+        document.getElementById('totalOps').textContent = manifest.total_operations.toLocaleString();
+        document.getElementById('headerStats').textContent =
+            `${manifest.total_paths.toLocaleString()} endpoints across ${manifest.total_modules} modules \u2014 generated from resolved YANG trees`;
 
-    function loadSpec(fname, el) {
+        const fetches = manifest.modules.map(async fname => {
+            try {
+                const r = await fetch(`${__apiBase()}/${fname}.json`);
+                const spec = await r.json();
+                const title = (spec.info.title || fname).replace('Cisco IOS-XE OpenConfig - ', '');
+                const paths = spec.paths || {};
+                const pathList = Object.keys(paths);
+                const opOrder = ['get','put','patch','post','delete'];
+                const pathOps = {};
+                for (const p of pathList) {
+                    const ops = paths[p] || {};
+                    for (const mth of opOrder) {
+                        if (ops[mth] && ops[mth].operationId) { pathOps[p] = ops[mth].operationId; break; }
+                    }
+                }
+                return { fname, title, paths: pathList.length, pathList, pathOps };
+            } catch(e) {
+                return { fname, title: fname, paths: 0, pathList: [], pathOps: {} };
+            }
+        });
+        allModules = await Promise.all(fetches);
+        allModules.sort((a, b) => a.title.localeCompare(b.title));
+        containerTree = YangTreeSidebar.build(allModules);
+        renderSidebar();
+        checkHash();
+    }
+
+    function renderSidebar(filter = '') {
+        const host = document.getElementById('sidebarContent');
+        const r = YangTreeSidebar.render(containerTree, host, {
+            filter: filter,
+            currentModule: currentModule,
+            collapseAllByDefault: true,
+            storageKey: 'openconfig',
+            onLoad: loadSpec,
+        });
+        const info = document.getElementById('searchInfo');
+        if (filter && filter.trim()) {
+            info.textContent = `${r.visibleTops} top containers, ${r.matched} nodes match`;
+            info.style.display = 'block';
+        } else {
+            info.style.display = 'none';
+        }
+    }
+
+    function filterModules() { renderSidebar(document.getElementById('searchBox').value); }
+
+    function loadSpec(fname, el, opId) {
+        const sameSpec = (currentModule === fname);
         currentModule = fname;
         document.getElementById('welcomeBox').style.display = 'none';
         document.getElementById('downloadBar').style.display = 'flex';
         document.getElementById('downloadLabel').textContent = fname + '.json';
-        document.querySelectorAll('.module-list a').forEach(a => a.classList.remove('selected'));
+        document.querySelectorAll('.module-list a, .tree-row').forEach(a => a.classList.remove('selected'));
         if (el) el.classList.add('selected');
-        if (window.__DeepLink) { window.__DeepLink.setSpec(fname); } else { window.location.hash = '#spec=' + fname; }
-        SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui', presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset], layout: 'StandaloneLayout', deepLinking: false, filter: true });
-
+        if (el && el.classList.contains('tree-label')) {
+            const row = el.closest('.tree-row');
+            if (row) row.classList.add('selected');
+        }
+        if (window.__DeepLink) {
+            if (opId) { window.__DeepLink.setSpecOp(fname, opId); }
+            else { window.__DeepLink.setSpec(fname); }
+        } else {
+            window.location.hash = '#spec=' + fname + (opId ? '&op=' + encodeURIComponent(opId) : '');
+        }
+        if (!sameSpec) {
+            SwaggerUIBundle({ url: `${__apiBase()}/${fname}.json`, dom_id: '#swagger-ui',
+                presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+                layout: 'StandaloneLayout', deepLinking: false, filter: true
+            });
+        } else if (opId && window.__DeepLink && window.__DeepLink.tryExpandOp) {
+            window.__DeepLink.tryExpandOp(opId);
+        }
         // Update YANG tree link
         const treeLink = document.getElementById('treeLink');
         if (treeLink) {
