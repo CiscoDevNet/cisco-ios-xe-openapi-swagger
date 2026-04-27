@@ -1185,7 +1185,7 @@ def generate_all(tree_html: str, output_dir: str):
 def main():
     script_dir = Path(__file__).parent
     tree_html = str(script_dir.parent / 'yang-trees' / 'Cisco-IOS-XE-native.html')
-    output_dir = str(script_dir.parent / 'swagger-native-config-model' / 'api-v2')
+    output_dir = str(script_dir.parent / 'swagger-native-config-model' / 'api')
 
     generate_all(tree_html, output_dir)
 

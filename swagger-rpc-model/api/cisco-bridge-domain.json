@@ -1,29 +1,71 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "cisco-bridge-domain - RPC Operations",
-    "description": "This YANG module describes the configuration and operational\n     model for bridge domain.\n\n     Terms and Acronyms\n       AC : Attachment Circuits\n\n       BD : Bridge Domain\n\n       BCB : Backbone Core Bridge\n\n       BEB : Backbone Edge Bridge\n\n       B-MAC : Backbone MAC Address\n\n       CE : Customer Edge\n\n       C-MAC : Customer/Client MAC Address\n\n       DHCP : Dynamic Host Configuration Protocol\n\n       DAI : Dynamic ARP Inspection\n\n       EVC : Ethernet Virtual Circuit\n\n       IGMP : Internet Group Management Protocol\n\n       IPSG : IP Source Guard\n\n       L2VPN : Layer 2 Virtual Private Network\n\n       MLD : Multicast Listener Discovery\n\n       PBB : Provider Backbone Bridge\n\n       VLAN : Virtual Local Area Network\n    \n\n**Module:** `cisco-bridge-domain`\n**Version:** 2019-07-01\n**Operations:** 3\n\n**YANG Model:** [cisco-bridge-domain - RPC Operations.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/cisco-bridge-domain - RPC Operations.yang)",
-    "version": "2019-07-01"
+    "title": "Cisco IOS-XE RPC - cisco-bridge-domain",
+    "description": "RPC operations from `cisco-bridge-domain` module.\n\n**RPCs:** 3 (clear-bridge-domain, clear-mac-address, create-parameterized-bridge-domains)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "cisco-bridge-domain",
+    "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/operations/cisco_bridge_domain:clear-bridge-domain": {
+    "/operations/cisco-bridge-domain:clear-bridge-domain": {
       "post": {
-        "summary": "Clear mac-address table for bridge-domain and allows a bridge\n       to forward again after it was put in shutdown state as a\n       result of exceeding the configured MAC limit.",
-        "description": "Clear mac-address table for bridge-domain and allows a bridge\n       to forward again after it was put in shutdown state as a\n       result of exceeding the configured MAC limit.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:clear-bridge-domain`",
-        "operationId": "clear-bridge-domain",
+        "summary": "Execute clear-bridge-domain",
+        "operationId": "post-cisco-bridge-domain-clear-bridge-domain",
         "tags": [
           "cisco-bridge-domain"
         ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errstr": {
+                      "type": "string",
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": 1
+                },
+                "example": {
+                  "cisco-bridge-domain:output": {
+                    "errstr": "configured-value"
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -31,145 +73,62 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "cisco_bridge_domain:clear-bridge-domain": {
+                  "(bridge-domains)": {
                     "type": "object",
                     "properties": {
                       "all": {
-                        "type": "string",
-                        "description": "Clear all bridge-domains configured on the device."
+                        "type": "boolean",
+                        "description": "Presence flag",
+                        "example": true
                       },
                       "bd-id": {
                         "type": "string",
-                        "description": "Clear a single bridge-domain"
+                        "example": "1"
                       },
                       "bg-id": {
                         "type": "string",
-                        "description": "Clears all bridge-domains under this bridge-group."
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "cisco_bridge_domain:clear-bridge-domain": {
-                  "all": "example-string",
-                  "bd-id": "example-string",
-                  "bg-id": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "RPC executed successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errstr": {
-                      "type": "string",
-                      "description": "Error message from the device if RPC failed."
-                    }
-                  }
-                },
-                "example": {
-                  "errstr": "example-string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      }
-    },
-    "/operations/cisco_bridge_domain:clear-mac-address": {
-      "post": {
-        "summary": "This RPC allows to clear dynamically learnt mac-address\n       entries from the mac-address table.",
-        "description": "This RPC allows to clear dynamically learnt mac-address\n       entries from the mac-address table.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:clear-mac-address`",
-        "operationId": "clear-mac-address",
-        "tags": [
-          "cisco-bridge-domain"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cisco_bridge_domain:clear-mac-address": {
-                    "type": "object",
-                    "properties": {
-                      "bd-id": {
-                        "type": "string",
-                        "description": "Bridge-domain identifier, clear all mac-address entries\n             dynamically learnt on this bridge-domain"
-                      },
-                      "bg-id": {
-                        "type": "string",
-                        "description": "Bridge-group identifier, clear all mac-address entries\n             from all bridge-domains under this bridge-group."
-                      },
-                      "interface": {
-                        "type": "string",
-                        "description": "Reference to an interface. Clear mac-addesses learnt by\n           by this interface."
-                      },
-                      "mac-address": {
-                        "type": "string",
-                        "description": "Clear a specific mac-address entry from the mac-table."
-                      },
-                      "bridge-domain": {
-                        "type": "object",
-                        "properties": {
-                          "bd-id": {
-                            "type": "string",
-                            "description": "Bridge-domain identifier, clear all mac-address entries\n             dynamically learnt on this bridge-domain"
-                          },
-                          "bg-id": {
-                            "type": "string",
-                            "description": "Bridge-group identifier, clear all mac-address entries\n             from all bridge-domains under this bridge-group."
-                          }
-                        },
-                        "required": [
-                          "bd-id",
-                          "bg-id"
-                        ],
-                        "description": "Clear mac-address entries for given bridge-domain(s)."
+                        "example": "1"
                       }
                     },
-                    "required": [
-                      "bd-id",
-                      "bg-id"
-                    ]
+                    "example": 1
                   }
-                }
+                },
+                "example": 1
               },
               "example": {
-                "cisco_bridge_domain:clear-mac-address": {
-                  "bd-id": "example-string",
-                  "bg-id": "example-string",
-                  "interface": "GigabitEthernet1/0/1",
-                  "mac-address": "00:11:22:33:44:55",
-                  "bridge-domain": {
-                    "bd-id": "example-string",
-                    "bg-id": "example-string"
+                "cisco-bridge-domain:input": {
+                  "(bridge-domains)": {
+                    "all": true,
+                    "bd-id": "1",
+                    "bg-id": "1"
                   }
                 }
               }
             }
           }
         },
+        "description": "Execute the **clear-bridge-domain** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-bridge-domain:clear-mac-address": {
+      "post": {
+        "summary": "Execute clear-mac-address",
+        "operationId": "post-cisco-bridge-domain-clear-mac-address",
+        "tags": [
+          "cisco-bridge-domain"
+        ],
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -177,36 +136,20 @@
                   "properties": {
                     "errstr": {
                       "type": "string",
-                      "description": "Error message from the device if RPC failed."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
-                  "errstr": "example-string"
+                  "cisco-bridge-domain:output": {
+                    "errstr": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
-      }
-    },
-    "/operations/cisco_bridge_domain:create-parameterized-bridge-domains": {
-      "post": {
-        "summary": "Create bridge domains automatically from user defined\n       parameters.",
-        "description": "Create bridge domains automatically from user defined\n       parameters.\n\n**Endpoint:** `POST /restconf/operations/cisco_bridge_domain:create-parameterized-bridge-domains`",
-        "operationId": "create-parameterized-bridge-domains",
-        "tags": [
-          "cisco-bridge-domain"
-        ],
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -214,33 +157,68 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "cisco_bridge_domain:create-parameterized-bridge-domains": {
+                  "bridge-domain": {
                     "type": "object",
                     "properties": {
-                      "parameter": {
+                      "bd-id": {
                         "type": "string",
-                        "description": "Create bridge-domains from vlan encapsulations of the\n               member interfaces."
+                        "example": "1"
                       },
-                      "interface": {
+                      "bg-id": {
                         "type": "string",
-                        "description": "Reference to an interface instance which is\n             configured to be part of this bridge domain"
+                        "example": "1"
                       }
-                    }
+                    },
+                    "example": 1
+                  },
+                  "interface": {
+                    "type": "string",
+                    "example": "GigabitEthernet1/0/1",
+                    "description": "Interface name (e.g., GigabitEthernet1/0/1)"
+                  },
+                  "mac-address": {
+                    "type": "string",
+                    "example": "00:1a:2b:3c:4d:5e",
+                    "description": "MAC address in colon-separated hex notation"
                   }
-                }
+                },
+                "example": "10.1.1.1"
               },
               "example": {
-                "cisco_bridge_domain:create-parameterized-bridge-domains": {
-                  "parameter": "GigabitEthernet1/0/1",
-                  "interface": "GigabitEthernet1/0/1"
+                "cisco-bridge-domain:input": {
+                  "bridge-domain": {
+                    "bd-id": "1",
+                    "bg-id": "1"
+                  },
+                  "interface": "GigabitEthernet1/0/1",
+                  "mac-address": "00:1a:2b:3c:4d:5e"
                 }
               }
             }
           }
         },
+        "description": "Execute the **clear-mac-address** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/cisco-bridge-domain:create-parameterized-bridge-domains": {
+      "post": {
+        "summary": "Execute create-parameterized-bridge-domains",
+        "operationId": "post-cisco-bridge-domain-create-parameterized-bridge-domains",
+        "tags": [
+          "cisco-bridge-domain"
+        ],
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "RPC executed successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -248,26 +226,63 @@
                   "properties": {
                     "errstr": {
                       "type": "string",
-                      "description": "Error message from the device if RPC failed."
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 1
                 },
                 "example": {
-                  "errstr": "example-string"
+                  "cisco-bridge-domain:output": {
+                    "errstr": "configured-value"
+                  }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal server error"
           }
-        }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parameter": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "member": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "interface": {
+                          "type": "string",
+                          "example": "GigabitEthernet1/0/1",
+                          "description": "Interface name (e.g., GigabitEthernet1/0/1)"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": 1
+              },
+              "example": {
+                "cisco-bridge-domain:input": {
+                  "parameter": "default",
+                  "member": [
+                    {
+                      "interface": "GigabitEthernet1/0/1"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **create-parameterized-bridge-domains** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
       }
     }
   },
@@ -275,7 +290,19 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       }
     }
   },
@@ -283,9 +310,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

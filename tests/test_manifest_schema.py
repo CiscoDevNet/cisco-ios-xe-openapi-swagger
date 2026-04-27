@@ -15,8 +15,8 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 
 MANIFESTS = sorted(
-    list(ROOT.glob("releases/*/swagger-*-model/api-v2/manifest.json"))
-    + list(ROOT.glob("swagger-*-model/api-v2/manifest.json"))
+    list(ROOT.glob("releases/*/swagger-*-model/api/manifest.json"))
+    + list(ROOT.glob("swagger-*-model/api/manifest.json"))
 )
 
 REQUIRED_INT_KEYS = ("total_modules", "total_paths", "total_operations", "spec_count")

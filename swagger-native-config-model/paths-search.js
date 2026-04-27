@@ -33,8 +33,8 @@
         catch (_) { return null; }
     }
     function apiBase() {
-        try { return window.__apiBase ? window.__apiBase() : 'api-v2'; }
-        catch (_) { return 'api-v2'; }
+        try { return window.__apiBase ? window.__apiBase() : 'api'; }
+        catch (_) { return 'api'; }
     }
     function esc(s) {
         try { return window.escapeHtml(String(s == null ? '' : s)); }

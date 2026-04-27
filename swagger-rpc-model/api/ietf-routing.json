@@ -1,19 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ietf-routing RPCs",
-    "description": "Routing Management (RFC 8349) - FIB route lookup operations\n\n**YANG Model:** [ietf-routing RPCs.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-routing RPCs.yang)",
-    "version": "2018-03-13",
+    "title": "Cisco IOS-XE RPC - ietf-routing",
+    "description": "RPC operations from `ietf-routing` module.\n\n**RPCs:** 1 (fib-route)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
     "x-yang-module": "ietf-routing",
     "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,12 +28,100 @@
   "paths": {
     "/operations/ietf-routing:fib-route": {
       "post": {
+        "summary": "Execute fib-route",
+        "operationId": "post-ietf-routing-fib-route",
         "tags": [
-          "Routing FIB"
+          "ietf-routing"
         ],
-        "summary": "Perform FIB route lookup",
-        "description": "Lookup a route in the Forwarding Information Base (FIB) for a given destination address",
-        "operationId": "fibRoute",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "route": {
+                      "type": "object",
+                      "properties": {
+                        "address-family": {
+                          "type": "string",
+                          "example": "ipv4-unicast"
+                        },
+                        "next-hop": {
+                          "type": "object",
+                          "properties": {
+                            "(next-hop-options)": {
+                              "type": "object",
+                              "properties": {
+                                "outgoing-interface": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "next-hop-address": {
+                                  "type": "string",
+                                  "example": "10.1.1.1"
+                                },
+                                "special-next-hop": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                }
+                              },
+                              "example": "configured-value"
+                            }
+                          },
+                          "example": "10.1.1.1",
+                          "description": "Next-hop IP address for this route"
+                        },
+                        "source-protocol": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "active": {
+                          "type": "boolean",
+                          "description": "Presence flag",
+                          "example": true
+                        },
+                        "last-updated": {
+                          "type": "string",
+                          "example": "2025-03-15T10:30:45Z"
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-routing:output": {
+                    "route": {
+                      "address-family": "ipv4-unicast",
+                      "next-hop": {
+                        "(next-hop-options)": {
+                          "outgoing-interface": "configured-value",
+                          "next-hop-address": "10.1.1.1",
+                          "special-next-hop": "default"
+                        }
+                      },
+                      "source-protocol": "configured-value",
+                      "active": true,
+                      "last-updated": "2025-03-15T10:30:45Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -34,220 +129,54 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
+                  "routing-instance-name": {
+                    "type": "string",
+                    "example": "example-1"
+                  },
+                  "destination-address": {
                     "type": "object",
                     "properties": {
-                      "routing-instance-name": {
+                      "address-family": {
                         "type": "string",
-                        "description": "Name of the routing instance"
-                      },
-                      "destination-address": {
-                        "type": "object",
-                        "properties": {
-                          "address-family": {
-                            "type": "string",
-                            "description": "Address family identifier (ipv4, ipv6, etc.)"
-                          }
-                        },
-                        "required": [
-                          "address-family"
-                        ]
+                        "example": "ipv4-unicast"
                       }
                     },
-                    "required": [
-                      "routing-instance-name",
-                      "destination-address"
-                    ]
+                    "example": "10.1.1.1"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-routing:input": {
+                  "routing-instance-name": "example-1",
+                  "destination-address": {
+                    "address-family": "ipv4-unicast"
                   }
                 }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "FIB route lookup successful",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "route": {
-                          "type": "object",
-                          "properties": {
-                            "address-family": {
-                              "type": "string",
-                              "description": "Address family"
-                            },
-                            "next-hop": {
-                              "type": "object",
-                              "properties": {
-                                "outgoing-interface": {
-                                  "type": "string",
-                                  "description": "Outgoing interface"
-                                },
-                                "next-hop-address": {
-                                  "type": "string",
-                                  "description": "Next-hop IP address"
-                                },
-                                "special-next-hop": {
-                                  "type": "string",
-                                  "enum": [
-                                    "blackhole",
-                                    "unreachable",
-                                    "prohibit",
-                                    "receive"
-                                  ],
-                                  "description": "Special next-hop type"
-                                }
-                              }
-                            },
-                            "source-protocol": {
-                              "type": "string",
-                              "description": "Source protocol that installed the route"
-                            },
-                            "active": {
-                              "type": "boolean",
-                              "description": "Whether the route is active"
-                            },
-                            "last-updated": {
-                              "type": "string",
-                              "format": "date-time",
-                              "description": "When the route was last updated"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/fib-route",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **fib-route** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
-          }
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       }
     }
@@ -256,15 +185,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "Routing FIB",
-      "description": "RPC operations for Routing FIB"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

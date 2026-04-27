@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive audit of the YANG accountability report.
-Cross-checks: YANG source files, spec files (api/api-v2), search-index.json,
+Cross-checks: YANG source files, spec files (api/api), search-index.json,
 yang_accountability.json, manifest.json files, and YANG tree files.
 """
 
@@ -28,7 +28,7 @@ def main():
                 yang_source_files.add(name)
     print(f"=== YANG SOURCE FILES: {len(yang_source_files)} ===")
 
-    # ─── 2. Scan all spec files (api and api-v2) ───
+    # ─── 2. Scan all spec files (api and api) ───
     model_folders = {
         "Operational": "swagger-oper-model",
         "Configuration": "swagger-cfg-model",
@@ -41,13 +41,13 @@ def main():
         "Other": "swagger-other-model",
     }
 
-    spec_modules_v2 = {}  # module_name -> list of categories (from api-v2)
-    spec_modules_v1 = {}  # module_name -> list of categories (from api only, no api-v2)
+    spec_modules_v2 = {}  # module_name -> list of categories (from api)
+    spec_modules_v1 = {}  # module_name -> list of categories (from api only, no api)
     all_spec_modules = {}  # module_name -> list of categories (union)
 
     for cat, folder in model_folders.items():
-        # api-v2
-        api_v2_dir = os.path.join(BASE, folder, "api-v2")
+        # api
+        api_v2_dir = os.path.join(BASE, folder, "api")
         if os.path.isdir(api_v2_dir):
             for f in os.listdir(api_v2_dir):
                 if f.endswith(".json") and f != "manifest.json":
@@ -66,7 +66,7 @@ def main():
                         all_spec_modules[name] = [cat]
 
     print(f"\n=== SPEC FILES ===")
-    print(f"  api-v2 specs: {len(spec_modules_v2)}")
+    print(f"  api specs: {len(spec_modules_v2)}")
     print(f"  api-only (v1, no v2): {len([k for k in spec_modules_v1 if k not in spec_modules_v2])}")
     print(f"  Total unique specs: {len(all_spec_modules)}")
 
@@ -110,7 +110,7 @@ def main():
     # ─── 6. Load manifests ───
     manifest_counts = {}
     for cat, folder in model_folders.items():
-        mf_path = os.path.join(BASE, folder, "api-v2", "manifest.json")
+        mf_path = os.path.join(BASE, folder, "api", "manifest.json")
         if os.path.isfile(mf_path):
             with open(mf_path) as f:
                 mf = json.load(f)
@@ -120,15 +120,15 @@ def main():
                 "total_paths": mf.get("total_paths", 0),
                 "total_operations": mf.get("total_operations", 0),
             }
-            # Verify manifest module count matches actual api-v2 files
-            api_v2_dir = os.path.join(BASE, folder, "api-v2")
+            # Verify manifest module count matches actual api files
+            api_v2_dir = os.path.join(BASE, folder, "api")
             actual_files = len([f for f in os.listdir(api_v2_dir) if f.endswith(".json") and f != "manifest.json"])
             if actual_files != mf["total_modules"]:
                 print(f"  WARNING: {cat} manifest says {mf['total_modules']} but has {actual_files} actual spec files!")
             if actual_files != len(mf.get("modules", [])):
                 print(f"  WARNING: {cat} manifest modules list has {len(mf['modules'])} but {actual_files} actual files!")
 
-    print(f"\n=== MANIFEST COUNTS (api-v2) ===")
+    print(f"\n=== MANIFEST COUNTS (api) ===")
     total_v2_specs = 0
     for cat in sorted(manifest_counts):
         mc = manifest_counts[cat]
@@ -282,7 +282,7 @@ def main():
     print(f"\n{'='*60}")
     print(f"=== CROSS-CHECK 6: Manifest consistency ===")
     for cat, folder in model_folders.items():
-        api_v2_dir = os.path.join(BASE, folder, "api-v2")
+        api_v2_dir = os.path.join(BASE, folder, "api")
         mf_path = os.path.join(api_v2_dir, "manifest.json")
         if not os.path.isfile(mf_path):
             print(f"  WARNING: No manifest.json for {cat}")
@@ -316,7 +316,7 @@ def main():
     print(f"=== FINAL AUDIT SUMMARY ===")
     print(f"  YANG source files:       {len(yang_source_files)}")
     print(f"  Accountability modules:  {len(acct_modules)}")
-    print(f"  Total unique specs:      {len(all_spec_modules)} (api-v2: {len(spec_modules_v2)}, v1-only: {len([k for k in spec_modules_v1 if k not in spec_modules_v2])})")
+    print(f"  Total unique specs:      {len(all_spec_modules)} (api: {len(spec_modules_v2)}, v1-only: {len([k for k in spec_modules_v1 if k not in spec_modules_v2])})")
     print(f"  YANG tree files:         {len(tree_modules)}")
     print(f"  Search index entries:    {len(search_modules)}")
     print(f"  Multi-category modules:  {acct_data.get('modules_multi_category', 'N/A')}")

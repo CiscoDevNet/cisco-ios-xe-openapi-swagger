@@ -1,19 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ietf-event-notifications RPCs",
-    "description": "YANG Push Event Subscription Management (RFC 8639) - Dynamic subscription lifecycle management for YANG-based event streams\n\n**YANG Model:** [ietf-event-notifications RPCs.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-event-notifications RPCs.yang)",
-    "version": "2019-09-09",
+    "title": "Cisco IOS-XE RPC - ietf-event-notifications",
+    "description": "RPC operations from `ietf-event-notifications` module.\n\n**RPCs:** 5 (establish-subscription, create-subscription, modify-subscription, delete-subscription, kill-subscription)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
     "x-yang-module": "ietf-event-notifications",
     "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,133 +28,175 @@
   "paths": {
     "/operations/ietf-event-notifications:establish-subscription": {
       "post": {
+        "summary": "Execute establish-subscription",
+        "operationId": "post-ietf-event-notifications-establish-subscription",
         "tags": [
-          "YANG Push Subscriptions"
+          "ietf-event-notifications"
         ],
-        "summary": "Establish a dynamic event subscription",
-        "description": "Create a dynamic subscription to YANG data events with filtering and update policies",
-        "operationId": "establishSubscription",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Event stream name (e.g., NETCONF, yang-push)"
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "enum": [
-                          "encode-xml",
-                          "encode-json"
-                        ],
-                        "description": "Encoding format for notifications"
-                      },
-                      "filter": {
-                        "type": "object",
-                        "description": "Subtree or XPath filter"
-                      },
-                      "stop-time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Optional end time for subscription"
-                      }
-                    },
-                    "required": [
-                      "stream"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "Subscription established",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "output": {
+                    "subscription-result": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "(result)": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "Subscription identifier"
-                        },
-                        "replay-start-time": {
+                        "subscription-id": {
                           "type": "string",
-                          "format": "date-time",
-                          "description": "Start time for event replay"
+                          "example": "1"
+                        },
+                        "stream": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "encoding": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "(filter-type)": {
+                          "type": "object",
+                          "properties": {
+                            "filter": {
+                              "type": "object",
+                              "example": "configured-value"
+                            },
+                            "filter-ref": {
+                              "type": "string",
+                              "example": "configured-value"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "example": "10:30:45"
+                        },
+                        "stopTime": {
+                          "type": "string",
+                          "example": "10:30:45"
                         }
-                      }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-event-notifications:output": {
+                    "subscription-result": "configured-value",
+                    "(result)": {
+                      "subscription-id": "1",
+                      "stream": "configured-value",
+                      "encoding": "configured-value",
+                      "(filter-type)": {
+                        "filter": [
+                          null
+                        ],
+                        "filter-ref": "configured-value"
+                      },
+                      "startTime": "10:30:45",
+                      "stopTime": "10:30:45"
                     }
                   }
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stream": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "encoding": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "(filter-type)": {
+                    "type": "object",
+                    "properties": {
+                      "filter": {
+                        "type": "object",
+                        "example": "configured-value"
+                      },
+                      "filter-ref": {
+                        "type": "string",
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "example": "10:30:45"
+                  },
+                  "stopTime": {
+                    "type": "string",
+                    "example": "10:30:45"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-event-notifications:input": {
+                  "stream": "configured-value",
+                  "encoding": "configured-value",
+                  "(filter-type)": {
+                    "filter": [
+                      null
+                    ],
+                    "filter-ref": "configured-value"
+                  },
+                  "startTime": "10:30:45",
+                  "stopTime": "10:30:45"
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/establish-subscription",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **establish-subscription** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     },
     "/operations/ietf-event-notifications:create-subscription": {
       "post": {
+        "summary": "Execute create-subscription",
+        "operationId": "post-ietf-event-notifications-create-subscription",
         "tags": [
-          "YANG Push Subscriptions"
+          "ietf-event-notifications"
         ],
-        "summary": "Create a subscription (legacy NETCONF)",
-        "description": "Legacy NETCONF notification subscription (RFC 5277 compatibility)",
-        "operationId": "createSubscription",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -155,27 +204,140 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
+                  "stream": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "encoding": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "(filter-type)": {
                     "type": "object",
                     "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Event stream name"
-                      },
                       "filter": {
                         "type": "object",
-                        "description": "Event filter"
-                      },
-                      "startTime": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Replay start time"
-                      },
-                      "stopTime": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Subscription end time"
+                        "example": "configured-value"
                       }
+                    },
+                    "example": "configured-value"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "example": "10:30:45"
+                  },
+                  "stopTime": {
+                    "type": "string",
+                    "example": "10:30:45"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-event-notifications:input": {
+                  "stream": "configured-value",
+                  "encoding": "configured-value",
+                  "(filter-type)": {
+                    "filter": [
+                      null
+                    ]
+                  },
+                  "startTime": "10:30:45",
+                  "stopTime": "10:30:45"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **create-subscription** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-event-notifications:modify-subscription": {
+      "post": {
+        "summary": "Execute modify-subscription",
+        "operationId": "post-ietf-event-notifications-modify-subscription",
+        "tags": [
+          "ietf-event-notifications"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscription-result": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "(result)": {
+                      "type": "object",
+                      "properties": {
+                        "subscription-id": {
+                          "type": "string",
+                          "example": "1"
+                        },
+                        "stream": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "encoding": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "(filter-type)": {
+                          "type": "object",
+                          "properties": {
+                            "filter": {
+                              "type": "object",
+                              "example": "configured-value"
+                            },
+                            "filter-ref": {
+                              "type": "string",
+                              "example": "configured-value"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "startTime": {
+                          "type": "string",
+                          "example": "10:30:45"
+                        },
+                        "stopTime": {
+                          "type": "string",
+                          "example": "10:30:45"
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-event-notifications:output": {
+                    "subscription-result": "configured-value",
+                    "(result)": {
+                      "subscription-id": "1",
+                      "stream": "configured-value",
+                      "encoding": "configured-value",
+                      "(filter-type)": {
+                        "filter": [
+                          null
+                        ],
+                        "filter-ref": "configured-value"
+                      },
+                      "startTime": "10:30:45",
+                      "stopTime": "10:30:45"
                     }
                   }
                 }
@@ -183,63 +345,6 @@
             }
           }
         },
-        "responses": {
-          "204": {
-            "description": "Subscription created successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/create-subscription",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-event-notifications:modify-subscription": {
-      "post": {
-        "tags": [
-          "YANG Push Subscriptions"
-        ],
-        "summary": "Modify an existing subscription",
-        "description": "Update parameters of an active dynamic subscription",
-        "operationId": "modifySubscription",
         "requestBody": {
           "required": true,
           "content": {
@@ -247,89 +352,94 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
+                  "subscription-id": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "(filter-type)": {
                     "type": "object",
                     "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Subscription identifier to modify"
-                      },
                       "filter": {
                         "type": "object",
-                        "description": "New filter criteria"
+                        "example": "configured-value"
                       },
-                      "stop-time": {
+                      "filter-ref": {
                         "type": "string",
-                        "format": "date-time",
-                        "description": "New stop time"
+                        "example": "configured-value"
                       }
                     },
-                    "required": [
-                      "id"
-                    ]
+                    "example": "configured-value"
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "example": "10:30:45"
+                  },
+                  "stopTime": {
+                    "type": "string",
+                    "example": "10:30:45"
                   }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-event-notifications:input": {
+                  "subscription-id": "1",
+                  "(filter-type)": {
+                    "filter": [
+                      null
+                    ],
+                    "filter-ref": "configured-value"
+                  },
+                  "startTime": "10:30:45",
+                  "stopTime": "10:30:45"
                 }
               }
             }
           }
         },
-        "responses": {
-          "204": {
-            "description": "Subscription modified successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/modify-subscription",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **modify-subscription** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     },
     "/operations/ietf-event-notifications:delete-subscription": {
       "post": {
+        "summary": "Execute delete-subscription",
+        "operationId": "post-ietf-event-notifications-delete-subscription",
         "tags": [
-          "YANG Push Subscriptions"
+          "ietf-event-notifications"
         ],
-        "summary": "Delete a subscription",
-        "description": "Terminate an active subscription by ID",
-        "operationId": "deleteSubscription",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscription-result": {
+                      "type": "string",
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-event-notifications:output": {
+                    "subscription-result": "configured-value"
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -337,80 +447,64 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Subscription identifier to delete"
-                      }
-                    },
-                    "required": [
-                      "id"
-                    ]
+                  "subscription-id": {
+                    "type": "string",
+                    "example": "1"
                   }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-event-notifications:input": {
+                  "subscription-id": "1"
                 }
               }
             }
           }
         },
-        "responses": {
-          "204": {
-            "description": "Subscription deleted successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/delete-subscription",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **delete-subscription** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     },
     "/operations/ietf-event-notifications:kill-subscription": {
       "post": {
+        "summary": "Execute kill-subscription",
+        "operationId": "post-ietf-event-notifications-kill-subscription",
         "tags": [
-          "YANG Push Subscriptions"
+          "ietf-event-notifications"
         ],
-        "summary": "Forcefully terminate a subscription",
-        "description": "Force termination of a subscription (administrative action)",
-        "operationId": "killSubscription",
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscription-result": {
+                      "type": "string",
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-event-notifications:output": {
+                    "subscription-result": "configured-value"
+                  }
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -418,148 +512,41 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Subscription identifier to kill"
-                      }
-                    },
-                    "required": [
-                      "id"
-                    ]
+                  "identifier": {
+                    "type": "string",
+                    "example": "1"
                   }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-event-notifications:input": {
+                  "identifier": "1"
                 }
               }
             }
           }
         },
-        "responses": {
-          "204": {
-            "description": "Subscription terminated successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/kill-subscription",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **kill-subscription** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
-          }
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       }
     }
@@ -568,15 +555,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "YANG Push Subscriptions",
-      "description": "RPC operations for YANG Push Subscriptions"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

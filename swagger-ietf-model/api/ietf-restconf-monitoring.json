@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ietf-restconf-monitoring",
-    "description": "This module contains monitoring information for the\n     RESTCONF protocol.\n\n     Copyright (c) 2017 IETF Trust and the persons identified as\n     authors of the code.  All rights reserved.\n\n     Redistribution and use in source and binary forms, with or\n     without modification, is permitted pursuant to, and subject\n     to the license terms contained in, the Simplified BSD License\n     set forth in Section 4.c of the IETF Trust's Legal Provisions\n     Relating to IETF Documents\n     (http://trustee.ietf.org/license-info).\n\n     This version of this YANG module is part of RFC 8040; see\n     the RFC itself for full legal notices.\n\n**IETF Standard YANG Model**\n**Module:** `ietf-restconf-monitoring`\n**Paths:** 21\n\n**YANG Model:** [ietf-restconf-monitoring.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-restconf-monitoring.yang)",
-    "version": "17.18.1"
+    "title": "Cisco IOS-XE IETF - ietf-restconf-monitoring",
+    "description": "IETF standard data from `ietf-restconf-monitoring` module.\n\n**Root containers:** 1 (restconf-state)\n**Paths:** 13 | **Operations:** 13\n\nSupports CRUD for read-write nodes, GET for read-only nodes.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "ietf-restconf-monitoring",
+    "x-model-type": "ietf"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -20,51 +29,26 @@
     "/data/ietf-restconf-monitoring:restconf-state": {
       "get": {
         "summary": "Get restconf-state",
-        "description": "Contains RESTCONF protocol monitoring information.",
-        "operationId": "get-restconf-state-0",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The stream name."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Description of stream content."
-                    },
-                    "replay-support": {
-                      "type": "boolean",
-                      "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                    },
-                    "replay-log-creation-time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Only present if notification replay is supported."
-                    },
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    },
-                    "capability": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "description": "A RESTCONF protocol capability URI."
-                      }
-                    },
                     "capabilities": {
                       "type": "object",
                       "properties": {
@@ -72,394 +56,124 @@
                           "type": "array",
                           "items": {
                             "type": "string",
-                            "description": "A RESTCONF protocol capability URI."
-                          }
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
                       },
-                      "description": "Contains a list of protocol capability URIs."
+                      "example": "configured-value"
                     },
                     "streams": {
                       "type": "object",
                       "properties": {
-                        "name": {
-                          "type": "string",
-                          "description": "The stream name."
-                        },
-                        "description": {
-                          "type": "string",
-                          "description": "Description of stream content."
-                        },
-                        "replay-support": {
-                          "type": "boolean",
-                          "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                        },
-                        "replay-log-creation-time": {
-                          "type": "string",
-                          "format": "date-time",
-                          "description": "Only present if notification replay is supported."
-                        },
-                        "encoding": {
-                          "type": "string",
-                          "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                        },
-                        "location": {
-                          "type": "string",
-                          "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
+                        "stream": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "example": "example-1",
+                                "description": "Unique identifier name"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "Configured via RESTCONF",
+                                "description": "User-configured description string"
+                              },
+                              "replay-support": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "replay-log-creation-time": {
+                                "type": "string",
+                                "example": "10:30:45"
+                              },
+                              "access": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "encoding": {
+                                      "type": "string",
+                                      "example": "configured-value"
+                                    },
+                                    "location": {
+                                      "type": "string",
+                                      "example": "San Jose, CA"
+                                    }
+                                  },
+                                  "example": "configured-value"
+                                },
+                                "example": "configured-value"
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
                       },
-                      "required": [
-                        "location"
-                      ],
-                      "description": "Container representing the notification event streams\n         supported by the server."
+                      "example": "configured-value"
                     }
                   },
-                  "required": [
-                    "location"
-                  ]
+                  "example": "active"
                 },
                 "example": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string",
-                  "capability": [
-                    "example-string",
-                    "example-string",
-                    "example-string"
-                  ],
-                  "capabilities": {
-                    "capability": [
-                      "example-string",
-                      "example-string",
-                      "example-string"
-                    ]
-                  },
-                  "streams": {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
+                  "ietf-restconf-monitoring:restconf-state": {
+                    "capabilities": {
+                      "capability": [
+                        "example"
+                      ]
+                    },
+                    "streams": {
+                      "stream": [
+                        {
+                          "name": "example-1",
+                          "description": "Configured via RESTCONF",
+                          "replay-support": true,
+                          "replay-log-creation-time": "10:30:45",
+                          "access": [
+                            {
+                              "encoding": "configured-value",
+                              "location": "San Jose, CA"
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "put": {
-        "summary": "Create or replace restconf-state",
-        "description": "Create or replace Contains RESTCONF protocol monitoring information.",
-        "operationId": "put-restconf-state-0",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  },
-                  "capability": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "description": "A RESTCONF protocol capability URI."
-                    }
-                  },
-                  "capabilities": {
-                    "type": "object",
-                    "properties": {
-                      "capability": {
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "description": "A RESTCONF protocol capability URI."
-                        }
-                      }
-                    },
-                    "description": "Contains a list of protocol capability URIs."
-                  },
-                  "streams": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "The stream name."
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Description of stream content."
-                      },
-                      "replay-support": {
-                        "type": "boolean",
-                        "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                      },
-                      "replay-log-creation-time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Only present if notification replay is supported."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ],
-                    "description": "Container representing the notification event streams\n         supported by the server."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string",
-                "capability": [
-                  "example-string",
-                  "example-string",
-                  "example-string"
-                ],
-                "capabilities": {
-                  "capability": [
-                    "example-string",
-                    "example-string",
-                    "example-string"
-                  ]
-                },
-                "streams": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
-                }
-              }
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify restconf-state",
-        "description": "Partially modify Contains RESTCONF protocol monitoring information.",
-        "operationId": "patch-restconf-state-0",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  },
-                  "capability": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "description": "A RESTCONF protocol capability URI."
-                    }
-                  },
-                  "capabilities": {
-                    "type": "object",
-                    "properties": {
-                      "capability": {
-                        "type": "array",
-                        "items": {
-                          "type": "string",
-                          "description": "A RESTCONF protocol capability URI."
-                        }
-                      }
-                    },
-                    "description": "Contains a list of protocol capability URIs."
-                  },
-                  "streams": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "The stream name."
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Description of stream content."
-                      },
-                      "replay-support": {
-                        "type": "boolean",
-                        "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                      },
-                      "replay-log-creation-time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Only present if notification replay is supported."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ],
-                    "description": "Container representing the notification event streams\n         supported by the server."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string",
-                "capability": [
-                  "example-string",
-                  "example-string",
-                  "example-string"
-                ],
-                "capabilities": {
-                  "capability": [
-                    "example-string",
-                    "example-string",
-                    "example-string"
-                  ]
-                },
-                "streams": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete restconf-state",
-        "description": "Delete Contains RESTCONF protocol monitoring information.",
-        "operationId": "delete-restconf-state-0",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
+        "description": "Retrieve restconf-state from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
     "/data/ietf-restconf-monitoring:restconf-state/capabilities": {
       "get": {
         "summary": "Get capabilities",
-        "description": "Contains a list of protocol capability URIs.",
-        "operationId": "get-capabilities-1",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-capabilities",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -469,510 +183,200 @@
                       "type": "array",
                       "items": {
                         "type": "string",
-                        "description": "A RESTCONF protocol capability URI."
-                      }
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
-                  "capability": [
-                    "example-string",
-                    "example-string",
-                    "example-string"
-                  ]
+                  "ietf-restconf-monitoring:capabilities": {
+                    "capability": [
+                      "example"
+                    ]
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "put": {
-        "summary": "Create or replace capabilities",
-        "description": "Create or replace Contains a list of protocol capability URIs.",
-        "operationId": "put-capabilities-1",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "capability": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "description": "A RESTCONF protocol capability URI."
-                    }
-                  }
-                }
-              },
-              "example": {
-                "capability": [
-                  "example-string",
-                  "example-string",
-                  "example-string"
-                ]
-              }
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify capabilities",
-        "description": "Partially modify Contains a list of protocol capability URIs.",
-        "operationId": "patch-capabilities-1",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "capability": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "description": "A RESTCONF protocol capability URI."
-                    }
-                  }
-                }
-              },
-              "example": {
-                "capability": [
-                  "example-string",
-                  "example-string",
-                  "example-string"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete capabilities",
-        "description": "Delete Contains a list of protocol capability URIs.",
-        "operationId": "delete-capabilities-1",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
+        "description": "Retrieve capabilities from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
     "/data/ietf-restconf-monitoring:restconf-state/capabilities/capability": {
       "get": {
         "summary": "Get capability",
-        "description": "A RESTCONF protocol capability URI. (collection)",
-        "operationId": "get-capability-2",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-capabilities-capability",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
-                  }
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "example": "configured-value"
                 },
-                "example": [
-                  {},
-                  {},
-                  {}
-                ]
+                "example": {
+                  "ietf-restconf-monitoring:capability": [
+                    "example"
+                  ]
+                }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "post": {
-        "summary": "Add capability entry",
-        "description": "Add a new entry to A RESTCONF protocol capability URI. (collection)",
-        "operationId": "post-capability-2",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/capabilities/capability={id}": {
-      "get": {
-        "summary": "Get capability-item",
-        "description": "A RESTCONF protocol capability URI.",
-        "operationId": "get-capability-item-3",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace capability-item",
-        "description": "Create or replace A RESTCONF protocol capability URI.",
-        "operationId": "put-capability-item-3",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify capability-item",
-        "description": "Partially modify A RESTCONF protocol capability URI.",
-        "operationId": "patch-capability-item-3",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete capability-item",
-        "description": "Delete A RESTCONF protocol capability URI.",
-        "operationId": "delete-capability-item-3",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
+        "description": "Retrieve capability from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
     "/data/ietf-restconf-monitoring:restconf-state/streams": {
       "get": {
         "summary": "Get streams",
-        "description": "Container representing the notification event streams\n         supported by the server.",
-        "operationId": "get-streams-4",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The stream name."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Description of stream content."
-                    },
-                    "replay-support": {
-                      "type": "boolean",
-                      "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                    },
-                    "replay-log-creation-time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Only present if notification replay is supported."
-                    },
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
+                    "stream": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "example-1",
+                            "description": "Unique identifier name"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Configured via RESTCONF",
+                            "description": "User-configured description string"
+                          },
+                          "replay-support": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "replay-log-creation-time": {
+                            "type": "string",
+                            "example": "10:30:45"
+                          },
+                          "access": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "encoding": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "location": {
+                                  "type": "string",
+                                  "example": "San Jose, CA"
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "example": "configured-value"
+                          }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
                   },
-                  "required": [
-                    "location"
-                  ]
+                  "example": "configured-value"
                 },
                 "example": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
+                  "ietf-restconf-monitoring:streams": {
+                    "stream": [
+                      {
+                        "name": "example-1",
+                        "description": "Configured via RESTCONF",
+                        "replay-support": true,
+                        "replay-log-creation-time": "10:30:45",
+                        "access": [
+                          {
+                            "encoding": "configured-value",
+                            "location": "San Jose, CA"
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "put": {
-        "summary": "Create or replace streams",
-        "description": "Create or replace Container representing the notification event streams\n         supported by the server.",
-        "operationId": "put-streams-4",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify streams",
-        "description": "Partially modify Container representing the notification event streams\n         supported by the server.",
-        "operationId": "patch-streams-4",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete streams",
-        "description": "Delete Container representing the notification event streams\n         supported by the server.",
-        "operationId": "delete-streams-4",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
+        "description": "Retrieve streams from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
     "/data/ietf-restconf-monitoring:restconf-state/streams/stream": {
       "get": {
         "summary": "Get stream",
-        "description": "Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "get-stream-5",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -982,355 +386,349 @@
                     "properties": {
                       "name": {
                         "type": "string",
-                        "description": "The stream name."
+                        "example": "example-1",
+                        "description": "Unique identifier name"
                       },
                       "description": {
                         "type": "string",
-                        "description": "Description of stream content."
+                        "example": "Configured via RESTCONF",
+                        "description": "User-configured description string"
                       },
                       "replay-support": {
                         "type": "boolean",
-                        "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
+                        "example": true
                       },
                       "replay-log-creation-time": {
                         "type": "string",
-                        "format": "date-time",
-                        "description": "Only present if notification replay is supported."
+                        "example": "10:30:45"
                       },
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
+                      "access": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "encoding": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "location": {
+                              "type": "string",
+                              "example": "San Jose, CA"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
                       }
                     },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
+                    "example": "configured-value"
                   },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add stream entry",
-        "description": "Add a new entry to Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "post-stream-5",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/streams/stream={id}": {
-      "get": {
-        "summary": "Get stream-item",
-        "description": "Each entry describes an event stream supported by\n           the server.",
-        "operationId": "get-stream-item-6",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The stream name."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Description of stream content."
-                    },
-                    "replay-support": {
-                      "type": "boolean",
-                      "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                    },
-                    "replay-log-creation-time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Only present if notification replay is supported."
-                    },
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
+                  "example": "configured-value"
                 },
                 "example": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
+                  "ietf-restconf-monitoring:stream": [
+                    {
+                      "name": "example-1",
+                      "description": "Configured via RESTCONF",
+                      "replay-support": true,
+                      "replay-log-creation-time": "10:30:45",
+                      "access": [
+                        {
+                          "encoding": "configured-value",
+                          "location": "San Jose, CA"
+                        }
+                      ]
+                    }
+                  ]
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "put": {
-        "summary": "Create or replace stream-item",
-        "description": "Create or replace Each entry describes an event stream supported by\n           the server.",
-        "operationId": "put-stream-item-6",
+        },
+        "description": "Retrieve stream from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream={name}": {
+      "get": {
+        "summary": "Get stream",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-name",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "example-1",
+                        "description": "Unique identifier name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Configured via RESTCONF",
+                        "description": "User-configured description string"
+                      },
+                      "replay-support": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "replay-log-creation-time": {
+                        "type": "string",
+                        "example": "10:30:45"
+                      },
+                      "access": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "encoding": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "location": {
+                              "type": "string",
+                              "example": "San Jose, CA"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
+                  "example": "example-1"
                 },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
+                "example": {
+                  "ietf-restconf-monitoring:stream": [
+                    {
+                      "name": "example-1",
+                      "description": "Configured via RESTCONF",
+                      "replay-support": true,
+                      "replay-log-creation-time": "10:30:45",
+                      "access": [
+                        {
+                          "encoding": "configured-value",
+                          "location": "San Jose, CA"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
           },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify stream-item",
-        "description": "Partially modify Each entry describes an event stream supported by\n           the server.",
-        "operationId": "patch-stream-item-6",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete stream-item",
-        "description": "Delete Each entry describes an event stream supported by\n           the server.",
-        "operationId": "delete-stream-item-6",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           }
-        }
+        },
+        "description": "Retrieve stream from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/name": {
+      "get": {
+        "summary": "Get name",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-name",
+        "tags": [
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "example-1",
+                  "description": "Unique identifier name"
+                },
+                "example": {
+                  "ietf-restconf-monitoring:name": "example-1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "description": "Retrieve name from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/description": {
+      "get": {
+        "summary": "Get description",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-description",
+        "tags": [
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Configured via RESTCONF",
+                  "description": "User-configured description string"
+                },
+                "example": {
+                  "ietf-restconf-monitoring:description": "configured-value"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "description": "Retrieve description from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/replay-support": {
+      "get": {
+        "summary": "Get replay-support",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-replay-support",
+        "tags": [
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "example": {
+                  "ietf-restconf-monitoring:replay-support": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "description": "Retrieve replay-support from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/replay-log-creation-time": {
+      "get": {
+        "summary": "Get replay-log-creation-time",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-replay-log-creation-time",
+        "tags": [
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "10:30:45"
+                },
+                "example": {
+                  "ietf-restconf-monitoring:replay-log-creation-time": "10:30:45"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        },
+        "description": "Retrieve replay-log-creation-time from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
     "/data/ietf-restconf-monitoring:restconf-state/streams/stream/access": {
       "get": {
         "summary": "Get access",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "get-access-7",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-access",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
@@ -1340,1753 +738,116 @@
                     "properties": {
                       "encoding": {
                         "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
+                        "example": "configured-value"
                       },
                       "location": {
                         "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
+                        "example": "San Jose, CA"
                       }
                     },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
+                    "example": "configured-value"
                   },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add access entry",
-        "description": "Add a new entry to The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "post-access-7",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/access={id}": {
-      "get": {
-        "summary": "Get access-item",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "get-access-item-8",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
+                  "example": "configured-value"
                 },
                 "example": {
-                  "encoding": "example-string",
-                  "location": "example-string"
+                  "ietf-restconf-monitoring:access": [
+                    {
+                      "encoding": "configured-value",
+                      "location": "San Jose, CA"
+                    }
+                  ]
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace access-item",
-        "description": "Create or replace The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "put-access-item-8",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify access-item",
-        "description": "Partially modify The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "patch-access-item-8",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete access-item",
-        "description": "Delete The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "delete-access-item-8",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/capability": {
-      "get": {
-        "summary": "Get capability",
-        "description": "A RESTCONF protocol capability URI. (collection)",
-        "operationId": "get-capability-9",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                },
-                "example": [
-                  {},
-                  {},
-                  {}
-                ]
-              }
-            }
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "post": {
-        "summary": "Add capability entry",
-        "description": "Add a new entry to A RESTCONF protocol capability URI. (collection)",
-        "operationId": "post-capability-9",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
+        "description": "Retrieve access from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
-    "/data/ietf-restconf-monitoring:restconf-state/capability={id}": {
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/access/encoding": {
       "get": {
-        "summary": "Get capability-item",
-        "description": "A RESTCONF protocol capability URI.",
-        "operationId": "get-capability-item-10",
+        "summary": "Get encoding",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-access-encoding",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace capability-item",
-        "description": "Create or replace A RESTCONF protocol capability URI.",
-        "operationId": "put-capability-item-10",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify capability-item",
-        "description": "Partially modify A RESTCONF protocol capability URI.",
-        "operationId": "patch-capability-item-10",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete capability-item",
-        "description": "Delete A RESTCONF protocol capability URI.",
-        "operationId": "delete-capability-item-10",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/stream": {
-      "get": {
-        "summary": "Get stream",
-        "description": "Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "get-stream-11",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "The stream name."
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Description of stream content."
-                      },
-                      "replay-support": {
-                        "type": "boolean",
-                        "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                      },
-                      "replay-log-creation-time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Only present if notification replay is supported."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add stream entry",
-        "description": "Add a new entry to Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "post-stream-11",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/stream={id}": {
-      "get": {
-        "summary": "Get stream-item",
-        "description": "Each entry describes an event stream supported by\n           the server.",
-        "operationId": "get-stream-item-12",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The stream name."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Description of stream content."
-                    },
-                    "replay-support": {
-                      "type": "boolean",
-                      "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                    },
-                    "replay-log-creation-time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Only present if notification replay is supported."
-                    },
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
+                  "type": "string",
+                  "example": "configured-value"
                 },
                 "example": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
+                  "ietf-restconf-monitoring:encoding": "configured-value"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace stream-item",
-        "description": "Create or replace Each entry describes an event stream supported by\n           the server.",
-        "operationId": "put-stream-item-12",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify stream-item",
-        "description": "Partially modify Each entry describes an event stream supported by\n           the server.",
-        "operationId": "patch-stream-item-12",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete stream-item",
-        "description": "Delete Each entry describes an event stream supported by\n           the server.",
-        "operationId": "delete-stream-item-12",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:restconf-state/stream/access": {
-      "get": {
-        "summary": "Get access",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "get-access-13",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "post": {
-        "summary": "Add access entry",
-        "description": "Add a new entry to The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "post-access-13",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
+        "description": "Retrieve encoding from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     },
-    "/data/ietf-restconf-monitoring:restconf-state/stream/access={id}": {
+    "/data/ietf-restconf-monitoring:restconf-state/streams/stream/access/location": {
       "get": {
-        "summary": "Get access-item",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "get-access-item-14",
+        "summary": "Get location",
+        "operationId": "get-ietf-restconf-monitoring:restconf-state-streams-stream-access-location",
         "tags": [
-          "ietf-restconf-monitoring"
+          "restconf-state"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
+                  "type": "string",
+                  "example": "San Jose, CA"
                 },
                 "example": {
-                  "encoding": "example-string",
-                  "location": "example-string"
+                  "ietf-restconf-monitoring:location": "configured-value"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace access-item",
-        "description": "Create or replace The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "put-access-item-14",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify access-item",
-        "description": "Partially modify The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "patch-access-item-14",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete access-item",
-        "description": "Delete The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "delete-access-item-14",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:capability": {
-      "get": {
-        "summary": "Get capability",
-        "description": "A RESTCONF protocol capability URI. (collection)",
-        "operationId": "get-capability-15",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                },
-                "example": [
-                  {},
-                  {},
-                  {}
-                ]
-              }
-            }
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
-        }
-      },
-      "post": {
-        "summary": "Add capability entry",
-        "description": "Add a new entry to A RESTCONF protocol capability URI. (collection)",
-        "operationId": "post-capability-15",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:capability={id}": {
-      "get": {
-        "summary": "Get capability-item",
-        "description": "A RESTCONF protocol capability URI.",
-        "operationId": "get-capability-item-16",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object"
-                },
-                "example": {}
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace capability-item",
-        "description": "Create or replace A RESTCONF protocol capability URI.",
-        "operationId": "put-capability-item-16",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify capability-item",
-        "description": "Partially modify A RESTCONF protocol capability URI.",
-        "operationId": "patch-capability-item-16",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object"
-              },
-              "example": {}
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete capability-item",
-        "description": "Delete A RESTCONF protocol capability URI.",
-        "operationId": "delete-capability-item-16",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:stream": {
-      "get": {
-        "summary": "Get stream",
-        "description": "Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "get-stream-17",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "The stream name."
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "Description of stream content."
-                      },
-                      "replay-support": {
-                        "type": "boolean",
-                        "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                      },
-                      "replay-log-creation-time": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Only present if notification replay is supported."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "name": "GigabitEthernet0/0/0",
-                    "description": "192.168.1.1",
-                    "replay-support": true,
-                    "replay-log-creation-time": "example-string",
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add stream entry",
-        "description": "Add a new entry to Each entry describes an event stream supported by\n           the server. (collection)",
-        "operationId": "post-stream-17",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:stream={id}": {
-      "get": {
-        "summary": "Get stream-item",
-        "description": "Each entry describes an event stream supported by\n           the server.",
-        "operationId": "get-stream-item-18",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The stream name."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Description of stream content."
-                    },
-                    "replay-support": {
-                      "type": "boolean",
-                      "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                    },
-                    "replay-log-creation-time": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "Only present if notification replay is supported."
-                    },
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
-                },
-                "example": {
-                  "name": "GigabitEthernet0/0/0",
-                  "description": "192.168.1.1",
-                  "replay-support": true,
-                  "replay-log-creation-time": "example-string",
-                  "encoding": "example-string",
-                  "location": "example-string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace stream-item",
-        "description": "Create or replace Each entry describes an event stream supported by\n           the server.",
-        "operationId": "put-stream-item-18",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify stream-item",
-        "description": "Partially modify Each entry describes an event stream supported by\n           the server.",
-        "operationId": "patch-stream-item-18",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The stream name."
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Description of stream content."
-                  },
-                  "replay-support": {
-                    "type": "boolean",
-                    "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-                  },
-                  "replay-log-creation-time": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Only present if notification replay is supported."
-                  },
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "name": "GigabitEthernet0/0/0",
-                "description": "192.168.1.1",
-                "replay-support": true,
-                "replay-log-creation-time": "example-string",
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete stream-item",
-        "description": "Delete Each entry describes an event stream supported by\n           the server.",
-        "operationId": "delete-stream-item-18",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:stream/access": {
-      "get": {
-        "summary": "Get access",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "get-access-19",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "encoding": {
-                        "type": "string",
-                        "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                      },
-                      "location": {
-                        "type": "string",
-                        "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                      }
-                    },
-                    "required": [
-                      "location"
-                    ]
-                  }
-                },
-                "example": [
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  },
-                  {
-                    "encoding": "example-string",
-                    "location": "example-string"
-                  }
-                ]
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add access entry",
-        "description": "Add a new entry to The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream. (collection)",
-        "operationId": "post-access-19",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/ietf-restconf-monitoring:stream/access={id}": {
-      "get": {
-        "summary": "Get access-item",
-        "description": "The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "get-access-item-20",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "encoding": {
-                      "type": "string",
-                      "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                    },
-                    "location": {
-                      "type": "string",
-                      "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                    }
-                  },
-                  "required": [
-                    "location"
-                  ]
-                },
-                "example": {
-                  "encoding": "example-string",
-                  "location": "example-string"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace access-item",
-        "description": "Create or replace The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "put-access-item-20",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify access-item",
-        "description": "Partially modify The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "patch-access-item-20",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "encoding": {
-                    "type": "string",
-                    "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-                  },
-                  "location": {
-                    "type": "string",
-                    "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-                  }
-                },
-                "required": [
-                  "location"
-                ]
-              },
-              "example": {
-                "encoding": "example-string",
-                "location": "example-string"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete access-item",
-        "description": "Delete The server will create an entry in this list for each\n             encoding format that is supported for this stream.\n             The media type 'text/event-stream' is expected\n             for all event streams.  This list identifies the\n             subtypes supported for this stream.",
-        "operationId": "delete-access-item-20",
-        "tags": [
-          "ietf-restconf-monitoring"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
+        "description": "Retrieve location from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     }
   },
@@ -3094,254 +855,29 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "ietf-restconf-monitoring-restconf-state": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The stream name."
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of stream content."
-          },
-          "replay-support": {
-            "type": "boolean",
-            "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-          },
-          "replay-log-creation-time": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Only present if notification replay is supported."
-          },
-          "encoding": {
-            "type": "string",
-            "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-          },
-          "location": {
-            "type": "string",
-            "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-          },
-          "capability": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "description": "A RESTCONF protocol capability URI."
-            }
-          },
-          "capabilities": {
-            "type": "object",
-            "properties": {
-              "capability": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "description": "A RESTCONF protocol capability URI."
-                }
-              }
-            },
-            "description": "Contains a list of protocol capability URIs."
-          },
-          "streams": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "The stream name."
-              },
-              "description": {
-                "type": "string",
-                "description": "Description of stream content."
-              },
-              "replay-support": {
-                "type": "boolean",
-                "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-              },
-              "replay-log-creation-time": {
-                "type": "string",
-                "format": "date-time",
-                "description": "Only present if notification replay is supported."
-              },
-              "encoding": {
-                "type": "string",
-                "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-              },
-              "location": {
-                "type": "string",
-                "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-              }
-            },
-            "required": [
-              "location"
-            ],
-            "description": "Container representing the notification event streams\n         supported by the server."
-          }
-        },
-        "required": [
-          "location"
-        ]
-      },
-      "ietf-restconf-monitoring-capabilities": {
-        "type": "object",
-        "properties": {
-          "capability": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "description": "A RESTCONF protocol capability URI."
-            }
-          }
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       },
-      "ietf-restconf-monitoring-capability": {
-        "type": "array",
-        "items": {
-          "type": "object"
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
         }
-      },
-      "ietf-restconf-monitoring-capability-item": {
-        "type": "object"
-      },
-      "ietf-restconf-monitoring-streams": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The stream name."
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of stream content."
-          },
-          "replay-support": {
-            "type": "boolean",
-            "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-          },
-          "replay-log-creation-time": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Only present if notification replay is supported."
-          },
-          "encoding": {
-            "type": "string",
-            "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-          },
-          "location": {
-            "type": "string",
-            "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-          }
-        },
-        "required": [
-          "location"
-        ]
-      },
-      "ietf-restconf-monitoring-stream": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "The stream name."
-            },
-            "description": {
-              "type": "string",
-              "description": "Description of stream content."
-            },
-            "replay-support": {
-              "type": "boolean",
-              "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-            },
-            "replay-log-creation-time": {
-              "type": "string",
-              "format": "date-time",
-              "description": "Only present if notification replay is supported."
-            },
-            "encoding": {
-              "type": "string",
-              "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-            },
-            "location": {
-              "type": "string",
-              "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-            }
-          },
-          "required": [
-            "location"
-          ]
-        }
-      },
-      "ietf-restconf-monitoring-stream-item": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The stream name."
-          },
-          "description": {
-            "type": "string",
-            "description": "Description of stream content."
-          },
-          "replay-support": {
-            "type": "boolean",
-            "description": "Indicates if replay buffer is supported for this stream.\n             If 'true', then the server MUST support the 'start-time'\n             and 'stop-time' query parameters for this stream."
-          },
-          "replay-log-creation-time": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Only present if notification replay is supported."
-          },
-          "encoding": {
-            "type": "string",
-            "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-          },
-          "location": {
-            "type": "string",
-            "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-          }
-        },
-        "required": [
-          "location"
-        ]
-      },
-      "ietf-restconf-monitoring-access": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "encoding": {
-              "type": "string",
-              "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-            },
-            "location": {
-              "type": "string",
-              "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-            }
-          },
-          "required": [
-            "location"
-          ]
-        }
-      },
-      "ietf-restconf-monitoring-access-item": {
-        "type": "object",
-        "properties": {
-          "encoding": {
-            "type": "string",
-            "description": "This is the secondary encoding format within the\n               'text/event-stream' encoding used by all streams.\n               The type 'xml' is supported for XML encoding.\n               The type 'json' is supported for JSON encoding."
-          },
-          "location": {
-            "type": "string",
-            "description": "Contains a URL that represents the entry point\n               for establishing notification delivery via\n               server-sent events."
-          }
-        },
-        "required": [
-          "location"
-        ]
       }
     }
   },
@@ -3349,15 +885,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "ietf-restconf-monitoring",
-      "description": "This module contains monitoring information for the\n     RESTCONF protocol.\n\n     Copyright (c) 2017 IETF Trust and the persons identified as\n     authors of the code.  All rights reserved.\n\n     Redistribution and use in source and binary forms, with or\n     without modification, is permitted pursuant to, and subject\n     to the license terms contained in, the Simplified BSD License\n     set forth in Section 4.c of the IETF Trust's Legal Provisions\n     Relating to IETF Documents\n     (http://trustee.ietf.org/license-info).\n\n     This version of this YANG module is part of RFC 8040; see\n     the RFC itself for full legal notices."
-    }
-  ],
-  "externalDocs": {
-    "description": "IETF YANG Models - GitHub",
-    "url": "https://github.com/YangModels/yang/tree/main/standard/ietf"
-  }
+  ]
 }

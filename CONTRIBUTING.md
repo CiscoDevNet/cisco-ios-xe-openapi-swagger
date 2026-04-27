@@ -60,7 +60,7 @@ python -X utf8 scripts/smoke_live.py
 
 ## Rules of thumb
 
-- **Don't hand-edit generated specs** under `swagger-*-model/api-v2/`. They get overwritten.
+- **Don't hand-edit generated specs** under `swagger-*-model/api/`. They get overwritten.
 - **Don't add inline `<script>` or `onclick=`** — strict CSP will block them.
 - **Always escape strings** before assigning to `innerHTML`. Use `escapeHtml()` from `search.js`.
 - **Always wrap localStorage** writes in try/catch and surface failures via `showToast()`.
@@ -87,7 +87,7 @@ python scripts/validate_examples_c9kv.py `
 
 When filing an issue, include:
 
-- Spec file path (e.g., `swagger-native-config-model/api-v2/native-switching.json`)
+- Spec file path (e.g., `swagger-native-config-model/api/native-switching.json`)
 - The affected operation (method + path)
 - Expected vs actual (screenshot or JSON snippet)
 - IOS-XE version if validating against a device

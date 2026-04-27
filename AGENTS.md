@@ -17,7 +17,7 @@ When making non-trivial changes, the following documents are authoritative. Upda
 | [VERSIONING.md](VERSIONING.md) | Multi-release folder layout, URL contract, CI gates, "add a new release" runbook |
 | [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) | MDT/gRPC dial-out filter xpath rule + OpenAPI extensions |
 | [../MIBS.md](../MIBS.md) | MIB coverage and platform applicability matrix |
-| [../telemetry-reference-v2.md](../telemetry-reference-v2.md) | Per-feature telemetry subscription metadata (feature → xpath, tier, cadence) |
+| [../telemetry-reference.md](../telemetry-reference.md) | Per-feature telemetry subscription metadata (feature → xpath, tier, cadence) |
 | [CHANGELOG.md](CHANGELOG.md) | Versions Supported table; release-by-release deltas |
 
 If a request conflicts with these docs, prefer updating the doc first (with rationale) and then code.
@@ -30,7 +30,7 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 
 **What ships:**
 
-- 608 OpenAPI 3.0 specs in the default 26.1.1 release (`releases/26.1.1/swagger-*-model/api-v2/*.json`); 506\u2013608 across the five tracked releases. See [version-stats.json](version-stats.json) for per-release counts.
+- 608 OpenAPI 3.0 specs in the default 26.1.1 release (`releases/26.1.1/swagger-*-model/api/*.json`); 506\u2013608 across the five tracked releases. See [version-stats.json](version-stats.json) for per-release counts.
 - 765 YANG tree HTML visualizations per release (`releases/<ver>/yang-trees/`)
 - 6 vanilla-JS pages (index, code generator, tree compare, accountability, plus 9 model index pages)
 - A per-release search index (`releases/<ver>/search-index.json`) consumed by Fuse.js fuzzy search
@@ -78,8 +78,8 @@ cisco-ios-xe-openapi-swagger/
 ├── yang_accountability.json    # Module-by-module coverage data
 │
 ├── swagger-{type}-model/       # 9 model categories (see §4)
-│   ├── index-v2.html           # Model browser with deep-linking
-│   ├── api-v2/*.json           # OpenAPI specs (deep paths)
+│   ├── index.html           # Model browser with deep-linking
+│   ├── api/*.json           # OpenAPI specs (deep paths)
 │   └── api/*.json              # Legacy v1 specs (kept as fallback)
 │
 ├── yang-trees/                 # 768 generated YANG/MIB tree HTML files
@@ -119,7 +119,7 @@ cisco-ios-xe-openapi-swagger/
 | `swagger-events-model/` | events | 38 | YANG-Push notifications + SNMP traps |
 | `swagger-other-model/` | other | 10 | Standalone / vendor-specific |
 
-Each directory ships an `index-v2.html` with hash-based deep-linking (`#spec=<module-name>`).
+Each directory ships an `index.html` with hash-based deep-linking (`#spec=<module-name>`).
 
 ---
 
@@ -166,7 +166,7 @@ After adding a new release or rebuilding manifests/viewers, run:
 # Normalize all manifest.json files (default + per-release) to the schema viewers expect.
 python scripts/normalize_manifests.py
 
-# Re-patch all 9 swagger-*-model/index-v2.html viewers with version-aware helpers
+# Re-patch all 9 swagger-*-model/index.html viewers with version-aware helpers
 # (reads default + active-versions allow-list from releases/index.json).
 python scripts/patch_viewers_version_aware.py
 
@@ -273,11 +273,11 @@ Edit [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py):
 python scripts/generate_search_index.py
 ```
 
-This rebuilds `search-index.json` from the `swagger-*-model/api-v2/manifest.json` files.
+This rebuilds `search-index.json` from the `swagger-*-model/api/manifest.json` files.
 
 ### "Fix a broken deep-link"
 
-The main `index.html` reads `#search=`, `#module=`, `#spec=` from the URL hash via `handleDeepLink()` in [search.js](search.js). Module pages read `#spec=<name>` via `checkHash()` in their `index-v2.html`.
+The main `index.html` reads `#search=`, `#module=`, `#spec=` from the URL hash via `handleDeepLink()` in [search.js](search.js). Module pages read `#spec=<name>` via `checkHash()` in their `index.html`.
 
 ### "Validate write-operation examples against C9KV"
 
@@ -295,7 +295,7 @@ python scripts/validate_examples_c9kv.py --host <ip> --username <u> --password <
 
 ### Spec Files Are Generated
 
-Direct edits to `swagger-*-model/api-v2/*.json` will be **overwritten** the next time generators or `enrich_v2_specs.py` run. Make changes in the relevant Python file instead.
+Direct edits to `swagger-*-model/api/*.json` will be **overwritten** the next time generators or `enrich_v2_specs.py` run. Make changes in the relevant Python file instead.
 
 ### CSP Will Block New CDN Scripts
 

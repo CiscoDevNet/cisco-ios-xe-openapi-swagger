@@ -4,7 +4,7 @@ Clean search-index.json:
 - Remove v1 entries that have a v2 equivalent (prefer v2)
 - Rename v2 types to plain types (rpc-v2 -> rpc, oper-v2 -> operational, etc.)
 - Clean displayCategory labels
-- Update swaggerUrl to use index-v2.html
+- Update swaggerUrl to use index.html
 - Keep v1-only entries (no v2 equivalent) but point them to redirecting index.html
 """
 import json

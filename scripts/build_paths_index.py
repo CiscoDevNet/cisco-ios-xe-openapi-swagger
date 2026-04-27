@@ -121,7 +121,7 @@ def main() -> int:
     print(f"[build_paths_index] {args.version}")
     grand_total = 0
     for cat in CATEGORIES:
-        api_dir = base / f"swagger-{cat}-model" / "api-v2"
+        api_dir = base / f"swagger-{cat}-model" / "api"
         if not api_dir.is_dir():
             print(f"  - {cat:14s}  MISSING ({api_dir.relative_to(root)})")
             continue

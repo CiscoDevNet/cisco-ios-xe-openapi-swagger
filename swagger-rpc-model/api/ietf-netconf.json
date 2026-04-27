@@ -1,19 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ietf-netconf RPCs",
-    "description": "NETCONF Protocol Operations (RFC 6241) - Core protocol operations for network configuration management\n\n**YANG Model:** [ietf-netconf RPCs.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-netconf RPCs.yang)",
-    "version": "2011-06-01",
+    "title": "Cisco IOS-XE RPC - ietf-netconf",
+    "description": "RPC operations from `ietf-netconf` module.\n\n**RPCs:** 13 (get-config, edit-config, copy-config, delete-config, lock...)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
     "x-yang-module": "ietf-netconf",
     "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,1297 +28,932 @@
   "paths": {
     "/operations/ietf-netconf:get-config": {
       "post": {
+        "summary": "Execute get-config",
+        "operationId": "post-ietf-netconf-get-config",
         "tags": [
-          "NETCONF Core"
+          "ietf-netconf"
         ],
-        "summary": "Retrieve all or part of a specified configuration datastore",
-        "description": "Retrieve configuration from candidate, running, or startup datastore with optional filtering",
-        "operationId": "getConfig",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "source": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "description": "Candidate configuration datastore",
-                            "nullable": true
-                          },
-                          "running": {
-                            "type": "string",
-                            "description": "Running configuration datastore",
-                            "nullable": true
-                          },
-                          "startup": {
-                            "type": "string",
-                            "description": "Startup configuration datastore",
-                            "nullable": true
-                          }
-                        }
-                      },
-                      "filter": {
-                        "type": "object",
-                        "description": "Subtree or XPath filter"
-                      }
-                    },
-                    "required": [
-                      "source"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
           "200": {
-            "description": "Configuration data retrieved successfully",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "output": {
+                    "data": {
                       "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "description": "Configuration data"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/get-config",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:edit-config": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Edit a configuration datastore",
-        "description": "Load all or part of a specified configuration to the specified target datastore",
-        "operationId": "editConfig",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          }
-                        }
-                      },
-                      "default-operation": {
-                        "type": "string",
-                        "enum": [
-                          "merge",
-                          "replace",
-                          "none"
-                        ]
-                      },
-                      "test-option": {
-                        "type": "string",
-                        "enum": [
-                          "test-then-set",
-                          "set",
-                          "test-only"
-                        ]
-                      },
-                      "error-option": {
-                        "type": "string",
-                        "enum": [
-                          "stop-on-error",
-                          "continue-on-error",
-                          "rollback-on-error"
-                        ]
-                      },
-                      "config": {
-                        "type": "object",
-                        "description": "Configuration data"
-                      }
-                    },
-                    "required": [
-                      "target"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Configuration edited successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/edit-config",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:copy-config": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Copy an entire configuration datastore",
-        "description": "Create or replace an entire configuration datastore with the contents of another complete configuration datastore",
-        "operationId": "copyConfig",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "url": {
-                            "type": "string",
-                            "format": "uri"
-                          }
-                        }
-                      },
-                      "source": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "url": {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          "config": {
-                            "type": "object"
-                          }
-                        }
-                      }
-                    },
-                    "required": [
-                      "target",
-                      "source"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Configuration copied successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/copy-config",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:delete-config": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Delete a configuration datastore",
-        "description": "Delete a configuration datastore (startup or URL)",
-        "operationId": "deleteConfig",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "url": {
-                            "type": "string",
-                            "format": "uri"
-                          }
-                        }
-                      }
-                    },
-                    "required": [
-                      "target"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Configuration deleted successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/delete-config",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:lock": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Lock a configuration datastore",
-        "description": "The NETCONF lock operation allows the client to lock the entire configuration datastore of a device",
-        "operationId": "lock",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          }
-                        }
-                      }
-                    },
-                    "required": [
-                      "target"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Datastore locked successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/lock",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:unlock": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Unlock a configuration datastore",
-        "description": "Release a configuration lock previously obtained with the lock operation",
-        "operationId": "unlock",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "target": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          }
-                        }
-                      }
-                    },
-                    "required": [
-                      "target"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Datastore unlocked successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/unlock",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:get": {
-      "post": {
-        "tags": [
-          "NETCONF Core"
-        ],
-        "summary": "Retrieve running configuration and device state information",
-        "description": "Retrieve both configuration data and state data with optional filtering",
-        "operationId": "get",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "filter": {
-                        "type": "object",
-                        "description": "Subtree or XPath filter"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Data retrieved successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "object",
-                          "description": "Configuration and state data"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/get",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:close-session": {
-      "post": {
-        "tags": [
-          "NETCONF Session"
-        ],
-        "summary": "Request graceful termination of a NETCONF session",
-        "description": "Gracefully close the current NETCONF session",
-        "operationId": "closeSession",
-        "responses": {
-          "204": {
-            "description": "Session closed successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/close-session",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:kill-session": {
-      "post": {
-        "tags": [
-          "NETCONF Session"
-        ],
-        "summary": "Force the termination of a NETCONF session",
-        "description": "Force termination of another NETCONF session by session ID",
-        "operationId": "killSession",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "session-id": {
-                        "type": "integer",
-                        "description": "Session identifier of session to terminate"
-                      }
-                    },
-                    "required": [
-                      "session-id"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Session killed successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/kill-session",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:commit": {
-      "post": {
-        "tags": [
-          "NETCONF Candidate"
-        ],
-        "summary": "Commit the candidate configuration to running",
-        "description": "Commit the candidate configuration datastore to the running configuration with optional confirmed commit",
-        "operationId": "commit",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "confirmed": {
-                        "type": "string",
-                        "description": "Request confirmed commit",
-                        "nullable": true
-                      },
-                      "confirm-timeout": {
-                        "type": "integer",
-                        "description": "Timeout in seconds for confirmed commit (default 600)"
-                      },
-                      "persist": {
-                        "type": "string",
-                        "description": "Token for persisting confirmed commit"
-                      },
-                      "persist-id": {
-                        "type": "string",
-                        "description": "Token for identifying confirmed commit to persist"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Candidate configuration committed successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/commit",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:discard-changes": {
-      "post": {
-        "tags": [
-          "NETCONF Candidate"
-        ],
-        "summary": "Discard changes from the candidate configuration",
-        "description": "Revert the candidate configuration datastore to the current running configuration",
-        "operationId": "discardChanges",
-        "responses": {
-          "204": {
-            "description": "Candidate changes discarded successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/discard-changes",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:cancel-commit": {
-      "post": {
-        "tags": [
-          "NETCONF Candidate"
-        ],
-        "summary": "Cancel an ongoing confirmed commit",
-        "description": "Cancel a confirmed commit in progress and revert to the state before the commit",
-        "operationId": "cancelCommit",
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "persist-id": {
-                        "type": "string",
-                        "description": "Token for identifying confirmed commit to cancel"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Confirmed commit cancelled successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/cancel-commit",
-      "x-restconf-kind": "rpc"
-    },
-    "/operations/ietf-netconf:validate": {
-      "post": {
-        "tags": [
-          "NETCONF Validation"
-        ],
-        "summary": "Validate a configuration datastore",
-        "description": "Validate the contents of the specified configuration datastore",
-        "operationId": "validate",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "source": {
-                        "type": "object",
-                        "properties": {
-                          "candidate": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "running": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "startup": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "YANG empty leaf (presence-only)"
-                          },
-                          "url": {
-                            "type": "string",
-                            "format": "uri"
-                          },
-                          "config": {
-                            "type": "object"
-                          }
-                        }
-                      }
-                    },
-                    "required": [
-                      "source"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Configuration validated successfully"
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/validate",
-      "x-restconf-kind": "rpc"
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic"
-      }
-    },
-    "schemas": {
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
+                      "example": "configured-value"
                     }
                   },
-                  "required": [
-                    "error-type",
-                    "error-tag"
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-netconf:output": {
+                    "data": [
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "filter": {
+                    "type": "object",
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "source": {
+                    "(config-source)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ]
+                    }
+                  },
+                  "filter": [
+                    null
                   ]
                 }
               }
             }
           }
         },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
+        "description": "Execute the **get-config** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:edit-config": {
+      "post": {
+        "summary": "Execute edit-config",
+        "operationId": "post-ietf-netconf-edit-config",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "default-operation": {
+                    "type": "string",
+                    "example": "50"
+                  },
+                  "test-option": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "error-option": {
+                    "type": "string",
+                    "example": "0"
+                  },
+                  "(edit-content)": {
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "type": "object",
+                        "example": "configured-value"
+                      },
+                      "url": {
+                        "type": "string",
+                        "example": "https://10.1.1.1/restconf"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ]
+                    }
+                  },
+                  "default-operation": "default",
+                  "test-option": "default",
+                  "error-option": "default",
+                  "(edit-content)": {
+                    "config": {
+                      "enabled": true,
+                      "description": "Configured via RESTCONF"
+                    },
+                    "url": "https://10.1.1.1/restconf"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **edit-config** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:copy-config": {
+      "post": {
+        "summary": "Execute copy-config",
+        "operationId": "post-ietf-netconf-copy-config",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "url": {
+                            "type": "string",
+                            "example": "https://10.1.1.1/restconf"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "url": {
+                            "type": "string",
+                            "example": "https://10.1.1.1/restconf"
+                          },
+                          "config": {
+                            "type": "object",
+                            "example": "configured-value"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ],
+                      "url": "https://10.1.1.1/restconf"
+                    }
+                  },
+                  "source": {
+                    "(config-source)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ],
+                      "url": "https://10.1.1.1/restconf",
+                      "config": {
+                        "enabled": true,
+                        "description": "Configured via RESTCONF"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **copy-config** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:delete-config": {
+      "post": {
+        "summary": "Execute delete-config",
+        "operationId": "post-ietf-netconf-delete-config",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "url": {
+                            "type": "string",
+                            "example": "https://10.1.1.1/restconf"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "startup": [
+                        null
+                      ],
+                      "url": "https://10.1.1.1/restconf"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **delete-config** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:lock": {
+      "post": {
+        "summary": "Execute lock",
+        "operationId": "post-ietf-netconf-lock",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **lock** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:unlock": {
+      "post": {
+        "summary": "Execute unlock",
+        "operationId": "post-ietf-netconf-unlock",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **unlock** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:get": {
+      "post": {
+        "summary": "Execute get",
+        "operationId": "post-ietf-netconf-get",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-netconf:output": {
+                    "data": [
+                      null
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filter": {
+                    "type": "object",
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "filter": [
+                    null
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **get** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:close-session": {
+      "post": {
+        "summary": "Execute close-session",
+        "operationId": "post-ietf-netconf-close-session",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Execute the **close-session** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:kill-session": {
+      "post": {
+        "summary": "Execute kill-session",
+        "operationId": "post-ietf-netconf-kill-session",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session-id": {
+                    "type": "string",
+                    "example": "1"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "session-id": "1"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **kill-session** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:commit": {
+      "post": {
+        "summary": "Execute commit",
+        "operationId": "post-ietf-netconf-commit",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "confirmed": {
+                    "type": "boolean",
+                    "description": "Presence flag",
+                    "example": true
+                  },
+                  "confirm-timeout": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295,
+                    "example": 1
+                  },
+                  "persist": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "persist-id": {
+                    "type": "string",
+                    "example": "1"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "confirmed": [
+                    null
+                  ],
+                  "confirm-timeout": 1,
+                  "persist": "configured-value",
+                  "persist-id": "1"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **commit** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:discard-changes": {
+      "post": {
+        "summary": "Execute discard-changes",
+        "operationId": "post-ietf-netconf-discard-changes",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Execute the **discard-changes** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:cancel-commit": {
+      "post": {
+        "summary": "Execute cancel-commit",
+        "operationId": "post-ietf-netconf-cancel-commit",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "persist-id": {
+                    "type": "string",
+                    "example": "1"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "persist-id": "1"
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **cancel-commit** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    },
+    "/operations/ietf-netconf:validate": {
+      "post": {
+        "summary": "Execute validate",
+        "operationId": "post-ietf-netconf-validate",
+        "tags": [
+          "ietf-netconf"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag",
+                            "example": true
+                          },
+                          "url": {
+                            "type": "string",
+                            "example": "https://10.1.1.1/restconf"
+                          },
+                          "config": {
+                            "type": "object",
+                            "example": "configured-value"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "2025-03-15"
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "source": {
+                    "(config-source)": {
+                      "candidate": "2025-03-15",
+                      "running": [
+                        null
+                      ],
+                      "startup": [
+                        null
+                      ],
+                      "url": "https://10.1.1.1/restconf",
+                      "config": {
+                        "enabled": true,
+                        "description": "Configured via RESTCONF"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Execute the **validate** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       }
     }
@@ -1320,27 +962,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "NETCONF Candidate",
-      "description": "RPC operations for NETCONF Candidate"
-    },
-    {
-      "name": "NETCONF Core",
-      "description": "RPC operations for NETCONF Core"
-    },
-    {
-      "name": "NETCONF Session",
-      "description": "RPC operations for NETCONF Session"
-    },
-    {
-      "name": "NETCONF Validation",
-      "description": "RPC operations for NETCONF Validation"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

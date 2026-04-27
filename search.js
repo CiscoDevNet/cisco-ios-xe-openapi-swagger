@@ -703,7 +703,7 @@ function handleDeepLink() {
         if (specParts.length === 2) {
             var modelDir = specParts[0];
             var specName = specParts[1];
-            window.location.href = modelDir + '/index-v2.html#spec=' + specName;
+            window.location.href = modelDir + '/index.html#spec=' + specName;
         }
     }
 }

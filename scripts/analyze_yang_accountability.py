@@ -38,10 +38,10 @@ SWAGGER_FOLDERS = {
 
 # v2 (deep-path) folder mappings
 SWAGGER_V2_FOLDERS = {
-    "oper-v2": BASE_DIR / "swagger-oper-model" / "api-v2",
-    "cfg-v2": BASE_DIR / "swagger-cfg-model" / "api-v2",
-    "openconfig-v2": BASE_DIR / "swagger-openconfig-model" / "api-v2",
-    "native-v2": BASE_DIR / "swagger-native-config-model" / "api-v2",
+    "oper-v2": BASE_DIR / "swagger-oper-model" / "api",
+    "cfg-v2": BASE_DIR / "swagger-cfg-model" / "api",
+    "openconfig-v2": BASE_DIR / "swagger-openconfig-model" / "api",
+    "native-v2": BASE_DIR / "swagger-native-config-model" / "api",
 }
 
 def get_existing_specs() -> Dict[str, List[str]]:

@@ -1,19 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "ietf-netconf-monitoring RPCs",
-    "description": "NETCONF Monitoring (RFC 6022) - Monitoring and management of NETCONF protocol sessions\n\n**YANG Model:** [ietf-netconf-monitoring RPCs.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/ietf-netconf-monitoring RPCs.yang)",
-    "version": "2010-10-04",
+    "title": "Cisco IOS-XE RPC - ietf-netconf-monitoring",
+    "description": "RPC operations from `ietf-netconf-monitoring` module.\n\n**RPCs:** 1 (get-schema)\n\nAll endpoints use POST on `/operations/`.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
     "x-yang-module": "ietf-netconf-monitoring",
     "x-model-type": "rpc"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,37 +28,39 @@
   "paths": {
     "/operations/ietf-netconf-monitoring:get-schema": {
       "post": {
+        "summary": "Execute get-schema",
+        "operationId": "post-ietf-netconf-monitoring-get-schema",
         "tags": [
-          "NETCONF Monitoring"
+          "ietf-netconf-monitoring"
         ],
-        "summary": "Retrieve a YANG schema from the device",
-        "description": "Retrieve a schema identified by name, version, and format from the device's schema list",
-        "operationId": "getSchema",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input": {
-                    "type": "object",
-                    "properties": {
-                      "identifier": {
-                        "type": "string",
-                        "description": "Name of the schema to retrieve"
-                      },
-                      "version": {
-                        "type": "string",
-                        "description": "Version of the schema (optional)"
-                      },
-                      "format": {
-                        "type": "string",
-                        "description": "Format identifier for the schema (yang, yin, rng, etc.)"
-                      }
-                    },
-                    "required": [
-                      "identifier"
+        "responses": {
+          "204": {
+            "description": "Success (no output)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "ietf-netconf-monitoring:output": {
+                    "data": [
+                      null
                     ]
                   }
                 }
@@ -59,149 +68,59 @@
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Schema retrieved successfully",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "output": {
-                      "type": "object",
-                      "properties": {
-                        "data": {
-                          "type": "string",
-                          "description": "Schema content"
-                        }
-                      }
-                    }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "identifier": {
+                    "type": "string",
+                    "example": "1"
+                  },
+                  "version": {
+                    "type": "string",
+                    "example": "17.18.1",
+                    "description": "Software version string"
+                  },
+                  "format": {
+                    "type": "string",
+                    "example": "configured-value"
                   }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden \u2014 insufficient access rights (NACM)",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/restconf-error"
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "ietf-netconf-monitoring:input": {
+                  "identifier": "1",
+                  "version": "17.18.1",
+                  "format": "configured-value"
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "Accept",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF response media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          },
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "description": "RESTCONF request body media type (RFC 8040)",
-            "schema": {
-              "type": "string",
-              "default": "application/yang-data+json",
-              "enum": [
-                "application/yang-data+json",
-                "application/yang-data+xml"
-              ]
-            }
-          }
-        ]
-      },
-      "x-yang-path": "/get-schema",
-      "x-restconf-kind": "rpc"
+        "description": "Execute the **get-schema** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "restconf-error": {
-        "type": "object",
-        "description": "Standard RESTCONF error response (RFC 8040 Section 7.1)",
-        "properties": {
-          "ietf-restconf:errors": {
-            "type": "object",
-            "properties": {
-              "error": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "error-type": {
-                      "type": "string",
-                      "enum": [
-                        "transport",
-                        "rpc",
-                        "protocol",
-                        "application"
-                      ],
-                      "description": "Layer where the error occurred"
-                    },
-                    "error-tag": {
-                      "type": "string",
-                      "description": "Enumerated error tag (e.g. invalid-value, data-missing, access-denied)"
-                    },
-                    "error-severity": {
-                      "type": "string",
-                      "enum": [
-                        "error",
-                        "warning"
-                      ],
-                      "description": "Error severity"
-                    },
-                    "error-app-tag": {
-                      "type": "string",
-                      "description": "Application-specific error tag"
-                    },
-                    "error-path": {
-                      "type": "string",
-                      "description": "YANG instance-identifier of the error node"
-                    },
-                    "error-message": {
-                      "type": "string",
-                      "description": "Human-readable error description"
-                    }
-                  },
-                  "required": [
-                    "error-type",
-                    "error-tag"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "example": {
-          "ietf-restconf:errors": {
-            "error": [
-              {
-                "error-type": "protocol",
-                "error-tag": "invalid-value",
-                "error-severity": "error",
-                "error-message": "Invalid input parameter"
-              }
-            ]
-          }
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       }
     }
@@ -210,15 +129,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "NETCONF Monitoring",
-      "description": "RPC operations for NETCONF Monitoring"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE YANG RPC Operations - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

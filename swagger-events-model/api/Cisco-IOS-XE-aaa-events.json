@@ -1,78 +1,121 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Events - aaa",
+    "title": "Cisco IOS-XE Events - Cisco-IOS-XE-aaa-events",
+    "description": "Event/notification data from `Cisco-IOS-XE-aaa-events` module.\n\n**Endpoints:** 3 | **Notifications:** 1\n\nData endpoints use GET. Notifications are delivered via RESTCONF SSE subscriptions.",
     "version": "17.18.1",
-    "description": "This module contains YANG definitions for AAA\n     event notifications generated from executing\n     the RPC.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication\n\n**YANG Model:** [Events - aaa.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/Events - aaa.yang)"
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-aaa-events",
+    "x-model-type": "events"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "sandbox-iosxe-latest-1.cisco.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/data/Cisco-IOS-XE-aaa-events:events": {
+    "/streams/Cisco-IOS-XE-aaa-events:test-aaa-authentication-update": {
       "get": {
-        "summary": "Get Cisco-IOS-XE-aaa-events event subscriptions",
-        "description": "Retrieve active event subscriptions for Cisco-IOS-XE-aaa-events",
+        "summary": "Notification: test-aaa-authentication-update",
+        "description": "YANG notification `test-aaa-authentication-update` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-aaa-events:test-aaa-authentication-update",
         "tags": [
-          "events"
+          "notifications"
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295,
+                      "example": 1,
+                      "description": "Unique numeric identifier"
+                    },
+                    "auth-result": {
+                      "type": "string",
+                      "example": "Success"
+                    }
+                  },
+                  "example": "2025-03-15"
+                },
                 "example": {
-                  "Cisco-IOS-XE-aaa-events:events": {
-                    "description": "Event notification stream"
+                  "Cisco-IOS-XE-aaa-events:test-aaa-authentication-update": {
+                    "id": 1,
+                    "auth-result": "Success"
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/operations/ietf-subscribed-notifications:establish-subscription": {
-      "post": {
-        "summary": "Create event subscription",
-        "description": "Establish a subscription to Cisco-IOS-XE-aaa-events events",
+    "/streams/Cisco-IOS-XE-aaa-events:test-aaa-authentication-update/id": {
+      "get": {
+        "summary": "Notification: id",
+        "description": "YANG notification `id` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-aaa-events:test-aaa-authentication-update-id",
         "tags": [
-          "events"
+          "notifications"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "example": {
-                "input": {
-                  "stream": "Cisco-IOS-XE-aaa-events:events",
-                  "encoding": "encode-json",
-                  "update-trigger": "periodic",
-                  "period": 6000
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295,
+                  "example": 1,
+                  "description": "Unique numeric identifier"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aaa-events:id": 1
                 }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-aaa-events:test-aaa-authentication-update/auth-result": {
+      "get": {
+        "summary": "Notification: auth-result",
+        "description": "YANG notification `auth-result` — subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-aaa-events:test-aaa-authentication-update-auth-result",
+        "tags": [
+          "notifications"
+        ],
         "responses": {
           "200": {
-            "description": "Subscription created",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Success"
+                },
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
-                  }
+                  "Cisco-IOS-XE-aaa-events:auth-result": "configured-value"
                 }
               }
             }
@@ -85,7 +128,29 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
@@ -93,15 +158,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "events",
-      "description": "Model-driven telemetry event subscriptions"
-    }
-  ],
-  "externalDocs": {
-    "description": "Cisco IOS-XE NETCONF/YANG Event Notifications - Cisco DevNet",
-    "url": "https://developer.cisco.com/iosxe/"
-  }
+  ]
 }

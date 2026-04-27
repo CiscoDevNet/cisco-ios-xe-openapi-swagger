@@ -1,4 +1,4 @@
-/* deeplink.js — shared deep-link helper for the swagger-*-model/index-v2.html viewers.
+/* deeplink.js — shared deep-link helper for the swagger-*-model/index.html viewers.
  *
  * Hash format: #spec=<module-name>&op=<operationId>
  *   - spec=<module-name>  → which OpenAPI spec to load (existing behavior)

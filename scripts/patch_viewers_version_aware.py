@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Patch swagger-<cat>-model/index-v2.html files to be version-aware.
+"""Patch swagger-<cat>-model/index.html files to be version-aware.
 
-Replaces hardcoded `api-v2/...` fetches with a base computed from the active
+Replaces hardcoded `api/...` fetches with a base computed from the active
 version (read from `?ver=` query string, `#ver=` hash, localStorage, or the
 parent window). The default version (read from releases/index.json) keeps the
-legacy relative `api-v2/` path; any other version fetches from
-`../releases/<ver>/swagger-<cat>-model/api-v2/`.
+legacy relative `api/` path; any other version fetches from
+`../releases/<ver>/swagger-<cat>-model/api/`.
 
 The allow-list of valid versions is also baked in at patch time so that bad
 URLs (`?ver=../etc`, `?ver=v0.0.0`) silently fall back to the default instead
@@ -66,10 +66,10 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
     }}
     function __apiBase() {{
         var ver = __activeVer();
-        if (ver === __IOSXE_DEFAULT_VER__) return 'api-v2';
+        if (ver === __IOSXE_DEFAULT_VER__) return 'api';
         var m = location.pathname.match(/\\/(swagger-[^/]+-model)\\//);
         var cat = m ? m[1] : '';
-        return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api-v2';
+        return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api';
     }}
     function __treeBase() {{
         var ver = __activeVer();
@@ -141,9 +141,9 @@ def patch(p: Path, helper: str) -> bool:
                 break
 
     # Replace fetch calls (no-op on already-patched files).
-    src = src.replace("fetch('api-v2/manifest.json')",
+    src = src.replace("fetch('api/manifest.json')",
                       "fetch(__apiBase() + '/manifest.json')")
-    src = src.replace("fetch(`api-v2/${fname}.json`)",
+    src = src.replace("fetch(`api/${fname}.json`)",
                       "fetch(`${__apiBase()}/${fname}.json`)")
     src = src.replace(
         "url: `${getSpecFolder(fname)}/${fname}.json`",
@@ -178,7 +178,7 @@ def main() -> int:
     default_ver, allowed = load_release_config()
     print(f"[patch] default={default_ver} allowed={allowed}")
     helper = build_helper(default_ver, allowed)
-    files = sorted(ROOT.glob("swagger-*-model/index-v2.html"))
+    files = sorted(ROOT.glob("swagger-*-model/index.html"))
     changed = 0
     for f in files:
         if patch(f, helper):

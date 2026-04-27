@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add redirects from v1 index.html to index-v2.html for all model pages."""
+"""Add redirects from v1 index.html to index.html for all model pages."""
 import os
 from pathlib import Path
 
@@ -13,8 +13,8 @@ models = [
 ]
 
 redirect_snippet = (
-    '    <meta http-equiv="refresh" content="0;url=index-v2.html">\n'
-    "    <script>var t='index-v2.html';if(location.hash)t+=location.hash;"
+    '    <meta http-equiv="refresh" content="0;url=index.html">\n'
+    "    <script>var t='index.html';if(location.hash)t+=location.hash;"
     "if(location.search)t+=location.search;window.location.replace(t);</script>"
 )
 
@@ -25,7 +25,7 @@ def main():
             print(f'{m} - NOT FOUND')
             continue
         content = path.read_text(encoding='utf-8')
-        if 'url=index-v2.html' in content:
+        if 'url=index.html' in content:
             print(f'{m} - already done')
             continue
         content = content.replace('<head>', '<head>\n' + redirect_snippet, 1)

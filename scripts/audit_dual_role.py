@@ -57,11 +57,11 @@ def main():
                 'other': 'swagger-other-model',
             }
             for label, folder in folders.items():
-                for api in ['api-v2', 'api']:
+                for api in ['api', 'api']:
                     p = os.path.join(BASE, folder, api, name + '.json')
                     if os.path.exists(p):
                         spec_locs.append(label)
-                        break  # Don't double-count api + api-v2
+                        break  # Don't double-count api + api
             dual_modules.append((name, roles, spec_locs))
 
     print(f"Modules with MULTIPLE roles: {len(dual_modules)}")

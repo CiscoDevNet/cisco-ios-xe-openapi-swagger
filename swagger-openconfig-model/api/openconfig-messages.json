@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "openconfig-messages",
-    "description": "This module defines configuration and operational state data\n    related to Syslog messages that a device may generate.\n\n    These messages are historically obtained through the Syslog\n    transport, however this module allows for obtaining them through\n    an alternative transport, such as a Subscribe operation over an\n    RPC.\n\n    This module does not usurp traditional syslog servers, which may\n    still be configured through the\n    /yang/system/openconfig-system.yang model, rather it provies the\n    Operator with an alternative method of consuming messages.\n\n**Module:** `openconfig-messages`\n**Paths:** 3\n\n**YANG Model:** [openconfig-messages.yang](https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181/openconfig-messages.yang)",
-    "version": "17.18.1"
+    "title": "OpenConfig - openconfig-messages",
+    "description": "OpenConfig `openconfig-messages` module.\n\n**Root containers:** 1 (messages)\n**Paths:** 20 | **Ops:** 47\n\n`config` subtrees: GET/PUT/PATCH/DELETE | `state` subtrees: GET only.",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "openconfig-messages",
+    "x-model-type": "openconfig"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -20,40 +29,322 @@
     "/data/openconfig-messages:messages": {
       "get": {
         "summary": "Get messages",
-        "description": "Top-level container for Syslog messages.",
-        "operationId": "get-messages-0",
+        "operationId": "get-openconfig-messages:messages",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/openconfig-messages-messages"
+                  "type": "object",
+                  "properties": {
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "severity": {
+                          "type": "string",
+                          "example": "informational",
+                          "description": "Log severity level"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "severity": {
+                          "type": "string",
+                          "example": "informational",
+                          "description": "Log severity level"
+                        },
+                        "message": {
+                          "type": "object",
+                          "properties": {
+                            "msg": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "priority": {
+                              "type": "integer",
+                              "example": 100,
+                              "description": "Priority value (higher = preferred)"
+                            },
+                            "app-name": {
+                              "type": "string",
+                              "example": "example-1"
+                            },
+                            "procid": {
+                              "type": "string",
+                              "example": "1"
+                            },
+                            "msgid": {
+                              "type": "string",
+                              "example": "1"
+                            }
+                          },
+                          "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                        }
+                      },
+                      "example": "active",
+                      "description": "Current operational state"
+                    },
+                    "debug-entries": {
+                      "type": "object",
+                      "properties": {
+                        "debug-service": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "example": "configured-value"
+                              },
+                              "config": {
+                                "type": "object",
+                                "properties": {
+                                  "service": {
+                                    "type": "string",
+                                    "example": "configured-value"
+                                  },
+                                  "enabled": {
+                                    "type": "boolean",
+                                    "example": true,
+                                    "description": "Whether this feature is enabled"
+                                  }
+                                },
+                                "example": "configured-value"
+                              },
+                              "state": {
+                                "type": "object",
+                                "properties": {
+                                  "service": {
+                                    "type": "string",
+                                    "example": "configured-value"
+                                  },
+                                  "enabled": {
+                                    "type": "boolean",
+                                    "example": true,
+                                    "description": "Whether this feature is enabled"
+                                  }
+                                },
+                                "example": "active",
+                                "description": "Current operational state"
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:messages": {
+                    "config": {
+                      "severity": "informational"
+                    },
+                    "state": {
+                      "severity": "informational",
+                      "message": {
+                        "msg": "configured-value",
+                        "priority": 100,
+                        "app-name": "example-1",
+                        "procid": "1",
+                        "msgid": "1"
+                      }
+                    },
+                    "debug-entries": {
+                      "debug-service": [
+                        {
+                          "service": "configured-value",
+                          "config": {
+                            "service": "IDENTITY",
+                            "enabled": true
+                          },
+                          "state": {
+                            "service": "IDENTITY",
+                            "enabled": true
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           }
-        }
+        },
+        "description": "Retrieve messages from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       },
       "put": {
-        "summary": "Create or replace messages",
-        "description": "Create or replace Top-level container for Syslog messages.",
-        "operationId": "put-messages-0",
+        "summary": "Replace messages",
+        "operationId": "put-openconfig-messages:messages",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-messages"
+                "type": "object",
+                "properties": {
+                  "config": {
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "example": "informational",
+                        "description": "Log severity level"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "state": {
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "example": "informational",
+                        "description": "Log severity level"
+                      },
+                      "message": {
+                        "type": "object",
+                        "properties": {
+                          "msg": {
+                            "type": "string",
+                            "example": "configured-value"
+                          },
+                          "priority": {
+                            "type": "integer",
+                            "example": 100,
+                            "description": "Priority value (higher = preferred)"
+                          },
+                          "app-name": {
+                            "type": "string",
+                            "example": "example-1"
+                          },
+                          "procid": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "msgid": {
+                            "type": "string",
+                            "example": "1"
+                          }
+                        },
+                        "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                      }
+                    },
+                    "example": "active",
+                    "description": "Current operational state"
+                  },
+                  "debug-entries": {
+                    "type": "object",
+                    "properties": {
+                      "debug-service": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Whether this feature is enabled"
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Whether this feature is enabled"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:messages": {
+                  "config": {
+                    "severity": "informational"
+                  },
+                  "state": {
+                    "severity": "informational",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "example-1",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  },
+                  "debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "configured-value",
+                        "config": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        },
+                        "state": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -68,21 +359,157 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Create or replace messages on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
       },
       "patch": {
-        "summary": "Modify messages",
-        "description": "Partially modify Top-level container for Syslog messages.",
-        "operationId": "patch-messages-0",
+        "summary": "Update messages",
+        "operationId": "patch-openconfig-messages:messages",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-messages"
+                "type": "object",
+                "properties": {
+                  "config": {
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "example": "informational",
+                        "description": "Log severity level"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "state": {
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "example": "informational",
+                        "description": "Log severity level"
+                      },
+                      "message": {
+                        "type": "object",
+                        "properties": {
+                          "msg": {
+                            "type": "string",
+                            "example": "configured-value"
+                          },
+                          "priority": {
+                            "type": "integer",
+                            "example": 100,
+                            "description": "Priority value (higher = preferred)"
+                          },
+                          "app-name": {
+                            "type": "string",
+                            "example": "example-1"
+                          },
+                          "procid": {
+                            "type": "string",
+                            "example": "1"
+                          },
+                          "msgid": {
+                            "type": "string",
+                            "example": "1"
+                          }
+                        },
+                        "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                      }
+                    },
+                    "example": "active",
+                    "description": "Current operational state"
+                  },
+                  "debug-entries": {
+                    "type": "object",
+                    "properties": {
+                      "debug-service": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Whether this feature is enabled"
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "example": true,
+                                  "description": "Whether this feature is enabled"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:messages": {
+                  "config": {
+                    "severity": "informational"
+                  },
+                  "state": {
+                    "severity": "informational",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "example-1",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  },
+                  "debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "configured-value",
+                        "config": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        },
+                        "state": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -94,14 +521,14 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Partially update messages on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
       },
       "delete": {
         "summary": "Delete messages",
-        "description": "Delete Top-level container for Syslog messages.",
-        "operationId": "delete-messages-0",
+        "operationId": "delete-openconfig-messages:messages",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -110,46 +537,83 @@
           "404": {
             "description": "Not found"
           }
-        }
+        },
+        "description": "Remove messages from the device configuration.\n\nThis deletes the resource and all descendant data."
       }
     },
     "/data/openconfig-messages:messages/config": {
       "get": {
         "summary": "Get config",
-        "description": "Configuration data for Syslog messages.",
-        "operationId": "get-config-1",
+        "operationId": "get-openconfig-messages:messages-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/openconfig-messages-config"
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "type": "string",
+                      "example": "informational",
+                      "description": "Log severity level"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:config": {
+                    "severity": "informational"
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           }
-        }
+        },
+        "description": "Retrieve config from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       },
       "put": {
-        "summary": "Create or replace config",
-        "description": "Create or replace Configuration data for Syslog messages.",
-        "operationId": "put-config-1",
+        "summary": "Replace config",
+        "operationId": "put-openconfig-messages:messages-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-config"
+                "type": "object",
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "example": "informational",
+                    "description": "Log severity level"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "severity": "informational"
+                }
               }
             }
           }
@@ -164,21 +628,34 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Create or replace config on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
       },
       "patch": {
-        "summary": "Modify config",
-        "description": "Partially modify Configuration data for Syslog messages.",
-        "operationId": "patch-config-1",
+        "summary": "Update config",
+        "operationId": "patch-openconfig-messages:messages-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-config"
+                "type": "object",
+                "properties": {
+                  "severity": {
+                    "type": "string",
+                    "example": "informational",
+                    "description": "Log severity level"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "severity": "informational"
+                }
               }
             }
           }
@@ -190,14 +667,14 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Partially update config on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
       },
       "delete": {
         "summary": "Delete config",
-        "description": "Delete Configuration data for Syslog messages.",
-        "operationId": "delete-config-1",
+        "operationId": "delete-openconfig-messages:messages-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -206,46 +683,704 @@
           "404": {
             "description": "Not found"
           }
-        }
+        },
+        "description": "Remove config from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/config/severity": {
+      "get": {
+        "summary": "Get severity",
+        "operationId": "get-openconfig-messages:messages-config-severity",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "informational",
+                  "description": "Log severity level"
+                },
+                "example": {
+                  "openconfig-messages:severity": "configured-value"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve severity from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace severity",
+        "operationId": "put-openconfig-messages:messages-config-severity",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "informational",
+                "description": "Log severity level"
+              },
+              "example": {
+                "openconfig-messages:severity": "configured-value"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace severity on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update severity",
+        "operationId": "patch-openconfig-messages:messages-config-severity",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "informational",
+                "description": "Log severity level"
+              },
+              "example": {
+                "openconfig-messages:severity": "configured-value"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update severity on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete severity",
+        "operationId": "delete-openconfig-messages:messages-config-severity",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove severity from the device configuration.\n\nThis deletes the resource and all descendant data."
       }
     },
     "/data/openconfig-messages:messages/state": {
       "get": {
         "summary": "Get state",
-        "description": "Operational state data for a Syslog messages.",
-        "operationId": "get-state-2",
+        "operationId": "get-openconfig-messages:messages-state",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/openconfig-messages-state"
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "type": "string",
+                      "example": "informational",
+                      "description": "Log severity level"
+                    },
+                    "message": {
+                      "type": "object",
+                      "properties": {
+                        "msg": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "priority": {
+                          "type": "integer",
+                          "example": 100,
+                          "description": "Priority value (higher = preferred)"
+                        },
+                        "app-name": {
+                          "type": "string",
+                          "example": "example-1"
+                        },
+                        "procid": {
+                          "type": "string",
+                          "example": "1"
+                        },
+                        "msgid": {
+                          "type": "string",
+                          "example": "1"
+                        }
+                      },
+                      "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                    }
+                  },
+                  "example": "active",
+                  "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-messages:state": {
+                    "severity": "informational",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "example-1",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
-            "description": "Resource not found"
+            "description": "Not found"
           }
-        }
+        },
+        "description": "Retrieve state from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/severity": {
+      "get": {
+        "summary": "Get severity",
+        "operationId": "get-openconfig-messages:messages-state-severity",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "informational",
+                  "description": "Log severity level"
+                },
+                "example": {
+                  "openconfig-messages:severity": "configured-value"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve severity from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message": {
+      "get": {
+        "summary": "Get message",
+        "operationId": "get-openconfig-messages:messages-state-message",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "msg": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "priority": {
+                      "type": "integer",
+                      "example": 100,
+                      "description": "Priority value (higher = preferred)"
+                    },
+                    "app-name": {
+                      "type": "string",
+                      "example": "example-1"
+                    },
+                    "procid": {
+                      "type": "string",
+                      "example": "1"
+                    },
+                    "msgid": {
+                      "type": "string",
+                      "example": "1"
+                    }
+                  },
+                  "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                },
+                "example": {
+                  "openconfig-messages:message": {
+                    "msg": "configured-value",
+                    "priority": 100,
+                    "app-name": "example-1",
+                    "procid": "1",
+                    "msgid": "1"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve message from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message/msg": {
+      "get": {
+        "summary": "Get msg",
+        "operationId": "get-openconfig-messages:messages-state-message-msg",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:msg": "configured-value"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve msg from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message/priority": {
+      "get": {
+        "summary": "Get priority",
+        "operationId": "get-openconfig-messages:messages-state-message-priority",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "example": 100,
+                  "description": "Priority value (higher = preferred)"
+                },
+                "example": {
+                  "openconfig-messages:priority": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve priority from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message/app-name": {
+      "get": {
+        "summary": "Get app-name",
+        "operationId": "get-openconfig-messages:messages-state-message-app-name",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "example-1"
+                },
+                "example": {
+                  "openconfig-messages:app-name": "example-1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve app-name from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message/procid": {
+      "get": {
+        "summary": "Get procid",
+        "operationId": "get-openconfig-messages:messages-state-message-procid",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "example": {
+                  "openconfig-messages:procid": "1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve procid from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/state/message/msgid": {
+      "get": {
+        "summary": "Get msgid",
+        "operationId": "get-openconfig-messages:messages-state-message-msgid",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "1"
+                },
+                "example": {
+                  "openconfig-messages:msgid": "1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve msgid from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries": {
+      "get": {
+        "summary": "Get debug-entries",
+        "operationId": "get-openconfig-messages:messages-debug-entries",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "debug-service": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "service": {
+                            "type": "string",
+                            "example": "configured-value"
+                          },
+                          "config": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "example": true,
+                                "description": "Whether this feature is enabled"
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "example": true,
+                                "description": "Whether this feature is enabled"
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "configured-value",
+                        "config": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        },
+                        "state": {
+                          "service": "IDENTITY",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve debug-entries from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       },
       "put": {
-        "summary": "Create or replace state",
-        "description": "Create or replace Operational state data for a Syslog messages.",
-        "operationId": "put-state-2",
+        "summary": "Replace debug-entries",
+        "operationId": "put-openconfig-messages:messages-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-state"
+                "type": "object",
+                "properties": {
+                  "debug-service": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Whether this feature is enabled"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Whether this feature is enabled"
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-entries": {
+                  "debug-service": [
+                    {
+                      "service": "configured-value",
+                      "config": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -260,21 +1395,86 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Create or replace debug-entries on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
       },
       "patch": {
-        "summary": "Modify state",
-        "description": "Partially modify Operational state data for a Syslog messages.",
-        "operationId": "patch-state-2",
+        "summary": "Update debug-entries",
+        "operationId": "patch-openconfig-messages:messages-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/yang-data+json": {
               "schema": {
-                "$ref": "#/components/schemas/openconfig-messages-state"
+                "type": "object",
+                "properties": {
+                  "debug-service": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Whether this feature is enabled"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "example": true,
+                              "description": "Whether this feature is enabled"
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-entries": {
+                  "debug-service": [
+                    {
+                      "service": "configured-value",
+                      "config": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -286,14 +1486,14 @@
           "400": {
             "description": "Bad request"
           }
-        }
+        },
+        "description": "Partially update debug-entries on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
       },
       "delete": {
-        "summary": "Delete state",
-        "description": "Delete Operational state data for a Syslog messages.",
-        "operationId": "delete-state-2",
+        "summary": "Delete debug-entries",
+        "operationId": "delete-openconfig-messages:messages-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -302,7 +1502,943 @@
           "404": {
             "description": "Not found"
           }
-        }
+        },
+        "description": "Remove debug-entries from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service": {
+      "get": {
+        "summary": "Get debug-service",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string",
+                        "example": "configured-value"
+                      },
+                      "config": {
+                        "type": "object",
+                        "properties": {
+                          "service": {
+                            "type": "string",
+                            "example": "configured-value"
+                          },
+                          "enabled": {
+                            "type": "boolean",
+                            "example": true,
+                            "description": "Whether this feature is enabled"
+                          }
+                        },
+                        "example": "configured-value"
+                      },
+                      "state": {
+                        "type": "object",
+                        "properties": {
+                          "service": {
+                            "type": "string",
+                            "example": "configured-value"
+                          },
+                          "enabled": {
+                            "type": "boolean",
+                            "example": true,
+                            "description": "Whether this feature is enabled"
+                          }
+                        },
+                        "example": "active",
+                        "description": "Current operational state"
+                      }
+                    },
+                    "example": "configured-value"
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:debug-service": [
+                    {
+                      "service": "configured-value",
+                      "config": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "IDENTITY",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve debug-service from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace debug-service",
+        "operationId": "put-openconfig-messages:messages-debug-entries-debug-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "Whether this feature is enabled"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "Whether this feature is enabled"
+                        }
+                      },
+                      "example": "active",
+                      "description": "Current operational state"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-service": [
+                  {
+                    "service": "configured-value",
+                    "config": {
+                      "service": "IDENTITY",
+                      "enabled": true
+                    },
+                    "state": {
+                      "service": "IDENTITY",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace debug-service on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update debug-service",
+        "operationId": "patch-openconfig-messages:messages-debug-entries-debug-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "config": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "Whether this feature is enabled"
+                        }
+                      },
+                      "example": "configured-value"
+                    },
+                    "state": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "Whether this feature is enabled"
+                        }
+                      },
+                      "example": "active",
+                      "description": "Current operational state"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-service": [
+                  {
+                    "service": "configured-value",
+                    "config": {
+                      "service": "IDENTITY",
+                      "enabled": true
+                    },
+                    "state": {
+                      "service": "IDENTITY",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update debug-service on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete debug-service",
+        "operationId": "delete-openconfig-messages:messages-debug-entries-debug-service",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove debug-service from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/service": {
+      "get": {
+        "summary": "Get service",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:service": "configured-value"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve service from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace service",
+        "operationId": "put-openconfig-messages:messages-debug-entries-debug-service-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:service": "configured-value"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace service on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update service",
+        "operationId": "patch-openconfig-messages:messages-debug-entries-debug-service-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:service": "configured-value"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update service on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete service",
+        "operationId": "delete-openconfig-messages:messages-debug-entries-debug-service-service",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove service from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/config": {
+      "get": {
+        "summary": "Get config",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-config",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "enabled": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Whether this feature is enabled"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:config": {
+                    "service": "IDENTITY",
+                    "enabled": true
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve config from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace config",
+        "operationId": "put-openconfig-messages:messages-debug-entries-debug-service-config",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Whether this feature is enabled"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "service": "IDENTITY",
+                  "enabled": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace config on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update config",
+        "operationId": "patch-openconfig-messages:messages-debug-entries-debug-service-config",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "type": "string",
+                    "example": "configured-value"
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Whether this feature is enabled"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "service": "IDENTITY",
+                  "enabled": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update config on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete config",
+        "operationId": "delete-openconfig-messages:messages-debug-entries-debug-service-config",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove config from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/config/service": {
+      "get": {
+        "summary": "Get service",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-config-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:service": "IDENTITY"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve service from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace service",
+        "operationId": "put-openconfig-messages:messages-debug-entries-debug-service-config-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:service": "IDENTITY"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace service on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update service",
+        "operationId": "patch-openconfig-messages:messages-debug-entries-debug-service-config-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "string",
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:service": "IDENTITY"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update service on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete service",
+        "operationId": "delete-openconfig-messages:messages-debug-entries-debug-service-config-service",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove service from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/config/enabled": {
+      "get": {
+        "summary": "Get enabled",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-config-enabled",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean",
+                  "example": true,
+                  "description": "Whether this feature is enabled"
+                },
+                "example": {
+                  "openconfig-messages:enabled": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve enabled from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      },
+      "put": {
+        "summary": "Replace enabled",
+        "operationId": "put-openconfig-messages:messages-debug-entries-debug-service-config-enabled",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "boolean",
+                "example": true,
+                "description": "Whether this feature is enabled"
+              },
+              "example": {
+                "openconfig-messages:enabled": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Create or replace enabled on the device.\n\nThis replaces the entire resource — any fields not included will be removed."
+      },
+      "patch": {
+        "summary": "Update enabled",
+        "operationId": "patch-openconfig-messages:messages-debug-entries-debug-service-config-enabled",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "boolean",
+                "example": true,
+                "description": "Whether this feature is enabled"
+              },
+              "example": {
+                "openconfig-messages:enabled": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        },
+        "description": "Partially update enabled on the device.\n\nOnly the fields included in the request body are modified; other fields remain unchanged."
+      },
+      "delete": {
+        "summary": "Delete enabled",
+        "operationId": "delete-openconfig-messages:messages-debug-entries-debug-service-config-enabled",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Remove enabled from the device configuration.\n\nThis deletes the resource and all descendant data."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/state": {
+      "get": {
+        "summary": "Get state",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-state",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": {
+                      "type": "string",
+                      "example": "configured-value"
+                    },
+                    "enabled": {
+                      "type": "boolean",
+                      "example": true,
+                      "description": "Whether this feature is enabled"
+                    }
+                  },
+                  "example": "active",
+                  "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-messages:state": {
+                    "service": "IDENTITY",
+                    "enabled": true
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve state from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/state/service": {
+      "get": {
+        "summary": "Get service",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-state-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string",
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:service": "IDENTITY"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve service from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service/state/enabled": {
+      "get": {
+        "summary": "Get enabled",
+        "operationId": "get-openconfig-messages:messages-debug-entries-debug-service-state-enabled",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean",
+                  "example": true,
+                  "description": "Whether this feature is enabled"
+                },
+                "example": {
+                  "openconfig-messages:enabled": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "description": "Retrieve enabled from the device via RESTCONF.\n\nReturns the current operational or configuration state of this resource."
       }
     }
   },
@@ -310,255 +2446,35 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "openconfig-messages-messages": {
-        "type": "object",
-        "properties": {
-          "severity": {
-            "type": "string",
-            "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files."
-          },
-          "msg": {
-            "type": "string",
-            "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-          },
-          "priority": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 255,
-            "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-          },
-          "app-name": {
-            "type": "string",
-            "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-          },
-          "procid": {
-            "type": "string",
-            "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-          },
-          "msgid": {
-            "type": "string",
-            "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-          },
-          "message": {
-            "type": "object",
-            "properties": {
-              "msg": {
-                "type": "string",
-                "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-              },
-              "priority": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-              },
-              "app-name": {
-                "type": "string",
-                "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-              },
-              "procid": {
-                "type": "string",
-                "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-              },
-              "msgid": {
-                "type": "string",
-                "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-              }
-            },
-            "description": "Syslog messages the client is Subscribing to. This is all\n        messages currently configured to be sent according to\n        syslog-severity."
-          },
-          "service": {
-            "type": "string",
-            "description": "Reference to the debug-enable service key."
-          },
-          "enabled": {
-            "type": "boolean",
-            "description": "Enable and disable debugging."
-          },
-          "debug-entries": {
-            "type": "object",
-            "properties": {
-              "service": {
-                "type": "string",
-                "description": "Reference to the debug-enable service key."
-              },
-              "enabled": {
-                "type": "boolean",
-                "description": "Enable and disable debugging."
-              },
-              "config": {
-                "type": "object",
-                "properties": {
-                  "service": {
-                    "type": "string",
-                    "description": "Enumeration of all services which can have debugging enabled.\n        Vendors are to augment this base identity with their platform\n        or OS specific debug options."
-                  },
-                  "enabled": {
-                    "type": "boolean",
-                    "description": "Enable and disable debugging."
-                  }
-                },
-                "description": "Configuration data for debug service entries."
-              },
-              "state": {
-                "type": "object",
-                "properties": {
-                  "service": {
-                    "type": "string",
-                    "description": "Enumeration of all services which can have debugging enabled.\n        Vendors are to augment this base identity with their platform\n        or OS specific debug options."
-                  },
-                  "enabled": {
-                    "type": "boolean",
-                    "description": "Enable and disable debugging."
-                  }
-                },
-                "description": "Operational state data for enabled debugs."
-              }
-            },
-            "description": "Enclosing container for list of debugs to enable."
-          },
-          "config": {
-            "type": "object",
-            "properties": {
-              "severity": {
-                "type": "string",
-                "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files."
-              }
-            },
-            "description": "Configuration data for Syslog messages."
-          },
-          "state": {
-            "type": "object",
-            "properties": {
-              "severity": {
-                "type": "string",
-                "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files."
-              },
-              "msg": {
-                "type": "string",
-                "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-              },
-              "priority": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-              },
-              "app-name": {
-                "type": "string",
-                "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-              },
-              "procid": {
-                "type": "string",
-                "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-              },
-              "msgid": {
-                "type": "string",
-                "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-              },
-              "message": {
-                "type": "object",
-                "properties": {
-                  "msg": {
-                    "type": "string",
-                    "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-                  },
-                  "priority": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 255,
-                    "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-                  },
-                  "app-name": {
-                    "type": "string",
-                    "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-                  },
-                  "procid": {
-                    "type": "string",
-                    "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-                  },
-                  "msgid": {
-                    "type": "string",
-                    "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-                  }
-                },
-                "description": "Syslog messages the client is Subscribing to. This is all\n        messages currently configured to be sent according to\n        syslog-severity."
-              }
-            },
-            "description": "Operational state data for a Syslog messages."
-          }
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       },
-      "openconfig-messages-config": {
-        "type": "object",
-        "properties": {
-          "severity": {
-            "type": "string",
-            "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files."
-          }
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       },
-      "openconfig-messages-state": {
-        "type": "object",
-        "properties": {
-          "severity": {
-            "type": "string",
-            "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files."
-          },
-          "msg": {
-            "type": "string",
-            "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-          },
-          "priority": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 255,
-            "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-          },
-          "app-name": {
-            "type": "string",
-            "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-          },
-          "procid": {
-            "type": "string",
-            "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-          },
-          "msgid": {
-            "type": "string",
-            "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-          },
-          "message": {
-            "type": "object",
-            "properties": {
-              "msg": {
-                "type": "string",
-                "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc.."
-              },
-              "priority": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity."
-              },
-              "app-name": {
-                "type": "string",
-                "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message."
-              },
-              "procid": {
-                "type": "string",
-                "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting."
-              },
-              "msgid": {
-                "type": "string",
-                "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic."
-              }
-            },
-            "description": "Syslog messages the client is Subscribing to. This is all\n        messages currently configured to be sent according to\n        syslog-severity."
-          }
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
         }
       }
     }
@@ -567,15 +2483,5 @@
     {
       "basicAuth": []
     }
-  ],
-  "tags": [
-    {
-      "name": "openconfig-messages",
-      "description": "This module defines configuration and operational state data\n    related to Syslog messages that a device may generate.\n\n    These messages are historically obtained through the Syslog\n    transport, however this module allows for obtaining them through\n    an alternative transport, such as a Subscribe operation over an\n    RPC.\n\n    This module does not usurp traditional syslog servers, which may\n    still be configured through the\n    /yang/system/openconfig-system.yang model, rather it provies the\n    Operator with an alternative method of consuming messages."
-    }
-  ],
-  "externalDocs": {
-    "description": "OpenConfig YANG Models - GitHub",
-    "url": "https://github.com/openconfig/public/tree/master/release/models"
-  }
+  ]
 }

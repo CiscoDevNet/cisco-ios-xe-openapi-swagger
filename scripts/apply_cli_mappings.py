@@ -3,7 +3,7 @@
 apply_cli_mappings.py — Stamp `x-cli-equivalent` on native config operations.
 
 Reads ``references/native-cli-mappings.yaml`` and walks every spec under the
-release's native-config api-v2 directory. When a mapping ``path`` is a prefix
+release's native-config api directory. When a mapping ``path`` is a prefix
 of an OpenAPI ``paths`` key, every operation under that path gets the mapping's
 ``cli`` string attached as ``x-cli-equivalent`` (and optionally ``x-cli-notes``).
 

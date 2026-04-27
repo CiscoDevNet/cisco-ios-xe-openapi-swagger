@@ -5,22 +5,22 @@ import re
 
 nav_links = [
     ('Home', '../index.html'),
-    ('Oper (v2)', '../swagger-oper-model/index-v2.html'),
-    ('Config (v2)', '../swagger-cfg-model/index-v2.html'),
-    ('Native (v2)', '../swagger-native-config-model/index-v2.html'),
-    ('OpenConfig (v2)', '../swagger-openconfig-model/index-v2.html'),
-    ('RPC (v2)', '../swagger-rpc-model/index-v2.html'),
-    ('IETF (v2)', '../swagger-ietf-model/index-v2.html'),
-    ('MIB (v2)', '../swagger-mib-model/index-v2.html'),
-    ('Events (v2)', '../swagger-events-model/index-v2.html'),
-    ('Other (v2)', '../swagger-other-model/index-v2.html'),
+    ('Oper (v2)', '../swagger-oper-model/index.html'),
+    ('Config (v2)', '../swagger-cfg-model/index.html'),
+    ('Native (v2)', '../swagger-native-config-model/index.html'),
+    ('OpenConfig (v2)', '../swagger-openconfig-model/index.html'),
+    ('RPC (v2)', '../swagger-rpc-model/index.html'),
+    ('IETF (v2)', '../swagger-ietf-model/index.html'),
+    ('MIB (v2)', '../swagger-mib-model/index.html'),
+    ('Events (v2)', '../swagger-events-model/index.html'),
+    ('Other (v2)', '../swagger-other-model/index.html'),
 ]
 
 pages = {
-    'swagger-oper-model/index-v2.html': 'Oper (v2)',
-    'swagger-cfg-model/index-v2.html': 'Config (v2)',
-    'swagger-native-config-model/index-v2.html': 'Native (v2)',
-    'swagger-openconfig-model/index-v2.html': 'OpenConfig (v2)',
+    'swagger-oper-model/index.html': 'Oper (v2)',
+    'swagger-cfg-model/index.html': 'Config (v2)',
+    'swagger-native-config-model/index.html': 'Native (v2)',
+    'swagger-openconfig-model/index.html': 'OpenConfig (v2)',
 }
 
 def main():
@@ -61,7 +61,7 @@ def main():
                 content = f.read()
             
             # Check if v2 link already exists
-            if 'index-v2.html' in content:
+            if 'index.html' in content:
                 print(f'{page}: v2 link already exists')
                 continue
             
@@ -70,7 +70,7 @@ def main():
             tree_pattern = r'(<a[^>]*yang-trees[^>]*>.*?</a>)'
             tree_match = re.search(tree_pattern, content)
             if tree_match:
-                v2_button = '<a href="index-v2.html" style="background: #1565C0; color: white; padding: 6px 14px; border-radius: 4px; font-size: 13px; text-decoration: none;">v2 ↗</a>\n        '
+                v2_button = '<a href="index.html" style="background: #1565C0; color: white; padding: 6px 14px; border-radius: 4px; font-size: 13px; text-decoration: none;">v2 ↗</a>\n        '
                 new_content = content[:tree_match.start()] + v2_button + content[tree_match.start():]
                 with open(page, 'w', encoding='utf-8') as f:
                     f.write(new_content)

@@ -35,8 +35,8 @@
   }
 
   function specBaseUrl(ver, cat) {
-    if (ver === '17.18.1') return 'swagger-' + cat + '-model/api-v2/';
-    return 'releases/' + encodeURIComponent(ver) + '/swagger-' + cat + '-model/api-v2/';
+    if (ver === '17.18.1') return 'swagger-' + cat + '-model/api/';
+    return 'releases/' + encodeURIComponent(ver) + '/swagger-' + cat + '-model/api/';
   }
 
   // --- State -----------------------------------------------------------------

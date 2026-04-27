@@ -18,7 +18,7 @@ async def main():
         b = await p.chromium.launch(headless=True)
         page = await b.new_page()
         page.on('pageerror', lambda e: print('PAGEERR:', e))
-        await page.goto('https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index-v2.html', wait_until='domcontentloaded')
+        await page.goto('https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html', wait_until='domcontentloaded')
         await page.wait_for_selector('#moduleList li a', timeout=30000)
         await page.evaluate(JS_INSTRUMENT)
         await page.evaluate("document.querySelector(\"#moduleList li a[data-module='ATM-MIB']\").click()")

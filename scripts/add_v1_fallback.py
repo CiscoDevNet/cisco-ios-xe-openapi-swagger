@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Add v1 API fallback support to all index-v2.html files.
+"""Add v1 API fallback support to all index.html files.
 
-When a spec is requested via #spec=X but doesn't exist in api-v2/,
+When a spec is requested via #spec=X but doesn't exist in api/,
 falls back to loading from api/ instead. This supports 125 v1-only
 modules that were linked from the search index.
 """
@@ -21,7 +21,7 @@ def patch_file(filepath):
     if 'function getSpecFolder' not in content:
         old = '    function loadSpec(fname, el) {'
         new = """    function getSpecFolder(fname) {
-        return allModules.find(m => m.fname === fname) ? 'api-v2' : 'api';
+        return allModules.find(m => m.fname === fname) ? 'api' : 'api';
     }
 
     function loadSpec(fname, el) {"""
@@ -31,9 +31,9 @@ def patch_file(filepath):
 
     # 2. Update SwaggerUIBundle url in loadSpec to use getSpecFolder
     # Handle both single-line and multi-line patterns
-    # Pattern 1: single line SwaggerUIBundle({ url: `api-v2/...
+    # Pattern 1: single line SwaggerUIBundle({ url: `api/...
     content_new = re.sub(
-        r"SwaggerUIBundle\(\{\s*url:\s*`api-v2/\$\{fname\}\.json`",
+        r"SwaggerUIBundle\(\{\s*url:\s*`api/\$\{fname\}\.json`",
         "SwaggerUIBundle({ url: `${getSpecFolder(fname)}/${fname}.json`",
         content
     )
@@ -41,9 +41,9 @@ def patch_file(filepath):
         changes += 1
         content = content_new
 
-    # Pattern 2: multi-line with url: `api-v2/${fname}.json`,
+    # Pattern 2: multi-line with url: `api/${fname}.json`,
     content_new = re.sub(
-        r"url:\s*`api-v2/\$\{fname\}\.json`",
+        r"url:\s*`api/\$\{fname\}\.json`",
         "url: `${getSpecFolder(fname)}/${fname}.json`",
         content
     )
@@ -52,7 +52,7 @@ def patch_file(filepath):
         content = content_new
 
     # 3. Update downloadSpec to use getSpecFolder
-    old_download = "a.href = `api-v2/${currentModule}.json`;"
+    old_download = "a.href = `api/${currentModule}.json`;"
     new_download = "a.href = `${getSpecFolder(currentModule)}/${currentModule}.json`;"
     if old_download in content:
         content = content.replace(old_download, new_download, 1)
@@ -93,9 +93,9 @@ def patch_file(filepath):
     return changes
 
 def main():
-    pattern = os.path.join(BASE, 'swagger-*-model', 'index-v2.html')
+    pattern = os.path.join(BASE, 'swagger-*-model', 'index.html')
     files = sorted(glob.glob(pattern))
-    print(f"Found {len(files)} index-v2.html files")
+    print(f"Found {len(files)} index.html files")
     
     total = 0
     for f in files:
