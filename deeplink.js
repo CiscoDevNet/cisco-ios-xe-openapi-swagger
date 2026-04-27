@@ -85,6 +85,14 @@
         var next = { spec: name, op: op || undefined };
         if (cur.ver) next.ver = cur.ver;
         writeHash(buildHash(next));
+        // writeHash uses history.replaceState, which does NOT fire a
+        // 'hashchange' event. Without this, a tree-leaf click that loads a
+        // new spec would never start the observer that scrolls/expands the
+        // target op. Kick it explicitly so the op pops into view as soon as
+        // Swagger UI finishes rendering it.
+        if (op) {
+            try { attachAutoExpand(); } catch (_) { /* DOM not ready */ }
+        }
     }
 
     /** Find the Swagger UI .opblock element for the given operationId. */
