@@ -1,4 +1,4 @@
-﻿/* paths-search.js â€” cross-chunk operation search for the Native Config viewer.
+/* paths-search.js — cross-chunk operation search for the Native Config viewer.
  *
  * Runs on every active release. On older releases the script detects the version and
  * becomes a silent no-op so legacy behaviour is unchanged.
@@ -10,7 +10,7 @@
  * - When the user types in the existing #searchBox, in addition to filtering
  *   the module list the script renders an "Operations matching" section above
  *   the module list with up to MAX_HITS path hits across all chunks.
- * - Click â†’ loadSpec(spec) â†’ after Swagger UI renders, scroll/expand the
+ * - Click → loadSpec(spec) → after Swagger UI renders, scroll/expand the
  *   operation by anchoring on `#operations-<tag>-<operationId>` and using
  *   the existing __DeepLink helper if present.
  *
@@ -145,7 +145,7 @@
         }
         if (!__index) {
             box.style.display = 'block';
-            box.innerHTML = '<div class="om-head">Operations matching <span class="count">' + (__indexFailed ? '(index unavailable)' : 'loadingâ€¦') + '</span></div>';
+            box.innerHTML = '<div class="om-head">Operations matching <span class="count">' + (__indexFailed ? '(index unavailable)' : 'loading…') + '</span></div>';
             return;
         }
         if (hits.length === 0) {
@@ -167,7 +167,7 @@
             html += '<li><a href="#" class="op-hit"' + attrs + '>'
                   + methodBadge(h.ms || ['get'])
                   + '<span class="pp">' + highlight(h.p, q.toLowerCase()) + '</span>'
-                  + '<span class="sub">' + esc(h.s) + (h.sm ? ' â€” ' + esc(h.sm) : '') + '</span>'
+                  + '<span class="sub">' + esc(h.s) + (h.sm ? ' — ' + esc(h.sm) : '') + '</span>'
                   + '</a></li>';
         }
         html += '</ul>';
