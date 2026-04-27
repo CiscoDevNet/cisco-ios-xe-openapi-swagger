@@ -47,12 +47,16 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 - **Audit floor tightened** — [scripts/audit_path_depth.py](scripts/audit_path_depth.py)
   `MIN_MAX_DEPTH` raised cfg / oper 6 → 7. Strict mode now blocks any future regression
   below d7 for those two categories.
-- **17.x backport (deferred)** — the from-tree generators already support 17.18.1, 17.15.x,
-  17.12.x and 17.9.x via `_resolve_paths(version)` (legacy top-level `yang-trees/` for
-  17.18.1, `releases/<ver>/yang-trees/` otherwise). A subsequent operations cycle should
-  run `python scripts/build_release.py --version <ver>` for each 17.x release to materialise
-  the deeper specs and re-run downstream overlays. Audit floor was kept conservative on
-  cfg / oper (d7) so the bump is achievable on older trees too.
+- **17.x backport (shipped)** — the from-tree generators were rolled out to 17.9.x, 17.12.x
+  and 17.15.x via `_resolve_paths(version)` (`releases/<ver>/yang-trees/`). Followed by
+  `enrich`, `github-links`, `external-docs`, `tree-links`, `mdt-annotate`, `manifests`,
+  `stamp-spec-count`, `search-index` and `path-depth-audit`. Depth gains:
+  - 17.9.x : cfg 643→2519 (d2→d8), oper 1907→17136 (d3→d8), events 52→699 (d1→d2)
+  - 17.12.x: cfg 601→2512 (d2→d8), oper 2226→19042 (d3→d8), events 54→710 (d1→d2)
+  - 17.15.x: cfg 579→2546 (d2→d8), oper 2426→20465 (d3→d8), events 70→799 (d1→d2)
+  All four active releases (17.9.x, 17.12.x, 17.15.x, 26.1.1) now PASS the strict
+  path-depth audit floor. 17.18.1 still uses the legacy top-level `api/` layout and was
+  intentionally left untouched.
 
 ### Added — Path-depth audit, tree-based generators & cross-chunk operation search (rounds 6–7, 2026)
 
