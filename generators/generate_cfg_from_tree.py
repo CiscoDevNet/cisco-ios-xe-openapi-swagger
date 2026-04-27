@@ -475,11 +475,17 @@ def process_tree_file(html_path, output_dir, max_depth=8):
 def _resolve_paths(version: str):
     """Locate tree input dir + spec output dir for the given release.
 
-    Mirrors generators/_version_args.py conventions: 17.18.1 uses the
-    legacy top-level layout, every other release lives under releases/<ver>/.
+    For 17.18.1, prefer the per-release layout when releases/17.18.1/yang-trees
+    exists (the dataset has been migrated). Fall back to the legacy top-level
+    layout otherwise.
     """
     project_root = Path(__file__).resolve().parent.parent
-    if version == '17.18.1':
+    release_tree = project_root / 'releases' / version / 'yang-trees'
+    if release_tree.is_dir():
+        tree_dir = release_tree
+        output_dir = (project_root / 'releases' / version
+                      / 'swagger-cfg-model' / 'api-v2')
+    elif version == '17.18.1':
         tree_dir = project_root / 'yang-trees'
         output_dir = project_root / 'swagger-cfg-model' / 'api-v2'
     else:

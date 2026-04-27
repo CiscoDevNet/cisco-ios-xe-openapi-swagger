@@ -1,0 +1,673 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "openconfig-pcep",
+    "description": "OpenConfig configuration data model\n\n**Module:** `openconfig-pcep`\n**Paths:** 1",
+    "version": "17.18.1"
+  },
+  "servers": [
+    {
+      "url": "https://{device}/restconf",
+      "variables": {
+        "device": {
+          "default": "router.example.com",
+          "description": "Device IP or hostname"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/data/openconfig-pcep:pcep": {
+      "get": {
+        "summary": "Get pcep",
+        "description": "Top-level PCEP configuration and operational state.",
+        "operationId": "get-pcep-0",
+        "tags": [
+          "openconfig-pcep"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/openconfig-pcep-pcep"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Create or replace pcep",
+        "description": "Create or replace Top-level PCEP configuration and operational state.",
+        "operationId": "put-pcep-0",
+        "tags": [
+          "openconfig-pcep"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "$ref": "#/components/schemas/openconfig-pcep-pcep"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modify pcep",
+        "description": "Partially modify Top-level PCEP configuration and operational state.",
+        "operationId": "patch-pcep-0",
+        "tags": [
+          "openconfig-pcep"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "$ref": "#/components/schemas/openconfig-pcep-pcep"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete pcep",
+        "description": "Delete Top-level PCEP configuration and operational state.",
+        "operationId": "delete-pcep-0",
+        "tags": [
+          "openconfig-pcep"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "openconfig-pcep-pcep": {
+        "type": "object",
+        "properties": {
+          "pce-server-address": {
+            "type": "string",
+            "description": "IPv4 address of PCE server."
+          },
+          "id": {
+            "type": "string",
+            "description": "A unique name for the PCE server."
+          },
+          "port": {
+            "type": "string",
+            "description": "The destination TCP port used for PCEP service in the PCE server."
+          },
+          "source-address": {
+            "type": "string",
+            "description": "The source IP address used by PCC(Router) to establish PCEP session."
+          },
+          "pce-type": {
+            "type": "string",
+            "description": "The type of PCEP capability supported which is advertised in the Open\n        message when a PCEP session is established."
+          },
+          "preference": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "When multiple PCE servers are specified, the candidate PCE server\n        with the highest preference is selected to calculate paths.\n        The greater or lower the value, the higher the preference could\n        dependon vendor implementation. If no preference value is set, indicate\n        the lowest preference or no preference at all."
+          },
+          "report-local-lsp": {
+            "type": "boolean",
+            "description": "Specifies whether the PCC (Router) will advertise LSP existence and state\n\tfor LSPs that are not controlled by any PCE (for example, LSPs that are\n\tstatically configured at the PCC) but without delegating them."
+          },
+          "pce-initiated-capability": {
+            "type": "boolean",
+            "description": "Indicates to PCE that PCC (Router) supports PCE-initiated LSP paths instantiation.\n\t A PCE can initiate LSPs only for PCCs that advertised this capability."
+          },
+          "sr-support": {
+            "type": "boolean",
+            "description": "Indicates to PCE that PCC (Router) supports Segment-Routing\n\t to set up LSP paths in addition to RSVP-TE."
+          },
+          "keepalive": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "Interval for sending keepalive messages over PCE session."
+          },
+          "dead-timer": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255,
+            "description": "Interval after which PCE session is declared dead."
+          },
+          "redelegation-timeout-interval": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+          },
+          "state-timeout-interval": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+          },
+          "timers": {
+            "type": "object",
+            "properties": {
+              "keepalive": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255,
+                "description": "Interval for sending keepalive messages over PCE session."
+              },
+              "dead-timer": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255,
+                "description": "Interval after which PCE session is declared dead."
+              },
+              "redelegation-timeout-interval": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+              },
+              "state-timeout-interval": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "keepalive": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval for sending keepalive messages over PCE session."
+                  },
+                  "dead-timer": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval after which PCE session is declared dead."
+                  },
+                  "redelegation-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+                  },
+                  "state-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+                  }
+                },
+                "description": "This container defines PCEP timers configuration."
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "keepalive": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval for sending keepalive messages over PCE session."
+                  },
+                  "dead-timer": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval after which PCE session is declared dead."
+                  },
+                  "redelegation-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+                  },
+                  "state-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+                  }
+                },
+                "description": "This container defines state information for PCEP timers."
+              }
+            },
+            "description": "This container defines PCEP timers."
+          },
+          "enable": {
+            "type": "boolean",
+            "description": "Enables PCEP authentication on the node."
+          },
+          "authentication-key": {
+            "type": "string",
+            "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+          },
+          "keychain": {
+            "type": "string",
+            "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+          },
+          "authentication": {
+            "type": "object",
+            "properties": {
+              "enable": {
+                "type": "boolean",
+                "description": "Enables PCEP authentication on the node."
+              },
+              "authentication-key": {
+                "type": "string",
+                "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+              },
+              "keychain": {
+                "type": "string",
+                "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "enable": {
+                    "type": "boolean",
+                    "description": "Enables PCEP authentication on the node."
+                  },
+                  "authentication-key": {
+                    "type": "string",
+                    "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+                  },
+                  "keychain": {
+                    "type": "string",
+                    "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+                  }
+                },
+                "description": "Configuration of PCEP authentication attributes"
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "enable": {
+                    "type": "boolean",
+                    "description": "Enables PCEP authentication on the node."
+                  },
+                  "authentication-key": {
+                    "type": "string",
+                    "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+                  },
+                  "keychain": {
+                    "type": "string",
+                    "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+                  }
+                },
+                "description": "PCEP authentication state."
+              }
+            },
+            "description": "Global PCEP authentication"
+          },
+          "path-computation-servers": {
+            "type": "object",
+            "properties": {
+              "pce-server-address": {
+                "type": "string",
+                "description": "IPv4 address of PCE server."
+              },
+              "id": {
+                "type": "string",
+                "description": "A unique name for the PCE server."
+              },
+              "port": {
+                "type": "string",
+                "description": "The destination TCP port used for PCEP service in the PCE server."
+              },
+              "source-address": {
+                "type": "string",
+                "description": "The source IP address used by PCC(Router) to establish PCEP session."
+              },
+              "pce-type": {
+                "type": "string",
+                "description": "The type of PCEP capability supported which is advertised in the Open\n        message when a PCEP session is established."
+              },
+              "preference": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255,
+                "description": "When multiple PCE servers are specified, the candidate PCE server\n        with the highest preference is selected to calculate paths.\n        The greater or lower the value, the higher the preference could\n        dependon vendor implementation. If no preference value is set, indicate\n        the lowest preference or no preference at all."
+              },
+              "report-local-lsp": {
+                "type": "boolean",
+                "description": "Specifies whether the PCC (Router) will advertise LSP existence and state\n\tfor LSPs that are not controlled by any PCE (for example, LSPs that are\n\tstatically configured at the PCC) but without delegating them."
+              },
+              "pce-initiated-capability": {
+                "type": "boolean",
+                "description": "Indicates to PCE that PCC (Router) supports PCE-initiated LSP paths instantiation.\n\t A PCE can initiate LSPs only for PCCs that advertised this capability."
+              },
+              "sr-support": {
+                "type": "boolean",
+                "description": "Indicates to PCE that PCC (Router) supports Segment-Routing\n\t to set up LSP paths in addition to RSVP-TE."
+              },
+              "keepalive": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255,
+                "description": "Interval for sending keepalive messages over PCE session."
+              },
+              "dead-timer": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255,
+                "description": "Interval after which PCE session is declared dead."
+              },
+              "redelegation-timeout-interval": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+              },
+              "state-timeout-interval": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535,
+                "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+              },
+              "timers": {
+                "type": "object",
+                "properties": {
+                  "keepalive": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval for sending keepalive messages over PCE session."
+                  },
+                  "dead-timer": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "Interval after which PCE session is declared dead."
+                  },
+                  "redelegation-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+                  },
+                  "state-timeout-interval": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 65535,
+                    "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+                  },
+                  "config": {
+                    "type": "object",
+                    "properties": {
+                      "keepalive": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "Interval for sending keepalive messages over PCE session."
+                      },
+                      "dead-timer": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "Interval after which PCE session is declared dead."
+                      },
+                      "redelegation-timeout-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+                      },
+                      "state-timeout-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+                      }
+                    },
+                    "description": "This container defines PCEP timers configuration."
+                  },
+                  "state": {
+                    "type": "object",
+                    "properties": {
+                      "keepalive": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "Interval for sending keepalive messages over PCE session."
+                      },
+                      "dead-timer": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 255,
+                        "description": "Interval after which PCE session is declared dead."
+                      },
+                      "redelegation-timeout-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "When a PCEP session is terminated, the period of time a PCC waits\n        before revoking LSP delegation and attempting to redelegate LSPs\n        associated with the terminated PCEP session to an alternate PCE."
+                      },
+                      "state-timeout-interval": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535,
+                        "description": "When a PCEP session is terminated, the period of time a PCC waits\n\tbefore before flushing LSP state associated with that PCEP session\n\tand reverting to operator-defined default parameters or behaviors."
+                      }
+                    },
+                    "description": "This container defines state information for PCEP timers."
+                  }
+                },
+                "description": "This container defines PCEP timers."
+              },
+              "enable": {
+                "type": "boolean",
+                "description": "Enables PCEP authentication on the node."
+              },
+              "authentication-key": {
+                "type": "string",
+                "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+              },
+              "keychain": {
+                "type": "string",
+                "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+              },
+              "authentication": {
+                "type": "object",
+                "properties": {
+                  "enable": {
+                    "type": "boolean",
+                    "description": "Enables PCEP authentication on the node."
+                  },
+                  "authentication-key": {
+                    "type": "string",
+                    "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+                  },
+                  "keychain": {
+                    "type": "string",
+                    "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+                  },
+                  "config": {
+                    "type": "object",
+                    "properties": {
+                      "enable": {
+                        "type": "boolean",
+                        "description": "Enables PCEP authentication on the node."
+                      },
+                      "authentication-key": {
+                        "type": "string",
+                        "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+                      },
+                      "keychain": {
+                        "type": "string",
+                        "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+                      }
+                    },
+                    "description": "Configuration of PCEP authentication attributes"
+                  },
+                  "state": {
+                    "type": "object",
+                    "properties": {
+                      "enable": {
+                        "type": "boolean",
+                        "description": "Enables PCEP authentication on the node."
+                      },
+                      "authentication-key": {
+                        "type": "string",
+                        "description": "Password (key) used for securing a PCEP session using\n        TCP-MD5 authentication"
+                      },
+                      "keychain": {
+                        "type": "string",
+                        "description": "Reference to a predefined keychain that should be used to secure\n       PCEP session"
+                      }
+                    },
+                    "description": "PCEP authentication state."
+                  }
+                },
+                "description": "Global PCEP authentication"
+              },
+              "config": {
+                "type": "object",
+                "properties": {
+                  "pce-server-address": {
+                    "type": "string",
+                    "description": "The destination IP address of the PCE server for PCEP service.\n\tSpecify multiple entries in the path-computation-server-list to provide redundancy.\n\tWhen multiple candidate servers are specified for a single client,\n\tthey are prioritized according to preference."
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "A unique name for the PCE server."
+                  },
+                  "port": {
+                    "type": "string",
+                    "description": "The destination TCP port used for PCEP service in the PCE server."
+                  },
+                  "source-address": {
+                    "type": "string",
+                    "description": "The source IP address used by PCC(Router) to establish PCEP session."
+                  },
+                  "pce-type": {
+                    "type": "string",
+                    "description": "The type of PCEP capability supported which is advertised in the Open\n        message when a PCEP session is established."
+                  },
+                  "preference": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "When multiple PCE servers are specified, the candidate PCE server\n        with the highest preference is selected to calculate paths.\n        The greater or lower the value, the higher the preference could\n        dependon vendor implementation. If no preference value is set, indicate\n        the lowest preference or no preference at all."
+                  },
+                  "report-local-lsp": {
+                    "type": "boolean",
+                    "description": "Specifies whether the PCC (Router) will advertise LSP existence and state\n\tfor LSPs that are not controlled by any PCE (for example, LSPs that are\n\tstatically configured at the PCC) but without delegating them."
+                  },
+                  "pce-initiated-capability": {
+                    "type": "boolean",
+                    "description": "Indicates to PCE that PCC (Router) supports PCE-initiated LSP paths instantiation.\n\t A PCE can initiate LSPs only for PCCs that advertised this capability."
+                  },
+                  "sr-support": {
+                    "type": "boolean",
+                    "description": "Indicates to PCE that PCC (Router) supports Segment-Routing\n\t to set up LSP paths in addition to RSVP-TE."
+                  }
+                },
+                "description": "PCE server configuration."
+              },
+              "state": {
+                "type": "object",
+                "properties": {
+                  "pce-server-address": {
+                    "type": "string",
+                    "description": "The destination IP address of the PCE server for PCEP service.\n\tSpecify multiple entries in the path-computation-server-list to provide redundancy.\n\tWhen multiple candidate servers are specified for a single client,\n\tthey are prioritized according to preference."
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "A unique name for the PCE server."
+                  },
+                  "port": {
+                    "type": "string",
+                    "description": "The destination TCP port used for PCEP service in the PCE server."
+                  },
+                  "source-address": {
+                    "type": "string",
+                    "description": "The source IP address used by PCC(Router) to establish PCEP session."
+                  },
+                  "pce-type": {
+                    "type": "string",
+                    "description": "The type of PCEP capability supported which is advertised in the Open\n        message when a PCEP session is established."
+                  },
+                  "preference": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255,
+                    "description": "When multiple PCE servers are specified, the candidate PCE server\n        with the highest preference is selected to calculate paths.\n        The greater or lower the value, the higher the preference could\n        dependon vendor implementation. If no preference value is set, indicate\n        the lowest preference or no preference at all."
+                  },
+                  "report-local-lsp": {
+                    "type": "boolean",
+                    "description": "Specifies whether the PCC (Router) will advertise LSP existence and state\n\tfor LSPs that are not controlled by any PCE (for example, LSPs that are\n\tstatically configured at the PCC) but without delegating them."
+                  },
+                  "pce-initiated-capability": {
+                    "type": "boolean",
+                    "description": "Indicates to PCE that PCC (Router) supports PCE-initiated LSP paths instantiation.\n\t A PCE can initiate LSPs only for PCCs that advertised this capability."
+                  },
+                  "sr-support": {
+                    "type": "boolean",
+                    "description": "Indicates to PCE that PCC (Router) supports Segment-Routing\n\t to set up LSP paths in addition to RSVP-TE."
+                  }
+                },
+                "description": "PCE server state."
+              }
+            },
+            "description": "Defines PCE server parameters."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "openconfig-pcep",
+      "description": "OpenConfig configuration data model"
+    }
+  ]
+}
