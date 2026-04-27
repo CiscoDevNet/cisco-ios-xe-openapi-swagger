@@ -24,8 +24,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 def stamp(manifest: Path) -> tuple[bool, int]:
     """Add/update spec_count on a manifest. Returns (changed, on_disk_count)."""
+    # Exclude bookkeeping files: manifest itself and the cross-chunk paths
+    # index produced by build_paths_index.py (Round 6+). Only true OpenAPI
+    # spec JSONs should count toward spec_count.
+    _NON_SPECS = {"manifest.json", "_paths_index.json"}
     on_disk = sum(
-        1 for f in manifest.parent.glob("*.json") if f.name != "manifest.json"
+        1 for f in manifest.parent.glob("*.json") if f.name not in _NON_SPECS
     )
     try:
         data = json.loads(manifest.read_text(encoding="utf-8"))

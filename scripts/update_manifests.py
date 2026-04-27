@@ -19,7 +19,8 @@ FOLDERS = [
 EXCLUDE = {
     'manifest.json', 'all-operations.json', 'all-rpc-operations.json',
     'all-config.json', 'all-ietf.json', 'all-openconfig.json',
-    'all-mib.json', 'all-events.json', 'all-other.json'
+    'all-mib.json', 'all-events.json', 'all-other.json',
+    '_paths_index.json',
 }
 
 

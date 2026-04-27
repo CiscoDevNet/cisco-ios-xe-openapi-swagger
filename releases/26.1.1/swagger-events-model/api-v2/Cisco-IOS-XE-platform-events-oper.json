@@ -1,78 +1,756 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Events - platform-oper",
+    "title": "Cisco IOS-XE Events - Cisco-IOS-XE-platform-events-oper",
+    "description": "Event/notification data from `Cisco-IOS-XE-platform-events-oper` module.\n\n**Endpoints:** 22 | **Notifications:** 2\n\nData endpoints use GET. Notifications are delivered via RESTCONF SSE subscriptions.",
     "version": "17.18.1",
-    "description": "This module contains a collection of YANG definitions\n     for monitoring of platform components events.\n\n**Event Notifications Module** - Used for model-driven telemetry and streaming subscriptions.\n\n**Usage**: Subscribe to events via NETCONF/RESTCONF subscriptions\n\n**Protocol**: RFC 8639 (Subscription to YANG Notifications)\n\n**Authentication**: HTTP Basic Authentication"
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-platform-events-oper",
+    "x-model-type": "events"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "sandbox-iosxe-latest-1.cisco.com"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
   ],
   "paths": {
-    "/data/Cisco-IOS-XE-platform-events-oper:events": {
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update": {
       "get": {
-        "summary": "Get Cisco-IOS-XE-platform-events-oper event subscriptions",
-        "description": "Retrieve active event subscriptions for Cisco-IOS-XE-platform-events-oper",
+        "summary": "Notification: platform-sensor-state-update",
+        "description": "YANG notification `platform-sensor-state-update` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update",
         "tags": [
-          "events"
+          "notifications"
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "type": "string"
+                    },
+                    "comp-type": {
+                      "type": "string"
+                    },
+                    "sensor-type": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "sensor-val": {
+                      "type": "object",
+                      "properties": {
+                        "value-instant": {
+                          "type": "number"
+                        },
+                        "value-avg": {
+                          "type": "number"
+                        },
+                        "value-max": {
+                          "type": "number"
+                        },
+                        "value-min": {
+                          "type": "number"
+                        },
+                        "sampling-period-sec": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295
+                        }
+                      }
+                    },
+                    "alarm-data": {
+                      "type": "object",
+                      "properties": {
+                        "alarm-status": {
+                          "type": "boolean"
+                        },
+                        "alarm-threshold-high": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295
+                        },
+                        "alarm-threshold-low": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295
+                        },
+                        "severity": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "new-state": {
+                      "type": "string"
+                    },
+                    "time-stamp": {
+                      "type": "string"
+                    }
+                  }
+                },
                 "example": {
-                  "Cisco-IOS-XE-platform-events-oper:events": {
-                    "description": "Event notification stream"
+                  "Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update": {
+                    "severity": "example",
+                    "comp-type": "example",
+                    "sensor-type": "example",
+                    "description": "example",
+                    "location": "example",
+                    "id": "example",
+                    "sensor-val": {
+                      "value-instant": 1.0,
+                      "value-avg": 1.0,
+                      "value-max": 1.0,
+                      "value-min": 1.0,
+                      "sampling-period-sec": 1
+                    },
+                    "alarm-data": {
+                      "alarm-status": true,
+                      "alarm-threshold-high": 1,
+                      "alarm-threshold-low": 1,
+                      "severity": "example"
+                    },
+                    "new-state": "example",
+                    "time-stamp": "example"
                   }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
     },
-    "/operations/ietf-subscribed-notifications:establish-subscription": {
-      "post": {
-        "summary": "Create event subscription",
-        "description": "Establish a subscription to Cisco-IOS-XE-platform-events-oper events",
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/severity": {
+      "get": {
+        "summary": "Notification: severity",
+        "description": "YANG notification `severity` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-severity",
         "tags": [
-          "events"
+          "notifications"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "example": {
-                "input": {
-                  "stream": "Cisco-IOS-XE-platform-events-oper:events",
-                  "encoding": "encode-json",
-                  "update-trigger": "periodic",
-                  "period": 6000
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:severity": "example"
                 }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/comp-type": {
+      "get": {
+        "summary": "Notification: comp-type",
+        "description": "YANG notification `comp-type` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-comp-type",
+        "tags": [
+          "notifications"
+        ],
         "responses": {
           "200": {
-            "description": "Subscription created",
+            "description": "Notification payload (delivered via SSE/subscription)",
             "content": {
               "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
                 "example": {
-                  "output": {
-                    "subscription-id": 12345
+                  "Cisco-IOS-XE-platform-events-oper:comp-type": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/sensor-type": {
+      "get": {
+        "summary": "Notification: sensor-type",
+        "description": "YANG notification `sensor-type` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-sensor-type",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:sensor-type": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/description": {
+      "get": {
+        "summary": "Notification: description",
+        "description": "YANG notification `description` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-description",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:description": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/location": {
+      "get": {
+        "summary": "Notification: location",
+        "description": "YANG notification `location` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-location",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:location": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/id": {
+      "get": {
+        "summary": "Notification: id",
+        "description": "YANG notification `id` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-id",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:id": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/sensor-val": {
+      "get": {
+        "summary": "Notification: sensor-val",
+        "description": "YANG notification `sensor-val` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-sensor-val",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "value-instant": {
+                      "type": "number"
+                    },
+                    "value-avg": {
+                      "type": "number"
+                    },
+                    "value-max": {
+                      "type": "number"
+                    },
+                    "value-min": {
+                      "type": "number"
+                    },
+                    "sampling-period-sec": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    }
                   }
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:sensor-val": {
+                    "value-instant": 1.0,
+                    "value-avg": 1.0,
+                    "value-max": 1.0,
+                    "value-min": 1.0,
+                    "sampling-period-sec": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/alarm-data": {
+      "get": {
+        "summary": "Notification: alarm-data",
+        "description": "YANG notification `alarm-data` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-alarm-data",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "alarm-status": {
+                      "type": "boolean"
+                    },
+                    "alarm-threshold-high": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "alarm-threshold-low": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 4294967295
+                    },
+                    "severity": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:alarm-data": {
+                    "alarm-status": true,
+                    "alarm-threshold-high": 1,
+                    "alarm-threshold-low": 1,
+                    "severity": "example"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/new-state": {
+      "get": {
+        "summary": "Notification: new-state",
+        "description": "YANG notification `new-state` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-new-state",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:new-state": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update/time-stamp": {
+      "get": {
+        "summary": "Notification: time-stamp",
+        "description": "YANG notification `time-stamp` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-sensor-state-update-time-stamp",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:time-stamp": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update": {
+      "get": {
+        "summary": "Notification: platform-component-state-update",
+        "description": "YANG notification `platform-component-state-update` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "severity": {
+                      "type": "string"
+                    },
+                    "comp-type": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "part-no": {
+                      "type": "string"
+                    },
+                    "comp-state": {
+                      "type": "string"
+                    },
+                    "new-status": {
+                      "type": "string"
+                    },
+                    "status-desc": {
+                      "type": "string"
+                    },
+                    "time-stamp": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:platform-component-state-update": {
+                    "severity": "example",
+                    "comp-type": "example",
+                    "description": "example",
+                    "location": "example",
+                    "id": "example",
+                    "part-no": "example",
+                    "comp-state": "example",
+                    "new-status": "example",
+                    "status-desc": "example",
+                    "time-stamp": "example"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/severity": {
+      "get": {
+        "summary": "Notification: severity",
+        "description": "YANG notification `severity` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-severity",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:severity": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/comp-type": {
+      "get": {
+        "summary": "Notification: comp-type",
+        "description": "YANG notification `comp-type` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-comp-type",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:comp-type": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/description": {
+      "get": {
+        "summary": "Notification: description",
+        "description": "YANG notification `description` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-description",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:description": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/location": {
+      "get": {
+        "summary": "Notification: location",
+        "description": "YANG notification `location` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-location",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:location": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/id": {
+      "get": {
+        "summary": "Notification: id",
+        "description": "YANG notification `id` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-id",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:id": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/part-no": {
+      "get": {
+        "summary": "Notification: part-no",
+        "description": "YANG notification `part-no` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-part-no",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:part-no": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/comp-state": {
+      "get": {
+        "summary": "Notification: comp-state",
+        "description": "YANG notification `comp-state` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-comp-state",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:comp-state": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/new-status": {
+      "get": {
+        "summary": "Notification: new-status",
+        "description": "YANG notification `new-status` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-new-status",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:new-status": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/status-desc": {
+      "get": {
+        "summary": "Notification: status-desc",
+        "description": "YANG notification `status-desc` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-status-desc",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:status-desc": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streams/Cisco-IOS-XE-platform-events-oper:platform-component-state-update/time-stamp": {
+      "get": {
+        "summary": "Notification: time-stamp",
+        "description": "YANG notification `time-stamp` \u2014 subscribe via RESTCONF or NETCONF to receive this event.",
+        "operationId": "notification-Cisco-IOS-XE-platform-events-oper:platform-component-state-update-time-stamp",
+        "tags": [
+          "notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification payload (delivered via SSE/subscription)",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-platform-events-oper:time-stamp": "example"
                 }
               }
             }
@@ -85,19 +763,35 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
+      }
+    },
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
   "security": [
     {
       "basicAuth": []
-    }
-  ],
-  "tags": [
-    {
-      "name": "events",
-      "description": "Model-driven telemetry event subscriptions"
     }
   ]
 }

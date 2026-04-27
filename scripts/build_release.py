@@ -40,10 +40,20 @@ GENERATORS = PROJECT_ROOT / "generators"
 # Ordered pipeline. Each entry: (label, command-as-list-of-tokens).
 # ``$VER`` is substituted with the release version at run time.
 PIPELINE: list[tuple[str, list[str]]] = [
-    # 1. Spec generation per model category
-    ("oper-specs",          ["python", str(GENERATORS / "generate_oper_openapi_v2.py"),
+    # 1. Trees first — the cfg/oper/events tree-based generators consume
+    #    the resolved YANG tree HTMLs as input. Other categories use YANG
+    #    source directly so this just means they run after trees, which is
+    #    harmless. (Pre-Round-7 the order was specs->trees; the swap below
+    #    enforces specs-after-trees for the from-tree generators.)
+    ("trees",               ["python", str(SCRIPTS / "generate_all_pyang_trees.py"),
                              "--version", "$VER"]),
-    ("cfg-specs",           ["python", str(GENERATORS / "generate_cfg_openapi_v2.py"),
+    # 2. Spec generation per model category. cfg/oper/events use tree-based
+    #    generators (Round 7) which produce paths down to d5+. Others still
+    #    use the regex YANG parsers — they're either deep enough already or
+    #    inherently shallow (mib/rpc).
+    ("oper-specs",          ["python", str(GENERATORS / "generate_oper_from_tree.py"),
+                             "--version", "$VER"]),
+    ("cfg-specs",           ["python", str(GENERATORS / "generate_cfg_from_tree.py"),
                              "--version", "$VER"]),
     ("native-specs",        ["python", str(GENERATORS / "generate_native_openapi_v2.py"),
                              "--version", "$VER"]),
@@ -55,19 +65,16 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("rpc-specs",           ["python", str(GENERATORS / "generate_rpc_openapi_v2.py"),
                              "--version", "$VER"]),
-    ("events-specs",        ["python", str(GENERATORS / "generate_events_openapi.py"),
+    ("events-specs",        ["python", str(GENERATORS / "generate_events_from_tree.py"),
                              "--version", "$VER"]),
     ("other-specs",         ["python", str(GENERATORS / "generate_other_openapi_v2.py"),
                              "--version", "$VER"]),
-    # 2. Post-processing / enrichment
+    # 3. Post-processing / enrichment
     ("enrich",              ["python", str(SCRIPTS / "enrich_v2_specs.py"),
                              "--version", "$VER"]),
     ("github-links",        ["python", str(SCRIPTS / "add_yang_github_links.py"),
                              "--version", "$VER"]),
     ("external-docs",       ["python", str(SCRIPTS / "add_external_docs.py"),
-                             "--version", "$VER"]),
-    # 3. Trees
-    ("trees",               ["python", str(SCRIPTS / "generate_all_pyang_trees.py"),
                              "--version", "$VER"]),
     ("tree-links",          ["python", str(SCRIPTS / "add_tree_links.py"),
                              "--version", "$VER"]),
