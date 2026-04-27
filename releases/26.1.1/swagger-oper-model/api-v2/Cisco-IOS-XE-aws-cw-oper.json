@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Cisco-IOS-XE-aws-cw-oper",
-    "description": "This module contains a collection of YANG definitions\n     for AWS Cloudwatch operational data.\n     Copyright (c) 2023-2025 by Cisco Systems, Inc.\n     All rights reserved.\n\nCisco IOS-XE operational state data (read-only).\n**Category:** Telemetry & Automation\n**Paths:** 5",
-    "version": "17.18.1"
+    "title": "Cisco IOS-XE Operational - Cisco-IOS-XE-aws-cw-oper",
+    "description": "Operational data from `Cisco-IOS-XE-aws-cw-oper` module.\n\n**Root containers:** 1 (aws-cw-oper-data)\n**Paths:** 19 | **Descendants:** 18\n\nAll endpoints are read-only (GET).",
+    "version": "17.18.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "Cisco-IOS-XE-aws-cw-oper",
+    "x-model-type": "operational"
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "router.example.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -20,27 +29,137 @@
     "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data": {
       "get": {
         "summary": "Get aws-cw-oper-data",
-        "description": "AWS Cloudwatch oper data",
-        "operationId": "get-aws-cw-oper-data-0",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data",
         "tags": [
-          "Cisco-IOS-XE-aws-cw-oper"
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-aws-cw-oper-aws-cw-oper-data"
+                  "type": "object",
+                  "properties": {
+                    "aws-oper-cw": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "cw-profile-name": {
+                            "type": "string"
+                          },
+                          "cw-pid": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4294967295
+                          },
+                          "cw-state": {
+                            "type": "string"
+                          },
+                          "cw-vrf": {
+                            "type": "string"
+                          },
+                          "cw-trace": {
+                            "type": "string"
+                          },
+                          "cw-region": {
+                            "type": "string"
+                          },
+                          "cw-profile-descr": {
+                            "type": "string"
+                          },
+                          "cw-proxy": {
+                            "type": "object",
+                            "properties": {
+                              "http-url": {
+                                "type": "string"
+                              },
+                              "http-port": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 65535
+                              },
+                              "https-url": {
+                                "type": "string"
+                              },
+                              "https-port": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 65535
+                              }
+                            }
+                          },
+                          "cw-shutdown": {
+                            "type": "boolean"
+                          },
+                          "aws-oper-log-cw": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "cw-log-file-path": {
+                                  "type": "string"
+                                },
+                                "cw-log-group-name": {
+                                  "type": "string"
+                                },
+                                "cw-log-stream-name": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data": {
+                    "aws-oper-cw": [
+                      {
+                        "cw-profile-name": "GigabitEthernet1/0/1",
+                        "cw-pid": "C9300-48T",
+                        "cw-state": "up",
+                        "cw-vrf": "example",
+                        "cw-trace": "example",
+                        "cw-region": "example",
+                        "cw-profile-descr": "example",
+                        "cw-proxy": {
+                          "http-url": "example",
+                          "http-port": 1,
+                          "https-url": "example",
+                          "https-port": 1
+                        },
+                        "cw-shutdown": true,
+                        "aws-oper-log-cw": [
+                          {
+                            "cw-log-file-path": "example",
+                            "cw-log-group-name": "GigabitEthernet1/0/1",
+                            "cw-log-stream-name": "GigabitEthernet1/0/1"
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
@@ -48,111 +167,825 @@
     "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw": {
       "get": {
         "summary": "Get aws-oper-cw",
-        "description": "AWS Cloudwatch profile oper data (collection)",
-        "operationId": "get-aws-oper-cw-1",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw",
         "tags": [
-          "Cisco-IOS-XE-aws-cw-oper"
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-aws-cw-oper-aws-oper-cw"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "cw-profile-name": {
+                        "type": "string"
+                      },
+                      "cw-pid": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967295
+                      },
+                      "cw-state": {
+                        "type": "string"
+                      },
+                      "cw-vrf": {
+                        "type": "string"
+                      },
+                      "cw-trace": {
+                        "type": "string"
+                      },
+                      "cw-region": {
+                        "type": "string"
+                      },
+                      "cw-profile-descr": {
+                        "type": "string"
+                      },
+                      "cw-proxy": {
+                        "type": "object",
+                        "properties": {
+                          "http-url": {
+                            "type": "string"
+                          },
+                          "http-port": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                          },
+                          "https-url": {
+                            "type": "string"
+                          },
+                          "https-port": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 65535
+                          }
+                        }
+                      },
+                      "cw-shutdown": {
+                        "type": "boolean"
+                      },
+                      "aws-oper-log-cw": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "cw-log-file-path": {
+                              "type": "string"
+                            },
+                            "cw-log-group-name": {
+                              "type": "string"
+                            },
+                            "cw-log-stream-name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:aws-oper-cw": [
+                    {
+                      "cw-profile-name": "GigabitEthernet1/0/1",
+                      "cw-pid": "C9300-48T",
+                      "cw-state": "up",
+                      "cw-vrf": "example",
+                      "cw-trace": "example",
+                      "cw-region": "example",
+                      "cw-profile-descr": "example",
+                      "cw-proxy": {
+                        "http-url": "example",
+                        "http-port": 1,
+                        "https-url": "example",
+                        "https-port": 1
+                      },
+                      "cw-shutdown": true,
+                      "aws-oper-log-cw": [
+                        {
+                          "cw-log-file-path": "example",
+                          "cw-log-group-name": "GigabitEthernet1/0/1",
+                          "cw-log-stream-name": "GigabitEthernet1/0/1"
+                        }
+                      ]
+                    }
+                  ]
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw={cw-profile-name}": {
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-profile-name": {
       "get": {
-        "summary": "Get aws-oper-cw-item",
-        "description": "AWS Cloudwatch profile oper data",
-        "operationId": "get-aws-oper-cw-item-2",
+        "summary": "Get cw-profile-name",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-profile-name",
         "tags": [
-          "Cisco-IOS-XE-aws-cw-oper"
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-aws-cw-oper-aws-oper-cw-item"
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-profile-name": "GigabitEthernet1/0/1"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-aws-cw-oper:aws-oper-cw": {
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-pid": {
       "get": {
-        "summary": "Get aws-oper-cw",
-        "description": "AWS Cloudwatch profile oper data (collection)",
-        "operationId": "get-aws-oper-cw-3",
+        "summary": "Get cw-pid",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-pid",
         "tags": [
-          "Cisco-IOS-XE-aws-cw-oper"
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-aws-cw-oper-aws-oper-cw"
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-pid": "C9300-48T"
                 }
               }
             }
           },
-          "404": {
-            "description": "Resource not found"
-          },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/Cisco-IOS-XE-aws-cw-oper:aws-oper-cw={cw-profile-name}": {
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-state": {
       "get": {
-        "summary": "Get aws-oper-cw-item",
-        "description": "AWS Cloudwatch profile oper data",
-        "operationId": "get-aws-oper-cw-item-4",
+        "summary": "Get cw-state",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-state",
         "tags": [
-          "Cisco-IOS-XE-aws-cw-oper"
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cisco-IOS-XE-aws-cw-oper-aws-oper-cw-item"
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-state": "up"
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-vrf": {
+      "get": {
+        "summary": "Get cw-vrf",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-vrf",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-vrf": "example"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-trace": {
+      "get": {
+        "summary": "Get cw-trace",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-trace",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-trace": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-region": {
+      "get": {
+        "summary": "Get cw-region",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-region",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-region": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-profile-descr": {
+      "get": {
+        "summary": "Get cw-profile-descr",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-profile-descr",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-profile-descr": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-proxy": {
+      "get": {
+        "summary": "Get cw-proxy",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-proxy",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "http-url": {
+                      "type": "string"
+                    },
+                    "http-port": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    },
+                    "https-url": {
+                      "type": "string"
+                    },
+                    "https-port": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 65535
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-proxy": {
+                    "http-url": "example",
+                    "http-port": 1,
+                    "https-url": "example",
+                    "https-port": 1
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-proxy/http-url": {
+      "get": {
+        "summary": "Get http-url",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-proxy-http-url",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:http-url": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-proxy/http-port": {
+      "get": {
+        "summary": "Get http-port",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-proxy-http-port",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:http-port": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-proxy/https-url": {
+      "get": {
+        "summary": "Get https-url",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-proxy-https-url",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:https-url": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-proxy/https-port": {
+      "get": {
+        "summary": "Get https-port",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-proxy-https-port",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:https-port": 1
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/cw-shutdown": {
+      "get": {
+        "summary": "Get cw-shutdown",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-cw-shutdown",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "boolean"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-shutdown": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/aws-oper-log-cw": {
+      "get": {
+        "summary": "Get aws-oper-log-cw",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-aws-oper-log-cw",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "cw-log-file-path": {
+                        "type": "string"
+                      },
+                      "cw-log-group-name": {
+                        "type": "string"
+                      },
+                      "cw-log-stream-name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:aws-oper-log-cw": [
+                    {
+                      "cw-log-file-path": "example",
+                      "cw-log-group-name": "GigabitEthernet1/0/1",
+                      "cw-log-stream-name": "GigabitEthernet1/0/1"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/aws-oper-log-cw/cw-log-file-path": {
+      "get": {
+        "summary": "Get cw-log-file-path",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-aws-oper-log-cw-cw-log-file-path",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-log-file-path": "example"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/aws-oper-log-cw/cw-log-group-name": {
+      "get": {
+        "summary": "Get cw-log-group-name",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-aws-oper-log-cw-cw-log-group-name",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-log-group-name": "GigabitEthernet1/0/1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data/aws-oper-cw/aws-oper-log-cw/cw-log-stream-name": {
+      "get": {
+        "summary": "Get cw-log-stream-name",
+        "operationId": "get-Cisco-IOS-XE-aws-cw-oper:aws-cw-oper-data-aws-oper-cw-aws-oper-log-cw-cw-log-stream-name",
+        "tags": [
+          "aws-cw-oper-data"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": {
+                  "Cisco-IOS-XE-aws-cw-oper:cw-log-stream-name": "GigabitEthernet1/0/1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
           }
         }
       }
@@ -162,302 +995,28 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "Cisco-IOS-XE-aws-cw-oper-aws-cw-oper-data": {
-        "type": "object",
-        "properties": {
-          "http-url": {
-            "type": "string",
-            "description": "HTTP URL"
-          },
-          "http-port": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HTTP port"
-          },
-          "https-url": {
-            "type": "string",
-            "description": "HTTPS URL"
-          },
-          "https-port": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HTTPS port"
-          },
-          "cw-log-file-path": {
-            "type": "string",
-            "description": "Log file path"
-          },
-          "cw-log-group-name": {
-            "type": "string",
-            "description": "Log group name"
-          },
-          "cw-log-stream-name": {
-            "type": "string",
-            "description": "Log stream name"
-          },
-          "cw-profile-name": {
-            "type": "string",
-            "description": "Profile name"
-          },
-          "cw-pid": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4294967295,
-            "description": "Cloudwatch agent process ID"
-          },
-          "cw-state": {
-            "type": "string",
-            "description": "Agent state"
-          },
-          "cw-vrf": {
-            "type": "string",
-            "description": "Cloudwatch VRF"
-          },
-          "cw-trace": {
-            "type": "string",
-            "description": "Cloudwatch trace level"
-          },
-          "cw-region": {
-            "type": "string",
-            "description": "Cloudwatch region"
-          },
-          "cw-profile-descr": {
-            "type": "string",
-            "description": "Cloudwatch profile description"
-          },
-          "cw-shutdown": {
-            "type": "boolean",
-            "description": "Cloudwatch shutdown variable"
-          },
-          "cw-proxy": {
-            "type": "object",
-            "properties": {
-              "http-url": {
-                "type": "string",
-                "description": "HTTP URL"
-              },
-              "http-port": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 65535,
-                "description": "HTTP port"
-              },
-              "https-url": {
-                "type": "string",
-                "description": "HTTPS URL"
-              },
-              "https-port": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 65535,
-                "description": "HTTPS port"
-              }
-            },
-            "description": "Cloudwatch proxy settings"
-          }
+    "parameters": {
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
         }
       },
-      "Cisco-IOS-XE-aws-cw-oper-aws-oper-cw": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "http-url": {
-              "type": "string",
-              "description": "HTTP URL"
-            },
-            "http-port": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 65535,
-              "description": "HTTP port"
-            },
-            "https-url": {
-              "type": "string",
-              "description": "HTTPS URL"
-            },
-            "https-port": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 65535,
-              "description": "HTTPS port"
-            },
-            "cw-log-file-path": {
-              "type": "string",
-              "description": "Log file path"
-            },
-            "cw-log-group-name": {
-              "type": "string",
-              "description": "Log group name"
-            },
-            "cw-log-stream-name": {
-              "type": "string",
-              "description": "Log stream name"
-            },
-            "cw-profile-name": {
-              "type": "string",
-              "description": "Profile name"
-            },
-            "cw-pid": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 4294967295,
-              "description": "Cloudwatch agent process ID"
-            },
-            "cw-state": {
-              "type": "string",
-              "description": "Agent state"
-            },
-            "cw-vrf": {
-              "type": "string",
-              "description": "Cloudwatch VRF"
-            },
-            "cw-trace": {
-              "type": "string",
-              "description": "Cloudwatch trace level"
-            },
-            "cw-region": {
-              "type": "string",
-              "description": "Cloudwatch region"
-            },
-            "cw-profile-descr": {
-              "type": "string",
-              "description": "Cloudwatch profile description"
-            },
-            "cw-shutdown": {
-              "type": "boolean",
-              "description": "Cloudwatch shutdown variable"
-            },
-            "cw-proxy": {
-              "type": "object",
-              "properties": {
-                "http-url": {
-                  "type": "string",
-                  "description": "HTTP URL"
-                },
-                "http-port": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 65535,
-                  "description": "HTTP port"
-                },
-                "https-url": {
-                  "type": "string",
-                  "description": "HTTPS URL"
-                },
-                "https-port": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 65535,
-                  "description": "HTTPS port"
-                }
-              },
-              "description": "Cloudwatch proxy settings"
-            }
-          }
-        }
-      },
-      "Cisco-IOS-XE-aws-cw-oper-aws-oper-cw-item": {
-        "type": "object",
-        "properties": {
-          "http-url": {
-            "type": "string",
-            "description": "HTTP URL"
-          },
-          "http-port": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HTTP port"
-          },
-          "https-url": {
-            "type": "string",
-            "description": "HTTPS URL"
-          },
-          "https-port": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 65535,
-            "description": "HTTPS port"
-          },
-          "cw-log-file-path": {
-            "type": "string",
-            "description": "Log file path"
-          },
-          "cw-log-group-name": {
-            "type": "string",
-            "description": "Log group name"
-          },
-          "cw-log-stream-name": {
-            "type": "string",
-            "description": "Log stream name"
-          },
-          "cw-profile-name": {
-            "type": "string",
-            "description": "Profile name"
-          },
-          "cw-pid": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 4294967295,
-            "description": "Cloudwatch agent process ID"
-          },
-          "cw-state": {
-            "type": "string",
-            "description": "Agent state"
-          },
-          "cw-vrf": {
-            "type": "string",
-            "description": "Cloudwatch VRF"
-          },
-          "cw-trace": {
-            "type": "string",
-            "description": "Cloudwatch trace level"
-          },
-          "cw-region": {
-            "type": "string",
-            "description": "Cloudwatch region"
-          },
-          "cw-profile-descr": {
-            "type": "string",
-            "description": "Cloudwatch profile description"
-          },
-          "cw-shutdown": {
-            "type": "boolean",
-            "description": "Cloudwatch shutdown variable"
-          },
-          "cw-proxy": {
-            "type": "object",
-            "properties": {
-              "http-url": {
-                "type": "string",
-                "description": "HTTP URL"
-              },
-              "http-port": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 65535,
-                "description": "HTTP port"
-              },
-              "https-url": {
-                "type": "string",
-                "description": "HTTPS URL"
-              },
-              "https-port": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 65535,
-                "description": "HTTPS port"
-              }
-            },
-            "description": "Cloudwatch proxy settings"
-          }
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth (RFC 8040)",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
         }
       }
     }
@@ -465,12 +1024,6 @@
   "security": [
     {
       "basicAuth": []
-    }
-  ],
-  "tags": [
-    {
-      "name": "Cisco-IOS-XE-aws-cw-oper",
-      "description": "This module contains a collection of YANG definitions\n     for AWS Cloudwatch operational data.\n     Copyright (c) 2023-2025 by Cisco Systems, Inc.\n     All rights reserved."
     }
   ]
 }

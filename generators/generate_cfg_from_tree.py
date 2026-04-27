@@ -420,15 +420,27 @@ def process_tree_file(html_path, output_dir, max_depth=5):
     if not roots:
         return results
 
+    # Group roots by module name so multiple top-level containers from the
+    # same YANG module produce a single spec file (avoids fname collisions
+    # where last-write-wins; mirrors generate_oper_from_tree.py logic).
+    from collections import defaultdict
+    module_roots: dict[str, list] = defaultdict(list)
     for module_name, root in roots:
-        base_path = f"/data/{module_name}:{root.name}"
-        tag = root.name
+        module_roots[module_name].append(root)
 
-        deep = collect_deep_paths(root, base_path, max_depth=max_depth)
+    for module_name, root_list in module_roots.items():
         paths_dict = {}
-        for rpath, rnode in deep:
-            if rpath not in paths_dict:
-                paths_dict[rpath] = make_path_operations(rpath, rnode, tag, module_name)
+        total_descendants = 0
+        root_names = []
+        for root in root_list:
+            base_path = f"/data/{module_name}:{root.name}"
+            tag = root.name
+            root_names.append(root.name)
+            total_descendants += root.descendant_count()
+            deep = collect_deep_paths(root, base_path, max_depth=max_depth)
+            for rpath, rnode in deep:
+                if rpath not in paths_dict:
+                    paths_dict[rpath] = make_path_operations(rpath, rnode, tag, module_name)
 
         if not paths_dict:
             continue
@@ -436,14 +448,15 @@ def process_tree_file(html_path, output_dir, max_depth=5):
         # Count operations (rw gets 4 ops, ro gets 1)
         total_ops = sum(len(ops) for ops in paths_dict.values())
 
-        desc_count = root.descendant_count()
         title = f"Cisco IOS-XE Configuration - {module_name}"
         desc = (f"Configuration data from `{module_name}` module.\n\n"
-                f"**Root:** {root.name} | **Paths:** {len(paths_dict)} | "
-                f"**Operations:** {total_ops} | **Descendants:** {desc_count}\n\n"
+                f"**Root containers:** {len(root_list)} ({', '.join(root_names[:5])}{'...' if len(root_names) > 5 else ''})\n"
+                f"**Paths:** {len(paths_dict)} | **Operations:** {total_ops} | "
+                f"**Descendants:** {total_descendants}\n\n"
                 f"Supports GET/PUT/PATCH/DELETE for read-write nodes.")
 
-        spec = create_spec(title, desc, tag, paths_dict, module_name)
+        primary_tag = root_list[0].name
+        spec = create_spec(title, desc, primary_tag, paths_dict, module_name)
 
         spec_json = json.dumps(spec, indent=2)
         size_kb = len(spec_json.encode('utf-8')) / 1024
@@ -459,10 +472,25 @@ def process_tree_file(html_path, output_dir, max_depth=5):
     return results
 
 
-def generate_all():
-    script_dir = Path(__file__).parent
-    tree_dir = script_dir.parent / 'yang-trees'
-    output_dir = script_dir.parent / 'swagger-cfg-model' / 'api-v2'
+def _resolve_paths(version: str):
+    """Locate tree input dir + spec output dir for the given release.
+
+    Mirrors generators/_version_args.py conventions: 17.18.1 uses the
+    legacy top-level layout, every other release lives under releases/<ver>/.
+    """
+    project_root = Path(__file__).resolve().parent.parent
+    if version == '17.18.1':
+        tree_dir = project_root / 'yang-trees'
+        output_dir = project_root / 'swagger-cfg-model' / 'api-v2'
+    else:
+        tree_dir = project_root / 'releases' / version / 'yang-trees'
+        output_dir = (project_root / 'releases' / version
+                      / 'swagger-cfg-model' / 'api-v2')
+    return tree_dir, output_dir
+
+
+def generate_all(version: str = '17.18.1'):
+    tree_dir, output_dir = _resolve_paths(version)
 
     if output_dir.exists():
         for f in output_dir.glob('*.json'):
@@ -470,7 +498,9 @@ def generate_all():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*70}")
-    print("Configuration YANG Tree -> OpenAPI 3.0 Generator (v2)")
+    print(f"Configuration YANG Tree -> OpenAPI 3.0 Generator (v2)  [{version}]")
+    print(f"  trees:  {tree_dir}")
+    print(f"  output: {output_dir}")
     print(f"{'='*70}\n")
 
     tree_files = sorted(tree_dir.glob('Cisco-IOS-XE-*-cfg*.html'))
@@ -500,7 +530,7 @@ def generate_all():
         'modules': sorted(all_generated),
         'generator': 'generate_cfg_from_tree.py',
         'source': 'yang-trees/Cisco-IOS-XE-*-cfg.html',
-        'version': '17.18.1'
+        'version': version,
     }
     with open(output_dir / 'manifest.json', 'w', encoding='utf-8') as f:
         json.dump(manifest, f, indent=2)
@@ -511,4 +541,8 @@ def generate_all():
 
 
 if __name__ == '__main__':
-    generate_all()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--version', default='17.18.1')
+    args = ap.parse_args()
+    generate_all(args.version)

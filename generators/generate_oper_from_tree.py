@@ -529,10 +529,20 @@ def process_tree_file(html_path, output_dir, max_depth=5):
     return results
 
 
-def generate_all():
-    script_dir = Path(__file__).parent
-    tree_dir = script_dir.parent / 'yang-trees'
-    output_dir = script_dir.parent / 'swagger-oper-model' / 'api-v2'
+def _resolve_paths(version: str):
+    project_root = Path(__file__).resolve().parent.parent
+    if version == '17.18.1':
+        tree_dir = project_root / 'yang-trees'
+        output_dir = project_root / 'swagger-oper-model' / 'api-v2'
+    else:
+        tree_dir = project_root / 'releases' / version / 'yang-trees'
+        output_dir = (project_root / 'releases' / version
+                      / 'swagger-oper-model' / 'api-v2')
+    return tree_dir, output_dir
+
+
+def generate_all(version: str = '17.18.1'):
+    tree_dir, output_dir = _resolve_paths(version)
 
     # Clean previous output
     if output_dir.exists():
@@ -541,7 +551,9 @@ def generate_all():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*70}")
-    print("Operational YANG Tree -> OpenAPI 3.0 Generator (v2)")
+    print(f"Operational YANG Tree -> OpenAPI 3.0 Generator (v2)  [{version}]")
+    print(f"  trees:  {tree_dir}")
+    print(f"  output: {output_dir}")
     print(f"{'='*70}\n")
 
     # Find all oper tree files
@@ -571,7 +583,7 @@ def generate_all():
         'modules': sorted(all_generated),
         'generator': 'generate_oper_from_tree.py',
         'source': 'yang-trees/Cisco-IOS-XE-*-oper.html',
-        'version': '17.18.1'
+        'version': version,
     }
     with open(output_dir / 'manifest.json', 'w', encoding='utf-8') as f:
         json.dump(manifest, f, indent=2)
@@ -582,4 +594,8 @@ def generate_all():
 
 
 if __name__ == '__main__':
-    generate_all()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--version', default='17.18.1')
+    args = ap.parse_args()
+    generate_all(args.version)
