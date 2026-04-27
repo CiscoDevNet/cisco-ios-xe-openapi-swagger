@@ -319,16 +319,16 @@ Every spec follows this structure:
 ### Completeness Requirements (100% achieved)
 
 Every operation in every spec has:
-- ✅ `operationId` — unique identifier (24,734 total)
-- ✅ `tags` — at least one tag per operation
-- ✅ `description` — meaningful description
-- ✅ `summary` — concise summary
-- ✅ `responses` — proper response schemas for GET operations
+- `operationId` — unique identifier (24,734 total)
+- `tags` — at least one tag per operation
+- `description` — meaningful description
+- `summary` — concise summary
+- `responses` — proper response schemas for GET operations
 
 Every spec has:
-- ✅ `externalDocs` — link to Cisco DevNet
-- ✅ `security` — basicAuth scheme defined
-- ✅ `servers` — parameterized RESTCONF URL
+- `externalDocs` — link to Cisco DevNet
+- `security` — basicAuth scheme defined
+- `servers` — parameterized RESTCONF URL
 
 ### YANG List Key Parameters
 
@@ -501,7 +501,7 @@ Each tree HTML file includes:
 
 Every spec's `info.description` field includes a link to its tree visualization:
 ```
-📊 YANG Tree: View Module-Name structure
+YANG Tree: View Module-Name structure
 (link to: https://jeremycohoe.github.io/.../yang-trees/Module-Name.html)
 ```
 

@@ -2,12 +2,12 @@
 
 ## Fixed Issues
 
-### 4. ✅ Empty `{}` and `null` Examples — Fixed
+### 4. Empty `{}` and `null` Examples — Fixed
 **Issue:** POST/PUT/PATCH request bodies showed `{}` or stray `null` values, making the examples unusable for real RESTCONF calls.
 **Fix:** [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) now schema-walks, then path-matches, then falls back to `[null]` (RFC 7951 empty-leaf encoding). 48,541 enrichments applied across 657 specs. Verified: 0 empty `{}` and 0 `null` values across all 26,331 config examples.
 **Status:** Fixed and deployed. See [CHANGELOG](CHANGELOG.md) for details.
 
-### 5. ✅ Deep-Link URLs — Fixed
+### 5. Deep-Link URLs — Fixed
 **Issue:** Copying a search-result URL brought users back to the index page instead of the right module.
 **Fix:** [search.js](search.js) now reads/writes URL hashes:
 - `#search=<query>` — runs the search on load
@@ -15,12 +15,12 @@
 - `#spec=<model>/<name>` — opens the spec inside the right model's `index-v2.html`
 **Status:** Fixed and deployed.
 
-### 1. ✅ Other Model - Fixed [object object] Display
+### 1. Other Model - Fixed [object object] Display
 **Issue:** Other/Misc tab showed `[object object]` instead of module names  
 **Fix:** Updated JavaScript to properly handle module objects from manifest  
 **Status:** Fixed and deployed
 
-### 2. ✅ Native Config - Added Search for hostname
+### 2. Native Config - Added Search for hostname
 **Issue:** Too many APIs, couldn't find `hostname` easily  
 **Fix:** 
 - Added search box at top of sidebar
@@ -34,7 +34,7 @@
 3. Search for "hostname" in the operations filter
 4. Look for `/data/Cisco-IOS-XE-native:native/hostname`
 
-### 3. ⚠️ MIB Model - Errors Expected
+### 3. MIB Model - Errors Expected
 **Issue:** "Lots of lots of errors"  
 **Explanation:** MIB-to-YANG conversions often have validation issues:
 - 147 MIB modules converted from SNMP MIBs
@@ -79,15 +79,15 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 
 | Category | Specs | Paths/Ops | Use Case | Quality |
 |----------|-------|-----------|----------|---------|
-| **Operational** | 205 specs | 20,159 paths | Monitoring, state data | ⭐⭐⭐⭐⭐ Production Ready |
-| **Native Config** | 81 specs | 13,452 ops | Full device config | ⭐⭐⭐⭐⭐ Production Ready |
-| **Configuration** | 39 specs | 9,452 ops | Feature config | ⭐⭐⭐⭐⭐ Production Ready |
-| **RPC** | 59 specs | 232 RPCs | Actions, commands | ⭐⭐⭐⭐⭐ Production Ready |
-| **OpenConfig** | 57 specs | 5,920 ops | Vendor-neutral config | ⭐⭐⭐⭐ Stable |
-| **IETF** | 19 specs | 1,122 ops | Standards-based | ⭐⭐⭐⭐ Stable |
-| **Events** | 38 specs | 861 paths | Notifications | ⭐⭐⭐⭐ Stable |
-| **MIB** | 149 specs | 12,482 paths | SNMP MIB reference | ⚠️ Reference Only |
-| **Other** | 9 specs | 4,593 ops | Misc/vendor-specific | ⭐⭐⭐ Variable |
+| **Operational** | 205 specs | 20,159 paths | Monitoring, state data | Production Ready |
+| **Native Config** | 81 specs | 13,452 ops | Full device config | Production Ready |
+| **Configuration** | 39 specs | 9,452 ops | Feature config | Production Ready |
+| **RPC** | 59 specs | 232 RPCs | Actions, commands | Production Ready |
+| **OpenConfig** | 57 specs | 5,920 ops | Vendor-neutral config | Stable |
+| **IETF** | 19 specs | 1,122 ops | Standards-based | Stable |
+| **Events** | 38 specs | 861 paths | Notifications | Stable |
+| **MIB** | 149 specs | 12,482 paths | SNMP MIB reference | Reference Only |
+| **Other** | 9 specs | 4,593 ops | Misc/vendor-specific | Variable |
 
 ### Quick Links
 

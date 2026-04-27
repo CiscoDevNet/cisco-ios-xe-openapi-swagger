@@ -217,6 +217,30 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 - Adding new third-party scripts requires updating the CSP `meta` tag
 - All pages must work without JS for basic content (progressive enhancement)
 
+### No emoji in UI or docs
+
+This is a developer-facing technical reference, not a marketing site. Decorative
+emoji (e.g. globes, rockets, stars-of-wonder, charts, clipboards, fire, etc.)
+look like AI slop and frequently render as mojibake on consoles or older
+browsers. Do **not** add emoji to:
+
+- HTML files (landing page, viewers, code generator, accountability pages)
+- JS files (toast messages, placeholder text, badges, search results)
+- Markdown docs at the repo root (`README.md`, `AGENTS.md`, `CHANGELOG.md`,
+  `QUICK_REFERENCE.md`, `PROJECT_REQUIREMENTS.md`, etc.)
+
+**Banned ranges:** `U+1F000-1FAFF`, `U+2600-27BF`, `U+2300-23FF`, `U+2B00-2BFF`
+(plus `U+FE0F` variation selector when attached to those code points).
+
+**Exempt (functional monochrome glyphs the UI needs):**
+
+- `U+2605` BLACK STAR / `U+2606` WHITE STAR — favorites toggle
+- `U+2713` CHECK MARK — copy-to-clipboard confirmation
+- `U+2715` MULTIPLICATION X — close button
+
+If you find decorative emoji creeping back in, run
+`python -X utf8 scripts/strip_emoji.py .` from the repo root to remove them.
+
 ### Git & deploy
 
 - Push to `main` → GitHub Actions deploys to Pages automatically
@@ -265,31 +289,31 @@ python scripts/validate_examples_c9kv.py --host <ip> --username <u> --password <
 
 ## 8. Pitfalls — Read Before Editing
 
-### ⚠️ Specs and Search Index Drift
+### Specs and Search Index Drift
 
 `search-index.json` is generated from spec manifests. **If you edit specs directly without regenerating the search index, the site will look stale.** Always re-run `scripts/generate_search_index.py` after spec changes.
 
-### ⚠️ Spec Files Are Generated
+### Spec Files Are Generated
 
 Direct edits to `swagger-*-model/api-v2/*.json` will be **overwritten** the next time generators or `enrich_v2_specs.py` run. Make changes in the relevant Python file instead.
 
-### ⚠️ CSP Will Block New CDN Scripts
+### CSP Will Block New CDN Scripts
 
 The CSP `meta` tag in each HTML page restricts script sources. Adding a new external library (e.g., `unpkg.com`) requires updating CSP in **every** HTML file that uses it. Prefer `cdn.jsdelivr.net` (already allowlisted).
 
-### ⚠️ Inline Scripts Have Been Extracted
+### Inline Scripts Have Been Extracted
 
 Don't reintroduce inline `<script>` blocks or `onclick="..."` attributes — they violate CSP. The 4 main pages were refactored to externalize all JS. See [index-app.js](index-app.js), [code-generator.js](code-generator.js), [tree-compare.js](tree-compare.js), [yang-accountability.js](yang-accountability.js).
 
-### ⚠️ MIB Specs Have Validation Issues
+### MIB Specs Have Validation Issues
 
 149 MIB specs are auto-converted from SNMP MIBs. Some don't validate cleanly — this is **expected and documented**. Don't try to "fix" them by hand-editing JSON. They're reference-only; production code should use Operational/Native/Config/RPC models.
 
-### ⚠️ YANG Empty Leaves & Presence Containers
+### YANG Empty Leaves & Presence Containers
 
 In RFC 7951 RESTCONF JSON, an empty YANG leaf is `[null]` (an array containing null), **not** `null` or `{}`. The enrichment script uses `[null]` for YANG presence containers it can't otherwise fill. Don't replace these with `{}` — devices will reject the request.
 
-### ⚠️ "Empty" Examples Used to Be a Real Bug
+### "Empty" Examples Used to Be a Real Bug
 
 Earlier versions had `{"Cisco-IOS-XE-native:vlan": {}}` examples that broke device updates. The fix lives in `scripts/enrich_v2_specs.py` (`build_example_from_schema()`, `_build_example_from_path()`, `_populate_empty_example()`). If you see `{}` come back in examples, the fix has regressed.
 
@@ -313,11 +337,11 @@ Adding `pytest` or similar is welcome but not required.
 
 When making changes that affect generated artifacts:
 
-✅ **Safe** — edit, re-run generator/enrichment locally, commit both source and outputs
-✅ **Safe** — add new generators or scripts, document them here
-✅ **Safe** — frontend changes (must validate CSP compliance)
+**Safe** — edit, re-run generator/enrichment locally, commit both source and outputs
+**Safe** — add new generators or scripts, document them here
+**Safe** — frontend changes (must validate CSP compliance)
 
-⚠️ **Confirm with user first**:
+**Confirm with user first**:
 
 - Deleting any `swagger-*-model/` directory or its contents
 - Removing scripts in `scripts/` or `generators/` (some are referenced by the deploy workflow)

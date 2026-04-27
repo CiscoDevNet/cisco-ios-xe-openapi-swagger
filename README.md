@@ -7,10 +7,10 @@
 
 Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTCONF APIs. **Complete coverage with 657 OpenAPI specs, 43,726 paths, and 767 YANG tree files** for developer productivity.
 
-🌐 **[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**  
+**[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
-## ✨ Deep-Path Specifications
+## Deep-Path Specifications
 
 **Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All 9 model types covered:
 
@@ -26,13 +26,13 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 
 **Key Features:**
 -  **Comprehensive Docs** - Getting started guide with 15+ examples
-- 🎯 **53 Logical Categories** - Organized by network engineer workflows
-- 📊 **100% Accountability** - Every YANG module mapped and documented
-- 🌳 **767 Tree Files** - Searchable YANG tree visualizations
+- **53 Logical Categories** - Organized by network engineer workflows
+- **100% Accountability** - Every YANG module mapped and documented
+- **767 Tree Files** - Searchable YANG tree visualizations
 
-📊 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
+**[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
-## 📊 Quick Stats
+## Quick Stats
 
 | Metric | Count | Description |
 |--------|-------|-------------|
@@ -46,67 +46,67 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE 17.18.1 RESTC
 | **Coverage** | 61.7% | Modules with specs (680/1103) |
 | **Accountability** | 100% | All modules mapped |
 
-## 🗂️ Model Categories
+## Model Categories
 
-### ⭐ Primary Models (Categorized & Organized)
+### Primary Models (Categorized & Organized)
 
-#### 📊 Native Configuration (81 specs, 3,363 paths, 13,452 operations)
+#### Native Configuration (81 specs, 3,363 paths, 13,452 operations)
 Full CLI-equivalent configuration organized by network domain.
 - **Categories:** Top-level leafs, containers, IP, IPv6, Router, Crypto, AAA, Line, VRF, Platform & System, Protocols, Security & Access, Switching L2, QoS, Monitor, License, Service, Other, App & Services, L2 Discovery, Routing & Multicast, Security Services, Platform & Diagnostics, WAN & Legacy, Industrial & IoT, Misc Extensions
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
-#### 📈 Operational Data (205 modules, 20,159 paths)
+#### Operational Data (205 modules, 20,159 paths)
 Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
 
-#### 🔔 Events (38 specs, 861 paths)
+#### Events (38 specs, 861 paths)
 Event notification modules for YANG-Push telemetry and SNMP trap visualization.
 - **YANG Events:** 40 Cisco-IOS-XE event modules
 - **MIB Notifications:** 88 SNMP trap modules (view-only in Swagger)
 - [Browse Events APIs →](swagger-events-model/)
 
-#### ⚡ RPC Operations (59 specs, 232 RPCs)
+#### RPC Operations (59 specs, 232 RPCs)
 Remote procedure calls for device actions and commands.
 - **Cisco RPCs:** 51 modules for device operations
 - **IETF/Tailf:** 7 modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query, and others)
 - [Browse RPC APIs →](swagger-rpc-model/)
 
-### 📚 Standard Models (Original Structure)
+### Standard Models (Original Structure)
 
-#### ⚙️ Configuration (39 specs, 2,363 paths)
+#### Configuration (39 specs, 2,363 paths)
 Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
 - [Browse Config APIs →](swagger-cfg-model/)
 
-#### 🌍 OpenConfig (57 specs, 2,377 paths)
+#### OpenConfig (57 specs, 2,377 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
 
-#### 📜 IETF Standards (19 specs, 438 paths)
+#### IETF Standards (19 specs, 438 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
 - [Browse IETF APIs →](swagger-ietf-model/)
 
-#### 📡 MIB Translations (149 specs, 12,482 paths)
+#### MIB Translations (149 specs, 12,482 paths)
 SNMP MIB modules with YANG tree visualizations.
 - IF-MIB, CISCO-PROCESS-MIB, OSPF-MIB, Entity MIBs
 - [Browse MIB APIs →](swagger-mib-model/)
 
-#### 📦 Other Models (9 specs, 1,374 paths)
+#### Other Models (9 specs, 1,374 paths)
 Standalone and vendor-specific modules.
 - [Browse Other APIs →](swagger-other-model/)
 
-## ✅ Recent Improvements
+## Recent Improvements
 
 - **Realistic write-operation examples** — Every POST/PUT/PATCH body across all 657 specs now ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
 - **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.
 - **Live-device validation script** — [scripts/validate_examples_c9kv.py](scripts/validate_examples_c9kv.py) verifies examples against a real Catalyst 9000V (or any IOS-XE 17.18.1+ device).
 
-## 🚀 Quick Start
+## Quick Start
 
 ### View Online
 Visit [https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
@@ -132,7 +132,7 @@ curl -O https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-
 openapi-generator-cli generate -i Cisco-IOS-XE-interfaces-oper.json -g python -o ./python-client
 ```
 
-## 📚 API Examples
+## API Examples
 
 ### Python RESTCONF Example
 ```python
@@ -152,7 +152,7 @@ response = requests.get(
 print(response.json())
 ```
 
-## 🔧 Development
+## Development
 
 ### Prerequisites
 - Python 3.8+
@@ -181,7 +181,7 @@ python scripts/validate_quality.py
 python scripts/analyze_yang_accountability.py
 ```
 
-## 📋 Project Structure
+## Project Structure
 
 ```
 iosxe-1718-yang-swagger/
@@ -200,7 +200,7 @@ iosxe-1718-yang-swagger/
 └── references/17181-YANG-modules/      # 848 YANG sources
 ```
 
-## 📄 Documentation
+## Documentation
 
 - [AGENTS.md](AGENTS.md) — AI agent guide (build/run, conventions, pitfalls, common tasks)
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution workflow
@@ -212,7 +212,7 @@ iosxe-1718-yang-swagger/
 - [YANG_MODULE_ACCOUNTABILITY.md](YANG_MODULE_ACCOUNTABILITY.md) — Module-by-module coverage
 - [GITHUB_PAGES_DEPLOY.md](GITHUB_PAGES_DEPLOY.md) — Deployment workflow details
 
-## 🔗 Resources
+## Resources
 
 - [Cisco IOS-XE RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
 - [Cisco YANG Suite](https://developer.cisco.com/yangsuite/)
@@ -220,7 +220,7 @@ iosxe-1718-yang-swagger/
 - [YANG Models on GitHub](https://github.com/YangModels/yang)
 - [OpenAPI Specification](https://swagger.io/specification/)
 
-## 📞 Contact
+## Contact
 
 - **Issues**: [GitHub Issues](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/issues)
 - **DevNet**: [Cisco DevNet Community](https://community.cisco.com/t5/networking-developer-community/ct-p/5672j-dev-networking)
