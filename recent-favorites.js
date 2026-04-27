@@ -66,9 +66,9 @@ function addToRecent(module) {
         console.error('Error adding to recent:', error);
         if (typeof showToast !== 'undefined') {
             if (error.name === 'QuotaExceededError') {
-                showToast('⚠️ Cannot save recent modules - storage is full', 'warning');
+                showToast('Cannot save recent modules - storage is full', 'warning');
             } else {
-                showToast('⚠️ Cannot save recent modules (storage may be disabled)', 'warning');
+                showToast('Cannot save recent modules (storage may be disabled)', 'warning');
             }
         }
         return { success: false, error: error.message };
@@ -120,9 +120,9 @@ function toggleFavorite(module) {
         console.error('Error toggling favorite:', error);
         if (typeof showToast !== 'undefined') {
             if (error.name === 'QuotaExceededError') {
-                showToast('⚠️ Cannot save favorites - storage is full', 'warning');
+                showToast('Cannot save favorites - storage is full', 'warning');
             } else {
-                showToast('⚠️ Cannot save favorites (storage may be disabled)', 'warning');
+                showToast('Cannot save favorites (storage may be disabled)', 'warning');
             }
         }
         return false;
@@ -189,8 +189,8 @@ function renderRecentModules() {
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">📖 API Spec</a>` : ''}
-                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">🌳 YANG Tree</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">API Spec</a>` : ''}
+                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">YANG Tree</a>` : ''}
                 </div>
             </div>
         `;
@@ -234,8 +234,8 @@ function renderFavoriteModules() {
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">📖 API Spec</a>` : ''}
-                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">🌳 YANG Tree</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">API Spec</a>` : ''}
+                    ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">YANG Tree</a>` : ''}
                 </div>
             </div>
         `;

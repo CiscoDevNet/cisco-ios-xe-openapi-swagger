@@ -25,11 +25,6 @@
         'other': 'Other',
         'rpc': 'RPC'
     };
-    var CAT_EMOJI = {
-        'cfg': '⚙️', 'events': '🔔', 'ietf': '📜', 'mib': '🗄️',
-        'native-config': '🏠', 'openconfig': '🌍', 'oper': '📊',
-        'other': '📦', 'rpc': '⚡'
-    };
     var METHOD_COLOR = {
         get: '#10B981', post: '#F59E0B', put: '#3B82F6',
         patch: '#8B5CF6', delete: '#EF4444', head: '#6B7280', options: '#6B7280'
@@ -137,7 +132,7 @@
         if (truncated) hits = hits.slice(0, MAX_HITS);
 
         var header = '<div class="search-stats" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-            + '🔧 <strong>Operations matching "' + escHtml(q) + '"</strong>: '
+            + '<strong>Operations matching "' + escHtml(q) + '"</strong>: '
             + hits.length + (truncated ? '+' : '') + ' hit' + (hits.length !== 1 ? 's' : '')
             + (truncated ? ' (showing first ' + MAX_HITS + ')' : '')
             + ' <span style="font-size:0.78rem;color:var(--text-secondary,#888);">across all categories in '
@@ -147,7 +142,6 @@
         var rowsHtml = hits.map(function (h) {
             var cat = h.cat, row = h.row;
             var label = escHtml(CAT_LABEL[cat] || cat);
-            var emoji = CAT_EMOJI[cat] || '';
             var pathHtml = escHtml(row.p);
             var summary = row.sm ? '<div style="font-size:0.78rem;color:var(--text-secondary,#666);margin-top:2px;">' + escHtml(row.sm) + '</div>' : '';
 
@@ -168,7 +162,7 @@
             return '<div class="search-result-card" style="border-left-color:#1565C0;padding:8px 12px;">'
                 + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
                 + '<span class="search-result-badge" style="background:#E3F2FD;color:#0D47A1;">'
-                + emoji + ' ' + label + '</span>'
+                + label + '</span>'
                 + '<span style="font-size:0.8rem;color:var(--text-secondary,#666);">' + escHtml(row.s) + '</span>'
                 + methods
                 + '</div>'
