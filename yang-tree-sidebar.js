@@ -19,6 +19,8 @@
  *       currentModule: 'fname',      // for .selected highlight
  *       onLoad: (fname, el, opId) => void,   // click handler
  *       collapseAllByDefault: true,  // recommended for multi-root viewers
+ *       storageKey: 'yang-tree-cfg', // when set, expansion state persists
+ *                                    // in localStorage across reloads
  *     }
  *     → { visibleTops, matched }     // for the "x of y" label
  *
@@ -134,8 +136,9 @@
         var indent = depth * 12;
         var pathBadge = node.totalPaths > 1 ? '<span class="path-count">' + node.totalPaths + '</span>' : '';
         var fnameBadge = fname ? '<span class="leaf-spec">' + _escape(fname) + '</span>' : '';
+        var pathAttr = hasKids ? ' data-tree-path="' + _escape(fullPath) + '"' : '';
         var html =
-            '<div class="tree-row' + collapsedClass + selected + '" data-depth="' + depth + '" style="padding-left:' + indent + 'px" ' + toggleAttr + '>' +
+            '<div class="tree-row' + collapsedClass + selected + '" data-depth="' + depth + '"' + pathAttr + ' style="padding-left:' + indent + 'px" ' + toggleAttr + '>' +
                 arrow +
                 '<span class="tree-label" ' + labelAttr + '><code>' + _escape(node.name) + '</code>' + fnameBadge + '</span>' +
                 pathBadge +
@@ -154,6 +157,12 @@
         }
         // Click handler — stash on the namespace so the inline onclick can find it.
         window.YangTreeSidebar._currentOnLoad = opts.onLoad || function () {};
+        // Persist storageKey on the host so toggle() can find it later.
+        if (opts.storageKey) {
+            hostEl.setAttribute('data-tree-storage-key', opts.storageKey);
+        } else {
+            hostEl.removeAttribute('data-tree-storage-key');
+        }
         var html = '';
         var visibleTops = 0;
         var tops = [];
@@ -168,8 +177,45 @@
             if (r) { html += r.html; visibleTops++; }
         }
         hostEl.innerHTML = html;
+        // Apply persisted expand/collapse state. We only honor it when there is
+        // no active filter — a filter forces an open view of matching subtrees.
+        if (opts.storageKey && !filterRe) {
+            var saved = _readState(opts.storageKey);
+            if (saved) {
+                var rows = hostEl.querySelectorAll('.tree-row[data-tree-path]');
+                for (var j = 0; j < rows.length; j++) {
+                    var row = rows[j];
+                    var path = row.getAttribute('data-tree-path');
+                    if (!(path in saved)) continue;
+                    var wantCollapsed = !!saved[path];
+                    var isCollapsed = row.classList.contains('collapsed');
+                    if (wantCollapsed !== isCollapsed) {
+                        row.classList.toggle('collapsed');
+                        var kids = row.nextElementSibling;
+                        if (kids && kids.classList.contains('tree-children')) {
+                            kids.classList.toggle('collapsed');
+                        }
+                    }
+                }
+            }
+        }
         var matched = hostEl.querySelectorAll('.tree-row').length;
         return { visibleTops: visibleTops, matched: matched };
+    }
+
+    function _readState(key) {
+        try {
+            var raw = window.localStorage.getItem('YangTreeSidebar:' + key);
+            if (!raw) return null;
+            var parsed = JSON.parse(raw);
+            return (parsed && typeof parsed === 'object') ? parsed : null;
+        } catch (_) { return null; }
+    }
+
+    function _writeState(key, state) {
+        try {
+            window.localStorage.setItem('YangTreeSidebar:' + key, JSON.stringify(state));
+        } catch (_) { /* quota / disabled — ignore */ }
     }
 
     function toggle(rowEl, evt) {
@@ -177,6 +223,16 @@
         rowEl.classList.toggle('collapsed');
         var kids = rowEl.nextElementSibling;
         if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
+        // Persist the new state if the host opted in.
+        var host = rowEl.parentElement;
+        while (host && !host.hasAttribute('data-tree-storage-key')) host = host.parentElement;
+        if (!host) return;
+        var key = host.getAttribute('data-tree-storage-key');
+        var path = rowEl.getAttribute('data-tree-path');
+        if (!key || !path) return;
+        var state = _readState(key) || {};
+        state[path] = rowEl.classList.contains('collapsed');
+        _writeState(key, state);
     }
 
     function _click(fname, el, opId) {
