@@ -94,6 +94,10 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),
                              "--version", "$VER"]),
+    # 26.1.1 only: per-category cross-chunk operation index for the viewer
+    # search box. Older releases keep the legacy chunk-only sidebar search.
+    ("paths-index",         ["python", str(SCRIPTS / "build_paths_index.py"),
+                             "--version", "$VER"]),
     # 7. Exports
     ("postman",             ["python", str(SCRIPTS / "generate_postman_v2_collection.py"),
                              "--version", "$VER", "--per-category", "--max-mb", "50"]),
