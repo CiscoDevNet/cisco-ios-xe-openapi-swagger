@@ -20,9 +20,33 @@
 
     // === Load data ===
 
+    function _activeVersion() {
+        // Honor ?ver=… or #ver=… on this page, then fall back to the parent
+        // hub's __IOSXE_ACTIVE_VERSION__ when navigated to from index.html.
+        try {
+            var qs = new URLSearchParams(location.search).get('ver');
+            if (qs) return qs;
+            var m = (location.hash || '').match(/[#&]ver=([^&]+)/);
+            if (m) return decodeURIComponent(m[1]);
+        } catch (_) { /* noop */ }
+        if (window.__IOSXE_ACTIVE_VERSION__) return window.__IOSXE_ACTIVE_VERSION__;
+        return null;
+    }
+
+    function _accountabilityUrl() {
+        var ver = _activeVersion();
+        if (ver) return 'releases/' + encodeURIComponent(ver) + '/yang_accountability.json';
+        return 'yang_accountability.json';
+    }
+
     async function loadModuleData() {
         try {
-            var response = await fetch('yang_accountability.json');
+            var url = _accountabilityUrl();
+            var response = await fetch(url, { cache: 'no-store' });
+            if (!response.ok && url !== 'yang_accountability.json') {
+                // Per-release JSON missing — fall back to root snapshot.
+                response = await fetch('yang_accountability.json', { cache: 'no-store' });
+            }
             reportData = await response.json();
             allModules = reportData.modules;
 

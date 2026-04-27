@@ -486,6 +486,13 @@
                 else if (key === 'modules_total') el.textContent = fmtNum(totals.modules_total);
                 else if (key === 'modules_with_specs') el.textContent = fmtNum(totals.modules_with_specs);
                 else if (key === 'modules_with_trees') el.textContent = fmtNum(totals.modules_with_trees);
+                else if (key === 'yang_modules') el.textContent = fmtNum(totals.yang_modules);
+                else if (key === 'mib_modules') el.textContent = fmtNum(totals.mib_modules);
+                else if (key === 'yang_tree_files') el.textContent = fmtNum(totals.yang_tree_files);
+                else if (key === 'mib_tree_files') el.textContent = fmtNum(totals.mib_tree_files);
+                else if (key === 'total_tree_files') el.textContent = fmtNum(totals.total_tree_files || totals.modules_with_trees);
+                else if (key === 'modules_excluded') el.textContent = fmtNum(totals.modules_excluded);
+                else if (key === 'spec_only_modules') el.textContent = fmtNum(totals.spec_only_modules);
                 else if (key === 'version_label') el.textContent = ver;
                 else if (key === 'tree_coverage_pct') {
                     var tpct = totals.modules_total
