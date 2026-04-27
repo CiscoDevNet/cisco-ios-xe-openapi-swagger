@@ -43,6 +43,20 @@
         .module-list a:hover { background: #e3f2fd; }
         .module-list a.selected { background: #e3f2fd; border-left: 3px solid #1565c0; }
         .module-list .path-count { color: #999; font-size: 11px; white-space: nowrap; }
+        /* Recursive YANG container tree */
+        .tree-row { display: flex; align-items: center; padding: 4px 12px 4px 4px; font-size: 12px; color: #333; cursor: pointer; user-select: none; border-bottom: 1px solid #f5f5f5; gap: 4px; }
+        .tree-row:hover { background: #e3f2fd; }
+        .tree-row.selected { background: #e3f2fd; border-left: 3px solid #1565c0; }
+        .tree-row code { font-family: 'Consolas','Monaco','Courier New',monospace; font-size: 12px; background: transparent; padding: 0; color: #1a237e; }
+        .tree-row .tree-arrow { display: inline-block; width: 12px; flex: 0 0 12px; color: #5c6bc0; font-size: 9px; transition: transform 0.15s; }
+        .tree-row.collapsed .tree-arrow { transform: rotate(-90deg); }
+        .tree-arrow-empty { visibility: hidden; }
+        .tree-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .tree-label[data-module], .tree-label[onclick] { cursor: pointer; }
+        .tree-label .leaf-spec { color: #999; font-size: 10px; margin-left: 6px; font-style: italic; }
+        .tree-row .path-count { color: #5c6bc0; font-size: 10px; background: #e8eaf6; border-radius: 8px; padding: 0 6px; min-width: 22px; text-align: center; }
+        .tree-children { }
+        .tree-children.collapsed { display: none; }
         .main-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
         .swagger-container { flex: 1; overflow-y: auto; }
         .info-box { padding: 24px; margin: 24px; background: #e3f2fd; border-radius: 8px; }
@@ -131,13 +145,14 @@
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    // Sidebar layout = the actual YANG container tree under
-    // /data/Cisco-IOS-XE-native:native/. Top-level YANG containers (e.g.
-    // interface, ip, vlan, line, router) are the section headers; their
-    // immediate child YANG nodes are the items underneath. The map is
-    // built dynamically from each spec's path list at init time.
+    // Sidebar = the FULL recursive YANG container tree under
+    // /data/Cisco-IOS-XE-native:native/. Every container/list node from
+    // every spec is rendered, regardless of which JSON file it lives in
+    // (since the spec-file split is a generation artifact, not part of
+    // YANG). Each tree node knows the spec that owns its API path so
+    // clicks still load the right Swagger UI document.
     const NATIVE_PREFIX = '/data/Cisco-IOS-XE-native:native/';
-    let containerTree = {}; // { topContainer: { subs: {sub:fname}, specs: Set, leafSpec: fname|null, totalPaths } }
+    let containerTree = null; // root node: { name, children: Map, ownPathSpec, totalPaths }
 
     // === version-aware api base (added by patch_viewers_version_aware.py) ===
     // Default version + allow-list are baked from releases/index.json at
@@ -240,112 +255,123 @@
         checkHash();
     }
 
-    // Walk every spec's paths and build a 2-level tree keyed on the YANG
-    // top-level container (immediate child of native:native) and its
-    // immediate child node. The owning spec for each (top, sub) is the
-    // first spec that references that path.
+    // Walk every spec's paths and build a full N-ary YANG container tree.
+    // List keys (e.g. `interface={name}`) collapse onto their parent
+    // container node so the tree mirrors the YANG schema rather than the
+    // RESTCONF URL form.
     function buildContainerTree() {
-        const tree = {};
-        for (const m of allModules) {
+        const root = { name: '', children: new Map(), ownPathSpec: null, totalPaths: 0 };
+        // Sort specs by name so the *first* spec to claim a node wins
+        // deterministically across reloads.
+        const sorted = [...allModules].sort((a, b) => a.fname.localeCompare(b.fname));
+        for (const m of sorted) {
             for (const p of m.pathList) {
                 if (!p.startsWith(NATIVE_PREFIX)) continue;
-                const rest = p.slice(NATIVE_PREFIX.length); // top[/sub[/...]]
+                const rest = p.slice(NATIVE_PREFIX.length);
                 if (!rest) continue;
-                const segs = rest.split('/');
-                const top = segs[0];
-                if (!top) continue;
-                if (!tree[top]) tree[top] = { subs: {}, specs: new Set(), leafSpec: null, totalPaths: 0 };
-                const node = tree[top];
-                node.specs.add(m.fname);
-                node.totalPaths++;
-                // Top-level path itself (e.g. /native/aaa) -> leaf section
-                if (segs.length === 1 && !node.leafSpec) node.leafSpec = m.fname;
-                if (segs.length >= 2) {
-                    const sub = segs[1];
-                    if (!(sub in node.subs)) node.subs[sub] = m.fname;
+                // Strip RESTCONF list keys: `interface={name}` -> `interface`
+                const segs = rest.split('/').map(s => s.replace(/=.*/, '')).filter(Boolean);
+                if (!segs.length) continue;
+                let node = root;
+                root.totalPaths++;
+                for (const s of segs) {
+                    if (!node.children.has(s)) {
+                        node.children.set(s, { name: s, children: new Map(), ownPathSpec: null, totalPaths: 0 });
+                    }
+                    node = node.children.get(s);
+                    node.totalPaths++;
+                }
+                if (!node.ownPathSpec) node.ownPathSpec = m.fname;
+            }
+        }
+        containerTree = root;
+    }
+
+    // Recursive renderer. Builds an indented list with a disclosure
+    // triangle on every node that has children. Leaf nodes (and any node
+    // that has an addressable path) load the owning spec on click.
+    // `filterRe` is a compiled regex (or null). When filtering, we keep a
+    // node only if its full path matches OR any descendant matches; the
+    // matched ancestors auto-expand.
+    function renderNode(node, depth, pathSoFar, filterRe, openByDefault) {
+        const fullPath = pathSoFar ? pathSoFar + '/' + node.name : node.name;
+        const selfMatch = !filterRe || filterRe.test(fullPath);
+        let childrenHtml = '';
+        let descendantMatch = false;
+        if (node.children.size) {
+            const sortedChildren = [...node.children.values()].sort((a, b) => a.name.localeCompare(b.name));
+            for (const c of sortedChildren) {
+                const r = renderNode(c, depth + 1, fullPath, filterRe, openByDefault);
+                if (r) {
+                    childrenHtml += r.html;
+                    if (r.matched) descendantMatch = true;
                 }
             }
         }
-        containerTree = tree;
+        if (filterRe && !selfMatch && !descendantMatch) return null;
+
+        const hasKids = node.children.size > 0;
+        const fname = node.ownPathSpec;
+        // Auto-expand if filtering and a descendant matched, or if this is
+        // the top level (depth 0) and openByDefault is true.
+        const expanded = (filterRe && descendantMatch) || (openByDefault && depth === 0);
+        const collapsedClass = hasKids ? (expanded ? '' : ' collapsed') : '';
+        const arrow = hasKids ? `<span class="tree-arrow">&#9660;</span>` : `<span class="tree-arrow tree-arrow-empty"></span>`;
+        const toggleAttr = hasKids ? `onclick="toggleTreeNode(this, event)"` : '';
+        const selected = (fname && currentModule === fname) ? ' selected' : '';
+        const loadAttr = fname
+            ? `data-module="${escapeHtml(fname)}" onclick="event.stopPropagation(); loadSpec('${escapeHtml(fname)}', this); return false;"`
+            : 'onclick="event.stopPropagation(); return false;"';
+        const labelAttr = fname ? loadAttr : '';
+        const indent = depth * 12;
+        const pathBadge = node.totalPaths > 1 ? `<span class="path-count">${node.totalPaths}</span>` : '';
+        const fnameBadge = fname ? `<span class="leaf-spec">${escapeHtml(fname)}</span>` : '';
+        const html = `
+<div class="tree-row${collapsedClass}${selected}" data-depth="${depth}" style="padding-left:${indent}px" ${toggleAttr}>
+    ${arrow}
+    <span class="tree-label" ${labelAttr}><code>${escapeHtml(node.name)}</code>${fnameBadge}</span>
+    ${pathBadge}
+</div>
+<div class="tree-children${collapsedClass}">${childrenHtml}</div>`;
+        return { html, matched: selfMatch || descendantMatch };
     }
 
     function renderSidebar(filter = '') {
         const container = document.getElementById('sidebarContent');
-        const fl = filter.toLowerCase();
-        let html = '';
-
-        const tops = Object.keys(containerTree).sort();
-        let visibleTops = 0;
-        let visibleLeaves = 0;
-
-        for (const top of tops) {
-            const node = containerTree[top];
-            const subs = Object.keys(node.subs).sort();
-
-            // Filter: keep this group if the top-level name matches OR any sub matches
-            // OR any of its specs' titles/fnames match.
-            const topMatch = !fl || top.toLowerCase().includes(fl);
-            const subMatches = subs.filter(s => !fl || topMatch || s.toLowerCase().includes(fl));
-            const specHit = !fl || [...node.specs].some(fn => {
-                const m = allModules.find(x => x.fname === fn);
-                return m && (m.fname.toLowerCase().includes(fl) || m.title.toLowerCase().includes(fl));
-            });
-            if (fl && !topMatch && subMatches.length === 0 && !specHit) continue;
-            visibleTops++;
-
-            // Section header always toggles. Spec loading is done via the
-            // items below it so the interaction stays uniform. With 162 top
-            // containers we collapse by default, and auto-expand when the
-            // user is filtering.
-            const collapsedClass = fl ? '' : ' collapsed';
-            html += `<div class="section-header${collapsedClass}" onclick="toggleSection(this)">
-                <span><code>${escapeHtml(top)}</code> <span class="count">(${node.totalPaths})</span></span>
-                <span class="arrow">&#9660;</span>
-            </div>`;
-
-            // Items under this top-level container.
-            html += `<ul class="module-list${collapsedClass}">`;
-            // If filtering and the top didn't match, only show matched subs.
-            // Otherwise show all subs. If there are no subs, render a single
-            // self row for the leaf spec.
-            const showSubs = fl && !topMatch ? subMatches : subs;
-            if (showSubs.length === 0 && node.leafSpec) {
-                const fname = node.leafSpec;
-                const sel = (currentModule === fname) ? ' selected' : '';
-                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(fname)}" onclick="loadSpec('${escapeHtml(fname)}', this); return false;">
-                    <span><em>open spec</em></span>
-                    <span class="path-count">${escapeHtml(fname)}</span>
-                </a></li>`;
-                visibleLeaves++;
-            }
-            for (const sub of showSubs) {
-                const fname = node.subs[sub];
-                const sel = (currentModule === fname) ? ' selected' : '';
-                html += `<li><a href="#" class="${sel}" data-module="${escapeHtml(fname)}" onclick="loadSpec('${escapeHtml(fname)}', this); return false;">
-                    <span><code>${escapeHtml(sub)}</code></span>
-                    <span class="path-count">${escapeHtml(fname)}</span>
-                </a></li>`;
-                visibleLeaves++;
-            }
-            html += `</ul>`;
+        const fl = filter.trim();
+        let filterRe = null;
+        if (fl) {
+            // Treat search text as a case-insensitive substring (escape regex specials).
+            const safe = fl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filterRe = new RegExp(safe, 'i');
         }
-
+        // Render each top-level container as its own subtree. We expand
+        // top-level by default ONLY when filtering; otherwise everything
+        // starts collapsed.
+        let html = '';
+        let visibleTops = 0;
+        const tops = [...containerTree.children.values()].sort((a, b) => a.name.localeCompare(b.name));
+        for (const t of tops) {
+            const r = renderNode(t, 0, '', filterRe, !!filterRe);
+            if (r) { html += r.html; visibleTops++; }
+        }
         container.innerHTML = html;
 
-        // Search info
         const info = document.getElementById('searchInfo');
         if (fl) {
-            info.textContent = `${visibleTops} containers, ${visibleLeaves} sub-nodes match`;
+            const matchedRows = container.querySelectorAll('.tree-row').length;
+            info.textContent = `${visibleTops} top containers, ${matchedRows} nodes match`;
             info.style.display = 'block';
         } else {
             info.style.display = 'none';
         }
     }
 
-    function toggleSection(el) {
-        el.classList.toggle('collapsed');
-        const list = el.nextElementSibling;
-        if (list) list.classList.toggle('collapsed');
+    function toggleTreeNode(rowEl, evt) {
+        if (evt) evt.stopPropagation();
+        rowEl.classList.toggle('collapsed');
+        const kids = rowEl.nextElementSibling;
+        if (kids && kids.classList.contains('tree-children')) kids.classList.toggle('collapsed');
     }
 
     function filterModules() {
