@@ -2,7 +2,9 @@
 """Build per-category _paths_index.json files for the cross-chunk operation
 search feature in the Swagger viewers.
 
-Scope: 26.1.1 only. Older releases keep the legacy chunk-only sidebar search.
+Runs for every active release. Each viewer's paths-search.js IIFE is gated
+on __IOSXE_ACTIVE_VERSION__ so users see the wider search surface on the
+release they are currently browsing.
 
 Output schema (one file per category, written next to the v2 specs).
 Entries are deduplicated to one row per (spec, path); HTTP methods and the
@@ -105,14 +107,10 @@ def build_one(api_dir: Path, version: str, category: str) -> int:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--version", default="26.1.1",
-                    help="Release version (only 26.1.1 supported).")
+                    help="Release version to index.")
     ap.add_argument("--root", default=".",
                     help="Repo root containing the releases/ directory.")
     args = ap.parse_args()
-
-    if args.version != "26.1.1":
-        print(f"[build_paths_index] skip version {args.version}: feature is 26.1.1-only.")
-        return 0
 
     root = Path(args.root).resolve()
     base = root / "releases" / args.version
