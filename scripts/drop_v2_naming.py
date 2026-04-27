@@ -11,7 +11,7 @@ At per-release level (``releases/<ver>/swagger-<cat>-model/``): only
 ``api-v2/`` exists, so a simple rename to ``api/``.
 
 Bulk text-replace tokens across source files: ``api-v2`` -> ``api``,
-``index-v2.html`` -> ``index.html``, ``telemetry-reference-v2.md`` ->
+``index-v2.html`` -> ``index.html``, ``telemetry-reference.md`` ->
 ``telemetry-reference.md``.
 
 Real protocol/standard names (e.g. ``Cisco-IOS-XE-mdt-oper-v2.yang``,
@@ -55,7 +55,7 @@ REDIRECT_STUB = """<!DOCTYPE html>
 """
 
 REPLACEMENTS = [
-    ("telemetry-reference-v2.md", "telemetry-reference.md"),
+    ("telemetry-reference.md", "telemetry-reference.md"),
     ("index-v2.html",             "index.html"),
     ("api-v2",                    "api"),
 ]
@@ -171,7 +171,7 @@ def phase2_bulk_replace():
 
 
 def phase3_telemetry():
-    src = WORKSPACE / "telemetry-reference-v2.md"
+    src = WORKSPACE / "telemetry-reference.md"
     dst = WORKSPACE / "telemetry-reference.md"
     if not src.is_file() or dst.exists():
         return False
