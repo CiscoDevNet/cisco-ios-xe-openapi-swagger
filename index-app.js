@@ -404,6 +404,8 @@
         }
         // Expose for other scripts (search.js reads this).
         window.__IOSXE_ACTIVE_VERSION__ = ver;
+        // Refresh the homepage stats table + cards for the active release.
+        applyVersionStats(ver);
         // Rewrite category-card links so the chosen version is preserved when
         // a viewer is opened (also covered by viewer's localStorage fallback,
         // but the explicit ?ver= makes deep-links + new-tab work cleanly).
@@ -422,6 +424,90 @@
                     a.setAttribute('href', clean + sep + 'ver=' + encodeURIComponent(ver));
                 });
         } catch (_) { /* noop */ }
+    }
+
+    // === Version-aware homepage stats ===
+    // Loads version-stats.json once and patches the model cards, the
+    // dashboard stats table, and the Project Summary box so they all reflect
+    // the currently-selected IOS-XE release. Without this the page would
+    // show the same hardcoded counts regardless of which release is active.
+    var __VERSION_STATS = null;
+    var __VERSION_STATS_PROMISE = null;
+
+    function loadVersionStats() {
+        if (__VERSION_STATS) return Promise.resolve(__VERSION_STATS);
+        if (__VERSION_STATS_PROMISE) return __VERSION_STATS_PROMISE;
+        __VERSION_STATS_PROMISE = fetch('version-stats.json', { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; })
+            .then(function (data) { __VERSION_STATS = data; return data; });
+        return __VERSION_STATS_PROMISE;
+    }
+
+    function fmtNum(n) {
+        if (n == null) return '\u2014';
+        return Number(n).toLocaleString();
+    }
+
+    function applyVersionStats(ver) {
+        loadVersionStats().then(function (data) {
+            if (!data || !data.totals || !data.totals[ver]) return;
+            var totals = data.totals[ver];
+            var cats = (data.categories && data.categories[ver]) || {};
+            function pick(obj, fld) {
+                return obj ? obj[fld === 'ops' ? 'operations' : fld] : null;
+            }
+            // 1. Per-category cards
+            document.querySelectorAll('[data-stat-cat]').forEach(function (el) {
+                var cat = el.getAttribute('data-stat-cat');
+                var fld = el.getAttribute('data-stat-field');
+                var num = el.querySelector('[data-stat-num]');
+                if (!num || !cats[cat]) return;
+                num.textContent = fmtNum(pick(cats[cat], fld));
+            });
+            // 2. Per-category table rows
+            document.querySelectorAll('[data-stat-row]').forEach(function (el) {
+                var cat = el.getAttribute('data-stat-row');
+                var fld = el.getAttribute('data-stat-field');
+                if (!cats[cat]) return;
+                el.textContent = fmtNum(pick(cats[cat], fld));
+            });
+            // 3. Table totals
+            document.querySelectorAll('[data-stat-total]').forEach(function (el) {
+                var fld = el.getAttribute('data-stat-total');
+                el.textContent = fmtNum(pick(totals, fld));
+            });
+            // 4. Project Summary box
+            document.querySelectorAll('[data-stat-summary]').forEach(function (el) {
+                var key = el.getAttribute('data-stat-summary');
+                if (key === 'specs') el.textContent = fmtNum(totals.specs);
+                else if (key === 'paths') el.textContent = fmtNum(totals.paths);
+                else if (key === 'modules_total') el.textContent = fmtNum(totals.modules_total);
+                else if (key === 'modules_with_specs_pct') {
+                    var pct = totals.modules_total
+                        ? (100 * totals.modules_with_specs / totals.modules_total).toFixed(1)
+                        : '0.0';
+                    el.textContent = fmtNum(totals.modules_with_specs)
+                        + ' modules (' + pct + '%)';
+                } else if (key === 'modules_with_trees_pct') {
+                    var pct2 = totals.modules_total
+                        ? Math.round(100 * totals.modules_with_trees / totals.modules_total)
+                        : 0;
+                    el.textContent = fmtNum(totals.modules_with_trees)
+                        + ' modules (' + pct2 + '%)';
+                }
+            });
+            // 5. Banner showing the active version + headline counts.
+            var banner = document.getElementById('versionStatsBanner');
+            if (banner) {
+                banner.textContent = 'Counts below reflect IOS-XE ' + ver + ': '
+                    + fmtNum(totals.specs) + ' specs, '
+                    + fmtNum(totals.paths) + ' paths, '
+                    + fmtNum(totals.operations) + ' operations across '
+                    + fmtNum(totals.modules_total) + ' tracked modules.';
+                banner.style.display = '';
+            }
+        });
     }
 
     if (document.readyState === 'loading') {
