@@ -238,7 +238,7 @@ def main():
                 "2. Set your device IP, username, and password in the environment\n"
                 "3. Disable SSL certificate verification (Settings → General → SSL)\n\n"
                 "**Authentication:** Uses Basic Auth from environment variables.\n\n"
-                "**Source:** https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger"
+                "**Source:** https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger"
             ),
             "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
         },

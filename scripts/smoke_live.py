@@ -18,7 +18,7 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
-DEFAULT_BASE_URL = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger"
+DEFAULT_BASE_URL = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger"
 ROOT = Path(__file__).resolve().parent.parent
 
 

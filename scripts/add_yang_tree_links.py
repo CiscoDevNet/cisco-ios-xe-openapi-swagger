@@ -8,7 +8,7 @@ from pathlib import Path
 
 def get_tree_link(module_name: str) -> str:
     """Generate link to pyang tree HTML file"""
-    base_url = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees"
+    base_url = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/yang-trees"
     return f"{base_url}/{module_name}.html"
 
 def tree_file_exists(module_name: str, trees_dir: Path) -> bool:

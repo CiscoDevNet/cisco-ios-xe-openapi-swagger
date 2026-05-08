@@ -29,7 +29,7 @@
 - Also enabled Swagger UI's built-in filter (search box in operations)
 
 **How to find hostname API:**
-1. Go to [Native Config](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/)
+1. Go to [Native Config](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/)
 2. Click **System - hostname, banner, etc** in sidebar
 3. Search for "hostname" in the operations filter
 4. Look for `/data/Cisco-IOS-XE-native:native/hostname`
@@ -50,7 +50,7 @@
 ## YANG Module Locations
 
 ### Cisco-IOS-XE-ios-events-oper.yang
-**GitHub Link:** https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/blob/main/references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
+**GitHub Link:** https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/blob/main/references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
 
 **Local Path:** 
 ```
@@ -59,7 +59,7 @@ references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
 
 **OpenAPI Spec:**
 - **Category:** Events Model
-- **URL:** https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/
+- **URL:** https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/
 - **Select Module:** Cisco-IOS-XE-ios-events-oper
 - **API Endpoint:** `/data/ios-events-ios-xe-oper:ios-events`
 
@@ -71,7 +71,7 @@ references/17181-YANG-modules/
 The accountability report tracks 1,103 total modules (848 YANG + 255 spec-only MIB/Native).
 
 **Browse on GitHub:**  
-https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/tree/main/references/17181-YANG-modules
+https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/tree/main/references/17181-YANG-modules
 
 ## API Categories Summary
 
@@ -93,15 +93,15 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 
 | Model | Link |
 |-------|------|
-| Operational | [Browse Oper](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index.html) |
-| Native Config | [Browse Native](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index.html) |
-| Configuration | [Browse Config](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index.html) |
-| OpenConfig | [Browse OpenConfig](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index.html) |
-| IETF | [Browse IETF](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index.html) |
-| MIB | [Browse MIB](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html) |
-| RPC | [Browse RPC](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index.html) |
-| Events | [Browse Events](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index.html) |
-| Other | [Browse Other](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index.html) |
+| Operational | [Browse Oper](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index.html) |
+| Native Config | [Browse Native](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/index.html) |
+| Configuration | [Browse Config](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-cfg-model/index.html) |
+| OpenConfig | [Browse OpenConfig](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-openconfig-model/index.html) |
+| IETF | [Browse IETF](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index.html) |
+| MIB | [Browse MIB](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html) |
+| RPC | [Browse RPC](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index.html) |
+| Events | [Browse Events](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index.html) |
+| Other | [Browse Other](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index.html) |
 
 ## Tips & Tricks
 
@@ -114,15 +114,15 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 ### Common APIs Quick Links
 
 **Hostname Configuration:**
-- [Native > System](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/) > Select "System"
+- [Native > System](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-native-config-model/) > Select "System"
 - Endpoint: `/data/Cisco-IOS-XE-native:native/hostname`
 
 **Interface State:**
-- [Operational](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/) > Select "Cisco-IOS-XE-interfaces-oper"
+- [Operational](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/) > Select "Cisco-IOS-XE-interfaces-oper"
 - Endpoint: `/data/interfaces-ios-xe-oper:interfaces`
 
 **Save Config (RPC):**
-- [RPC](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/) > Select "Cisco-IOS-XE-rpc"
+- [RPC](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/) > Select "Cisco-IOS-XE-rpc"
 - Endpoint: `/operations/cisco-ia:save-config`
 
 ## Known Limitations
@@ -136,4 +136,4 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 - **YANG Models:** [Cisco IOS-XE YANG GitHub](https://github.com/YangModels/yang/tree/main/vendor/cisco/xe)
 - **RESTCONF Guide:** [IOS-XE 17.18 RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
 - **YANG Suite:** [Cisco YANG Suite](https://developer.cisco.com/yangsuite/) | [GitHub](https://github.com/CiscoDevNet/yangsuite/)
-- **OpenAPI Specs:** All available at https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/
+- **OpenAPI Specs:** All available at https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/

@@ -326,7 +326,7 @@ def main():
     print(f"COMPLETE: Generated {len(generated_modules)}/{len(yang_files)} tree files")
     print(f"{'='*70}")
     print(f"\nView index: file:///{output_dir / 'index.html'}")
-    print(f"GitHub Pages: https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees/\n")
+    print(f"GitHub Pages: https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/yang-trees/\n")
 
 if __name__ == '__main__':
     main()

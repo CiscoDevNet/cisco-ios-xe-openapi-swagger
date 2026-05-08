@@ -84,7 +84,7 @@ def configure_paths(version: str | None) -> None:
 
 
 # GitHub Pages base URL
-GH_PAGES = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger"
+GH_PAGES = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger"
 
 # All swagger model folders
 MODEL_FOLDERS = {

@@ -19,7 +19,7 @@ from datetime import datetime
 
 BASE = Path(__file__).parent.parent
 YANG_DIR = BASE / "references" / "17181-YANG-modules"
-GH_PAGES = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger"
+GH_PAGES = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger"
 
 # Modules missing config specs and where to put them
 MISSING_CONFIG_SPECS = {

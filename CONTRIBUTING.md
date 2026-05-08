@@ -11,7 +11,7 @@ Thanks for your interest in improving the Cisco IOS-XE OpenAPI documentation hub
 ## Setup
 
 ```powershell
-git clone https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger.git
+git clone https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger.git
 cd cisco-ios-xe-openapi-swagger
 
 # Python tooling
