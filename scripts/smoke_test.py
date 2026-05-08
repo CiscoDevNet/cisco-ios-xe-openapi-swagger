@@ -11,7 +11,7 @@ import asyncio
 import re
 from playwright.async_api import async_playwright
 
-BASE = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/"
+BASE = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/"
 BAD_RE = re.compile(r"[\u0080-\u009F\uFFFD]")
 
 

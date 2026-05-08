@@ -478,7 +478,7 @@ This project has created a professional, organized, and developer-friendly docum
 ---
 
 **Project Completion Date:** December 2024  
-**Repository:** github.com/jeremycohoe/cisco-ios-xe-openapi-swagger  
+**Repository:** github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger  
 **Documentation Hub:** Live on GitHub Pages  
 **Maintainer:** Jeremy Cohoe (jcohoe@cisco.com)
 

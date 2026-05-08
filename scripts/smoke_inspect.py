@@ -1,7 +1,7 @@
 import asyncio, json
 from playwright.async_api import async_playwright
 
-URL = 'https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html#spec=ATM-MIB&op=get-ATM-MIB%5C%3AATM-MIB'
+URL = 'https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html#spec=ATM-MIB&op=get-ATM-MIB%5C%3AATM-MIB'
 
 async def main():
     async with async_playwright() as p:

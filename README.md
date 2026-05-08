@@ -2,12 +2,12 @@
 
 [![IOS-XE Version](https://img.shields.io/badge/IOS--XE-26.1.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-608-brightgreen)](docs/PROJECT_SUMMARY.md)
 
 Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1). The site defaults to the newest release (26.1.1) with **608 OpenAPI specs, 37,072 paths, and 765 YANG tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
-**[View Live Documentation](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)**
+**[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
 ## Deep-Path Specifications
@@ -110,12 +110,12 @@ Standalone and vendor-specific modules.
 ## Quick Start
 
 ### View Online
-Visit [https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+Visit [https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 
 ### Test Locally
 ```bash
 # Clone repository
-git clone https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger.git
+git clone https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger.git
 cd cisco-ios-xe-openapi-swagger
 
 # Start local server
@@ -127,7 +127,7 @@ python -m http.server 8000
 ### Use the OpenAPI Specs
 ```bash
 # Download a specific spec
-curl -O https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
+curl -O https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
 
 # Generate Python client
 openapi-generator-cli generate -i Cisco-IOS-XE-interfaces-oper.json -g python -o ./python-client
@@ -223,7 +223,7 @@ iosxe-1718-yang-swagger/
 
 ## Contact
 
-- **Issues**: [GitHub Issues](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger/issues)
+- **Issues**: [GitHub Issues](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues)
 - **DevNet**: [Cisco DevNet Community](https://community.cisco.com/t5/networking-developer-community/ct-p/5672j-dev-networking)
 - **Author**: Jeremy Cohoe
 

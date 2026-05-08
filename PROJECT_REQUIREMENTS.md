@@ -5,8 +5,8 @@
 **Date:** April 25, 2026
 **IOS-XE Versions Supported:** 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1
 **Author:** Jeremy Cohoe (jcohoe@cisco.com)
-**Repository:** [github.com/jeremycohoe/cisco-ios-xe-openapi-swagger](https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger)
-**Live Site:** [jeremycohoe.github.io/cisco-ios-xe-openapi-swagger](https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/)
+**Repository:** [github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger)
+**Live Site:** [ciscodevnet.github.io/cisco-ios-xe-openapi-swagger](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 
 > **Companion documents (binding):**
 > - [VERSIONING.md](VERSIONING.md) — multi-release folder layout, URL contract, CI gates, release-add runbook.
@@ -502,7 +502,7 @@ Each tree HTML file includes:
 Every spec's `info.description` field includes a link to its tree visualization:
 ```
 YANG Tree: View Module-Name structure
-(link to: https://jeremycohoe.github.io/.../yang-trees/Module-Name.html)
+(link to: https://ciscodevnet.github.io/.../yang-trees/Module-Name.html)
 ```
 
 Specs where no tree file exists have the tree link hidden (21 broken links were fixed in commit `9daa75d`).
@@ -643,7 +643,7 @@ The site is deployed via GitHub Pages from the `main` branch:
 
 **CI/CD:** `.github/workflows/deploy-pages.yml` handles automatic deployment on push to `main`.
 
-**URL:** `https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/`
+**URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/`
 
 **Requirements:**
 - `.nojekyll` file in root (disables Jekyll processing)
@@ -654,7 +654,7 @@ The site is deployed via GitHub Pages from the `main` branch:
 
 ```bash
 # Clone the repository
-git clone https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger.git
+git clone https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger.git
 cd cisco-ios-xe-openapi-swagger
 
 # Serve locally (any static HTTP server works)

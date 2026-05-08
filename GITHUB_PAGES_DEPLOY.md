@@ -44,7 +44,7 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 
 ## Access Your Site
 
-**Live URL:** https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/
+**Live URL:** https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/
 
 ## Statistics
 

@@ -46,7 +46,7 @@ def main():
     """Main entry point"""
     script_dir = Path(__file__).parent
     swagger_dir = script_dir.parent / 'swagger-mib-model' / 'api'
-    tree_base_url = "https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/yang-trees"
+    tree_base_url = "https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/yang-trees"
     
     print("Adding YANG tree links to MIB swagger specifications...\n")
     
