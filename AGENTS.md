@@ -243,9 +243,25 @@ If you find decorative emoji creeping back in, run
 
 ### Git & deploy
 
-- Push to `main` → GitHub Actions deploys to Pages automatically
+**Two remotes — dev (default) and prod (manual promotion):**
+
+| Remote | URL | Role |
+|--------|-----|------|
+| `dev`  | `https://github.com/jeremycohoe/cisco-ios-xe-openapi-swagger` | Default working remote. Local `main` tracks `dev/main`. Push here freely. |
+| `prod` | `https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger` | Public/official Cisco DevNet copy. Push here only on deliberate promotion (releases, milestones). |
+
+Day-to-day workflow:
+
+```bash
+git push                # pushes to dev (tracked upstream)
+# ...iterate freely on dev...
+git push prod main      # promote to CiscoDevNet when ready
+```
+
+- Push to `main` on **either** remote → that remote's GitHub Actions deploys to its own Pages site
 - Generated artifacts (specs, trees, search index) **are committed** — keeps the deploy reproducible without running Python in CI
 - Don't commit large debugging/exploration files; use `archive/` for completed-phase docs
+- Never `git push --force prod` without explicit user confirmation; prefer `--force-with-lease` and verify the remote SHA you're overwriting
 
 ---
 
