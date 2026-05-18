@@ -1,0 +1,57 @@
+name: Link check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.html"
+      - "**/*.md"
+      - ".github/workflows/linkcheck.yml"
+  schedule:
+    # Weekly Monday 06:00 UTC — catches link rot in external references
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@1d97d84f0bc547f7d25f4f31d8f7569a6c6c2e6c # v2.6.1
+        with:
+          # Scan all HTML and Markdown plus the sitemap, skip heavy
+          # generator / archive / release artifact trees that contain
+          # gigabytes of unrelated content.
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --accept '200,206,301,302,403,429'
+            --timeout 20
+            --max-retries 2
+            --exclude-mail
+            --exclude 'localhost'
+            --exclude 'example\.(com|org)'
+            --exclude '127\.0\.0\.1'
+            './**/*.html'
+            './**/*.md'
+            './sitemap.xml'
+          fail: true
+          output: lychee-report.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: lychee-report
+          path: lychee-report.md
+          if-no-files-found: ignore

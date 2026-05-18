@@ -178,16 +178,82 @@ jobs:
           # yang-trees, exports, telemetry-index, accountability, etc.)
           echo "Copying releases/..."
           cp -r releases deploy/ 2>/dev/null || true
-          
+
           # Exclude heavy directories
           echo "Excluding references, archive, generators, scripts, internal docs from deployment..."
-          
-          # Show deployment size for debugging
+
+      - name: Set up Node (for minifiers)
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "20"
+
+      - name: Minify CSS and JS in deploy/
+        run: |
+          # Minify only the small shared front-end files we control.
+          # We deliberately skip the bulky per-release JSON specs and
+          # third-party search-index data — those are JSON, not JS/CSS.
+          npm install --no-save --silent terser@5.x clean-css-cli@5.x
+
+          before_total=0
+          after_total=0
+
+          minify_js() {
+            local f="$1"
+            local before after
+            before=$(stat -c%s "$f")
+            npx --no-install terser "$f" \
+              --compress --mangle \
+              --output "$f.tmp" 2>/dev/null || { echo "skip $f"; return; }
+            mv "$f.tmp" "$f"
+            after=$(stat -c%s "$f")
+            before_total=$((before_total + before))
+            after_total=$((after_total + after))
+            echo "  js  ${f#deploy/}: ${before} -> ${after}"
+          }
+
+          minify_css() {
+            local f="$1"
+            local before after
+            before=$(stat -c%s "$f")
+            npx --no-install cleancss -o "$f.tmp" "$f" 2>/dev/null \
+              || { echo "skip $f"; return; }
+            mv "$f.tmp" "$f"
+            after=$(stat -c%s "$f")
+            before_total=$((before_total + before))
+            after_total=$((after_total + after))
+            echo "  css ${f#deploy/}: ${before} -> ${after}"
+          }
+
+          echo "=== Minifying deploy/assets/ ==="
+          for f in deploy/assets/css/*.css; do [ -f "$f" ] && minify_css "$f"; done
+          for f in deploy/assets/js/*.js;  do [ -f "$f" ] && minify_js  "$f"; done
+
+          echo "=== Minifying deploy/ top-level JS ==="
+          # Only minify our hand-written JS, skip search-index and similar data files
+          for f in deploy/*.js; do
+            [ -f "$f" ] || continue
+            case "$(basename "$f")" in
+              search-index*.js) echo "  skip $f (data)";;
+              *) minify_js "$f";;
+            esac
+          done
+
+          if [ $before_total -gt 0 ]; then
+            pct=$(( (before_total - after_total) * 100 / before_total ))
+            echo ""
+            echo "=== Minification summary ==="
+            echo "  before:  ${before_total} bytes"
+            echo "  after:   ${after_total} bytes"
+            echo "  savings: ${pct}% (-$((before_total - after_total)) bytes)"
+          fi
+
+      - name: Deployment summary
+        run: |
           echo "=== Deployment Summary ==="
           du -sh deploy
           echo "Total files to deploy:"
           find deploy -type f | wc -l
-          echo "Deployment directory structure:"
+          echo "Top-level deployment contents:"
           ls -lah deploy/
           
       - name: Setup Pages
