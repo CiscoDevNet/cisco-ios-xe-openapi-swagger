@@ -158,6 +158,8 @@ jobs:
           cp *.json deploy/ 2>/dev/null || true
           cp README.md deploy/ 2>/dev/null || true
           cp .nojekyll deploy/ 2>/dev/null || true
+          # SEO surface (robots.txt + sitemap.xml refreshed below)
+          cp robots.txt deploy/ 2>/dev/null || true
           
           # Copy tools directory (Postman collection, etc.)
           echo "Copying tools..."
@@ -166,6 +168,11 @@ jobs:
           # Copy shared front-end assets (CSS/JS used by all HTML pages)
           echo "Copying assets..."
           cp -r assets deploy/ 2>/dev/null || true
+
+          # Refresh sitemap.xml with today's <lastmod> values
+          echo "Refreshing sitemap.xml..."
+          python3 scripts/generate_sitemap.py >/dev/null
+          cp sitemap.xml deploy/ 2>/dev/null || true
 
           # Copy releases tree (multi-version artifacts: per-release specs,
           # yang-trees, exports, telemetry-index, accountability, etc.)
