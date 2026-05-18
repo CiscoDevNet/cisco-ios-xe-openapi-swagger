@@ -201,10 +201,14 @@ def main() -> int:
             f"{blurb} for Cisco IOS-XE. Browse, search, and deep-link "
             "to any RESTCONF endpoint."
         )
+        # Canonical/og:url use the directory form (Pages auto-resolves to
+        # index.html); avoids duplicate-content split between /dir/ and
+        # /dir/index.html.
+        canonical_url = f"{site}/swagger-{key}-model/"
         block = _block(
             title=existing_title,
             description=description,
-            page_url=f"{site}/{rel}",
+            page_url=canonical_url,
             asset_prefix="../",
             site_url=site,
             include_json_ld=False,
