@@ -1,0 +1,308 @@
+/* ============================================================
+   site.css — shared design system overlay
+   Loaded AFTER each page's inline <style> so it can refine
+   without forcing a full rewrite. Works with both legacy
+   [data-theme="dark"] (index/code-gen/tree-compare) and
+   body.dark (telemetry/exports/accountability-compare).
+   ============================================================ */
+
+/* ---------- Design tokens (light) ---------- */
+:root {
+    /* Brand */
+    --c-brand-700: #0d47a1;
+    --c-brand-600: #1565c0;
+    --c-brand-500: #1976d2;
+    --c-brand-400: #2a8fe7;
+    --c-cyan-500:  #00bceb;   /* Cisco brand cyan, for hover accents */
+    --c-cyan-700:  #0288a8;
+
+    /* Surfaces */
+    --c-surface-0: #f7f8fa;   /* page background */
+    --c-surface-1: #ffffff;   /* cards */
+    --c-surface-2: #eef1f5;   /* subtle wells */
+    --c-surface-3: #e3e8ef;   /* dividers / chips */
+
+    /* Text */
+    --c-text:        #1f2933;
+    --c-text-muted:  #52606d;   /* WCAG AA on white (7.0:1) */
+    --c-text-subtle: #7b8794;
+    --c-text-on-brand: #ffffff;
+
+    /* Borders */
+    --c-border:        #d9dee4;
+    --c-border-strong: #b7c0c9;
+
+    /* Status */
+    --c-success: #2e7d32;
+    --c-warning: #b26500;       /* contrast-safe on white */
+    --c-danger:  #c62828;
+    --c-info:    #1565c0;
+
+    /* Elevation */
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 2px 4px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 4px 8px rgba(15, 23, 42, 0.06), 0 12px 24px rgba(15, 23, 42, 0.10);
+
+    /* Radii */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    /* Type scale */
+    --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-mono: 'Roboto Mono', 'SF Mono', Consolas, Menlo, monospace;
+
+    /* Map to legacy variable names so pages that read them get the new palette */
+    --bg-primary:   var(--c-surface-0);
+    --bg-secondary: var(--c-surface-1);
+    --bg-card:      var(--c-surface-1);
+    --text-primary: var(--c-text);
+    --text-secondary: var(--c-text-muted);
+    --border-color: var(--c-border);
+    --accent-color: var(--c-brand-600);
+    --accent-hover: var(--c-brand-700);
+
+    /* telemetry / exports legacy aliases */
+    --bg:     var(--c-surface-0);
+    --fg:     var(--c-text);
+    --card:   var(--c-surface-1);
+    --border: var(--c-border);
+    --accent: var(--c-brand-600);
+    --muted:  var(--c-text-subtle);
+}
+
+/* ---------- Dark theme (supports both legacy selectors) ---------- */
+[data-theme="dark"], body.dark {
+    --c-surface-0: #0f1419;
+    --c-surface-1: #1a2028;
+    --c-surface-2: #232b35;
+    --c-surface-3: #2d3742;
+
+    --c-text:        #e6edf3;
+    --c-text-muted:  #afbac5;
+    --c-text-subtle: #8b96a4;
+    --c-text-on-brand: #ffffff;
+
+    --c-border:        #2d3742;
+    --c-border-strong: #475260;
+
+    --c-brand-600: #42a5f5;
+    --c-brand-700: #1e88e5;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4), 0 12px 24px rgba(0, 0, 0, 0.5);
+
+    /* Re-map legacy aliases under dark */
+    --bg-primary:     var(--c-surface-0);
+    --bg-secondary:   var(--c-surface-1);
+    --bg-card:        var(--c-surface-1);
+    --text-primary:   var(--c-text);
+    --text-secondary: var(--c-text-muted);
+    --border-color:   var(--c-border);
+    --accent-color:   var(--c-brand-600);
+    --accent-hover:   var(--c-brand-700);
+
+    --bg:     var(--c-surface-0);
+    --fg:     var(--c-text);
+    --card:   var(--c-surface-1);
+    --border: var(--c-border);
+    --accent: var(--c-brand-600);
+}
+
+/* ---------- A11y primitives ---------- */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 8px;
+    background: var(--c-brand-700);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    z-index: 10000;
+    transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Restore meaningful keyboard-focus rings everywhere */
+:focus-visible {
+    outline: 2px solid var(--c-cyan-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+/* Don't double-ring buttons that already get color-shift focus */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) { outline: none; }
+
+.sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+}
+
+/* ---------- Dark-mode contrast fixes ---------- */
+[data-theme="dark"] .badge-rpc,
+body.dark .badge-rpc {
+    background: #ffd54f;
+    color: #1a1a1a;
+}
+
+/* Dark-mode: tone down brand-gradient headers so they sit better on dark bg */
+[data-theme="dark"] .header,
+body.dark .header,
+[data-theme="dark"] header,
+body.dark > header {
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Force good contrast for muted text in dark mode */
+[data-theme="dark"] .card p,
+[data-theme="dark"] .stat-label,
+[data-theme="dark"] .search-result-desc,
+body.dark .card p,
+body.dark .stat-label,
+body.dark .search-result-desc { color: var(--c-text-muted); }
+
+/* Form controls in dark mode — fix Roboto inputs reading white on white */
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+body.dark input,
+body.dark select,
+body.dark textarea {
+    background: var(--c-surface-2);
+    color: var(--c-text);
+    border-color: var(--c-border-strong);
+}
+[data-theme="dark"] input::placeholder,
+body.dark input::placeholder { color: var(--c-text-subtle); }
+
+/* Tables — fix hover row in dark */
+[data-theme="dark"] tr:hover,
+body.dark tr:hover { background: var(--c-surface-2); }
+[data-theme="dark"] table,
+body.dark table { color: var(--c-text); }
+
+/* ---------- Refined surfaces (subtle visual refresh) ---------- */
+.card, .form-section, .summary-box, .module-section,
+.search-container, .stats, .recent-favorites-section,
+.dashboard-container, .info-card, .summary-card,
+.release-block, .controls, .matrix-wrap, .deltas, .table-wrap {
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--c-border);
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease, background 0.3s;
+}
+.card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--c-border-strong);
+}
+
+/* Cyan hover accent — gives clickable elements a subtle interactive cue */
+a:hover { transition: color 0.15s ease; }
+.card a:hover,
+.quick-link:hover,
+.btn-primary:hover { background: var(--c-brand-700); }
+
+/* ---------- Improved button hierarchy ---------- */
+.btn-primary,
+.compare-btn,
+button.advanced-filter-toggle,
+.card a[href] {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* ---------- Header polish ---------- */
+.header h1, header h1 {
+    letter-spacing: -0.01em;
+    font-weight: 700;
+}
+
+/* ---------- Mobile responsiveness improvements ---------- */
+@media (max-width: 768px) {
+    .container { padding-left: 16px !important; padding-right: 16px !important; }
+    .header { padding: 28px 16px !important; }
+    .header h1, header h1 { font-size: 1.6rem !important; }
+    .header p, header p { font-size: 0.95rem !important; }
+
+    /* Stack 4-col stats grid into 2-col on phones */
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+    /* Stack any 2-col control rows */
+    .control-row { grid-template-columns: 1fr !important; }
+
+    /* Quick nav: allow horizontal scroll instead of awkward wrap */
+    .nav,
+    nav.quick-nav {
+        white-space: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    /* Tables on mobile — let them scroll horizontally */
+    .table-wrap,
+    .matrix-wrap { overflow-x: auto; }
+
+    /* Buttons big enough to tap */
+    .btn, .btn-primary, .btn-secondary,
+    .filter-btn { min-height: 40px; }
+}
+
+@media (max-width: 480px) {
+    .header h1, header h1 { font-size: 1.35rem !important; }
+    .grid { gap: 12px !important; }
+    .card { padding: 18px !important; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .card:hover { transform: none !important; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+    .header, header { background: none !important; color: #000 !important; }
+    .dark-mode-toggle, .skip-link, .nav, .filter-btn, .compare-btn { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+}
+
+/* ---------- Theme toggle (shared style, used on pages that don't ship one) ---------- */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.15);
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background 0.2s, transform 0.15s;
+}
+.theme-toggle:hover { background: rgba(0,0,0,0.25); transform: scale(1.05); }
+[data-theme="dark"] .theme-toggle,
+body.dark .theme-toggle {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+}
+@media (max-width: 768px) {
+    .theme-toggle { width: 36px; height: 36px; top: 12px; right: 12px; font-size: 1rem; }
+}
