@@ -109,6 +109,29 @@
         ensureSkipLink();
         ensureToggle();
         wireExistingToggles();
+        decorateVersionLabels();
+    }
+
+    /**
+     * Wrap any .header-version element that lives inside a header (and isn't
+     * already pill-wrapped) with .version-pill, so the active IOS-XE release
+     * is visually discoverable on every page.
+     */
+    function decorateVersionLabels() {
+        var labels = document.querySelectorAll('.header, header, .site-header')
+        if (!labels.length) return;
+        document.querySelectorAll('.header-version').forEach(function (el) {
+            // Skip if already inside a pill or hidden
+            if (el.closest('.version-pill')) return;
+            // Only decorate version-labels that sit inside the page hero
+            var inHero = el.closest('.header, header, .site-header');
+            if (!inHero) return;
+            var pill = document.createElement('span');
+            pill.className = 'version-pill';
+            pill.title = 'Active IOS-XE release';
+            el.parentNode.insertBefore(pill, el);
+            pill.appendChild(el);
+        });
     }
 
     // React to OS-level theme changes if user has not chosen one
