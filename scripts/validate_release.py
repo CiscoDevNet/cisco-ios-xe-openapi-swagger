@@ -50,10 +50,19 @@ def ok(msg: str) -> None:
     print(f"  ✓ {msg}")
 
 
+def is_spec_file(name: str) -> bool:
+    """Return True for actual OpenAPI spec files, excluding manifest.json and
+    auxiliary index files (e.g. ``_paths_index.json``) that live alongside
+    specs but are not themselves modules."""
+    return name != "manifest.json" and not name.startswith("_")
+
+
 def gate_json_validity(rel: Path, errs: list[str]) -> None:
     print("\n[gate 1] JSON validity")
     n = 0
     for spec in rel.glob("swagger-*-model/api/*.json"):
+        if not is_spec_file(spec.name):
+            continue
         try:
             json.loads(spec.read_text(encoding="utf-8"))
             n += 1
@@ -71,7 +80,7 @@ def gate_manifests(rel: Path, errs: list[str]) -> None:
             fail(f"invalid manifest {manifest.relative_to(PROJECT_ROOT)}: {e}", errs)
             continue
         on_disk = sum(
-            1 for f in manifest.parent.glob("*.json") if f.name != "manifest.json"
+            1 for f in manifest.parent.glob("*.json") if is_spec_file(f.name)
         )
         declared = data.get("spec_count")
         if declared is None:
@@ -148,7 +157,7 @@ def gate_tree_coverage(rel: Path, errs: list[str]) -> None:
 
     missing: list[str] = []
     for spec in rel.glob("swagger-*-model/api/*.json"):
-        if spec.name == "manifest.json":
+        if not is_spec_file(spec.name):
             continue
         module = spec.stem
         rec = documented.get(module)
@@ -158,6 +167,14 @@ def gate_tree_coverage(rel: Path, errs: list[str]) -> None:
             continue
         if module in excluded:
             continue
+        # Synthetic split-spec convention: ``native-<chunk>`` files in
+        # swagger-native-config-model/api are slices of Cisco-IOS-XE-native.
+        # If the parent module is documented (generated) treat the chunk as
+        # covered transitively.
+        if module.startswith("native-"):
+            parent = documented.get("Cisco-IOS-XE-native")
+            if parent and parent.get("status") == "generated":
+                continue
         missing.append(module)
     if missing:
         fail(f"{len(missing)} specs lack a tree and have no exclusion: {missing[:5]}…",
@@ -171,7 +188,7 @@ def gate_spec_tree_links(rel: Path, errs: list[str]) -> None:
     broken: list[str] = []
     n = 0
     for spec in rel.glob("swagger-*-model/api/*.json"):
-        if spec.name == "manifest.json":
+        if not is_spec_file(spec.name):
             continue
         try:
             data = json.loads(spec.read_text(encoding="utf-8"))
@@ -195,6 +212,8 @@ def gate_mdt_xpaths(rel: Path, errs: list[str]) -> None:
     bad: list[str] = []
     n = 0
     for spec in (rel / "swagger-oper-model" / "api").glob("*.json"):
+        if not is_spec_file(spec.name):
+            continue
         try:
             data = json.loads(spec.read_text(encoding="utf-8"))
         except Exception:
