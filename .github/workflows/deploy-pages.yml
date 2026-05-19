@@ -247,6 +247,46 @@ jobs:
             echo "  savings: ${pct}% (-$((before_total - after_total)) bytes)"
           fi
 
+      - name: Minify JSON data files in deploy/
+        run: |
+          # Strip whitespace from top-level JSON data files. These are
+          # large (search-index, accountability dumps) and the page never
+          # consumes the indented form. Per-release spec JSONs are left
+          # alone — they live under releases/ and are not in scope here.
+          python3 - <<'PY'
+          import json, os, sys
+          targets = [
+            "search-index.json",
+            "accountability_compare.json",
+            "yang_accountability.json",
+            "yang-prefix-map.json",
+            "version-stats.json",
+          ]
+          total_before = total_after = 0
+          for name in targets:
+              path = os.path.join("deploy", name)
+              if not os.path.isfile(path):
+                  continue
+              before = os.path.getsize(path)
+              with open(path, "r", encoding="utf-8") as fh:
+                  data = json.load(fh)
+              compact = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+              with open(path, "w", encoding="utf-8") as fh:
+                  fh.write(compact)
+              after = os.path.getsize(path)
+              total_before += before
+              total_after  += after
+              pct = (before - after) * 100 // before if before else 0
+              print(f"  json {name}: {before} -> {after} ({pct}% saved)")
+          if total_before:
+              pct = (total_before - total_after) * 100 // total_before
+              print()
+              print("=== JSON minification summary ===")
+              print(f"  before:  {total_before} bytes")
+              print(f"  after:   {total_after} bytes")
+              print(f"  savings: {pct}% (-{total_before - total_after} bytes)")
+          PY
+
       - name: Deployment summary
         run: |
           echo "=== Deployment Summary ==="
