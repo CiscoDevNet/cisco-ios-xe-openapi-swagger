@@ -1,0 +1,115 @@
+name: Accessibility (axe-core)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.html"
+      - "assets/css/**"
+      - "assets/js/**"
+      - ".github/workflows/a11y.yml"
+  schedule:
+    # Weekly on Monday 07:00 UTC
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Prepare deploy snapshot
+        run: |
+          mkdir -p deploy
+          cp -r swagger-*-model deploy/ 2>/dev/null || true
+          cp -r yang-trees deploy/ 2>/dev/null || true
+          cp -r docs deploy/ 2>/dev/null || true
+          cp *.html deploy/ 2>/dev/null || true
+          cp *.js deploy/ 2>/dev/null || true
+          cp *.json deploy/ 2>/dev/null || true
+          cp -r tools deploy/ 2>/dev/null || true
+          cp -r assets deploy/ 2>/dev/null || true
+          cp robots.txt deploy/ 2>/dev/null || true
+          python3 scripts/generate_sitemap.py >/dev/null
+          cp sitemap.xml deploy/ 2>/dev/null || true
+
+      - name: Start static HTTP server
+        working-directory: deploy
+        run: |
+          python3 -m http.server 8080 >/tmp/http.log 2>&1 &
+          echo $! > /tmp/http.pid
+          # Wait for the server to accept connections
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://localhost:8080/index.html >/dev/null; then
+              echo "server up"; exit 0
+            fi
+            sleep 1
+          done
+          echo "server failed to start"; cat /tmp/http.log; exit 1
+
+      - name: Install axe-core CLI
+        run: npm install --no-save --silent @axe-core/cli@4.10.x
+
+      - name: Run axe-core scans
+        run: |
+          set -e
+          URLS=(
+            "http://localhost:8080/index.html"
+            "http://localhost:8080/code-generator.html"
+            "http://localhost:8080/tree-compare.html"
+            "http://localhost:8080/exports.html"
+            "http://localhost:8080/telemetry.html"
+            "http://localhost:8080/yang-accountability.html"
+            "http://localhost:8080/yang-accountability-compare.html"
+            "http://localhost:8080/404.html"
+            "http://localhost:8080/swagger-cfg-model/index.html"
+          )
+          mkdir -p axe-reports
+          failures=0
+          for url in "${URLS[@]}"; do
+            name=$(echo "$url" | sed 's|^http://localhost:8080/||; s|/|_|g; s|\.html$||')
+            echo "::group::axe $url"
+            if npx --yes @axe-core/cli "$url" \
+                 --tags wcag2a,wcag2aa,wcag21a,wcag21aa \
+                 --exit \
+                 --save "axe-reports/${name}.json"; then
+              echo "OK"
+            else
+              echo "FAIL"
+              failures=$((failures+1))
+            fi
+            echo "::endgroup::"
+          done
+          if [ "$failures" -gt 0 ]; then
+            echo "::error::$failures page(s) failed axe-core checks"
+            exit 1
+          fi
+
+      - name: Stop static server
+        if: always()
+        run: |
+          if [ -f /tmp/http.pid ]; then kill "$(cat /tmp/http.pid)" 2>/dev/null || true; fi
+
+      - name: Upload axe reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: axe-reports
+          path: axe-reports/
+          retention-days: 14
