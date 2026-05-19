@@ -1,0 +1,41 @@
+name: HTML Lint (htmlhint)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "**/*.html"
+      - ".htmlhintrc"
+      - ".github/workflows/htmlcheck.yml"
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  htmlhint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "20"
+
+      - name: Install htmlhint
+        run: npm install --no-save --silent htmlhint@1.x
+
+      - name: Run htmlhint
+        run: |
+          # Lint top-level pages plus the nine swagger viewer index pages.
+          # Archive/ and per-release HTML are excluded deliberately —
+          # those are historical artifacts not part of the live surface.
+          npx --no-install htmlhint \
+            --config .htmlhintrc \
+            "*.html" \
+            "swagger-*-model/index.html"
