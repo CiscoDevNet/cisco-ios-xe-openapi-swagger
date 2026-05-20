@@ -49,10 +49,14 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
         module_name = fn.replace('.json', '')
         count += 1
 
-        # Extract description
+        # Extract description (truncate at word boundary for smaller index)
         desc = spec.get('info', {}).get('description', '')
-        if len(desc) > 250:
-            desc = desc[:250] + '...'
+        if len(desc) > 160:
+            cut = desc[:160]
+            sp = cut.rfind(' ')
+            if sp > 120:
+                cut = cut[:sp]
+            desc = cut + '...'
 
         # Extract keywords from paths and tags
         keywords = set()
