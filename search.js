@@ -55,7 +55,24 @@ async function loadSearchIndex() {
             
             const data = await response.json();
             searchIndex = data.modules;
-            
+
+            // Hydrate per-module records from the top-level categories map
+            // (search-index.json v3.1+). Older indexes already carry these
+            // fields per-module, so we only fill in the gaps. This keeps
+            // consumers like recent-favorites.js and code-generator.js
+            // unaware of the wire format change.
+            const categories = (data && data.categories) || {};
+            for (const m of searchIndex) {
+                const cat = m.category && categories[m.category];
+                if (cat) {
+                    if (!m.displayCategory) m.displayCategory = cat.displayCategory;
+                    if (!m.emoji) m.emoji = cat.emoji;
+                }
+                if (!m.swaggerUrl && m.category && m.name) {
+                    m.swaggerUrl = m.category + '/index.html#spec=' + m.name;
+                }
+            }
+
             // Build autocomplete index
             buildAutocompleteIndex();
             
