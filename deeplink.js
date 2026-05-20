@@ -274,15 +274,95 @@
         };
     })();
 
+    // ----------------------------------------------------------------
+    // Scroll memory
+    // ----------------------------------------------------------------
+    // The viewer is effectively an SPA — switching spec via the sidebar
+    // keeps the page mounted and only repaints #swagger-ui. The browser's
+    // native scroll restoration does not fire for hash-only navigations,
+    // so the back/forward buttons return the user to the right spec but
+    // always at the top of the page.
+    //
+    // We persist scrollY per-hash in sessionStorage (per-tab, survives
+    // back/forward, drops on tab close). On hashchange we wait for the
+    // spec content to actually render (via a MutationObserver on the
+    // Swagger UI container), then restore scrollY — but only when the
+    // hash does NOT carry an op= target, since op-targeted scrolls take
+    // precedence and would fight with us.
+    var SCROLL_KEY_PREFIX = 'iosxe-scroll:';
+    var scrollSaveTimer = null;
+    function _scrollKey() {
+        return SCROLL_KEY_PREFIX + (window.location.hash || '');
+    }
+    function _saveScroll() {
+        try { sessionStorage.setItem(_scrollKey(), String(window.scrollY)); } catch (_) {}
+    }
+    function _debouncedSaveScroll() {
+        if (scrollSaveTimer) clearTimeout(scrollSaveTimer);
+        scrollSaveTimer = setTimeout(_saveScroll, 200);
+    }
+    function _readSavedScroll() {
+        try {
+            var v = sessionStorage.getItem(_scrollKey());
+            if (v == null) return null;
+            var y = parseInt(v, 10);
+            return isNaN(y) ? null : y;
+        } catch (_) { return null; }
+    }
+    function _restoreScrollWhenReady() {
+        var p = parseHash();
+        if (p.op) return;                       // op= owns the scroll target
+        var y = _readSavedScroll();
+        if (!y) return;
+        var ui = document.getElementById('swagger-ui');
+        if (!ui) {
+            // Try once after the next tick in case the page hasn't wired
+            // up #swagger-ui yet.
+            setTimeout(_restoreScrollWhenReady, 100);
+            return;
+        }
+        var attempts = 0;
+        function attempt() {
+            attempts++;
+            // Only scroll once the document is tall enough — otherwise we
+            // clamp to the bottom and lose position when content arrives.
+            var maxY = (document.documentElement.scrollHeight || 0) - window.innerHeight;
+            if (maxY >= y - 4) {
+                try { window.scrollTo(0, y); } catch (_) { /* ignore */ }
+                return;
+            }
+            if (attempts > 60) return;          // ~6s budget
+            setTimeout(attempt, 100);
+        }
+        attempt();
+    }
+
+    function attachScrollMemory() {
+        // Save on user scroll (debounced so we don't thrash sessionStorage).
+        window.addEventListener('scroll', _debouncedSaveScroll, { passive: true });
+        // Save before unload to capture the final position.
+        window.addEventListener('beforeunload', _saveScroll);
+        // Restore after a hashchange (spec switch via sidebar / back-forward).
+        window.addEventListener('hashchange', function () {
+            // Wait a tick so the viewer's own checkHash() can kick off the
+            // spec load — then poll until the new content is tall enough.
+            setTimeout(_restoreScrollWhenReady, 50);
+        });
+        // Initial restore on first paint.
+        setTimeout(_restoreScrollWhenReady, 200);
+    }
+
     // Initial wiring after DOM ready.
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () {
             attachClickCapture();
             attachAutoExpand();
+            attachScrollMemory();
         });
     } else {
         attachClickCapture();
         attachAutoExpand();
+        attachScrollMemory();
     }
 
     window.__DeepLink = {
