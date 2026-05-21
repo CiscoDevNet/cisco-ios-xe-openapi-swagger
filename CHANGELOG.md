@@ -28,6 +28,44 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 ## [Unreleased]
 
+### Added — Site quality, PWA, and per-release exports (round 9, 2026)
+
+- **Lighthouse strict + axe-core CI** — site quality gates (Tier 3) added to the deploy
+  workflow, blocking regressions in performance, accessibility, best-practices, and SEO.
+- **JSON minify + htmlhint** (Tier 4) — deploy step now minifies JSON data files and runs
+  htmlhint over every shipped HTML page.
+- **search-index v3.1 slim-down** (Tier 5 + 8) —
+  [scripts/generate_search_index.py](scripts/generate_search_index.py) now drops empty
+  fields and truncates module descriptions at a 160-char word boundary (down from 250).
+  Combined effect: `search-index.json` shipped size 1,124,074 → 1,096,810 B (−2.4%
+  pretty, larger savings post-CI minify); `max-desc-len` capped at 162.
+- **PWA service worker + manifest** (Tier 6) — [service-worker.js](service-worker.js)
+  pre-caches the app shell and serves it offline. [site.webmanifest](site.webmanifest)
+  registered on all 17 top-level pages by [scripts/inject_pwa.py](scripts/inject_pwa.py).
+- **Deep-link scroll-position memory** (Tier 7) — [deeplink.js](deeplink.js) now stores
+  the last `op=` location under `iosxe-scroll-<spec>` and restores it after spec load,
+  so refreshing or returning to a deep-link lands on the same operation row instead of
+  the top of the page.
+- **Update-available toast** (Tier 9) — when a new service worker reaches `installed`
+  while an existing controller is in charge, all pages surface a small bottom-right
+  card with a Reload button. Reload posts `{type:'SKIP_WAITING'}`; the
+  `controllerchange` listener then refreshes the page exactly once.
+  `CACHE_VERSION` bumped to `v2-2026.05.20`. Inline registration is CSP-safe
+  (`role=status`, `aria-live=polite`, dismiss button, fail-silent).
+- **Per-release Postman + Bruno exports for all 5 releases** — `releases/<ver>/exports/`
+  now exists for 17.9.x, 17.12.x, 17.15.x, 17.18.1 and 26.1.1, each with 9 per-category
+  Postman v2.1 collections, a Postman environment, a `postman-manifest.json`, and a
+  `bruno-manifest.json`. Bruno collection content remains git-ignored and is
+  regenerated locally via
+  [scripts/generate_bruno_collection.py](scripts/generate_bruno_collection.py).
+  Per-release request totals: 17.9.x=52,170 / 17.12.x=54,164 / 17.15.x=58,874 /
+  17.18.1=68,353 / 26.1.1=63,541.
+- **`Cisco-IOS-XE-bgp-route-oper` exclusion reason** — `yang_accountability.json` (root
+  + all 5 per-release files) and [YANG_MODULE_ACCOUNTABILITY.md](YANG_MODULE_ACCOUNTABILITY.md)
+  updated to record `"Source YANG not bundled with model package"` instead of `null`.
+- **[FAQ.md](FAQ.md)** — new top-level FAQ covering offline use, Catalyst 9k API
+  discovery, on-device validation, MDT subscription, and Postman/Bruno consumption.
+
 ### Added — Hub-level cross-category operation search & d8 spec depth (round 8, 2026)
 
 - **[hub-search-ops.js](hub-search-ops.js)** — augments the universal search box on the

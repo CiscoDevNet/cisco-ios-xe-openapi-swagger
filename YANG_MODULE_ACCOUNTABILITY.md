@@ -66,7 +66,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-bgp-nbr-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-nbr-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-nbr-oper.html) |
 | Cisco-IOS-XE-bgp-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-oper.html) |
 | Cisco-IOS-XE-bgp-rib-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-rib-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-rib-oper.html) |
-| Cisco-IOS-XE-bgp-route-oper | - | ❌ No spec | - |
+| Cisco-IOS-XE-bgp-route-oper | - | ❌ No spec | Source YANG not bundled with model package |
 | Cisco-IOS-XE-boot-integrity-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-boot-integrity-oper) | [🌳](yang-trees/Cisco-IOS-XE-boot-integrity-oper.html) |
 | Cisco-IOS-XE-breakout-port-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-breakout-port-oper) | [🌳](yang-trees/Cisco-IOS-XE-breakout-port-oper.html) |
 | Cisco-IOS-XE-bridge-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bridge-oper) | [🌳](yang-trees/Cisco-IOS-XE-bridge-oper.html) |
