@@ -26,6 +26,32 @@ Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8
 
 ---
 
+## What's New in 26.1.1
+
+Highlights for users coming from 17.x. This is a curated summary; see the
+release-tagged sections below for full per-round detail.
+
+- **+27 net new YANG modules** vs 17.18.1 (742 vs 715 tree modules); +122 modules vs 17.9.x (620).
+- **Per-release artefacts** under [releases/26.1.1/](releases/26.1.1/) —
+  search index, YANG accountability report, Postman collections, Bruno collections,
+  prefix map, and viewer manifests, all version-pinned. The hub's version selector
+  resolves these at runtime.
+- **Deeper cfg + oper specs** — `generate_cfg_from_tree.py` and `generate_oper_from_tree.py`
+  now emit depth-8 trees, producing ~4× more cfg paths, ~7.8× more oper paths and
+  ~10.8× more native paths over the legacy depth-4 cap.
+- **MDT telemetry builder** — `telemetry.html` derives a paste-ready
+  `telemetry ietf subscription` snippet from any operational xpath, with curated
+  tier / cadence / on-change annotations folded in when matched.
+- **Site quality bar** — Lighthouse strict mode + axe-core gates every deploy;
+  PWA service worker enables offline browsing of the shell.
+- **Tooling parity across releases** — all five active releases (17.9.x, 17.12.x,
+  17.15.x, 17.18.1, 26.1.1) pass the same strict pyang validation and ship the
+  same set of artefacts.
+
+For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.md#walkthrough-add-a-missing-operational-spec).
+
+---
+
 ## [Unreleased]
 
 ### Added — Site quality, PWA, and per-release exports (round 9, 2026)

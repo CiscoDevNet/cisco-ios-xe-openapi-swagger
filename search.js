@@ -1,6 +1,23 @@
 // Universal Search for Cisco IOS-XE YANG Documentation Hub
 // Provides fuzzy search across all YANG modules with browse-all capability
 
+// Tunable constants. Centralised so behaviour can be adjusted in one place
+// instead of hunting through magic numbers scattered across this file.
+const SEARCH_CONFIG = Object.freeze({
+    debounceMs: 200,            // Input → performSearch debounce window
+    minQueryChars: 2,           // Below this we show a hint instead of searching
+    autocompleteLimit: 8,       // Max suggestions shown in the dropdown
+    displayLimit: 60,           // Max search-result cards rendered per query
+    relatedLimit: 5,            // Max "related modules" shown per card
+    descTruncate: 160,          // Max chars for description preview (word-boundary)
+    fuseThreshold: 0.35,        // Fuse.js fuzziness (0=exact, 1=match anything)
+    toastShowMs: 10,            // Delay before adding .show class to toast
+    toastDismissMs: 5000,       // How long a toast stays visible
+    toastRemoveMs: 300          // Fade-out window before DOM removal
+});
+// Back-compat alias for any external callers / future modules.
+if (typeof window !== 'undefined') window.SEARCH_CONFIG = SEARCH_CONFIG;
+
 // HTML Sanitization utility to prevent XSS
 function escapeHtml(str) {
     if (str == null) return '';
@@ -84,7 +101,7 @@ async function loadSearchIndex() {
                     { name: 'description', weight: 0.2 },
                     { name: 'displayCategory', weight: 0.1 }
                 ],
-                threshold: 0.35,
+                threshold: SEARCH_CONFIG.fuseThreshold,
                 includeScore: true,
                 includeMatches: true,
                 minMatchCharLength: 2,
@@ -244,7 +261,7 @@ function getRelatedModules(module) {
             related.push(m);
         }
     }
-    return related.slice(0, 5);
+    return related.slice(0, SEARCH_CONFIG.relatedLimit);
 }
 
 // Render search results
@@ -273,7 +290,7 @@ function renderResults(results) {
     // 'relevance' = default Fuse.js order, no re-sort needed
     
     const totalResults = results.length;
-    const displayLimit = 60;
+    const displayLimit = SEARCH_CONFIG.displayLimit;
     const modeLabel = browseMode ? 'Browsing' : 'Found';
     const sortBtnStyle = (s) => `cursor:pointer; padding:3px 8px; border:1px solid ${currentSort===s ? '#1565C0' : 'var(--border-color,#ddd)'}; border-radius:4px; background:${currentSort===s ? '#1565C0' : 'var(--bg-card,#fff)'}; color:${currentSort===s ? '#fff' : 'var(--text-secondary,#666)'}; font-size:0.78rem;`;
     const sortBtn = (key, label) => `<button style="${sortBtnStyle(key)}" aria-pressed="${currentSort===key}" onclick="changeSort('${key}')">${label}</button>`;
@@ -285,7 +302,7 @@ function renderResults(results) {
         const badgeClass = getBadgeClass(module.type);
         const borderColor = getBorderColor(module.type);
         const isFav = typeof isFavorite !== 'undefined' ? isFavorite(module.name) : false;
-        const description = truncateDescription(module.description, 160);
+        const description = truncateDescription(module.description, SEARCH_CONFIG.descTruncate);
         const escapedName = escapeHtml(module.name);
         const escapedDesc = escapeHtml(description);
         const pathLabel = module.type === 'rpc' ? 'operations' : 'paths';
@@ -391,7 +408,7 @@ function filterResults(results) {
 
 // Show autocomplete suggestions
 function showAutocomplete(query) {
-    if (!query || query.length < 2) {
+    if (!query || query.length < SEARCH_CONFIG.minQueryChars) {
         hideAutocomplete();
         return;
     }
@@ -399,7 +416,7 @@ function showAutocomplete(query) {
     const lowerQuery = query.toLowerCase();
     const suggestions = autocompleteIndex
         .filter(entry => entry.name.toLowerCase().includes(lowerQuery))
-        .slice(0, 8);
+        .slice(0, SEARCH_CONFIG.autocompleteLimit);
     
     if (suggestions.length === 0) {
         hideAutocomplete();
@@ -590,8 +607,8 @@ function performSearch() {
     
     browseMode = false;
     
-    if (query.length < 2) {
-        document.getElementById('searchResults').innerHTML = '<div class="search-stats">Type at least 2 characters to search...</div>';
+    if (query.length < SEARCH_CONFIG.minQueryChars) {
+        document.getElementById('searchResults').innerHTML = '<div class="search-stats">Type at least ' + SEARCH_CONFIG.minQueryChars + ' characters to search...</div>';
         document.getElementById('searchResults').classList.add('active');
         return;
     }
@@ -742,8 +759,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show autocomplete
         showAutocomplete(query);
         
-        // Debounced search (fast 200ms)
-        searchTimeout = setTimeout(performSearch, 200);
+        // Debounced search (SEARCH_CONFIG.debounceMs)
+        searchTimeout = setTimeout(performSearch, SEARCH_CONFIG.debounceMs);
     });
     
     // Keyboard shortcuts
@@ -838,11 +855,11 @@ function showToast(message, type = 'info') {
     document.body.appendChild(toast);
     
     // Trigger animation
-    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => toast.classList.add('show'), SEARCH_CONFIG.toastShowMs);
     
-    // Auto-remove after 5 seconds
+    // Auto-remove after the configured display window
     setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 5000);
+        setTimeout(() => toast.remove(), SEARCH_CONFIG.toastRemoveMs);
+    }, SEARCH_CONFIG.toastDismissMs);
 }

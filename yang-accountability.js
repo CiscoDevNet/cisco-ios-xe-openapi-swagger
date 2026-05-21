@@ -6,6 +6,12 @@
     var reportData = {};
     var currentFilter = { category: 'all', status: 'all' };
 
+    // Pagination: render rows in chunks so the initial paint stays cheap on
+    // releases with 1300+ modules. "Show more" appends another page; "Show
+    // all" disables paging for the rest of the session.
+    var PAGE_SIZE = 200;
+    var visibleRows = PAGE_SIZE;
+
     var CAT_ORDER = ['oper', 'rpc', 'cfg', 'openconfig', 'ietf', 'mib', 'events', 'native', 'other', 'types', 'deviation', 'common', 'native-aug', 'rpc-aug', 'submodule'];
     var EXCLUDED = new Set(['types', 'deviation', 'common', 'native-aug', 'rpc-aug', 'submodule']);
     var CAT_NOTES = {
@@ -87,6 +93,7 @@
             currentFilter.category = btn.dataset.category;
             container.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
             btn.classList.add('active');
+            visibleRows = PAGE_SIZE;
             renderTable();
         });
     }
@@ -141,14 +148,17 @@
             return true;
         });
 
-        document.getElementById('tableStats').textContent = 'Showing: ' + filtered.length + ' of ' + allModules.length + ' modules';
+        document.getElementById('tableStats').textContent = 'Showing: ' + Math.min(filtered.length, visibleRows) + ' of ' + filtered.length + ' modules' + (filtered.length !== allModules.length ? ' (filtered from ' + allModules.length + ')' : '');
 
         if (filtered.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">No modules match your filters</td></tr>';
+            _renderPagerControls(0, 0);
             return;
         }
 
-        tbody.innerHTML = filtered.map(function (module, index) {
+        var slice = filtered.slice(0, visibleRows);
+
+        tbody.innerHTML = slice.map(function (module, index) {
             var classBadge = getCategoryBadge(module.classification);
 
             var catsHtml;
@@ -186,7 +196,24 @@
                 '<td>' + treeHtml + '</td>' +
                 '</tr>';
         }).join('');
+
+        _renderPagerControls(slice.length, filtered.length);
     }
+
+    function _renderPagerControls(shown, total) {
+        var pager = document.getElementById('tablePager');
+        if (!pager) return;
+        if (total === 0 || shown >= total) {
+            pager.innerHTML = '';
+            return;
+        }
+        var remaining = total - shown;
+        var nextChunk = Math.min(PAGE_SIZE, remaining);
+        pager.innerHTML =
+            '<button type="button" id="pagerMore" class="filter-btn" aria-label="Show next ' + nextChunk + ' rows">Show next ' + nextChunk + '</button>' +
+            ' <button type="button" id="pagerAll" class="filter-btn" aria-label="Show all ' + total + ' rows">Show all (' + total + ')</button>';
+        document.getElementById('pagerMore').onclick = function () { visibleRows += PAGE_SIZE; renderTable(); };
+        document.getElementById('pagerAll').onclick = function () { visibleRows = Number.MAX_SAFE_INTEGER; renderTable(); };
 
     // === Utilities ===
 
@@ -222,6 +249,7 @@
         currentFilter.status = status;
         btn.parentElement.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
+        visibleRows = PAGE_SIZE;
         renderTable();
     }
 
@@ -250,7 +278,7 @@
         loadModuleData();
 
         // Search box
-        document.getElementById('searchBox').addEventListener('keyup', renderTable);
+        document.getElementById('searchBox').addEventListener('keyup', function () { visibleRows = PAGE_SIZE; renderTable(); });
 
         // Status filter buttons (event delegation)
         var statusFilterContainer = document.getElementById('statusFilterButtons');

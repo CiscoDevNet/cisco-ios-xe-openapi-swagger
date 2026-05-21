@@ -47,6 +47,19 @@
 
     var chartRetries = 0;
 
+    function _renderChartFallback(ctx, reason) {
+        var container = ctx.closest('.chart-section, .dashboard-chart, div');
+        if (!container) return;
+        // Replace the canvas with a small, accessible fallback so the page
+        // doesn't show a broken/empty chart well when Chart.js is blocked
+        // (CSP, ad blocker, offline cache miss).
+        var msg = document.createElement('div');
+        msg.setAttribute('role', 'status');
+        msg.style.cssText = 'padding:16px;font:14px/1.4 system-ui,-apple-system,sans-serif;color:var(--text-muted,#666);text-align:center;';
+        msg.textContent = reason || 'Statistics chart unavailable in this environment.';
+        container.replaceChild(msg, ctx);
+    }
+
     function drawChart() {
         var ctx = document.getElementById('moduleChart');
         if (!ctx) {
@@ -58,8 +71,7 @@
             chartRetries++;
             if (chartRetries > 30) {
                 console.warn('Chart.js failed to load after 30 retries');
-                var container = ctx.closest('.chart-section, .dashboard-chart, div');
-                if (container) container.style.display = 'none';
+                _renderChartFallback(ctx, 'Statistics chart unavailable (Chart.js failed to load).');
                 return;
             }
             setTimeout(drawChart, 100);
@@ -131,6 +143,7 @@
             console.log('Chart initialized successfully');
         } catch (error) {
             console.error('Error creating chart:', error);
+            _renderChartFallback(ctx, 'Statistics chart could not be rendered.');
         }
     }
 

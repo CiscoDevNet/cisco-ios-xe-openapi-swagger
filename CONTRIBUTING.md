@@ -58,6 +58,45 @@ python -X utf8 scripts/smoke_live.py
 | Add a UI feature | The corresponding `*.js` file (no inline scripts) | (refresh browser) |
 | Bump YANG release version | All generators + many scripts (touches 100+ files) | **Discuss in an issue first** |
 
+## Walkthrough: add a missing operational spec
+
+End-to-end example of the most common contribution shape. Substitute your
+YANG module name for `Cisco-IOS-XE-foo-oper`.
+
+1. **Confirm the gap.** Open [yang-accountability.html](yang-accountability.html),
+   filter by status = `Missing spec`, and locate the module. The "Reason" column
+   tells you if it was deliberately excluded (skip) or just unbuilt (proceed).
+2. **Find the tree.** YANG trees live under `yang-trees/<version>/`. The file is
+   `Cisco-IOS-XE-foo-oper.tree` for the 17.18.1 default; per-release copies live
+   under `releases/<ver>/yang-trees/`.
+3. **Run the matching generator.** Most categories use
+   `generators/generate_<category>_from_tree.py`:
+   ```powershell
+   python generators/generate_oper_from_tree.py `
+     --tree yang-trees/Cisco-IOS-XE-foo-oper.tree `
+     --out swagger-oper-model/api/Cisco-IOS-XE-foo-oper.json
+   ```
+   For 26.1.1, also pass `--release 26.1.1` and write under
+   `releases/26.1.1/swagger-oper-model/api/`.
+4. **Enrich examples.** `python scripts/enrich_v2_specs.py` walks every spec
+   and fills realistic `example` values from the heuristics in
+   `get_example_for_field()` / `CONTAINER_FILL`.
+5. **Refresh the search index.** `python scripts/generate_search_index.py`
+   rebuilds `search-index.json` (root + per release).
+6. **Refresh accountability.** `python scripts/generate_accountability.py`
+   updates `yang_accountability.json` so the module flips from "Missing spec"
+   to "Documented".
+7. **Refresh manifests.** `python scripts/fix_manifest_schema.py` recomputes
+   `total_modules`/`total_paths`/`total_operations`/`spec_count` on every
+   affected `manifest.json` so the viewer header math stays correct.
+8. **Run the test suite.** `python -X utf8 -m pytest tests/ -v` — all 143
+   manifest schema tests must pass.
+9. **Preview.** `python -m http.server 8000`, open
+   `http://localhost:8000/swagger-oper-model/index.html#spec=Cisco-IOS-XE-foo-oper`,
+   click through a couple of paths and confirm the examples render.
+10. **Commit the generator output alongside the generator change** in a single
+    commit so reviewers can reproduce the diff with one `python` command.
+
 ## Rules of thumb
 
 - **Don't hand-edit generated specs** under `swagger-*-model/api/`. They get overwritten.
