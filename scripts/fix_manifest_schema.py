@@ -43,19 +43,34 @@ def _normalize_modules(modules) -> list[str]:
     return out
 
 
+def _is_spec_file(name: str) -> bool:
+    """Match scripts/validate_release.py:is_spec_file — excludes manifest.json
+    and auxiliary indices like ``_paths_index.json`` that live alongside specs
+    but are not themselves modules."""
+    return name != "manifest.json" and not name.startswith("_")
+
+
+def _scan_specs(api_dir: Path) -> list[str]:
+    return sorted(p.stem for p in api_dir.glob("*.json") if _is_spec_file(p.name))
+
+
 def patch(manifest_path: Path) -> bool:
     data = json.loads(manifest_path.read_text(encoding="utf-8"))
     api_dir = manifest_path.parent
 
     modules = _normalize_modules(data.get("modules"))
+    on_disk = _scan_specs(api_dir)
     if not modules:
-        modules = sorted(p.stem for p in api_dir.glob("*.json") if p.name != "manifest.json")
+        modules = on_disk
     else:
         # If any listed module lacks a sibling spec file, fall back to scanning
         # the directory. Catches name-prefix drift (e.g. modules listed as
-        # "00-core" while files on disk are "native-00-core.json").
-        if any(not (api_dir / f"{m}.json").exists() for m in modules):
-            modules = sorted(p.stem for p in api_dir.glob("*.json") if p.name != "manifest.json")
+        # "00-core" while files on disk are "native-00-core.json"). Also drop
+        # any non-spec entries that may have been previously injected (auxiliary
+        # _paths_index.json etc).
+        if any(not (api_dir / f"{m}.json").exists() for m in modules) \
+                or any(m.startswith("_") for m in modules):
+            modules = on_disk
 
     changed = data.get("modules") != modules
     data["modules"] = modules
