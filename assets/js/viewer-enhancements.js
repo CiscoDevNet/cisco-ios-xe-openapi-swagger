@@ -155,7 +155,51 @@
     function boot() {
         syncQueryVerIntoHash();
         injectVersionSwitcher();
+        injectSidebarToggle();
         attachSlashFocus();
+    }
+
+    // ---------- (5) phone-class hamburger ------------------------------
+    // viewer.css hides the sidebar below 600px and reveals .sidebar-toggle.
+    // We inject the button + a click-out backdrop here so every viewer
+    // page gets the same behaviour without touching its inline markup.
+    function injectSidebarToggle() {
+        var sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+        if (document.querySelector('.sidebar-toggle')) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sidebar-toggle';
+        btn.setAttribute('aria-label', 'Toggle module list');
+        btn.setAttribute('aria-controls', sidebar.id || 'sidebar');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '&#9776;';   // hamburger glyph (U+2630)
+        var backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        function close() {
+            sidebar.classList.remove('open');
+            backdrop.style.display = 'none';
+            btn.setAttribute('aria-expanded', 'false');
+        }
+        btn.addEventListener('click', function () {
+            var open = !sidebar.classList.contains('open');
+            sidebar.classList.toggle('open', open);
+            backdrop.style.display = open ? 'block' : 'none';
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        backdrop.addEventListener('click', close);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) close();
+        });
+        // Auto-close when the user picks a module on small screens.
+        sidebar.addEventListener('click', function (e) {
+            if (window.innerWidth > 600) return;
+            if (e.target.closest('a, .module-list li')) {
+                setTimeout(close, 50);
+            }
+        });
+        document.body.appendChild(btn);
+        document.body.appendChild(backdrop);
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', boot);
