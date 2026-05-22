@@ -78,7 +78,8 @@
 <body>
     <main class="container">
         <h1>404</h1>
-        <p>Page not found. The documentation you're looking for doesn't exist.</p>
+        <p id="msg">Page not found. The documentation you're looking for doesn't exist.</p>
+        <p id="redirectMsg" style="display:none; font-size:0.95rem; color:var(--text-muted);"></p>
         <a href="index.html" class="main-link">← Back to Documentation Hub</a>
         <div class="quick-links">
             <a href="swagger-oper-model/index.html" style="background: #2196F3;">Oper</a>
@@ -99,6 +100,59 @@
     <script>
         const saved = localStorage.getItem('theme');
         if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+        // Hash-aware routing: if the failed URL carries a #spec=...&op=... or
+        // #ver=... fragment, try to route the user to a viewer that can
+        // resolve it instead of dropping them on a dead list. Works for
+        // typo'd paths like `/swagger-cfg-modle/index.html#spec=foo` or
+        // for old/renamed pages where someone pasted a deep link.
+        (function recoverDeepLink() {
+            try {
+                var raw = (window.location.hash || '').replace(/^#/, '');
+                if (!raw) return;
+                var params = {};
+                raw.split('&').forEach(function (s) {
+                    var i = s.indexOf('=');
+                    if (i > 0) {
+                        try { params[s.substring(0, i)] = decodeURIComponent(s.substring(i + 1)); }
+                        catch (_) { params[s.substring(0, i)] = s.substring(i + 1); }
+                    }
+                });
+                if (!params.spec) return;
+                // The spec name uniquely identifies its viewer category by
+                // the YANG model's filename prefix. Use a small lookup so we
+                // don't need to fetch search-index.json from this static page.
+                var rules = [
+                    { match: /^Cisco-IOS-XE-mib/i,                  cat: 'swagger-mib-model' },
+                    { match: /^iana-/i,                              cat: 'swagger-other-model' },
+                    { match: /^cisco-iox$|^Cisco-IOS-XE-native/i,    cat: 'swagger-native-config-model' },
+                    { match: /^openconfig-/i,                        cat: 'swagger-openconfig-model' },
+                    { match: /^ietf-/i,                              cat: 'swagger-ietf-model' },
+                    { match: /-rpc$|^Cisco-IOS-XE-.+-rpc/i,          cat: 'swagger-rpc-model' },
+                    { match: /-events?$|-notif/i,                    cat: 'swagger-events-model' },
+                    { match: /-oper$/i,                              cat: 'swagger-oper-model' },
+                    { match: /-cfg$/i,                               cat: 'swagger-cfg-model' },
+                ];
+                var cat = null;
+                for (var i = 0; i < rules.length; i++) {
+                    if (rules[i].match.test(params.spec)) { cat = rules[i].cat; break; }
+                }
+                if (!cat) return;
+                // Preserve ver= and op= so the destination viewer can deep-link.
+                var hashParts = [];
+                if (params.ver) hashParts.push('ver=' + encodeURIComponent(params.ver));
+                hashParts.push('spec=' + encodeURIComponent(params.spec));
+                if (params.op) hashParts.push('op=' + encodeURIComponent(params.op));
+                var target = cat + '/index.html#' + hashParts.join('&');
+                var msg = document.getElementById('redirectMsg');
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.innerHTML = 'Redirecting you to <strong>' + cat + '</strong> for <code>' + params.spec + '</code>'
+                        + (params.op ? ' (operation <code>' + params.op + '</code>)' : '') + '\u2026';
+                }
+                setTimeout(function () { window.location.replace(target); }, 800);
+            } catch (_) { /* leave the 404 page intact */ }
+        })();
     </script>
 </body>
 </html>

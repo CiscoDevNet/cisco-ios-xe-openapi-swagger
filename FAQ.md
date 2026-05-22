@@ -71,6 +71,31 @@ shape, but only a real device confirms semantics.
 * For end-to-end pipelines (collector + decoder + dashboard) see the
   [telemetry-reference-v2.md](telemetry-reference-v2.md) cookbook.
 
+### How do shareable deep-links work?
+
+Every URL the **Copy Share Link** button produces uses a fixed hash format
+so the link opens directly on the same spec, operation, and IOS-XE release:
+
+```
+https://<host>/<category>/index.html?ver=<release>#ver=<release>&spec=<module>&op=<operationId>
+```
+
+* `?ver=` and `#ver=` carry the active release (e.g. `26.1.1`). The viewer
+  reads from the query first; the hash copy is what survives reloads and
+  what other tooling (e.g. `recent-favorites.js`) snapshots.
+* `#spec=` is the YANG module file name without the `.json` extension
+  (e.g. `Cisco-IOS-XE-native`).
+* `#op=` is the OpenAPI `operationId`, which the build step makes globally
+  unique so the same hash always lands on exactly one operation.
+
+If the spec doesn't exist in the requested release the viewer surfaces a
+yellow toast and falls back to the module list. If you land on a 404 page,
+[404.html](404.html) parses the same hash and forwards you to the nearest
+correct viewer automatically.
+
+**Keyboard shortcuts:** `/` or `Ctrl+K` focuses the search box on the home
+page and every viewer.
+
 ---
 
 ## Postman / Bruno exports

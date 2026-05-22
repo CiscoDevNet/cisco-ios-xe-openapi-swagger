@@ -50,13 +50,15 @@ let activeQueryLower = '';
 // layout. window.__IOSXE_ACTIVE_VERSION__ is set by index-app.js once the
 // version selector resolves.
 //
-// `cache: 'no-cache'` forces a revalidation (cheap conditional GET → 304
-// when unchanged) so users always pick up a fresh search-index.json the
-// moment we publish a new build. Without this, the Pages default
-// max-age=600 keeps stale indexes (e.g. with pre-dedup duplicates)
-// pinned in the browser for up to 10 minutes after each deploy.
+// `cache: 'no-store'` bypasses the browser cache entirely. We previously
+// used 'no-cache' which only forces revalidation — on a revalidation
+// network hiccup the browser can still serve the stale copy, which is
+// exactly the bug we were trying to avoid (GitHub Pages default
+// max-age=600 pinning a pre-rewrite index for up to 10 minutes after
+// deploy). Every other index/manifest fetch in the site uses 'no-store'
+// (yang-accountability.js, index-app.js, telemetry.js) — match them.
 async function loadSearchIndexForActiveVersion() {
-    var opts = { cache: 'no-cache' };
+    var opts = { cache: 'no-store' };
     var ver = (typeof window !== 'undefined') ? window.__IOSXE_ACTIVE_VERSION__ : null;
     if (ver) {
         try {
@@ -127,7 +129,7 @@ async function loadSearchIndex() {
             
             // Update search input
             if (searchInput) {
-                searchInput.placeholder = `Search ${searchIndex.length} modules — type a name, keyword, or feature... (Ctrl+K)`;
+                searchInput.placeholder = `Search ${searchIndex.length} modules — type a name, keyword, or feature... (press / or Ctrl+K)`;
                 searchInput.disabled = false;
             }
             
@@ -136,10 +138,19 @@ async function loadSearchIndex() {
             console.error('Error loading search index:', error);
             const searchInput = document.getElementById('universalSearch');
             if (searchInput) {
-                searchInput.placeholder = 'Search unavailable — please refresh the page';
+                searchInput.placeholder = 'Search unavailable — click here to retry';
                 searchInput.disabled = false;
+                // Wire a one-shot click handler so users can retry without
+                // a full page reload (also helps on flaky cell networks).
+                searchInput.addEventListener('click', function retry() {
+                    searchInput.removeEventListener('click', retry);
+                    searchReadyPromise = null;
+                    loadSearchIndex();
+                }, { once: true });
             }
-            showToast('Search unavailable. Please refresh the page.', 'error');
+            if (typeof showToast === 'function') {
+                showToast('Search index failed to load (' + (error && error.message || 'network error') + '). Click the search box to retry.', 'error');
+            }
         }
     })();
     
@@ -817,7 +828,19 @@ document.addEventListener('DOMContentLoaded', () => {
             searchInput.select();
             searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        
+
+        // "/" focuses search too (GitHub convention). Skip when already
+        // typing into a form field so we don't hijack the user's input.
+        if (e.key === '/' && document.activeElement !== searchInput) {
+            const t = e.target;
+            if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'
+                    || t.tagName === 'SELECT' || t.isContentEditable)) return;
+            e.preventDefault();
+            searchInput.focus();
+            try { searchInput.select(); } catch (_) {}
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         // Escape to clear search and hide results
         if (e.key === 'Escape' && document.activeElement === searchInput) {
             searchInput.value = '';
