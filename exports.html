@@ -35,6 +35,19 @@
   a:hover { text-decoration:underline; }
   .help { background:rgba(106,27,154,.06); border-left:3px solid var(--accent);
           padding:10px 14px; border-radius:4px; margin-bottom:18px; font-size:.85rem; }
+  .filters { display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+             background:var(--card); border:1px solid var(--border); border-radius:8px;
+             padding:10px 14px; margin-bottom:18px; font-size:.85rem; }
+  .filters label { font-weight:500; }
+  .filters select { background:var(--bg); color:var(--fg); border:1px solid var(--border);
+                    border-radius:4px; padding:4px 8px; font:inherit; }
+  .filters .fmt-btn { background:var(--card); color:var(--accent);
+                      border:1px solid var(--accent); border-radius:14px;
+                      padding:3px 12px; cursor:pointer; font:inherit; }
+  .filters .fmt-btn.active { background:var(--accent); color:#fff; }
+  .filters .summary { margin-left:auto; color:var(--muted); font-family:"SF Mono",Consolas,monospace; }
+  .release-block.format-postman .bruno-table,
+  .release-block.format-bruno   .postman-table { display:none; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site-chrome.js" defer></script>
@@ -86,6 +99,17 @@
     Bruno collections are folders containing <code>.bru</code> files; clone the
     full repository to use them, or download via the GitHub UI.
   </div>
+  <div class="filters" id="filterBar" hidden>
+    <label for="verFilter">Release:</label>
+    <select id="verFilter" aria-label="Filter by release"><option value="all">All</option></select>
+    <label>Format:</label>
+    <div role="group" aria-label="Filter by export format">
+      <button type="button" class="fmt-btn active" data-format="all">All</button>
+      <button type="button" class="fmt-btn" data-format="postman">Postman only</button>
+      <button type="button" class="fmt-btn" data-format="bruno">Bruno only</button>
+    </div>
+    <span class="summary" id="exportsSummary" aria-live="polite"></span>
+  </div>
   <div id="releases"></div>
   <div id="empty" class="empty" style="display:none;">
     No exports manifests found. Run <code>python scripts/build_release.py --version &lt;v&gt;</code>
@@ -107,7 +131,9 @@
       Promise.all(active.map(loadRelease)).then(function () {
         if (!document.querySelector('#releases > .release-block')) {
           document.getElementById('empty').style.display = 'block';
+          return;
         }
+        initFilters();
       });
     });
 
@@ -124,12 +150,17 @@
       if (!pm && !br) return;
       var block = document.createElement('div');
       block.className = 'release-block';
+      block.dataset.ver = ver;
       var when = (pm && pm.generated) || (br && br.generated) || '';
       block.innerHTML =
         '<h2>IOS-XE ' + escapeHtml(ver) + '</h2>'
         + '<div class="gen">Generated: ' + escapeHtml(when || '—') + '</div>';
-      block.appendChild(buildTable('Postman', pm, prefix));
-      block.appendChild(buildTable('Bruno', br, prefix));
+      var pmt = buildTable('Postman', pm, prefix);
+      pmt.classList.add('postman-table');
+      block.appendChild(pmt);
+      var brt = buildTable('Bruno', br, prefix);
+      brt.classList.add('bruno-table');
+      block.appendChild(brt);
       document.getElementById('releases').appendChild(block);
     });
   }
@@ -187,6 +218,130 @@
   function escapeHtml(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // === Filter bar (release + format) =====================================
+  // URL hash shape: #ver=<release>&format=<all|postman|bruno>
+
+  function parseHash() {
+    var out = {};
+    var h = (location.hash || '').replace(/^#/, '');
+    if (!h) return out;
+    h.split('&').forEach(function (kv) {
+      if (!kv) return;
+      var i = kv.indexOf('=');
+      var k = i >= 0 ? kv.slice(0, i) : kv;
+      var v = i >= 0 ? decodeURIComponent(kv.slice(i + 1)) : '';
+      if (k) out[k] = v;
+    });
+    return out;
+  }
+
+  function writeHash(state) {
+    try {
+      var parts = [];
+      if (state.ver && state.ver !== 'all') parts.push('ver=' + encodeURIComponent(state.ver));
+      if (state.format && state.format !== 'all') parts.push('format=' + encodeURIComponent(state.format));
+      var next = parts.length ? '#' + parts.join('&') : ' ';
+      if (location.hash !== next) {
+        history.replaceState(null, '', location.pathname + location.search + next);
+      }
+    } catch (_) { /* noop */ }
+  }
+
+  function applyFilters(state) {
+    var blocks = document.querySelectorAll('#releases > .release-block');
+    var shown = 0, hidden = 0;
+    blocks.forEach(function (b) {
+      var match = state.ver === 'all' || b.dataset.ver === state.ver;
+      b.style.display = match ? '' : 'none';
+      if (match) shown++; else hidden++;
+      b.classList.remove('format-all', 'format-postman', 'format-bruno');
+      b.classList.add('format-' + state.format);
+    });
+    var sum = document.getElementById('exportsSummary');
+    if (sum) {
+      var totals = collectTotals(state);
+      sum.textContent =
+        shown + ' release' + (shown === 1 ? '' : 's') + ' shown' +
+        (hidden ? ' (' + hidden + ' hidden)' : '') +
+        '  ·  ' + totals.requests.toLocaleString() + ' requests  ·  ' +
+        formatBytes(totals.bytes);
+    }
+  }
+
+  function collectTotals(state) {
+    var blocks = document.querySelectorAll('#releases > .release-block');
+    var req = 0, bytes = 0;
+    blocks.forEach(function (b) {
+      if (state.ver !== 'all' && b.dataset.ver !== state.ver) return;
+      var tables = [];
+      if (state.format !== 'bruno')   tables.push(b.querySelector('.postman-table'));
+      if (state.format !== 'postman') tables.push(b.querySelector('.bruno-table'));
+      tables.forEach(function (t) {
+        if (!t) return;
+        t.querySelectorAll('tbody tr').forEach(function (tr) {
+          var n = parseInt((tr.children[1] && tr.children[1].textContent || '').replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(n)) req += n;
+          var sz = tr.querySelector('.size');
+          if (sz) bytes += parseSize(sz.textContent);
+        });
+      });
+    });
+    return { requests: req, bytes: bytes };
+  }
+
+  function parseSize(text) {
+    var m = String(text || '').trim().match(/^([\d.]+)\s*(B|KB|MB|GB)$/i);
+    if (!m) return 0;
+    var n = parseFloat(m[1]);
+    var unit = m[2].toUpperCase();
+    var mult = { B:1, KB:1024, MB:1024*1024, GB:1024*1024*1024 }[unit] || 1;
+    return n * mult;
+  }
+
+  function initFilters() {
+    var bar = document.getElementById('filterBar');
+    if (!bar) return;
+    bar.hidden = false;
+    var verSel = document.getElementById('verFilter');
+    var blocks = document.querySelectorAll('#releases > .release-block');
+    blocks.forEach(function (b) {
+      var opt = document.createElement('option');
+      opt.value = b.dataset.ver;
+      opt.textContent = 'IOS-XE ' + b.dataset.ver;
+      verSel.appendChild(opt);
+    });
+    var hash = parseHash();
+    var state = {
+      ver: hash.ver && verSel.querySelector('option[value="' + cssEscape(hash.ver) + '"]') ? hash.ver : 'all',
+      format: ['all', 'postman', 'bruno'].indexOf(hash.format) >= 0 ? hash.format : 'all'
+    };
+    verSel.value = state.ver;
+    bar.querySelectorAll('.fmt-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.format === state.format);
+    });
+    applyFilters(state);
+
+    verSel.addEventListener('change', function () {
+      state.ver = this.value;
+      writeHash(state);
+      applyFilters(state);
+    });
+    bar.querySelectorAll('.fmt-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.format = btn.dataset.format;
+        bar.querySelectorAll('.fmt-btn').forEach(function (b) {
+          b.classList.toggle('active', b === btn);
+        });
+        writeHash(state);
+        applyFilters(state);
+      });
+    });
+  }
+
+  function cssEscape(s) {
+    return String(s).replace(/["\\]/g, '\\$&');
   }
 })();
 </script>
