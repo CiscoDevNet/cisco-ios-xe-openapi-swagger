@@ -39,6 +39,11 @@ let selectedSuggestionIndex = -1;
 let browseMode = false;
 let currentSort = 'relevance';
 let lastResults = [];
+// Lowercased copy of the current query — referenced by renderResults() to
+// decide whether to upgrade a result's link from "open the spec at the top"
+// to "deep-link to the matching top-level YANG container" (see topPaths in
+// search-index.json).
+let activeQueryLower = '';
 
 // Multi-release: try the active-release search index first, then fall back to
 // the root index for backward compatibility with the legacy single-release
@@ -271,6 +276,22 @@ function getRelatedModules(module) {
     return related.slice(0, SEARCH_CONFIG.relatedLimit);
 }
 
+// Returns the URL we should send the user to when they click "View API Spec"
+// on a search result. If the active query exactly matches one of the
+// module's top-level YANG containers (e.g. user typed "iox" and the module
+// has /native/iox → operationId "get-iox"), append &op=<id> to the spec
+// hash so Swagger UI lands directly on that operation row instead of just
+// opening the spec at the top.
+function pickDeepLink(module) {
+    if (!module || !module.swaggerUrl) return module && module.swaggerUrl;
+    const q = activeQueryLower;
+    if (!q || !module.topPaths) return module.swaggerUrl;
+    const opId = module.topPaths[q];
+    if (!opId) return module.swaggerUrl;
+    if (module.swaggerUrl.indexOf('&op=') !== -1) return module.swaggerUrl;
+    return module.swaggerUrl + '&op=' + encodeURIComponent(opId);
+}
+
 // Render search results
 function renderResults(results) {
     const resultsContainer = document.getElementById('searchResults');
@@ -313,10 +334,22 @@ function renderResults(results) {
         const escapedName = escapeHtml(module.name);
         const escapedDesc = escapeHtml(description);
         const pathLabel = module.type === 'rpc' ? 'operations' : 'paths';
-        
+
+        // If the current query exactly matches a top-level YANG container in
+        // this module (e.g. user searched "iox" and native-platform has a
+        // /native/iox container), build a deep link straight to that
+        // operation row instead of just dropping the user at the spec top.
+        // module.topPaths is { <container-lowercased>: <operationId> }.
+        const specUrl = pickDeepLink(module);
+        const opHint = (typeof activeQueryLower === 'string' && activeQueryLower &&
+            module.topPaths && Object.prototype.hasOwnProperty.call(module.topPaths, activeQueryLower))
+            ? activeQueryLower
+            : null;
+
         let linksHtml = '';
-        if (module.swaggerUrl) {
-            linksHtml += `<a href="${escapeHtml(module.swaggerUrl)}" class="search-result-link" data-module="${escapedName}">View API Spec</a>`;
+        if (specUrl) {
+            const label = opHint ? `View ${escapeHtml(opHint)} API` : 'View API Spec';
+            linksHtml += `<a href="${escapeHtml(specUrl)}" class="search-result-link" data-module="${escapedName}">${label}</a>`;
         }
         if (module.yangTreeUrl) {
             linksHtml += `<a href="${escapeHtml(module.yangTreeUrl)}" class="search-result-link" data-module="${escapedName}">View YANG Tree</a>`;
@@ -327,7 +360,8 @@ function renderResults(results) {
         let relatedHtml = '';
         if (related.length > 0) {
             const relLinks = related.map(r => {
-                const url = r.swaggerUrl ? escapeHtml(r.swaggerUrl) : '#';
+                const rUrl = pickDeepLink(r);
+                const url = rUrl ? escapeHtml(rUrl) : '#';
                 const badge = escapeHtml(r.displayCategory);
                 const rName = escapeHtml(r.name);
                 return `<a href="${url}" title="${rName}" class="related-link" data-related-search="${rName}">${escapeHtml(r.emoji)} ${badge}</a>`;
@@ -596,7 +630,8 @@ function changeSort(sort) {
 // Perform search
 function performSearch() {
     const query = document.getElementById('universalSearch').value.trim();
-    
+    activeQueryLower = query.toLowerCase();
+
     if (!searchReady) return;
     
     // If no search text, check if we should browse by filter
