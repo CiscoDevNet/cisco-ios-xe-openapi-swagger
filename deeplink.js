@@ -365,11 +365,55 @@
         attachScrollMemory();
     }
 
+    /**
+     * Copy the current viewer URL (including #spec=...&op=...&ver=...) to
+     * the clipboard. The URL is always in sync with what the user is looking
+     * at because (a) the sidebar updates the spec hash on every click and
+     * (b) attachClickCapture() above appends the op when an operation row
+     * is clicked.
+     *
+     * Pass the button element to get a brief "Copied!" confirmation. Falls
+     * back to a hidden <textarea> + execCommand for browsers without the
+     * async Clipboard API (Safari < 13.1, file:// origins).
+     */
+    function copyShareLink(btn) {
+        var url = window.location.href;
+        function flash(label) {
+            if (!btn) return;
+            var orig = btn.textContent;
+            btn.textContent = label;
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+        }
+        function fallback() {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = url;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'absolute';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                var ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                flash(ok ? 'Copied!' : 'Copy failed');
+            } catch (_) { flash('Copy failed'); }
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(
+                function () { flash('Copied!'); },
+                function () { fallback(); }
+            );
+        } else {
+            fallback();
+        }
+    }
+
     window.__DeepLink = {
         parseHash: parseHash,
         buildHash: buildHash,
         setSpec: setSpec,
         setSpecOp: setSpecOp,
-        tryExpandOp: tryExpandOp
+        tryExpandOp: tryExpandOp,
+        copyShareLink: copyShareLink
     };
 })();

@@ -16,18 +16,12 @@ MODEL_DIRS = {
     'swagger-other-model': ('other', 'Other Models', '📦'),
 }
 
-# Models that also have a v2 (tree-based deep-path) api/ directory
-V2_DIRS = {
-    'swagger-native-config-model': ('native-v2', 'Native Config v2 (Deep)', '🏠'),
-    'swagger-oper-model': ('oper-v2', 'Operational v2 (Deep)', '📊'),
-    'swagger-cfg-model': ('cfg-v2', 'Configuration v2 (Deep)', '⚙️'),
-    'swagger-openconfig-model': ('openconfig-v2', 'OpenConfig v2 (Deep)', '🌐'),
-    'swagger-mib-model': ('mib-v2', 'MIB v2 (Deep)', '📡'),
-    'swagger-ietf-model': ('ietf-v2', 'IETF v2 (Deep)', '📜'),
-    'swagger-rpc-model': ('rpc-v2', 'RPC v2 (Deep)', '🔧'),
-    'swagger-events-model': ('events-v2', 'Events v2 (Deep)', '🔔'),
-    'swagger-other-model': ('other-v2', 'Other v2 (Deep)', '📦'),
-}
+# NOTE: There is no longer a separate v1/v2 directory split — every viewer
+# serves a single `api/` directory containing the tree-derived (v2) specs.
+# The legacy V2_DIRS pass has been removed because it scanned the SAME
+# directories as MODEL_DIRS, producing duplicate entries (every module
+# appeared twice — once tagged v1, once tagged v2). See `version` field
+# below: kept as 'v2' for historical/consumer compatibility.
 
 modules = []
 total_endpoints = 0
@@ -105,23 +99,14 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
 
 def main():
     global total_endpoints
-    # Index v1 specs (api/ directories)
+    # Single indexing pass — every viewer has exactly one `api/` directory.
     for dir_name, (type_name, display_cat, emoji) in MODEL_DIRS.items():
-        api_dir = os.path.join(BASE, dir_name, 'api')
-        if not os.path.isdir(api_dir):
-            continue
-        count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v1')
-        total_endpoints += eps
-        by_category[dir_name] = count
-
-    # Index v2 specs (api/ directories)
-    for dir_name, (type_name, display_cat, emoji) in V2_DIRS.items():
         api_dir = os.path.join(BASE, dir_name, 'api')
         if not os.path.isdir(api_dir):
             continue
         count, eps = index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, 'v2')
         total_endpoints += eps
-        by_category[dir_name + '/v2'] = count
+        by_category[dir_name] = count
 
     # Build a categories lookup: search.js (and downstream consumers via
     # hydration there) read displayCategory + emoji from this map instead
