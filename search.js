@@ -44,15 +44,22 @@ let lastResults = [];
 // the root index for backward compatibility with the legacy single-release
 // layout. window.__IOSXE_ACTIVE_VERSION__ is set by index-app.js once the
 // version selector resolves.
+//
+// `cache: 'no-cache'` forces a revalidation (cheap conditional GET → 304
+// when unchanged) so users always pick up a fresh search-index.json the
+// moment we publish a new build. Without this, the Pages default
+// max-age=600 keeps stale indexes (e.g. with pre-dedup duplicates)
+// pinned in the browser for up to 10 minutes after each deploy.
 async function loadSearchIndexForActiveVersion() {
+    var opts = { cache: 'no-cache' };
     var ver = (typeof window !== 'undefined') ? window.__IOSXE_ACTIVE_VERSION__ : null;
     if (ver) {
         try {
-            var resp = await fetch('releases/' + encodeURIComponent(ver) + '/search-index.json');
+            var resp = await fetch('releases/' + encodeURIComponent(ver) + '/search-index.json', opts);
             if (resp.ok) return resp;
         } catch (_) { /* fall through to root */ }
     }
-    return fetch('search-index.json');
+    return fetch('search-index.json', opts);
 }
 
 // Load search index
