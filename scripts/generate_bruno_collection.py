@@ -149,7 +149,7 @@ def write_collection(out_dir: Path, version: str, category: str,
                                   req.get("summary"), req.get("body"))
         b = body.encode("utf-8")
         if cur_size + len(b) > max_bytes and written_in_part > 0:
-            parts.append({"name": cur_name, "path": str(cur_dir.relative_to(PROJECT_ROOT)),
+            parts.append({"name": cur_name, "path": cur_dir.relative_to(PROJECT_ROOT).as_posix(),
                           "request_count": written_in_part, "size_bytes": cur_size})
             cur_part += 1
             cur_name = f"IOS-XE-{version}-{category}-part-{cur_part}"
@@ -181,7 +181,7 @@ def write_collection(out_dir: Path, version: str, category: str,
         written_in_part += 1
         seq += 1
 
-    parts.append({"name": cur_name, "path": str(cur_dir.relative_to(PROJECT_ROOT)),
+    parts.append({"name": cur_name, "path": cur_dir.relative_to(PROJECT_ROOT).as_posix(),
                   "request_count": written_in_part, "size_bytes": cur_size})
     return parts
 

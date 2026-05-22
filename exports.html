@@ -146,26 +146,30 @@
 
     var t = document.createElement('table');
     t.innerHTML = '<thead><tr><th>Collection</th><th>Requests</th>'
-                + '<th>Size</th><th>Path</th></tr></thead><tbody></tbody>';
+                + '<th>Size</th><th>Download</th></tr></thead><tbody></tbody>';
     var tbody = t.querySelector('tbody');
     var max = manifest.max_bytes || (50 * 1024 * 1024);
     (manifest.collections || []).forEach(function (c) {
       var tr = document.createElement('tr');
       var pct = (c.size_bytes || 0) / max;
       var sizeClass = pct > 0.9 ? 'warn' : 'ok';
+      var fullPath = String(c.path || '').replace(/\\/g, '/');
+      var basename = fullPath.split('/').pop() || fullPath;
       tr.innerHTML =
         '<td>' + escapeHtml(c.name || '') + '</td>'
-        + '<td>' + (c.request_count || 0) + '</td>'
+        + '<td>' + (c.request_count || 0).toLocaleString() + '</td>'
         + '<td class="size ' + sizeClass + '">' + formatBytes(c.size_bytes || 0) + '</td>'
-        + '<td><a href="' + escapeHtml(c.path) + '" download>'
-        + escapeHtml(c.path) + '</a></td>';
+        + '<td><a href="' + escapeHtml(fullPath) + '" download title="' + escapeHtml(fullPath) + '">'
+        + escapeHtml(basename) + '</a></td>';
       tbody.appendChild(tr);
     });
     if (manifest.environment) {
+      var env = String(manifest.environment).replace(/\\/g, '/');
+      var envName = env.split('/').pop() || env;
       var tr = document.createElement('tr');
       tr.innerHTML = '<td colspan="3"><span class="badge">environment</span></td>'
-        + '<td><a href="' + escapeHtml(manifest.environment) + '" download>'
-        + escapeHtml(manifest.environment) + '</a></td>';
+        + '<td><a href="' + escapeHtml(env) + '" download title="' + escapeHtml(env) + '">'
+        + escapeHtml(envName) + '</a></td>';
       tbody.appendChild(tr);
     }
     wrap.appendChild(t);
