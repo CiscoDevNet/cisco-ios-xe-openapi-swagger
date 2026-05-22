@@ -45,6 +45,93 @@
         return 'yang_accountability.json';
     }
 
+    // === Hash deep-link (search + filters + version) ===
+    // URL hash shape:
+    //   #ver=<release>&q=<search>&cat=<classification>&status=<status>
+    // Lets users share / bookmark an exact filter view.
+
+    function _parseHash() {
+        var out = {};
+        var h = (location.hash || '').replace(/^#/, '');
+        if (!h) return out;
+        h.split('&').forEach(function (kv) {
+            if (!kv) return;
+            var i = kv.indexOf('=');
+            var k = i >= 0 ? kv.slice(0, i) : kv;
+            var v = i >= 0 ? decodeURIComponent(kv.slice(i + 1)) : '';
+            if (k) out[k] = v;
+        });
+        return out;
+    }
+
+    function _writeHash() {
+        try {
+            var parts = [];
+            var ver = _activeVersion();
+            if (ver) parts.push('ver=' + encodeURIComponent(ver));
+            var q = (document.getElementById('searchBox') || {}).value || '';
+            if (q) parts.push('q=' + encodeURIComponent(q));
+            if (currentFilter.category && currentFilter.category !== 'all') {
+                parts.push('cat=' + encodeURIComponent(currentFilter.category));
+            }
+            if (currentFilter.status && currentFilter.status !== 'all') {
+                parts.push('status=' + encodeURIComponent(currentFilter.status));
+            }
+            var next = parts.length ? '#' + parts.join('&') : ' ';
+            if (location.hash !== next) {
+                history.replaceState(null, '', location.pathname + location.search + next);
+            }
+        } catch (_) { /* noop */ }
+    }
+
+    function _applyHashOnLoad() {
+        var h = _parseHash();
+        if (h.q) {
+            var sb = document.getElementById('searchBox');
+            if (sb) sb.value = h.q;
+        }
+        if (h.cat) currentFilter.category = h.cat;
+        if (h.status) currentFilter.status = h.status;
+    }
+
+    function _syncFilterButtons() {
+        // After data load, reflect currentFilter state in the button highlights.
+        var catBtns = document.querySelectorAll('#categoryFilterButtons .filter-btn');
+        catBtns.forEach(function (b) {
+            b.classList.toggle('active', b.dataset.category === currentFilter.category);
+        });
+        var statusBtns = document.querySelectorAll('#statusFilterButtons .filter-btn');
+        statusBtns.forEach(function (b) {
+            b.classList.toggle('active', b.dataset.status === currentFilter.status);
+        });
+    }
+
+    function _bindShareBtn() {
+        var btn = document.getElementById('yaShareBtn');
+        if (!btn || btn.__bound) return;
+        btn.__bound = true;
+        btn.addEventListener('click', function () {
+            _writeHash();
+            var original = btn.textContent;
+            var url = location.href;
+            var done = function () {
+                btn.textContent = 'Copied!';
+                setTimeout(function () { btn.textContent = original; }, 3000);
+            };
+            // Prefer the shared DeepLink helper for consistent UX (3s flash + toast)
+            if (window.__DeepLink && typeof window.__DeepLink.copyShareLink === 'function') {
+                try { window.__DeepLink.copyShareLink(btn); return; } catch (_) { /* fall through */ }
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done, function () {
+                    window.prompt('Copy this URL:', url);
+                });
+            } else {
+                window.prompt('Copy this URL:', url);
+            }
+        });
+    }
+
     async function loadModuleData() {
         try {
             var url = _accountabilityUrl();
@@ -66,6 +153,7 @@
             buildCategoryButtons();
             renderCategorySummary();
             renderTable();
+            _syncFilterButtons();
         } catch (error) {
             console.error('Error loading module data:', error);
             document.getElementById('moduleTableBody').innerHTML =
@@ -95,6 +183,7 @@
             btn.classList.add('active');
             visibleRows = PAGE_SIZE;
             renderTable();
+            _writeHash();
         });
     }
 
@@ -251,6 +340,7 @@
         btn.classList.add('active');
         visibleRows = PAGE_SIZE;
         renderTable();
+        _writeHash();
     }
 
     // === Sort ===
@@ -275,10 +365,12 @@
     // === Initialization ===
 
     function init() {
+        _applyHashOnLoad();
+        _bindShareBtn();
         loadModuleData();
 
         // Search box
-        document.getElementById('searchBox').addEventListener('keyup', function () { visibleRows = PAGE_SIZE; renderTable(); });
+        document.getElementById('searchBox').addEventListener('keyup', function () { visibleRows = PAGE_SIZE; renderTable(); _writeHash(); });
 
         // Status filter buttons (event delegation)
         var statusFilterContainer = document.getElementById('statusFilterButtons');
