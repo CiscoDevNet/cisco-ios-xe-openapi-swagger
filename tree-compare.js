@@ -8,17 +8,89 @@
     var leftTreeData = null;
     var rightTreeData = null;
 
-    // === Load search index ===
-
-    async function loadSearchIndex() {
+    // === URL / share-link helpers ===
+    // Hash format: #left=<module>&right=<module>&ver=<release>
+    //   - left/right auto-fill the dropdowns and trigger a compare on load
+    //   - ver picks up the per-release search-index.json (matches
+    //     viewer behaviour) so a shared link reproduces the exact pair
+    //     the user was looking at in the exact release.
+    function parseHash() {
+        var raw = (window.location.hash || '').replace(/^#/, '');
+        var out = {};
+        raw.split('&').forEach(function (p) {
+            if (!p) return;
+            var i = p.indexOf('=');
+            var k = (i < 0 ? p : p.slice(0, i)).toLowerCase();
+            var v = i < 0 ? '' : decodeURIComponent(p.slice(i + 1));
+            if (k) out[k] = v;
+        });
+        return out;
+    }
+    function activeVer() {
         try {
-            var response = await fetch('search-index.json');
+            var q = new URLSearchParams(window.location.search).get('ver');
+            if (q) return q;
+        } catch (_) {}
+        var h = parseHash().ver;
+        if (h) return h;
+        try {
+            var s = localStorage.getItem('iosxe-active-version');
+            if (s) return s;
+        } catch (_) {}
+        return null;
+    }
+    function writeHash(left, right) {
+        var ver = activeVer();
+        var parts = [];
+        if (ver) parts.push('ver=' + encodeURIComponent(ver));
+        if (left) parts.push('left=' + encodeURIComponent(left));
+        if (right) parts.push('right=' + encodeURIComponent(right));
+        var next = '#' + parts.join('&');
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname
+                + window.location.search + next);
+        } else {
+            window.location.hash = next;
+        }
+    }
+
+    // === Load search index ===
+    // Prefer releases/<ver>/search-index.json when ?ver= / #ver= is set;
+    // fall back to the root index if the per-release file is missing.
+    async function loadSearchIndex() {
+        var ver = activeVer();
+        var opts = { cache: 'no-store' };
+        try {
+            if (ver) {
+                var perRel = await fetch('releases/' + encodeURIComponent(ver)
+                    + '/search-index.json', opts);
+                if (perRel.ok) {
+                    searchIndex = await perRel.json();
+                    populateModuleSelects();
+                    applyHashSelection();
+                    return;
+                }
+            }
+            var response = await fetch('search-index.json', opts);
             searchIndex = await response.json();
             populateModuleSelects();
+            applyHashSelection();
         } catch (error) {
             console.error('Failed to load search index:', error);
             showNotice('Failed to load module list. Please refresh the page.', 'error');
         }
+    }
+
+    // If the URL hash carries left/right, populate the selects and run
+    // compareModules() once the dropdowns are ready.
+    function applyHashSelection() {
+        var h = parseHash();
+        if (!h.left && !h.right) return;
+        var s1 = document.getElementById('module1');
+        var s2 = document.getElementById('module2');
+        if (s1 && h.left)  s1.value = h.left;
+        if (s2 && h.right) s2.value = h.right;
+        if (h.left && h.right) compareModules();
     }
 
     // === Populate module dropdowns ===
@@ -129,12 +201,47 @@
             document.getElementById('rightModuleName').textContent = rightTreeData.module.name;
             document.getElementById('rightModuleType').textContent = rightTreeData.module.displayCategory;
 
+            // Mirror the current pair into the URL so Copy Share Link
+            // produces a permalink that reproduces this comparison.
+            writeHash(module1, module2);
+
             renderComparison();
         } catch (error) {
             showNotice('Failed to load trees. Please try again.', 'error');
             container.classList.remove('active');
         }
     }
+
+    // === Copy share link ===
+    function copyShareLink(btn) {
+        var url = window.location.href;
+        var orig = btn ? btn.textContent : '';
+        function flash(label) {
+            if (!btn) return;
+            btn.textContent = label;
+            setTimeout(function () { btn.textContent = orig; }, 3000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(
+                function () { flash('Copied!'); },
+                function () { flash('Copy failed'); }
+            );
+        } else {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.position = 'absolute';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                var ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                flash(ok ? 'Copied!' : 'Copy failed');
+            } catch (_) { flash('Copy failed'); }
+        }
+    }
+    // Expose so the page button (and tests) can invoke it directly.
+    window.__TreeCompare = { copyShareLink: copyShareLink };
 
     // === Render comparison ===
 
@@ -318,6 +425,11 @@
 
         var exportBtn = document.getElementById('exportBtn');
         if (exportBtn) exportBtn.addEventListener('click', exportComparison);
+
+        var shareBtn = document.getElementById('shareBtn');
+        if (shareBtn) shareBtn.addEventListener('click', function () {
+            copyShareLink(shareBtn);
+        });
 
         // Filter trees
         document.getElementById('searchLeft').addEventListener('input', renderComparison);
