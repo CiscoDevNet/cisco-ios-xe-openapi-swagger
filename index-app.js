@@ -294,6 +294,16 @@
         var advFiltersBtn = document.getElementById('advancedFiltersBtn');
         if (advFiltersBtn) advFiltersBtn.addEventListener('click', function () { if (typeof toggleAdvancedFilters === 'function') toggleAdvancedFilters(); });
 
+        // Keyboard shortcuts help button (opens dialog managed by site-chrome.js)
+        var kbdHelpBtn = document.getElementById('kbdHelpBtn');
+        if (kbdHelpBtn) {
+            kbdHelpBtn.addEventListener('click', function () {
+                if (typeof window.__openShortcutHelp === 'function') {
+                    window.__openShortcutHelp();
+                }
+            });
+        }
+
         var resetBtn = document.getElementById('resetFiltersBtn');
         if (resetBtn) resetBtn.addEventListener('click', function () { if (typeof resetFilters === 'function') resetFilters(); });
 
