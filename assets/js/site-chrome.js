@@ -110,6 +110,166 @@
         ensureToggle();
         wireExistingToggles();
         decorateVersionLabels();
+        installShortcutHelp();
+    }
+
+    // === Keyboard shortcut help dialog ('?' to open) ====================
+    // Lists the global shortcuts that work on every page. Pages may register
+    // additional shortcuts by pushing { keys:'g h', desc:'Go to hub' } onto
+    // window.__SHORTCUTS before this script runs (or after — re-rendered on
+    // open). Closes on Esc or backdrop click. Restores focus on close.
+
+    var SHORTCUT_DIALOG_ID = 'kbd-help-dialog';
+    var SHORTCUT_RETURN_FOCUS = null;
+
+    function defaultShortcuts() {
+        return [
+            { keys: ['?'],               desc: 'Show this keyboard shortcuts help' },
+            { keys: ['/', 'Ctrl', 'K'],  desc: 'Focus the search box' },
+            { keys: ['Esc'],             desc: 'Close dialogs, clear search, dismiss menus' },
+            { keys: ['Tab'],             desc: 'Move focus to next control' },
+            { keys: ['Shift', 'Tab'],    desc: 'Move focus to previous control' },
+            { keys: ['Enter'],           desc: 'Activate focused button/link or submit search' }
+        ];
+    }
+
+    function allShortcuts() {
+        var base = defaultShortcuts();
+        var extra = Array.isArray(window.__SHORTCUTS) ? window.__SHORTCUTS : [];
+        // Normalize extras: accept either keys:string or keys:array
+        extra.forEach(function (s) {
+            if (!s) return;
+            var keys = s.keys;
+            if (typeof keys === 'string') keys = keys.split(/\s+/);
+            base.push({ keys: keys || [], desc: s.desc || s.description || '' });
+        });
+        return base;
+    }
+
+    function renderShortcutBody() {
+        var rows = allShortcuts().map(function (s) {
+            var kbd = (s.keys || []).map(function (k) {
+                return '<kbd>' + escapeHtml(k) + '</kbd>';
+            }).join('<span class="kbd-plus">+</span>');
+            return '<tr><td class="kbd-cell">' + kbd + '</td><td>' + escapeHtml(s.desc) + '</td></tr>';
+        }).join('');
+        return '<table class="kbd-table"><tbody>' + rows + '</tbody></table>';
+    }
+
+    function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function ensureShortcutDialog() {
+        var dlg = document.getElementById(SHORTCUT_DIALOG_ID);
+        if (dlg) return dlg;
+        injectShortcutStyles();
+        dlg = document.createElement('div');
+        dlg.id = SHORTCUT_DIALOG_ID;
+        dlg.className = 'kbd-help-backdrop';
+        dlg.setAttribute('role', 'dialog');
+        dlg.setAttribute('aria-modal', 'true');
+        dlg.setAttribute('aria-labelledby', 'kbd-help-title');
+        dlg.hidden = true;
+        dlg.innerHTML =
+            '<div class="kbd-help-panel" tabindex="-1">' +
+                '<div class="kbd-help-header">' +
+                    '<h2 id="kbd-help-title">Keyboard Shortcuts</h2>' +
+                    '<button type="button" class="kbd-help-close" aria-label="Close keyboard shortcuts">\u00d7</button>' +
+                '</div>' +
+                '<div class="kbd-help-body"></div>' +
+                '<div class="kbd-help-foot">Press <kbd>?</kbd> any time to reopen this dialog.</div>' +
+            '</div>';
+        document.body.appendChild(dlg);
+        dlg.addEventListener('click', function (e) {
+            if (e.target === dlg || e.target.classList.contains('kbd-help-close')) {
+                closeShortcutHelp();
+            }
+        });
+        return dlg;
+    }
+
+    function injectShortcutStyles() {
+        if (document.getElementById('kbd-help-styles')) return;
+        var st = document.createElement('style');
+        st.id = 'kbd-help-styles';
+        st.textContent =
+            '.kbd-help-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99998;' +
+                'display:flex;align-items:center;justify-content:center;padding:20px;}' +
+            '.kbd-help-backdrop[hidden]{display:none;}' +
+            '.kbd-help-panel{background:var(--c-surface-0,#fff);color:var(--c-text,#222);' +
+                'border-radius:10px;max-width:520px;width:100%;max-height:80vh;overflow:auto;' +
+                'box-shadow:0 12px 36px rgba(0,0,0,.35);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;outline:none;}' +
+            '[data-theme="dark"] .kbd-help-panel,body.dark .kbd-help-panel{background:#23262d;color:#e8e8e8;}' +
+            '.kbd-help-header{display:flex;align-items:center;justify-content:space-between;' +
+                'padding:14px 18px;border-bottom:1px solid rgba(127,127,127,.25);}' +
+            '.kbd-help-header h2{margin:0;font-size:1.1rem;}' +
+            '.kbd-help-close{background:transparent;border:0;color:inherit;font-size:1.6rem;line-height:1;' +
+                'cursor:pointer;padding:0 6px;border-radius:4px;}' +
+            '.kbd-help-close:hover,.kbd-help-close:focus{background:rgba(127,127,127,.18);outline:none;}' +
+            '.kbd-help-body{padding:12px 18px;}' +
+            '.kbd-help-foot{padding:10px 18px;border-top:1px solid rgba(127,127,127,.25);font-size:.82rem;opacity:.8;}' +
+            '.kbd-table{width:100%;border-collapse:collapse;}' +
+            '.kbd-table td{padding:6px 4px;vertical-align:middle;}' +
+            '.kbd-table td.kbd-cell{width:1%;white-space:nowrap;padding-right:14px;}' +
+            '.kbd-help-panel kbd{display:inline-block;min-width:1.6em;padding:2px 7px;border:1px solid rgba(127,127,127,.45);' +
+                'border-bottom-width:2px;border-radius:4px;background:rgba(127,127,127,.10);' +
+                'font:600 12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;}' +
+            '.kbd-plus{display:inline-block;margin:0 4px;opacity:.55;}';
+        document.head.appendChild(st);
+    }
+
+    function openShortcutHelp() {
+        var dlg = ensureShortcutDialog();
+        var body = dlg.querySelector('.kbd-help-body');
+        if (body) body.innerHTML = renderShortcutBody();
+        SHORTCUT_RETURN_FOCUS = document.activeElement;
+        dlg.hidden = false;
+        var panel = dlg.querySelector('.kbd-help-panel');
+        if (panel) panel.focus();
+    }
+
+    function closeShortcutHelp() {
+        var dlg = document.getElementById(SHORTCUT_DIALOG_ID);
+        if (!dlg || dlg.hidden) return;
+        dlg.hidden = true;
+        if (SHORTCUT_RETURN_FOCUS && typeof SHORTCUT_RETURN_FOCUS.focus === 'function') {
+            try { SHORTCUT_RETURN_FOCUS.focus(); } catch (_) {}
+        }
+        SHORTCUT_RETURN_FOCUS = null;
+    }
+
+    function isTypingTarget(el) {
+        if (!el) return false;
+        var tag = el.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+        if (el.isContentEditable) return true;
+        return false;
+    }
+
+    function installShortcutHelp() {
+        document.addEventListener('keydown', function (e) {
+            // '?' opens the help dialog. On most keyboards this is Shift+/, so
+            // also accept e.key === '?' or (e.shiftKey && e.key === '/').
+            var isQuestion = e.key === '?' || (e.shiftKey && e.key === '/');
+            if (isQuestion && !isTypingTarget(e.target)) {
+                e.preventDefault();
+                var dlg = document.getElementById(SHORTCUT_DIALOG_ID);
+                if (dlg && !dlg.hidden) closeShortcutHelp();
+                else openShortcutHelp();
+                return;
+            }
+            if (e.key === 'Escape') {
+                var d = document.getElementById(SHORTCUT_DIALOG_ID);
+                if (d && !d.hidden) {
+                    e.preventDefault();
+                    closeShortcutHelp();
+                }
+            }
+        });
+        // Expose for programmatic open (e.g., a Help link in the nav)
+        window.__openShortcutHelp = openShortcutHelp;
     }
 
     /**
