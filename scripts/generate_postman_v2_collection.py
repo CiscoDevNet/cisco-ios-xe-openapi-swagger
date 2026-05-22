@@ -192,7 +192,7 @@ def write_collection(target_dir: Path, version: str, category: str,
             out_path.write_text(json.dumps(coll, indent=2) + "\n", encoding="utf-8")
             parts.append({
                 "name": coll["info"]["name"],
-                "path": str(out_path.relative_to(PROJECT_ROOT)),
+                "path": out_path.relative_to(PROJECT_ROOT).as_posix(),
                 "request_count": sum(len(f.get("item") or []) for f in coll["item"]),
                 "size_bytes": out_path.stat().st_size,
             })
@@ -211,7 +211,7 @@ def write_collection(target_dir: Path, version: str, category: str,
         out_path.write_text(json.dumps(coll, indent=2) + "\n", encoding="utf-8")
         parts.append({
             "name": coll["info"]["name"],
-            "path": str(out_path.relative_to(PROJECT_ROOT)),
+            "path": out_path.relative_to(PROJECT_ROOT).as_posix(),
             "request_count": sum(len(f.get("item") or []) for f in coll["item"]),
             "size_bytes": out_path.stat().st_size,
         })
@@ -272,7 +272,7 @@ def main() -> int:
         "generated": datetime.now(timezone.utc).replace(microsecond=0)
             .isoformat().replace("+00:00", "Z"),
         "max_bytes": max_bytes,
-        "environment": str(env_path.relative_to(PROJECT_ROOT)),
+        "environment": env_path.relative_to(PROJECT_ROOT).as_posix(),
         "collections": manifest,
     }, indent=2) + "\n", encoding="utf-8")
 

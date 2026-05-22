@@ -6,6 +6,110 @@
     var allSpecModules = [];
     var allPaths = [];
 
+    // === Active release ==================================================
+    // Honour ?ver=… / #ver=… / localStorage so the spec picker pulls from
+    // releases/<ver>/search-index.json when the user came in from a release.
+
+    function _activeVersion() {
+        try {
+            var qs = new URLSearchParams(location.search).get('ver');
+            if (qs) return qs;
+            var m = (location.hash || '').match(/[#&]ver=([^&]+)/);
+            if (m) return decodeURIComponent(m[1]);
+        } catch (_) { /* noop */ }
+        if (window.__IOSXE_ACTIVE_VERSION__) return window.__IOSXE_ACTIVE_VERSION__;
+        try {
+            var ls = localStorage.getItem('iosxeActiveVersion');
+            if (ls) return ls;
+        } catch (_) { /* noop */ }
+        return null;
+    }
+
+    function _searchIndexUrl() {
+        var ver = _activeVersion();
+        if (ver) return 'releases/' + encodeURIComponent(ver) + '/search-index.json';
+        return 'search-index.json';
+    }
+
+    function _specBaseUrl(category, name) {
+        // The release dirs mirror the live tree (swagger-*-model/api/<name>.json),
+        // so just rebase on releases/<ver>/ when a release is active.
+        var ver = _activeVersion();
+        var prefix = ver ? 'releases/' + encodeURIComponent(ver) + '/' : '';
+        return prefix + category + '/api/' + name + '.json';
+    }
+
+    // === Hash deep-link ==================================================
+    // Hash shape:
+    //   #ver=<release>&category=<cat>&spec=<name>&path=<encoded>&method=<verb>
+    // Lets users share / bookmark a fully-populated form (everything but the
+    // password, which we never persist).
+
+    function _parseHash() {
+        var out = {};
+        var h = (location.hash || '').replace(/^#/, '');
+        if (!h) return out;
+        h.split('&').forEach(function (kv) {
+            if (!kv) return;
+            var i = kv.indexOf('=');
+            var k = i >= 0 ? kv.slice(0, i) : kv;
+            var v = i >= 0 ? decodeURIComponent(kv.slice(i + 1)) : '';
+            if (k) out[k] = v;
+        });
+        return out;
+    }
+
+    function _writeHash() {
+        try {
+            var parts = [];
+            var ver = _activeVersion();
+            if (ver) parts.push('ver=' + encodeURIComponent(ver));
+            var picker = document.getElementById('specPicker');
+            if (picker && picker.value) {
+                var opt = picker.selectedOptions[0];
+                if (opt) {
+                    if (opt.dataset.category) parts.push('category=' + encodeURIComponent(opt.dataset.category));
+                    if (opt.dataset.name) parts.push('spec=' + encodeURIComponent(opt.dataset.name));
+                }
+            }
+            var pathPicker = document.getElementById('pathPicker');
+            if (pathPicker && pathPicker.value) {
+                parts.push('path=' + encodeURIComponent(pathPicker.value));
+            }
+            var method = document.getElementById('method');
+            if (method && method.value && method.value !== 'GET') {
+                parts.push('method=' + encodeURIComponent(method.value));
+            }
+            var next = parts.length ? '#' + parts.join('&') : ' ';
+            if (location.hash !== next) {
+                history.replaceState(null, '', location.pathname + location.search + next);
+            }
+        } catch (_) { /* noop */ }
+    }
+
+    function _bindShareBtn() {
+        var btn = document.getElementById('cgShareBtn');
+        if (!btn || btn.__bound) return;
+        btn.__bound = true;
+        btn.addEventListener('click', function () {
+            _writeHash();
+            if (window.__DeepLink && typeof window.__DeepLink.copyShareLink === 'function') {
+                try { window.__DeepLink.copyShareLink(btn); return; } catch (_) { /* fall through */ }
+            }
+            var url = location.href;
+            var orig = btn.textContent;
+            var done = function () {
+                btn.textContent = 'Copied!';
+                setTimeout(function () { btn.textContent = orig; }, 3000);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this URL:', url); });
+            } else {
+                window.prompt('Copy this URL:', url);
+            }
+        });
+    }
+
     // === Show/hide body input based on method ===
 
     function initMethodToggle() {
@@ -13,6 +117,7 @@
             var bodyGroup = document.getElementById('bodyGroup');
             var method = this.value;
             bodyGroup.style.display = ['POST', 'PUT', 'PATCH'].includes(method) ? 'block' : 'none';
+            _writeHash();
         });
     }
 
@@ -211,11 +316,17 @@
 
     async function loadSpecPicker() {
         try {
-            var resp = await fetch('search-index.json');
+            var url = _searchIndexUrl();
+            var resp = await fetch(url, { cache: 'no-store' });
+            if (!resp.ok && url !== 'search-index.json') {
+                // Per-release index missing — fall back to the root one.
+                resp = await fetch('search-index.json', { cache: 'no-store' });
+            }
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
             allSpecModules = data.modules;
             filterSpecPicker();
+            _restoreFromHash();
         } catch (e) {
             console.error('Failed to load search index for spec picker:', e);
             var picker = document.getElementById('specPicker');
@@ -242,13 +353,11 @@
 
         var opt = picker.selectedOptions[0];
         var category = opt.dataset.category;
-        var version = opt.dataset.version;
         var name = opt.dataset.name;
-        var apiFolder = version === 'v1' ? 'api' : 'api';
-        var specUrl = category + '/' + apiFolder + '/' + name + '.json';
+        var specUrl = _specBaseUrl(category, name);
 
         try {
-            var resp = await fetch(specUrl);
+            var resp = await fetch(specUrl, { cache: 'no-store' });
             loadedSpec = await resp.json();
             allPaths = Object.keys(loadedSpec.paths).sort().map(function (p) {
                 var methods = Object.keys(loadedSpec.paths[p])
@@ -259,6 +368,7 @@
             document.getElementById('pathSearch').value = '';
             filterPathPicker();
             pathPickerGroup.style.display = 'block';
+            _writeHash();
         } catch (e) {
             console.error('Failed to load spec:', e);
             pathPickerGroup.style.display = 'none';
@@ -296,12 +406,48 @@
                 }
             }
         }
+        _writeHash();
+    }
+
+    // Restore picker state from #spec=<name>&category=<cat>&path=<p>&method=<m>.
+    // Called from loadSpecPicker() once allSpecModules is populated.
+    async function _restoreFromHash() {
+        var h = _parseHash();
+        if (!h.spec || !h.category) return;
+        var picker = document.getElementById('specPicker');
+        if (!picker) return;
+        // Find the matching option (search-index may have re-filtered the list,
+        // so re-run filter clear before picking).
+        document.getElementById('specSearch').value = '';
+        filterSpecPicker();
+        var match = Array.prototype.find.call(picker.options, function (o) {
+            return o.dataset && o.dataset.name === h.spec && o.dataset.category === h.category;
+        });
+        if (!match) return;
+        picker.value = match.value;
+        await onSpecSelected();
+        if (h.path) {
+            var pp = document.getElementById('pathPicker');
+            var pmatch = Array.prototype.find.call(pp.options, function (o) { return o.value === h.path; });
+            if (pmatch) {
+                pp.value = h.path;
+                onPathSelected();
+            }
+        }
+        if (h.method) {
+            var sel = document.getElementById('method');
+            if (sel) {
+                sel.value = h.method.toUpperCase();
+                sel.dispatchEvent(new Event('change'));
+            }
+        }
     }
 
     // === Initialization ===
 
     function init() {
         initMethodToggle();
+        _bindShareBtn();
 
         // Generate button
         var generateBtn = document.getElementById('generateBtn');
