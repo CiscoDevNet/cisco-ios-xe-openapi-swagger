@@ -80,11 +80,47 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
             if tag_name:
                 keywords.add(tag_name.lower())
 
+        # Top-level path map: { <yang-container-name-lowercased>: <operationId> }
+        # for paths exactly one level under the YANG root (e.g.
+        # /data/Cisco-IOS-XE-native:native/iox).  Used by search.js to
+        # deep-link a keyword hit straight to that container's operation
+        # instead of just opening the spec at the top of the page.
+        top_paths: dict[str, str] = {}
+        for path, methods in paths.items():
+            if not isinstance(methods, dict):
+                continue
+            segs = [s for s in path.split('/') if s]
+            # Drop /data/ or /operations/ prefix.
+            if segs and segs[0] in ('data', 'operations'):
+                segs = segs[1:]
+            if segs and segs[0] in ('restconf',):
+                segs = segs[1:]
+                if segs and segs[0] in ('data', 'operations'):
+                    segs = segs[1:]
+            # Drop the YANG namespace prefix on the root segment
+            # (Cisco-IOS-XE-native:native -> we want the rest).
+            if segs and ':' in segs[0]:
+                segs = segs[1:]
+            # Strip RESTCONF list-keys from any remaining segment so we
+            # match the YANG container name, not the keyed instance.
+            segs = [s.split('=', 1)[0] for s in segs]
+            # Direct children of root only.
+            if len(segs) != 1 or not segs[0]:
+                continue
+            seg = segs[0].lower()
+            if seg in top_paths:
+                continue  # first writer wins (stable across re-runs)
+            for verb in ('get', 'put', 'patch', 'post', 'delete'):
+                op = methods.get(verb)
+                if isinstance(op, dict) and op.get('operationId'):
+                    top_paths[seg] = op['operationId']
+                    break
+
         # NOTE: displayCategory, emoji, and swaggerUrl are intentionally
         # omitted here — search.js hydrates them from the top-level
         # `categories` lookup map at load time. This cuts ~150 KB off the
         # uncompressed payload across 1.3k+ modules.
-        modules.append({
+        module_entry = {
             'name': module_name,
             'type': type_name,
             'category': dir_name,
@@ -92,7 +128,10 @@ def index_api_dir(api_dir, dir_name, type_name, display_cat, emoji, version):
             'keywords': sorted(list(keywords))[:50],
             'pathCount': len(paths),
             'version': version,
-        })
+        }
+        if top_paths:
+            module_entry['topPaths'] = top_paths
+        modules.append(module_entry)
 
     return count, endpoints
 

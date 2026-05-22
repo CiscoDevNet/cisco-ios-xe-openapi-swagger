@@ -70,6 +70,13 @@ PIPELINE: list[tuple[str, list[str]]] = [
     ("other-specs",         ["python", str(GENERATORS / "generate_other_openapi_v2.py"),
                              "--version", "$VER"]),
     # 3. Post-processing / enrichment
+    # 3a. Make operationIds globally unique per spec (OpenAPI 3.0 requires it).
+    # The generators historically derived ids from just the last path
+    # segment, which collides whenever the same YANG leaf name appears
+    # under two different containers (e.g. /iox/switch vs /hw-module/switch).
+    # See scripts/rewrite_operation_ids.py for the slug algorithm.
+    ("unique-op-ids",       ["python", str(SCRIPTS / "rewrite_operation_ids.py"),
+                             "--version", "$VER"]),
     ("enrich",              ["python", str(SCRIPTS / "enrich_v2_specs.py"),
                              "--version", "$VER"]),
     ("github-links",        ["python", str(SCRIPTS / "add_yang_github_links.py"),
