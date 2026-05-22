@@ -382,7 +382,11 @@
             if (!btn) return;
             var orig = btn.textContent;
             btn.textContent = label;
-            setTimeout(function () { btn.textContent = orig; }, 1500);
+            // 3 s gives the user enough time to see the confirmation
+            // without re-reading the button caption while their mouse
+            // is still over it (a 1.5 s flash was easy to miss on the
+            // viewer pages that had a busy header).
+            setTimeout(function () { btn.textContent = orig; }, 3000);
         }
         function fallback() {
             try {

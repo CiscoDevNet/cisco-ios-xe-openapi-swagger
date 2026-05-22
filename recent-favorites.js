@@ -22,6 +22,65 @@ function _sanitizeUrl(url) {
     return '';
 }
 
+// When recording a module visit we may be on the index page (no current
+// op/spec context) OR inside a viewer that has both. Sniff both sources
+// so a starred entry can later be reopened on the same operation in the
+// same release. Stored fields are intentionally lightweight strings.
+function _snapshotContext(module) {
+    var ctx = { op: null, ver: null };
+    try {
+        // 1. operationId from the current viewer hash (set by deeplink.js).
+        var raw = (window.location.hash || '').replace(/^#/, '');
+        raw.split('&').forEach(function (s) {
+            var i = s.indexOf('=');
+            if (i <= 0) return;
+            var k = s.substring(0, i);
+            var v = s.substring(i + 1);
+            try { v = decodeURIComponent(v); } catch (_) {}
+            if (k === 'op' && !ctx.op) ctx.op = v;
+            if (k === 'ver' && !ctx.ver) ctx.ver = v;
+            // Only attribute the op to *this* module — protects against
+            // starring module A while spec=B is loaded in another tab via
+            // shared localStorage.
+            if (k === 'spec' && module && v && v !== module.name) {
+                ctx.op = null;
+            }
+        });
+    } catch (_) {}
+    try {
+        if (!ctx.ver && window.__IOSXE_ACTIVE_VERSION__) ctx.ver = window.__IOSXE_ACTIVE_VERSION__;
+        if (!ctx.ver) ctx.ver = localStorage.getItem('iosxe-active-version');
+    } catch (_) {}
+    return ctx;
+}
+
+// Compose the final href for a stored module entry. The base swaggerUrl
+// is of the form "swagger-cfg-model/index.html#spec=<name>". We append
+// the op= and ver= the user had when they saved the entry so the link
+// jumps back to the exact same row in the exact same release.
+function _composeDeepLink(entry) {
+    var url = _sanitizeUrl(entry && entry.swaggerUrl);
+    if (!url) return '';
+    // Make sure there's a hash to extend; older entries (no #spec=) get a
+    // synthesized one from .name.
+    if (url.indexOf('#') === -1 && entry && entry.name) {
+        url += '#spec=' + encodeURIComponent(entry.name);
+    }
+    if (entry && entry.op && url.indexOf('&op=') === -1 && url.indexOf('#op=') === -1) {
+        url += '&op=' + encodeURIComponent(entry.op);
+    }
+    if (entry && entry.ver && url.indexOf('&ver=') === -1 && url.indexOf('#ver=') === -1) {
+        // Use ?ver= so the viewer's __activeVer() picks it up even if a
+        // collision exists with hash params from a previous deep link.
+        var hashIdx = url.indexOf('#');
+        var path = hashIdx >= 0 ? url.substring(0, hashIdx) : url;
+        var hash = hashIdx >= 0 ? url.substring(hashIdx) : '';
+        var sep = path.indexOf('?') >= 0 ? '&' : '?';
+        url = path + sep + 'ver=' + encodeURIComponent(entry.ver) + hash;
+    }
+    return url;
+}
+
 // Get recent modules from localStorage
 function getRecentModules() {
     try {
@@ -41,6 +100,10 @@ function addToRecent(module) {
         // Remove if already exists
         recent = recent.filter(m => m.name !== module.name);
         
+        // Snapshot op/ver from current viewer hash so we can reconstruct
+        // a deep link when the entry is clicked later.
+        const ctx = _snapshotContext(module);
+        
         // Add to beginning
         recent.unshift({
             name: module.name,
@@ -49,6 +112,8 @@ function addToRecent(module) {
             emoji: module.emoji,
             swaggerUrl: module.swaggerUrl,
             yangTreeUrl: module.yangTreeUrl,
+            op: ctx.op || null,
+            ver: ctx.ver || null,
             timestamp: new Date().toISOString()
         });
         
@@ -96,7 +161,10 @@ function toggleFavorite(module) {
             // Remove from favorites
             favorites.splice(index, 1);
         } else {
-            // Add to favorites
+            // Add to favorites — capture current op/ver so re-opening this
+            // bookmark lands the user on the same operation in the same
+            // release they were viewing when they starred it.
+            const ctx = _snapshotContext(module);
             favorites.push({
                 name: module.name,
                 type: module.type,
@@ -104,6 +172,8 @@ function toggleFavorite(module) {
                 emoji: module.emoji,
                 swaggerUrl: module.swaggerUrl,
                 yangTreeUrl: module.yangTreeUrl,
+                op: ctx.op || null,
+                ver: ctx.ver || null,
                 timestamp: new Date().toISOString()
             });
         }
@@ -161,7 +231,11 @@ function renderRecentModules() {
     const recent = getRecentModules();
     
     if (recent.length === 0) {
-        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No recent modules yet. Browse some modules to see them here!</p>';
+        container.innerHTML = '<div class="empty-state">'
+            + '<span class="empty-state-icon" aria-hidden="true">&middot;&middot;&middot;</span>'
+            + '<div class="empty-state-title">No recent modules yet</div>'
+            + '<p class="empty-state-hint">Use the search box above or click a category card below to start browsing OpenAPI specs. The last 10 you visit will appear here.</p>'
+            + '</div>';
         return;
     }
     
@@ -170,16 +244,24 @@ function renderRecentModules() {
         const name = _escapeHtml(module.name);
         const emoji = _escapeHtml(module.emoji);
         const category = _escapeHtml(module.displayCategory);
-        const swaggerUrl = _sanitizeUrl(module.swaggerUrl);
+        const swaggerUrl = _composeDeepLink(module);
         const yangTreeUrl = _sanitizeUrl(module.yangTreeUrl);
+        const opBadge = module.op
+            ? '<span class="recent-op-badge" title="Opens directly on this operation">→ ' + _escapeHtml(module.op) + '</span>'
+            : '';
+        const verBadge = module.ver
+            ? '<span class="recent-ver-badge" title="Saved while viewing this release">' + _escapeHtml(module.ver) + '</span>'
+            : '';
         return `
             <div class="recent-card">
                 <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px;">
                     <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                            <span style="font-size: 0.75rem; color: #1565C0;">${emoji} ${category}</span>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                            <span style="font-size: 0.75rem; color: var(--accent-color, #1565C0);">${emoji} ${category}</span>
+                            ${verBadge}
                         </div>
-                        <div style="font-weight: 500; color: #333; word-break: break-word;">${name}</div>
+                        <div style="font-weight: 500; color: var(--text-primary, #333); word-break: break-word;">${name}</div>
+                        ${opBadge}
                     </div>
                     <button class="favorite-btn ${isFav ? 'active' : ''}" 
                             data-module="${name}"
@@ -189,7 +271,7 @@ function renderRecentModules() {
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">API Spec</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">${module.op ? 'Open Operation' : 'Open Spec'}</a>` : ''}
                     ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">YANG Tree</a>` : ''}
                 </div>
             </div>
@@ -207,7 +289,11 @@ function renderFavoriteModules() {
     const favorites = getFavoriteModules();
     
     if (favorites.length === 0) {
-        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No favorites yet. Click the star (☆) icon to bookmark modules!</p>';
+        container.innerHTML = '<div class="empty-state">'
+            + '<span class="empty-state-icon" aria-hidden="true">☆</span>'
+            + '<div class="empty-state-title">No favorites yet</div>'
+            + '<p class="empty-state-hint">When viewing any module, click the <strong>☆ star</strong> in the search result card or recent list to bookmark it here — we’ll remember the exact operation and release.</p>'
+            + '</div>';
         return;
     }
     
@@ -215,16 +301,24 @@ function renderFavoriteModules() {
         const name = _escapeHtml(module.name);
         const emoji = _escapeHtml(module.emoji);
         const category = _escapeHtml(module.displayCategory);
-        const swaggerUrl = _sanitizeUrl(module.swaggerUrl);
+        const swaggerUrl = _composeDeepLink(module);
         const yangTreeUrl = _sanitizeUrl(module.yangTreeUrl);
+        const opBadge = module.op
+            ? '<span class="recent-op-badge" title="Opens directly on this operation">→ ' + _escapeHtml(module.op) + '</span>'
+            : '';
+        const verBadge = module.ver
+            ? '<span class="recent-ver-badge" title="Saved while viewing this release">' + _escapeHtml(module.ver) + '</span>'
+            : '';
         return `
             <div class="recent-card">
                 <div style="display: flex; align-items: start; justify-content: space-between; gap: 8px;">
                     <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                            <span style="font-size: 0.75rem; color: #1565C0;">${emoji} ${category}</span>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
+                            <span style="font-size: 0.75rem; color: var(--accent-color, #1565C0);">${emoji} ${category}</span>
+                            ${verBadge}
                         </div>
-                        <div style="font-weight: 500; color: #333; word-break: break-word;">${name}</div>
+                        <div style="font-weight: 500; color: var(--text-primary, #333); word-break: break-word;">${name}</div>
+                        ${opBadge}
                     </div>
                     <button class="favorite-btn active" 
                             data-module="${name}"
@@ -234,7 +328,7 @@ function renderFavoriteModules() {
                     </button>
                 </div>
                 <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">API Spec</a>` : ''}
+                    ${swaggerUrl ? `<a href="${_escapeHtml(swaggerUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">${module.op ? 'Open Operation' : 'Open Spec'}</a>` : ''}
                     ${yangTreeUrl ? `<a href="${_escapeHtml(yangTreeUrl)}" class="quick-link" data-module="${name}" onclick="trackModuleClick(this.dataset.module)">YANG Tree</a>` : ''}
                 </div>
             </div>
