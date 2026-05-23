@@ -101,6 +101,26 @@
         const saved = localStorage.getItem('theme');
         if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
+        // Offline detection: if the browser is reporting offline, tweak the
+        // message + suggest reloading once back online. Helps users
+        // distinguish a real 404 from a "you tried to deep-link while your
+        // wifi is down" situation.
+        (function offlineHint() {
+            if (typeof navigator === 'undefined' || navigator.onLine !== false) return;
+            var msg = document.getElementById('msg');
+            if (msg) {
+                msg.innerHTML = 'You appear to be <strong>offline</strong>. The page may exist but couldn&apos;t be loaded.<br>' +
+                    'Cached pages (Home, About, Accountability, Compare, Code Gen, Exports) should still work.';
+            }
+            window.addEventListener('online', function () {
+                var rm = document.getElementById('redirectMsg');
+                if (rm) {
+                    rm.style.display = 'block';
+                    rm.innerHTML = 'You\u2019re back online \u2014 try reloading this page.';
+                }
+            }, { once: true });
+        })();
+
         // Hash-aware routing: if the failed URL carries a #spec=...&op=... or
         // #ver=... fragment, try to route the user to a viewer that can
         // resolve it instead of dropping them on a dead list. Works for
