@@ -742,6 +742,18 @@ function updateUrlHash(query) {
 function handleDeepLink() {
     var hash = decodeURIComponent(window.location.hash);
 
+    // ?q=query — bridge Google's SearchAction sitelinks search box to our
+    // hash-based deep-link format. Normalises the URL to use #search=
+    // so subsequent navigation matches the rest of the codebase.
+    try {
+        var sp = new URLSearchParams(window.location.search);
+        var qParam = sp.get('q');
+        if (qParam && qParam.length >= 2 && !hash) {
+            history.replaceState(null, '', window.location.pathname + '#search=' + encodeURIComponent(qParam));
+            hash = '#search=' + qParam;
+        }
+    } catch (_) { /* URLSearchParams unsupported \u2192 skip */ }
+
     // #search=query — restore a search
     if (hash.startsWith('#search=')) {
         var query = hash.replace('#search=', '');

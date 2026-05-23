@@ -54,6 +54,23 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Hub SearchAction, offline 404 hint (round 19, 2026)
+
+- **Hub JSON-LD extended with `SearchAction`.** Google can now show a
+  sitelinks search box that posts queries to
+  `https://…/?q={search_term_string}`. `search.js` bridges `?q=` to the
+  existing `#search=` deep-link format, so the SearchAction lands on a
+  real, fully-rendered result list. JSON-LD also now declares
+  `publisher: Cisco DevNet` and `inLanguage: en`.
+- **404 offline hint.** When `navigator.onLine === false`, the 404 page
+  rewrites its message to explain that the page may exist but couldn’t
+  load, and reminds the visitor that cached pages (Home, About,
+  Accountability, Compare, Code Gen, Exports) still work. When the
+  browser comes back online, an inline note suggests reloading.
+- **Service worker** bumped to `v12-2026.05.23`.
+
+## [Pre-Unreleased — round 18]
+
 ### Added — Search clear button, SEO JSON-LD (round 18, 2026)
 
 - **Native search clear-X on all filter inputs.** Switched the universal

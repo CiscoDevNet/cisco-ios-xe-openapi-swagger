@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v11-2026.05.23 (round 18)';
+    var SITE_BUILD = 'v12-2026.05.23 (round 19)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
