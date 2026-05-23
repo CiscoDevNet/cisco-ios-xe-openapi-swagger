@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v14-2026.05.23 (round 21)';
+    var SITE_BUILD = 'v15-2026.05.23 (round 22)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
@@ -117,8 +117,40 @@
         decorateVersionLabels();
         installShortcutHelp();
         installBackToTop();
+        installHeadingAnchors();
         installFooter();
         installPwaInstallPrompt();
+    }
+
+    // === Heading permalink anchors ======================================
+    // Decorates h2/h3/h4 elements that already have an `id` with a small
+    // "\u00b6" permalink that becomes visible on hover/focus. Clicking
+    // copies the anchored URL to the clipboard so users can share section
+    // links. Opt-in: only runs when <body data-anchors="on"> is set.
+    function installHeadingAnchors() {
+        if (!document.body) return;
+        if (document.body.getAttribute('data-anchors') !== 'on') return;
+        var nodes = document.querySelectorAll('h2[id], h3[id], h4[id]');
+        Array.prototype.forEach.call(nodes, function (h) {
+            if (h.querySelector('.heading-anchor')) return;
+            var a = document.createElement('a');
+            a.className = 'heading-anchor';
+            a.href = '#' + h.id;
+            a.setAttribute('aria-label', 'Link to ' + (h.textContent || '').trim());
+            a.title = 'Copy link to this section';
+            a.textContent = '\u00b6';
+            a.addEventListener('click', function (e) {
+                // Don't fight the default jump-to-anchor; still copy URL.
+                try {
+                    var url = window.location.origin + window.location.pathname + '#' + h.id;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url);
+                    }
+                } catch (_) { /* clipboard blocked \u2014 graceful */ }
+            });
+            h.appendChild(document.createTextNode(' '));
+            h.appendChild(a);
+        });
     }
 
     // === PWA install prompt =============================================
