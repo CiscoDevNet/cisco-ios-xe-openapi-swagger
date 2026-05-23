@@ -54,6 +54,31 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Copy-as-text, footer build link, SW precache (round 15, 2026)
+
+- **Copy as Text on yang-accountability.** New `Copy as Text` button next to
+  `Export CSV` produces a paste-ready plain-text report of the currently
+  filtered modules: header summary (release, totals, filter state) plus an
+  aligned name/spec/tree/categories table. Truncates after 200 rows with a
+  `+N more` footer and points at CSV for the full set. Uses clipboard API
+  with execCommand fallback for older browsers.
+- **Page shortcut keys on yang-accountability.** New keybindings surfaced in
+  the `?` dialog: `E` Export CSV, `T` Copy as Text, `L` Share Link, `/`
+  focus search box. Standard guards for INPUT/TEXTAREA/contentEditable
+  targets.
+- **Build badge in footer links to changelog.** The `Build v… (round N)`
+  label in the global footer is now an anchor to
+  `CHANGELOG.md#unreleased`, with a dotted underline that turns solid on
+  hover, so anyone can see exactly what shipped in this build.
+- **Service worker precache widened.** Added `about.html`,
+  `yang-accountability.html`, `tree-compare.html`, `code-generator.html`,
+  and `exports.html` to the precache list so the top-level navigation
+  resolves instantly after the first visit / installs PWA mode with
+  the full app shell available offline.
+- **Service worker** bumped to `v8-2026.05.23`.
+
+## [Pre-Unreleased — round 14]
+
 ### Added — Issue templates, skeletons, PWA install, perf hints (round 14, 2026)
 
 - **GitHub issue + PR templates.** New `.github/ISSUE_TEMPLATE/` with three

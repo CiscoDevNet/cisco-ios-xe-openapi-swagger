@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v7-2026.05.23';
+const CACHE_VERSION = 'v8-2026.05.23';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
@@ -28,6 +28,11 @@ const PRECACHE_URLS = [
   '',                       // -> scope root (index.html)
   'index.html',
   '404.html',
+  'about.html',
+  'yang-accountability.html',
+  'tree-compare.html',
+  'code-generator.html',
+  'exports.html',
   'assets/css/site.css',
   'assets/js/site-chrome.js',
   'assets/icons/favicon.svg',
