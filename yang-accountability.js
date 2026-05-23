@@ -205,6 +205,85 @@
         });
     }
 
+    // === Copy-as-text export ===========================================
+    // Renders the currently-filtered modules as a plain-text report you can
+    // paste into chat, email, or a code review comment. Two-column fixed-
+    // width header + name-aligned rows. Truncates after 200 rows with a
+    // "+N more" footer so big copies don't explode the clipboard.
+
+    function _buildTextReport(modules) {
+        var ver = (typeof _activeVersion === 'function') ? _activeVersion() : '';
+        var ts = new Date().toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+        var lines = [];
+        lines.push('YANG Module Accountability' + (ver ? ' \u2014 ' + ver : ''));
+        lines.push('Generated ' + ts);
+        if (reportData) {
+            lines.push('Total: ' + reportData.total_modules +
+                       '  |  With spec: ' + reportData.modules_with_specs +
+                       '  |  Coverage: ' + (100 * reportData.modules_with_specs / reportData.total_modules).toFixed(1) + '%');
+        }
+        lines.push('Filter: category=' + currentFilter.category + ', status=' + currentFilter.status +
+                   (document.getElementById('searchBox') && document.getElementById('searchBox').value ?
+                    ', search="' + document.getElementById('searchBox').value + '"' : ''));
+        lines.push('Rows: ' + modules.length);
+        lines.push('');
+        var MAX = 200;
+        var shown = modules.slice(0, MAX);
+        var nameWidth = Math.min(60, shown.reduce(function (n, m) { return Math.max(n, (m.name || '').length); }, 4));
+        function pad(s, w) { s = s || ''; return s.length >= w ? s : s + new Array(w - s.length + 1).join(' '); }
+        lines.push(pad('Name', nameWidth) + '  Spec  Tree  Categories');
+        lines.push(new Array(nameWidth + 1).join('-') + '  ----  ----  ----------');
+        shown.forEach(function (m) {
+            var cats = (m.categories || []).map(function (c) { return c.label || c.key || ''; }).join(', ');
+            lines.push(pad(m.name || '', nameWidth) + '  ' +
+                       (m.has_spec ? ' yes' : '  no') + '  ' +
+                       (m.tree_url ? ' yes' : '  no') + '  ' + cats);
+        });
+        if (modules.length > MAX) {
+            lines.push('');
+            lines.push('+' + (modules.length - MAX) + ' more rows not shown (use Export CSV for the full set).');
+        }
+        return lines.join('\n');
+    }
+
+    function _bindCopyTextBtn() {
+        var btn = document.getElementById('yaCopyTextBtn');
+        if (!btn || btn.__bound) return;
+        btn.__bound = true;
+        btn.addEventListener('click', function () {
+            var rows = _filteredModules();
+            if (!rows.length) {
+                btn.textContent = 'No rows match filter';
+                setTimeout(function () { btn.textContent = 'Copy as Text'; }, 2500);
+                return;
+            }
+            var text = _buildTextReport(rows);
+            var orig = btn.textContent;
+            var done = function () {
+                btn.textContent = 'Copied ' + Math.min(rows.length, 200) + ' rows';
+                setTimeout(function () { btn.textContent = orig; }, 3000);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done, _fallbackCopy);
+            } else {
+                _fallbackCopy();
+            }
+            function _fallbackCopy() {
+                // execCommand path for older browsers / insecure contexts.
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'absolute';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); done(); }
+                catch (_) { window.prompt('Copy report:', text); }
+                document.body.removeChild(ta);
+            }
+        });
+    }
+
     async function loadModuleData() {
         // Render a short skeleton table while the JSON fetch is in flight.
         // Keeps the layout stable and signals "loading" without a spinner.
@@ -506,10 +585,34 @@
 
     // === Initialization ===
 
+    function _registerShortcuts() {
+        // Page-specific keyboard shortcuts. Surfaced in the '?' dialog by
+        // pushing entries into the shared window.__SHORTCUTS array.
+        var SH = window.__SHORTCUTS = window.__SHORTCUTS || [];
+        SH.push({ keys: 'E', label: 'Export CSV (filtered rows)' });
+        SH.push({ keys: 'T', label: 'Copy filtered table as text' });
+        SH.push({ keys: 'L', label: 'Copy Share Link (filter state)' });
+        SH.push({ keys: '/', label: 'Focus the module search box' });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            var t = e.target;
+            if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
+                      t.tagName === 'SELECT' || t.isContentEditable)) return;
+            var k = e.key;
+            if (k === 'e' || k === 'E') { var b = document.getElementById('yaCsvBtn'); if (b) { e.preventDefault(); b.click(); } }
+            else if (k === 't' || k === 'T') { var b2 = document.getElementById('yaCopyTextBtn'); if (b2) { e.preventDefault(); b2.click(); } }
+            else if (k === 'l' || k === 'L') { var b3 = document.getElementById('yaShareBtn'); if (b3) { e.preventDefault(); b3.click(); } }
+            else if (k === '/') { var s = document.getElementById('searchBox'); if (s) { e.preventDefault(); s.focus(); s.select && s.select(); } }
+        });
+    }
+
     function init() {
         _applyHashOnLoad();
         _bindShareBtn();
         _bindCsvBtn();
+        _bindCopyTextBtn();
+        _registerShortcuts();
         loadModuleData();
 
         // Search box

@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v7-2026.05.23 (round 14)';
+    var SITE_BUILD = 'v8-2026.05.23 (round 15)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
@@ -230,7 +230,7 @@
                 '<div class="site-footer-meta">' +
                     '<span>Cisco IOS-XE OpenAPI / YANG Explorer</span>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<span>Build ' + escapeHtml(SITE_BUILD) + '</span>' +
+                    '<a class="site-footer-build" href="' + prefix + 'CHANGELOG.md#unreleased" title="View what changed in this build">Build ' + escapeHtml(SITE_BUILD) + '</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<span>\u00a9 ' + year + ' Cisco Systems</span>' +
                 '</div>' +
