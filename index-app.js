@@ -344,6 +344,28 @@
             if (e.key === 'Escape') closeCodeGenerator();
         });
 
+        // Hub keyboard shortcuts. Advertised in the search box placeholder
+        // and the `?` help dialog:
+        //   '/'        focus the universal search input
+        //   Ctrl/Cmd+K focus the universal search input (Slack/GitHub muscle memory)
+        var SH = window.__SHORTCUTS = window.__SHORTCUTS || [];
+        SH.push({ keys: '/  or  Ctrl/Cmd+K', label: 'Focus the universal search box' });
+        document.addEventListener('keydown', function (e) {
+            var t = e.target;
+            var inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
+                                t.tagName === 'SELECT' || t.isContentEditable);
+            var isSlash = (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inField);
+            var isCtrlK = ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey) && !e.altKey);
+            if (isSlash || isCtrlK) {
+                var box = document.getElementById('universalSearch');
+                if (box) {
+                    e.preventDefault();
+                    box.focus();
+                    box.select && box.select();
+                }
+            }
+        });
+
         // Click outside modal to close
         var modal = document.getElementById('codeGenModal');
         if (modal) {
