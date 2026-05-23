@@ -54,6 +54,18 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — BreadcrumbList + viewer ItemList JSON-LD (round 21, 2026)
+
+- **BreadcrumbList structured data** on every top-level non-hub page
+  (About, Accountability, Tree Compare, Code Generator, Exports,
+  Telemetry) — helps Google render breadcrumbs in search results.
+- **Hub ItemList JSON-LD** enumerating all 9 viewer categories (Native
+  config / oper, Operational, IETF, OpenConfig, RPC, Events, MIB,
+  Other) so search engines can surface direct links to each category.
+- **Service worker** bumped to `v14-2026.05.23`.
+
+## [Pre-Unreleased — round 20]
+
 ### Added — Footer aria-current, Edit-on-GitHub, robots hints (round 20, 2026)
 
 - **Footer marks the active page.** Links in the global footer that
