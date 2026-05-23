@@ -11,6 +11,11 @@
 (function () {
     'use strict';
 
+    // Site-wide build identifier — surfaced in the shared footer and useful
+    // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
+    // and the round entry in CHANGELOG.md.
+    var SITE_BUILD = 'v5-2026.05.22 (round 12)';
+
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
 
@@ -112,6 +117,52 @@
         decorateVersionLabels();
         installShortcutHelp();
         installBackToTop();
+        installFooter();
+    }
+
+    // === Shared footer ===========================================
+    // Injects a minimal footer with the SITE_BUILD identifier + key
+    // navigation links. Pages may suppress it with
+    // <body data-footer="off"> (used on Swagger UI viewers that have
+    // their own scroll containers).
+    function installFooter() {
+        if (!document.body) return;
+        if (document.body.getAttribute('data-footer') === 'off') return;
+        if (document.querySelector('.site-footer')) return;
+        // Resolve "home" relative to current path so subdir viewers link
+        // back to the hub correctly.
+        var depth = (window.location.pathname.split('/').filter(Boolean).length - 1);
+        // GH Pages serves the site under a /<repo>/ prefix in production;
+        // count the path segment that names the page as well.
+        var here = window.location.pathname.replace(/\/+$/, '');
+        var isSubdir = /\/swagger-[a-z-]+-model$/.test(here.replace(/\/index\.html$/, ''));
+        var prefix = isSubdir ? '../' : '';
+        var year = new Date().getFullYear();
+        var f = document.createElement('footer');
+        f.className = 'site-footer';
+        f.setAttribute('role', 'contentinfo');
+        f.innerHTML =
+            '<div class="site-footer-inner">' +
+                '<div class="site-footer-links">' +
+                    '<a href="' + prefix + 'index.html">Home</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="' + prefix + 'yang-accountability.html">Accountability</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="' + prefix + 'tree-compare.html">Compare</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="' + prefix + 'exports.html">Exports</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="' + prefix + 'CHANGELOG.md">Changelog</a>' +
+                '</div>' +
+                '<div class="site-footer-meta">' +
+                    '<span>Cisco IOS-XE OpenAPI / YANG Explorer</span>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<span>Build ' + escapeHtml(SITE_BUILD) + '</span>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<span>\u00a9 ' + year + ' Cisco Systems</span>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(f);
     }
 
     // === Back-to-top floating button ====================================
