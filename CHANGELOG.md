@@ -54,6 +54,22 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Hub shortcut, tree-compare empty state (round 16, 2026)
+
+- **Hub keyboard shortcut: `/` or `Ctrl/Cmd+K` focuses the universal search.**
+  The search box placeholder has long advertised this, and now it actually
+  works. Honors INPUT/TEXTAREA/contentEditable guards. Surfaced in the `?`
+  help dialog.
+- **Tree-compare empty-state placeholders.** Before any module is chosen,
+  each side of the split view now shows a friendly empty state
+  (&ldquo;Pick a module above ←&rdquo; / &ldquo;→&rdquo;) that explains what the panel
+  does, mentions sync-scroll + diff highlighting, and hints at the `?`
+  shortcut. Styled to match the surrounding viewer chrome and to work in
+  both light and dark themes.
+- **Service worker** bumped to `v9-2026.05.23`.
+
+## [Pre-Unreleased — round 15]
+
 ### Added — Copy-as-text, footer build link, SW precache (round 15, 2026)
 
 - **Copy as Text on yang-accountability.** New `Copy as Text` button next to
