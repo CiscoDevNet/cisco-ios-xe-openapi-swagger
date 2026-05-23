@@ -132,6 +132,79 @@
         });
     }
 
+    // === CSV export ====================================================
+    // Dumps the currently-filtered table rows to a downloadable CSV. Columns
+    // mirror the on-screen table plus a few useful flags. Honors RFC 4180:
+    // values containing comma/quote/newline are wrapped in double quotes and
+    // embedded quotes are doubled. Uses UTF-8 BOM so Excel opens it cleanly.
+
+    function _csvCell(value) {
+        var s = value == null ? '' : String(value);
+        if (/[",\r\n]/.test(s)) {
+            s = '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+    }
+
+    function _csvRow(values) {
+        return values.map(_csvCell).join(',');
+    }
+
+    function _buildCsv(modules) {
+        var headers = [
+            'Module Name', 'Classification', 'Categories',
+            'Has Spec', 'Has Tree', 'Spec URLs', 'Tree URL', 'Reason Excluded'
+        ];
+        var lines = [_csvRow(headers)];
+        modules.forEach(function (m) {
+            var cats = (m.categories || []).map(function (c) { return c.label || c.key || ''; }).join('; ');
+            var specUrls = (m.categories || []).map(function (c) { return c.spec_url || ''; }).filter(Boolean).join('; ');
+            lines.push(_csvRow([
+                m.name || '',
+                m.classification || '',
+                cats,
+                m.has_spec ? 'yes' : 'no',
+                m.tree_url ? 'yes' : 'no',
+                specUrls,
+                m.tree_url || '',
+                m.reason_excluded || ''
+            ]));
+        });
+        return lines.join('\r\n') + '\r\n';
+    }
+
+    function _bindCsvBtn() {
+        var btn = document.getElementById('yaCsvBtn');
+        if (!btn || btn.__bound) return;
+        btn.__bound = true;
+        btn.addEventListener('click', function () {
+            var rows = _filteredModules();
+            if (!rows.length) {
+                btn.textContent = 'No rows match filter';
+                setTimeout(function () { btn.textContent = 'Export CSV'; }, 2500);
+                return;
+            }
+            var csv = _buildCsv(rows);
+            // UTF-8 BOM so Excel auto-detects encoding
+            var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+            var ver = (typeof _activeVersion === 'function') ? _activeVersion() : '';
+            var ts = new Date().toISOString().slice(0, 10);
+            var name = 'yang-accountability' + (ver ? '-' + ver : '') + '-' + ts + '.csv';
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                URL.revokeObjectURL(a.href);
+                a.remove();
+            }, 0);
+            var orig = btn.textContent;
+            btn.textContent = 'Exported ' + rows.length + ' rows';
+            setTimeout(function () { btn.textContent = orig; }, 3000);
+        });
+    }
+
     async function loadModuleData() {
         try {
             var url = _accountabilityUrl();
@@ -223,11 +296,9 @@
 
     // === Main table ===
 
-    function renderTable() {
-        var tbody = document.getElementById('moduleTableBody');
-        var searchTerm = document.getElementById('searchBox').value.toLowerCase();
-
-        var filtered = allModules.filter(function (module) {
+    function _filteredModules() {
+        var searchTerm = (document.getElementById('searchBox').value || '').toLowerCase();
+        return allModules.filter(function (module) {
             if (currentFilter.category !== 'all' && module.classification !== currentFilter.category) return false;
             if (currentFilter.status === 'documented' && !module.has_spec) return false;
             if (currentFilter.status === 'missing' && module.has_spec) return false;
@@ -236,6 +307,11 @@
             if (searchTerm && !module.name.toLowerCase().includes(searchTerm)) return false;
             return true;
         });
+    }
+
+    function renderTable() {
+        var tbody = document.getElementById('moduleTableBody');
+        var filtered = _filteredModules();
 
         document.getElementById('tableStats').textContent = 'Showing: ' + Math.min(filtered.length, visibleRows) + ' of ' + filtered.length + ' modules' + (filtered.length !== allModules.length ? ' (filtered from ' + allModules.length + ')' : '');
 
@@ -367,6 +443,7 @@
     function init() {
         _applyHashOnLoad();
         _bindShareBtn();
+        _bindCsvBtn();
         loadModuleData();
 
         // Search box
