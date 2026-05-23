@@ -206,6 +206,9 @@
     }
 
     async function loadModuleData() {
+        // Render a short skeleton table while the JSON fetch is in flight.
+        // Keeps the layout stable and signals "loading" without a spinner.
+        _renderLoadingSkeleton();
         try {
             var url = _accountabilityUrl();
             var response = await fetch(url, { cache: 'no-store' });
@@ -232,6 +235,35 @@
             document.getElementById('moduleTableBody').innerHTML =
                 '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #F44336;">Error loading data. Please refresh.</td></tr>';
         }
+    }
+
+    // Render skeleton rows + stat-card placeholders before the real fetch
+    // resolves. Uses six columns to match renderTable()'s structure.
+    function _renderLoadingSkeleton() {
+        var tbody = document.getElementById('moduleTableBody');
+        if (tbody) {
+            var rows = '';
+            for (var i = 0; i < 8; i++) {
+                rows +=
+                    '<tr class="skeleton-row" aria-hidden="true">' +
+                        '<td><span class="skeleton-bar sk-sm"></span></td>' +
+                        '<td><span class="skeleton-bar sk-lg"></span></td>' +
+                        '<td><span class="skeleton-bar sk-sm"></span></td>' +
+                        '<td><span class="skeleton-bar sk-md"></span></td>' +
+                        '<td><span class="skeleton-bar sk-md"></span></td>' +
+                        '<td><span class="skeleton-bar sk-sm"></span></td>' +
+                    '</tr>';
+            }
+            tbody.innerHTML = rows;
+        }
+        // Stat-card placeholders.
+        ['statTotal', 'statWithSpec', 'statCoverage', 'statWithTree',
+         'statMultiCat', 'statExcluded'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && !el.textContent.trim()) el.innerHTML = '<span class="skeleton-bar sk-sm" aria-hidden="true"></span>';
+        });
+        var stats = document.getElementById('tableStats');
+        if (stats) stats.textContent = 'Loading modules\u2026';
     }
 
     // === Category buttons ===
