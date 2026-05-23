@@ -54,6 +54,26 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Search clear button, SEO JSON-LD (round 18, 2026)
+
+- **Native search clear-X on all filter inputs.** Switched the universal
+  search box (hub), modules filter (accountability), spec picker filter
+  (code generator), and both per-side tree filters (tree-compare) from
+  `<input type="text">` to `<input type="search">`. Browsers render a
+  built-in clear button when there's content, and `autocomplete="off"` +
+  `spellcheck="false"` keep autofill/red-squiggle noise out of the way.
+- **Themed clear button.** Added a custom
+  `::-webkit-search-cancel-button` rule in [assets/css/site.css](cisco-ios-xe-openapi-swagger/assets/css/site.css) so the X is
+  visible on both light and dark backgrounds (it's near-invisible by
+  default in dark mode).
+- **JSON-LD structured data on About page.** Added a Schema.org `WebSite`
+  + `WebPage` + `Organization` graph so search engines surface the page
+  with rich metadata (name, audience, publisher). No CSP impact —
+  `application/ld+json` isn't an executable script.
+- **Service worker** bumped to `v11-2026.05.23`.
+
+## [Pre-Unreleased — round 17]
+
 ### Added — Telemetry shortcuts, smooth anchors (round 17, 2026)
 
 - **Telemetry page shortcut keys.** New keybindings surfaced in the `?`
