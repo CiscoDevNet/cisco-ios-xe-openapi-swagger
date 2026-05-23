@@ -54,6 +54,20 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Telemetry shortcuts, smooth anchors (round 17, 2026)
+
+- **Telemetry page shortcut keys.** New keybindings surfaced in the `?`
+  dialog: `/` focus path filter, `E` Export CSV, `C` Copy YANG-push snippet.
+  Same INPUT/TEXTAREA guard pattern as the other page-level shortcut sets.
+- **Smooth anchor scrolling + sticky-header offset.** Anchor links now
+  scroll with `scroll-behavior: smooth` site-wide, and every heading /
+  section with an `id` reserves `scroll-margin-top: 80px` so the jumped-to
+  element clears any sticky nav (e.g. the tree-compare controls bar)
+  instead of hiding behind it. Honors `prefers-reduced-motion`.
+- **Service worker** bumped to `v10-2026.05.23`.
+
+## [Pre-Unreleased — round 16]
+
 ### Added — Hub shortcut, tree-compare empty state (round 16, 2026)
 
 - **Hub keyboard shortcut: `/` or `Ctrl/Cmd+K` focuses the universal search.**

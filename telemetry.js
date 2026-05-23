@@ -103,7 +103,32 @@
     var csvBtn = $('b-csv');
     if (csvBtn) csvBtn.addEventListener('click', function () { exportRowsCsv(csvBtn); });
 
+    registerShortcuts();
+
     loadRelease(current);
+  }
+
+  // Page-specific keyboard shortcuts, surfaced in the '?' dialog via the
+  // shared window.__SHORTCUTS array (consumed by site-chrome.js).
+  function registerShortcuts() {
+    var SH = window.__SHORTCUTS = window.__SHORTCUTS || [];
+    SH.push({ keys: '/', label: 'Focus the path filter' });
+    SH.push({ keys: 'E', label: 'Export the current rows as CSV' });
+    SH.push({ keys: 'C', label: 'Copy the generated YANG-push snippet' });
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' ||
+                t.tagName === 'SELECT' || t.isContentEditable)) return;
+      var k = e.key;
+      if (k === '/') {
+        var f = $('b-filter'); if (f) { e.preventDefault(); f.focus(); f.select && f.select(); }
+      } else if (k === 'e' || k === 'E') {
+        var c = $('b-csv'); if (c) { e.preventDefault(); c.click(); }
+      } else if (k === 'c' || k === 'C') {
+        var s = $('b-copy-snippet'); if (s) { e.preventDefault(); s.click(); }
+      }
+    });
   }
 
   // --- Release-level loaders -------------------------------------------------
