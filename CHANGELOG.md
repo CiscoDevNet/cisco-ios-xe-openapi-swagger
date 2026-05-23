@@ -54,6 +54,18 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — 404 polish, format-detection, robots noindex (round 23, 2026)
+
+- **404 page polish.** Now declares `theme-color` (light/dark variants)
+  so the mobile status bar matches the rest of the site, and emits
+  `robots: noindex, follow` so search engines don’t index error pages.
+- **`format-detection: telephone=no`** added to every top-level page so
+  iOS Safari stops auto-linking version numbers like `17.9.5` and
+  module dotted-paths as phone numbers.
+- **Service worker** bumped to `v16-2026.05.23`.
+
+## [Pre-Unreleased — round 22]
+
 ### Added — Heading permalink anchors (round 22, 2026)
 
 - **Heading anchors.** Long-form pages tagged with
