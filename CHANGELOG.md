@@ -54,6 +54,18 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Heading permalink anchors (round 22, 2026)
+
+- **Heading anchors.** Long-form pages tagged with
+  `<body data-anchors="on">` now grow a small pilcrow (¶) next to
+  each `h2[id]`/`h3[id]`/`h4[id]` on hover or keyboard focus. Click
+  the pilcrow to jump to that section *and* copy the deep-link URL to
+  the clipboard so it can be shared. Enabled on `about.html`; other
+  pages can opt in by setting the body attribute.
+- **Service worker** bumped to `v15-2026.05.23`.
+
+## [Pre-Unreleased — round 21]
+
 ### Added — BreadcrumbList + viewer ItemList JSON-LD (round 21, 2026)
 
 - **BreadcrumbList structured data** on every top-level non-hub page
