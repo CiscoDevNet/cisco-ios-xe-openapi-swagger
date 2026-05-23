@@ -54,6 +54,24 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Footer aria-current, Edit-on-GitHub, robots hints (round 20, 2026)
+
+- **Footer marks the active page.** Links in the global footer that
+  point at the page you’re currently viewing now emit
+  `aria-current="page"` so screen readers announce them as the
+  current location, and a subtle bold/solid-underline treatment makes
+  the active link easy to spot visually.
+- **Edit on GitHub.** Top-level pages (hub, About, Accountability,
+  Compare, Code Gen, Exports, Telemetry) now expose an `Edit on
+  GitHub` link in the footer that opens the current page’s source
+  file in the GitHub web editor on a new tab. Subdir viewer pages
+  (which are generated) deliberately omit the link.
+- **`max-image-preview:large` robots hint** added on every top-level
+  page so Google can render rich, larger thumbnails in search results.
+- **Service worker** bumped to `v13-2026.05.23`.
+
+## [Pre-Unreleased — round 19]
+
 ### Added — Hub SearchAction, offline 404 hint (round 19, 2026)
 
 - **Hub JSON-LD extended with `SearchAction`.** Google can now show a
