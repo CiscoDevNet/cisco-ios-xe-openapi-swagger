@@ -292,6 +292,7 @@ button.advanced-filter-toggle,
     .copy-btn, .share-btn, .back-to-top, .kbd-help-backdrop,
     .controls, .filter-bar, #b-filter, #b-csv, #csvBtn,
     #shortcuts-hint, #kbdHelpBtn, .site-footer,
+    .pwa-install-toast, #iosxe-pwa-toast, #iosxe-sw-toast,
     .swagger-ui .topbar, .swagger-ui .try-out, .swagger-ui .auth-wrapper,
     iframe, button[data-toggle], .toast { display: none !important; }
     /* Tables: keep borders + avoid row splits */
@@ -391,6 +392,105 @@ body.dark .site-footer-sep { color: #374151; }
 @media (max-width: 640px) {
     .site-footer-inner { flex-direction: column; align-items: flex-start; }
     .site-footer { font-size: 0.78rem; }
+}
+
+/* ---------- Loading skeleton placeholders ---------- */
+/* Used by yang-accountability, telemetry, etc. while initial fetches resolve. */
+.skeleton-bar {
+    display: inline-block;
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg,
+        rgba(0,0,0,0.06) 0%,
+        rgba(0,0,0,0.12) 50%,
+        rgba(0,0,0,0.06) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+    vertical-align: middle;
+}
+.skeleton-bar.sk-sm { width: 60px; }
+.skeleton-bar.sk-md { width: 140px; }
+.skeleton-bar.sk-lg { width: 220px; }
+.skeleton-bar.sk-xl { width: 320px; max-width: 100%; }
+.skeleton-row td { padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+@keyframes skeleton-pulse {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+[data-theme="dark"] .skeleton-bar,
+body.dark .skeleton-bar {
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.06) 0%,
+        rgba(255,255,255,0.14) 50%,
+        rgba(255,255,255,0.06) 100%);
+    background-size: 200% 100%;
+}
+[data-theme="dark"] .skeleton-row td,
+body.dark .skeleton-row td { border-bottom-color: rgba(255,255,255,0.06); }
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-bar { animation: none; }
+}
+
+/* ---------- PWA install toast (injected by site-chrome.js) ---------- */
+.pwa-install-toast {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 9997;
+    max-width: 360px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--surface, #fff);
+    color: var(--text, #111);
+    border: 1px solid var(--border, #d1d5db);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    font-size: 0.9rem;
+    animation: pwa-toast-in 0.25s ease-out;
+}
+.pwa-install-text strong { font-size: 0.95rem; }
+.pwa-install-text span { color: var(--muted, #6b7280); font-size: 0.82rem; }
+.pwa-install-actions { display: flex; flex-direction: column; gap: 6px; }
+.pwa-install-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: #1565C0;
+    color: #fff;
+    cursor: pointer;
+    font: 500 0.85rem inherit;
+    transition: background 0.15s;
+}
+.pwa-install-btn:hover { background: #0D47A1; }
+.pwa-install-btn.pwa-install-secondary {
+    background: transparent;
+    color: var(--text, #111);
+    border-color: var(--border, #d1d5db);
+}
+.pwa-install-btn.pwa-install-secondary:hover { background: rgba(0,0,0,0.04); }
+.pwa-install-btn:focus-visible { outline: 2px solid #1976d2; outline-offset: 2px; }
+[data-theme="dark"] .pwa-install-toast,
+body.dark .pwa-install-toast {
+    background: #1f2937;
+    color: #f1f5f9;
+    border-color: #374151;
+}
+[data-theme="dark"] .pwa-install-btn.pwa-install-secondary,
+body.dark .pwa-install-btn.pwa-install-secondary { color: #f1f5f9; border-color: #374151; }
+[data-theme="dark"] .pwa-install-btn.pwa-install-secondary:hover,
+body.dark .pwa-install-btn.pwa-install-secondary:hover { background: rgba(255,255,255,0.06); }
+@keyframes pwa-toast-in {
+    from { transform: translateY(8px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+}
+@media (max-width: 640px) {
+    .pwa-install-toast { left: 8px; right: 8px; max-width: none; bottom: 8px; flex-direction: column; align-items: stretch; }
+    .pwa-install-actions { flex-direction: row; justify-content: flex-end; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pwa-install-toast { animation: none; }
 }
 
 /* ---------- Theme toggle (shared style, used on pages that don't ship one) ---------- */

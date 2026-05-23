@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v6-2026.05.23 (round 13)';
+    var SITE_BUILD = 'v7-2026.05.23 (round 14)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
@@ -118,6 +118,75 @@
         installShortcutHelp();
         installBackToTop();
         installFooter();
+        installPwaInstallPrompt();
+    }
+
+    // === PWA install prompt =============================================
+    // Listens for `beforeinstallprompt` and surfaces a small, dismissable
+    // toast offering "Install app". The toast remembers a per-user "no
+    // thanks" choice in localStorage for 30 days so it doesn't nag.
+    // Opt-out: set <body data-pwa-prompt="off">.
+    function installPwaInstallPrompt() {
+        if (!document.body) return;
+        if (document.body.getAttribute('data-pwa-prompt') === 'off') return;
+        var DISMISS_KEY = 'iosxe-pwa-dismissed-until';
+        try {
+            var until = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+            if (until && Date.now() < until) return;
+        } catch (_) { /* storage disabled — proceed */ }
+        var deferred = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+            // Prevent the default mini-infobar; we'll surface our own UI.
+            e.preventDefault();
+            deferred = e;
+            showPwaToast();
+        });
+        // If the user has already installed, never prompt again.
+        window.addEventListener('appinstalled', function () {
+            try { localStorage.setItem(DISMISS_KEY, String(Date.now() + 365 * 24 * 3600 * 1000)); } catch (_) {}
+            dismissPwaToast();
+        });
+
+        function showPwaToast() {
+            if (document.getElementById('iosxe-pwa-toast')) return;
+            var t = document.createElement('div');
+            t.id = 'iosxe-pwa-toast';
+            t.setAttribute('role', 'dialog');
+            t.setAttribute('aria-live', 'polite');
+            t.setAttribute('aria-label', 'Install this site as an app');
+            t.className = 'pwa-install-toast';
+            t.innerHTML =
+                '<div class="pwa-install-text">' +
+                    '<strong>Install this site?</strong><br>' +
+                    '<span>Open offline-ready, faster startup, dedicated window.</span>' +
+                '</div>' +
+                '<div class="pwa-install-actions">' +
+                    '<button type="button" class="pwa-install-btn" data-pwa="install">Install</button>' +
+                    '<button type="button" class="pwa-install-btn pwa-install-secondary" data-pwa="dismiss">Not now</button>' +
+                '</div>';
+            document.body.appendChild(t);
+            t.querySelector('[data-pwa="install"]').addEventListener('click', function () {
+                if (!deferred) { dismissPwaToast(); return; }
+                deferred.prompt();
+                deferred.userChoice.then(function (choice) {
+                    if (choice && choice.outcome === 'dismissed') {
+                        // 7-day cooldown if they tap Install but back out.
+                        try { localStorage.setItem(DISMISS_KEY, String(Date.now() + 7 * 24 * 3600 * 1000)); } catch (_) {}
+                    }
+                    deferred = null;
+                    dismissPwaToast();
+                });
+            });
+            t.querySelector('[data-pwa="dismiss"]').addEventListener('click', function () {
+                // 30-day "not now".
+                try { localStorage.setItem(DISMISS_KEY, String(Date.now() + 30 * 24 * 3600 * 1000)); } catch (_) {}
+                dismissPwaToast();
+            });
+        }
+        function dismissPwaToast() {
+            var t = document.getElementById('iosxe-pwa-toast');
+            if (t && t.parentNode) t.parentNode.removeChild(t);
+        }
     }
 
     // === Shared footer ===========================================

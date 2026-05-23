@@ -54,6 +54,36 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Issue templates, skeletons, PWA install, perf hints (round 14, 2026)
+
+- **GitHub issue + PR templates.** New `.github/ISSUE_TEMPLATE/` with three
+  templates (`bug_report.md`, `feature_request.md`, `spec_accuracy.md`) and a
+  `config.yml` that disables blank issues, routes upstream YANG bugs to
+  `YangModels/yang`, and links to Cisco DevNet + GitHub Discussions. New
+  `.github/PULL_REQUEST_TEMPLATE.md` covers change type, validation checklist,
+  screenshots, and reviewer notes — making the About-page &ldquo;Open a bug
+  report&rdquo; / &ldquo;Request a feature&rdquo; deep links land on a guided form.
+- **Loading skeleton on `yang-accountability.html`.** While the per-release
+  JSON is in flight, the table now renders eight pulse-animated skeleton rows
+  and stat-card placeholders instead of an empty table. Honors
+  `prefers-reduced-motion`, dark-mode aware. Skeleton CSS in
+  [assets/css/site.css](assets/css/site.css) is reusable (`.skeleton-bar`,
+  `.skeleton-row`).
+- **PWA install prompt UX.** `site-chrome.js` now intercepts
+  `beforeinstallprompt`, suppresses the browser default mini-infobar, and
+  surfaces a dismissable Install / Not&nbsp;now toast (bottom-left, dark-mode
+  aware, responsive). &ldquo;Not now&rdquo; sets a 30-day cooldown in
+  localStorage; if the user starts the prompt but cancels we cool down for 7
+  days; if they install we never prompt again. Opt-out via
+  `<body data-pwa-prompt="off">`.
+- **Performance hints.** Added `<link rel="preconnect">` to
+  `fonts.googleapis.com` and `fonts.gstatic.com` on the four top-level pages
+  that pull Roboto / Roboto Mono (index, code-generator, yang-accountability,
+  about). Trims first-paint cost on cold-cache visits.
+- **Service worker** bumped to `v7-2026.05.23`.
+
+## [Pre-Unreleased — round 13]
+
 ### Added — About page, engagement CTAs, footer links (round 13, 2026)
 
 - **New `about.html`** — a technical-marketing landing page covering project
