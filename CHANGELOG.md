@@ -54,6 +54,31 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — UX polish, print, back-to-top, persistence (round 11, 2026)
+
+- **Print stylesheet** — `@media print` block in
+  [assets/css/site.css](assets/css/site.css) now hides chrome (headers, dark
+  toggle, share/CSV buttons, Swagger UI topbar, iframes) and forces a light
+  palette with bordered tables, page-break avoidance on rows/cards, and full
+  URLs appended after external links. Yang accountability, telemetry, exports,
+  and the compare matrices print cleanly to PDF.
+- **Floating "Back to top" button** — site-chrome now injects a single shared
+  Back-to-top control that appears after ~400 px of scroll on every page. Uses
+  smooth scrolling, restores focus to `#main-content` / `main` / `h1`, ships
+  proper `aria-label`/`title`, respects dark mode, and may be suppressed per
+  page via `<body data-back-to-top="off">`.
+- **Tree-compare toggle persistence** — `Sync Scroll` and `Highlight Diffs`
+  states are now persisted to `localStorage` (`iosxe-tree-compare-prefs`) and
+  rehydrated on load with `aria-pressed` reflecting the active state.
+- **Empty-state polish on yang-accountability** — when filters return zero
+  modules the empty row now shows a friendlier message plus a "Clear filters"
+  button that wipes the search box, resets category + status to `all`, syncs
+  the filter-button visuals, refreshes the hash, and focuses the search box.
+- **Service worker** bumped to `v4-2026.05.22` so returning visitors pick up
+  the print stylesheet + back-to-top button immediately.
+
+## [Pre-Unreleased — round 10]
+
 ### Added — UX polish, deep-links, CSV export (round 10, 2026)
 
 - **Keyboard shortcut help dialog** — press `?` on any page to open a focused,

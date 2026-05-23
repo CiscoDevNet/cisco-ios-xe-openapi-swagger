@@ -111,6 +111,45 @@
         wireExistingToggles();
         decorateVersionLabels();
         installShortcutHelp();
+        installBackToTop();
+    }
+
+    // === Back-to-top floating button ====================================
+    // Appears after the user scrolls past ~400px. Opt-out: pages may set
+    // <body data-back-to-top="off"> to suppress (useful on Swagger UI viewers
+    // that have their own scroll containers).
+    function installBackToTop() {
+        if (!document.body) return;
+        if (document.body.getAttribute('data-back-to-top') === 'off') return;
+        if (document.querySelector('.back-to-top')) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'back-to-top';
+        btn.setAttribute('aria-label', 'Back to top');
+        btn.setAttribute('title', 'Back to top');
+        btn.innerHTML = '\u2191';
+        btn.addEventListener('click', function () {
+            try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            catch (e) { window.scrollTo(0, 0); }
+            // Move focus to skip-link or first heading for keyboard users
+            var target = document.querySelector('#main-content, main, h1');
+            if (target && typeof target.focus === 'function') {
+                target.setAttribute('tabindex', '-1');
+                setTimeout(function () { target.focus({ preventScroll: true }); }, 350);
+            }
+        });
+        document.body.appendChild(btn);
+        var threshold = 400;
+        var ticking = false;
+        function update() {
+            ticking = false;
+            var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+            btn.classList.toggle('visible', y > threshold);
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+        }, { passive: true });
+        update();
     }
 
     // === Keyboard shortcut help dialog ('?' to open) ====================

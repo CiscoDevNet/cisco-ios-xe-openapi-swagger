@@ -282,9 +282,68 @@ button.advanced-filter-toggle,
 
 /* ---------- Print ---------- */
 @media print {
-    .header, header { background: none !important; color: #000 !important; }
-    .dark-mode-toggle, .skip-link, .nav, .filter-btn, .compare-btn { display: none !important; }
+    /* Reset chrome */
+    .header, header { background: none !important; color: #000 !important; box-shadow: none !important; }
     body { background: #fff !important; color: #000 !important; }
+    a { color: #000 !important; text-decoration: underline; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; color: #555; }
+    /* Hide interactive / decorative chrome */
+    .dark-mode-toggle, .theme-toggle, .skip-link, .nav, .filter-btn, .compare-btn,
+    .copy-btn, .share-btn, .back-to-top, .kbd-help-backdrop,
+    .controls, .filter-bar, #b-filter, #b-csv, #csvBtn,
+    #shortcuts-hint, #kbdHelpBtn,
+    .swagger-ui .topbar, .swagger-ui .try-out, .swagger-ui .auth-wrapper,
+    iframe, button[data-toggle], .toast { display: none !important; }
+    /* Tables: keep borders + avoid row splits */
+    table { border-collapse: collapse !important; width: 100% !important; page-break-inside: auto; }
+    thead { display: table-header-group; }
+    tr, td, th { page-break-inside: avoid; }
+    th, td { border: 1px solid #999 !important; padding: 4px 6px !important; color: #000 !important; background: #fff !important; }
+    th { background: #eee !important; }
+    /* Don't break inside cards */
+    .card, .release-block, .stat-card { page-break-inside: avoid; }
+    /* Force light scheme regardless of dark mode */
+    :root, [data-theme="dark"], body.dark {
+        --bg: #fff !important;
+        --text: #000 !important;
+        --muted: #444 !important;
+        --border: #999 !important;
+    }
+}
+
+/* ---------- Back-to-top button (injected by site-chrome.js) ---------- */
+.back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9998;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border, #ccc);
+    background: var(--surface, #fff);
+    color: var(--text, #111);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    line-height: 1;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    transition: opacity 0.2s, transform 0.15s, background 0.2s;
+    opacity: 0;
+}
+.back-to-top.visible { display: inline-flex; opacity: 1; }
+.back-to-top:hover { transform: translateY(-2px); }
+.back-to-top:focus-visible { outline: 2px solid #1976d2; outline-offset: 2px; }
+[data-theme="dark"] .back-to-top,
+body.dark .back-to-top {
+    background: #1f2937;
+    color: #f1f5f9;
+    border-color: #374151;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+}
+@media (max-width: 768px) {
+    .back-to-top { width: 38px; height: 38px; bottom: 16px; right: 16px; font-size: 1.2rem; }
 }
 
 /* ---------- Theme toggle (shared style, used on pages that don't ship one) ---------- */
