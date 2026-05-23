@@ -54,6 +54,29 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — About page, engagement CTAs, footer links (round 13, 2026)
+
+- **New `about.html`** — a technical-marketing landing page covering project
+  mission, by-the-numbers stats (608 specs / 37,072 paths / 1,125 modules /
+  765 trees / 9 categories / 5 releases / 100% accountability), what you can
+  do here (8 capability cards), releases table, architecture summary, and a
+  dedicated &ldquo;Open an issue, give feedback, or contribute&rdquo; section
+  with deep links into the GitHub bug-report / feature-request templates,
+  Discussions, CONTRIBUTING.md, and the changelog. Credits / licensing block
+  clarifies upstream YangModels licensing, Swagger UI attribution, and the
+  not-an-official-Cisco-product disclaimer.
+- **Header nav and footer** now include an &ldquo;About&rdquo; link on every
+  page; the shared footer also gains a direct &ldquo;Open an issue&rdquo;
+  link to the GitHub Issues new-issue flow.
+- **Sitemap** grown to 17 entries with `about.html` and refreshed `lastmod`.
+- **Emoji-guard test** now also gates `about.html`, keeping the page free of
+  decorative glyphs while still allowing HTML entities like `&mdash;`,
+  `&copy;`, and the functional KEEP-listed monochrome symbols.
+- **Service worker** bumped to `v6-2026.05.23` so returning visitors land
+  on the new About page and refreshed footer immediately.
+
+## [Pre-Unreleased — round 12]
+
 ### Added — Page shortcuts, shared footer, copy-as-text (round 12, 2026)
 
 - **Page-specific keyboard shortcuts**. `tree-compare.html` now responds to
