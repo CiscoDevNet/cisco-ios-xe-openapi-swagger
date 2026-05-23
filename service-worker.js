@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v17-2026.05.23';
+const CACHE_VERSION = 'v18-2026.05.23';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
@@ -35,6 +35,7 @@ const PRECACHE_URLS = [
   'exports.html',
   'assets/css/site.css',
   'assets/js/site-chrome.js',
+  'assets/js/sw-register.js',
   'assets/icons/favicon.svg',
   'assets/icons/favicon.ico',
   'assets/icons/apple-touch-icon.png',

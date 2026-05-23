@@ -53,7 +53,32 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 ---
 
 ## [Unreleased]
+### Security \u2014 externalize SW registration + regression tests (round 25, 2026)
 
+- **Closed the CSP / inline-script gap.** Top-level pages ship
+  `script-src 'self'` (no `'unsafe-inline'`), but the PWA service
+  worker registration + update-toast block was injected inline,
+  which modern browsers refuse to execute. The whole snippet moved
+  to `assets/js/sw-register.js` and `scripts/inject_pwa.py` now
+  emits `<script src="assets/js/sw-register.js" defer></script>`.
+  The new module derives its SW URL + scope from
+  `document.currentScript.src`, so the same file works from the
+  site root and from every viewer subdirectory.
+- **Added `tests/test_security_regressions.py`** with three
+  parameterised guards: (a) URL-fragment / query-string values
+  must not flow into `innerHTML`/`outerHTML`/`document.write`/
+  `insertAdjacentHTML`; (b) `location.href`/`assign`/`replace`
+  assignments built from concatenation must carry a whitelist
+  guard for the destination (catches the round-24
+  `javascript:` URL exploit shape); (c) strict-CSP pages must
+  not contain inline executable `<script>` blocks (JSON-LD data
+  blocks and external `<script src=...>` exempted). 44 new
+  assertions, all green.
+- **Service worker** bumped to `v18-2026.05.23` and now precaches
+  `assets/js/sw-register.js` so offline reloads still see the new
+  module.
+
+## [Pre-Unreleased \u2014 round 24]
 ### Security — Reflected-XSS fixes in 404 + hub deep-link (round 24, 2026)
 
 - **Fixed reflected XSS in `404.html` hash-recovery flow.** When the

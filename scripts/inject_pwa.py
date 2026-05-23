@@ -47,63 +47,20 @@ VIEWERS = [
 
 
 def _block(asset_prefix: str) -> str:
-    """Manifest link + inline SW registration. asset_prefix lets viewer
-    pages reach back to the site root (../) for both URLs.
+    """Manifest link + external SW registration script.
 
-    The registration also wires up an "update available" toast: when a
-    new service worker reaches the `installed` state while an existing
-    controller is still in charge, we surface a small bottom-right card
-    with a Reload button that triggers the SKIP_WAITING handshake.
+    The SW registration logic and update-toast UI live in
+    ``assets/js/sw-register.js`` so that pages whose CSP forbids
+    ``'unsafe-inline'`` for ``script-src`` can still register the
+    service worker. The external script derives its SW URL and scope
+    from its own ``document.currentScript.src`` so it works the same
+    from the site root and from viewer subdirectories.
     """
-    sw_url = f'{asset_prefix}service-worker.js'
-    scope = asset_prefix or './'
     manifest = f'{asset_prefix}site.webmanifest'
-    # Compact single-string payload. Kept inline (no extra request) and
-    # without any external CSS — fail-silent on every branch so a broken
-    # update path can never break the page.
-    register = (
-        "if('serviceWorker' in navigator && "
-        "(location.protocol==='https:'||location.hostname==='localhost')){"
-        "window.addEventListener('load',function(){"
-        f"navigator.serviceWorker.register('{sw_url}',{{scope:'{scope}'}}).then(function(reg){{"
-        "function show(w){"
-        "if(document.getElementById('iosxe-sw-toast'))return;"
-        "var t=document.createElement('div');t.id='iosxe-sw-toast';"
-        "t.setAttribute('role','status');t.setAttribute('aria-live','polite');"
-        "t.style.cssText='position:fixed;right:16px;bottom:16px;z-index:99999;"
-        "background:#1565c0;color:#fff;padding:10px 14px;border-radius:8px;"
-        "box-shadow:0 4px 12px rgba(0,0,0,.25);"
-        "font:14px/1.4 system-ui,-apple-system,sans-serif;"
-        "display:flex;gap:10px;align-items:center;max-width:90vw';"
-        "var s=document.createElement('span');s.textContent='New version available.';"
-        "var b=document.createElement('button');b.type='button';b.textContent='Reload';"
-        "b.style.cssText='background:#fff;color:#1565c0;border:0;padding:6px 12px;"
-        "border-radius:6px;font:600 13px system-ui,-apple-system,sans-serif;cursor:pointer';"
-        "var x=document.createElement('button');x.type='button';x.textContent='\\u00d7';"
-        "x.setAttribute('aria-label','Dismiss update notification');"
-        "x.style.cssText='background:transparent;color:#fff;border:0;"
-        "font:18px/1 system-ui,sans-serif;cursor:pointer;padding:0 4px';"
-        "var reloaded=false;"
-        "navigator.serviceWorker.addEventListener('controllerchange',function(){"
-        "if(reloaded)return;reloaded=true;location.reload();});"
-        "b.addEventListener('click',function(){try{w.postMessage({type:'SKIP_WAITING'});}catch(e){}});"
-        "x.addEventListener('click',function(){t.remove();});"
-        "t.appendChild(s);t.appendChild(b);t.appendChild(x);"
-        "document.body.appendChild(t);"
-        "}"
-        "if(reg.waiting && navigator.serviceWorker.controller)show(reg.waiting);"
-        "reg.addEventListener('updatefound',function(){"
-        "var nw=reg.installing;if(!nw)return;"
-        "nw.addEventListener('statechange',function(){"
-        "if(nw.state==='installed' && navigator.serviceWorker.controller)show(nw);"
-        "});"
-        "});"
-        "}).catch(function(){});"
-        "});}"
-    )
+    sw_register = f'{asset_prefix}assets/js/sw-register.js'
     return (
         f'\n<link rel="manifest" href="{manifest}">'
-        f'\n<script>{register}</script>'
+        f'\n<script src="{sw_register}" defer></script>'
     )
 
 
