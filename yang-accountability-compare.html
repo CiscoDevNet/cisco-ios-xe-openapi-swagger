@@ -137,6 +137,7 @@
       <option value="all-versions">Present in all versions</option>
       <option value="diff">Differing across versions</option>
     </select>
+    <button id="csvBtn" type="button" title="Download visible rows as CSV">Export CSV</button>
     <span id="count" style="color:var(--muted);"></span>
   </div>
   <div class="matrix-wrap">
@@ -219,30 +220,86 @@
   function bindControls() {
     document.getElementById('filter').addEventListener('input', drawTable);
     document.getElementById('presence').addEventListener('change', drawTable);
+    var csv = document.getElementById('csvBtn');
+    if (csv) csv.addEventListener('click', function () { exportCsv(csv); });
   }
 
-  function drawTable() {
+  function _filteredRows() {
     var versions = DATA.versions || [];
     var matrix = DATA.matrix || [];
     var q = document.getElementById('filter').value.trim().toLowerCase();
     var presence = document.getElementById('presence').value;
-    var tbody = document.querySelector('#matrix tbody');
-    tbody.innerHTML = '';
-    var shown = 0;
-    matrix.forEach(function (row) {
-      if (q && row.module.toLowerCase().indexOf(q) === -1) return;
+    return matrix.filter(function (row) {
+      if (q && row.module.toLowerCase().indexOf(q) === -1) return false;
       var presents = versions.map(function (v) {
         return row.by_version[v] && row.by_version[v].present;
       });
-      if (presence === 'any' && !presents.some(Boolean)) return;
-      if (presence === 'all-versions' && !presents.every(Boolean)) return;
+      if (presence === 'any' && !presents.some(Boolean)) return false;
+      if (presence === 'all-versions' && !presents.every(Boolean)) return false;
       if (presence === 'diff') {
         var first = JSON.stringify(row.by_version[versions[0]] || {});
         var same = versions.every(function (v) {
           return JSON.stringify(row.by_version[v] || {}) === first;
         });
-        if (same) return;
+        if (same) return false;
       }
+      return true;
+    });
+  }
+
+  function _csvCell(value) {
+    var s = value == null ? '' : String(value);
+    if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function exportCsv(btn) {
+    var versions = DATA.versions || [];
+    var rows = _filteredRows();
+    if (!rows.length) {
+      var o = btn.textContent;
+      btn.textContent = 'No rows';
+      setTimeout(function () { btn.textContent = o; }, 2000);
+      return;
+    }
+    var headers = ['Module'];
+    versions.forEach(function (v) {
+      headers.push(v + ' present');
+      headers.push(v + ' has_spec');
+      headers.push(v + ' has_tree');
+    });
+    var lines = [headers.map(_csvCell).join(',')];
+    rows.forEach(function (row) {
+      var vals = [row.module];
+      versions.forEach(function (v) {
+        var c = row.by_version[v] || {};
+        vals.push(c.present ? 'yes' : 'no');
+        vals.push(c.has_spec ? 'yes' : 'no');
+        vals.push(c.has_tree ? 'yes' : 'no');
+      });
+      lines.push(vals.map(_csvCell).join(','));
+    });
+    var csv = '\uFEFF' + lines.join('\r\n') + '\r\n';
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var ts = new Date().toISOString().slice(0, 10);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'yang-accountability-compare-' + ts + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    var orig = btn.textContent;
+    btn.textContent = 'Exported ' + rows.length;
+    setTimeout(function () { btn.textContent = orig; }, 2500);
+  }
+
+  function drawTable() {
+    var versions = DATA.versions || [];
+    var matrix = DATA.matrix || [];
+    var tbody = document.querySelector('#matrix tbody');
+    tbody.innerHTML = '';
+    var rows = _filteredRows();
+    rows.forEach(function (row) {
       var tr = document.createElement('tr');
       var td = document.createElement('td');
       td.className = 'module';
@@ -264,10 +321,9 @@
         tr.appendChild(cell);
       });
       tbody.appendChild(tr);
-      shown++;
     });
     document.getElementById('count').textContent =
-      shown + ' / ' + matrix.length + ' modules shown';
+      rows.length + ' / ' + matrix.length + ' modules shown';
   }
 
   function escapeHtml(s) {

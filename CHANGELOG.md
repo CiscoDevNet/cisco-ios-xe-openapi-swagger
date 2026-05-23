@@ -54,6 +54,46 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — UX polish, deep-links, CSV export (round 10, 2026)
+
+- **Keyboard shortcut help dialog** — press `?` on any page to open a focused,
+  Esc-dismissable modal listing global shortcuts (`/`, `Ctrl+K`, `Esc`, `Tab`,
+  `Shift+Tab`, `Enter`). Implemented in [assets/js/site-chrome.js](assets/js/site-chrome.js)
+  with proper focus management (returns focus on close, `aria-modal`,
+  `aria-labelledby`). Pages may extend via `window.__SHORTCUTS`. A discoverable
+  "? Shortcuts" button sits next to the hub search bar.
+- **`yang-accountability.html` Export CSV** — downloads the currently-filtered rows
+  as a UTF-8 BOM, RFC 4180-quoted `.csv` named
+  `yang-accountability-<ver>-<date>.csv`. Columns: Module Name, Classification,
+  Categories, Has Spec, Has Tree, Spec URLs, Tree URL, Reason Excluded.
+- **`telemetry.html` Export CSV** — downloads visible Method / OpenAPI path / MDT
+  filter xpath rows as
+  `telemetry-paths-<ver>-<spec>-<date>.csv` honoring the active path filter.
+- **`yang-accountability.html` deep-links + Copy Share Link** — URL hash now
+  preserves `ver`, `q`, `cat`, `status`; filter buttons sync to URL on every
+  change. A new Copy Share Link button reproduces the exact filter state.
+- **`code-generator.html` deep-links + Copy Share Link + version-aware picker** —
+  `ver=&category=&spec=&path=&method=` hash schema; per-release search-index
+  fallback; never persists credentials.
+- **`exports.html` filter bar** — release dropdown + Postman / Bruno / All
+  toggle with hash sync (`#ver=&format=`), live totals (requests + bytes), and
+  basename-only Path display with full path in tooltip.
+- **Postman split-by-category** — each release ships 9 per-category Postman v2.1
+  collections to stay under GitHub's 50 MB recommended limit. Max shard 22.7 MB
+  (native-config 26.1.1).
+- **Sitemap refresh + sitemap generator** — `python scripts/generate_sitemap.py`
+  refreshes `lastmod` on all 16 entries to today.
+- **Accessibility** — `aria-label` on filter inputs across code-generator,
+  yang-accountability, yang-accountability-compare, tree-compare, telemetry;
+  keyboard-activatable native-config search-clear span; close-button
+  `aria-label` on the code-snippet modal.
+- **Generator output paths** — Postman + Bruno manifests now write POSIX paths
+  (forward slashes) regardless of host OS, so download links on the live site
+  work correctly when generators run on Windows.
+- **Terminology** — "Has Swagger Spec:" → "Has OpenAPI Spec:" on the hub.
+- **Service worker** — `CACHE_VERSION` bumped to `v3-2026.05.22` to ensure
+  returning visitors pick up this round's changes.
+
 ### Added — Site quality, PWA, and per-release exports (round 9, 2026)
 
 - **Lighthouse strict + axe-core CI** — site quality gates (Tier 3) added to the deploy
