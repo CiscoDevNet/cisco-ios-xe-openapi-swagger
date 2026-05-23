@@ -171,8 +171,22 @@
                 var msg = document.getElementById('redirectMsg');
                 if (msg) {
                     msg.style.display = 'block';
-                    msg.innerHTML = 'Redirecting you to <strong>' + cat + '</strong> for <code>' + params.spec + '</code>'
-                        + (params.op ? ' (operation <code>' + params.op + '</code>)' : '') + '\u2026';
+                    // Build the redirect notice with DOM nodes so the
+                    // attacker-controlled fragment values (params.spec /
+                    // params.op) can't break out of innerHTML and execute
+                    // script. Reflected XSS otherwise possible via URLs
+                    // like /#spec=<img src=x onerror=...>.
+                    msg.textContent = '';
+                    msg.appendChild(document.createTextNode('Redirecting you to '));
+                    var cs = document.createElement('strong'); cs.textContent = cat; msg.appendChild(cs);
+                    msg.appendChild(document.createTextNode(' for '));
+                    var cc = document.createElement('code'); cc.textContent = params.spec; msg.appendChild(cc);
+                    if (params.op) {
+                        msg.appendChild(document.createTextNode(' (operation '));
+                        var co = document.createElement('code'); co.textContent = params.op; msg.appendChild(co);
+                        msg.appendChild(document.createTextNode(')'));
+                    }
+                    msg.appendChild(document.createTextNode('\u2026'));
                 }
                 setTimeout(function () { window.location.replace(target); }, 800);
             } catch (_) { /* leave the 404 page intact */ }

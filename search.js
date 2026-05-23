@@ -802,7 +802,18 @@ function handleDeepLink() {
         if (specParts.length === 2) {
             var modelDir = specParts[0];
             var specName = specParts[1];
-            window.location.href = modelDir + '/index.html#spec=' + specName;
+            // SECURITY: only redirect when modelDir matches a known viewer
+            // category directory. Without this guard an attacker can craft
+            // a URL like `#spec=javascript:alert(1)/x` and have it executed
+            // because `window.location.href = "javascript:..."` runs the
+            // payload. Whitelist short-circuits that path.
+            var ALLOWED_MODEL_DIRS = [
+                'swagger-cfg-model', 'swagger-events-model', 'swagger-ietf-model',
+                'swagger-mib-model', 'swagger-native-config-model', 'swagger-oper-model',
+                'swagger-openconfig-model', 'swagger-other-model', 'swagger-rpc-model'
+            ];
+            if (ALLOWED_MODEL_DIRS.indexOf(modelDir) === -1) return;
+            window.location.href = modelDir + '/index.html#spec=' + encodeURIComponent(specName);
         }
     }
 }

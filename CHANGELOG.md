@@ -54,6 +54,28 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Security — Reflected-XSS fixes in 404 + hub deep-link (round 24, 2026)
+
+- **Fixed reflected XSS in `404.html` hash-recovery flow.** When the
+  deep-link recovery routine surfaces the “Redirecting you to …”
+  notice, the values of `params.spec` and `params.op` (parsed from
+  the URL fragment) used to flow into `innerHTML` unescaped. A
+  crafted URL like `/404.html#spec=Cisco-IOS-XE-mib<img src=x
+  onerror=...>` would have executed the payload. The notice is now
+  assembled with DOM nodes (`textContent` / `createElement`) so the
+  fragment is rendered as text.
+- **Fixed open-redirect / `javascript:` URL injection on the hub
+  `#spec=model/name` deep-link.** `search.js` previously did
+  `window.location.href = modelDir + '/index.html#spec=' + specName`
+  with no validation, allowing `#spec=javascript:alert(1)/x` to
+  execute the JS payload via the `javascript:` URL scheme. The
+  redirect now refuses any `modelDir` that isn’t in the known
+  whitelist of viewer category directories, and `specName` is
+  `encodeURIComponent`-encoded.
+- **Service worker** bumped to `v17-2026.05.23`.
+
+## [Pre-Unreleased — round 23]
+
 ### Added — 404 polish, format-detection, robots noindex (round 23, 2026)
 
 - **404 page polish.** Now declares `theme-color` (light/dark variants)
