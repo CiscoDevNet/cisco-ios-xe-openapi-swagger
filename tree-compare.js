@@ -382,15 +382,21 @@
 
     // === Export comparison ===
 
-    function exportComparison() {
-        if (!leftTreeData || !rightTreeData) return;
-
-        var text = 'YANG Tree Comparison Report\n' +
+    // Build the textual comparison report shared by Export (download) and
+    // Copy as Text (clipboard).
+    function _buildComparisonReport() {
+        if (!leftTreeData || !rightTreeData) return null;
+        return 'YANG Tree Comparison Report\n' +
             'Generated: ' + new Date().toLocaleString() + '\n\n' +
             'Left Module: ' + leftTreeData.module.name + '\n' +
             'Right Module: ' + rightTreeData.module.name + '\n\n' +
             '=== LEFT TREE ===\n' + leftTreeData.content + '\n\n' +
             '=== RIGHT TREE ===\n' + rightTreeData.content;
+    }
+
+    function exportComparison() {
+        var text = _buildComparisonReport();
+        if (!text) return;
 
         var blob = new Blob([text], { type: 'text/plain' });
         var url = URL.createObjectURL(blob);
@@ -399,6 +405,37 @@
         a.download = 'tree-comparison-' + leftTreeData.module.name + '-vs-' + rightTreeData.module.name + '.txt';
         a.click();
         URL.revokeObjectURL(url);
+    }
+
+    // Copy the same report to the clipboard. Used by the Copy as Text button
+    // and the 'C' keyboard shortcut.
+    function copyComparisonAsText(btn) {
+        var text = _buildComparisonReport();
+        if (!text) { showNotice('Select two modules and compare them first.', 'warning'); return; }
+        var orig = btn ? btn.textContent : '';
+        function flash(label) {
+            if (!btn) return;
+            btn.textContent = label;
+            setTimeout(function () { btn.textContent = orig; }, 3000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { flash('Copied!'); },
+                function () { flash('Copy failed'); }
+            );
+        } else {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'absolute';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                var ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                flash(ok ? 'Copied!' : 'Copy failed');
+            } catch (_) { flash('Copy failed'); }
+        }
     }
 
     // === Dark mode ===
@@ -471,6 +508,11 @@
         var exportBtn = document.getElementById('exportBtn');
         if (exportBtn) exportBtn.addEventListener('click', exportComparison);
 
+        var copyTextBtn = document.getElementById('copyTextBtn');
+        if (copyTextBtn) copyTextBtn.addEventListener('click', function () {
+            copyComparisonAsText(copyTextBtn);
+        });
+
         var shareBtn = document.getElementById('shareBtn');
         if (shareBtn) shareBtn.addEventListener('click', function () {
             copyShareLink(shareBtn);
@@ -482,6 +524,42 @@
 
         // Reflect persisted toggle prefs on the button visuals.
         _syncToggleButtons();
+
+        // === Page-specific keyboard shortcuts ===
+        // Registered with the shared help dialog (site-chrome.js) and wired
+        // to a single keydown listener that ignores typing targets.
+        window.__SHORTCUTS = (window.__SHORTCUTS || []).concat([
+            { keys: 's',       desc: 'Toggle Sync Scroll' },
+            { keys: 'h',       desc: 'Toggle Highlight Diffs' },
+            { keys: 'e',       desc: 'Export comparison as .txt' },
+            { keys: 'c',       desc: 'Copy comparison as text' },
+            { keys: 'l',       desc: 'Copy Share Link' },
+            { keys: 'Enter',   desc: 'Compare selected modules (when focused on Compare button)' }
+        ]);
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            // Don't hijack keys while typing in inputs / textareas / selects
+            var t = e.target;
+            var tag = t && t.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+            var k = (e.key || '').toLowerCase();
+            if (k === 's') {
+                e.preventDefault();
+                var b = document.getElementById('syncScrollBtn'); if (b) b.click();
+            } else if (k === 'h') {
+                e.preventDefault();
+                var b2 = document.getElementById('highlightBtn'); if (b2) b2.click();
+            } else if (k === 'e') {
+                e.preventDefault();
+                var b3 = document.getElementById('exportBtn'); if (b3) b3.click();
+            } else if (k === 'c') {
+                e.preventDefault();
+                var b4 = document.getElementById('copyTextBtn'); if (b4) b4.click();
+            } else if (k === 'l') {
+                e.preventDefault();
+                var b5 = document.getElementById('shareBtn'); if (b5) b5.click();
+            }
+        });
     }
 
     if (document.readyState === 'loading') {

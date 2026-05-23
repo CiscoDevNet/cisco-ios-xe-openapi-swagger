@@ -481,6 +481,32 @@
 
         // Load spec picker
         loadSpecPicker();
+
+        // === Page-specific keyboard shortcuts ===
+        // Registered with the shared help dialog (site-chrome.js) and wired
+        // to a single keydown listener that ignores typing targets.
+        window.__SHORTCUTS = (window.__SHORTCUTS || []).concat([
+            { keys: 'g', desc: 'Generate code for the current spec + path' },
+            { keys: 'l', desc: 'Copy Share Link for current selection' },
+            { keys: 'x', desc: 'Clear the form' }
+        ]);
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            var t = e.target;
+            var tag = t && t.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+            var k = (e.key || '').toLowerCase();
+            if (k === 'g') {
+                e.preventDefault();
+                var b = document.getElementById('generateBtn'); if (b) b.click();
+            } else if (k === 'l') {
+                e.preventDefault();
+                var b2 = document.getElementById('cgShareBtn'); if (b2) b2.click();
+            } else if (k === 'x') {
+                e.preventDefault();
+                var b3 = document.getElementById('clearBtn'); if (b3) b3.click();
+            }
+        });
     }
 
     if (document.readyState === 'loading') {

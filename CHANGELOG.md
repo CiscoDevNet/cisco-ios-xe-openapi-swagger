@@ -54,6 +54,29 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ## [Unreleased]
 
+### Added — Page shortcuts, shared footer, copy-as-text (round 12, 2026)
+
+- **Page-specific keyboard shortcuts**. `tree-compare.html` now responds to
+  `S` (Sync Scroll), `H` (Highlight Diffs), `E` (Export), `C` (Copy as Text),
+  and `L` (Copy Share Link). `code-generator.html` responds to `G` (generate),
+  `L` (Copy Share Link), `X` (Clear). Each page pushes its bindings onto
+  `window.__SHORTCUTS` so the `?` help dialog shows them alongside the global
+  shortcuts. All bindings ignore typing targets (inputs / textareas / selects /
+  contenteditable) and modifier keys.
+- **"Copy as Text" on `tree-compare.html`** — new button next to Export that
+  copies the same side-by-side comparison report (header + Left tree + Right
+  tree) to the clipboard with a 3-second "Copied!" flash and graceful
+  fallback for older browsers.
+- **Shared site footer** injected by `site-chrome.js` on every page (opt-out
+  via `<body data-footer="off">`). Carries quick links (Home / Accountability /
+  Compare / Exports / Changelog) and a build badge (`SITE_BUILD`) for cache-
+  busting triage. Footer is hidden in print and styled for both light + dark
+  themes; collapses to a stacked layout below 640 px.
+- **Service worker** bumped to `v5-2026.05.22` so returning visitors pick up
+  the new page bindings, Copy-as-Text button, and footer immediately.
+
+## [Pre-Unreleased — round 11]
+
 ### Added — UX polish, print, back-to-top, persistence (round 11, 2026)
 
 - **Print stylesheet** — `@media print` block in
