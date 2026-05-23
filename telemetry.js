@@ -100,6 +100,8 @@
       var btn = $('b-copy-snippet');
       copyText($('b-snippet').textContent, btn);
     });
+    var csvBtn = $('b-csv');
+    if (csvBtn) csvBtn.addEventListener('click', function () { exportRowsCsv(csvBtn); });
 
     loadRelease(current);
   }
@@ -247,6 +249,28 @@
     el.hidden = false;
   }
 
+  function _builderRows() {
+    if (!state.spec || !state.spec.paths) return [];
+    var q = ($('b-filter').value || '').trim().toLowerCase();
+    var paths = state.spec.paths;
+    var rows = [];
+    Object.keys(paths).sort().forEach(function (apiPath) {
+      var ops = paths[apiPath] || {};
+      Object.keys(ops).forEach(function (method) {
+        if (['get','post','put','patch','delete'].indexOf(method) === -1) return;
+        var xpath = deriveXpath(apiPath, state.prefixes);
+        rows.push({ method: method.toUpperCase(), api: apiPath, xpath: xpath });
+      });
+    });
+    if (q) {
+      rows = rows.filter(function (r) {
+        var hay = (r.api + ' ' + (r.xpath || '')).toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+    }
+    return rows;
+  }
+
   function renderBuilderTable() {
     var tbody = document.querySelector('#b-tbl tbody');
     var empty = $('b-empty');
@@ -260,24 +284,7 @@
       return;
     }
 
-    var q = $('b-filter').value.trim().toLowerCase();
-    var paths = state.spec.paths;
-    var rows = [];
-    Object.keys(paths).sort().forEach(function (apiPath) {
-      var ops = paths[apiPath] || {};
-      Object.keys(ops).forEach(function (method) {
-        if (['get','post','put','patch','delete'].indexOf(method) === -1) return;
-        var xpath = deriveXpath(apiPath, state.prefixes);
-        rows.push({ method: method.toUpperCase(), api: apiPath, xpath: xpath });
-      });
-    });
-
-    if (q) {
-      rows = rows.filter(function (r) {
-        var hay = (r.api + ' ' + (r.xpath || '')).toLowerCase();
-        return hay.indexOf(q) !== -1;
-      });
-    }
+    var rows = _builderRows();
 
     if (!rows.length) {
       empty.textContent = 'No paths match the current filter.';
@@ -314,6 +321,49 @@
           }, 1200);
         });
       });
+  }
+
+  // === CSV export ====================================================
+  // Dumps the currently-visible builder rows (Method, OpenAPI path, MDT
+  // filter xpath) to a downloadable CSV that honors RFC 4180 quoting. Excel
+  // auto-detects UTF-8 because we prefix a BOM.
+
+  function _csvCell(value) {
+    var s = value == null ? '' : String(value);
+    if (/[",\r\n]/.test(s)) {
+      s = '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  function exportRowsCsv(btn) {
+    var rows = _builderRows();
+    if (!rows.length) {
+      var orig = btn.textContent;
+      btn.textContent = 'No rows';
+      setTimeout(function () { btn.textContent = orig; }, 2000);
+      return;
+    }
+    var lines = [['Method', 'OpenAPI Path', 'MDT Filter Xpath'].map(_csvCell).join(',')];
+    rows.forEach(function (r) {
+      lines.push([r.method, r.api, r.xpath || ''].map(_csvCell).join(','));
+    });
+    var csv = '\uFEFF' + lines.join('\r\n') + '\r\n';
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var ts = new Date().toISOString().slice(0, 10);
+    var parts = ['telemetry-paths'];
+    if (state.ver) parts.push(state.ver);
+    if (state.specName) parts.push(String(state.specName).replace(/[^A-Za-z0-9._-]+/g, '_'));
+    parts.push(ts);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = parts.join('-') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    var origLabel = btn.textContent;
+    btn.textContent = 'Exported ' + rows.length;
+    setTimeout(function () { btn.textContent = origLabel; }, 2500);
   }
 
   function buildSubscriptionSnippet(xpath) {
