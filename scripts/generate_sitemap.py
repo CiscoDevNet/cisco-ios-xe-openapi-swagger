@@ -23,6 +23,7 @@ TOP_LEVEL_PAGES = [
     ("exports.html", 0.7, "monthly"),
     ("yang-accountability.html", 0.7, "monthly"),
     ("yang-accountability-compare.html", 0.6, "monthly"),
+    ("about.html", 0.6, "monthly"),
 ]
 VIEWER_DIRS = [
     "swagger-cfg-model", "swagger-events-model", "swagger-ietf-model",

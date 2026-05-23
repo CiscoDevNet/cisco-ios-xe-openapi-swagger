@@ -35,6 +35,7 @@ UI_FILES = [
     "yang-accountability-compare.html",
     "exports.html",
     "telemetry.html",
+    "about.html",
     "404.html",
     "index-app.js",
     "code-generator.js",

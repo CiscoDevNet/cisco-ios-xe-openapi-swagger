@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v5-2026.05.22 (round 12)';
+    var SITE_BUILD = 'v6-2026.05.23 (round 13)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
@@ -146,11 +146,15 @@
                 '<div class="site-footer-links">' +
                     '<a href="' + prefix + 'index.html">Home</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="' + prefix + 'about.html">About</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="' + prefix + 'yang-accountability.html">Accountability</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="' + prefix + 'tree-compare.html">Compare</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="' + prefix + 'exports.html">Exports</a>' +
+                    ' <span class="site-footer-sep">\u00b7</span> ' +
+                    '<a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues/new" target="_blank" rel="noopener noreferrer">Open an issue</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="' + prefix + 'CHANGELOG.md">Changelog</a>' +
                 '</div>' +
