@@ -14,7 +14,7 @@
     // Site-wide build identifier — surfaced in the shared footer and useful
     // when triaging cache / SW issues. Keep in sync with the SW CACHE_VERSION
     // and the round entry in CHANGELOG.md.
-    var SITE_BUILD = 'v12-2026.05.23 (round 19)';
+    var SITE_BUILD = 'v13-2026.05.23 (round 20)';
 
     // Share the key with legacy page-specific handlers (index-app.js, tree-compare.js)
     var STORAGE_KEY = 'theme';
@@ -207,25 +207,52 @@
         var isSubdir = /\/swagger-[a-z-]+-model$/.test(here.replace(/\/index\.html$/, ''));
         var prefix = isSubdir ? '../' : '';
         var year = new Date().getFullYear();
+
+        // Mark the link to the current page so assistive tech announces it
+        // as the active location. Match by the trailing filename only so we
+        // tolerate the /index.html omission GH Pages performs.
+        var herePage = (here.split('/').pop() || 'index.html');
+        if (!herePage || herePage === '') herePage = 'index.html';
+        function navLink(href, label) {
+            var isCurrent = (href === prefix + herePage);
+            var ariaAttr = isCurrent ? ' aria-current="page"' : '';
+            return '<a href="' + href + '"' + ariaAttr + '>' + label + '</a>';
+        }
+
+        // "Edit this page on GitHub" — only emit when we can map the
+        // current URL to a source file in the repo. Subdir viewers index
+        // pages don't have a single source file (generated), so skip.
+        var editHref = null;
+        var REPO = 'https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger';
+        var EDITABLE = ['index.html', 'about.html', 'yang-accountability.html',
+                         'tree-compare.html', 'exports.html', 'code-generator.html',
+                         'telemetry.html'];
+        if (!isSubdir && EDITABLE.indexOf(herePage) !== -1) {
+            editHref = REPO + '/edit/main/' + herePage;
+        }
+
         var f = document.createElement('footer');
         f.className = 'site-footer';
         f.setAttribute('role', 'contentinfo');
         f.innerHTML =
             '<div class="site-footer-inner">' +
                 '<div class="site-footer-links">' +
-                    '<a href="' + prefix + 'index.html">Home</a>' +
+                    navLink(prefix + 'index.html', 'Home') +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a href="' + prefix + 'about.html">About</a>' +
+                    navLink(prefix + 'about.html', 'About') +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a href="' + prefix + 'yang-accountability.html">Accountability</a>' +
+                    navLink(prefix + 'yang-accountability.html', 'Accountability') +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a href="' + prefix + 'tree-compare.html">Compare</a>' +
+                    navLink(prefix + 'tree-compare.html', 'Compare') +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a href="' + prefix + 'exports.html">Exports</a>' +
+                    navLink(prefix + 'exports.html', 'Exports') +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues/new" target="_blank" rel="noopener noreferrer">Open an issue</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="' + prefix + 'CHANGELOG.md">Changelog</a>' +
+                    (editHref ? ' <span class="site-footer-sep">\u00b7</span> ' +
+                                '<a href="' + editHref + '" target="_blank" rel="noopener noreferrer" title="Open this page\u2019s source in the GitHub editor">Edit on GitHub</a>'
+                              : '') +
                 '</div>' +
                 '<div class="site-footer-meta">' +
                     '<span>Cisco IOS-XE OpenAPI / YANG Explorer</span>' +
