@@ -3,8 +3,28 @@
     'use strict';
 
     var searchIndex = null;
-    var syncScrollEnabled = true;
-    var highlightEnabled = false;
+    // Tree-compare toggle preferences are persisted in localStorage so the
+    // user's Sync Scroll / Highlight Diffs choices survive across reloads.
+    var TC_PREFS_KEY = 'iosxe-tree-compare-prefs';
+    function _loadPrefs() {
+        try {
+            var raw = localStorage.getItem(TC_PREFS_KEY);
+            if (!raw) return null;
+            var p = JSON.parse(raw);
+            return (p && typeof p === 'object') ? p : null;
+        } catch (_) { return null; }
+    }
+    function _savePrefs() {
+        try {
+            localStorage.setItem(TC_PREFS_KEY, JSON.stringify({
+                syncScroll: syncScrollEnabled,
+                highlight: highlightEnabled
+            }));
+        } catch (_) { /* ignore quota / disabled storage */ }
+    }
+    var _tcPrefs = _loadPrefs() || {};
+    var syncScrollEnabled = (typeof _tcPrefs.syncScroll === 'boolean') ? _tcPrefs.syncScroll : true;
+    var highlightEnabled  = (typeof _tcPrefs.highlight  === 'boolean') ? _tcPrefs.highlight  : false;
     var leftTreeData = null;
     var rightTreeData = null;
 
@@ -327,12 +347,37 @@
 
     function toggleSyncScroll() {
         syncScrollEnabled = !syncScrollEnabled;
-        document.getElementById('syncScrollBtn').classList.toggle('active');
+        var b = document.getElementById('syncScrollBtn');
+        if (b) {
+            b.classList.toggle('active', syncScrollEnabled);
+            b.setAttribute('aria-pressed', syncScrollEnabled ? 'true' : 'false');
+        }
+        _savePrefs();
     }
 
     function toggleHighlight() {
         highlightEnabled = !highlightEnabled;
-        document.getElementById('highlightBtn').classList.toggle('active');
+        var b = document.getElementById('highlightBtn');
+        if (b) {
+            b.classList.toggle('active', highlightEnabled);
+            b.setAttribute('aria-pressed', highlightEnabled ? 'true' : 'false');
+        }
+        _savePrefs();
+    }
+
+    // Sync the button visual state to the persisted preference once the
+    // DOM is ready. Called from init().
+    function _syncToggleButtons() {
+        var sb = document.getElementById('syncScrollBtn');
+        if (sb) {
+            sb.classList.toggle('active', syncScrollEnabled);
+            sb.setAttribute('aria-pressed', syncScrollEnabled ? 'true' : 'false');
+        }
+        var hb = document.getElementById('highlightBtn');
+        if (hb) {
+            hb.classList.toggle('active', highlightEnabled);
+            hb.setAttribute('aria-pressed', highlightEnabled ? 'true' : 'false');
+        }
     }
 
     // === Export comparison ===
@@ -434,6 +479,9 @@
         // Filter trees
         document.getElementById('searchLeft').addEventListener('input', renderComparison);
         document.getElementById('searchRight').addEventListener('input', renderComparison);
+
+        // Reflect persisted toggle prefs on the button visuals.
+        _syncToggleButtons();
     }
 
     if (document.readyState === 'loading') {

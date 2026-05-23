@@ -316,7 +316,22 @@
         document.getElementById('tableStats').textContent = 'Showing: ' + Math.min(filtered.length, visibleRows) + ' of ' + filtered.length + ' modules' + (filtered.length !== allModules.length ? ' (filtered from ' + allModules.length + ')' : '');
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">No modules match your filters</td></tr>';
+            // Determine which filters are active to decide whether to offer
+            // a "Clear filters" CTA in the empty state.
+            var hasSearch = !!((document.getElementById('searchBox') || {}).value || '').trim();
+            var hasCat = currentFilter.category && currentFilter.category !== 'all';
+            var hasStatus = currentFilter.status && currentFilter.status !== 'all';
+            var anyActive = hasSearch || hasCat || hasStatus;
+            var cta = anyActive
+                ? '<div style="margin-top:12px;"><button type="button" id="emptyClearFiltersBtn" class="copy-btn">Clear filters</button></div>'
+                : '';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">'
+                + '<div style="font-size:1.1rem;margin-bottom:6px;">No modules match your filters</div>'
+                + '<div style="font-size:0.9rem;color:#888;">Try a broader search, or clear filters to see all modules.</div>'
+                + cta
+                + '</td></tr>';
+            var clearBtn = document.getElementById('emptyClearFiltersBtn');
+            if (clearBtn) clearBtn.addEventListener('click', _clearAllFilters);
             _renderPagerControls(0, 0);
             return;
         }
@@ -417,6 +432,25 @@
         visibleRows = PAGE_SIZE;
         renderTable();
         _writeHash();
+    }
+
+    // Reset all visible filters (search box, category buttons, status buttons)
+    // and re-render. Invoked from the "Clear filters" CTA in the empty state.
+    function _clearAllFilters() {
+        var sb = document.getElementById('searchBox');
+        if (sb) sb.value = '';
+        currentFilter.category = 'all';
+        currentFilter.status = 'all';
+        document.querySelectorAll('[data-category]').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.category === 'all');
+        });
+        document.querySelectorAll('[data-status]').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.status === 'all');
+        });
+        visibleRows = PAGE_SIZE;
+        renderTable();
+        _writeHash();
+        if (sb) sb.focus();
     }
 
     // === Sort ===
