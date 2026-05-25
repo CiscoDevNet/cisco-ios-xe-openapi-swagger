@@ -381,7 +381,7 @@ function renderResults(results) {
         }
         
         return `
-            <div class="search-result-card" style="border-left-color: ${borderColor}">
+            <div class="search-result-card" style="border-left-color: ${borderColor}; ${specUrl ? 'cursor:pointer;' : ''}" ${specUrl ? `data-href="${escapeHtml(specUrl)}" tabindex="0" role="link" aria-label="Open ${escapedName}${opHint ? ' — ' + escapeHtml(opHint) : ''}"` : ''}>
                 <div class="search-result-header">
                     <span class="search-result-badge ${badgeClass}">${escapeHtml(module.emoji)} ${escapeHtml(module.displayCategory)}</span>
                     <span class="search-result-title">${escapedName}</span>
@@ -400,6 +400,29 @@ function renderResults(results) {
     
     resultsContainer.innerHTML = statsHtml + cardsHtml;
     resultsContainer.classList.add('active');
+
+    // Make the whole card act as a link: clicking anywhere on the card
+    // (outside of inner buttons / links / the favorite star) navigates to
+    // its data-href. Inner <a>/<button> elements keep their own behavior.
+    if (!resultsContainer._cardClickWired) {
+        resultsContainer._cardClickWired = true;
+        resultsContainer.addEventListener('click', function (e) {
+            var card = e.target.closest && e.target.closest('.search-result-card');
+            if (!card) return;
+            var href = card.getAttribute('data-href');
+            if (!href) return;
+            // Don't hijack clicks on inner interactive elements.
+            if (e.target.closest('a, button, input, select, textarea, [role="button"]')) return;
+            window.location.href = href;
+        });
+        resultsContainer.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var card = e.target.closest && e.target.closest('.search-result-card[data-href]');
+            if (!card || card !== e.target) return;
+            e.preventDefault();
+            window.location.href = card.getAttribute('data-href');
+        });
+    }
     
     if (totalResults > displayLimit) {
         resultsContainer.innerHTML += `<div class="search-stats" style="text-align: center; margin-top: 16px;">Refine your search or filters to see more specific results.</div>`;
