@@ -95,7 +95,28 @@
             }
         }
         _groupSiblingsByModule(root);
+        _propagateOwnPathSpec(root);
         return root;
+    }
+
+    // Make every container node clickable: if a node doesn't have its own
+    // path (i.e. is an intermediate container in the YANG tree), inherit
+    // the owning spec from its first child that has one. Clicking the row
+    // then loads that spec at the top — much better UX than "leaf rows are
+    // clickable but the parents above them are dead".
+    function _propagateOwnPathSpec(node) {
+        if (!node.children || !node.children.size) return node.ownPathSpec || null;
+        var firstChildSpec = null;
+        node.children.forEach(function (child) {
+            var s = _propagateOwnPathSpec(child);
+            if (!firstChildSpec && s) firstChildSpec = s;
+        });
+        if (!node.ownPathSpec && firstChildSpec) {
+            node.ownPathSpec = firstChildSpec;
+            // No specific operation — clicking opens the spec at the top.
+            node.ownPathOpId = null;
+        }
+        return node.ownPathSpec || firstChildSpec;
     }
 
     // Some modules (notably YANG `notifications` modules like
