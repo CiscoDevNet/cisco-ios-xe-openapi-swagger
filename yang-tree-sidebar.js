@@ -136,6 +136,14 @@
                 child.name = key.substring(mod.length + 1) || key;
                 group.children.set(child.name, child);
                 group.totalPaths += child.totalPaths;
+                // Promote the first child's owning spec onto the synthetic
+                // group so clicking the module-name row loads that spec's
+                // page. Children of a `<module>:` bucket all come from the
+                // same OpenAPI spec, so any child's ownPathSpec works.
+                if (!group.ownPathSpec && child.ownPathSpec) {
+                    group.ownPathSpec = child.ownPathSpec;
+                    group.ownPathOpId = null; // group row → no specific op
+                }
                 node.children.delete(key);
             }
             node.children.set(mod, group);
