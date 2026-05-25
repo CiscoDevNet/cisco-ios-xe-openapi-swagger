@@ -239,15 +239,26 @@ body.dark .swagger-ui .renderedMarkdown code,
     color: var(--c-brand-400, #6fb0e6) !important;
 }
 
-/* ---------- Viewer mobile polish ---------- */
+/* ---------- Viewer mobile polish ----------
+   Key iOS Safari notes:
+     * 100vh on iOS includes the URL bar — use 100dvh (dynamic viewport)
+       so the layout doesn't get cropped when the URL bar collapses.
+     * The sidebar becomes position:fixed at this breakpoint, so .container's
+       only in-flow child is .main-content. Give the container a real
+       min-height so .main-content (flex:1) has somewhere to grow into,
+       otherwise the page collapses to just the header on portrait phones.
+     * Let .main-content / .swagger-container scroll with the page rather
+       than inside a fixed-height pane.
+*/
 @media (max-width: 768px) {
-    .container { flex-direction: column !important; min-height: 0 !important; }
+    .container {
+        flex-direction: column !important;
+        min-height: 100dvh !important;
+    }
     .nav-bar { padding: 8px 16px !important; overflow-x: auto; flex-wrap: nowrap !important; }
     .header { padding: 16px !important; }
-    .header h1 { font-size: 18px !important; }
-    /* Let the page scroll naturally on mobile — fixed-height flex panes
-       cause iOS Safari to clip the welcome / Swagger UI below the fold. */
-    .main-content { overflow: visible !important; }
+    .header h1 { font-size: 18px !important; padding-right: calc(56px + env(safe-area-inset-right, 0px)); }
+    .main-content { overflow: visible !important; min-height: 60vh; }
     .swagger-container { overflow: visible !important; }
 }
 
@@ -259,18 +270,18 @@ body.dark .swagger-ui .renderedMarkdown code,
 .sidebar-toggle {
     display: none;
     position: fixed;
-    top: 12px;
-    right: 12px;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
     z-index: 1000;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 8px;
-    background: var(--c-brand-600);
+    background: var(--c-brand-600, #1565c0);
     color: #fff;
-    border: 1px solid var(--c-brand-700);
+    border: 1px solid var(--c-brand-700, #0d47a1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1;
     padding: 0;
 }
@@ -287,18 +298,22 @@ body.dark .swagger-ui .renderedMarkdown code,
     .sidebar-toggle { display: inline-flex; align-items: center; justify-content: center; }
     .sidebar {
         position: fixed !important;
-        inset: 56px 0 0 0 !important;
-        width: auto !important;
+        top: 56px !important;
+        left: 0 !important;
+        right: auto !important;
+        bottom: 0 !important;
+        width: min(340px, 92vw) !important;
         max-width: 92vw;
         max-height: none !important;
-        height: calc(100vh - 56px) !important;
+        height: calc(100dvh - 56px) !important;
         z-index: 999;
         transform: translateX(-100%);
         transition: transform 0.22s ease;
         box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .sidebar.open { transform: translateX(0); }
     .sidebar.open ~ .sidebar-backdrop,
     .sidebar.open + .sidebar-backdrop { display: block; }
-    .header h1 { padding-right: 56px; }      /* keep title clear of the toggle */
 }
