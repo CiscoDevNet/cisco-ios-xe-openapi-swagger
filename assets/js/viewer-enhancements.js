@@ -159,8 +159,8 @@
         attachSlashFocus();
     }
 
-    // ---------- (5) phone-class hamburger ------------------------------
-    // viewer.css hides the sidebar below 600px and reveals .sidebar-toggle.
+    // ---------- (5) phone/tablet hamburger -----------------------------
+    // viewer.css hides the sidebar at/below 768px and reveals .sidebar-toggle.
     // We inject the button + a click-out backdrop here so every viewer
     // page gets the same behaviour without touching its inline markup.
     function injectSidebarToggle() {
@@ -193,8 +193,8 @@
         });
         // Auto-close when the user picks a module on small screens.
         sidebar.addEventListener('click', function (e) {
-            if (window.innerWidth > 600) return;
-            if (e.target.closest('a, .module-list li')) {
+            if (window.innerWidth > 768) return;
+            if (e.target.closest('a, .module-list li, .tree-row, .tree-label')) {
                 setTimeout(close, 50);
             }
         });
