@@ -10,16 +10,16 @@
 
 ---
 
-## Verified repo facts (as of 2026-05-23)
+## Verified repo facts (as of 2026-05-29)
 
 Use these for any slide or claim. Round at will but don't invent.
 
 | Metric | Value |
 |---|---|
-| First commit | 2026-02-01 |
-| Latest commit | 2026-05-23 |
-| Calendar span | ~16 weeks |
-| Git commits | 374 |
+| First commit | 2026-02-01 (Sun, 10:06 PT / 19:06 Amsterdam) — 8 days before Cisco Live EMEA |
+| Latest commit | 2026-05-25 |
+| Calendar span | ~17 weeks |
+| Git commits | 379 |
 | Shipped polish/feature rounds | 25 |
 | Passing tests | 187 |
 | Source files (py/js/html/md, ex-archive/releases/yang-trees) | 243 |
@@ -34,7 +34,32 @@ Use these for any slide or claim. Round at will but don't invent.
 | Release trains tracked | 5 — 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1 |
 | Site URL | https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/ |
 
-**Headline tile for slide 14:** `668 specs · 5 releases · 25 rounds · ~16 weeks · 187 tests`
+**Headline tile for slide 14:** `668 specs · 5 releases · 25 rounds · ~17 weeks · 187 tests · 379 commits`
+
+---
+
+## Project timeline & commit cadence
+
+All timestamps are Pacific Time (commit timezone). Cisco Live EMEA 2026 in Amsterdam ran **Feb 9–13, 2026** (Mon–Fri).
+
+| ISO Week | Date range (PT) | Commits | Notes |
+|---|---|---:|---|
+| W05 | Jan 26 – Feb 01 | **120** | **Project kickoff Sunday Feb 1, 10:06 AM PT (= 19:06 Amsterdam).** ~80-min initial scaffolding burst followed by all-day Sunday → Monday → Tuesday push. |
+| W06 | Feb 02 – Feb 08 | **94**  | Final pre-Amsterdam polish week. |
+| W07 | Feb 09 – Feb 15 | 19  | **Cisco Live Amsterdam week — on-site, light commits as expected.** |
+| W09 | Feb 23 – Mar 01 | 4   | Post-event lull. |
+| W13 | Mar 23 – Mar 29 | 11  | |
+| W14 | Mar 30 – Apr 05 | 6   | |
+| W17 | Apr 20 – Apr 26 | **63**  | "Rounds 1–10" sweep — PWA, dark mode, accountability, code generator. |
+| W19 | May 04 – May 10 | 3   | |
+| W20 | May 11 – May 17 | 9   | |
+| W21 | May 18 – May 24 | **50**  | "Rounds 18–25" + iOS mobile + search-UX fixes. |
+
+**Two crunch sprints stand out:**
+1. **Pre-Cisco-Live Amsterdam (W05 + W06): 214 commits in 14 days.** Built the demo-ready surface area starting from zero exactly 8 days before the show — initial commit was the Sunday-evening-Amsterdam-time before travel week.
+2. **Late-April polish (W17: 63 commits).** Followed by a steadier rhythm and a second mini-sprint in W21.
+
+**Activity gaps (W08, W10–W12, W15–W16, W18) are genuine zero-commit weeks** — useful for the "this was nights & weekends around a day job" honest-engineer framing.
 
 ---
 
