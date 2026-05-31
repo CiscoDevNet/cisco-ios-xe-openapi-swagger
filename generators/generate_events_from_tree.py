@@ -202,6 +202,13 @@ def parse_yang_tree_html(html_path: str) -> List[Tuple[str, TreeNode, str]]:
 # ---------------------------------------------------------------------------
 
 def example_for_type(yang_type, name=''):
+    try:
+        from yang_value_index import lookup_example
+        v = lookup_example(name)
+        if v is not None:
+            return v
+    except Exception:
+        pass
     base = yang_type.split(':')[-1] if ':' in yang_type else yang_type
     type_map = {
         'string': 'example', 'uint8': 1, 'uint16': 1, 'uint32': 1, 'uint64': 1,
