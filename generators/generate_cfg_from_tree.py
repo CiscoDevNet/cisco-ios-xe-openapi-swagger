@@ -334,10 +334,12 @@ COMMON_COMPONENTS = {
 
 def make_path_operations(restconf_path, node, tag, module_prefix):
     """Create GET + write operations (PUT/PATCH/DELETE for rw nodes)."""
-    schema = build_schema(node, max_depth=4)
+    inner_schema = build_schema(node, max_depth=4)
     example = generate_example(node, max_depth=3)
     wrapper_key = f"{module_prefix}:{node.name}"
     wrapped = {wrapper_key: [example] if node.node_type == 'list' else example}
+    # Wrap schema to match RESTCONF wire format so Swagger UI's Try-It body matches.
+    schema = {'type': 'object', 'properties': {wrapper_key: inner_schema}}
     op_id = restconf_path.replace('/data/', '').replace('/', '-').replace('=', '-').replace('{', '').replace('}', '')
 
     ops = {}

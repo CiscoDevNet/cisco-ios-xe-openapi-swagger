@@ -348,6 +348,7 @@ def make_path_operations(restconf_path, node, tag, module_prefix):
     example = generate_example(node, max_depth=3)
     wrapper_key = f"{module_prefix}:{node.name}"
     wrapped = {wrapper_key: [example] if node.node_type == 'list' else example}
+    schema = {'type': 'object', 'properties': {wrapper_key: schema}}
     op_id = restconf_path.replace('/data/', '').replace('/', '-').replace('=', '-').replace('{', '').replace('}', '')
 
     ops = {}
