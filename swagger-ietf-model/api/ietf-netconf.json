@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Cisco IOS-XE IETF - ietf-netconf",
-    "description": "IETF standard data from `ietf-netconf` module.\n\n**Root containers:** 2 (output, output)\n**Paths:** 1 | **Operations:** 1\n\nSupports CRUD for read-write nodes, GET for read-only nodes.",
+    "description": "IETF standard data from `ietf-netconf` module.\n\n**Root containers:** 13 (get-config, edit-config, copy-config, delete-config, lock...)\n**Paths:** 13 | **Operations:** 13\n\nSupports CRUD for read-write nodes, GET for read-only nodes.",
     "version": "17.18.1",
     "contact": {
       "name": "Cisco IOS-XE RESTCONF API",
@@ -26,12 +26,12 @@
     }
   ],
   "paths": {
-    "/operations/ietf-netconf:output": {
+    "/operations/ietf-netconf:get-config": {
       "post": {
-        "summary": "Execute output",
-        "operationId": "post-root",
+        "summary": "Execute get-config",
+        "operationId": "post-ietf-netconf:get-config",
         "tags": [
-          "output"
+          "get-config"
         ],
         "responses": {
           "200": {
@@ -40,7 +40,90 @@
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
-                  "example": "configured-value"
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {}
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "filter": {
+                    "type": "object"
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "source": {
+                    "(config-source)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null
+                    }
+                  },
+                  "filter": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:edit-config": {
+      "post": {
+        "summary": "Execute edit-config",
+        "operationId": "post-ietf-netconf:edit-config",
+        "tags": [
+          "edit-config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
                 },
                 "example": {}
               }
@@ -53,7 +136,751 @@
             "description": "Unauthorized"
           }
         },
-        "description": "Execute the **output** RPC operation.\n\nSends a POST request to invoke this action on the device. The request body contains input parameters; the response contains any output values."
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "default-operation": {
+                    "type": "string"
+                  },
+                  "test-option": {
+                    "type": "string"
+                  },
+                  "error-option": {
+                    "type": "string"
+                  },
+                  "(edit-content)": {
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "type": "object"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": null,
+                      "running": null
+                    }
+                  },
+                  "default-operation": "default",
+                  "test-option": "default",
+                  "error-option": "default",
+                  "(edit-content)": {
+                    "config": {},
+                    "url": "example"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:copy-config": {
+      "post": {
+        "summary": "Execute copy-config",
+        "operationId": "post-ietf-netconf:copy-config",
+        "tags": [
+          "copy-config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "config": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null,
+                      "url": "example"
+                    }
+                  },
+                  "source": {
+                    "(config-source)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null,
+                      "url": "example",
+                      "config": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:delete-config": {
+      "post": {
+        "summary": "Execute delete-config",
+        "operationId": "post-ietf-netconf:delete-config",
+        "tags": [
+          "delete-config"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "startup": null,
+                      "url": "example"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:lock": {
+      "post": {
+        "summary": "Execute lock",
+        "operationId": "post-ietf-netconf:lock",
+        "tags": [
+          "lock"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:unlock": {
+      "post": {
+        "summary": "Execute unlock",
+        "operationId": "post-ietf-netconf:unlock",
+        "tags": [
+          "unlock"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "object",
+                    "properties": {
+                      "(config-target)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "target": {
+                    "(config-target)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:get": {
+      "post": {
+        "summary": "Execute get",
+        "operationId": "post-ietf-netconf:get",
+        "tags": [
+          "get"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {}
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filter": {
+                    "type": "object"
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "filter": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:close-session": {
+      "post": {
+        "summary": "Execute close-session",
+        "operationId": "post-ietf-netconf:close-session",
+        "tags": [
+          "close-session"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:kill-session": {
+      "post": {
+        "summary": "Execute kill-session",
+        "operationId": "post-ietf-netconf:kill-session",
+        "tags": [
+          "kill-session"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session-id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "session-id": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:commit": {
+      "post": {
+        "summary": "Execute commit",
+        "operationId": "post-ietf-netconf:commit",
+        "tags": [
+          "commit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "confirmed": {
+                    "type": "boolean",
+                    "description": "Presence flag"
+                  },
+                  "confirm-timeout": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  },
+                  "persist": {
+                    "type": "string"
+                  },
+                  "persist-id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "confirmed": null,
+                  "confirm-timeout": 1,
+                  "persist": "example",
+                  "persist-id": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:discard-changes": {
+      "post": {
+        "summary": "Execute discard-changes",
+        "operationId": "post-ietf-netconf:discard-changes",
+        "tags": [
+          "discard-changes"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:cancel-commit": {
+      "post": {
+        "summary": "Execute cancel-commit",
+        "operationId": "post-ietf-netconf:cancel-commit",
+        "tags": [
+          "cancel-commit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "persist-id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "persist-id": "example"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/operations/ietf-netconf:validate": {
+      "post": {
+        "summary": "Execute validate",
+        "operationId": "post-ietf-netconf:validate",
+        "tags": [
+          "validate"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object"
+                },
+                "example": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source": {
+                    "type": "object",
+                    "properties": {
+                      "(config-source)": {
+                        "type": "object",
+                        "properties": {
+                          "candidate": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "running": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "startup": {
+                            "type": "boolean",
+                            "description": "Presence flag"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "config": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ietf-netconf:input": {
+                  "source": {
+                    "(config-source)": {
+                      "candidate": null,
+                      "running": null,
+                      "startup": null,
+                      "url": "example",
+                      "config": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

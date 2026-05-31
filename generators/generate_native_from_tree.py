@@ -394,12 +394,16 @@ def make_path_operations(restconf_path: str, node: TreeNode, tag: str,
                          module_prefix: str = 'Cisco-IOS-XE-native',
                          schema_depth: int = 4) -> Dict[str, Any]:
     """Create GET/PUT/PATCH/DELETE operations for a RESTCONF path."""
-    schema = build_schema_from_node(node, max_depth=schema_depth)
+    inner_schema = build_schema_from_node(node, max_depth=schema_depth)
     example = generate_example(node, max_depth=min(schema_depth, 3))
     op_base = node.name.lower().replace(' ', '-')
 
     wrapper_key = f"{module_prefix}:{node.name}"
     wrapped_example = {wrapper_key: [example] if node.node_type == 'list' else example}
+    # RESTCONF wire format wraps the resource in {"module:node": value}; the
+    # schema must mirror that wrapping or Swagger UI's "Try it out" body
+    # renders as an unusable bare scalar instead of a valid RESTCONF payload.
+    schema = {'type': 'object', 'properties': {wrapper_key: inner_schema}}
 
     ops = {}
 
