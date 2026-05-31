@@ -699,7 +699,7 @@ class OperToOpenAPI:
             },
             'servers': [{
                 'url': 'https://{device}/restconf',
-                'variables': {'device': {'default': 'router.example.com', 'description': 'Device IP or hostname'}}
+                'variables': {'device': {'default': 'devnetsandboxiosxec9k.cisco.com', 'description': 'Device IP or hostname'}}
             }],
             'paths': {},
             'components': {

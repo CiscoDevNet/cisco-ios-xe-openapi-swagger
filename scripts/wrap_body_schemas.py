@@ -67,6 +67,24 @@ VIEWER_CATEGORIES = (
     'openconfig', 'oper', 'other', 'rpc',
 )
 
+# Canonical DevNet Always-On Catalyst 9000v sandbox.
+# Public catalog: https://devnetsandbox.cisco.com/DevNet/catalog/Cat9k-Always-On_cat9k-always-on
+# RESTCONF 443, NETCONF 830, gNMI 9339, SSH 22.
+SANDBOX_HOST = 'devnetsandboxiosxec9k.cisco.com'
+SANDBOX_HOSTNAME = 'devnetsandboxiosxec9k'  # short form for the hostname leaf value
+# Legacy placeholder strings we proactively replace whenever encountered.
+LEGACY_HOSTS = {
+    'router.example.com',
+    'sandbox-iosxe-latest-1.cisco.com',
+    'my-router.example.com',
+    '192.168.1.1',
+    '10.0.0.1',
+}
+LEGACY_HOSTNAME_VALUES = {
+    'DC1-CORE-SW01', 'rtr-edge-01', 'router.example.com',
+    'BRANCH-RTR-01', 'ACCESS-SW-FL2-01',
+}
+
 
 def _derive_wrap_key_from_path(url_path: str) -> Optional[str]:
     """For ``/data/<module>:<root>/.../<leaf>`` return ``<module>:<leaf>``.
@@ -196,6 +214,8 @@ def _walk_operations(spec: dict, counters: dict) -> None:
                     counters['body_examined'] += 1
                     if _wrap_if_needed(media, path):
                         counters['body_wrapped'] += 1
+                    if _normalize_hostname_example(media):
+                        counters['hostname_normalized'] += 1
             for _code, resp in (op.get('responses') or {}).items():
                 if not isinstance(resp, dict):
                     continue
@@ -204,12 +224,63 @@ def _walk_operations(spec: dict, counters: dict) -> None:
                     counters['resp_examined'] += 1
                     if _wrap_if_needed(media, path):
                         counters['resp_wrapped'] += 1
+                    if _normalize_hostname_example(media):
+                        counters['hostname_normalized'] += 1
+
+
+def _normalize_server_default(spec: dict) -> bool:
+    """Force every spec's ``servers[*].variables.device.default`` to the
+    canonical DevNet Always-On C9K sandbox host. Returns True if anything
+    changed.
+    """
+    changed = False
+    servers = spec.get('servers')
+    if not isinstance(servers, list):
+        return False
+    for srv in servers:
+        if not isinstance(srv, dict):
+            continue
+        vars_ = srv.get('variables')
+        if not isinstance(vars_, dict):
+            continue
+        dev = vars_.get('device')
+        if not isinstance(dev, dict):
+            continue
+        cur = dev.get('default')
+        if cur != SANDBOX_HOST:
+            dev['default'] = SANDBOX_HOST
+            changed = True
+    return changed
+
+
+def _normalize_hostname_example(media_node: dict) -> bool:
+    """Replace placeholder hostname values inside ``<module>:hostname`` example
+    bodies with the canonical sandbox short hostname. Returns True if changed.
+    """
+    if not isinstance(media_node, dict):
+        return False
+    example = media_node.get('example')
+    if not isinstance(example, dict):
+        return False
+    changed = False
+    for key, value in list(example.items()):
+        if not isinstance(key, str) or not key.endswith(':hostname'):
+            continue
+        if isinstance(value, str) and value != SANDBOX_HOSTNAME:
+            if value in LEGACY_HOSTNAME_VALUES or value.lower() in {v.lower() for v in LEGACY_HOSTNAME_VALUES}:
+                example[key] = SANDBOX_HOSTNAME
+                changed = True
+            elif value.startswith('router') or value.startswith('rtr-') or value.startswith('DC') or value.startswith('BRANCH'):
+                example[key] = SANDBOX_HOSTNAME
+                changed = True
+    return changed
 
 
 def process_api_dir(api_dir: Path) -> dict:
     counters = {
         'files': 0, 'body_examined': 0, 'body_wrapped': 0,
         'resp_examined': 0, 'resp_wrapped': 0,
+        'server_normalized': 0, 'hostname_normalized': 0,
     }
     if not api_dir.is_dir():
         return counters
@@ -222,9 +293,17 @@ def process_api_dir(api_dir: Path) -> dict:
             continue
         if not isinstance(spec, dict) or 'paths' not in spec:
             continue
-        before = (counters['body_wrapped'], counters['resp_wrapped'])
+        before = (
+            counters['body_wrapped'], counters['resp_wrapped'],
+            counters['server_normalized'], counters['hostname_normalized'],
+        )
+        if _normalize_server_default(spec):
+            counters['server_normalized'] += 1
         _walk_operations(spec, counters)
-        after = (counters['body_wrapped'], counters['resp_wrapped'])
+        after = (
+            counters['body_wrapped'], counters['resp_wrapped'],
+            counters['server_normalized'], counters['hostname_normalized'],
+        )
         if after != before:
             spec_path.write_text(
                 json.dumps(spec, indent=2) + '\n', encoding='utf-8'
@@ -247,6 +326,7 @@ def process_release(project_root: Path, version: Optional[str]) -> None:
     grand = {
         'body_examined': 0, 'body_wrapped': 0,
         'resp_examined': 0, 'resp_wrapped': 0, 'files': 0,
+        'server_normalized': 0, 'hostname_normalized': 0,
     }
     print(f'[wrap_body_schemas] === {label} ===')
     for api_dir in roots:
@@ -256,12 +336,15 @@ def process_release(project_root: Path, version: Optional[str]) -> None:
         cat = api_dir.parent.name
         print(f'  {cat:30s} files={c["files"]:4d}  '
               f'body wrapped={c["body_wrapped"]:5d}/{c["body_examined"]:5d}  '
-              f'resp wrapped={c["resp_wrapped"]:5d}/{c["resp_examined"]:5d}')
+              f'resp wrapped={c["resp_wrapped"]:5d}/{c["resp_examined"]:5d}  '
+              f'server={c["server_normalized"]:4d}  host={c["hostname_normalized"]:4d}')
         for k in grand:
             grand[k] += c[k]
     print(f'  TOTAL files={grand["files"]}  '
           f'body wrapped={grand["body_wrapped"]}/{grand["body_examined"]}  '
-          f'resp wrapped={grand["resp_wrapped"]}/{grand["resp_examined"]}')
+          f'resp wrapped={grand["resp_wrapped"]}/{grand["resp_examined"]}  '
+          f'server normalized={grand["server_normalized"]}  '
+          f'hostname normalized={grand["hostname_normalized"]}')
 
 
 def main() -> int:

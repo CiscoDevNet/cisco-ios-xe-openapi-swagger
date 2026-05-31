@@ -84,7 +84,7 @@ class NativeToOpenAPI:
         
         # Hostname examples - realistic production data center naming
         if 'hostname' in name_lower:
-            return 'DC1-CORE-SW01'
+            return 'devnetsandboxiosxec9k'
         
         # Version examples
         if 'version' in name_lower and not any(x in name_lower for x in ['ip', 'software', 'protocol']):
@@ -830,7 +830,7 @@ class NativeToOpenAPI:
                 'url': 'https://{device}/restconf',
                 'variables': {
                     'device': {
-                        'default': 'router.example.com',
+                        'default': 'devnetsandboxiosxec9k.cisco.com',
                         'description': 'Device IP or hostname'
                     }
                 }

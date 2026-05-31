@@ -227,7 +227,7 @@ OPER_EXAMPLE_VALUES = {
     'free-memory': 2048000,
     'used-memory': 1024000,
     'total-memory': 3072000,
-    'hostname': 'DC1-CORE-SW01',
+    'hostname': 'devnetsandboxiosxec9k',
     'serial-number': 'FCW2345L0AB',
     'pid': 'C9300-48T',
     'version': '17.18.1',

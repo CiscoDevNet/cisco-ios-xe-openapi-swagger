@@ -166,7 +166,7 @@ def parse_yang_tree_html(html_path: str) -> TreeNode:
 # ---------------------------------------------------------------------------
 
 EXAMPLE_VALUES = {
-    'hostname': 'DC1-CORE-SW01',
+    'hostname': 'devnetsandboxiosxec9k',
     'name': 'GigabitEthernet1/0/1',
     'description': 'UPLINK_TO_CORE',
     'address': '10.10.10.1',
