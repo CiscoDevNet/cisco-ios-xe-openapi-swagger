@@ -97,6 +97,8 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("native-example-overlay", ["python", str(SCRIPTS / "apply_example_overlay.py"),
                              "--version", "$VER"]),
+    ("wrap-body-schemas",   ["python", str(SCRIPTS / "wrap_body_schemas.py"),
+                             "--version", "$VER"]),
     ("native-capabilities", ["python", str(SCRIPTS / "build_native_capabilities.py"),
                              "--version", "$VER"]),
     # 6. Manifests + accountability + search
