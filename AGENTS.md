@@ -202,6 +202,32 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 - Generators write JSON with `indent=2` and a trailing newline
 - **Do not edit generated specs by hand.** Modify the relevant generator in `generators/` or post-processor in `scripts/` and re-run
 
+### RESTCONF request/response body schemas (CRITICAL)
+
+All `requestBody` and `responses['200'].content['application/yang-data+json']` payloads MUST be wrapped objects matching RESTCONF wire format — never bare scalars or arrays. For a leaf `hostname` in `Cisco-IOS-XE-native`, the schema and example are both:
+
+```json
+{ "type": "object",
+  "properties": { "Cisco-IOS-XE-native:hostname": { "type": "string" } } }
+```
+
+Swagger UI's "Try it out" pre-fills the body from the **schema**, not the media-type-level `example`, so a bare `{"type":"string"}` leaves the editor blank and the request fails on the device. The 8 `generate_*_from_tree.py` generators (cfg, events, ietf, mib, native, openconfig, oper, other) wrap the schema with `wrapper_key = "<module>:<node>"` immediately after computing the inner schema. An audit script lives in `tmp/` when needed; the live invariant is "0 bare scalar/array body schemas" across all viewers.
+
+### Example data generation (realistic Try-It-Out bodies)
+
+Example values for generated specs come from a layered lookup in `example_for_type(yang_type, name)`:
+
+1. **Demo-polish overrides** — only `generate_native_from_tree.py` and `generate_oper_from_tree.py` carry name-keyed dicts (`EXAMPLE_VALUES` / `OPER_EXAMPLE_VALUES`) for common leaves: `hostname → "DC1-CORE-SW01"`, `address → "10.10.10.1"`, `vlan → 100`, `community → "RO_SNMP_v2c"`, `area → "0.0.0.0"`, `as-number → 65001`, etc. Add new overrides here when a particular demo path needs a more meaningful value than the YANG default.
+2. **YANG-derived defaults / enums** — all 9 `generate_*_from_tree.py` generators call `yang_value_index.lookup_example(name)` (built once per process from `references/17181-YANG-modules/*.yang`). The index scans every `leaf` and `typedef`, records `default "X";` statements and `enum X;` lists, and **only returns a value when every YANG leaf with that name agrees** (unanimous default or unanimous first enum). Conflicting same-name leaves return `None` so we never substitute a wrong default into an unrelated path.
+3. **Type-based fallback** — `string → "example"`, `boolean → true`, `uint* → 1`, `enumeration → "default"`, `union → "auto"`, `empty → null` (presence). Used when neither override nor YANG index resolves the name.
+
+The current state of native config payloads after this pipeline: 6,726 PUT/PATCH/POST example bodies; ~83% carry a realistic value (override or unambiguous YANG default), ~16% still emit the literal `"example"` placeholder for unmapped string leaves whose names don't appear in any YANG default or enum.
+
+When improving coverage:
+- **Prefer extending the YANG index** (it benefits all 9 generators at once) over per-generator overrides.
+- **For ambiguous names** (e.g. `mode`, `type`, `name`), do NOT add to overrides — pick the right value via the YANG index by passing path context, or accept the placeholder. A wrong realistic-looking value is worse than an obvious placeholder.
+- After changing the index or overrides, regenerate the affected viewers and re-run the audit one-liner in `tmp/` to verify the realistic-value percentage didn't regress.
+
 ### Frontend JS
 
 - **Vanilla ES6** — no bundler, no transpiler, no `npm install`

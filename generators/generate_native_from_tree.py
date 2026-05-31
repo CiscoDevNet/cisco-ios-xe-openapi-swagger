@@ -194,10 +194,19 @@ def example_for_type(yang_type: str, name: str = '') -> Any:
     """Generate a reasonable example value from YANG type and node name."""
     name_lower = name.lower().replace('-', '').replace('_', '')
 
-    # Check name-based overrides first
+    # Check name-based overrides first (demo-polished values)
     for key, val in EXAMPLE_VALUES.items():
         if key.replace('-', '') in name_lower:
             return val
+
+    # YANG-derived default or first enum value (covers ~5500 leaves)
+    try:
+        from yang_value_index import lookup_example
+        v = lookup_example(name)
+        if v is not None:
+            return v
+    except Exception:
+        pass
 
     # Type-based defaults
     type_map = {
