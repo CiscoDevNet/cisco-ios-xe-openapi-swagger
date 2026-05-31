@@ -160,7 +160,7 @@ Content-Type: application/yang-data+json
                 "url": "https://{device}/restconf",
                 "variables": {
                     "device": {
-                        "default": "router.example.com",
+                        "default": "devnetsandboxiosxec9k.cisco.com",
                         "description": "Device IP or hostname"
                     }
                 }

@@ -525,7 +525,7 @@ class RPCYANGToOpenAPIConverter:
             },
             'servers': [{
                 'url': 'https://{device}/restconf',
-                'variables': {'device': {'default': 'router.example.com'}}
+                'variables': {'device': {'default': 'devnetsandboxiosxec9k.cisco.com'}}
             }],
             'paths': {},
             'components': {

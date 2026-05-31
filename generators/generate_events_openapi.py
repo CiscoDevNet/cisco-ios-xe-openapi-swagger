@@ -57,7 +57,7 @@ def main():
             },
             "servers": [{
                 "url": "https://{device}/restconf",
-                "variables": {"device": {"default": "sandbox-iosxe-latest-1.cisco.com"}}
+                "variables": {"device": {"default": "devnetsandboxiosxec9k.cisco.com"}}
             }],
             "paths": {
                 f"/data/{module_name}:events": {

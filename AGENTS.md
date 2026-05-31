@@ -213,11 +213,23 @@ All `requestBody` and `responses['200'].content['application/yang-data+json']` p
 
 Swagger UI's "Try it out" pre-fills the body from the **schema**, not the media-type-level `example`, so a bare `{"type":"string"}` leaves the editor blank and the request fails on the device. The 8 `generate_*_from_tree.py` generators (cfg, events, ietf, mib, native, openconfig, oper, other) wrap the schema with `wrapper_key = "<module>:<node>"` immediately after computing the inner schema, and `scripts/wrap_body_schemas.py` (invoked from `build_release.py` after `apply_example_overlay`) enforces the invariant across the legacy v2 generators (`generate_*_openapi_v2.py`) and every release by deriving the wrap key from the URL path when no namespaced example is present. The live invariant is "0 PUT/PATCH/POST bodies whose schema is not `{type:object, properties:{<module>:<leaf>: ...}}`" across all 5 releases and all 9 viewers (currently 0 / 97,208).
 
+### Canonical demo target: DevNet Always-On C9K sandbox
+
+Every spec MUST point Swagger UI's "Execute" at the public Cisco DevNet Always-On Catalyst 9000v sandbox so the demo can actually be tried without a private device. Canonical values, enforced by `scripts/wrap_body_schemas.py`:
+
+| Setting | Value | Notes |
+|---|---|---|
+| `servers[*].variables.device.default` | `devnetsandboxiosxec9k.cisco.com` | Public hostname (RESTCONF 443, NETCONF 830, gNMI 9339, SSH 22). Catalog: https://devnetsandbox.cisco.com/DevNet/catalog/Cat9k-Always-On_cat9k-always-on |
+| `Cisco-IOS-XE-native:hostname` example body value | `devnetsandboxiosxec9k` | Short form (no domain) — matches the device's own `hostname` config. |
+| `index.html` + `code-generator.html` device-IP inputs | `devnetsandboxiosxec9k.cisco.com` | Default + placeholder so copy/paste-able snippets target the sandbox. |
+
+Never introduce `router.example.com`, `sandbox-iosxe-latest-1.cisco.com`, `192.168.1.1`, `10.0.0.1`, `DC1-CORE-SW01`, `rtr-edge-01`, or any other placeholder for these fields — the post-processor will rewrite them but the source-of-truth in `generators/` and `scripts/` must already be correct.
+
 ### Example data generation (realistic Try-It-Out bodies)
 
 Example values for generated specs come from a layered lookup in `example_for_type(yang_type, name)`:
 
-1. **Demo-polish overrides** — only `generate_native_from_tree.py` and `generate_oper_from_tree.py` carry name-keyed dicts (`EXAMPLE_VALUES` / `OPER_EXAMPLE_VALUES`) for common leaves: `hostname → "DC1-CORE-SW01"`, `address → "10.10.10.1"`, `vlan → 100`, `community → "RO_SNMP_v2c"`, `area → "0.0.0.0"`, `as-number → 65001`, etc. Add new overrides here when a particular demo path needs a more meaningful value than the YANG default.
+1. **Demo-polish overrides** — only `generate_native_from_tree.py` and `generate_oper_from_tree.py` carry name-keyed dicts (`EXAMPLE_VALUES` / `OPER_EXAMPLE_VALUES`) for common leaves: `hostname → "devnetsandboxiosxec9k"`, `address → "10.10.10.1"`, `vlan → 100`, `community → "RO_SNMP_v2c"`, `area → "0.0.0.0"`, `as-number → 65001`, etc. Add new overrides here when a particular demo path needs a more meaningful value than the YANG default.
 2. **YANG-derived defaults / enums** — all 9 `generate_*_from_tree.py` generators call `yang_value_index.lookup_example(name)` (built once per process from `references/17181-YANG-modules/*.yang`). The index scans every `leaf` and `typedef`, records `default "X";` statements and `enum X;` lists, and **only returns a value when every YANG leaf with that name agrees** (unanimous default or unanimous first enum). Conflicting same-name leaves return `None` so we never substitute a wrong default into an unrelated path.
 3. **Type-based fallback** — `string → "example"`, `boolean → true`, `uint* → 1`, `enumeration → "default"`, `union → "auto"`, `empty → null` (presence). Used when neither override nor YANG index resolves the name.
 

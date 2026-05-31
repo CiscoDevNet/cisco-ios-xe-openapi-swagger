@@ -59,7 +59,7 @@ def generate_combined_spec():
                 "description": "IOS-XE Device RESTCONF Endpoint",
                 "variables": {
                     "device": {
-                        "default": "sandbox-iosxe-latest-1.cisco.com",
+                        "default": "devnetsandboxiosxec9k.cisco.com",
                         "description": "Device hostname or IP address"
                     }
                 }

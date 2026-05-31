@@ -83,7 +83,7 @@ class IETFToOpenAPI:
         if 'interface' in name_lower or 'name' in name_lower:
             return "GigabitEthernet0/0/0"
         if 'hostname' in name_lower or 'host' in name_lower:
-            return "router.example.com"
+            return "devnetsandboxiosxec9k"
         if 'username' in name_lower or 'user' in name_lower:
             return "admin"
         if 'password' in name_lower:
@@ -567,7 +567,7 @@ class IETFToOpenAPI:
             },
             'servers': [{
                 'url': 'https://{device}/restconf',
-                'variables': {'device': {'default': 'router.example.com', 'description': 'Device IP or hostname'}}
+                'variables': {'device': {'default': 'devnetsandboxiosxec9k.cisco.com', 'description': 'Device IP or hostname'}}
             }],
             'paths': {},
             'components': {

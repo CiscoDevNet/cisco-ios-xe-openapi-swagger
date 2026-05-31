@@ -65,7 +65,7 @@ This collection includes the most common operational state queries for network t
                 "url": "https://{device}/restconf",
                 "variables": {
                     "device": {
-                        "default": "router.example.com",
+                        "default": "devnetsandboxiosxec9k.cisco.com",
                         "description": "Device IP or hostname"
                     }
                 }
@@ -388,7 +388,7 @@ def create_performance_quickstart():
                 "url": "https://{device}/restconf",
                 "variables": {
                     "device": {
-                        "default": "router.example.com",
+                        "default": "devnetsandboxiosxec9k.cisco.com",
                         "description": "Device IP or hostname"
                     }
                 }
@@ -580,7 +580,7 @@ def create_inventory_quickstart():
                 "url": "https://{device}/restconf",
                 "variables": {
                     "device": {
-                        "default": "router.example.com",
+                        "default": "devnetsandboxiosxec9k.cisco.com",
                         "description": "Device IP or hostname"
                     }
                 }
