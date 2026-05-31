@@ -221,7 +221,21 @@ Example values for generated specs come from a layered lookup in `example_for_ty
 2. **YANG-derived defaults / enums** — all 9 `generate_*_from_tree.py` generators call `yang_value_index.lookup_example(name)` (built once per process from `references/17181-YANG-modules/*.yang`). The index scans every `leaf` and `typedef`, records `default "X";` statements and `enum X;` lists, and **only returns a value when every YANG leaf with that name agrees** (unanimous default or unanimous first enum). Conflicting same-name leaves return `None` so we never substitute a wrong default into an unrelated path.
 3. **Type-based fallback** — `string → "example"`, `boolean → true`, `uint* → 1`, `enumeration → "default"`, `union → "auto"`, `empty → null` (presence). Used when neither override nor YANG index resolves the name.
 
-The current state of native config payloads after this pipeline: 6,726 PUT/PATCH/POST example bodies; ~83% carry a realistic value (override or unambiguous YANG default), ~16% still emit the literal `"example"` placeholder for unmapped string leaves whose names don't appear in any YANG default or enum.
+The current state of generated example bodies after this pipeline, **per release surface** (request + response examples across all 8 viewers; the same counts apply to each of the 5 tracked releases once that release is re-built):
+
+| Viewer | Example bodies | Generic `"example"` placeholder |
+|--------|---------------:|--------------------------------:|
+| cfg            |  6,965 | 31.3% |
+| events         |    861 | 64.7% |
+| ietf           |    928 | 51.5% |
+| mib            | 12,482 | 74.5% |
+| native-config  | 10,089 | 16.3% |
+| openconfig     |  4,739 | 54.9% |
+| oper           | 21,507 | 20.7% |
+| other          |  3,520 | 39.5% |
+| **Total**      | **61,091** | **37.0%** |
+
+> Scope caveat: numbers above are for the **top-level (default 26.1.1) viewer surface**. The four other tracked releases (`releases/17.9.x/`, `releases/17.12.x/`, `releases/17.15.x/`, `releases/17.18.1/`) carry roughly comparable example-body volumes per release. Of the 9 from-tree generators, 7 (`native`, `ietf`, `mib`, `openconfig`, `events`, `other`, `rpc`) hardcode the top-level `yang-trees/` input path and only re-emit examples for the default surface; only `cfg` and `oper` accept `--version` and re-emit per-release. To roll the same example-data layering across all 5 releases, re-run `scripts/build_release.py --version <ver>` for each release rather than the individual generators.
 
 When improving coverage:
 - **Prefer extending the YANG index** (it benefits all 9 generators at once) over per-generator overrides.
