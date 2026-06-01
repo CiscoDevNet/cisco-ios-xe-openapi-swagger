@@ -57,6 +57,13 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("native-specs",        ["python", str(GENERATORS / "generate_native_openapi_v2.py"),
                              "--version", "$VER"]),
+    # Resolve sibling-module augments that fill Cisco-IOS-XE-native's empty
+    # placeholder containers (router, xconnect, route-tag, l2vpn-config).
+    # Without this step those four placeholders ship as bodyless stubs and
+    # the BGP / OSPF / EIGRP / ISIS / LISP / NHRP / RIP / static config
+    # subtrees are missing from the viewer entirely.
+    ("native-augment-specs", ["python", str(SCRIPTS / "generate_native_augment_specs.py"),
+                             "--version", "$VER"]),
     ("openconfig-specs",    ["python", str(GENERATORS / "generate_openconfig_openapi_v2.py"),
                              "--version", "$VER"]),
     ("ietf-specs",          ["python", str(GENERATORS / "generate_ietf_openapi_v2.py"),
@@ -98,6 +105,13 @@ PIPELINE: list[tuple[str, list[str]]] = [
     ("native-example-overlay", ["python", str(SCRIPTS / "apply_example_overlay.py"),
                              "--version", "$VER"]),
     ("wrap-body-schemas",   ["python", str(SCRIPTS / "wrap_body_schemas.py"),
+                             "--version", "$VER"]),
+    # Top-level /native coverage guard. Compares every container/list/leaf
+    # declared at the top of `container native` in the YANG source against
+    # the paths emitted by the split native-config specs. Fatal: the
+    # augment-resolution step above must produce coverage for every
+    # placeholder, otherwise the build fails.
+    ("native-coverage",     ["python", str(SCRIPTS / "check_native_coverage.py"),
                              "--version", "$VER"]),
     ("native-capabilities", ["python", str(SCRIPTS / "build_native_capabilities.py"),
                              "--version", "$VER"]),
