@@ -236,6 +236,36 @@ def find_native_augments(
     return yang_path.stem, out
 
 
+def find_native_root_augments(yang_path: Path) -> Tuple[str, List[str]]:
+    """Return (module_name, [body, ...]) for augments targeting `/native`
+    itself (no child path) — i.e. modules that add brand-new top-level
+    children to /native via `augment "/ios:native" { uses ...; }` or inline
+    container/list declarations.
+    """
+    try:
+        text = yang_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return yang_path.stem, []
+    m = _IMPORT_NATIVE_RE.search(text)
+    if not m:
+        return yang_path.stem, []
+    prefix = m.group(1)
+    text = _strip_comments(text)
+
+    bodies: List[str] = []
+    # Match augment "/pref:native" exactly (no trailing /...)
+    root_target_re = re.compile(
+        r"augment\s+\"/" + re.escape(prefix) + r":native\"\s*\{"
+    )
+    for am in root_target_re.finditer(text):
+        brace_pos = am.end() - 1
+        end = _find_balanced(text, brace_pos)
+        if end == -1:
+            continue
+        bodies.append(text[brace_pos + 1 : end])
+    return yang_path.stem, bodies
+
+
 # --- body -> path tree ----------------------------------------------------
 
 def _walk_body(
@@ -277,6 +307,14 @@ def _walk_body(
         if kind == "uses":
             if name in visited_groupings:
                 pos = match.end()
+                # If uses has a refinement block `uses NAME { ... }`, the
+                # `{` is captured as the last char of the match — skip
+                # past the matching `}` so subsequent statements at the
+                # same depth remain visible.
+                if body[match.end() - 1] == "{":
+                    close = _find_balanced(body, match.end() - 1)
+                    if close != -1:
+                        pos = close + 1
                 continue
             grouping_body = _resolve_grouping(name, owner_module, idx)
             if grouping_body is not None:
@@ -293,6 +331,10 @@ def _walk_body(
                     visited_groupings | {name},
                 )
             pos = match.end()
+            if body[match.end() - 1] == "{":
+                close = _find_balanced(body, match.end() - 1)
+                if close != -1:
+                    pos = close + 1
             continue
 
         after = body[match.end() - 1]
@@ -351,6 +393,130 @@ def _record_path(
 
 
 # --- OpenAPI spec emission ------------------------------------------------
+
+_TOP_DATA_RE = re.compile(
+    r"\b(container|list|leaf|leaf-list|choice|anyxml)\s+([A-Za-z0-9_\-]+)\b"
+)
+
+
+def _top_level_data_names(
+    body: str,
+    owner_module: str,
+    idx: Dict[str, Tuple[Dict[str, str], Dict[str, str]]],
+    visited_groupings: Optional[set] = None,
+) -> set:
+    """Return the set of data-node names declared at depth 0 of `body`,
+    expanding `uses <grouping>` references recursively (so a body of
+    `uses some-grouping;` yields the grouping's top-level data names).
+    """
+    if visited_groupings is None:
+        visited_groupings = set()
+    names: set = set()
+    depth = 0
+    i = 0
+    while i < len(body):
+        c = body[i]
+        if c == "{":
+            depth += 1
+            i += 1
+            continue
+        if c == "}":
+            depth -= 1
+            i += 1
+            continue
+        if depth == 0:
+            dm = _TOP_DATA_RE.match(body, i)
+            if dm:
+                names.add(dm.group(2))
+                i = dm.end()
+                continue
+            um = _USES_RE.match(body, i)
+            if um:
+                g = um.group(1)
+                local = g.split(":")[-1]
+                if local not in visited_groupings:
+                    gbody = _resolve_grouping(g, owner_module, idx)
+                    if gbody is not None:
+                        names |= _top_level_data_names(
+                            gbody, owner_module, idx, visited_groupings | {local}
+                        )
+                i = um.end()
+                if body[um.end() - 1] == "{":
+                    close = _find_balanced(body, um.end() - 1)
+                    if close != -1:
+                        i = close + 1
+                continue
+        i += 1
+    return names
+
+
+def _parse_native_top_children(yang_path: Path) -> Dict[str, str]:
+    """Return {child_name: body_text} for every top-level container/list
+    declared directly in `container native { ... }` in Cisco-IOS-XE-native.yang.
+    Bodyless containers map to ''. Used as a safety-net sweep so any
+    container the v2 generator skipped still gets a spec.
+    """
+    try:
+        text = yang_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return {}
+    text = _strip_comments(text)
+    m = re.search(r"\bcontainer\s+native\s*\{", text)
+    if not m:
+        return {}
+    end = _find_balanced(text, m.end() - 1)
+    if end == -1:
+        return {}
+    nbody = text[m.end() : end]
+    out: Dict[str, str] = {}
+    depth = 0
+    i = 0
+    while i < len(nbody):
+        c = nbody[i]
+        if c == "{":
+            depth += 1
+            i += 1
+            continue
+        if c == "}":
+            depth -= 1
+            i += 1
+            continue
+        if depth == 0:
+            mm = re.match(r"(container|list)\s+([A-Za-z0-9_\-]+)\s*([;{])", nbody[i:])
+            if mm:
+                name = mm.group(2)
+                term = mm.group(3)
+                if term == ";":
+                    out.setdefault(name, "")
+                    i += mm.end()
+                else:
+                    brace = i + mm.end() - 1
+                    cend = _find_balanced(nbody, brace)
+                    if cend == -1:
+                        break
+                    out.setdefault(name, nbody[brace + 1 : cend])
+                    i = cend + 1
+                continue
+        i += 1
+    return out
+
+
+def _covered_top_names(api_dir: Path) -> set:
+    """Top-level /native/<name> segments present in any existing native-*.json."""
+    covered: set = set()
+    top_re = re.compile(r"^/data/Cisco-IOS-XE-native:native/([^/?=]+)")
+    for fp in sorted(api_dir.glob("native-*.json")):
+        try:
+            spec = json.loads(fp.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        for p in spec.get("paths", {}).keys():
+            mm = top_re.match(p)
+            if mm:
+                covered.add(mm.group(1))
+    return covered
+
+
 
 def _path_entry(name: str, kind: str, tag: str, is_list_item: bool) -> Dict:
     summary_kind = {"container": "container", "list": "list", "list-item": "list entry"}[kind]
@@ -525,16 +691,48 @@ def process_release(version: str) -> int:
     aggregated: Dict[str, Dict[str, Dict]] = {p: {} for p in PLACEHOLDERS}
     module_counts: Dict[str, int] = {p: 0 for p in PLACEHOLDERS}
 
+    # Collect native-root augments (modules that add NEW top-level children
+    # to /native via `augment "/<pref>:native"`). Each discovered child
+    # name becomes its own spec — same pattern as the placeholders, but the
+    # name set is discovered dynamically rather than fixed.
+    root_aggregated: Dict[str, Dict[str, Dict]] = {}
+    root_origins: Dict[str, set] = {}
+
     for fp in sorted(rd.glob("*.yang")):
         owner, augments = find_native_augments(fp)
-        if not augments:
-            continue
-        for placeholder, segments, body in augments:
-            module_counts[placeholder] += 1
-            _record_path([placeholder], 0, "container", "", aggregated[placeholder])
-            _walk_body(
-                body, segments, len(segments), aggregated[placeholder], owner, idx
-            )
+        if augments:
+            for placeholder, segments, body in augments:
+                module_counts[placeholder] += 1
+                _record_path([placeholder], 0, "container", "", aggregated[placeholder])
+                _walk_body(
+                    body, segments, len(segments), aggregated[placeholder], owner, idx
+                )
+        _owner2, root_bodies = find_native_root_augments(fp)
+        for rbody in root_bodies:
+            # First, discover ALL top-level data-node names this augment adds
+            # (containers, lists, AND leaf/leaf-list). _walk_body below only
+            # emits container/list paths, so we need this separate sweep to
+            # avoid silently dropping leaf-only additions (e.g. Cisco-IOS-XE-pae
+            # adds `leaf pae;`).
+            top_names = _top_level_data_names(rbody, owner, idx)
+            for nm in top_names:
+                root_aggregated.setdefault(nm, {})
+                if not root_aggregated[nm]:
+                    _record_path([nm], 0, "container", "", root_aggregated[nm])
+                root_origins.setdefault(nm, set()).add(owner)
+            # Then expand container/list bodies via _walk_body.
+            tmp: Dict[str, Dict] = {}
+            _walk_body(rbody, [], 0, tmp, owner, idx)
+            for path, info in tmp.items():
+                rest = path[len("/data/Cisco-IOS-XE-native:native/"):]
+                if not rest:
+                    continue
+                child = rest.lstrip("/").split("/")[0].split("=")[0]
+                root_aggregated.setdefault(child, {})
+                if not root_aggregated[child]:
+                    _record_path([child], 0, "container", "", root_aggregated[child])
+                root_aggregated[child][path] = info
+                root_origins.setdefault(child, set()).add(owner)
 
     written: List[str] = []
     for p in PLACEHOLDERS:
@@ -604,6 +802,75 @@ def process_release(version: str) -> int:
             f"[{version}] wrote {out.name}: {len(aggregated[p])} paths "
             f"from {module_counts[p]} augment(s)"
         )
+
+    # Root-augment specs (one per discovered child).
+    for child in sorted(root_aggregated):
+        paths_map = root_aggregated[child]
+        spec_name = f"native-{child}"
+        title_subject = child.replace("-", " ").title()
+        # Re-use build_spec but pass the child as "placeholder" so tags /
+        # descriptions are consistent with the placeholder-augment specs.
+        spec = build_spec(spec_name, title_subject, child, paths_map, version)
+        # Override description so it's clear this is a root-augment child.
+        origins = sorted(root_origins.get(child, set()))
+        spec["info"]["description"] = (
+            f"Cisco IOS-XE Native Configuration — `/native/{child}` subtree, "
+            f"added to the /native root by sibling YANG module(s) via "
+            f"`augment \"/ios:native\"`. Origin module(s): "
+            f"{', '.join(origins) if origins else 'unknown'}.\n\n"
+            f"**Paths:** {len(paths_map)}\n"
+            f"**HTTP methods:** GET / PUT / PATCH / DELETE"
+        )
+        spec["info"]["x-augment-resolved"] = True
+        spec["info"]["x-augment-target"] = "/native (root)"
+        out = ad / f"{spec_name}.json"
+        out.write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
+        written.append(spec_name)
+        print(
+            f"[{version}] wrote {out.name}: {len(paths_map)} paths "
+            f"(root augment from {', '.join(origins)})"
+        )
+
+    # Completeness sweep: any top-level container/list declared in
+    # Cisco-IOS-XE-native.yang that no existing spec covers gets its own
+    # spec. Catches gaps where the v2 native generator silently dropped a
+    # container (historical: dot1x, login, password, object-group, zone,
+    # zone-pair, identity, scada-gw all fell into this bucket).
+    native_yang = rd / "Cisco-IOS-XE-native.yang"
+    if native_yang.is_file():
+        native_children = _parse_native_top_children(native_yang)
+        covered_now = _covered_top_names(ad)
+        for child in sorted(native_children):
+            if child in covered_now or child in PLACEHOLDERS:
+                continue
+            body = native_children[child]
+            paths_map: Dict[str, Dict] = {}
+            _record_path([child], 0, "container", "", paths_map)
+            if body:
+                _walk_body(
+                    body, [child], 1, paths_map, "Cisco-IOS-XE-native", idx
+                )
+            spec_name = f"native-{child}"
+            # Avoid clobbering an existing file written earlier this run.
+            if (ad / f"{spec_name}.json").exists():
+                continue
+            title_subject = child.replace("-", " ").title()
+            spec = build_spec(spec_name, title_subject, child, paths_map, version)
+            spec["info"]["description"] = (
+                f"Cisco IOS-XE Native Configuration — `/native/{child}` subtree, "
+                f"emitted by the completeness sweep because the primary native "
+                f"generator did not produce a spec for this top-level container.\n\n"
+                f"**Paths:** {len(paths_map)}\n"
+                f"**HTTP methods:** GET / PUT / PATCH / DELETE"
+            )
+            (ad / f"{spec_name}.json").write_text(
+                json.dumps(spec, indent=2) + "\n", encoding="utf-8"
+            )
+            written.append(spec_name)
+            print(
+                f"[{version}] wrote {spec_name}.json: {len(paths_map)} paths "
+                f"(completeness sweep)"
+            )
 
     if written:
         _patch_manifest(ad, written)

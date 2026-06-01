@@ -194,9 +194,9 @@ The interactive accountability report is viewable at `yang-accountability.html`.
 
 `Cisco-IOS-XE-native.yang` is a monolithic model with 140+ augmenting sibling modules. Unlike other categories where each module maps 1:1 to a spec, the native model must be decomposed into logical categories. Worse, four of its top-level containers (`router`, `xconnect`, `route-tag`, `l2vpn-config`) are declared as **bodyless placeholders** (`container router;` with no `{...}` body) — their real schema lives in `augment` statements in sibling modules (`Cisco-IOS-XE-bgp`, `-ospf`, `-eigrp`, `-isis`, `-lisp`, `-nhrp`, `-rip`, `-l2vpn`) that import native and write into those placeholders. Augment bodies typically reference `uses <grouping-name>;` instead of inlining the schema, so resolution requires building a cross-module grouping index over every `.yang` file in the release.
 
-### The Solution: 40 Category Specs (26.1.1)
+### The Solution: 159 Category Specs (26.1.1)
 
-The native config model is split into 40 OpenAPI specs based on functional groupings — including 8 augment-resolved router-protocol buckets and 3 augment-resolved placeholder specs:
+The native config model is split into 159 OpenAPI specs based on functional groupings — including 8 augment-resolved router-protocol buckets, augment-resolved placeholder specs (xconnect, route-tag, l2vpn-config), per-child specs for the 113 root-augment additions from sibling modules, and a completeness-sweep safety net for any top-level container the v2 generator drops:
 
 | Group | Spec files (26.1.1) |
 |-------|---------------------|
@@ -209,24 +209,34 @@ The native config model is split into 40 OpenAPI specs based on functional group
 | **Platform & ops** | `native-platform.json`, `native-ha.json`, `native-monitor.json`, `native-logging.json`, `native-cli.json`, `native-license.json` |
 | **QoS / WAN** | `native-qos.json`, `native-mpls.json`, `native-wireless.json`, `native-voice.json` |
 
-**Totals (26.1.1):** 40 spec files, 8,922 paths, 35,688 operations. (Each path supports GET/PUT/PATCH/DELETE.) The exact spec list per release is recorded in `releases/<ver>/swagger-native-config-model/api/manifest.json`.
+**Totals (26.1.1):** 159 spec files, 10,417 paths, 41,668 operations. (Each path supports GET/PUT/PATCH/DELETE.) The exact spec list per release is recorded in `releases/<ver>/swagger-native-config-model/api/manifest.json`.
 
 ### Augment-resolution pipeline
 
-Two scripts wired into `scripts/build_release.py` keep native coverage honest:
+Three generation phases plus a fatal guard, all wired into `scripts/build_release.py`:
 
-1. **`scripts/generate_native_augment_specs.py`** — runs immediately after `generate_native_openapi_v2.py`. Builds a cross-module grouping index, walks every `augment "/<pref>:native/<pref>:<placeholder>"` body (expanding `uses` recursively, intra- and cross-module), and emits one OpenAPI spec per placeholder. The `/native/router` subtree (~3,700 paths) is split per-protocol via the `_ROUTER_BUCKETS` map to stay under the legacy ~6 MB per-spec ceiling.
-2. **`scripts/check_native_coverage.py`** — fatal guard. Enumerates every top-level container/list/leaf declared in `container native { ... }` of the YANG source (resolving `uses` inside the native module) and verifies every name appears in some `/data/Cisco-IOS-XE-native:native/<name>` path across the split specs. A missing name fails the build.
+1. **Placeholder augments** — `scripts/generate_native_augment_specs.py` builds a cross-module grouping index, walks every `augment "/<pref>:native/<pref>:<placeholder>"` body (expanding `uses` recursively, intra- and cross-module, tolerating `uses NAME { refinement }` blocks), and emits one OpenAPI spec per placeholder. The `/native/router` subtree (~3,700 paths) is split per-protocol via the `_ROUTER_BUCKETS` map to stay under the legacy ~6 MB per-spec ceiling.
+2. **Root augments** — the same script also processes `augment "/<pref>:native"` (no child path) via `find_native_root_augments`. Each new top-level child added by a sibling module gets its own `native-<child>.json`. Leaf-only additions (e.g. `Cisco-IOS-XE-pae` adds `leaf pae;`) are detected via `_top_level_data_names` and emitted as single-path stubs.
+3. **Completeness sweep** — final pass that scans `Cisco-IOS-XE-native.yang`'s own body for any top-level container the v2 generator silently dropped (historical drops: `dot1x`, `identity`, `login`, `object-group`, `password`, `scada-gw`, `zone`, `zone-pair`) and emits a `native-<child>.json` for each.
+4. **`scripts/check_native_coverage.py`** — fatal guard. Enumerates every top-level container/list/leaf declared in `container native { ... }` of the YANG source PLUS every root-augment addition from sibling modules (via `root_augment_added_children`), and verifies every name appears in some `/data/Cisco-IOS-XE-native:native/<name>` path across the split specs. A missing name fails the build.
 
-### Known remaining edge case: native-root augments
+### Known remaining edge case: native-root augments (RESOLVED)
 
-Modules can also augment the `/native` root directly (`augment "/ios:native" { uses some-grouping; }`) to add brand-new top-level children. Today this affects `Cisco-IOS-XE-mmode` (adds `maintenance-template`) and `Cisco-IOS-XE-kron` (adds `kron` scheduler) across all 5 releases. Because those names are not declared in `Cisco-IOS-XE-native.yang`, the coverage guard does not currently flag them. Closing this gap means extending `generate_native_augment_specs.py` to also process root augments and `check_native_coverage.py` to enumerate root-augment additions.
+67 sibling modules augment the `/native` root directly to add brand-new top-level children (e.g. `Cisco-IOS-XE-kron` adds `kron`, `Cisco-IOS-XE-mmode` adds `maintenance-template`, `Cisco-IOS-XE-voice` adds `voice`/`sccp`/`stcapp`/…, `Cisco-IOS-XE-switch` adds `device`/`feature`/`openflow`/…, `Cisco-IOS-XE-aaa` adds `security`/`login`/`password`). The augment-spec generator now emits a per-child `native-<child>.json` for every such addition, and the coverage guard's `root_augment_added_children` mirrors the discovery so the build fails if any future sibling-module augment loses coverage.
 
-### Native augment coverage (26.1.1)
+### Native augment coverage (post-fix)
 
-- **Placeholder augments** (`/native/router`, `/native/xconnect`, `/native/route-tag`, `/native/l2vpn-config`): **100% resolved.** All 29 router augments from 9 modules, plus xconnect/route-tag/l2vpn-config, are emitted as dedicated specs. Build-time guard `check_native_coverage.py` confirms 151/151 top-level `/native/*` children are covered (zero missing).
-- **Native-root augments** (`augment "/ios:native" { uses ... }`): 2 known modules not yet covered — `Cisco-IOS-XE-mmode` (`maintenance-template`) and `Cisco-IOS-XE-kron` (`kron`). See "Known remaining edge case" above.
-- **Operational-only siblings** (no config YANG): `lldp`, `macsec`, `trustsec` — these have entries in the oper model instead.
+All 5 releases pass the fatal coverage guard with zero missing children:
+
+| Release | /native children | Native specs | Paths | Operations |
+|---|---:|---:|---:|---:|
+| 17.9.x  | 233 / 233 | 129 | 9,059  | 36,236 |
+| 17.12.x | 237 / 237 | 133 | 9,169  | 36,676 |
+| 17.15.x | 256 / 256 | 152 | 9,635  | 38,540 |
+| 17.18.1 | 258 / 258 | 153 | 9,871  | 39,484 |
+| 26.1.1  | 264 / 264 | 159 | 10,417 | 41,668 |
+
+Operational-only siblings (`lldp`, `macsec`, `trustsec`) live in the oper model.
 
 ---
 

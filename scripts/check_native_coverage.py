@@ -115,6 +115,119 @@ def yang_top_level_data_children(yang_path: Path) -> set[str]:
     return resolve(_depth_zero_statements(body), set())
 
 
+_IMPORT_NATIVE_RE = re.compile(
+    r"import\s+Cisco-IOS-XE-native\s*\{\s*prefix\s+(\S+)\s*;"
+)
+
+
+def root_augment_added_children(ref_dir: Path) -> dict[str, set[str]]:
+    """Scan every sibling .yang module in ref_dir that imports
+    Cisco-IOS-XE-native and find augments targeting the /native root itself
+    (`augment "/<prefix>:native"`). Return {child_name: {origin_module, ...}}
+    for every brand-new top-level child those augments add (resolving
+    `uses <grouping>` cross-module).
+
+    These children are NOT declared in Cisco-IOS-XE-native.yang but ARE
+    valid data-tree children at runtime and must be covered by a spec.
+    """
+    # Index every module's groupings + imports once.
+    module_groupings: dict[str, dict[str, str]] = {}
+    module_imports: dict[str, dict[str, str]] = {}
+    for fp in ref_dir.glob("*.yang"):
+        try:
+            text = fp.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        gs: dict[str, str] = {}
+        for gm in re.finditer(r"grouping\s+([A-Za-z0-9_\-:]+)\s*\{", text):
+            gbody, _ = _balanced_body(text, gm.end() - 1)
+            if gbody:
+                gs[gm.group(1)] = gbody
+        module_groupings[fp.stem] = gs
+        imp: dict[str, str] = {}
+        for im in re.finditer(r"\bimport\s+(\S+)\s*\{\s*prefix\s+(\S+)\s*;", text):
+            imp[im.group(2)] = im.group(1)
+        module_imports[fp.stem] = imp
+
+    def resolve_uses(name: str, owner: str, seen: set[str]) -> str | None:
+        if ":" in name:
+            pref, local = name.split(":", 1)
+            target = module_imports.get(owner, {}).get(pref)
+            if not target:
+                return None
+            return module_groupings.get(target, {}).get(local)
+        # unqualified: own module then any
+        own = module_groupings.get(owner, {})
+        if name in own:
+            return own[name]
+        for _m, gs in module_groupings.items():
+            if name in gs:
+                return gs[name]
+        return None
+
+    def discover_top_children(body: str, owner: str, seen: set[str]) -> set[str]:
+        out: set[str] = set()
+        for s in _depth_zero_statements(body):
+            s2 = " ".join(s.split())
+            mm = _DATA_KIND_RE.match(s2)
+            if mm:
+                out.add(mm.group(2))
+                continue
+            um = _USES_RE.match(s2)
+            if um:
+                target = um.group(1)
+                local = target.split(":")[-1]
+                if local in seen:
+                    continue
+                gbody = resolve_uses(target, owner, seen)
+                if gbody:
+                    out |= discover_top_children(gbody, owner, seen | {local})
+        # Also handle nested-container forms: `container foo { ... }`
+        # which _depth_zero_statements collapses into "container foo".
+        # Re-scan body directly to catch them too.
+        depth = 0
+        i = 0
+        while i < len(body):
+            c = body[i]
+            if c == "{":
+                if depth == 0:
+                    # Look backward to identify what opened this block.
+                    pre = body[:i]
+                    mm2 = re.search(
+                        r"(container|list|leaf|leaf-list|choice|anyxml)\s+([A-Za-z0-9_\-:]+)\s*$",
+                        pre,
+                    )
+                    if mm2:
+                        out.add(mm2.group(2))
+                depth += 1
+            elif c == "}":
+                depth -= 1
+            i += 1
+        return out
+
+    added: dict[str, set[str]] = {}
+    for fp in ref_dir.glob("*.yang"):
+        try:
+            text = fp.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        im = _IMPORT_NATIVE_RE.search(text)
+        if not im:
+            continue
+        prefix = im.group(1)
+        root_re = re.compile(
+            r"augment\s+\"/" + re.escape(prefix) + r":native\"\s*\{"
+        )
+        for am in root_re.finditer(text):
+            body, _ = _balanced_body(text, am.end() - 1)
+            if not body:
+                continue
+            children = discover_top_children(body, fp.stem, set())
+            for ch in children:
+                added.setdefault(ch, set()).add(fp.stem)
+    return added
+
+
 def covered_top_segments(api_dir: Path) -> set[str]:
     covered: set[str] = set()
     for fp in sorted(glob.glob(str(api_dir / "native-*.json"))):
@@ -147,6 +260,12 @@ def check_release(version: str) -> tuple[int, list[str], int]:
         sys.stderr.write(f"[{version}] missing api dir: {api_dir}\n")
         return 2, [], 0
     yang_top = yang_top_level_data_children(yang_path)
+    # Also include children added by `augment "/<pref>:native"` root augments
+    # in sibling modules (e.g. Cisco-IOS-XE-kron adds /native/kron, mmode
+    # adds /native/maintenance-template). These are not declared in
+    # Cisco-IOS-XE-native.yang itself but ARE valid data-tree children.
+    root_aug = root_augment_added_children(_ref_dir(version))
+    yang_top |= set(root_aug.keys())
     covered = covered_top_segments(api_dir)
     missing = sorted(yang_top - covered)
     return (1 if missing else 0), missing, len(yang_top)
