@@ -60,9 +60,11 @@ jobs:
             dir=$(dirname "$manifest")
             model=$(basename $(dirname "$dir"))
             
-            # Check manifest module count matches file count
+            # Check manifest module count matches file count.
+            # Exclude manifest.json itself and underscore-prefixed helper
+            # indexes (_paths_index.json, etc.) that aren't modules.
             declared=$(python3 -c "import json; print(json.load(open('$manifest'))['total_modules'])")
-            actual=$(ls "$dir"/*.json 2>/dev/null | grep -v manifest | wc -l)
+            actual=$(ls "$dir"/*.json 2>/dev/null | grep -v -E '/(manifest\.json|_[^/]+\.json)$' | wc -l)
             
             if [ "$declared" != "$actual" ]; then
               echo "❌ $model: manifest declares $declared modules but found $actual files"
