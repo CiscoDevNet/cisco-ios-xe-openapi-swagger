@@ -1,9 +1,9 @@
 # YANG Module Accountability Report
 
-**Date:** April 27, 2026
+**Date:** June 01, 2026
 **IOS-XE Version:** 17.18.1
-**Total YANG Modules:** 1026
-**Modules with OpenAPI Specs:** 573 (55.8%)
+**Total YANG Modules:** 1151
+**Modules with OpenAPI Specs:** 698 (60.6%)
 **Modules with YANG Trees:** 715
 **Modules in Multiple Categories:** 10
 
@@ -32,7 +32,7 @@ This report provides **100% accountability** for every YANG module in the
 | **ietf** | 33 | 21 | 64% |  |
 | **mib** | 150 | 148 | 99% |  |
 | **events** | 41 | 41 | 100% |  |
-| **native** | 29 | 28 | 97% |  |
+| **native** | 154 | 153 | 99% |  |
 | **other** | 30 | 6 | 20% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
@@ -66,7 +66,7 @@ This report provides **100% accountability** for every YANG module in the
 | Cisco-IOS-XE-bgp-nbr-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-nbr-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-nbr-oper.html) |
 | Cisco-IOS-XE-bgp-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-oper.html) |
 | Cisco-IOS-XE-bgp-rib-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bgp-rib-oper) | [🌳](yang-trees/Cisco-IOS-XE-bgp-rib-oper.html) |
-| Cisco-IOS-XE-bgp-route-oper | - | ❌ No spec | Groupings-only module (no instantiated data nodes); consumed via import by Cisco-IOS-XE-bgp-rib-oper / -nbr-oper |
+| Cisco-IOS-XE-bgp-route-oper | - | ❌ No spec | - |
 | Cisco-IOS-XE-boot-integrity-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-boot-integrity-oper) | [🌳](yang-trees/Cisco-IOS-XE-boot-integrity-oper.html) |
 | Cisco-IOS-XE-breakout-port-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-breakout-port-oper) | [🌳](yang-trees/Cisco-IOS-XE-breakout-port-oper.html) |
 | Cisco-IOS-XE-bridge-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-bridge-oper) | [🌳](yang-trees/Cisco-IOS-XE-bridge-oper.html) |
@@ -659,7 +659,7 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-pw | Other | [Other](swagger-other-model/index.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Other | [RPC](swagger-rpc-model/index.html#spec=cisco-smart-license) [Other](swagger-other-model/index.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
 
-### NATIVE (29 modules)
+### NATIVE (154 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -669,29 +669,154 @@ This report provides **100% accountability** for every YANG module in the
 | native-00-interface-basics | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-00-interface-basics) | - |
 | native-00-routing-basics | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-00-routing-basics) | - |
 | native-aaa | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aaa) | - |
+| native-access-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-access-list) | - |
+| native-access-session | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-access-session) | - |
+| native-alarm | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-alarm) | - |
+| native-alarm-profile | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-alarm-profile) | - |
+| native-app-hosting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-app-hosting) | - |
+| native-application | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-application) | - |
+| native-arp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-arp) | - |
+| native-authentication | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-authentication) | - |
+| native-auto | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-auto) | - |
+| native-autoconf | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-autoconf) | - |
+| native-bba-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-bba-group) | - |
+| native-bridge | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-bridge) | - |
+| native-buffers | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-buffers) | - |
+| native-call | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-call) | - |
+| native-call-manager-fallback | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-call-manager-fallback) | - |
+| native-ccm-manager | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ccm-manager) | - |
+| native-cef | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-cef) | - |
 | native-cli | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-cli) | - |
+| native-coap | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-coap) | - |
+| native-codec | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-codec) | - |
+| native-credentials | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-credentials) | - |
 | native-crypto | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-crypto) | - |
+| native-dapr | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dapr) | - |
+| native-device | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-device) | - |
+| native-device-sensor | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-device-sensor) | - |
 | native-dhcp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dhcp) | - |
+| native-diagnostic | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-diagnostic) | - |
+| native-dial-peer | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dial-peer) | - |
+| native-dialer | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dialer) | - |
+| native-dialer-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dialer-list) | - |
+| native-dlr | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dlr) | - |
 | native-dns | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dns) | - |
+| native-dot1x | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dot1x) | - |
+| native-dsapp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dsapp) | - |
+| native-dspfarm | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dspfarm) | - |
+| native-dying-gasp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-dying-gasp) | - |
+| native-energywise | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-energywise) | - |
+| native-esmc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-esmc) | - |
+| native-esmc-synce | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-esmc-synce) | - |
+| native-et-analytics | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-et-analytics) | - |
+| native-ethernet-internal | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ethernet-internal) | - |
+| native-fabric-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-fabric-group) | - |
+| native-feature | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-feature) | - |
+| native-fqdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-fqdn) | - |
+| native-gateway | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-gateway) | - |
+| native-geo | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-geo) | - |
+| native-gnss | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-gnss) | - |
+| native-group-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-group-policy) | - |
+| native-gw-accounting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-gw-accounting) | - |
 | native-ha | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ha) | - |
+| native-http | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-http) | - |
+| native-hw-switch | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-hw-switch) | - |
+| native-ida | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ida) | - |
+| native-identity | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-identity) | - |
 | native-interfaces | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-interfaces) | - |
+| native-ipc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ipc) | - |
+| native-irig | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-irig) | - |
+| native-isdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-isdn) | - |
+| native-kron | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-kron) | - |
+| native-l2nat | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-l2nat) | - |
+| native-l2protocol-tunnel | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-l2protocol-tunnel) | - |
+| native-l2vpn-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-l2vpn-config) | - |
+| native-l3nat-iox | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-l3nat-iox) | - |
 | native-license | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-license) | - |
+| native-lldp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-lldp) | - |
 | native-logging | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-logging) | - |
+| native-login | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-login) | - |
+| native-maintenance-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-maintenance-template) | - |
+| native-mdns-sd | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-mdns-sd) | - |
+| native-media | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-media) | - |
+| native-mgmt-traffic | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-mgmt-traffic) | - |
 | native-monitor | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-monitor) | - |
 | native-mpls | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-mpls) | - |
+| native-mrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-mrp) | - |
+| native-named-ordering-route-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-named-ordering-route-map) | - |
+| native-nat64 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-nat64) | - |
+| native-nat66 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-nat66) | - |
+| native-network-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-network-policy) | - |
+| native-nhrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-nhrp) | - |
 | native-ntp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ntp) | - |
+| native-num-exp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-num-exp) | - |
+| native-object-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-object-group) | - |
+| native-openflow | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-openflow) | - |
+| native-pae | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-pae) | - |
+| native-password | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-password) | - |
 | native-platform | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-platform) | - |
+| native-pm-agent | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-pm-agent) | - |
+| native-pnp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-pnp) | - |
+| native-power | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-power) | - |
+| native-profinet | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-profinet) | - |
+| native-prp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-prp) | - |
 | native-qos | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-qos) | - |
+| native-qos-overhead-accounting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-qos-overhead-accounting) | - |
+| native-relay | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-relay) | - |
+| native-rep | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-rep) | - |
+| native-route-tag | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-route-tag) | - |
+| native-router | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router) | - |
+| native-router-bgp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-bgp) | - |
+| native-router-eigrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-eigrp) | - |
+| native-router-isis | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-isis) | - |
+| native-router-lisp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-lisp) | - |
+| native-router-lisp-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-lisp-list) | - |
+| native-router-nhrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-nhrp) | - |
+| native-router-ospf | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-ospf) | - |
+| native-router-rip | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-router-rip) | - |
 | native-routing | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-routing) | - |
+| native-scada-gw | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-scada-gw) | - |
+| native-sccp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-sccp) | - |
+| native-sccp-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-sccp-config) | - |
 | native-security | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-security) | - |
+| native-service-export | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-export) | - |
+| native-service-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-group) | - |
+| native-service-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-list) | - |
+| native-service-routing | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-routing) | - |
+| native-service-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-template) | - |
 | native-services-1 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-1) | - |
 | native-services-2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-2) | - |
 | native-services-3 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-3) | - |
+| native-shell | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-shell) | - |
+| native-sip-ua | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-sip-ua) | - |
+| native-site-manager | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-site-manager) | - |
 | native-snmp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-snmp) | - |
+| native-stack-mac | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-stack-mac) | - |
+| native-stcapp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-stcapp) | - |
+| native-stcapp-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-stcapp-config) | - |
+| native-switch | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-switch) | - |
+| native-switch-global-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-switch-global-config) | - |
+| native-switch-virtual | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-switch-virtual) | - |
 | native-switching | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-switching) | - |
+| native-trunk | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-trunk) | - |
+| native-uc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-uc) | - |
+| native-ucse | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-ucse) | - |
+| native-uplink | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-uplink) | - |
+| native-utd | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-utd) | - |
+| native-utd-mt | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-utd-mt) | - |
+| native-utd-st | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-utd-st) | - |
+| native-utd-unified-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-utd-unified-policy) | - |
 | native-voice | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-voice) | - |
+| native-voice-card | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-voice-card) | - |
+| native-voice-card-sb | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-voice-card-sb) | - |
+| native-voice-port | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-voice-port) | - |
+| native-vpdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-vpdn) | - |
 | native-vpn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-vpn) | - |
+| native-vstack | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-vstack) | - |
 | native-wireless | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-wireless) | - |
+| native-xconnect | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-xconnect) | - |
+| native-zone | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-zone) | - |
+| native-zone-pair | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-zone-pair) | - |
 
 ### OTHER (30 modules)
 
@@ -1219,4 +1344,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-04-27T09:00:53.101384*
+*Report generated: 2026-06-01T12:38:34.284786*

@@ -111,7 +111,7 @@ cisco-ios-xe-openapi-swagger/
 |---|---|---|---|
 | `swagger-oper-model/` | operational | 205 | Read-only state/statistics (GET) |
 | `swagger-cfg-model/` | configuration | 39 | Feature config (full CRUD) |
-| `swagger-native-config-model/` | native | 40 | Full CLI-equivalent config (full CRUD). Composed of one spec per top-level functional area plus 8 augment-resolved router protocol buckets (bgp/eigrp/isis/lisp/lisp-list/nhrp/ospf/rip) — see [§6 Native YANG augments & placeholders](#native-yang-augments--placeholders-critical). |
+| `swagger-native-config-model/` | native | 159 | Full CLI-equivalent config (full CRUD). Composed of one spec per top-level functional area plus 8 augment-resolved router protocol buckets (bgp/eigrp/isis/lisp/lisp-list/nhrp/ospf/rip), augment-resolved placeholder specs, root-augment specs for sibling-module additions (kron, maintenance-template, voice/switch/aaa subtrees, …), and a completeness-sweep safety net — see [§6 Native YANG augments & placeholders](#native-yang-augments--placeholders-critical). |
 | `swagger-openconfig-model/` | openconfig | 57 | Vendor-neutral standards |
 | `swagger-ietf-model/` | ietf | 19 | RFC-compliant IETF models |
 | `swagger-mib-model/` | mib | 149 | SNMP MIB → YANG translations (GET) |
@@ -242,7 +242,19 @@ Augment bodies typically reference `uses <grouping-name>;` instead of inlining t
 1. [scripts/generate_native_augment_specs.py](scripts/generate_native_augment_specs.py) runs immediately after `native-specs`. It scans every YANG module for `augment "/<pref>:native/<pref>:<placeholder>"`, builds a cross-module grouping index, walks each augment body (recursively expanding `uses` intra- and cross-module), and emits one OpenAPI 3.0 spec per placeholder. The `/native/router` subtree is split into per-protocol buckets via the `_ROUTER_BUCKETS` map to stay under the legacy ~6 MB per-spec ceiling.
 2. [scripts/check_native_coverage.py](scripts/check_native_coverage.py) is a **fatal** build-time guard. It enumerates every top-level container/list/leaf declared in `container native { ... }` of the YANG source (resolving `uses` inside the native module) and verifies every name appears in some `/data/Cisco-IOS-XE-native:native/<name>` path across the split specs. Failure stops `scripts/build_release.py`.
 
-**Known remaining edge case — native-root augments:** Modules can also augment the `/native` root directly (`augment "/ios:native" { uses some-grouping; }`) to add brand-new top-level children. Today this affects `Cisco-IOS-XE-mmode` (`maintenance-template`) and `Cisco-IOS-XE-kron` (`kron` scheduler) across all 5 releases. Because those names are not declared in `Cisco-IOS-XE-native.yang`, the coverage guard does not currently flag them — they are silently absent from the viewer. Closing this gap means extending `generate_native_augment_specs.py` to also process root augments and `check_native_coverage.py` to enumerate root-augment additions.
+**Known remaining edge case — native-root augments (RESOLVED):** Modules can also augment the `/native` root directly (`augment "/ios:native" { uses some-grouping; }`) to add brand-new top-level children. This affects 67 sibling modules across 113 distinct top-level children (kron, maintenance-template, voice, switch, security/login/password, scada-gw, zone, zone-pair, etc.). The augment-spec generator now handles this class too: it discovers root augments via `find_native_root_augments`, walks their bodies (expanding `uses` cross-module and tolerating `uses NAME { refinement }` blocks), and emits a `native-<child>.json` per added child — including stub specs for leaf-only additions like `pae`. The coverage guard's `root_augment_added_children` mirrors this discovery so any new sibling-module augment will be enforced.
+
+**Completeness sweep:** A final pass in `generate_native_augment_specs.py` (`_parse_native_top_children` + `_covered_top_names`) emits a `native-<child>.json` for any top-level container declared in `Cisco-IOS-XE-native.yang` itself that the v2 generator silently dropped (historical examples: `dot1x`, `identity`, `login`, `object-group`, `password`, `scada-gw`, `zone`, `zone-pair`). This is the safety net that makes the coverage guard achievable for every release.
+
+**Coverage today (post-fix, all 5 releases):**
+
+| Release | Top-level /native children | Native spec files | Total paths | Operations |
+|---|---:|---:|---:|---:|
+| 17.9.x  | 233 / 233 ✅ | 129 | 9,059  | 36,236 |
+| 17.12.x | 237 / 237 ✅ | 133 | 9,169  | 36,676 |
+| 17.15.x | 256 / 256 ✅ | 152 | 9,635  | 38,540 |
+| 17.18.1 | 258 / 258 ✅ | 153 | 9,871  | 39,484 |
+| 26.1.1  | 264 / 264 ✅ | 159 | 10,417 | 41,668 |
 
 **Rules when touching the native pipeline:**
 
@@ -474,4 +486,4 @@ When making changes that affect generated artifacts:
 
 ---
 
-*Last updated: 2026-06-01 — Adds native YANG augment-placeholder resolver and fatal coverage guard; documents augment complexity and the remaining native-root-augment edge case (kron/mmode).*
+*Last updated: 2026-06-01 — Closes the native-root-augment gap (kron/mmode + 111 other sibling-module children) and adds a completeness sweep for any top-level native container the v2 generator silently drops. Coverage guard now verifies 233–264 children per release across all 5 releases.*
