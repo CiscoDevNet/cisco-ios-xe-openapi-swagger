@@ -111,7 +111,7 @@ cisco-ios-xe-openapi-swagger/
 |---|---|---|---|
 | `swagger-oper-model/` | operational | 205 | Read-only state/statistics (GET) |
 | `swagger-cfg-model/` | configuration | 39 | Feature config (full CRUD) |
-| `swagger-native-config-model/` | native | 81 | Full CLI-equivalent config (full CRUD) |
+| `swagger-native-config-model/` | native | 40 | Full CLI-equivalent config (full CRUD). Composed of one spec per top-level functional area plus 8 augment-resolved router protocol buckets (bgp/eigrp/isis/lisp/lisp-list/nhrp/ospf/rip) — see [§6 Native YANG augments & placeholders](#native-yang-augments--placeholders-critical). |
 | `swagger-openconfig-model/` | openconfig | 57 | Vendor-neutral standards |
 | `swagger-ietf-model/` | ietf | 19 | RFC-compliant IETF models |
 | `swagger-mib-model/` | mib | 149 | SNMP MIB → YANG translations (GET) |
@@ -212,6 +212,45 @@ All `requestBody` and `responses['200'].content['application/yang-data+json']` p
 ```
 
 Swagger UI's "Try it out" pre-fills the body from the **schema**, not the media-type-level `example`, so a bare `{"type":"string"}` leaves the editor blank and the request fails on the device. The 8 `generate_*_from_tree.py` generators (cfg, events, ietf, mib, native, openconfig, oper, other) wrap the schema with `wrapper_key = "<module>:<node>"` immediately after computing the inner schema, and `scripts/wrap_body_schemas.py` (invoked from `build_release.py` after `apply_example_overlay`) enforces the invariant across the legacy v2 generators (`generate_*_openapi_v2.py`) and every release by deriving the wrap key from the URL path when no namespaced example is present. The live invariant is "0 PUT/PATCH/POST bodies whose schema is not `{type:object, properties:{<module>:<leaf>: ...}}`" across all 5 releases and all 9 viewers (currently 0 / 97,208).
+
+### Native YANG augments & placeholders (CRITICAL)
+
+`Cisco-IOS-XE-native.yang` is **not** a self-contained module. Several of its top-level containers are declared as bodyless placeholders, e.g.
+
+```yang
+container router;
+container xconnect;
+container route-tag;
+container l2vpn-config;
+```
+
+Their real schema lives in **augment statements inside sibling modules** that import native and write into these placeholders:
+
+| Placeholder | Augmenting modules (26.1.1 example) | Generated specs |
+|---|---|---|
+| `/native/router` | `Cisco-IOS-XE-bgp`, `-ospf`, `-eigrp`, `-isis`, `-lisp`, `-nhrp`, `-rip` (29 augments, 9 modules) | `native-router-bgp.json`, `native-router-ospf.json`, `native-router-eigrp.json`, `native-router-isis.json`, `native-router-lisp.json`, `native-router-lisp-list.json`, `native-router-nhrp.json`, `native-router-rip.json` + slim `native-router.json` index |
+| `/native/xconnect` | `Cisco-IOS-XE-l2vpn` | `native-xconnect.json` |
+| `/native/route-tag` | `Cisco-IOS-XE-eigrp` | `native-route-tag.json` |
+| `/native/l2vpn-config` | `Cisco-IOS-XE-l2vpn` | `native-l2vpn-config.json` |
+
+Augment bodies typically reference `uses <grouping-name>;` instead of inlining the schema, so resolution requires a **cross-module grouping index** built from every `.yang` file in the release.
+
+**Historical bug:** [generators/generate_native_openapi_v2.py](generators/generate_native_openapi_v2.py) only parses `Cisco-IOS-XE-native.yang` and uses a regex that requires `container <name> {` (body) — silently dropping `container router;` (bodyless placeholder). For multiple releases this hid the entire BGP/OSPF/EIGRP/ISIS/LISP/NHRP/RIP/xconnect config tree from the viewer.
+
+**Fixed in the pipeline:**
+
+1. [scripts/generate_native_augment_specs.py](scripts/generate_native_augment_specs.py) runs immediately after `native-specs`. It scans every YANG module for `augment "/<pref>:native/<pref>:<placeholder>"`, builds a cross-module grouping index, walks each augment body (recursively expanding `uses` intra- and cross-module), and emits one OpenAPI 3.0 spec per placeholder. The `/native/router` subtree is split into per-protocol buckets via the `_ROUTER_BUCKETS` map to stay under the legacy ~6 MB per-spec ceiling.
+2. [scripts/check_native_coverage.py](scripts/check_native_coverage.py) is a **fatal** build-time guard. It enumerates every top-level container/list/leaf declared in `container native { ... }` of the YANG source (resolving `uses` inside the native module) and verifies every name appears in some `/data/Cisco-IOS-XE-native:native/<name>` path across the split specs. Failure stops `scripts/build_release.py`.
+
+**Known remaining edge case — native-root augments:** Modules can also augment the `/native` root directly (`augment "/ios:native" { uses some-grouping; }`) to add brand-new top-level children. Today this affects `Cisco-IOS-XE-mmode` (`maintenance-template`) and `Cisco-IOS-XE-kron` (`kron` scheduler) across all 5 releases. Because those names are not declared in `Cisco-IOS-XE-native.yang`, the coverage guard does not currently flag them — they are silently absent from the viewer. Closing this gap means extending `generate_native_augment_specs.py` to also process root augments and `check_native_coverage.py` to enumerate root-augment additions.
+
+**Rules when touching the native pipeline:**
+
+- Do **not** assume native = one module. Always think in terms of (native YANG + augmenting sibling YANG + groupings).
+- Do **not** rely on the v2 native generator for anything inside the 4 placeholders — its output is empty there by design. The augment-resolver owns those subtrees.
+- Do **not** delete `native-router.json` even though it only contains the placeholder root path; it is the index that lets the guard map the router subtree back to a single covered name.
+- When adding a new placeholder-style container to `Cisco-IOS-XE-native.yang`, add its name to `PLACEHOLDERS` in `generate_native_augment_specs.py` and (if router-sized) extend `_ROUTER_BUCKETS`.
+- When adding a new module that augments `/native` root, extend the generator to handle root augments and add to `_ROUTER_BUCKETS` / a new bucket map. Document it in this section.
 
 ### Canonical demo target: DevNet Always-On C9K sandbox
 
@@ -435,4 +474,4 @@ When making changes that affect generated artifacts:
 
 ---
 
-*Last updated: 2026-04-25 — Reflects the post-enrichment (zero-empty-examples) and deep-linking fixes.*
+*Last updated: 2026-06-01 — Adds native YANG augment-placeholder resolver and fatal coverage guard; documents augment complexity and the remaining native-root-augment edge case (kron/mmode).*

@@ -192,53 +192,41 @@ The interactive accountability report is viewable at `yang-accountability.html`.
 
 ### The Problem
 
-`Cisco-IOS-XE-native.yang` is a monolithic model with 163+ augment sub-modules. Unlike other categories where each module maps 1:1 to a spec, the native model must be decomposed into logical categories.
+`Cisco-IOS-XE-native.yang` is a monolithic model with 140+ augmenting sibling modules. Unlike other categories where each module maps 1:1 to a spec, the native model must be decomposed into logical categories. Worse, four of its top-level containers (`router`, `xconnect`, `route-tag`, `l2vpn-config`) are declared as **bodyless placeholders** (`container router;` with no `{...}` body) — their real schema lives in `augment` statements in sibling modules (`Cisco-IOS-XE-bgp`, `-ospf`, `-eigrp`, `-isis`, `-lisp`, `-nhrp`, `-rip`, `-l2vpn`) that import native and write into those placeholders. Augment bodies typically reference `uses <grouping-name>;` instead of inlining the schema, so resolution requires building a cross-module grouping index over every `.yang` file in the release.
 
-### The Solution: 27 Category Specs
+### The Solution: 40 Category Specs (26.1.1)
 
-The native config model is split into 27 OpenAPI specs based on functional groupings:
+The native config model is split into 40 OpenAPI specs based on functional groupings — including 8 augment-resolved router-protocol buckets and 3 augment-resolved placeholder specs:
 
-| Spec File | Description |
-|-----------|-------------|
-| `native-00-top-level-containers.json` | Top-level containers (hostname, version, etc.) |
-| `native-00-top-level-leafs.json` | Top-level leaf nodes |
-| `native-aaa.json` | Authentication, Authorization, Accounting |
-| `native-app-services.json` | Application services (NBAR, IP SLA, etc.) |
-| `native-crypto.json` | Cryptographic configuration |
-| `native-industrial-iot.json` | Industrial IoT protocols |
-| `native-intf-ethernet.json` | Ethernet interfaces |
-| `native-intf-service.json` | Service instances |
-| `native-intf-virtual.json` | Virtual interfaces (Loopback, Tunnel, BDI, etc.) |
-| `native-intf-wan.json` | WAN interfaces (Serial, Cellular, etc.) |
-| `native-ip.json` | IP configuration (addressing, routing, NAT) |
-| `native-l2-discovery.json` | L2 discovery protocols (CDP, LLDP) |
-| `native-line.json` | Line (console, VTY) configuration |
-| `native-misc-ext.json` | Miscellaneous extensions |
-| `native-other.json` | Remaining native containers (~82 containers) |
-| `native-platform-diag.json` | Platform diagnostics |
-| `native-platform-system.json` | Platform and system configuration |
-| `native-policy.json` | Policy maps and class maps |
-| `native-protocols.json` | Routing protocols (OSPF, BGP, EIGRP, etc.) |
-| `native-qos-policy.json` | QoS and queuing |
-| `native-router.json` | Router-level configuration |
-| `native-routing-multicast.json` | Multicast routing |
-| `native-security-access.json` | Security and access control |
-| `native-security-services.json` | Security services (UTD, Umbrella, etc.) |
-| `native-switching-l2.json` | Layer 2 switching |
-| `native-vrf.json` | VRF configuration |
-| `native-wan-legacy.json` | Legacy WAN technologies |
+| Group | Spec files (26.1.1) |
+|-------|---------------------|
+| **Quick-start** | `native-00-day0.json`, `native-00-interface-basics.json`, `native-00-routing-basics.json`, `native-00-core.json` |
+| **Interfaces / L2** | `native-interfaces.json`, `native-switching.json`, `native-l2vpn-config.json` (augmented), `native-xconnect.json` (augmented) |
+| **Routing (top-level)** | `native-routing.json`, `native-route-tag.json` (augmented) |
+| **Routing protocols (augment-resolved router buckets)** | `native-router.json` (slim index), `native-router-bgp.json`, `native-router-ospf.json`, `native-router-eigrp.json`, `native-router-isis.json`, `native-router-lisp.json`, `native-router-lisp-list.json`, `native-router-nhrp.json`, `native-router-rip.json` |
+| **Services** | `native-services-1.json`, `native-services-2.json`, `native-services-3.json`, `native-dns.json`, `native-dhcp.json`, `native-ntp.json`, `native-snmp.json` |
+| **Security** | `native-security.json`, `native-crypto.json`, `native-aaa.json`, `native-vpn.json` |
+| **Platform & ops** | `native-platform.json`, `native-ha.json`, `native-monitor.json`, `native-logging.json`, `native-cli.json`, `native-license.json` |
+| **QoS / WAN** | `native-qos.json`, `native-mpls.json`, `native-wireless.json`, `native-voice.json` |
 
-**Totals:** 328 paths, 1,307 operations (each path supports GET/PUT/PATCH/DELETE)
+**Totals (26.1.1):** 40 spec files, 8,922 paths, 35,688 operations. (Each path supports GET/PUT/PATCH/DELETE.) The exact spec list per release is recorded in `releases/<ver>/swagger-native-config-model/api/manifest.json`.
 
-### Known Gap: `kron` Module
+### Augment-resolution pipeline
 
-`Cisco-IOS-XE-kron.yang` (job/event scheduling) is the only significant native augment not covered. It was identified during audit but not included in the original Swagger generation batch. Related but different modules (`event` = EEM, `scheduler` = CPU allocation) are documented.
+Two scripts wired into `scripts/build_release.py` keep native coverage honest:
 
-### Native Augment Coverage
+1. **`scripts/generate_native_augment_specs.py`** — runs immediately after `generate_native_openapi_v2.py`. Builds a cross-module grouping index, walks every `augment "/<pref>:native/<pref>:<placeholder>"` body (expanding `uses` recursively, intra- and cross-module), and emits one OpenAPI spec per placeholder. The `/native/router` subtree (~3,700 paths) is split per-protocol via the `_ROUTER_BUCKETS` map to stay under the legacy ~6 MB per-spec ceiling.
+2. **`scripts/check_native_coverage.py`** — fatal guard. Enumerates every top-level container/list/leaf declared in `container native { ... }` of the YANG source (resolving `uses` inside the native module) and verifies every name appears in some `/data/Cisco-IOS-XE-native:native/<name>` path across the split specs. A missing name fails the build.
 
-- **Documented:** 162/163 augment modules (99.4%)
-- **Missing:** `kron` (1 module)
-- **Operational-only (no config YANG):** `lldp`, `macsec`, `trustsec` — these have oper specs instead
+### Known remaining edge case: native-root augments
+
+Modules can also augment the `/native` root directly (`augment "/ios:native" { uses some-grouping; }`) to add brand-new top-level children. Today this affects `Cisco-IOS-XE-mmode` (adds `maintenance-template`) and `Cisco-IOS-XE-kron` (adds `kron` scheduler) across all 5 releases. Because those names are not declared in `Cisco-IOS-XE-native.yang`, the coverage guard does not currently flag them. Closing this gap means extending `generate_native_augment_specs.py` to also process root augments and `check_native_coverage.py` to enumerate root-augment additions.
+
+### Native augment coverage (26.1.1)
+
+- **Placeholder augments** (`/native/router`, `/native/xconnect`, `/native/route-tag`, `/native/l2vpn-config`): **100% resolved.** All 29 router augments from 9 modules, plus xconnect/route-tag/l2vpn-config, are emitted as dedicated specs. Build-time guard `check_native_coverage.py` confirms 151/151 top-level `/native/*` children are covered (zero missing).
+- **Native-root augments** (`augment "/ios:native" { uses ... }`): 2 known modules not yet covered — `Cisco-IOS-XE-mmode` (`maintenance-template`) and `Cisco-IOS-XE-kron` (`kron`). See "Known remaining edge case" above.
+- **Operational-only siblings** (no config YANG): `lldp`, `macsec`, `trustsec` — these have entries in the oper model instead.
 
 ---
 
