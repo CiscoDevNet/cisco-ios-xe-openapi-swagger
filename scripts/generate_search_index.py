@@ -192,21 +192,36 @@ def build_index_for_root(root_dir):
 
 
 def main():
-    # 1. Root index (default release — what the top-level viewers serve).
-    index = build_index_for_root(BASE)
+    # The top-level swagger-*-model/api/ directories have been removed -- the
+    # viewers always fetch from releases/<ver>/swagger-*-model/api/ now (no
+    # default-version shortcut). The root search-index.json is therefore built
+    # from releases/<default_version>/ so the unversioned page (which is what
+    # the landing page links to) still has a hydrated search index.
+    releases_root = os.path.join(BASE, 'releases')
+    default_ver = None
+    releases_idx = os.path.join(releases_root, 'index.json')
+    if os.path.isfile(releases_idx):
+        try:
+            default_ver = json.load(open(releases_idx, encoding='utf-8')).get('default')
+        except Exception:
+            default_ver = None
+    if not default_ver:
+        raise SystemExit('cannot determine default version from releases/index.json')
+
+    default_dir = os.path.join(releases_root, default_ver)
+    index = build_index_for_root(default_dir)
     if index is None:
-        raise SystemExit('no swagger-*-model/api directories found at repo root')
+        raise SystemExit(f'no swagger-*-model/api directories found under releases/{default_ver}/')
     out_path = os.path.join(BASE, 'search-index.json')
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
         f.write('\n')
-    print(f"search-index.json: {index['stats']['total_modules']} modules, "
+    print(f"search-index.json (from releases/{default_ver}): {index['stats']['total_modules']} modules, "
           f"{index['stats']['total_endpoints']} endpoints  -> {out_path}")
 
-    # 2. Per-release indexes — search.js fetches releases/<ver>/search-index.json
+    # 2. Per-release indexes -- search.js fetches releases/<ver>/search-index.json
     #    first, falling back to the root file. Without this, switching
     #    release in the version dropdown still searched the default release.
-    releases_root = os.path.join(BASE, 'releases')
     if os.path.isdir(releases_root):
         for ver in sorted(os.listdir(releases_root)):
             rel_dir = os.path.join(releases_root, ver)
