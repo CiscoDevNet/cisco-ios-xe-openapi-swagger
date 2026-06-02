@@ -126,8 +126,8 @@ python -m http.server 8000
 
 ### Use the OpenAPI Specs
 ```bash
-# Download a specific spec
-curl -O https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
+# Download a specific spec (replace 26.1.1 with the release you want)
+curl -O https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/releases/26.1.1/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
 
 # Generate Python client
 openapi-generator-cli generate -i Cisco-IOS-XE-interfaces-oper.json -g python -o ./python-client
