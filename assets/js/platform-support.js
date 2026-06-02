@@ -59,9 +59,21 @@
         return inflight[ver];
     }
 
+    function resolveModuleName(fname) {
+        if (!lastDoc || !lastDoc.modules || !fname) return fname;
+        if (lastDoc.modules[fname]) return fname;
+        // Native viewer splits Cisco-IOS-XE-native into sub-specs
+        // (native-aaa, native-bgp, native-00-core, ...). All resolve to
+        // the single underlying YANG module.
+        if (/^native(-|$)/i.test(fname) && lastDoc.modules['Cisco-IOS-XE-native']) {
+            return 'Cisco-IOS-XE-native';
+        }
+        return fname;
+    }
+
     function getModulePlatforms(fname) {
         if (!lastDoc || !lastDoc.modules || !fname) return [];
-        var entry = lastDoc.modules[fname];
+        var entry = lastDoc.modules[resolveModuleName(fname)];
         if (!entry || !entry.platforms) return [];
         var byId = {};
         (lastDoc.platforms || []).forEach(function (p) { byId[p.id] = p; });
@@ -75,7 +87,7 @@
 
     function getModuleRevision(fname) {
         if (!lastDoc || !lastDoc.modules || !fname) return null;
-        var entry = lastDoc.modules[fname];
+        var entry = lastDoc.modules[resolveModuleName(fname)];
         return entry ? (entry.revision || null) : null;
     }
 
