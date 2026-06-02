@@ -130,6 +130,7 @@
                 <a id="treeLink" href="#" target="_blank" rel="noopener noreferrer" style="display:none; padding: 6px 14px; border-radius: 4px; font-size: 12px; background: #4CAF50; color: white; text-decoration: none; font-weight: 500;">View YANG Tree</a>
                 <button type="button" class="btn copy-share-btn" onclick="window.__DeepLink && window.__DeepLink.copyShareLink(this)" title="Copy a shareable link that opens this exact spec / operation / release">Copy Share Link</button>
             </div>
+            <div id="platformBadges" class="platform-badges" style="display:none;margin:6px 0 10px 0;padding:6px 10px;background:#fafafa;border:1px solid #e0e0e0;border-radius:4px;"></div>
             <div id="swagger-ui" class="swagger-container"></div>
         </main>
     </div>
@@ -137,6 +138,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0/swagger-ui-standalone-preset.js" integrity="sha384-6DNyIQAo3wcTAtOv9yarCKSm1Vhxwkg5ZHgsQ9Y4gD1NuzRgK4+HmCyRbEKkpJ66" crossorigin="anonymous"></script>
     <script src="../deeplink.js"></script>
     <script src="../yang-tree-sidebar.js"></script>
+    <script src="../assets/js/platform-support.js"></script>
     <script src="paths-search.js"></script>
     <script>
     function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -298,6 +300,7 @@
                 treeLink.style.display = r.ok ? 'inline-block' : 'none';
             }).catch(() => { treeLink.style.display = 'none'; });
         }
+        if (window.__PlatformSupport) { window.__PlatformSupport.renderBadges(document.getElementById("platformBadges"), fname); }
     }
     function downloadSpec() { if (!currentModule) return; const a = document.createElement('a'); a.href = `${__apiBase()}/${currentModule}.json`; a.download = currentModule+'.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
     function checkHash() { const p = (window.__DeepLink && window.__DeepLink.parseHash()) || (function () { var h = decodeURIComponent(window.location.hash || '').replace(/^#/, ''); var o = {}; h.split('&').forEach(function (s) { var i = s.indexOf('='); if (i > 0) o[s.substring(0, i)] = s.substring(i + 1); }); return o; })(); if (p.spec && allModules.find(m => m.fname === p.spec)) { if (currentModule !== p.spec) loadSpec(p.spec, document.querySelector(`[data-module="${CSS.escape(p.spec)}"]`)); if (p.op && window.__DeepLink) window.__DeepLink.tryExpandOp(p.op); } }
