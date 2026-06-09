@@ -451,6 +451,7 @@ Current automated coverage (run as part of G-1):
 - `tests/test_security_regressions.py` — catches CSP / XSS / open-redirect regressions on hub pages
 - `tests/test_manifest_schema.py` — informational; 6 pre-existing failures are tracked as baseline
 - `tests/test_assurance_spec_complete.py` — fails if `ASSURANCE_SPEC.md` references a file/script that no longer exists (spec-rot guard)
+- `tests/test_release_counts.py` — fails on **silent regression in API count, operation count, or module count** vs the checked-in `release_counts.json` baseline. Refresh the baseline only on intentional drops: `python -X utf8 scripts/release_counts.py --write`
 
 Local smoke runner:
 
