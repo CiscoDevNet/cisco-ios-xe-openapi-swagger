@@ -268,6 +268,7 @@ HEADER_NAV = [
     ("About", "about.html"),
 ]
 
+INLINE_IMAGE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)\)")
 INLINE_LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 INLINE_CODE = re.compile(r"`([^`\n]+)`")
 INLINE_BOLD = re.compile(r"\*\*([^*\n]+)\*\*")
@@ -287,6 +288,18 @@ def _render_inline(text: str) -> str:
     pre = html.escape(pre, quote=False)
     pre = INLINE_BOLD.sub(r"<strong>\1</strong>", pre)
     pre = INLINE_ITALIC.sub(r"<em>\1</em>", pre)
+
+    def _img_repl(m: re.Match) -> str:
+        alt = m.group(1)
+        src = m.group(2)
+        return (
+            f'<img src="{html.escape(src, quote=True)}" '
+            f'alt="{html.escape(alt, quote=True)}" '
+            f'loading="lazy" style="max-width:100%;height:auto;border-radius:6px;">'
+        )
+
+    # Images must run before INLINE_LINK so the leading '!' isn't lost.
+    pre = INLINE_IMAGE.sub(_img_repl, pre)
 
     def _link_repl(m: re.Match) -> str:
         label = m.group(1)
