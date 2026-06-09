@@ -38,32 +38,65 @@ jobs:
         run: |
           python3 -X utf8 scripts/release_counts.py --write
 
-      - name: Show diff (for run log)
+      - name: Check for changes
+        id: diff
         run: |
-          git --no-pager diff -- release_counts.json | head -200 || true
+          if git diff --quiet -- release_counts.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No baseline changes detected."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "--- baseline diff ---"
+            git --no-pager diff -- release_counts.json | head -200
+          fi
 
-      - name: Create or update PR if baseline changed
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
-        with:
-          commit-message: "chore(g6): refresh release_counts.json baseline"
-          branch: g6/baseline-refresh
-          delete-branch: true
-          title: "chore(g6): weekly release_counts.json baseline refresh"
-          labels: |
-            automation
-            g6
-          body: |
-            Automated weekly refresh of the G-6 API/operation/module count
-            baseline (`release_counts.json`).
+      - name: Open or update PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: g6/baseline-refresh
+        run: |
+          set -euo pipefail
 
-            **Review checklist:**
-            - [ ] Specs / paths / operations counts moved in the expected direction
-            - [ ] Any *dropped* modules listed below are intentional renames or removals
-            - [ ] If totals dropped, confirm `scripts/release_counts.py --check` was
-                  expected to fail before this refresh
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-            See [ASSURANCE_SPEC.md](../blob/main/ASSURANCE_SPEC.md) §3 G-6
-            and [scripts/release_counts.py](../blob/main/scripts/release_counts.py).
+          # Reset the branch to current main + the new baseline (force-push is safe:
+          # branch is bot-owned and only this workflow writes to it).
+          git checkout -B "$BRANCH"
+          git add release_counts.json
+          git commit -m "chore(g6): refresh release_counts.json baseline"
+          git push --force-with-lease origin "$BRANCH"
 
-            If the diff is empty when reviewed, this PR will be closed
-            automatically on the next run.
+          BODY=$(cat <<'EOF'
+          Automated weekly refresh of the G-6 API/operation/module count
+          baseline (`release_counts.json`).
+
+          **Review checklist:**
+          - [ ] Specs / paths / operations counts moved in the expected direction
+          - [ ] Any *dropped* modules listed below are intentional renames or removals
+          - [ ] If totals dropped, confirm `scripts/release_counts.py --check` was
+                expected to fail before this refresh
+
+          See `ASSURANCE_SPEC.md` §3 G-6 and `scripts/release_counts.py`.
+
+          > _Note: this PR was opened by `GITHUB_TOKEN`, so PR-triggered
+          > workflows (CI, lychee, lighthouse) will **not** run automatically.
+          > If you want them, push an empty commit to this branch or close +
+          > reopen the PR._
+          EOF
+          )
+
+          # If a PR already exists for this branch, the push above updated it.
+          # Otherwise, open a new one.
+          if ! gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "chore(g6): weekly release_counts.json baseline refresh" \
+              --label automation \
+              --label g6 \
+              --body "$BODY"
+          else
+            echo "PR for $BRANCH already exists; branch was force-updated."
+          fi
