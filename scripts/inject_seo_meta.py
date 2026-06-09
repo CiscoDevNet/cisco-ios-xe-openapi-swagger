@@ -62,6 +62,9 @@ TOP_LEVEL: dict[str, tuple[str | None, str]] = {
         None,
         "Compare YANG module coverage between Cisco IOS-XE releases.",
     ),
+    # app-map.html intentionally omitted: its full SEO block is baked by
+    # scripts/build_app_map_html.py (the page is regenerated from APP_MAP.md
+    # every time, so injecting external markers would be clobbered).
 }
 
 VIEWER_DESCRIPTIONS: dict[str, str] = {
