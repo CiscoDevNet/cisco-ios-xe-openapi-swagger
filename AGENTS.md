@@ -13,6 +13,7 @@ When making non-trivial changes, the following documents are authoritative. Upda
 
 | Doc | Authoritative for |
 |-----|-------------------|
+| [ASSURANCE_SPEC.md](ASSURANCE_SPEC.md) | **Required post-change validation.** Run the gates / smoke / data / security checks defined there and append the final assurance report to your reply **before declaring work complete**. |
 | [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) | High-level scope, model categories, accountability rules |
 | [VERSIONING.md](VERSIONING.md) | Multi-release folder layout, URL contract, CI gates, "add a new release" runbook |
 | [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) | MDT/gRPC dial-out filter xpath rule + OpenAPI extensions |
@@ -442,15 +443,26 @@ Earlier versions had `{"Cisco-IOS-XE-native:vlan": {}}` examples that broke devi
 
 ## 9. Testing Approach
 
-There is **no automated test suite** yet (this is a static doc site). Verification is manual:
+**Follow [ASSURANCE_SPEC.md](ASSURANCE_SPEC.md) after every change** — it lists every required gate, smoke test, data check, and security check, and defines the final assurance report you must append to your reply.
 
-- **Lint**: `python -c "import ast; ast.parse(open('scripts/foo.py').read())"` for syntax
-- **Spec validation**: `python scripts/validate_quality.py` audits all specs
-- **Audit reports**: `python scripts/audit_examples.py`, `audit_quality.py`, etc.
-- **Live device**: `python scripts/validate_examples_c9kv.py` sends real RESTCONF requests
-- **Visual**: `python -m http.server 8000` and click through the UI
+Current automated coverage (run as part of G-1):
 
-Adding `pytest` or similar is welcome but not required.
+- `tests/test_no_emoji.py` — enforces no decorative emoji or UTF-8 mojibake in source
+- `tests/test_security_regressions.py` — catches CSP / XSS / open-redirect regressions on hub pages
+- `tests/test_manifest_schema.py` — informational; 6 pre-existing failures are tracked as baseline
+- `tests/test_assurance_spec_complete.py` — fails if `ASSURANCE_SPEC.md` references a file/script that no longer exists (spec-rot guard)
+
+Local smoke runner:
+
+- `python -X utf8 scripts/smoke_assurance.py` — hits the live deployed site and runs S-1..S-6 from the assurance spec using only the Python stdlib (no browser, no Playwright). Pass `--base http://localhost:8000` to test a local `python -m http.server` instance, or `--only S-1,S-4` to scope. Exit codes: `0` = all PASS, `1` = at least one FAIL, `2` = no FAILs but SKIP.
+- `python -X utf8 scripts/smoke_live.py` — deeper, Playwright-based variant retained for browser-only assertions. Requires `pip install playwright; playwright install chromium`.
+
+Deeper, slower validation:
+
+- `python scripts/validate_release.py --version <v>` (per-release artifact parity — G-2)
+- `python scripts/validate_quality.py` (spec quality audit)
+- `python scripts/validate_examples_c9kv.py` (real RESTCONF requests against a live C9kv — not in CI)
+- `python -m http.server 8000` and click through the UI
 
 ---
 

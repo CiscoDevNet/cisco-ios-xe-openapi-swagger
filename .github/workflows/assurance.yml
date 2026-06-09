@@ -1,0 +1,203 @@
+name: assurance
+
+# Runs the ASSURANCE_SPEC.md gates (G-1, G-3) and the headless smoke runner
+# (S-1..S-6) on every PR. Posts a markdown summary as a PR comment.
+#
+# G-2 (validate_release.py) already runs in deploy-pages.yml on push to main.
+# G-4 (lychee linkcheck) lives in linkcheck.yml. G-5 (Pages deploy success)
+# is observable only after merge, so it isn't part of this PR-time job.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      smoke_base_url:
+        description: 'Base URL for smoke tests (S-1..S-6)'
+        required: false
+        default: 'https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger'
+
+concurrency:
+  group: assurance-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  assurance:
+    name: Assurance gates + smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install pytest
+        run: pip install --no-cache-dir pytest
+
+      - name: G-1 unit tests (no-emoji + CSP + spec-rot)
+        id: g1
+        continue-on-error: true
+        run: |
+          set +e
+          python -X utf8 -m pytest \
+            tests/test_no_emoji.py \
+            tests/test_security_regressions.py \
+            tests/test_assurance_spec_complete.py \
+            -v --no-header > g1.log 2>&1
+          rc=$?
+          cat g1.log
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: G-3 manifest schema (informational)
+        id: g3
+        continue-on-error: true
+        run: |
+          set +e
+          python -X utf8 -m pytest tests/test_manifest_schema.py \
+            -v --no-header > g3.log 2>&1
+          rc=$?
+          cat g3.log
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Smoke S-1..S-6 against ${{ github.event.inputs.smoke_base_url || 'https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger' }}
+        id: smoke
+        continue-on-error: true
+        run: |
+          set +e
+          python -X utf8 scripts/smoke_assurance.py \
+            --base "${{ github.event.inputs.smoke_base_url || 'https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger' }}" \
+            > smoke.log 2>&1
+          rc=$?
+          cat smoke.log
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Build PR report
+        if: always()
+        id: report
+        env:
+          G1_RC: ${{ steps.g1.outputs.rc }}
+          G3_RC: ${{ steps.g3.outputs.rc }}
+          SMOKE_RC: ${{ steps.smoke.outputs.rc }}
+        run: |
+          python - <<'PY'
+          import os
+          import textwrap
+          from pathlib import Path
+
+          def verdict(rc: str, *, partial_on_skip: bool = False) -> str:
+              try:
+                  n = int(rc)
+              except (TypeError, ValueError):
+                  return "SKIP"
+              if n == 0:
+                  return "PASS"
+              if partial_on_skip and n == 2:
+                  # smoke_assurance.py exits 2 when checks skipped (no failures)
+                  return "PARTIAL"
+              return "FAIL"
+
+          def tail(p: str, n: int = 40) -> str:
+              try:
+                  return "\n".join(Path(p).read_text(encoding="utf-8", errors="replace").splitlines()[-n:])
+              except FileNotFoundError:
+                  return "(log missing)"
+
+          g1 = verdict(os.environ.get("G1_RC", ""))
+          g3 = verdict(os.environ.get("G3_RC", ""))  # informational; never blocks
+          sm = verdict(os.environ.get("SMOKE_RC", ""), partial_on_skip=True)
+
+          # OVERALL: G-1 must be PASS; smoke must be PASS or PARTIAL (skips OK,
+          # fails are not). G-3 is informational and does not affect overall.
+          if g1 == "PASS" and sm in ("PASS", "PARTIAL"):
+              overall = "PASS" if sm == "PASS" else "PARTIAL"
+          else:
+              overall = "FAIL"
+
+          body = textwrap.dedent(f"""\
+              ## Assurance report
+
+              | Check | Status |
+              |---|---|
+              | G-1 unit tests (no-emoji + CSP + spec-rot) | **{g1}** |
+              | G-3 manifest schema (informational) | {g3} |
+              | S-1..S-6 smoke against live site | **{sm}** |
+
+              **OVERALL: {overall}**
+
+              <details><summary>G-1 tail</summary>
+
+              ```
+              {tail("g1.log")}
+              ```
+              </details>
+
+              <details><summary>G-3 tail (informational, does not block)</summary>
+
+              ```
+              {tail("g3.log")}
+              ```
+              </details>
+
+              <details><summary>Smoke tail</summary>
+
+              ```
+              {tail("smoke.log")}
+              ```
+              </details>
+
+              <sub>Generated by `.github/workflows/assurance.yml` (see [ASSURANCE_SPEC.md](../blob/main/ASSURANCE_SPEC.md)).</sub>
+              """)
+          Path("assurance_report.md").write_text(body, encoding="utf-8")
+          print(f"::notice::Assurance overall={overall} g1={g1} g3={g3} smoke={sm}")
+          Path("overall.txt").write_text(overall, encoding="utf-8")
+          PY
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: assurance-report
+          path: |
+            assurance_report.md
+            g1.log
+            g3.log
+            smoke.log
+          retention-days: 14
+
+      - name: Post / update PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('assurance_report.md', 'utf8');
+            const marker = '<!-- assurance-bot -->';
+            const tagged = `${marker}\n${body}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: tagged });
+              core.info(`Updated assurance comment #${existing.id}`);
+            } else {
+              const created = await github.rest.issues.createComment({ owner, repo, issue_number, body: tagged });
+              core.info(`Created assurance comment #${created.data.id}`);
+            }
+
+      - name: Fail job if any required gate failed
+        if: always()
+        run: |
+          overall=$(cat overall.txt 2>/dev/null || echo FAIL)
+          echo "Overall: $overall"
+          if [ "$overall" != "PASS" ]; then
+            echo "::error::Assurance overall=$overall — see report artifact and PR comment."
+            exit 1
+          fi

@@ -73,11 +73,17 @@ $env:PYTHONIOENCODING='utf-8'; $env:PYTHONUTF8='1'
 
 | # | Gate | Command | Failure means |
 |---|---|---|---|
-| G-1 | Unit tests | `python -X utf8 -m pytest tests/test_no_emoji.py tests/test_security_regressions.py -q` | Emoji introduced, or CSP/XSS regression — **block deploy** |
-| G-2 | Per-release validation (only releases you touched) | `python -X utf8 scripts/validate_release.py --version 26.1.1` (repeat for each touched release) | Manifest / artifact mismatch — **block deploy** |
+| G-1 | Unit tests | `python -X utf8 -m pytest tests/test_no_emoji.py tests/test_security_regressions.py tests/test_assurance_spec_complete.py -q` | Emoji introduced, CSP/XSS regression, or spec references a missing file — **block deploy** |
+| G-2 | Per-release validation (only releases you touched) | `python -X utf8 scripts/validate_release.py --version 26.1.1 --gates 1,2,3,4,5,6` (repeat for each touched release) | Manifest / artifact mismatch — **block deploy** |
 | G-3 | Manifest schema check (informational only — 6 known-failing) | `python -X utf8 -m pytest tests/test_manifest_schema.py -q` | Only **new** failures count; record pre-existing 6 as baseline |
-| G-4 | Internal link integrity (workflow `linkcheck.yml`) | Trigger via GitHub Actions OR locally: `python -X utf8 scripts/audit_refs.py` if changes touch HTML/JS/Markdown links | Broken internal link — **block deploy** |
+| G-4 | Internal link integrity | CI runs `lycheeverse/lychee-action` via `.github/workflows/linkcheck.yml` on every PR. Locally: `python -X utf8 scripts/smoke_live.py --base <url>` covers the critical hub links. Full lychee run requires Docker | Broken internal link — **block deploy** |
 | G-5 | GitHub Actions `Deploy to GitHub Pages` workflow finished `success` for the deploy commit | `gh run list --workflow=deploy-pages.yml --limit 1` OR API: `https://api.github.com/repos/CiscoDevNet/cisco-ios-xe-openapi-swagger/actions/runs?per_page=1` | If `failure` at the `Deploy to GitHub Pages` step itself (last step) → likely transient infra; **retry with empty commit** `git commit --allow-empty -m "chore: retrigger Pages deploy"` |
+
+> **OneDrive note:** Gate 7 of `validate_release.py` (export size cap) walks
+> the entire `releases/<ver>/exports/` tree and is **very slow** on OneDrive
+> (10+ minutes). The `--gates 1,2,3,4,5,6` flag above skips it; CI runs gate 7
+> on Linux runners where it's fast. Run the full suite manually only when you
+> changed `tools/*.postman_collection.json` or `releases/*/exports/`.
 
 ### 3.3 Informational only (run, record, never gate)
 
@@ -101,14 +107,25 @@ python -X utf8 scripts/generate_sitemap.py
 
 ---
 
-## 4. Critical smoke tests (the top-3 user flows)
+## 4. Critical smoke tests (the top user flows)
 
 These are the user-ranked critical flows. **Required to verify any UI change
 to the live deployed Pages site.**
 
-Use the integrated browser (or `Invoke-WebRequest` for headless checks).
-Each smoke test has an exact pass criterion — record what you actually saw,
-not what you expect.
+The fastest way to run S-1..S-6 end-to-end against the live (or any) site:
+
+```powershell
+python -X utf8 scripts/smoke_assurance.py
+python -X utf8 scripts/smoke_assurance.py --base http://localhost:8000
+python -X utf8 scripts/smoke_assurance.py --only S-1,S-4
+```
+
+Exit codes: `0` = all PASS, `1` = at least one FAIL, `2` = no FAILs but one
+or more SKIP (network error). The script uses only the Python stdlib (no
+Playwright / no browser), so it runs in CI without browser dependencies.
+
+For manual UI verification (badge rendering, JS console errors), use the
+integrated browser — the criteria below remain authoritative.
 
 ### S-1 — Viewer renders a spec
 - **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-oper-model/index.html#spec=Cisco-IOS-XE-tcam-oper`
@@ -147,8 +164,28 @@ not what you expect.
   per [CSP fix history](#known-fragile-areas)).
 
 > **Coverage note:** `platform-coverage.html` is included in
-> `tests/test_security_regressions.py::STRICT_CSP_PAGES` as of 2026-06-09,
+> `tests/test_security_regressions.py` `STRICT_CSP_PAGES` as of 2026-06-09,
 > so any reintroduction of an inline `<script>` block is caught by G-1.
+
+### S-5 (added 2026-06-09) — Code generator hub
+- **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/code-generator.html`
+- **PASS criteria:**
+  - Page returns HTTP 200 and HTML loads its external `code-generator.js`
+  - Picking a module + language produces a non-empty snippet in the output
+    pane
+  - No new CSP / console errors
+- **FAIL if:** page stuck on "Loading…", `code-generator.js` 404, or
+  inline-`<script>` block re-introduced (CSP would block it silently).
+
+### S-6 (added 2026-06-09) — Telemetry / MDT hub
+- **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/telemetry.html`
+- **PASS criteria:**
+  - Page returns HTTP 200 and HTML loads its external `telemetry.js`
+  - xpath search box is interactive and produces matches when typing
+  - If `releases/<default>/telemetry-index.json` is published, the page
+    surfaces ≥ 1 xpath; if not yet published it's an acceptable PARTIAL.
+- **FAIL if:** stuck on "Loading…", `telemetry.js` 404, or the index file
+  parses to an empty/malformed payload.
 
 ---
 
@@ -176,7 +213,7 @@ Run these whenever you touch the corresponding area.
 |---|---|---|---|
 | D-1 | Manifest `total_modules` equals actual `.json` file count (excluding `manifest.json` + `_*.json`) | `python -X utf8 scripts/validate_release.py --version <v>` for each touched release | Exit 0, no `❌` lines |
 | D-2 | Every viewer's `manifest.json` is parseable JSON | `python -X utf8 -c "import json,glob; [json.load(open(f, encoding='utf-8')) for f in glob.glob('releases/*/swagger-*-model/api/manifest.json')]"` | No exception |
-| D-3 | `search-index.json` contains every module from every manifest | `python -X utf8 scripts/check_native_coverage.py` (or equivalent — see also `scripts/audit_swagger_vs_tree.py`) | No "missing in search-index" warnings |
+| D-3 | `search-index.json` contains every module from every manifest | `python -X utf8 scripts/audit_swagger_vs_tree.py` (full audit). Native-only spot check: `python -X utf8 scripts/check_native_coverage.py` | No "missing in search-index" warnings |
 | D-4 | `platform-support-index.json` lists all 5 releases and points at a default that exists | `Invoke-WebRequest .../platform-support-index.json \| ConvertFrom-Json` — assert `releases.Count -eq 5` and `releases -contains default` | Both true |
 | D-5 | No duplicate operation IDs within any spec | `python -X utf8 scripts/audit_opid_duplicates.py` | Empty report |
 | D-6 | Per-release `platform-support.json` parses and has > 800 modules each | `Get-ChildItem releases/*/platform-support.json \| % { (Get-Content $_ -Raw \| ConvertFrom-Json).modules.PSObject.Properties.Count }` | All ≥ 800 |
@@ -278,6 +315,8 @@ SMOKE (live site):
   S-2 deep-link bgp-oper:        [PASS|FAIL|SKIPPED] <observation>
   S-3 yang-accountability:       [PASS|FAIL|SKIPPED] <observation>
   S-4 platform-coverage matrix:  [PASS|FAIL|SKIPPED] <observation>
+  S-5 code-generator hub:        [PASS|FAIL|SKIPPED] <observation>
+  S-6 telemetry hub:             [PASS|FAIL|SKIPPED] <observation>
 
 REGRESSION:
   R-1..R-6:                      [PASS|FAIL|N/A per item] <details only for non-PASS>
