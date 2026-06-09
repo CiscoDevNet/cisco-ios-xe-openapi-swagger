@@ -11,6 +11,7 @@ Counted per release × category:
                   and `_*.json` index files)
   - paths       : sum of len(spec["paths"]) across every spec
   - operations  : sum of HTTP-method operations under each path
+  - modules     : sorted list of spec stems (catches **renames** with same count)
 
 Also tracked at release level:
   - search_index.modules / categories
@@ -52,14 +53,16 @@ def _discover_releases() -> list[str]:
     return rels
 
 
-def _count_category(api_dir: Path) -> dict[str, int]:
+def _count_category(api_dir: Path) -> dict:
     specs = 0
     paths = 0
     operations = 0
+    modules: list[str] = []
     for f in sorted(api_dir.glob("*.json")):
         if not is_spec_file(f.name):
             continue
         specs += 1
+        modules.append(f.stem)
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
@@ -74,7 +77,12 @@ def _count_category(api_dir: Path) -> dict[str, int]:
                     continue
                 if method_name.lower() in HTTP_METHODS:
                     operations += 1
-    return {"specs": specs, "paths": paths, "operations": operations}
+    return {
+        "specs": specs,
+        "paths": paths,
+        "operations": operations,
+        "modules": sorted(modules),
+    }
 
 
 def _count_search_index(rel_root: Path) -> dict[str, int]:
@@ -170,6 +178,8 @@ def diff_snapshots(current: dict, baseline: dict) -> list[str]:
       - per-release search_index.modules or platform_support.modules
       - a release present in baseline but missing in current
       - a category present in baseline but missing in current
+      - a **named module** present in baseline but missing in current
+        (catches renames where counts stay the same)
     Growth is allowed and silent.
     """
     issues: list[str] = []
@@ -196,6 +206,16 @@ def diff_snapshots(current: dict, baseline: dict) -> list[str]:
                     issues.append(
                         f"[{ver}/{cat}] {field} dropped {b} -> {c} (-{b - c})"
                     )
+            # Named-module disappearance (catches renames where the total
+            # count is preserved by an unrelated addition).
+            base_mods = set(base_c.get("modules") or [])
+            cur_mods = set(cur_c.get("modules") or [])
+            gone = sorted(base_mods - cur_mods)
+            if gone:
+                preview = ", ".join(gone[:5]) + ("..." if len(gone) > 5 else "")
+                issues.append(
+                    f"[{ver}/{cat}] {len(gone)} module(s) disappeared: {preview}"
+                )
 
         for key, label in (("search_index", "modules"),
                            ("platform_support", "modules"),
