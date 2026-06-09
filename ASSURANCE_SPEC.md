@@ -113,7 +113,7 @@ python -X utf8 scripts/generate_sitemap.py
 These are the user-ranked critical flows. **Required to verify any UI change
 to the live deployed Pages site.**
 
-The fastest way to run S-1..S-6 end-to-end against the live (or any) site:
+The fastest way to run S-1..S-7 end-to-end against the live (or any) site:
 
 ```powershell
 python -X utf8 scripts/smoke_assurance.py
@@ -187,6 +187,16 @@ integrated browser — the criteria below remain authoritative.
     surfaces ≥ 1 xpath; if not yet published it's an acceptable PARTIAL.
 - **FAIL if:** stuck on "Loading…", `telemetry.js` 404, or the index file
   parses to an empty/malformed payload.
+
+### S-7 (added 2026-06-09) — App Map (architecture page)
+- **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/app-map.html`
+- **PASS criteria:**
+  - Page returns HTTP 200 and contains the markers `App Map`,
+    `Executive Summary`, `Page Inventory`, and `Feature Inventory`
+  - No inline `<script>` blocks (strict CSP). Page is regenerated from
+    `APP_MAP.md` by `scripts/build_app_map_html.py` at deploy time.
+- **FAIL if:** page 404s, content drifts from `APP_MAP.md`, or markers
+  disappear (would indicate the markdown source was truncated).
 
 ---
 
@@ -320,6 +330,7 @@ SMOKE (live site):
   S-4 platform-coverage matrix:  [PASS|FAIL|SKIPPED] <observation>
   S-5 code-generator hub:        [PASS|FAIL|SKIPPED] <observation>
   S-6 telemetry hub:             [PASS|FAIL|SKIPPED] <observation>
+  S-7 app-map:                   [PASS|FAIL|SKIPPED] <observation>
 
 REGRESSION:
   R-1..R-6:                      [PASS|FAIL|N/A per item] <details only for non-PASS>

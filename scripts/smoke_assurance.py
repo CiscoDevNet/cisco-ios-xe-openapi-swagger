@@ -254,6 +254,20 @@ def check_telemetry(base: str) -> Result:
                   f"HTML+JS 200; index has {len(idx) if isinstance(idx, list) else 'n/a'} entries")
 
 
+def check_app_map(base: str) -> Result:
+    # S-7: app-map page loads with expected architectural markers.
+    url = f"{base}/app-map.html"
+    s, body, _ = fetch(url)
+    if s == 0:
+        return Result("S-7 app-map", "SKIP", body)
+    if s != 200:
+        return Result("S-7 app-map", "FAIL", f"HTTP {s}")
+    markers = ["App Map", "Executive Summary", "Page Inventory", "Feature Inventory"]
+    missing = [m for m in markers if m not in body]
+    if missing:
+        return Result("S-7 app-map", "FAIL", f"missing markers: {missing}")
+    return Result("S-7 app-map", "PASS", f"{len(body)} bytes, all markers present")
+
 CHECKS: list[tuple[str, Callable[[str], Result]]] = [
     ("S-0", check_homepage),
     ("S-1", check_viewer_renders_spec),
@@ -262,6 +276,7 @@ CHECKS: list[tuple[str, Callable[[str], Result]]] = [
     ("S-4", check_platform_coverage),
     ("S-5", check_code_generator),
     ("S-6", check_telemetry),
+    ("S-7", check_app_map),
 ]
 
 

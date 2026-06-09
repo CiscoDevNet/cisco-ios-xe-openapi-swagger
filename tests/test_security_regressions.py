@@ -38,6 +38,7 @@ SCAN = [
     "yang-accountability.html",
     "yang-accountability-compare.html",
     "platform-coverage.html",
+    "app-map.html",
     "assets/js/site-chrome.js",
     "assets/js/sw-register.js",
     "assets/js/platform-coverage.js",
@@ -77,6 +78,7 @@ STRICT_CSP_PAGES = [
     "telemetry.html",
     "yang-accountability.html",
     "platform-coverage.html",
+    "app-map.html",
 ]
 INLINE_EXEC_SCRIPT = re.compile(
     r"<script(?![^>]*\bsrc=)(?![^>]*type\s*=\s*['\"]application/ld\+json)"
