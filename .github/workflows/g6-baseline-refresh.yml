@@ -1,0 +1,69 @@
+name: G-6 baseline refresh
+
+# Weekly check: regenerate scripts/release_counts.json from the current state
+# of releases/**. If the regenerated baseline differs from the committed one,
+# open (or update) a PR with the diff so a human reviews whether the change
+# is an intentional model addition or a silent regression.
+#
+# This closes the loop on G-6: the count guard fails the build on drops, but
+# someone still has to bump the baseline when a real new release lands. This
+# cron makes that bump a reviewable PR instead of a forgotten chore.
+
+on:
+  schedule:
+    # Mondays at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate baseline
+        run: |
+          python3 -X utf8 scripts/release_counts.py --write
+
+      - name: Show diff (for run log)
+        run: |
+          git --no-pager diff -- release_counts.json | head -200 || true
+
+      - name: Create or update PR if baseline changed
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          commit-message: "chore(g6): refresh release_counts.json baseline"
+          branch: g6/baseline-refresh
+          delete-branch: true
+          title: "chore(g6): weekly release_counts.json baseline refresh"
+          labels: |
+            automation
+            g6
+          body: |
+            Automated weekly refresh of the G-6 API/operation/module count
+            baseline (`release_counts.json`).
+
+            **Review checklist:**
+            - [ ] Specs / paths / operations counts moved in the expected direction
+            - [ ] Any *dropped* modules listed below are intentional renames or removals
+            - [ ] If totals dropped, confirm `scripts/release_counts.py --check` was
+                  expected to fail before this refresh
+
+            See [ASSURANCE_SPEC.md](../blob/main/ASSURANCE_SPEC.md) §3 G-6
+            and [scripts/release_counts.py](../blob/main/scripts/release_counts.py).
+
+            If the diff is empty when reviewed, this PR will be closed
+            automatically on the next run.
