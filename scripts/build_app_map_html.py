@@ -165,17 +165,72 @@ body {
     font-size: inherit;
     color: inherit;
 }
-.content .mermaid-block {
-    position: relative;
-    border: 1px dashed var(--border);
+/* Mindmap rendered from the source Mermaid `mindmap` block. Pure CSS,
+   no JS. Each depth gets a distinct accent so the hierarchy reads at a
+   glance. */
+.content .mindmap {
+    list-style: none;
+    padding: 0;
+    margin: 1.2em 0 1.6em;
+    font-size: 0.92rem;
 }
-.content .mermaid-block::before {
-    content: "Mermaid mindmap (source) \u2014 view as a diagram in the GitHub raw file";
-    display: block;
-    font-family: 'Roboto', sans-serif;
+.content .mindmap ul {
+    list-style: none;
+    padding-left: 26px;
+    margin: 6px 0 0;
+    border-left: 2px solid var(--border);
+}
+.content .mindmap li {
+    position: relative;
+    margin: 0;
+    padding: 4px 0 4px 14px;
+}
+.content .mindmap li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 10px;
+    height: 2px;
+    background: var(--border);
+}
+.content .mindmap > li > .node {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #1565C0, #0D47A1);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 6px;
+}
+.content .mindmap > li > ul > li > .node {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e8f0fc;
+    color: var(--accent-dark);
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid #c7d8ee;
+}
+.content .mindmap > li > ul > li > ul > li > .node {
+    color: var(--text);
+    font-weight: 500;
+}
+.content .mindmap > li > ul > li > ul > li > ul > li > .node {
     color: var(--muted);
-    font-size: 0.8rem;
-    margin-bottom: 8px;
+    font-size: 0.88rem;
+}
+.content .mindmap-source {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+.content .mindmap-source summary {
+    cursor: pointer;
+    user-select: none;
+}
+.content .mindmap-source pre {
+    margin-top: 6px;
+    font-size: 0.78rem;
 }
 .content table {
     border-collapse: collapse;
@@ -360,6 +415,95 @@ def _parse_blockquote(lines: list[str], idx: int) -> tuple[str, int]:
     return f"<blockquote><p>{inner}</p></blockquote>", j
 
 
+def _render_mindmap(code: str) -> str:
+    """Render a Mermaid `mindmap` block as a nested-list HTML tree.
+
+    The Mermaid mindmap syntax is purely indentation-based: the first
+    non-blank line after the `mindmap` directive is the root, and every
+    subsequent line is nested under whichever earlier line has strictly
+    smaller indent. Node text may be wrapped in `((...))`, `(...)`,
+    `[...]`, `{{...}}`, or be bare; we strip those shape markers.
+    Lines containing only `::sub` (or similar `::` directives) are
+    skipped — they are Mermaid styling hints with no node text.
+    """
+    raw_lines = code.splitlines()
+    # Drop the leading `mindmap` directive
+    if raw_lines and raw_lines[0].strip().lower().startswith("mindmap"):
+        raw_lines = raw_lines[1:]
+
+    nodes: list[tuple[int, str]] = []  # (indent, label)
+    # Mermaid mindmap shapes: nodeId may precede the bracketed label, e.g.
+    # `root((Big Idea))`, `Alpha[Box]`, `Beta(Pill)`, `Gamma{Diamond}`. We
+    # extract the bracketed label when present; otherwise we keep the whole
+    # stripped line.
+    SHAPE_RE = re.compile(
+        r"""^[\w\-]*       # optional node id
+            \s*
+            (?: \(\((?P<a>[^)]+)\)\)      # ((cloud))
+              | \[\[(?P<b>[^\]]+)\]\]      # [[subroutine]]
+              | \(\[(?P<c>[^\]]+)\]\)      # ([rounded])
+              | \[(?P<d>[^\]]+)\]          # [box]
+              | \((?P<e>[^)]+)\)            # (pill)
+              | \{\{(?P<f>[^}]+)\}\}        # {{hex}}
+              | \{(?P<g>[^}]+)\}            # {rhombus}
+              | \"(?P<h>[^"]+)\"            # "quoted"
+            )\s*$""",
+        re.VERBOSE,
+    )
+    for ln in raw_lines:
+        if not ln.strip():
+            continue
+        indent = len(ln) - len(ln.lstrip(" "))
+        text = ln.strip()
+        if text.startswith("::"):
+            continue
+        m = SHAPE_RE.match(text)
+        if m:
+            text = next(g for g in m.groupdict().values() if g is not None)
+        nodes.append((indent, text))
+
+    if not nodes:
+        return "<pre><code>(empty mindmap)</code></pre>"
+
+    # Build a tree from (indent, label) pairs. A node's children are the
+    # subsequent nodes with strictly greater indent, until an indent <= the
+    # node's own is reached.
+    Tree = list  # of (label, children)
+    roots: list[tuple[str, list]] = []
+    stack: list[tuple[int, list]] = []  # (indent, children-list-to-append-to)
+    for indent, label in nodes:
+        while stack and stack[-1][0] >= indent:
+            stack.pop()
+        node = (label, [])
+        if stack:
+            stack[-1][1].append(node)
+        else:
+            roots.append(node)
+        stack.append((indent, node[1]))
+
+    def _emit(tree: list[tuple[str, list]], root: bool = False) -> str:
+        if not tree:
+            return ""
+        cls = ' class="mindmap"' if root else ""
+        out: list[str] = [f"<ul{cls}>"]
+        for label, children in tree:
+            out.append(
+                f'<li><span class="node">{_render_inline(label)}</span>'
+                f"{_emit(children)}</li>"
+            )
+        out.append("</ul>")
+        return "".join(out)
+
+    source_escaped = html.escape(code, quote=False)
+    return (
+        _emit(roots, root=True)
+        + '<details class="mindmap-source">'
+        + "<summary>Show Mermaid source</summary>"
+        + f"<pre><code>{source_escaped}</code></pre>"
+        + "</details>"
+    )
+
+
 def _iter_blocks(text: str) -> Iterator[str]:
     """Yield HTML for each block in `text`."""
     lines = text.replace("\r\n", "\n").split("\n")
@@ -382,12 +526,14 @@ def _iter_blocks(text: str) -> Iterator[str]:
                 buf.append(lines[j])
                 j += 1
             code = "\n".join(buf)
-            cls = ' class="mermaid-block"' if lang == "mermaid" else ""
-            yield (
-                f"<pre{cls}><code>"
-                f"{html.escape(code, quote=False)}"
-                f"</code></pre>"
-            )
+            if lang == "mermaid" and code.lstrip().startswith("mindmap"):
+                yield _render_mindmap(code)
+            else:
+                yield (
+                    f"<pre><code>"
+                    f"{html.escape(code, quote=False)}"
+                    f"</code></pre>"
+                )
             i = j + 1
             continue
 
