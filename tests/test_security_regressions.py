@@ -37,8 +37,11 @@ SCAN = [
     "tree-compare.html",
     "yang-accountability.html",
     "yang-accountability-compare.html",
+    "platform-coverage.html",
     "assets/js/site-chrome.js",
     "assets/js/sw-register.js",
+    "assets/js/platform-coverage.js",
+    "assets/js/platform-support.js",
     "swagger-cfg-model/paths-search.js",
     "swagger-cfg-model/yang-tree-sidebar.js",
 ]
@@ -73,6 +76,7 @@ STRICT_CSP_PAGES = [
     "tree-compare.html",
     "telemetry.html",
     "yang-accountability.html",
+    "platform-coverage.html",
 ]
 INLINE_EXEC_SCRIPT = re.compile(
     r"<script(?![^>]*\bsrc=)(?![^>]*type\s*=\s*['\"]application/ld\+json)"
