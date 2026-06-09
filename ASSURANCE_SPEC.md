@@ -73,11 +73,12 @@ $env:PYTHONIOENCODING='utf-8'; $env:PYTHONUTF8='1'
 
 | # | Gate | Command | Failure means |
 |---|---|---|---|
-| G-1 | Unit tests | `python -X utf8 -m pytest tests/test_no_emoji.py tests/test_security_regressions.py tests/test_assurance_spec_complete.py -q` | Emoji introduced, CSP/XSS regression, or spec references a missing file — **block deploy** |
+| G-1 | Unit tests | `python -X utf8 -m pytest tests/test_no_emoji.py tests/test_security_regressions.py tests/test_assurance_spec_complete.py tests/test_release_counts.py -q` | Emoji introduced, CSP/XSS regression, spec references a missing file, **or any API/operation/module count dropped** vs `release_counts.json` baseline — **block deploy** |
 | G-2 | Per-release validation (only releases you touched) | `python -X utf8 scripts/validate_release.py --version 26.1.1 --gates 1,2,3,4,5,6` (repeat for each touched release) | Manifest / artifact mismatch — **block deploy** |
 | G-3 | Manifest schema check (informational only — 6 known-failing) | `python -X utf8 -m pytest tests/test_manifest_schema.py -q` | Only **new** failures count; record pre-existing 6 as baseline |
 | G-4 | Internal link integrity | CI runs `lycheeverse/lychee-action` via `.github/workflows/linkcheck.yml` on every PR. Locally: `python -X utf8 scripts/smoke_live.py --base <url>` covers the critical hub links. Full lychee run requires Docker | Broken internal link — **block deploy** |
 | G-5 | GitHub Actions `Deploy to GitHub Pages` workflow finished `success` for the deploy commit | `gh run list --workflow=deploy-pages.yml --limit 1` OR API: `https://api.github.com/repos/CiscoDevNet/cisco-ios-xe-openapi-swagger/actions/runs?per_page=1` | If `failure` at the `Deploy to GitHub Pages` step itself (last step) → likely transient infra; **retry with empty commit** `git commit --allow-empty -m "chore: retrigger Pages deploy"` |
+| G-6 | API / operation / module count regression guard | `python -X utf8 scripts/release_counts.py --check` (also covered by G-1 via `tests/test_release_counts.py`) | Any per-category drop in spec count, path count, operation count, search-index modules, or platform-support modules vs the checked-in [release_counts.json](release_counts.json) baseline — **block deploy**. Refresh baseline with `--write` only when the drop is intentional. |
 
 > **OneDrive note:** Gate 7 of `validate_release.py` (export size cap) walks
 > the entire `releases/<ver>/exports/` tree and is **very slow** on OneDrive
@@ -218,6 +219,7 @@ Run these whenever you touch the corresponding area.
 | D-5 | No duplicate operation IDs within any spec | `python -X utf8 scripts/audit_opid_duplicates.py` | Empty report |
 | D-6 | Per-release `platform-support.json` parses and has > 800 modules each | `Get-ChildItem releases/*/platform-support.json \| % { (Get-Content $_ -Raw \| ConvertFrom-Json).modules.PSObject.Properties.Count }` | All ≥ 800 |
 | D-7 | No emoji / no UTF-8 mojibake reintroduced | Part of G-1 | — |
+| D-8 | No silent drop in spec / path / operation / module counts vs the [release_counts.json](release_counts.json) baseline | Part of G-1 via `tests/test_release_counts.py`; standalone: `python -X utf8 scripts/release_counts.py --check` | Exit 0; failures list every per-release / per-category drop |
 
 **Rule of thumb:** if a module count drops by **more than 5 between commits**,
 treat as suspect and explain in the report.
@@ -309,6 +311,7 @@ GATES (required):
   G-2 validate_release per ver:  [PASS|FAIL|PARTIAL|N/A] <per-release results>
   G-4 linkcheck:                 [PASS|FAIL|PARTIAL|N/A] <evidence>
   G-5 Pages deploy:              [PASS|FAIL|PARTIAL|N/A] <run URL + conclusion>
+  G-6 API count regression:      [PASS|FAIL|PARTIAL|N/A] <number of dropped counts, or "no regressions">
 
 SMOKE (live site):
   S-1 viewer renders spec:       [PASS|FAIL|SKIPPED] <observation>
@@ -322,7 +325,7 @@ REGRESSION:
   R-1..R-6:                      [PASS|FAIL|N/A per item] <details only for non-PASS>
 
 DATA:
-  D-1..D-7:                      [PASS|FAIL|N/A per item] <details only for non-PASS>
+  D-1..D-8:                      [PASS|FAIL|N/A per item] <details only for non-PASS>
 
 SECURITY:
   SEC-1..SEC-7:                  [PASS|FAIL|N/A per item] <details only for non-PASS>
@@ -344,7 +347,7 @@ Rationale: <one or two sentences. Required even on PASS.>
 ```
 
 **Decision rules for `OVERALL`:**
-- **PASS** — every required gate (G-1, G-2, G-4, G-5), every applicable
+- **PASS** — every required gate (G-1, G-2, G-4, G-5, G-6), every applicable
   smoke test, and every applicable regression/data/security check is `PASS`.
 - **FAIL** — any required gate is `FAIL`, OR any smoke/regression/data/
   security check is `FAIL`, OR an invariant from §2 was violated.
