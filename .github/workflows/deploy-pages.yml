@@ -189,6 +189,12 @@ jobs:
           echo "Regenerating app-map.html from APP_MAP.md..."
           python3 -X utf8 scripts/build_app_map_html.py
           cp app-map.html deploy/ 2>/dev/null || true
+          # build_app_map_html also (re)generates docs/app_mindmap.png when
+          # Pillow is available; copy any fresh artifact over the earlier
+          # `cp -r docs deploy/` snapshot so the deployed image matches the
+          # current APP_MAP.md.
+          mkdir -p deploy/docs
+          cp docs/app_mindmap.png deploy/docs/ 2>/dev/null || true
 
           # Copy releases tree (multi-version artifacts: per-release specs,
           # yang-trees, exports, telemetry-index, accountability, etc.)
