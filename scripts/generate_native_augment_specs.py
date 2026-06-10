@@ -590,7 +590,7 @@ def build_spec(
     tag = spec_name
     title = f"Native - {title_subject} (augmented)"
     description = (
-        f"Cisco IOS-XE Native Configuration — `/native/{placeholder}` subtree, "
+        f"Cisco IOS XE Native Configuration — `/native/{placeholder}` subtree, "
         f"resolved from augment statements in sibling YANG modules "
         f"(e.g. Cisco-IOS-XE-bgp, -ospf, -eigrp, -isis, -lisp, -nhrp, -l2vpn).\n\n"
         f"**Paths:** {len(paths_map)}\n"
@@ -610,7 +610,7 @@ def build_spec(
             "description": description,
             "version": version,
             "contact": {
-                "name": "Cisco IOS-XE RESTCONF API",
+                "name": "Cisco IOS XE RESTCONF API",
                 "url": "https://developer.cisco.com/iosxe/",
             },
             "x-yang-module": "Cisco-IOS-XE-native",
@@ -814,7 +814,7 @@ def process_release(version: str) -> int:
         # Override description so it's clear this is a root-augment child.
         origins = sorted(root_origins.get(child, set()))
         spec["info"]["description"] = (
-            f"Cisco IOS-XE Native Configuration — `/native/{child}` subtree, "
+            f"Cisco IOS XE Native Configuration — `/native/{child}` subtree, "
             f"added to the /native root by sibling YANG module(s) via "
             f"`augment \"/ios:native\"`. Origin module(s): "
             f"{', '.join(origins) if origins else 'unknown'}.\n\n"
@@ -857,7 +857,7 @@ def process_release(version: str) -> int:
             title_subject = child.replace("-", " ").title()
             spec = build_spec(spec_name, title_subject, child, paths_map, version)
             spec["info"]["description"] = (
-                f"Cisco IOS-XE Native Configuration — `/native/{child}` subtree, "
+                f"Cisco IOS XE Native Configuration — `/native/{child}` subtree, "
                 f"emitted by the completeness sweep because the primary native "
                 f"generator did not produce a spec for this top-level container.\n\n"
                 f"**Paths:** {len(paths_map)}\n"

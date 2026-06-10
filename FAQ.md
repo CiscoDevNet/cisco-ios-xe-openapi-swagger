@@ -1,6 +1,6 @@
 # FAQ
 
-Frequently-asked questions about the Cisco IOS-XE OpenAPI / YANG documentation site
+Frequently-asked questions about the Cisco IOS XE OpenAPI / YANG documentation site
 (<https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/>).
 
 For the architecture overview see [README.md](README.md); for the release-cadence
@@ -23,7 +23,7 @@ When a new build is deployed and you have an open tab, a small bottom-right
 **Reload** card appears (Tier-9 update-available toast). Click **Reload** to
 activate the new version; the page refreshes exactly once.
 
-### How do I find APIs for Catalyst 9k / IOS-XE features?
+### How do I find APIs for Catalyst 9k / IOS XE features?
 
 Three entry points, in order of precision:
 
@@ -36,7 +36,7 @@ Three entry points, in order of precision:
    `swagger-events-model/`, `swagger-other-model/`) — each ships a paths-search
    box that walks every spec chunk and deep-links into the right operation.
 3. **YANG accountability** — [yang-accountability.html](yang-accountability.html)
-   maps every IOS-XE YANG module to its category, spec presence, and (when
+   maps every IOS XE YANG module to its category, spec presence, and (when
    excluded) the documented reason.
 
 Use the version selector in the top nav to switch between 17.9.x, 17.12.x,
@@ -74,7 +74,7 @@ shape, but only a real device confirms semantics.
 ### How do shareable deep-links work?
 
 Every URL the **Copy Share Link** button produces uses a fixed hash format
-so the link opens directly on the same spec, operation, and IOS-XE release:
+so the link opens directly on the same spec, operation, and IOS XE release:
 
 ```
 https://<host>/<category>/index.html?ver=<release>#ver=<release>&spec=<module>&op=<operationId>

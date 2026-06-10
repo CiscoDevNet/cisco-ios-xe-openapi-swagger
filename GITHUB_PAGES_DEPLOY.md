@@ -55,7 +55,7 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 | API Operations | 58,001 |
 | YANG Tree Files | 768 |
 | Model Types | 9 |
-| IOS-XE Version | 17.18.1 |
+| IOS XE Version | 17.18.1 |
 
 ## Custom Domain (Optional)
 

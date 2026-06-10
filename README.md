@@ -1,11 +1,11 @@
-# Cisco IOS-XE OpenAPI/Swagger Documentation
+# Cisco IOS XE OpenAPI/Swagger Documentation
 
-[![IOS-XE Version](https://img.shields.io/badge/IOS--XE-26.1.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
+[![IOS XE Version](https://img.shields.io/badge/IOS--XE-26.1.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-608-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1). The site defaults to the newest release (26.1.1) with **608 OpenAPI specs, 37,072 paths, and 765 YANG tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1). The site defaults to the newest release (26.1.1) with **608 OpenAPI specs, 37,072 paths, and 765 YANG tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
@@ -105,7 +105,7 @@ Standalone and vendor-specific modules.
 - **Realistic write-operation examples** — Every POST/PUT/PATCH body across the spec set ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
 - **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.
-- **Live-device validation script** — [scripts/validate_examples_c9kv.py](scripts/validate_examples_c9kv.py) verifies examples against a real Catalyst 9000V (or any IOS-XE 17.18.1+ device).
+- **Live-device validation script** — [scripts/validate_examples_c9kv.py](scripts/validate_examples_c9kv.py) verifies examples against a real Catalyst 9000V (or any IOS XE 17.18.1+ device).
 
 ## Quick Start
 
@@ -215,7 +215,7 @@ iosxe-1718-yang-swagger/
 
 ## Resources
 
-- [Cisco IOS-XE RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
+- [Cisco IOS XE RESTCONF Guide](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/1718/b-1718-programmability-cg/m_1718_prog_restconf.html)
 - [Cisco YANG Suite](https://developer.cisco.com/yangsuite/)
 - [YANG Suite on GitHub](https://github.com/CiscoDevNet/yangsuite/)
 - [YANG Models on GitHub](https://github.com/YangModels/yang)
@@ -229,4 +229,4 @@ iosxe-1718-yang-swagger/
 
 ---
 
-**Last Updated**: March 2026 | **IOS-XE Version**: 17.18.1 | **OpenAPI**: 3.0.0
+**Last Updated**: March 2026 | **IOS XE Version**: 17.18.1 | **OpenAPI**: 3.0.0

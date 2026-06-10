@@ -189,24 +189,24 @@ def classify_yang_module(filename, content=""):
     if name == "Cisco-IOS-XE-native":
         return "native", "Main native module - split into multiple specs"
 
-    # Cisco IOS-XE events (check before oper)
+    # Cisco IOS XE events (check before oper)
     if name.startswith("Cisco-IOS-XE-") and "-events" in name:
         return "events", ""
-    # Cisco IOS-XE oper
+    # Cisco IOS XE oper
     if name.startswith("Cisco-IOS-XE-") and "-oper" in name:
         return "oper", ""
-    # Cisco IOS-XE RPC
+    # Cisco IOS XE RPC
     if name.startswith("Cisco-IOS-XE-") and name.endswith("-rpc"):
         return "rpc", ""
     if name == "Cisco-IOS-XE-rpc":
         return "rpc", ""
-    # Cisco IOS-XE MIB
+    # Cisco IOS XE MIB
     if name.startswith("Cisco-IOS-XE-") and ("-mib" in name.lower()):
         return "mib", ""
-    # Cisco IOS-XE CFG
+    # Cisco IOS XE CFG
     if name.startswith("Cisco-IOS-XE-") and name.endswith("-cfg"):
         return "cfg", ""
-    # Remaining Cisco IOS-XE (probably cfg)
+    # Remaining Cisco IOS XE (probably cfg)
     if name.startswith("Cisco-IOS-XE-"):
         if content and re.search(r'^\s*rpc\s+\w+\s*{', content, re.MULTILINE):
             return "rpc", ""
@@ -526,7 +526,7 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
     L.append("# YANG Module Accountability Report")
     L.append("")
     L.append(f"**Date:** {now.strftime('%B %d, %Y')}")
-    L.append(f"**IOS-XE Version:** {IOS_XE_VERSION}")
+    L.append(f"**IOS XE Version:** {IOS_XE_VERSION}")
     L.append(f"**Total YANG Modules:** {total}")
     L.append(f"**Modules with OpenAPI Specs:** {with_spec} ({100*with_spec/total:.1f}%)")
     L.append(f"**Modules with YANG Trees:** {with_tree}")
@@ -652,7 +652,7 @@ def generate_markdown(modules, classifications, total, with_spec, with_tree, mul
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     parser.add_argument("--version", default=None,
-                        help="IOS-XE release tag (e.g. 26.1.1). "
+                        help="IOS XE release tag (e.g. 26.1.1). "
                              "When omitted, uses the legacy root layout.")
     args = parser.parse_args()
     configure_paths(args.version)

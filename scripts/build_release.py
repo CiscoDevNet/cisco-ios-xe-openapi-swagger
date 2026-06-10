@@ -2,7 +2,7 @@
 """
 build_release.py — Per-release orchestrator.
 
-Runs the full pipeline for a single IOS-XE release: spec generators, post-processing,
+Runs the full pipeline for a single IOS XE release: spec generators, post-processing,
 pyang trees, manifests, accountability, search index, telemetry index, MIB metadata,
 native capabilities, and Postman/Bruno exports. Idempotent — safe to re-run.
 

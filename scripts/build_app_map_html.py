@@ -34,9 +34,9 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "APP_MAP.md"
 TARGET = ROOT / "app-map.html"
 
-PAGE_TITLE = "App Map \u2014 Cisco IOS-XE OpenAPI Documentation Hub"
+PAGE_TITLE = "App Map \u2014 Cisco IOS XE OpenAPI Documentation Hub"
 PAGE_DESC = (
-    "Architectural map of the Cisco IOS-XE OpenAPI documentation hub: every "
+    "Architectural map of the Cisco IOS XE OpenAPI documentation hub: every "
     "page, every data file, every user flow \u2014 generated from the canonical "
     "APP_MAP.md source."
 )
@@ -474,7 +474,7 @@ def _render_mindmap(code: str) -> str:
     if has_png:
         figure = (
             '<figure class="mindmap-figure">'
-            f'<img src="{img_rel}" alt="Cisco IOS-XE Documentation Hub — app mindmap"'
+            f'<img src="{img_rel}" alt="Cisco IOS XE Documentation Hub — app mindmap"'
             ' loading="lazy">'
             '<figcaption>App-map overview &mdash; root node, color-coded category'
             ' branches, and second-level features. See the source below for the full'
@@ -608,7 +608,7 @@ def _render_mindmap_png(
     f_footer = _font(13)
 
     # --- title strip -----------------------------------------------------
-    draw.text((56, 32), "Cisco IOS-XE Documentation Hub  —  Application Mind Map",
+    draw.text((56, 32), "Cisco IOS XE Documentation Hub  —  Application Mind Map",
               font=f_title, fill=HEADER_BLUE)
     draw.text((58, 72),
               "Generated from APP_MAP.md  ·  Radial view: root → categories → features (full hierarchy in the source below).",
@@ -800,7 +800,7 @@ def _render_mindmap_png(
 
     # --- footer ----------------------------------------------------------
     draw.text((56, H - 36),
-              "Cisco IOS-XE Documentation Hub  ·  cs.co/xeswagger",
+              "Cisco IOS XE Documentation Hub  ·  cs.co/xeswagger",
               font=f_footer, fill=MUTED)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -910,7 +910,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
     <meta name="description" content="{html.escape(PAGE_DESC, quote=True)}">
-    <meta name="keywords" content="Cisco IOS-XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger, architecture, site map">
+    <meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger, architecture, site map">
     <meta name="author" content="Cisco DevNet">
     <meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
@@ -919,7 +919,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Cisco IOS-XE OpenAPI &amp; YANG Docs">
+    <meta property="og:site_name" content="Cisco IOS XE OpenAPI &amp; YANG Docs">
     <meta property="og:title" content="{html.escape(PAGE_TITLE)}">
     <meta property="og:description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta property="og:url" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/app-map.html">
@@ -937,7 +937,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <header class="header">
         <div class="inner">
             <h1>App Map</h1>
-            <p>Architectural map of every page, data file, and user flow in the Cisco IOS-XE OpenAPI documentation hub.</p>
+            <p>Architectural map of every page, data file, and user flow in the Cisco IOS XE OpenAPI documentation hub.</p>
             <nav>{nav_html}</nav>
         </div>
     </header>

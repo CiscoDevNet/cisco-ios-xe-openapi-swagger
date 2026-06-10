@@ -219,16 +219,16 @@ def process_spec(spec_path, spec_data):
 def main():
     print("=" * 60)
     print("Postman Collection Generator")
-    print("Cisco IOS-XE 17.18.1 RESTCONF - Complete")
+    print("Cisco IOS XE 17.18.1 RESTCONF - Complete")
     print("=" * 60)
 
     # Top-level collection structure
     collection = {
         "info": {
             "_postman_id": make_id(),
-            "name": "Cisco IOS-XE 17.18.1 RESTCONF - Complete Collection",
+            "name": "Cisco IOS XE 17.18.1 RESTCONF - Complete Collection",
             "description": (
-                "Complete Postman collection for Cisco IOS-XE 17.18.1 RESTCONF APIs.\n\n"
+                "Complete Postman collection for Cisco IOS XE 17.18.1 RESTCONF APIs.\n\n"
                 "**Auto-generated** from 747 OpenAPI 3.0 specs covering:\n"
                 "- 34,694 RESTCONF endpoints\n"
                 "- 58,001 operations (GET/PUT/POST/PATCH/DELETE)\n"
@@ -397,7 +397,7 @@ def main():
         coll = dict(collection)
         coll["info"] = dict(collection["info"])
         coll["info"]["_postman_id"] = make_id()
-        coll["info"]["name"] = f"Cisco IOS-XE 17.18.1 RESTCONF - {label}"
+        coll["info"]["name"] = f"Cisco IOS XE 17.18.1 RESTCONF - {label}"
         coll["item"] = items
         path = os.path.join("tools", f"IOS-XE-RESTCONF-{suffix}.postman_collection.json")
         with open(path, "w", encoding="utf-8") as f:

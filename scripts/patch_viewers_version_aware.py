@@ -91,7 +91,7 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
                 // Also keep the browser tab title in sync.
                 if (document.title) {{
                     document.title = document.title.replace(
-                        /Cisco IOS-XE [0-9.x]+/, 'Cisco IOS-XE ' + v);
+                        /Cisco IOS XE [0-9.x]+/, 'Cisco IOS XE ' + v);
                 }}
             }} catch (_) {{}}
         }}

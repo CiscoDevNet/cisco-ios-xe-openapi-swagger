@@ -1,7 +1,7 @@
 # YANG Module Accountability Report
 
 **Date:** June 01, 2026
-**IOS-XE Version:** 17.18.1
+**IOS XE Version:** 17.18.1
 **Total YANG Modules:** 1151
 **Modules with OpenAPI Specs:** 698 (60.6%)
 **Modules with YANG Trees:** 715

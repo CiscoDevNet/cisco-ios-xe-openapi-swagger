@@ -1,4 +1,4 @@
-// Universal Search for Cisco IOS-XE YANG Documentation Hub
+// Universal Search for Cisco IOS XE YANG Documentation Hub
 // Provides fuzzy search across all YANG modules with browse-all capability
 
 // Tunable constants. Centralised so behaviour can be adjusted in one place

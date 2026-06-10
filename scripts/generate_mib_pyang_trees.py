@@ -151,7 +151,7 @@ def generate_tree_html(yang_file: Path, output_dir: Path) -> bool:
     <div class="container">
         <div class="header">
             <h1>📊 {module_name}</h1>
-            <p>MIB YANG Tree Visualization - IOS-XE 17.18.1</p>
+            <p>MIB YANG Tree Visualization - IOS XE 17.18.1</p>
         </div>
         
         <div style="background: #f0f4ff; padding: 16px 40px; border-bottom: 1px solid #e2e8f0;">
@@ -230,7 +230,7 @@ def generate_mib_tree_index(output_dir: Path, generated_files: list):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIB YANG Tree Browser - Cisco IOS-XE 17.18.1</title>
+    <title>MIB YANG Tree Browser - Cisco IOS XE 17.18.1</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{

@@ -98,7 +98,7 @@ def categorize_yang_module(filename: str, content: str = "") -> Tuple[str, str]:
             return "types", "IETF type definitions only"
         return "ietf", ""
     
-    # Cisco IOS-XE modules
+    # Cisco IOS XE modules
     if name.startswith("Cisco-IOS-XE-"):
         # Types
         if name.endswith("-types") or "-types-" in name:
@@ -295,7 +295,7 @@ def generate_markdown_report(modules: List[dict], categories: dict):
         "# YANG Module Accountability Report",
         "",
         f"**Date:** {__import__('datetime').datetime.now().strftime('%B %d, %Y')}",
-        f"**IOS-XE Version:** 17.18.1",
+        f"**IOS XE Version:** 17.18.1",
         f"**Total YANG Modules:** {total}",
         f"**Modules with OpenAPI Specs:** {with_spec} ({100*with_spec/total:.1f}%)",
         "",

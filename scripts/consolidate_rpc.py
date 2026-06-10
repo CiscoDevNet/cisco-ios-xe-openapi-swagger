@@ -94,7 +94,7 @@ def create_consolidated_spec(category, paths_data):
     
     # Build description with module list
     modules = sorted(set(p['source_module'] for p in paths_data))
-    description = f"""Cisco IOS-XE RPC Operations - {category.replace('-ops', '').title()}
+    description = f"""Cisco IOS XE RPC Operations - {category.replace('-ops', '').title()}
 
 **Category:** {category.replace('-ops', '').title()} Operations
 **Modules:** {len(modules)}

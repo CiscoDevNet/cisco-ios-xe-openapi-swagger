@@ -555,7 +555,7 @@ def create_inventory_quickstart():
 - Power supplies and fans
 
 **Software:**
-- IOS-XE version
+- IOS XE version
 - Package versions
 - Boot variables
 
@@ -636,7 +636,7 @@ def create_inventory_quickstart():
             "/data/Cisco-IOS-XE-platform-software-oper:cisco-platform-software": {
                 "get": {
                     "summary": "Get software version information",
-                    "description": """IOS-XE software version and package information
+                    "description": """IOS XE software version and package information
 
 **Example Response:**
 ```json

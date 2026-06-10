@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-// Cisco IOS-XE OpenAPI & YANG Docs — Service Worker
+// Cisco IOS XE OpenAPI & YANG Docs — Service Worker
 // ---------------------------------------------------------------------
 // Goals:
 //   * Make repeat visits feel instant (stale-while-revalidate on HTML/JS/CSS)
@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v31-2026.06.09a';
+const CACHE_VERSION = 'v32-2026.06.10a';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 

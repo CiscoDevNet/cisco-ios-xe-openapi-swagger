@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-fetch_yang_release.py — Fetch a Cisco IOS-XE YANG release from YangModels/yang.
+fetch_yang_release.py — Fetch a Cisco IOS XE YANG release from YangModels/yang.
 
-Pulls the YANG modules for a single IOS-XE release (e.g. 17.9.x → vendor/cisco/xe/1791/)
+Pulls the YANG modules for a single IOS XE release (e.g. 17.9.x → vendor/cisco/xe/1791/)
 into ``references/<version>/`` using ``git`` so the upstream commit SHA can be pinned in
 ``releases/<version>/meta.json``.
 

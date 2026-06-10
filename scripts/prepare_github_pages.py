@@ -304,7 +304,7 @@ To use a custom domain:
 - OpenAPI Specifications: 597+
 - API Paths: 15,000+
 - Model Types: 9
-- IOS-XE Version: 17.18.1
+- IOS XE Version: 17.18.1
 
 Last prepared: February 2026
 '''

@@ -173,7 +173,7 @@ def generate_index_page(output_dir: Path, modules: list):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YANG Tree Browser - IOS-XE 17.18.1</title>
+    <title>YANG Tree Browser - IOS XE 17.18.1</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -247,7 +247,7 @@ def generate_index_page(output_dir: Path, modules: list):
 <body>
     <div class="header">
         <h1>📊 YANG Tree Browser</h1>
-        <p>Visual data structure for all IOS-XE 17.18.1 YANG modules</p>
+        <p>Visual data structure for all IOS XE 17.18.1 YANG modules</p>
         <input type="text" class="search-box" id="searchBox" placeholder="Search modules..." onkeyup="filterModules()">
     </div>
     
