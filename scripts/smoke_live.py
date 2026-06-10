@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Headless smoke test for the version-aware MIB viewer.
 
-Loads the MIB viewer once per active IOS-XE release and reports module count,
+Loads the MIB viewer once per active IOS XE release and reports module count,
 the resolved __apiBase(), and any console / page errors. Useful both against
 the live GitHub Pages deployment and a local static server.
 

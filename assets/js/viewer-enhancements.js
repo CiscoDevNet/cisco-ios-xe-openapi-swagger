@@ -64,10 +64,10 @@
         var label = document.createElement('label');
         label.setAttribute('for', 'viewerVersionPicker');
         label.className = 'sr-only';
-        label.textContent = 'Switch IOS-XE release';
+        label.textContent = 'Switch IOS XE release';
         var sel = document.createElement('select');
         sel.id = 'viewerVersionPicker';
-        sel.title = 'Switch IOS-XE release (preserves current spec & operation)';
+        sel.title = 'Switch IOS XE release (preserves current spec & operation)';
         allowed.forEach(function (v) {
             var opt = document.createElement('option');
             opt.value = v;

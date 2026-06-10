@@ -103,7 +103,7 @@ def create_consolidated_spec(category, paths_data):
     
     # Build description with module list
     modules = sorted(set(p['source_module'] for p in paths_data))
-    description = f"""Cisco IOS-XE Event Notifications - {category.title()}
+    description = f"""Cisco IOS XE Event Notifications - {category.title()}
 
 **Category:** {category.title()}
 **Modules:** {len(modules)}

@@ -40,7 +40,7 @@ def _parse_children(html_path: Path) -> list[str]:
 def _server_block() -> dict:
     return {
         "url": "https://{device}:{port}/restconf",
-        "description": "IOS-XE Device RESTCONF API",
+        "description": "IOS XE Device RESTCONF API",
         "variables": {
             "device": {
                 "default": "devnetsandboxiosxec9k.cisco.com",
@@ -83,14 +83,14 @@ def _build_spec(title_suffix: str, kind: str, children: list[str]) -> dict:
     return {
         "openapi": "3.0.0",
         "info": {
-            "title": f"Cisco IOS-XE Native Config - {title_suffix}",
+            "title": f"Cisco IOS XE Native Config - {title_suffix}",
             "description": (
                 f"Index of {len(children)} top-level {kind}(s) directly under /native. "
                 "Use the linked per-feature specs for the writable detail."
             ),
             "version": "17.18.1",
             "contact": {
-                "name": "Cisco IOS-XE RESTCONF API",
+                "name": "Cisco IOS XE RESTCONF API",
                 "url": "https://developer.cisco.com/iosxe/",
             },
             "x-yang-module": "Cisco-IOS-XE-native",

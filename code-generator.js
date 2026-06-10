@@ -147,7 +147,7 @@
 
         // Generate Python code
         var pythonCode = '#!/usr/bin/env python3\n' +
-            '"""\nCisco IOS-XE RESTCONF API Example\nGenerated: ' + new Date().toISOString() + '\n"""\n\n' +
+            '"""\nCisco IOS XE RESTCONF API Example\nGenerated: ' + new Date().toISOString() + '\n"""\n\n' +
             'import requests\nimport json\nfrom urllib3.exceptions import InsecureRequestWarning\n\n' +
             '# Disable SSL warnings (not recommended for production)\n' +
             'requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)\n\n' +
@@ -170,12 +170,12 @@
             '    print(f"Error: {response.text}")';
 
         // Generate Ansible code
-        var ansibleCode = '---\n# Cisco IOS-XE RESTCONF API Playbook\n' +
+        var ansibleCode = '---\n# Cisco IOS XE RESTCONF API Playbook\n' +
             '# Generated: ' + new Date().toISOString() + '\n\n' +
-            '- name: Cisco IOS-XE RESTCONF Example\n  hosts: localhost\n  gather_facts: no\n  \n  vars:\n' +
+            '- name: Cisco IOS XE RESTCONF Example\n  hosts: localhost\n  gather_facts: no\n  \n  vars:\n' +
             '    iosxe_host: "' + host + '"\n    iosxe_user: "' + username + '"\n' +
             '    iosxe_pass: "' + password + '"\n    api_path: "' + path + '"\n  \n  tasks:\n' +
-            '    - name: ' + method + ' request to IOS-XE RESTCONF\n      uri:\n' +
+            '    - name: ' + method + ' request to IOS XE RESTCONF\n      uri:\n' +
             '        url: "https://{{ iosxe_host }}{{ api_path }}"\n        method: ' + method + '\n' +
             '        user: "{{ iosxe_user }}"\n        password: "{{ iosxe_pass }}"\n' +
             '        force_basic_auth: yes\n        validate_certs: no\n        headers:\n' +
@@ -190,7 +190,7 @@
             '        var: api_response.json\n      when: api_response.json is defined';
 
         // Generate JavaScript (fetch) code
-        var jsCode = '// Cisco IOS-XE RESTCONF API Example\n' +
+        var jsCode = '// Cisco IOS XE RESTCONF API Example\n' +
             '// Generated: ' + new Date().toISOString() + '\n\n' +
             'const host = "' + host + '";\nconst username = "' + username + '";\n' +
             'const password = "' + password + '";\n\n' +

@@ -144,7 +144,7 @@ def consolidate_specs():
             "openapi": "3.0.0",
             "info": {
                 "title": category_titles.get(category, f"Operational - {category.title()}"),
-                "description": f"Cisco IOS-XE Operational State Data - {category.title()}\n\n"
+                "description": f"Cisco IOS XE Operational State Data - {category.title()}\n\n"
                               f"**Category:** {category.title()}\n"
                               f"**Modules:** {len(category_modules[category])}\n"
                               f"**Paths:** {len(paths_list)}\n\n"

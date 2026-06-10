@@ -126,7 +126,7 @@ def write_og_image() -> None:
     sub_font = _load_font(34)
     tag_font = _load_font(24, bold=True)
 
-    draw.text((72, 250), "Cisco IOS-XE", font=title_font, fill=WHITE)
+    draw.text((72, 250), "Cisco IOS XE", font=title_font, fill=WHITE)
     draw.text((72, 332), "OpenAPI & YANG Docs", font=title_font, fill=WHITE)
 
     draw.text((72, 460), "608 OpenAPI specs · 5 releases · Multi-version",

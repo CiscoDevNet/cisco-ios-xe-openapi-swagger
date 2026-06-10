@@ -383,7 +383,7 @@
 
     // === Version selector ===
     // Reads releases/index.json (canonical list) and lets the user pick which
-    // IOS-XE release the documentation should be sourced from. Selection is
+    // IOS XE release the documentation should be sourced from. Selection is
     // persisted in localStorage and reflected in the URL hash as `ver=<v>`.
     // The "default" release in releases/index.json is the initial selection.
     function initVersionSelector() {
@@ -439,7 +439,7 @@
     }
 
     function applyVersion(ver, releases, label, badge) {
-        if (label) label.textContent = 'IOS-XE ' + ver;
+        if (label) label.textContent = 'IOS XE ' + ver;
         var info = (releases || []).find(function (r) { return r.ver === ver; });
         if (badge) {
             badge.textContent = info ? (info.status || 'active') : 'active';
@@ -474,7 +474,7 @@
     // === Version-aware homepage stats ===
     // Loads version-stats.json once and patches the model cards, the
     // dashboard stats table, and the Project Summary box so they all reflect
-    // the currently-selected IOS-XE release. Without this the page would
+    // the currently-selected IOS XE release. Without this the page would
     // show the same hardcoded counts regardless of which release is active.
     var __VERSION_STATS = null;
     var __VERSION_STATS_PROMISE = null;
@@ -562,7 +562,7 @@
             // 5. Banner showing the active version + headline counts.
             var banner = document.getElementById('versionStatsBanner');
             if (banner) {
-                banner.textContent = 'Counts below reflect IOS-XE ' + ver + ': '
+                banner.textContent = 'Counts below reflect IOS XE ' + ver + ': '
                     + fmtNum(totals.specs) + ' specs, '
                     + fmtNum(totals.paths) + ' paths, '
                     + fmtNum(totals.operations) + ' operations across '

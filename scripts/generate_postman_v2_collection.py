@@ -160,7 +160,7 @@ def write_collection(target_dir: Path, version: str, category: str,
         return {
             "info": {
                 "_postman_id": str(uuid.uuid4()),
-                "name": f"IOS-XE {version} — {category}"
+                "name": f"IOS XE {version} — {category}"
                         + (f" (part {part})" if part > 1 else ""),
                 "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
                 "description": f"Generated {datetime.now(timezone.utc).isoformat()}\n"
@@ -221,7 +221,7 @@ def write_collection(target_dir: Path, version: str, category: str,
 def write_environment(rp: ReleasePaths, version: str) -> Path:
     env = {
         "id": str(uuid.uuid4()),
-        "name": f"IOS-XE {version} (RESTCONF)",
+        "name": f"IOS XE {version} (RESTCONF)",
         "values": [
             {"key": "host", "value": "10.0.0.1", "enabled": True},
             {"key": "port", "value": "443", "enabled": True},

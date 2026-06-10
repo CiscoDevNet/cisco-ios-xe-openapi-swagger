@@ -1,4 +1,4 @@
-"""Build an executive-ready 16:9 PNG summary of the IOS-XE Documentation Hub project.
+"""Build an executive-ready 16:9 PNG summary of the IOS XE Documentation Hub project.
 
 Output: docs/exec_summary.png (1920x1080, < 10 MB).
 """
@@ -100,7 +100,7 @@ def build():
     f_eyebrow = _font(22, bold=True)
     f_title = _font(58, bold=True)
     f_sub = _font(26)
-    draw.text((80, 48), "CISCO IOS-XE  ·  PROGRAMMABILITY ENABLEMENT", font=f_eyebrow, fill=CISCO_BLUE)
+    draw.text((80, 48), "CISCO IOS XE  ·  PROGRAMMABILITY ENABLEMENT", font=f_eyebrow, fill=CISCO_BLUE)
     draw.text((80, 84), "From 1,000+ YANG Models to a Self-Service Documentation Hub", font=f_title, fill=WHITE)
 
     # URL pill (top-right, compact so it never overlaps the title)
@@ -138,7 +138,7 @@ def build():
     )
     draw.text(
         (80, 196),
-        "telemetry recipes, code samples, and per-platform coverage — across every supported IOS-XE release.",
+        "telemetry recipes, code samples, and per-platform coverage — across every supported IOS XE release.",
         font=f_sub,
         fill=(210, 224, 240),
     )
@@ -149,7 +149,7 @@ def build():
         ("42,557", "REST paths"),
         ("85,481", "Operations"),
         ("1,196", "YANG + MIB modules"),
-        ("5", "IOS-XE releases"),
+        ("5", "IOS XE releases"),
         ("9", "Model categories"),
     ]
     kpi_y = 252
@@ -178,7 +178,7 @@ def build():
             "tag": "THE PROBLEM",
             "title": "YANG sprawl was blocking adoption",
             "body": (
-                "Network engineers had to read 1,000+ YANG modules across 5 IOS-XE releases just to find a "
+                "Network engineers had to read 1,000+ YANG modules across 5 IOS XE releases just to find a "
                 "single RESTCONF path or telemetry xpath. Coverage gaps, version drift, and platform support "
                 "were tribal knowledge — slowing automation projects and DevNet onboarding."
             ),
@@ -225,7 +225,7 @@ def build():
             "title": "DevNet-ready, release-aware, zero ops",
             "body": (
                 "Aligns with Cisco programmability strategy: standardizes on YANG + OpenAPI, plays cleanly "
-                "with Catalyst Center, Crosswork, and pyATS workflows, and scales to every new IOS-XE "
+                "with Catalyst Center, Crosswork, and pyATS workflows, and scales to every new IOS XE "
                 "train through a fully automated build pipeline."
             ),
             "bullets": [
@@ -280,7 +280,7 @@ def build():
     draw.line((80, footer_y - 14, W - 80, footer_y - 14), fill=(255, 255, 255, 40), width=1)
     f_foot = _font(16)
     f_foot_b = _font(16, bold=True)
-    draw.text((80, footer_y), "Cisco IOS-XE YANG Documentation Hub", font=f_foot_b, fill=WHITE)
+    draw.text((80, footer_y), "Cisco IOS XE YANG Documentation Hub", font=f_foot_b, fill=WHITE)
     draw.text(
         (80, footer_y + 22),
         "Static GitHub Pages site  ·  vanilla JS + Swagger UI + Chart.js  ·  built and maintained with an LLM coding agent",

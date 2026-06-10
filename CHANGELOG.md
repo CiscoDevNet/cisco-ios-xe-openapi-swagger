@@ -2,14 +2,14 @@
 
 All notable changes to this project. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
-The published site is versioned by IOS-XE release; the `Unreleased` section captures changes
+The published site is versioned by IOS XE release; the `Unreleased` section captures changes
 not yet reflected in a tagged release of the upstream YANG models.
 
 ---
 
 ## Versions Supported
 
-The site serves these IOS-XE releases under one GitHub Pages URL with an in-app version
+The site serves these IOS XE releases under one GitHub Pages URL with an in-app version
 selector (see [VERSIONING.md](VERSIONING.md) for the architecture).
 
 | Version | YangModels path | Status | Notes |
@@ -754,7 +754,7 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 ### Added
 
 - **`scripts/validate_examples_c9kv.py`** — Live-device validation for write-operation examples
-  against a Catalyst 9000V (or any IOS-XE 17.18.1+ device).
+  against a Catalyst 9000V (or any IOS XE 17.18.1+ device).
   - CLI: `--host --port --username --password --spec --method --limit --dry-run --patch-only --output`
   - 8,066 PATCH-testable examples confirmed via `--dry-run`.
 - **`AGENTS.md`** — AI agent guide (build/run, conventions, pitfalls, common tasks).

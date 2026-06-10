@@ -52,7 +52,7 @@ def categorize_module(module_name):
     """Categorize a YANG module by name."""
     name = module_name
     
-    # Cisco IOS-XE modules
+    # Cisco IOS XE modules
     if name.startswith("Cisco-IOS-XE-"):
         if "-events" in name:
             return "events"

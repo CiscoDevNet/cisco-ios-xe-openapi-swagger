@@ -1,11 +1,11 @@
 /* version-label.js — small bootstrap shared by top-level pages without
  * a full version selector (tree-compare, yang-accountability, etc).
  *
- * Reads the active IOS-XE release from ?ver= / #ver= / localStorage and
+ * Reads the active IOS XE release from ?ver= / #ver= / localStorage and
  * rewrites:
  *   - every element with class .header-version (textContent → version)
- *   - document.title (regex replace of "Cisco IOS-XE <ver>" or
- *     "IOS-XE <ver>" — keeps the rest of the title intact)
+ *   - document.title (regex replace of "Cisco IOS XE <ver>" or
+ *     "IOS XE <ver>" — keeps the rest of the title intact)
  *
  * Falls back silently to the static text already in the HTML if no version
  * is detectable. CSP-safe: external file, no eval.
@@ -34,7 +34,7 @@
             });
             if (document.title) {
                 document.title = document.title.replace(
-                    /IOS-XE [0-9.x]+/, 'IOS-XE ' + v);
+                    /IOS XE [0-9.x]+/, 'IOS XE ' + v);
             }
         } catch (_) { /* noop */ }
     }

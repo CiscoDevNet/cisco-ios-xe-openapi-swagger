@@ -29,38 +29,38 @@ END = "<!-- END seo-meta -->"
 TOP_LEVEL: dict[str, tuple[str | None, str]] = {
     "index.html": (
         None,
-        "Browse and search 608 Cisco IOS-XE OpenAPI specs across 5 releases. "
+        "Browse and search 608 Cisco IOS XE OpenAPI specs across 5 releases. "
         "Deep-link to any RESTCONF endpoint, generate client code, and "
         "download Postman or Bruno collections.",
     ),
     "code-generator.html": (
         None,
         "Generate ready-to-run Python, curl, Ansible, and RESTCONF code "
-        "snippets for any Cisco IOS-XE YANG model.",
+        "snippets for any Cisco IOS XE YANG model.",
     ),
     "tree-compare.html": (
         None,
-        "Compare YANG trees across Cisco IOS-XE releases — see exactly which "
+        "Compare YANG trees across Cisco IOS XE releases — see exactly which "
         "nodes were added, removed, or renamed between versions.",
     ),
     "telemetry.html": (
         None,
         "Browse model-driven telemetry (MDT) xpaths and subscription "
-        "examples for Cisco IOS-XE devices.",
+        "examples for Cisco IOS XE devices.",
     ),
     "exports.html": (
         None,
         "Download Postman and Bruno collections, OpenAPI spec bundles, and "
-        "per-release artifacts for Cisco IOS-XE programmability.",
+        "per-release artifacts for Cisco IOS XE programmability.",
     ),
     "yang-accountability.html": (
         None,
-        "Coverage report mapping every Cisco IOS-XE YANG module to its "
+        "Coverage report mapping every Cisco IOS XE YANG module to its "
         "OpenAPI spec and rendered tree.",
     ),
     "yang-accountability-compare.html": (
         None,
-        "Compare YANG module coverage between Cisco IOS-XE releases.",
+        "Compare YANG module coverage between Cisco IOS XE releases.",
     ),
     # app-map.html intentionally omitted: its full SEO block is baked by
     # scripts/build_app_map_html.py (the page is regenerated from APP_MAP.md
@@ -84,7 +84,7 @@ def _title_for(path: Path) -> str:
     """Extract the existing <title> text for canonical reuse."""
     text = path.read_text(encoding="utf-8")
     m = re.search(r"<title>([^<]+)</title>", text, re.I)
-    return m.group(1).strip() if m else "Cisco IOS-XE OpenAPI & YANG Docs"
+    return m.group(1).strip() if m else "Cisco IOS XE OpenAPI & YANG Docs"
 
 
 def _block(*, title: str, description: str, page_url: str,
@@ -97,15 +97,15 @@ def _block(*, title: str, description: str, page_url: str,
             '\n<script type="application/ld+json">'
             '{"@context":"https://schema.org",'
             '"@type":"WebSite",'
-            f'"name":"Cisco IOS-XE OpenAPI & YANG Docs",'
+            f'"name":"Cisco IOS XE OpenAPI & YANG Docs",'
             f'"url":"{site_url}/",'
             '"description":"Multi-version OpenAPI 2.0 and YANG tree '
-            'documentation for the Cisco IOS-XE programmability stack."'
+            'documentation for the Cisco IOS XE programmability stack."'
             "}</script>"
         )
     return (
         f'\n<meta name="description" content="{description}">'
-        '\n<meta name="keywords" content="Cisco IOS-XE, YANG, OpenAPI, '
+        '\n<meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, '
         'RESTCONF, NETCONF, network automation, model-driven telemetry, '
         'programmability, swagger">'
         '\n<meta name="author" content="Cisco DevNet">'
@@ -123,7 +123,7 @@ def _block(*, title: str, description: str, page_url: str,
         f'href="{asset_prefix}assets/icons/apple-touch-icon.png">'
         # Open Graph
         '\n<meta property="og:type" content="website">'
-        f'\n<meta property="og:site_name" content="Cisco IOS-XE OpenAPI '
+        f'\n<meta property="og:site_name" content="Cisco IOS XE OpenAPI '
         '&amp; YANG Docs">'
         f'\n<meta property="og:title" content="{title}">'
         f'\n<meta property="og:description" content="{description}">'
@@ -201,7 +201,7 @@ def main() -> int:
             continue
         existing_title = _title_for(path)
         description = (
-            f"{blurb} for Cisco IOS-XE. Browse, search, and deep-link "
+            f"{blurb} for Cisco IOS XE. Browse, search, and deep-link "
             "to any RESTCONF endpoint."
         )
         # Canonical/og:url use the directory form (Pages auto-resolves to

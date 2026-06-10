@@ -77,7 +77,7 @@ def check_homepage(base: str) -> Result:
         return Result("S-0 homepage", "SKIP", body)
     if status != 200:
         return Result("S-0 homepage", "FAIL", f"HTTP {status}")
-    must_contain = ["Cisco IOS-XE", "swagger-oper-model", "platform-coverage.html"]
+    must_contain = ["Cisco IOS XE", "swagger-oper-model", "platform-coverage.html"]
     missing = [m for m in must_contain if m not in body]
     if missing:
         return Result("S-0 homepage", "FAIL", f"missing markers: {missing}")

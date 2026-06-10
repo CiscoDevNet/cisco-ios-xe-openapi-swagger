@@ -1,4 +1,4 @@
-// Recent & Favorites functionality for Cisco IOS-XE YANG Documentation
+// Recent & Favorites functionality for Cisco IOS XE YANG Documentation
 // Tracks user's recently viewed modules and allows bookmarking favorites
 
 const STORAGE_KEYS = {

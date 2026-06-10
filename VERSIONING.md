@@ -2,13 +2,13 @@
 
 **Status:** Active (Phase 0 of multi-version rollout)
 **Owner:** Project maintainers
-**Scope:** This document is the single source of truth for how IOS-XE releases are added, stored, built, validated, and exposed in the UI. It supersedes any prior single-release assumptions in [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md).
+**Scope:** This document is the single source of truth for how IOS XE releases are added, stored, built, validated, and exposed in the UI. It supersedes any prior single-release assumptions in [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md).
 
 ---
 
 ## 1. Goals
 
-1. Host **multiple IOS-XE releases** (currently: 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1) under the **same GitHub Pages URL** with no domain change.
+1. Host **multiple IOS XE releases** (currently: 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1) under the **same GitHub Pages URL** with no domain change.
 2. Make adding a new release a **mechanical, scripted operation** — no ad-hoc edits across dozens of files.
 3. Preserve **deep-link backward compatibility** for existing URLs while introducing a new version-aware URL contract.
 4. Enforce **per-release CI gates** so a broken or incomplete release cannot ship.
@@ -155,7 +155,7 @@ CI (§9) verifies that `spec_count` matches the number of `*.json` spec files in
 
 ## 8. Adding a new release — runbook
 
-For maintainers adding the next IOS-XE release (e.g. `26.2.1`):
+For maintainers adding the next IOS XE release (e.g. `26.2.1`):
 
 1. **Fetch source YANG**:
    ```

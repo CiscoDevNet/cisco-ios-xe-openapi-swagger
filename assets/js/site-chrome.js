@@ -287,7 +287,7 @@
                               : '') +
                 '</div>' +
                 '<div class="site-footer-meta">' +
-                    '<span>Cisco IOS-XE OpenAPI / YANG Explorer</span>' +
+                    '<span>Cisco IOS XE OpenAPI Documentation Hub</span>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a class="site-footer-build" href="' + prefix + 'CHANGELOG.md#unreleased" title="View what changed in this build">Build ' + escapeHtml(SITE_BUILD) + '</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
@@ -496,7 +496,7 @@
 
     /**
      * Wrap any .header-version element that lives inside a header (and isn't
-     * already pill-wrapped) with .version-pill, so the active IOS-XE release
+     * already pill-wrapped) with .version-pill, so the active IOS XE release
      * is visually discoverable on every page.
      */
     function decorateVersionLabels() {
@@ -510,7 +510,7 @@
             if (!inHero) return;
             var pill = document.createElement('span');
             pill.className = 'version-pill';
-            pill.title = 'Active IOS-XE release';
+            pill.title = 'Active IOS XE release';
             el.parentNode.insertBefore(pill, el);
             pill.appendChild(el);
         });

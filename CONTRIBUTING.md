@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in improving the Cisco IOS-XE OpenAPI documentation hub.
+Thanks for your interest in improving the Cisco IOS XE OpenAPI documentation hub.
 
 ## Quick orientation
 
@@ -114,7 +114,7 @@ python scripts/validate_quality.py
 python scripts/audit_examples.py
 ```
 
-For live-device validation (requires a reachable IOS-XE 17.18.1+ device):
+For live-device validation (requires a reachable IOS XE 17.18.1+ device):
 
 ```powershell
 python scripts/validate_examples_c9kv.py `
@@ -129,7 +129,7 @@ When filing an issue, include:
 - Spec file path (e.g., `swagger-native-config-model/api/native-switching.json`)
 - The affected operation (method + path)
 - Expected vs actual (screenshot or JSON snippet)
-- IOS-XE version if validating against a device
+- IOS XE version if validating against a device
 
 ## Code of conduct
 

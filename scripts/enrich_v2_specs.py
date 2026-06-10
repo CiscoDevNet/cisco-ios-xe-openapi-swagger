@@ -153,7 +153,7 @@ def get_example_for_field(field_name, module_name=""):
     if fl in ("contact", "sysContact"):
         return "noc@example.com"
     if fl in ("sys-descr", "system-description", "sysDescr"):
-        return "Cisco IOS-XE Software, Catalyst 9300"
+        return "Cisco IOS XE Software, Catalyst 9300"
 
     # ── Uptime / Timestamps ──────────────────────────────────────────────
     if "uptime" in fl or "up-time" in fl:

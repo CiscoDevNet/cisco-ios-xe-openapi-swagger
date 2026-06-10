@@ -17,7 +17,7 @@ def get_example_for_field(field_name, category):
     """
     Generate production-realistic example values based on field name and category
     
-    Returns example values that match what you'd see on real Cisco IOS-XE devices
+    Returns example values that match what you'd see on real Cisco IOS XE devices
     """
     
     field_lower = field_name.lower()

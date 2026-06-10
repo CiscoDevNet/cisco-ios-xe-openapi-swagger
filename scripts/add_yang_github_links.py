@@ -9,7 +9,7 @@ import re
 
 def get_github_yang_url(module_name: str) -> str:
     """Generate GitHub URL for YANG module"""
-    # Base URL for IOS-XE 17.18.1 YANG models
+    # Base URL for IOS XE 17.18.1 YANG models
     base_url = "https://github.com/YangModels/yang/blob/main/vendor/cisco/xe/17181"
     yang_file = f"{module_name}.yang"
     return f"{base_url}/{yang_file}"
