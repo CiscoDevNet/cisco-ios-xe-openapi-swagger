@@ -23,6 +23,16 @@ When a new build is deployed and you have an open tab, a small bottom-right
 **Reload** card appears (Tier-9 update-available toast). Click **Reload** to
 activate the new version; the page refreshes exactly once.
 
+### Can I run the site locally / on an internal server / in an air-gapped network?
+
+Yes &mdash; `git clone` and `python -m http.server 8000`. The repo vendors
+every third-party library (Swagger UI, Fuse.js, Chart.js) under
+`assets/vendor/` with SHA-384 SRI verification, drops Google Fonts in favour
+of the system font stack, and enforces `default-src 'self'` CSP, so the site
+runs with **zero outbound traffic**. See
+[docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) for nginx / IIS / Apache
+recipes, security hardening, and a minimum file set for production.
+
 ### How do I find APIs for Catalyst 9k / IOS XE features?
 
 Three entry points, in order of precision:
