@@ -165,62 +165,35 @@ body {
     font-size: inherit;
     color: inherit;
 }
-/* Mindmap rendered from the source Mermaid `mindmap` block. Pure CSS,
-   no JS. Each depth gets a distinct accent so the hierarchy reads at a
-   glance. */
-.content .mindmap {
-    list-style: none;
+/* Mindmap is rendered as a generated PNG (see scripts/build_app_map_html.py
+   `_render_mindmap_png`). The source Mermaid block remains available below
+   the image inside a collapsed `<details>`. */
+.content .mindmap-figure {
+    margin: 1.2em 0 1.4em;
     padding: 0;
-    margin: 1.2em 0 1.6em;
-    font-size: 0.92rem;
+    background: linear-gradient(180deg, #f7faff, #eef3fb);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+    overflow: hidden;
 }
-.content .mindmap ul {
-    list-style: none;
-    padding-left: 26px;
-    margin: 6px 0 0;
-    border-left: 2px solid var(--border);
+.content .mindmap-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    margin: 0 auto;
 }
-.content .mindmap li {
-    position: relative;
-    margin: 0;
-    padding: 4px 0 4px 14px;
-}
-.content .mindmap li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 14px;
-    width: 10px;
-    height: 2px;
-    background: var(--border);
-}
-.content .mindmap > li > .node {
-    display: inline-block;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, #1565C0, #0D47A1);
-    color: #ffffff;
-    font-weight: 600;
-    border-radius: 6px;
-}
-.content .mindmap > li > ul > li > .node {
-    display: inline-block;
-    padding: 4px 10px;
-    background: #e8f0fc;
-    color: var(--accent-dark);
-    font-weight: 600;
-    border-radius: 4px;
-    border: 1px solid #c7d8ee;
-}
-.content .mindmap > li > ul > li > ul > li > .node {
-    color: var(--text);
-    font-weight: 500;
-}
-.content .mindmap > li > ul > li > ul > li > ul > li > .node {
+.content .mindmap-figure figcaption {
+    padding: 10px 16px 12px;
+    font-size: 0.82rem;
     color: var(--muted);
-    font-size: 0.88rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: #ffffff;
 }
 .content .mindmap-source {
-    margin-top: 6px;
+    margin: 0.2em 0 1.2em;
     font-size: 0.78rem;
     color: var(--muted);
 }
@@ -429,15 +402,17 @@ def _parse_blockquote(lines: list[str], idx: int) -> tuple[str, int]:
 
 
 def _render_mindmap(code: str) -> str:
-    """Render a Mermaid `mindmap` block as a nested-list HTML tree.
+    """Render a Mermaid `mindmap` block.
 
-    The Mermaid mindmap syntax is purely indentation-based: the first
-    non-blank line after the `mindmap` directive is the root, and every
-    subsequent line is nested under whichever earlier line has strictly
-    smaller indent. Node text may be wrapped in `((...))`, `(...)`,
-    `[...]`, `{{...}}`, or be bare; we strip those shape markers.
-    Lines containing only `::sub` (or similar `::` directives) are
-    skipped — they are Mermaid styling hints with no node text.
+    The hierarchy is parsed from the indentation-driven Mermaid syntax, then
+    drawn as a horizontal mindmap PNG (root on the left, color-coded L1
+    branches fanning right, L2 leaves listed beside each branch). The PNG
+    is written once per build to ``docs/app_mindmap.png`` and embedded via
+    ``<img>``. The original Mermaid source remains available below the
+    image inside a collapsed ``<details>`` for accessibility / portability.
+
+    If Pillow is unavailable the renderer falls back to a plain ``<pre>``
+    of the Mermaid source so the page still builds.
     """
     raw_lines = code.splitlines()
     # Drop the leading `mindmap` directive
@@ -445,10 +420,6 @@ def _render_mindmap(code: str) -> str:
         raw_lines = raw_lines[1:]
 
     nodes: list[tuple[int, str]] = []  # (indent, label)
-    # Mermaid mindmap shapes: nodeId may precede the bracketed label, e.g.
-    # `root((Big Idea))`, `Alpha[Box]`, `Beta(Pill)`, `Gamma{Diamond}`. We
-    # extract the bracketed label when present; otherwise we keep the whole
-    # stripped line.
     SHAPE_RE = re.compile(
         r"""^[\w\-]*       # optional node id
             \s*
@@ -478,12 +449,9 @@ def _render_mindmap(code: str) -> str:
     if not nodes:
         return "<pre><code>(empty mindmap)</code></pre>"
 
-    # Build a tree from (indent, label) pairs. A node's children are the
-    # subsequent nodes with strictly greater indent, until an indent <= the
-    # node's own is reached.
-    Tree = list  # of (label, children)
+    # Build the tree.
     roots: list[tuple[str, list]] = []
-    stack: list[tuple[int, list]] = []  # (indent, children-list-to-append-to)
+    stack: list[tuple[int, list]] = []
     for indent, label in nodes:
         while stack and stack[-1][0] >= indent:
             stack.pop()
@@ -494,27 +462,238 @@ def _render_mindmap(code: str) -> str:
             roots.append(node)
         stack.append((indent, node[1]))
 
-    def _emit(tree: list[tuple[str, list]], root: bool = False) -> str:
-        if not tree:
-            return ""
-        cls = ' class="mindmap"' if root else ""
-        out: list[str] = [f"<ul{cls}>"]
-        for label, children in tree:
-            out.append(
-                f'<li><span class="node">{_render_inline(label)}</span>'
-                f"{_emit(children)}</li>"
-            )
-        out.append("</ul>")
-        return "".join(out)
+    img_rel = "docs/app_mindmap.png"
+    img_ok = _render_mindmap_png(roots, ROOT / img_rel)
 
     source_escaped = html.escape(code, quote=False)
+    if img_ok:
+        figure = (
+            '<figure class="mindmap-figure">'
+            f'<img src="{img_rel}" alt="Cisco IOS-XE Documentation Hub — app mindmap"'
+            ' loading="lazy">'
+            '<figcaption>App-map overview &mdash; root node, color-coded category'
+            ' branches, and second-level features. See the source below for the full'
+            ' hierarchy including third-level details.</figcaption>'
+            '</figure>'
+        )
+    else:
+        # Pillow missing — fall back to the raw Mermaid source so the page
+        # still builds and downstream consumers can render it.
+        figure = (
+            "<pre><code class=\"language-mermaid\">"
+            f"{source_escaped}"
+            "</code></pre>"
+        )
+
     return (
-        _emit(roots, root=True)
+        figure
         + '<details class="mindmap-source">'
         + "<summary>Show Mermaid source</summary>"
         + f"<pre><code>{source_escaped}</code></pre>"
         + "</details>"
     )
+
+
+def _render_mindmap_png(
+    roots: list[tuple[str, list]], out_path: Path
+) -> bool:
+    """Draw the parsed mindmap as ``out_path`` (PNG). Returns True on success.
+
+    Layout: root pill on the left, each first-level branch as a colored pill
+    in the middle column, second-level leaves listed to the right of each
+    branch with thin colored connectors. Vertical space is allocated to each
+    branch proportional to its leaf count so dense branches do not overlap.
+    Third-level nodes are intentionally omitted from the visual (they
+    remain in the markdown source) so the picture stays readable.
+    """
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError:
+        return False
+
+    if not roots:
+        return False
+
+    root_label, root_children = roots[0]
+
+    branches: list[tuple[str, list[str]]] = []
+    for l1_label, l1_children in root_children:
+        leaves: list[str] = []
+        for child_label, _ in l1_children:
+            if child_label.startswith("::"):
+                continue
+            leaves.append(child_label)
+        branches.append((l1_label, leaves))
+
+    if not branches:
+        return False
+
+    # --- layout constants ------------------------------------------------
+    W = 2000
+    PAD_TOP = 90
+    PAD_BOTTOM = 70
+    ROW_H = 38
+    BRANCH_GAP = 16
+    total_rows = sum(max(1, len(b[1])) for b in branches)
+    inner_h = total_rows * ROW_H + (len(branches) - 1) * BRANCH_GAP
+    H = max(900, PAD_TOP + inner_h + PAD_BOTTOM)
+
+    BG_TOP = (245, 249, 254)
+    BG_BOT = (232, 240, 250)
+    TEXT = (28, 36, 52)
+    MUTED = (96, 110, 130)
+    SHADOW = (190, 205, 224)
+
+    PALETTE = [
+        (21, 101, 192),     # blue
+        (123, 31, 162),     # purple
+        (46, 125, 50),      # green
+        (239, 108, 0),      # orange
+        (0, 131, 143),      # teal
+        (84, 110, 122),     # slate
+        (194, 24, 91),      # pink
+        (191, 54, 12),      # deep orange
+    ]
+
+    img = Image.new("RGB", (W, H), BG_TOP)
+    draw = ImageDraw.Draw(img)
+    # vertical gradient background
+    for y in range(H):
+        t = y / max(1, H - 1)
+        r = int(BG_TOP[0] * (1 - t) + BG_BOT[0] * t)
+        g = int(BG_TOP[1] * (1 - t) + BG_BOT[1] * t)
+        b = int(BG_TOP[2] * (1 - t) + BG_BOT[2] * t)
+        draw.line([(0, y), (W, y)], fill=(r, g, b))
+
+    def _font(size: int, bold: bool = False):
+        for name in (
+            "seguisb.ttf" if bold else "segoeui.ttf",
+            "arialbd.ttf" if bold else "arial.ttf",
+            "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf",
+        ):
+            try:
+                return ImageFont.truetype(name, size)
+            except OSError:
+                continue
+        return ImageFont.load_default()
+
+    f_title = _font(22, bold=True)
+    f_subtitle = _font(15)
+    f_root = _font(28, bold=True)
+    f_branch = _font(20, bold=True)
+    f_leaf = _font(16)
+
+    # Title strip
+    draw.text((48, 26), "Cisco IOS-XE Documentation Hub  —  App Map",
+              font=f_title, fill=(13, 71, 161))
+    draw.text((48, 56), "Generated from APP_MAP.md. Two levels shown; full hierarchy is in the source.",
+              font=f_subtitle, fill=MUTED)
+
+    # --- y positions -----------------------------------------------------
+    branch_y: list[float] = []
+    leaf_ys: list[list[float]] = []
+    cur = PAD_TOP
+    for label, leaves in branches:
+        n = max(1, len(leaves))
+        ys = [cur + (i + 0.5) * ROW_H for i in range(n)]
+        center = sum(ys) / len(ys)
+        branch_y.append(center)
+        leaf_ys.append(ys[: len(leaves)])
+        cur += n * ROW_H + BRANCH_GAP
+
+    # X anchors
+    root_cx = 200
+    branch_cx = 760
+    leaf_x = 1120
+
+    # --- connectors (drawn first, behind nodes) --------------------------
+    def cubic_bezier(p0, p1, p2, p3, steps=40):
+        pts = []
+        for s in range(steps + 1):
+            t = s / steps
+            u = 1 - t
+            x = (u * u * u * p0[0]
+                 + 3 * u * u * t * p1[0]
+                 + 3 * u * t * t * p2[0]
+                 + t * t * t * p3[0])
+            y = (u * u * u * p0[1]
+                 + 3 * u * u * t * p1[1]
+                 + 3 * u * t * t * p2[1]
+                 + t * t * t * p3[1])
+            pts.append((x, y))
+        return pts
+
+    root_cy = H / 2
+
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        by = branch_y[i]
+        # root → branch
+        p0 = (root_cx + 130, root_cy)
+        p3 = (branch_cx - 140, by)
+        ctrl_x = (p0[0] + p3[0]) / 2
+        draw.line(
+            cubic_bezier(p0, (ctrl_x, p0[1]), (ctrl_x, p3[1]), p3, steps=40),
+            fill=color, width=5,
+        )
+        # branch → each leaf
+        for j, ly in enumerate(leaf_ys[i]):
+            q0 = (branch_cx + 130, by)
+            q3 = (leaf_x - 14, ly)
+            ctrl_x2 = (q0[0] + q3[0]) / 2
+            draw.line(
+                cubic_bezier(q0, (ctrl_x2, q0[1]), (ctrl_x2, q3[1]), q3, steps=24),
+                fill=color, width=2,
+            )
+
+    # --- root pill -------------------------------------------------------
+    root_pad_x, root_pad_y = 26, 16
+    rw = int(draw.textlength(root_label, font=f_root)) + root_pad_x * 2
+    rh = f_root.size + root_pad_y * 2
+    rx1, rx2 = root_cx - rw // 2, root_cx + rw // 2
+    ry1, ry2 = int(root_cy - rh // 2), int(root_cy + rh // 2)
+    draw.rounded_rectangle((rx1 + 3, ry1 + 5, rx2 + 3, ry2 + 5),
+                           radius=24, fill=SHADOW)
+    draw.rounded_rectangle((rx1, ry1, rx2, ry2), radius=24, fill=(13, 71, 161))
+    tw = draw.textlength(root_label, font=f_root)
+    draw.text((root_cx - tw / 2, ry1 + root_pad_y - 2),
+              root_label, font=f_root, fill=(255, 255, 255))
+
+    # --- branch pills + leaves ------------------------------------------
+    bp_pad_x, bp_pad_y = 18, 11
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        by = branch_y[i]
+        bw = int(draw.textlength(label, font=f_branch)) + bp_pad_x * 2
+        bh = f_branch.size + bp_pad_y * 2
+        bx1, bx2 = branch_cx - bw // 2, branch_cx + bw // 2
+        by1, by2 = int(by - bh // 2), int(by + bh // 2)
+        draw.rounded_rectangle((bx1 + 2, by1 + 4, bx2 + 2, by2 + 4),
+                               radius=16, fill=SHADOW)
+        draw.rounded_rectangle((bx1, by1, bx2, by2), radius=16, fill=color)
+        tw = draw.textlength(label, font=f_branch)
+        draw.text((branch_cx - tw / 2, by1 + bp_pad_y - 2),
+                  label, font=f_branch, fill=(255, 255, 255))
+
+        max_text_w = W - leaf_x - 80
+        for j, leaf in enumerate(leaves):
+            ly = leaf_ys[i][j]
+            # marker dot
+            r = 5
+            draw.ellipse((leaf_x - r, ly - r, leaf_x + r, ly + r), fill=color)
+            text = leaf
+            tw = draw.textlength(text, font=f_leaf)
+            while tw > max_text_w and len(text) > 4:
+                text = text[:-2]
+                tw = draw.textlength(text + "\u2026", font=f_leaf)
+            if text != leaf:
+                text = text + "\u2026"
+            draw.text((leaf_x + 14, ly - f_leaf.size / 2 - 1),
+                      text, font=f_leaf, fill=TEXT)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(out_path, format="PNG", optimize=True)
+    return True
 
 
 def _iter_blocks(text: str) -> Iterator[str]:
