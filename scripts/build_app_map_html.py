@@ -463,10 +463,15 @@ def _render_mindmap(code: str) -> str:
         stack.append((indent, node[1]))
 
     img_rel = "docs/app_mindmap.png"
-    img_ok = _render_mindmap_png(roots, ROOT / img_rel)
+    img_path = ROOT / img_rel
+    # Try to regenerate the PNG from the current source; if Pillow isn't
+    # available (common on a barebones CI runner) we still emit the figure
+    # when a previously-committed PNG exists on disk.
+    _render_mindmap_png(roots, img_path)
+    has_png = img_path.is_file() and img_path.stat().st_size > 0
 
     source_escaped = html.escape(code, quote=False)
-    if img_ok:
+    if has_png:
         figure = (
             '<figure class="mindmap-figure">'
             f'<img src="{img_rel}" alt="Cisco IOS-XE Documentation Hub — app mindmap"'
@@ -477,8 +482,8 @@ def _render_mindmap(code: str) -> str:
             '</figure>'
         )
     else:
-        # Pillow missing — fall back to the raw Mermaid source so the page
-        # still builds and downstream consumers can render it.
+        # Neither Pillow nor a committed PNG — fall back to raw Mermaid source
+        # so the page still builds and the data is preserved.
         figure = (
             "<pre><code class=\"language-mermaid\">"
             f"{source_escaped}"
