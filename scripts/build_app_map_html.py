@@ -504,11 +504,12 @@ def _render_mindmap_png(
 ) -> bool:
     """Draw the parsed mindmap as ``out_path`` (PNG). Returns True on success.
 
-    Three-column layout: root pill (left) → category pills (center) →
-    color-tinted leaf chips (right). Each branch sits in its own pastel
-    row-band so groups read as distinct sections. Soft drop shadows,
-    cubic-bezier connectors, and a Cisco-blue title strip make it
-    presentation-ready.
+    Radial "bubble" layout that mirrors Mermaid's native mindmap renderer:
+    a central root, six color-coded category bubbles arranged around it,
+    and every second-level (and third-level when present) leaf shown as a
+    smaller tinted bubble fanning outward along its branch axis. Connectors
+    are cubic Bezier curves in the branch color so the eye can trace any
+    leaf back to its category at a glance.
     """
     try:
         from PIL import Image, ImageDraw, ImageFont
@@ -518,31 +519,47 @@ def _render_mindmap_png(
     if not roots:
         return False
 
+    import math
+
     root_label, root_children = roots[0]
 
-    branches: list[tuple[str, list[str]]] = []
+    # Parse: each branch keeps its leaves AND each leaf keeps its sub-leaves.
+    # The Mermaid source uses "::sub" markers for an inline group; those are
+    # flattened into the parent branch (sub-leaves attach to the previous
+    # real leaf so the radial picture stays balanced).
+    branches: list[tuple[str, list[tuple[str, list[str]]]]] = []
     for l1_label, l1_children in root_children:
-        leaves: list[str] = []
-        for child_label, _ in l1_children:
+        leaves: list[tuple[str, list[str]]] = []
+        pending_sub: list[str] = []
+        for child_label, child_grand in l1_children:
             if child_label.startswith("::"):
+                # collect grandchildren of this marker as sub-leaves
+                for g_label, _ in child_grand:
+                    pending_sub.append(g_label)
                 continue
-            leaves.append(child_label)
+            sub = [g_label for g_label, _ in child_grand
+                   if not g_label.startswith("::")]
+            leaves.append((child_label, sub))
+        if pending_sub and leaves:
+            # attach the trailing "::sub" group to the last real leaf
+            tail_label, tail_sub = leaves[-1]
+            leaves[-1] = (tail_label, list(tail_sub) + pending_sub)
         branches.append((l1_label, leaves))
 
     if not branches:
         return False
 
-    # --- layout constants ------------------------------------------------
-    W = 2200
-    PAD_TOP = 120
-    PAD_BOTTOM = 80
-    ROW_H = 48
-    BRANCH_GAP = 22
-    total_rows = sum(max(1, len(b[1])) for b in branches)
-    inner_h = total_rows * ROW_H + (len(branches) - 1) * BRANCH_GAP
-    H = max(960, PAD_TOP + inner_h + PAD_BOTTOM)
-
-    # palette
+    # --- palette ---------------------------------------------------------
+    PALETTE = [
+        (21, 101, 192),    # blue
+        (123, 31, 162),    # purple
+        (46, 125, 50),     # green
+        (239, 108, 0),     # orange
+        (0, 131, 143),     # teal
+        (84, 110, 122),    # slate
+        (194, 24, 91),     # pink
+        (191, 54, 12),     # deep orange
+    ]
     BG_TOP = (244, 248, 254)
     BG_BOT = (228, 237, 249)
     TEXT = (24, 32, 48)
@@ -552,24 +569,17 @@ def _render_mindmap_png(
     ROOT_DARK = (10, 56, 130)
     ROOT_LIGHT = (33, 105, 200)
 
-    PALETTE = [
-        (21, 101, 192),     # blue
-        (123, 31, 162),     # purple
-        (46, 125, 50),      # green
-        (239, 108, 0),      # orange
-        (0, 131, 143),      # teal
-        (84, 110, 122),     # slate
-        (194, 24, 91),      # pink
-        (191, 54, 12),      # deep orange
-    ]
-
-    def _tint(rgb, amount=0.86):
-        """Blend rgb toward white by `amount` (0..1, higher = paler)."""
+    def _tint(rgb, amount=0.82):
         return tuple(int(c + (255 - c) * amount) for c in rgb)
 
+    def _darken(rgb, amount=0.25):
+        return tuple(int(c * (1 - amount)) for c in rgb)
+
+    # --- canvas ----------------------------------------------------------
+    W, H = 2600, 1900
     img = Image.new("RGB", (W, H), BG_TOP)
     draw = ImageDraw.Draw(img)
-    # vertical gradient background
+    # vertical gradient
     for y in range(H):
         t = y / max(1, H - 1)
         r = int(BG_TOP[0] * (1 - t) + BG_BOT[0] * t)
@@ -590,52 +600,23 @@ def _render_mindmap_png(
         return ImageFont.load_default()
 
     f_title = _font(30, bold=True)
-    f_subtitle = _font(17)
+    f_subtitle = _font(16)
     f_root = _font(34, bold=True)
-    f_branch = _font(24, bold=True)
-    f_leaf = _font(19)
-    f_count = _font(14, bold=True)
+    f_branch = _font(22, bold=True)
+    f_leaf = _font(17, bold=True)
+    f_sub = _font(13)
     f_footer = _font(13)
 
-    # Title strip + accent rule
-    draw.text((56, 32), "Cisco IOS-XE Documentation Hub  —  Application Map",
+    # --- title strip -----------------------------------------------------
+    draw.text((56, 32), "Cisco IOS-XE Documentation Hub  —  Application Mind Map",
               font=f_title, fill=HEADER_BLUE)
     draw.text((58, 72),
-              "Generated from APP_MAP.md  ·  Two levels shown; full hierarchy in the source below.",
+              "Generated from APP_MAP.md  ·  Radial view: root → categories → features (full hierarchy in the source below).",
               font=f_subtitle, fill=MUTED)
-    draw.rectangle((56, 104, 280, 108), fill=HEADER_BLUE)
+    draw.rectangle((56, 102, 320, 106), fill=HEADER_BLUE)
 
-    # --- y positions -----------------------------------------------------
-    branch_y: list[float] = []
-    leaf_ys: list[list[float]] = []
-    band_bounds: list[tuple[int, int]] = []
-    cur = PAD_TOP
-    for label, leaves in branches:
-        n = max(1, len(leaves))
-        band_top = cur - BRANCH_GAP // 2
-        ys = [cur + (i + 0.5) * ROW_H for i in range(n)]
-        center = sum(ys) / len(ys)
-        branch_y.append(center)
-        leaf_ys.append(ys[: len(leaves)])
-        cur += n * ROW_H
-        band_bottom = cur + BRANCH_GAP // 2
-        band_bounds.append((int(band_top), int(band_bottom)))
-        cur += BRANCH_GAP
-
-    # X anchors
-    root_cx = 250
-    branch_cx = 820
-    leaf_x = 1230  # left edge of leaf chips
-    leaf_max_w = W - leaf_x - 80
-
-    # --- alternating row bands (drawn first, beneath everything) --------
-    for i, (top, bot) in enumerate(band_bounds):
-        if i % 2 == 0:
-            draw.rectangle((leaf_x - 60, top, W - 40, bot),
-                           fill=(238, 244, 252))
-
-    # --- connectors (drawn next, behind nodes) --------------------------
-    def cubic_bezier(p0, p1, p2, p3, steps=40):
+    # --- helpers ---------------------------------------------------------
+    def cubic_bezier(p0, p1, p2, p3, steps=48):
         pts = []
         for s in range(steps + 1):
             t = s / steps
@@ -651,114 +632,173 @@ def _render_mindmap_png(
             pts.append((x, y))
         return pts
 
-    root_cy = H / 2
+    def text_size(text, font):
+        bbox = draw.textbbox((0, 0), text, font=font)
+        return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
-    for i, (label, leaves) in enumerate(branches):
-        color = PALETTE[i % len(PALETTE)]
-        tint = _tint(color, 0.78)
-        by = branch_y[i]
-        # root → branch (thicker, with paler outer halo)
-        p0 = (root_cx + 160, root_cy)
-        p3 = (branch_cx - 160, by)
-        ctrl_x = (p0[0] + p3[0]) / 2
-        halo_pts = cubic_bezier(p0, (ctrl_x, p0[1]), (ctrl_x, p3[1]), p3, steps=48)
-        draw.line(halo_pts, fill=tint, width=10)
-        draw.line(halo_pts, fill=color, width=5)
-        # branch → each leaf
-        for j, ly in enumerate(leaf_ys[i]):
-            q0 = (branch_cx + 150, by)
-            q3 = (leaf_x - 8, ly)
-            ctrl_x2 = (q0[0] + q3[0]) / 2
-            draw.line(
-                cubic_bezier(q0, (ctrl_x2, q0[1]), (ctrl_x2, q3[1]), q3, steps=28),
-                fill=color, width=3,
-            )
-
-    # --- root pill (gradient via two stacked rounded rects) --------------
-    root_pad_x, root_pad_y = 32, 22
-    rw = int(draw.textlength(root_label, font=f_root)) + root_pad_x * 2
-    rh = f_root.size + root_pad_y * 2
-    rx1, rx2 = root_cx - rw // 2, root_cx + rw // 2
-    ry1, ry2 = int(root_cy - rh // 2), int(root_cy + rh // 2)
-    # double shadow for depth
-    draw.rounded_rectangle((rx1 + 6, ry1 + 10, rx2 + 6, ry2 + 10),
-                           radius=30, fill=SHADOW)
-    draw.rounded_rectangle((rx1, ry1, rx2, ry2), radius=30, fill=ROOT_DARK)
-    # gradient highlight (lighter top half)
-    draw.rounded_rectangle((rx1, ry1, rx2, ry1 + rh // 2 + 4),
-                           radius=30, fill=ROOT_LIGHT)
-    # repaint bottom-half edge so it stays dark
-    draw.rectangle((rx1, ry1 + rh // 2 + 4, rx2, ry2), fill=ROOT_DARK)
-    # redraw rounded corners by re-stroking outline
-    draw.rounded_rectangle((rx1, ry1, rx2, ry2), radius=30,
-                           outline=ROOT_DARK, width=2)
-    tw = draw.textlength(root_label, font=f_root)
-    draw.text((root_cx - tw / 2, ry1 + root_pad_y - 4),
-              root_label, font=f_root, fill=(255, 255, 255))
-
-    # --- branch pills + leaf chips --------------------------------------
-    bp_pad_x, bp_pad_y = 22, 14
-    for i, (label, leaves) in enumerate(branches):
-        color = PALETTE[i % len(PALETTE)]
-        tint = _tint(color, 0.86)
-        by = branch_y[i]
-        bw = int(draw.textlength(label, font=f_branch)) + bp_pad_x * 2 + 44  # +badge
-        bh = f_branch.size + bp_pad_y * 2
-        bx1, bx2 = branch_cx - bw // 2, branch_cx + bw // 2
-        by1, by2 = int(by - bh // 2), int(by + bh // 2)
+    def draw_bubble(cx, cy, text, font, fill, text_color=(255, 255, 255),
+                    pad_x=18, pad_y=10, radius_extra=0, outline=None):
+        tw, th = text_size(text, font)
+        w = tw + pad_x * 2
+        h = th + pad_y * 2
+        x1, y1 = int(cx - w / 2), int(cy - h / 2)
+        x2, y2 = int(cx + w / 2), int(cy + h / 2)
+        rad = h // 2 + radius_extra
         # shadow
-        draw.rounded_rectangle((bx1 + 3, by1 + 6, bx2 + 3, by2 + 6),
-                               radius=20, fill=SHADOW)
-        draw.rounded_rectangle((bx1, by1, bx2, by2), radius=20, fill=color)
-        # label text (left of badge)
-        tw = draw.textlength(label, font=f_branch)
-        text_x = bx1 + bp_pad_x
-        draw.text((text_x, by1 + bp_pad_y - 3),
-                  label, font=f_branch, fill=(255, 255, 255))
-        # count badge (right inside the pill)
-        count_str = str(len(leaves))
-        cb_d = bh - 14
-        cb_cx = bx2 - bp_pad_x - cb_d // 2
-        cb_cy = by
-        draw.ellipse((cb_cx - cb_d // 2, cb_cy - cb_d // 2,
-                      cb_cx + cb_d // 2, cb_cy + cb_d // 2),
-                     fill=(255, 255, 255))
-        cw = draw.textlength(count_str, font=f_count)
-        draw.text((cb_cx - cw / 2, cb_cy - f_count.size / 2 - 1),
-                  count_str, font=f_count, fill=color)
+        draw.rounded_rectangle((x1 + 3, y1 + 5, x2 + 3, y2 + 5),
+                               radius=rad, fill=SHADOW)
+        draw.rounded_rectangle((x1, y1, x2, y2), radius=rad, fill=fill,
+                               outline=outline, width=2 if outline else 0)
+        draw.text((cx - tw / 2, cy - th / 2 - 1), text, font=font,
+                  fill=text_color)
+        return (x1, y1, x2, y2)
 
-        # leaf chips
-        chip_h = ROW_H - 12
-        for j, leaf in enumerate(leaves):
-            ly = leaf_ys[i][j]
-            text = leaf
-            tw = draw.textlength(text, font=f_leaf)
-            # truncate to fit
-            while tw > leaf_max_w - 60 and len(text) > 4:
-                text = text[:-2]
-                tw = draw.textlength(text + "\u2026", font=f_leaf)
-            if text != leaf:
-                text = text + "\u2026"
-                tw = draw.textlength(text, font=f_leaf)
-            chip_w = int(tw) + 56
-            cx1 = leaf_x
-            cx2 = leaf_x + chip_w
-            cy1 = int(ly - chip_h / 2)
-            cy2 = int(ly + chip_h / 2)
-            # tinted chip background
-            draw.rounded_rectangle((cx1, cy1, cx2, cy2),
-                                   radius=chip_h // 2, fill=tint)
-            # left color accent bar
-            draw.rounded_rectangle((cx1, cy1, cx1 + 8, cy2),
-                                   radius=4, fill=color)
-            # marker dot
-            r = 6
-            draw.ellipse((cx1 + 22 - r, ly - r, cx1 + 22 + r, ly + r),
-                         fill=color)
-            draw.text((cx1 + 38, ly - f_leaf.size / 2 - 1),
-                      text, font=f_leaf, fill=TEXT)
+    # --- radial layout ---------------------------------------------------
+    # Plot area sits below the title strip
+    plot_top = 140
+    cx0 = W / 2
+    cy0 = (plot_top + H) / 2 - 30
 
-    # Footer
+    n = len(branches)
+    # Proportional arc allocation: each branch gets angular space scaled
+    # to its number of leaves, with a minimum so sparse branches still
+    # read clearly. A fixed gap separates adjacent branches.
+    leaf_counts = [max(1, len(b[1])) for b in branches]
+    total_leaves = sum(leaf_counts)
+    GAP_DEG = 10
+    available = 360 - n * GAP_DEG
+    MIN_ARC = 38
+    raw_arcs = [available * c / total_leaves for c in leaf_counts]
+    arcs = [max(MIN_ARC, a) for a in raw_arcs]
+    # Renormalize so total = available
+    scale = available / sum(arcs)
+    arcs = [a * scale for a in arcs]
+
+    # Start at the top (-90°) and walk clockwise
+    start_angles: list[float] = []
+    centers: list[float] = []
+    cursor = -90 - GAP_DEG / 2
+    for arc in arcs:
+        cursor += GAP_DEG
+        start_angles.append(cursor)
+        centers.append(cursor + arc / 2)
+        cursor += arc
+
+    # Branch ring (distance from root to category bubble centre)
+    R_BRANCH = 360
+    # Leaf ring (distance from root to leaf bubble centre); push dense
+    # branches a bit further so chord-length per leaf stays comfortable.
+    LEAF_RING_BASE = 720
+
+    branch_pos: list[tuple[float, float, float]] = []
+    for c_deg in centers:
+        ang = math.radians(c_deg)
+        bx = cx0 + R_BRANCH * math.cos(ang)
+        by = cy0 + R_BRANCH * math.sin(ang)
+        branch_pos.append((bx, by, ang))
+
+    # --- draw connectors: root → branches --------------------------------
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        bx, by, ang = branch_pos[i]
+        sx = cx0 + 108 * math.cos(ang)
+        sy = cy0 + 108 * math.sin(ang)
+        c1 = (cx0 + 220 * math.cos(ang), cy0 + 220 * math.sin(ang))
+        c2 = (bx - 110 * math.cos(ang), by - 110 * math.sin(ang))
+        pts = cubic_bezier((sx, sy), c1, c2, (bx, by), steps=44)
+        draw.line(pts, fill=_tint(color, 0.75), width=14)
+        draw.line(pts, fill=color, width=7)
+
+    # --- compute leaf positions and draw connectors: branch → leaves ----
+    leaf_positions: list[list[tuple[float, float]]] = []
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        bx, by, ang_center = branch_pos[i]
+        nl = len(leaves)
+        positions: list[tuple[float, float]] = []
+        if nl == 0:
+            leaf_positions.append(positions)
+            continue
+        # Spread leaves across the full allocated arc (minus a small inset
+        # so they sit inside the branch's slice).
+        arc = arcs[i]
+        inner = arc - 6  # degrees actually used by leaves
+        if nl == 1:
+            offsets = [0.0]
+        else:
+            offsets = [-inner / 2 + (inner * j / (nl - 1)) for j in range(nl)]
+        # leaf ring: bump radius slightly for very dense branches so
+        # leaf bubbles do not crowd each other.
+        leaf_ring = LEAF_RING_BASE + max(0, (nl - 5) * 25)
+        for j, (leaf_label, _sub) in enumerate(leaves):
+            leaf_ang = math.radians(centers[i] + offsets[j])
+            lx = cx0 + leaf_ring * math.cos(leaf_ang)
+            ly = cy0 + leaf_ring * math.sin(leaf_ang)
+            positions.append((lx, ly))
+            # connector branch → leaf: simple curve from branch toward leaf
+            cmx = (bx + lx) / 2
+            cmy = (by + ly) / 2
+            pts = cubic_bezier((bx, by), (cmx, by), (cmx, ly), (lx, ly),
+                               steps=24)
+            draw.line(pts, fill=color, width=3)
+        leaf_positions.append(positions)
+
+    # --- draw leaf bubbles ---------------------------------------------
+    # (Sub-leaves are intentionally NOT rendered in the picture; they live
+    # in the collapsible Mermaid source block under the figure so the
+    # visual stays clean and uncluttered.)
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        tint = _tint(color, 0.84)
+        for (leaf_label, _sub), (lx, ly) in zip(leaves, leaf_positions[i]):
+            draw_bubble(lx, ly, leaf_label, f_leaf, fill=tint,
+                        text_color=_darken(color, 0.45),
+                        pad_x=14, pad_y=8, outline=color)
+
+    # --- draw branch bubbles (above connectors) -------------------------
+    for i, (label, leaves) in enumerate(branches):
+        color = PALETTE[i % len(PALETTE)]
+        bx, by, _ = branch_pos[i]
+        full = f"{label}  ({len(leaves)})"
+        draw_bubble(bx, by, full, f_branch, fill=color,
+                    text_color=(255, 255, 255), pad_x=22, pad_y=14)
+
+    # --- draw root bubble (on top of everything) ------------------------
+    # circular root
+    root_r = 110
+    # outer shadow
+    draw.ellipse((cx0 - root_r + 6, cy0 - root_r + 10,
+                  cx0 + root_r + 6, cy0 + root_r + 10), fill=SHADOW)
+    # main dark circle
+    draw.ellipse((cx0 - root_r, cy0 - root_r,
+                  cx0 + root_r, cy0 + root_r), fill=ROOT_DARK)
+    # highlight (lighter top half)
+    draw.pieslice((cx0 - root_r, cy0 - root_r,
+                   cx0 + root_r, cy0 + root_r),
+                  start=180, end=360, fill=ROOT_LIGHT)
+    # inner ring
+    draw.ellipse((cx0 - root_r + 8, cy0 - root_r + 8,
+                  cx0 + root_r - 8, cy0 + root_r - 8),
+                 outline=(255, 255, 255), width=3)
+    # root label (wrap on whitespace if needed)
+    root_words = root_label.split()
+    if len(root_words) >= 3:
+        line1 = " ".join(root_words[:-1])
+        line2 = root_words[-1]
+    else:
+        line1, line2 = root_label, ""
+    t1w, t1h = text_size(line1, f_root)
+    if line2:
+        t2w, t2h = text_size(line2, f_root)
+        draw.text((cx0 - t1w / 2, cy0 - t1h - 2), line1,
+                  font=f_root, fill=(255, 255, 255))
+        draw.text((cx0 - t2w / 2, cy0 + 4), line2,
+                  font=f_root, fill=(255, 255, 255))
+    else:
+        draw.text((cx0 - t1w / 2, cy0 - t1h / 2), line1,
+                  font=f_root, fill=(255, 255, 255))
+
+    # --- footer ----------------------------------------------------------
     draw.text((56, H - 36),
               "Cisco IOS-XE Documentation Hub  ·  cs.co/xeswagger",
               font=f_footer, fill=MUTED)
