@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v32-2026.06.10a';
+const CACHE_VERSION = 'v33-2026.06.10b';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
@@ -40,6 +40,12 @@ const PRECACHE_URLS = [
   'assets/icons/favicon.svg',
   'assets/icons/favicon.ico',
   'assets/icons/apple-touch-icon.png',
+  // Vendored third-party libs (air-gap support). SRI-pinned in HTML.
+  'assets/vendor/fuse.js',
+  'assets/vendor/chart.umd.js',
+  'assets/vendor/swagger-ui-5.31.0/swagger-ui.css',
+  'assets/vendor/swagger-ui-5.31.0/swagger-ui-bundle.js',
+  'assets/vendor/swagger-ui-5.31.0/swagger-ui-standalone-preset.js',
 ].map((p) => new URL(p, SCOPE).toString());
 
 // Paths under scope that we explicitly bypass (network-only).

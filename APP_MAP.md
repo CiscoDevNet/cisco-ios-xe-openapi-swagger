@@ -241,7 +241,7 @@ not repeated below.
 - **Data sources**: [platform-support-index.json](platform-support-index.json),
   `releases/<ver>/platform-support.json`.
 - **Scripts**: [assets/js/platform-coverage.js](assets/js/platform-coverage.js).
-- **CSP note**: Page declares its own CSP (no `script-src cdn.jsdelivr.net`).
+- **CSP note**: Page declares its own CSP (no external hosts).
 
 ### 3.10 [yang-trees/index.html](yang-trees/index.html) — Redirector
 - **Route**: `/yang-trees/`
@@ -514,11 +514,10 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | `releases/<ver>/path_depth_audit.json`, `tree_audit.json` | inferred QA artifacts | not directly bound to UI |
 | `tools/IOS-XE-RESTCONF-v*.postman_collection.json` (and v2 parts) | manual / generators | hub downloads, exports |
 
-External (CDN, allowed by CSP):
-- `cdn.jsdelivr.net/npm/fuse.js@7.0.0`
-- `cdn.jsdelivr.net/npm/chart.js@4.4.0`
-- `cdn.jsdelivr.net/npm/swagger-ui-dist@5.31.0`
-- `fonts.googleapis.com` + `fonts.gstatic.com` (Roboto)
+External: **none.** Every third-party library is vendored under
+`assets/vendor/` with SHA-384 SRI verification (Swagger UI 5.31.0,
+fuse.js 7.0.0, chart.js 4.4.0). No CDN, no web fonts. Site runs with
+zero outbound traffic. See [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md).
 
 LocalStorage keys observed:
 - `theme`

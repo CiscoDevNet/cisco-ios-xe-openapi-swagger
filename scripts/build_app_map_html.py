@@ -908,7 +908,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{html.escape(PAGE_TITLE)}</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
     <meta name="description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger, architecture, site map">
     <meta name="author" content="Cisco DevNet">
@@ -930,7 +930,6 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="twitter:title" content="{html.escape(PAGE_TITLE)}">
     <meta name="twitter:description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="twitter:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>{CSS}</style>
 </head>
 <body>
