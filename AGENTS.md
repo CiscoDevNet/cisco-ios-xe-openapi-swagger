@@ -439,6 +439,22 @@ In RFC 7951 RESTCONF JSON, an empty YANG leaf is `[null]` (an array containing n
 
 Earlier versions had `{"Cisco-IOS-XE-native:vlan": {}}` examples that broke device updates. The fix lives in `scripts/enrich_v2_specs.py` (`build_example_from_schema()`, `_build_example_from_path()`, `_populate_empty_example()`). If you see `{}` come back in examples, the fix has regressed.
 
+### RPC submodules and nested choice/case (fixed 2026-06-15)
+
+The single RPC generator is [generators/generate_rpc_openapi_v2.py](generators/generate_rpc_openapi_v2.py). Do **not** edit `generate_rpc_from_tree.py` — it is unused by the per-release pipeline.
+
+Two rules that the generator now enforces and that future edits must preserve:
+
+1. **YANG `include <submodule>;` must be resolved before parsing.** Parent modules (e.g. `Cisco-IOS-XE-rpc.yang`) declare RPCs like `rpc crypto { input { uses crypto-input-grouping; } }` while the grouping lives in a submodule (e.g. `Cisco-IOS-XE-crypto-rpc.yang`, `belongs-to Cisco-IOS-XE-rpc`). Without `_resolve_includes()` inlining the submodule body, `extract_groupings()` returns nothing and the request schema collapses to `{}`. This silently affected `rpc:crypto` (pki import/export/enroll/authenticate/benchmark/crl/certificate/server), `rpc:clear` (aaa/arp/bgp/dhcp/ospf/platform) and `rpc:debug` (platform/crypto) for years. Submodule files themselves are skipped via the `is_submodule` flag — `analyze_yang_accountability_v2.py` records `reason_excluded="Submodule of <parent> - included in parent spec"`.
+
+2. **All keyword scanners (`leaf` / `leaf-list` / `container` / `choice` / `case` / `uses`) must respect brace depth.** A naive `re.search(r'\bleaf\s+(\S+)\s*\{')` will match leaves nested arbitrarily deep and hoist them into the parent schema. Use `_iter_top_level_blocks(content, keyword)` and `_iter_top_level_uses(content)` — they walk character-by-character tracking brace depth, string literals and YANG comments, and only yield matches at `depth==0`.
+
+If a customer reports "I can find X in the YANG tree but not in the OpenAPI", check both rules before touching anything else.
+
+### `scripts/update_manifests.py` is dead code
+
+The `manifests` step in `scripts/build_release.py` calls `update_manifests.py`, which ignores `--version` and tries to write top-level `swagger-*-model/api/manifest.json` paths that no longer exist (everything moved under `releases/<v>/`). Per-release manifests are already created by each generator. Run `build_release.py` with `--only` lists that exclude `manifests`. Do not "fix" by writing top-level dirs.
+
 ---
 
 ## 9. Testing Approach
