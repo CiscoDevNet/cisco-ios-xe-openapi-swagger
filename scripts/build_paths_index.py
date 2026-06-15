@@ -47,6 +47,102 @@ CATEGORIES = (
 )
 HTTP_METHODS = ("get", "put", "post", "patch", "delete", "head", "options")
 
+# Per-operation keyword budget. Request-body schemas (especially native-config)
+# can be enormous, so the searchable keyword blob extracted from nested property
+# names + descriptions is capped to keep _paths_index.json small enough to fetch
+# on viewer load. RPC bodies are tiny, so this fully covers cases like the
+# hw-module "beacon" (Blue Beacon LED) leaf that is buried in the request body
+# and was previously invisible to operation search.
+_KW_MAX_CHARS = 600
+_KW_MAX_DEPTH = 16
+_KW_STOPWORDS = {
+    "the", "and", "for", "this", "that", "with", "from", "type", "value",
+    "object", "string", "which", "when", "will", "have", "been", "into",
+    "system", "data", "name", "list", "config", "configuration",
+}
+
+
+def _resolve_ref(ref: str, root: dict) -> dict | None:
+    """Resolve a same-document JSON pointer ($ref) to its schema object."""
+    if not ref.startswith("#/"):
+        return None
+    node: object = root
+    for part in ref[2:].split("/"):
+        part = part.replace("~1", "/").replace("~0", "~")
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node if isinstance(node, dict) else None
+
+
+def _collect_kw(schema, root, names, words, depth=0, seen=None):
+    """Walk a request-body schema collecting property names + description words.
+
+    Names are the highest-value tokens (e.g. ``beacon``). Descriptions add
+    natural-language coverage (e.g. ``Control Blue Beacon LED``). Same-document
+    ``$ref``s are resolved with a cycle guard. Bounded by depth and the caller's
+    overall character budget.
+    """
+    if depth > _KW_MAX_DEPTH or not isinstance(schema, dict):
+        return
+    if "$ref" in schema:
+        ref = schema["$ref"]
+        if seen is None:
+            seen = set()
+        if ref in seen:
+            return
+        seen = seen | {ref}
+        resolved = _resolve_ref(ref, root)
+        if resolved is not None:
+            _collect_kw(resolved, root, names, words, depth + 1, seen)
+        return
+    desc = schema.get("description")
+    if isinstance(desc, str) and desc:
+        for w in desc.replace("-", " ").split():
+            w = "".join(c for c in w.lower() if c.isalnum())
+            if len(w) >= 3 and w not in _KW_STOPWORDS:
+                words.add(w)
+    props = schema.get("properties")
+    if isinstance(props, dict):
+        for k, v in props.items():
+            kl = str(k).lower()
+            if len(kl) >= 2:
+                names.add(kl)
+            _collect_kw(v, root, names, words, depth + 1, seen)
+    items = schema.get("items")
+    if isinstance(items, dict):
+        _collect_kw(items, root, names, words, depth + 1, seen)
+    for comb in ("allOf", "oneOf", "anyOf"):
+        arr = schema.get(comb)
+        if isinstance(arr, list):
+            for s in arr:
+                _collect_kw(s, root, names, words, depth + 1, seen)
+
+
+def _build_kw(methods: dict, root: dict) -> str:
+    """Build the capped, deduplicated keyword blob for one (spec,path) row."""
+    names: set[str] = set()
+    words: set[str] = set()
+    for method, op in methods.items():
+        if method.lower() not in HTTP_METHODS or not isinstance(op, dict):
+            continue
+        body = op.get("requestBody")
+        if not isinstance(body, dict):
+            continue
+        for media in (body.get("content") or {}).values():
+            if isinstance(media, dict) and isinstance(media.get("schema"), dict):
+                _collect_kw(media["schema"], root, names, words)
+    if not names and not words:
+        return ""
+    # Property names first (most precise), then description words. Sorted for
+    # determinism, joined and truncated to the per-op budget.
+    ordered = sorted(names) + sorted(words - names)
+    blob = " ".join(ordered)
+    if len(blob) > _KW_MAX_CHARS:
+        blob = blob[:_KW_MAX_CHARS].rsplit(" ", 1)[0]
+    return blob
+
+
 
 def build_one(api_dir: Path, version: str, category: str) -> int:
     rows: list[dict] = []
@@ -81,14 +177,18 @@ def build_one(api_dir: Path, version: str, category: str) -> int:
                     summary = op.get("summary") or ""
             if not ms:
                 continue
-            rows.append({
+            row = {
                 "s": spec_name,
                 "p": raw_path,
                 "t": tag,
                 "sm": summary,
                 "ms": ms,
                 "ids": ids,
-            })
+            }
+            kw = _build_kw(methods, spec)
+            if kw:
+                row["kw"] = kw
+            rows.append(row)
 
     out = {
         "v": version,

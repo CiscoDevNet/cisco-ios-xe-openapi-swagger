@@ -94,6 +94,7 @@
                 var hay = row.p.toLowerCase();
                 var matched = hay.indexOf(needle) !== -1;
                 if (!matched && row.sm && row.sm.toLowerCase().indexOf(needle) !== -1) matched = true;
+                if (!matched && row.kw && row.kw.indexOf(needle) !== -1) matched = true;
                 if (!matched && row.ids) {
                     for (var k = 0; k < row.ids.length; k++) {
                         if (row.ids[k] && row.ids[k].toLowerCase().indexOf(needle) !== -1) { matched = true; break; }
