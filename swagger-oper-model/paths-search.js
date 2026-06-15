@@ -127,6 +127,7 @@
             if (o.p.toLowerCase().indexOf(qq) >= 0
              || (o.sm && o.sm.toLowerCase().indexOf(qq) >= 0)
              || (o.t && o.t.toLowerCase().indexOf(qq) >= 0)
+             || (o.kw && o.kw.indexOf(qq) >= 0)
              || (o.ids && o.ids.some(function (x) { return x && x.toLowerCase().indexOf(qq) >= 0; }))) {
                 hits.push(o);
                 if (hits.length >= MAX_HITS) break;
