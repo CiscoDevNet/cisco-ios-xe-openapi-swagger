@@ -7,8 +7,17 @@ Handles standalone Cisco and vendor-specific modules not in other categories.
 import json
 import re
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _yang_parse import (
+    find_balanced_braces as _shared_find_balanced_braces,
+    iter_top_level_blocks as _shared_iter_top_level_blocks,
+    resolve_includes as _shared_resolve_includes,
+    is_submodule as _shared_is_submodule,
+)
 
 class OtherToOpenAPI:
     """Convert misc/other YANG modules to OpenAPI 3.0 with proper YANG parsing"""
@@ -22,38 +31,12 @@ class OtherToOpenAPI:
         self.processed_modules = []
 
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
-        """Find the end position of balanced braces"""
-        if start_pos >= len(text) or text[start_pos] != '{':
-            return -1
-        count = 0
-        for i in range(start_pos, len(text)):
-            if text[i] == '{':
-                count += 1
-            elif text[i] == '}':
-                count -= 1
-                if count == 0:
-                    return i
-        return -1
+        return _shared_find_balanced_braces(text, start_pos)
 
     def extract_groupings(self, content: str):
-        """Extract all groupings from YANG content and cache them"""
-        pos = 0
-        while True:
-            grouping_match = re.search(r'\bgrouping\s+(\S+)\s*\{', content[pos:])
-            if not grouping_match:
-                break
-
-            grouping_name = grouping_match.group(1)
-            grouping_start = pos + grouping_match.end() - 1
-            grouping_end = self.find_balanced_braces(content, grouping_start)
-
-            if grouping_end == -1:
-                pos += grouping_match.end()
-                continue
-
-            grouping_body = content[grouping_start + 1:grouping_end]
-            self.groupings_cache[grouping_name] = grouping_body
-            pos = grouping_end + 1
+        """Cache all top-level groupings (depth-aware)."""
+        for name, body in _shared_iter_top_level_blocks(content, 'grouping'):
+            self.groupings_cache[name] = body
 
     def read_yang_file(self, filepath: Path) -> str:
         """Read YANG file content"""
@@ -509,6 +492,15 @@ class OtherToOpenAPI:
         content = self.read_yang_file(yang_file)
         if not content:
             return None
+
+        # Submodules are inlined into their parent module \u2014 don't emit
+        # standalone specs for them.
+        if _shared_is_submodule(content):
+            return None
+
+        # Inline `include <submodule>;` bodies so groupings defined in
+        # submodules become visible to the scanners.
+        content = _shared_resolve_includes(yang_file, content)
 
         module_name = self.extract_module_name(content)
         if not module_name:

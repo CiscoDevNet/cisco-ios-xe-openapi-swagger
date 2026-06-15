@@ -395,9 +395,17 @@
                     "ietf-event-notifications:filters": {
                       "type": "object",
                       "properties": {
-                        "filter-id": {
-                          "type": "string",
-                          "description": "An identifier to differentiate between filters."
+                        "filter": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "filter-id": {
+                                "type": "string",
+                                "description": "An identifier to differentiate between filters."
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -405,7 +413,17 @@
                 },
                 "example": {
                   "ietf-event-notifications:filters": {
-                    "filter-id": "example-string"
+                    "filter": [
+                      {
+                        "filter-id": "1"
+                      },
+                      {
+                        "filter-id": "2"
+                      },
+                      {
+                        "filter-id": "3"
+                      }
+                    ]
                   }
                 }
               }
@@ -433,9 +451,17 @@
                   "ietf-event-notifications:filters": {
                     "type": "object",
                     "properties": {
-                      "filter-id": {
-                        "type": "string",
-                        "description": "An identifier to differentiate between filters."
+                      "filter": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "filter-id": {
+                              "type": "string",
+                              "description": "An identifier to differentiate between filters."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -443,7 +469,17 @@
               },
               "example": {
                 "ietf-event-notifications:filters": {
-                  "filter-id": "example-string"
+                  "filter": [
+                    {
+                      "filter-id": "1"
+                    },
+                    {
+                      "filter-id": "2"
+                    },
+                    {
+                      "filter-id": "3"
+                    }
+                  ]
                 }
               }
             }
@@ -478,9 +514,17 @@
                   "ietf-event-notifications:filters": {
                     "type": "object",
                     "properties": {
-                      "filter-id": {
-                        "type": "string",
-                        "description": "An identifier to differentiate between filters."
+                      "filter": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "filter-id": {
+                              "type": "string",
+                              "description": "An identifier to differentiate between filters."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -488,7 +532,17 @@
               },
               "example": {
                 "ietf-event-notifications:filters": {
-                  "filter-id": "example-string"
+                  "filter": [
+                    {
+                      "filter-id": "1"
+                    },
+                    {
+                      "filter-id": "2"
+                    },
+                    {
+                      "filter-id": "3"
+                    }
+                  ]
                 }
               }
             }
@@ -777,21 +831,79 @@
                     "ietf-event-notifications:subscription-config": {
                       "type": "object",
                       "properties": {
-                        "stream": {
-                          "type": "string",
-                          "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                        },
-                        "encoding": {
-                          "type": "string",
-                          "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                        },
-                        "filter-ref": {
-                          "type": "string",
-                          "description": "References filter which is associated with the\n               subscription."
-                        },
-                        "subscription-id": {
-                          "type": "string",
-                          "description": "Identifier to use for this subscription."
+                        "subscription": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "stream": {
+                                "type": "string",
+                                "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                              },
+                              "encoding": {
+                                "type": "string",
+                                "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                              },
+                              "startTime": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                              },
+                              "stopTime": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "stopTime must be used with and be later than <startTime>"
+                              },
+                              "receivers": {
+                                "type": "object",
+                                "properties": {
+                                  "receiver": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "address": {
+                                          "type": "string",
+                                          "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                        },
+                                        "port": {
+                                          "type": "string",
+                                          "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                        },
+                                        "protocol": {
+                                          "type": "string",
+                                          "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                        }
+                                      },
+                                      "required": [
+                                        "address",
+                                        "port"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "description": "Set of receivers in a subscription."
+                              },
+                              "source-interface": {
+                                "type": "string",
+                                "description": "References the interface for notifications."
+                              },
+                              "source-vrf": {
+                                "type": "integer",
+                                "minimum": 16,
+                                "maximum": 1048574,
+                                "description": "Label of the vrf."
+                              },
+                              "source-address": {
+                                "type": "string",
+                                "description": "The source address for the notifications."
+                              },
+                              "subscription-id": {
+                                "type": "string",
+                                "description": "Identifier to use for this subscription."
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -799,10 +911,95 @@
                 },
                 "example": {
                   "ietf-event-notifications:subscription-config": {
-                    "stream": "example-string",
-                    "encoding": "example-string",
-                    "filter-ref": "example-string",
-                    "subscription-id": "192.168.1.1"
+                    "subscription": [
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "1"
+                      },
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "2"
+                      },
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "3"
+                      }
+                    ]
                   }
                 }
               }
@@ -830,21 +1027,79 @@
                   "ietf-event-notifications:subscription-config": {
                     "type": "object",
                     "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                      },
-                      "filter-ref": {
-                        "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
-                      },
-                      "subscription-id": {
-                        "type": "string",
-                        "description": "Identifier to use for this subscription."
+                      "subscription": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "stream": {
+                              "type": "string",
+                              "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                            },
+                            "encoding": {
+                              "type": "string",
+                              "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                            },
+                            "startTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                            },
+                            "stopTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "stopTime must be used with and be later than <startTime>"
+                            },
+                            "receivers": {
+                              "type": "object",
+                              "properties": {
+                                "receiver": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "address": {
+                                        "type": "string",
+                                        "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                      },
+                                      "port": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                      },
+                                      "protocol": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                      }
+                                    },
+                                    "required": [
+                                      "address",
+                                      "port"
+                                    ]
+                                  }
+                                }
+                              },
+                              "description": "Set of receivers in a subscription."
+                            },
+                            "source-interface": {
+                              "type": "string",
+                              "description": "References the interface for notifications."
+                            },
+                            "source-vrf": {
+                              "type": "integer",
+                              "minimum": 16,
+                              "maximum": 1048574,
+                              "description": "Label of the vrf."
+                            },
+                            "source-address": {
+                              "type": "string",
+                              "description": "The source address for the notifications."
+                            },
+                            "subscription-id": {
+                              "type": "string",
+                              "description": "Identifier to use for this subscription."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -852,10 +1107,95 @@
               },
               "example": {
                 "ietf-event-notifications:subscription-config": {
-                  "stream": "example-string",
-                  "encoding": "example-string",
-                  "filter-ref": "example-string",
-                  "subscription-id": "192.168.1.1"
+                  "subscription": [
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "2"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "3"
+                    }
+                  ]
                 }
               }
             }
@@ -890,21 +1230,79 @@
                   "ietf-event-notifications:subscription-config": {
                     "type": "object",
                     "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                      },
-                      "filter-ref": {
-                        "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
-                      },
-                      "subscription-id": {
-                        "type": "string",
-                        "description": "Identifier to use for this subscription."
+                      "subscription": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "stream": {
+                              "type": "string",
+                              "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                            },
+                            "encoding": {
+                              "type": "string",
+                              "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                            },
+                            "startTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                            },
+                            "stopTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "stopTime must be used with and be later than <startTime>"
+                            },
+                            "receivers": {
+                              "type": "object",
+                              "properties": {
+                                "receiver": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "address": {
+                                        "type": "string",
+                                        "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                      },
+                                      "port": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                      },
+                                      "protocol": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                      }
+                                    },
+                                    "required": [
+                                      "address",
+                                      "port"
+                                    ]
+                                  }
+                                }
+                              },
+                              "description": "Set of receivers in a subscription."
+                            },
+                            "source-interface": {
+                              "type": "string",
+                              "description": "References the interface for notifications."
+                            },
+                            "source-vrf": {
+                              "type": "integer",
+                              "minimum": 16,
+                              "maximum": 1048574,
+                              "description": "Label of the vrf."
+                            },
+                            "source-address": {
+                              "type": "string",
+                              "description": "The source address for the notifications."
+                            },
+                            "subscription-id": {
+                              "type": "string",
+                              "description": "Identifier to use for this subscription."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -912,10 +1310,95 @@
               },
               "example": {
                 "ietf-event-notifications:subscription-config": {
-                  "stream": "example-string",
-                  "encoding": "example-string",
-                  "filter-ref": "example-string",
-                  "subscription-id": "192.168.1.1"
+                  "subscription": [
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "2"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "3"
+                    }
+                  ]
                 }
               }
             }
@@ -976,9 +1459,59 @@
                             "type": "string",
                             "description": "The type of encoding for the subscribed data.\n         Default is XML"
                           },
-                          "filter-ref": {
+                          "startTime": {
                             "type": "string",
-                            "description": "References filter which is associated with the\n               subscription."
+                            "format": "date-time",
+                            "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                          },
+                          "stopTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "stopTime must be used with and be later than <startTime>"
+                          },
+                          "receivers": {
+                            "type": "object",
+                            "properties": {
+                              "receiver": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "address": {
+                                      "type": "string",
+                                      "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                    },
+                                    "port": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                    },
+                                    "protocol": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                    }
+                                  },
+                                  "required": [
+                                    "address",
+                                    "port"
+                                  ]
+                                }
+                              }
+                            },
+                            "description": "Set of receivers in a subscription."
+                          },
+                          "source-interface": {
+                            "type": "string",
+                            "description": "References the interface for notifications."
+                          },
+                          "source-vrf": {
+                            "type": "integer",
+                            "minimum": 16,
+                            "maximum": 1048574,
+                            "description": "Label of the vrf."
+                          },
+                          "source-address": {
+                            "type": "string",
+                            "description": "The source address for the notifications."
                           },
                           "subscription-id": {
                             "type": "string",
@@ -994,19 +1527,88 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "1"
                     },
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "2"
                     },
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "3"
                     }
                   ]
@@ -1044,9 +1646,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1060,7 +1712,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1"
                 }
               }
@@ -1104,9 +1779,59 @@
                           "type": "string",
                           "description": "The type of encoding for the subscribed data.\n         Default is XML"
                         },
-                        "filter-ref": {
+                        "startTime": {
                           "type": "string",
-                          "description": "References filter which is associated with the\n               subscription."
+                          "format": "date-time",
+                          "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                        },
+                        "stopTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "stopTime must be used with and be later than <startTime>"
+                        },
+                        "receivers": {
+                          "type": "object",
+                          "properties": {
+                            "receiver": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "address": {
+                                    "type": "string",
+                                    "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                  },
+                                  "port": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                  },
+                                  "protocol": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                  }
+                                },
+                                "required": [
+                                  "address",
+                                  "port"
+                                ]
+                              }
+                            }
+                          },
+                          "description": "Set of receivers in a subscription."
+                        },
+                        "source-interface": {
+                          "type": "string",
+                          "description": "References the interface for notifications."
+                        },
+                        "source-vrf": {
+                          "type": "integer",
+                          "minimum": 16,
+                          "maximum": 1048574,
+                          "description": "Label of the vrf."
+                        },
+                        "source-address": {
+                          "type": "string",
+                          "description": "The source address for the notifications."
                         },
                         "subscription-id": {
                           "type": "string",
@@ -1120,7 +1845,30 @@
                   "ietf-event-notifications:subscription": {
                     "stream": "example-string",
                     "encoding": "example-string",
-                    "filter-ref": "example-string",
+                    "startTime": "example-string",
+                    "stopTime": "example-string",
+                    "receivers": {
+                      "receiver": [
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        }
+                      ]
+                    },
+                    "source-interface": "GigabitEthernet0/0/0",
+                    "source-vrf": 16,
+                    "source-address": "192.168.1.1",
                     "subscription-id": "192.168.1.1"
                   }
                 }
@@ -1157,9 +1905,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1173,7 +1971,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1"
                 }
               }
@@ -1217,9 +2038,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1233,7 +2104,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1"
                 }
               }
@@ -1285,29 +2179,87 @@
                     "ietf-event-notifications:subscriptions": {
                       "type": "object",
                       "properties": {
-                        "stream": {
-                          "type": "string",
-                          "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                        },
-                        "encoding": {
-                          "type": "string",
-                          "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                        },
-                        "filter-ref": {
-                          "type": "string",
-                          "description": "References filter which is associated with the\n               subscription."
-                        },
-                        "subscription-id": {
-                          "type": "string",
-                          "description": "Identifier of this subscription."
-                        },
-                        "configured-subscription": {
-                          "type": "object",
-                          "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
-                        },
-                        "subscription-status": {
-                          "type": "string",
-                          "description": "The status of the subscription."
+                        "subscription": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "stream": {
+                                "type": "string",
+                                "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                              },
+                              "encoding": {
+                                "type": "string",
+                                "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                              },
+                              "startTime": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                              },
+                              "stopTime": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "stopTime must be used with and be later than <startTime>"
+                              },
+                              "receivers": {
+                                "type": "object",
+                                "properties": {
+                                  "receiver": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "address": {
+                                          "type": "string",
+                                          "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                        },
+                                        "port": {
+                                          "type": "string",
+                                          "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                        },
+                                        "protocol": {
+                                          "type": "string",
+                                          "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                        }
+                                      },
+                                      "required": [
+                                        "address",
+                                        "port"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "description": "Set of receivers in a subscription."
+                              },
+                              "source-interface": {
+                                "type": "string",
+                                "description": "References the interface for notifications."
+                              },
+                              "source-vrf": {
+                                "type": "integer",
+                                "minimum": 16,
+                                "maximum": 1048574,
+                                "description": "Label of the vrf."
+                              },
+                              "source-address": {
+                                "type": "string",
+                                "description": "The source address for the notifications."
+                              },
+                              "subscription-id": {
+                                "type": "string",
+                                "description": "Identifier of this subscription."
+                              },
+                              "configured-subscription": {
+                                "type": "object",
+                                "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
+                              },
+                              "subscription-status": {
+                                "type": "string",
+                                "description": "The status of the subscription."
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -1315,12 +2267,101 @@
                 },
                 "example": {
                   "ietf-event-notifications:subscriptions": {
-                    "stream": "example-string",
-                    "encoding": "example-string",
-                    "filter-ref": "example-string",
-                    "subscription-id": "192.168.1.1",
-                    "configured-subscription": {},
-                    "subscription-status": "192.168.1.1"
+                    "subscription": [
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "1",
+                        "configured-subscription": {},
+                        "subscription-status": "192.168.1.1"
+                      },
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "2",
+                        "configured-subscription": {},
+                        "subscription-status": "192.168.1.1"
+                      },
+                      {
+                        "stream": "example-string",
+                        "encoding": "example-string",
+                        "startTime": "example-string",
+                        "stopTime": "example-string",
+                        "receivers": {
+                          "receiver": [
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            },
+                            {
+                              "address": "192.168.1.1",
+                              "port": "example-string",
+                              "protocol": "example-string"
+                            }
+                          ]
+                        },
+                        "source-interface": "GigabitEthernet0/0/0",
+                        "source-vrf": 16,
+                        "source-address": "192.168.1.1",
+                        "subscription-id": "3",
+                        "configured-subscription": {},
+                        "subscription-status": "192.168.1.1"
+                      }
+                    ]
                   }
                 }
               }
@@ -1348,29 +2389,87 @@
                   "ietf-event-notifications:subscriptions": {
                     "type": "object",
                     "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                      },
-                      "filter-ref": {
-                        "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
-                      },
-                      "subscription-id": {
-                        "type": "string",
-                        "description": "Identifier of this subscription."
-                      },
-                      "configured-subscription": {
-                        "type": "object",
-                        "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
-                      },
-                      "subscription-status": {
-                        "type": "string",
-                        "description": "The status of the subscription."
+                      "subscription": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "stream": {
+                              "type": "string",
+                              "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                            },
+                            "encoding": {
+                              "type": "string",
+                              "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                            },
+                            "startTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                            },
+                            "stopTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "stopTime must be used with and be later than <startTime>"
+                            },
+                            "receivers": {
+                              "type": "object",
+                              "properties": {
+                                "receiver": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "address": {
+                                        "type": "string",
+                                        "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                      },
+                                      "port": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                      },
+                                      "protocol": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                      }
+                                    },
+                                    "required": [
+                                      "address",
+                                      "port"
+                                    ]
+                                  }
+                                }
+                              },
+                              "description": "Set of receivers in a subscription."
+                            },
+                            "source-interface": {
+                              "type": "string",
+                              "description": "References the interface for notifications."
+                            },
+                            "source-vrf": {
+                              "type": "integer",
+                              "minimum": 16,
+                              "maximum": 1048574,
+                              "description": "Label of the vrf."
+                            },
+                            "source-address": {
+                              "type": "string",
+                              "description": "The source address for the notifications."
+                            },
+                            "subscription-id": {
+                              "type": "string",
+                              "description": "Identifier of this subscription."
+                            },
+                            "configured-subscription": {
+                              "type": "object",
+                              "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
+                            },
+                            "subscription-status": {
+                              "type": "string",
+                              "description": "The status of the subscription."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -1378,12 +2477,101 @@
               },
               "example": {
                 "ietf-event-notifications:subscriptions": {
-                  "stream": "example-string",
-                  "encoding": "example-string",
-                  "filter-ref": "example-string",
-                  "subscription-id": "192.168.1.1",
-                  "configured-subscription": {},
-                  "subscription-status": "192.168.1.1"
+                  "subscription": [
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "1",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "2",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "3",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    }
+                  ]
                 }
               }
             }
@@ -1418,29 +2606,87 @@
                   "ietf-event-notifications:subscriptions": {
                     "type": "object",
                     "properties": {
-                      "stream": {
-                        "type": "string",
-                        "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-                      },
-                      "encoding": {
-                        "type": "string",
-                        "description": "The type of encoding for the subscribed data.\n         Default is XML"
-                      },
-                      "filter-ref": {
-                        "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
-                      },
-                      "subscription-id": {
-                        "type": "string",
-                        "description": "Identifier of this subscription."
-                      },
-                      "configured-subscription": {
-                        "type": "object",
-                        "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
-                      },
-                      "subscription-status": {
-                        "type": "string",
-                        "description": "The status of the subscription."
+                      "subscription": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "stream": {
+                              "type": "string",
+                              "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                            },
+                            "encoding": {
+                              "type": "string",
+                              "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                            },
+                            "startTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                            },
+                            "stopTime": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "stopTime must be used with and be later than <startTime>"
+                            },
+                            "receivers": {
+                              "type": "object",
+                              "properties": {
+                                "receiver": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "address": {
+                                        "type": "string",
+                                        "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                      },
+                                      "port": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                      },
+                                      "protocol": {
+                                        "type": "string",
+                                        "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                      }
+                                    },
+                                    "required": [
+                                      "address",
+                                      "port"
+                                    ]
+                                  }
+                                }
+                              },
+                              "description": "Set of receivers in a subscription."
+                            },
+                            "source-interface": {
+                              "type": "string",
+                              "description": "References the interface for notifications."
+                            },
+                            "source-vrf": {
+                              "type": "integer",
+                              "minimum": 16,
+                              "maximum": 1048574,
+                              "description": "Label of the vrf."
+                            },
+                            "source-address": {
+                              "type": "string",
+                              "description": "The source address for the notifications."
+                            },
+                            "subscription-id": {
+                              "type": "string",
+                              "description": "Identifier of this subscription."
+                            },
+                            "configured-subscription": {
+                              "type": "object",
+                              "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
+                            },
+                            "subscription-status": {
+                              "type": "string",
+                              "description": "The status of the subscription."
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -1448,12 +2694,101 @@
               },
               "example": {
                 "ietf-event-notifications:subscriptions": {
-                  "stream": "example-string",
-                  "encoding": "example-string",
-                  "filter-ref": "example-string",
-                  "subscription-id": "192.168.1.1",
-                  "configured-subscription": {},
-                  "subscription-status": "192.168.1.1"
+                  "subscription": [
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "1",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "2",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    },
+                    {
+                      "stream": "example-string",
+                      "encoding": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
+                      "subscription-id": "3",
+                      "configured-subscription": {},
+                      "subscription-status": "192.168.1.1"
+                    }
+                  ]
                 }
               }
             }
@@ -1514,9 +2849,59 @@
                             "type": "string",
                             "description": "The type of encoding for the subscribed data.\n         Default is XML"
                           },
-                          "filter-ref": {
+                          "startTime": {
                             "type": "string",
-                            "description": "References filter which is associated with the\n               subscription."
+                            "format": "date-time",
+                            "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                          },
+                          "stopTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "stopTime must be used with and be later than <startTime>"
+                          },
+                          "receivers": {
+                            "type": "object",
+                            "properties": {
+                              "receiver": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "address": {
+                                      "type": "string",
+                                      "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                    },
+                                    "port": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                    },
+                                    "protocol": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                    }
+                                  },
+                                  "required": [
+                                    "address",
+                                    "port"
+                                  ]
+                                }
+                              }
+                            },
+                            "description": "Set of receivers in a subscription."
+                          },
+                          "source-interface": {
+                            "type": "string",
+                            "description": "References the interface for notifications."
+                          },
+                          "source-vrf": {
+                            "type": "integer",
+                            "minimum": 16,
+                            "maximum": 1048574,
+                            "description": "Label of the vrf."
+                          },
+                          "source-address": {
+                            "type": "string",
+                            "description": "The source address for the notifications."
                           },
                           "subscription-id": {
                             "type": "string",
@@ -1540,7 +2925,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "1",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -1548,7 +2956,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "2",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -1556,7 +2987,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "3",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -1596,9 +3050,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1620,7 +3124,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -1666,9 +3193,59 @@
                           "type": "string",
                           "description": "The type of encoding for the subscribed data.\n         Default is XML"
                         },
-                        "filter-ref": {
+                        "startTime": {
                           "type": "string",
-                          "description": "References filter which is associated with the\n               subscription."
+                          "format": "date-time",
+                          "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                        },
+                        "stopTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "stopTime must be used with and be later than <startTime>"
+                        },
+                        "receivers": {
+                          "type": "object",
+                          "properties": {
+                            "receiver": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "address": {
+                                    "type": "string",
+                                    "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                  },
+                                  "port": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                  },
+                                  "protocol": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                  }
+                                },
+                                "required": [
+                                  "address",
+                                  "port"
+                                ]
+                              }
+                            }
+                          },
+                          "description": "Set of receivers in a subscription."
+                        },
+                        "source-interface": {
+                          "type": "string",
+                          "description": "References the interface for notifications."
+                        },
+                        "source-vrf": {
+                          "type": "integer",
+                          "minimum": 16,
+                          "maximum": 1048574,
+                          "description": "Label of the vrf."
+                        },
+                        "source-address": {
+                          "type": "string",
+                          "description": "The source address for the notifications."
                         },
                         "subscription-id": {
                           "type": "string",
@@ -1690,7 +3267,30 @@
                   "ietf-event-notifications:subscription": {
                     "stream": "example-string",
                     "encoding": "example-string",
-                    "filter-ref": "example-string",
+                    "startTime": "example-string",
+                    "stopTime": "example-string",
+                    "receivers": {
+                      "receiver": [
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        }
+                      ]
+                    },
+                    "source-interface": "GigabitEthernet0/0/0",
+                    "source-vrf": 16,
+                    "source-address": "192.168.1.1",
                     "subscription-id": "192.168.1.1",
                     "configured-subscription": {},
                     "subscription-status": "192.168.1.1"
@@ -1729,9 +3329,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1753,7 +3403,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -1799,9 +3472,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -1823,7 +3546,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -2319,9 +4065,59 @@
                             "type": "string",
                             "description": "The type of encoding for the subscribed data.\n         Default is XML"
                           },
-                          "filter-ref": {
+                          "startTime": {
                             "type": "string",
-                            "description": "References filter which is associated with the\n               subscription."
+                            "format": "date-time",
+                            "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                          },
+                          "stopTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "stopTime must be used with and be later than <startTime>"
+                          },
+                          "receivers": {
+                            "type": "object",
+                            "properties": {
+                              "receiver": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "address": {
+                                      "type": "string",
+                                      "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                    },
+                                    "port": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                    },
+                                    "protocol": {
+                                      "type": "string",
+                                      "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                    }
+                                  },
+                                  "required": [
+                                    "address",
+                                    "port"
+                                  ]
+                                }
+                              }
+                            },
+                            "description": "Set of receivers in a subscription."
+                          },
+                          "source-interface": {
+                            "type": "string",
+                            "description": "References the interface for notifications."
+                          },
+                          "source-vrf": {
+                            "type": "integer",
+                            "minimum": 16,
+                            "maximum": 1048574,
+                            "description": "Label of the vrf."
+                          },
+                          "source-address": {
+                            "type": "string",
+                            "description": "The source address for the notifications."
                           },
                           "subscription-id": {
                             "type": "string",
@@ -2345,7 +4141,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "1",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -2353,7 +4172,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "2",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -2361,7 +4203,30 @@
                     {
                       "stream": "example-string",
                       "encoding": "example-string",
-                      "filter-ref": "example-string",
+                      "startTime": "example-string",
+                      "stopTime": "example-string",
+                      "receivers": {
+                        "receiver": [
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          },
+                          {
+                            "address": "192.168.1.1",
+                            "port": "example-string",
+                            "protocol": "example-string"
+                          }
+                        ]
+                      },
+                      "source-interface": "GigabitEthernet0/0/0",
+                      "source-vrf": 16,
+                      "source-address": "192.168.1.1",
                       "subscription-id": "3",
                       "configured-subscription": {},
                       "subscription-status": "192.168.1.1"
@@ -2401,9 +4266,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -2425,7 +4340,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -2471,9 +4409,59 @@
                           "type": "string",
                           "description": "The type of encoding for the subscribed data.\n         Default is XML"
                         },
-                        "filter-ref": {
+                        "startTime": {
                           "type": "string",
-                          "description": "References filter which is associated with the\n               subscription."
+                          "format": "date-time",
+                          "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                        },
+                        "stopTime": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "stopTime must be used with and be later than <startTime>"
+                        },
+                        "receivers": {
+                          "type": "object",
+                          "properties": {
+                            "receiver": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "address": {
+                                    "type": "string",
+                                    "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                  },
+                                  "port": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                  },
+                                  "protocol": {
+                                    "type": "string",
+                                    "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                  }
+                                },
+                                "required": [
+                                  "address",
+                                  "port"
+                                ]
+                              }
+                            }
+                          },
+                          "description": "Set of receivers in a subscription."
+                        },
+                        "source-interface": {
+                          "type": "string",
+                          "description": "References the interface for notifications."
+                        },
+                        "source-vrf": {
+                          "type": "integer",
+                          "minimum": 16,
+                          "maximum": 1048574,
+                          "description": "Label of the vrf."
+                        },
+                        "source-address": {
+                          "type": "string",
+                          "description": "The source address for the notifications."
                         },
                         "subscription-id": {
                           "type": "string",
@@ -2495,7 +4483,30 @@
                   "ietf-event-notifications:subscription": {
                     "stream": "example-string",
                     "encoding": "example-string",
-                    "filter-ref": "example-string",
+                    "startTime": "example-string",
+                    "stopTime": "example-string",
+                    "receivers": {
+                      "receiver": [
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        },
+                        {
+                          "address": "192.168.1.1",
+                          "port": "example-string",
+                          "protocol": "example-string"
+                        }
+                      ]
+                    },
+                    "source-interface": "GigabitEthernet0/0/0",
+                    "source-vrf": 16,
+                    "source-address": "192.168.1.1",
                     "subscription-id": "192.168.1.1",
                     "configured-subscription": {},
                     "subscription-status": "192.168.1.1"
@@ -2534,9 +4545,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -2558,7 +4619,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -2604,9 +4688,59 @@
                         "type": "string",
                         "description": "The type of encoding for the subscribed data.\n         Default is XML"
                       },
-                      "filter-ref": {
+                      "startTime": {
                         "type": "string",
-                        "description": "References filter which is associated with the\n               subscription."
+                        "format": "date-time",
+                        "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                      },
+                      "stopTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "stopTime must be used with and be later than <startTime>"
+                      },
+                      "receivers": {
+                        "type": "object",
+                        "properties": {
+                          "receiver": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": {
+                                  "type": "string",
+                                  "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                                },
+                                "port": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                                },
+                                "protocol": {
+                                  "type": "string",
+                                  "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                                }
+                              },
+                              "required": [
+                                "address",
+                                "port"
+                              ]
+                            }
+                          }
+                        },
+                        "description": "Set of receivers in a subscription."
+                      },
+                      "source-interface": {
+                        "type": "string",
+                        "description": "References the interface for notifications."
+                      },
+                      "source-vrf": {
+                        "type": "integer",
+                        "minimum": 16,
+                        "maximum": 1048574,
+                        "description": "Label of the vrf."
+                      },
+                      "source-address": {
+                        "type": "string",
+                        "description": "The source address for the notifications."
                       },
                       "subscription-id": {
                         "type": "string",
@@ -2628,7 +4762,30 @@
                 "ietf-event-notifications:subscription": {
                   "stream": "example-string",
                   "encoding": "example-string",
-                  "filter-ref": "example-string",
+                  "startTime": "example-string",
+                  "stopTime": "example-string",
+                  "receivers": {
+                    "receiver": [
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      },
+                      {
+                        "address": "192.168.1.1",
+                        "port": "example-string",
+                        "protocol": "example-string"
+                      }
+                    ]
+                  },
+                  "source-interface": "GigabitEthernet0/0/0",
+                  "source-vrf": 16,
+                  "source-address": "192.168.1.1",
                   "subscription-id": "192.168.1.1",
                   "configured-subscription": {},
                   "subscription-status": "192.168.1.1"
@@ -2696,9 +4853,17 @@
       "ietf-event-notifications-filters": {
         "type": "object",
         "properties": {
-          "filter-id": {
-            "type": "string",
-            "description": "An identifier to differentiate between filters."
+          "filter": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "filter-id": {
+                  "type": "string",
+                  "description": "An identifier to differentiate between filters."
+                }
+              }
+            }
           }
         }
       },
@@ -2726,21 +4891,79 @@
       "ietf-event-notifications-subscription-config": {
         "type": "object",
         "properties": {
-          "stream": {
-            "type": "string",
-            "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-          },
-          "encoding": {
-            "type": "string",
-            "description": "The type of encoding for the subscribed data.\n         Default is XML"
-          },
-          "filter-ref": {
-            "type": "string",
-            "description": "References filter which is associated with the\n               subscription."
-          },
-          "subscription-id": {
-            "type": "string",
-            "description": "Identifier to use for this subscription."
+          "subscription": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stream": {
+                  "type": "string",
+                  "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                },
+                "encoding": {
+                  "type": "string",
+                  "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                },
+                "stopTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "stopTime must be used with and be later than <startTime>"
+                },
+                "receivers": {
+                  "type": "object",
+                  "properties": {
+                    "receiver": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "string",
+                            "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                          },
+                          "port": {
+                            "type": "string",
+                            "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                          },
+                          "protocol": {
+                            "type": "string",
+                            "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                          }
+                        },
+                        "required": [
+                          "address",
+                          "port"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Set of receivers in a subscription."
+                },
+                "source-interface": {
+                  "type": "string",
+                  "description": "References the interface for notifications."
+                },
+                "source-vrf": {
+                  "type": "integer",
+                  "minimum": 16,
+                  "maximum": 1048574,
+                  "description": "Label of the vrf."
+                },
+                "source-address": {
+                  "type": "string",
+                  "description": "The source address for the notifications."
+                },
+                "subscription-id": {
+                  "type": "string",
+                  "description": "Identifier to use for this subscription."
+                }
+              }
+            }
           }
         }
       },
@@ -2757,9 +4980,59 @@
               "type": "string",
               "description": "The type of encoding for the subscribed data.\n         Default is XML"
             },
-            "filter-ref": {
+            "startTime": {
               "type": "string",
-              "description": "References filter which is associated with the\n               subscription."
+              "format": "date-time",
+              "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+            },
+            "stopTime": {
+              "type": "string",
+              "format": "date-time",
+              "description": "stopTime must be used with and be later than <startTime>"
+            },
+            "receivers": {
+              "type": "object",
+              "properties": {
+                "receiver": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "address": {
+                        "type": "string",
+                        "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                      },
+                      "port": {
+                        "type": "string",
+                        "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                      },
+                      "protocol": {
+                        "type": "string",
+                        "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                      }
+                    },
+                    "required": [
+                      "address",
+                      "port"
+                    ]
+                  }
+                }
+              },
+              "description": "Set of receivers in a subscription."
+            },
+            "source-interface": {
+              "type": "string",
+              "description": "References the interface for notifications."
+            },
+            "source-vrf": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 1048574,
+              "description": "Label of the vrf."
+            },
+            "source-address": {
+              "type": "string",
+              "description": "The source address for the notifications."
             },
             "subscription-id": {
               "type": "string",
@@ -2787,9 +5060,59 @@
             "type": "string",
             "description": "The type of encoding for the subscribed data.\n         Default is XML"
           },
-          "filter-ref": {
+          "startTime": {
             "type": "string",
-            "description": "References filter which is associated with the\n               subscription."
+            "format": "date-time",
+            "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+          },
+          "stopTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "stopTime must be used with and be later than <startTime>"
+          },
+          "receivers": {
+            "type": "object",
+            "properties": {
+              "receiver": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "address": {
+                      "type": "string",
+                      "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                    },
+                    "port": {
+                      "type": "string",
+                      "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                    },
+                    "protocol": {
+                      "type": "string",
+                      "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                    }
+                  },
+                  "required": [
+                    "address",
+                    "port"
+                  ]
+                }
+              }
+            },
+            "description": "Set of receivers in a subscription."
+          },
+          "source-interface": {
+            "type": "string",
+            "description": "References the interface for notifications."
+          },
+          "source-vrf": {
+            "type": "integer",
+            "minimum": 16,
+            "maximum": 1048574,
+            "description": "Label of the vrf."
+          },
+          "source-address": {
+            "type": "string",
+            "description": "The source address for the notifications."
           },
           "subscription-id": {
             "type": "string",
@@ -2808,29 +5131,87 @@
       "ietf-event-notifications-subscriptions": {
         "type": "object",
         "properties": {
-          "stream": {
-            "type": "string",
-            "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
-          },
-          "encoding": {
-            "type": "string",
-            "description": "The type of encoding for the subscribed data.\n         Default is XML"
-          },
-          "filter-ref": {
-            "type": "string",
-            "description": "References filter which is associated with the\n               subscription."
-          },
-          "subscription-id": {
-            "type": "string",
-            "description": "Identifier of this subscription."
-          },
-          "configured-subscription": {
-            "type": "object",
-            "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
-          },
-          "subscription-status": {
-            "type": "string",
-            "description": "The status of the subscription."
+          "subscription": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stream": {
+                  "type": "string",
+                  "description": "Indicates which stream of events is of interest.\n         If not present, events in the default NETCONF stream\n         will be sent."
+                },
+                "encoding": {
+                  "type": "string",
+                  "description": "The type of encoding for the subscribed data.\n         Default is XML"
+                },
+                "startTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Used to trigger the replay feature\n         and indicate that the replay should start at the time\n         specified.  If <startTime> is not present, this is not a\n         replay subscription.  It is not valid to specify start\n         times that are later than the current time.  If the\n         <startTime> specified is earlier than the log can support,\n         the replay will begin with the earliest available\n         notification.  This parameter is of type dateTime and\n         compliant to [RFC3339].  Implementations must\n         support time zones."
+                },
+                "stopTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "stopTime must be used with and be later than <startTime>"
+                },
+                "receivers": {
+                  "type": "object",
+                  "properties": {
+                    "receiver": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "string",
+                            "description": "Specifies the address for the traffic to reach a\n             remote host. One of the following must be\n             specified: an ipv4 address, an ipv6 address,\n             or a host name."
+                          },
+                          "port": {
+                            "type": "string",
+                            "description": "This leaf specifies the port number to use for\n             messages destined for a receiver."
+                          },
+                          "protocol": {
+                            "type": "string",
+                            "description": "This leaf specifies the transport protocol used\n             to deliver messages destined for the receiver."
+                          }
+                        },
+                        "required": [
+                          "address",
+                          "port"
+                        ]
+                      }
+                    }
+                  },
+                  "description": "Set of receivers in a subscription."
+                },
+                "source-interface": {
+                  "type": "string",
+                  "description": "References the interface for notifications."
+                },
+                "source-vrf": {
+                  "type": "integer",
+                  "minimum": 16,
+                  "maximum": 1048574,
+                  "description": "Label of the vrf."
+                },
+                "source-address": {
+                  "type": "string",
+                  "description": "The source address for the notifications."
+                },
+                "subscription-id": {
+                  "type": "string",
+                  "description": "Identifier of this subscription."
+                },
+                "configured-subscription": {
+                  "type": "object",
+                  "description": "The presence of this leaf indicates that the\n           subscription originated from configuration, not\n           through a control channel or RPC."
+                },
+                "subscription-status": {
+                  "type": "string",
+                  "description": "The status of the subscription."
+                }
+              }
+            }
           }
         }
       }

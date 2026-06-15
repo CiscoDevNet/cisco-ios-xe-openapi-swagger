@@ -7,8 +7,19 @@ RFC 7950 (YANG 1.1) and RFC 8040 (RESTCONF) compliant.
 import json
 import re
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _yang_parse import (
+    find_balanced_braces as _shared_find_balanced_braces,
+    iter_top_level_blocks as _shared_iter_top_level_blocks,
+    iter_top_level_uses as _shared_iter_top_level_uses,
+    resolve_includes as _shared_resolve_includes,
+    is_submodule as _shared_is_submodule,
+)
+
 
 class RPCYANGToOpenAPIConverter:
     """
@@ -21,142 +32,21 @@ class RPCYANGToOpenAPIConverter:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.groupings_cache = {}
-        
-    def find_balanced_braces(self, text: str, start_pos: int) -> int:
-        """Find the end position of balanced braces"""
-        if start_pos >= len(text) or text[start_pos] != '{':
-            return -1
-        count = 0
-        for i in range(start_pos, len(text)):
-            if text[i] == '{':
-                count += 1
-            elif text[i] == '}':
-                count -= 1
-                if count == 0:
-                    return i
-        return -1
 
-    # Walk `content` and yield only matches at brace depth 0, skipping
-    # strings and YANG comments. Without this, every nested `leaf` /
-    # `container` / `choice` would be hoisted into the parent schema.
+    def find_balanced_braces(self, text: str, start_pos: int) -> int:
+        return _shared_find_balanced_braces(text, start_pos)
+
     def _iter_top_level_blocks(self, content: str, keyword: str):
-        """Yield (name, body) for each `keyword <name> { ... }` at depth 0."""
-        n = len(content)
-        i = 0
-        depth = 0
-        kw_re = re.compile(rf'{re.escape(keyword)}\b\s+(\S+)\s*\{{')
-        while i < n:
-            c = content[i]
-            if c == '"' or c == "'":
-                q = c
-                i += 1
-                while i < n:
-                    if content[i] == '\\' and i + 1 < n:
-                        i += 2
-                        continue
-                    if content[i] == q:
-                        i += 1
-                        break
-                    i += 1
-                continue
-            if c == '/' and i + 1 < n:
-                if content[i + 1] == '/':
-                    nl = content.find('\n', i)
-                    i = n if nl < 0 else nl + 1
-                    continue
-                if content[i + 1] == '*':
-                    end = content.find('*/', i + 2)
-                    i = n if end < 0 else end + 2
-                    continue
-            if c == '{':
-                depth += 1
-                i += 1
-                continue
-            if c == '}':
-                depth -= 1
-                i += 1
-                continue
-            if depth == 0:
-                prev_ok = (i == 0) or not (content[i - 1].isalnum() or content[i - 1] in '_-')
-                if prev_ok:
-                    m = kw_re.match(content, i)
-                    if m:
-                        name = m.group(1)
-                        block_start = m.end() - 1
-                        block_end = self.find_balanced_braces(content, block_start)
-                        if block_end != -1:
-                            yield name, content[block_start + 1:block_end]
-                            i = block_end + 1
-                            continue
-            i += 1
+        return _shared_iter_top_level_blocks(content, keyword)
 
     def _iter_top_level_uses(self, content: str):
-        """Yield grouping names from `uses <name>;` (or `uses <name> {...};`) at depth 0."""
-        n = len(content)
-        i = 0
-        depth = 0
-        uses_re = re.compile(r'uses\s+(?:[\w-]+:)?(\S+?)\s*(?:\{)?')
-        while i < n:
-            c = content[i]
-            if c == '"' or c == "'":
-                q = c
-                i += 1
-                while i < n:
-                    if content[i] == '\\' and i + 1 < n:
-                        i += 2
-                        continue
-                    if content[i] == q:
-                        i += 1
-                        break
-                    i += 1
-                continue
-            if c == '/' and i + 1 < n:
-                if content[i + 1] == '/':
-                    nl = content.find('\n', i)
-                    i = n if nl < 0 else nl + 1
-                    continue
-                if content[i + 1] == '*':
-                    end = content.find('*/', i + 2)
-                    i = n if end < 0 else end + 2
-                    continue
-            if c == '{':
-                depth += 1
-                i += 1
-                continue
-            if c == '}':
-                depth -= 1
-                i += 1
-                continue
-            if depth == 0:
-                prev_ok = (i == 0) or not (content[i - 1].isalnum() or content[i - 1] in '_-')
-                if prev_ok and content.startswith('uses', i):
-                    m = re.match(r'uses\s+(?:[\w-]+:)?([\w-]+)\s*(?:\{([^{}]*)\})?\s*;', content[i:])
-                    if m:
-                        yield m.group(1)
-                        i += m.end()
-                        continue
-            i += 1
+        return _shared_iter_top_level_uses(content)
 
     def extract_groupings(self, content: str):
-        """Extract all groupings from YANG content and cache them"""
-        self.groupings_cache = {}  # Reset cache
-        pos = 0
-        while True:
-            grouping_match = re.search(r'\bgrouping\s+(\S+)\s*\{', content[pos:])
-            if not grouping_match:
-                break
-            
-            grouping_name = grouping_match.group(1)
-            grouping_start = pos + grouping_match.end() - 1
-            grouping_end = self.find_balanced_braces(content, grouping_start)
-            
-            if grouping_end == -1:
-                pos += grouping_match.end()
-                continue
-            
-            grouping_body = content[grouping_start + 1:grouping_end]
-            self.groupings_cache[grouping_name] = grouping_body
-            pos = grouping_end + 1
+        """Extract all groupings from YANG content and cache them — top-level only."""
+        self.groupings_cache = {}
+        for name, body in _shared_iter_top_level_blocks(content, 'grouping'):
+            self.groupings_cache[name] = body
     
     def parse_leaf(self, leaf_content: str, leaf_name: str) -> Dict[str, Any]:
         """Parse a YANG leaf and return OpenAPI schema - RFC 7950 compliant"""
@@ -464,44 +354,18 @@ class RPCYANGToOpenAPIConverter:
         return None
     
     def _resolve_includes(self, yang_file: Path, content: str) -> str:
-        # Inline every `include <submodule>;` body so groupings and RPCs
-        # defined in submodules become visible to extract_groupings/extract_rpcs.
+        # See generators/_yang_parse.resolve_includes for the implementation.
         # Without this, parents like Cisco-IOS-XE-rpc collapse `uses
         # crypto-input-grouping;` into an empty schema (crypto pki import,
         # clear aaa/arp/bgp/dhcp/ospf, debug platform, etc.).
-        out = [content]
-        yang_dir = yang_file.parent
-        seen: set[str] = set()
-        for inc in re.finditer(r'\binclude\s+([\w-]+)\s*(?:\{[^}]*\})?\s*;', content):
-            submod = inc.group(1)
-            if submod in seen:
-                continue
-            seen.add(submod)
-            path = yang_dir / f"{submod}.yang"
-            if not path.is_file():
-                continue
-            try:
-                sub_content = path.read_text(encoding='utf-8')
-            except OSError:
-                continue
-            m = re.search(r'^\s*submodule\s+\S+\s*\{', sub_content, re.MULTILINE)
-            if m:
-                body_start = m.end() - 1
-                body_end = self.find_balanced_braces(sub_content, body_start)
-                if body_end != -1:
-                    out.append('\n')
-                    out.append(sub_content[body_start + 1:body_end])
-                    continue
-            out.append('\n')
-            out.append(sub_content)
-        return ''.join(out)
+        return _shared_resolve_includes(yang_file, content)
 
     def parse_yang_file(self, yang_file: Path) -> Dict[str, Any]:
         """Parse YANG file and extract module info"""
         with open(yang_file, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        is_submodule = bool(re.search(r'^\s*submodule\s+', content, re.MULTILINE))
+        is_submodule = _shared_is_submodule(content)
         if not is_submodule:
             content = self._resolve_includes(yang_file, content)
 
