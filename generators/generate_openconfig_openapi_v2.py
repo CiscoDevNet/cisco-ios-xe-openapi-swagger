@@ -7,8 +7,18 @@ Properly parses YANG structure using tree walking.
 import json
 import re
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List, Set
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _yang_parse import (
+    find_balanced_braces as _shared_find_balanced_braces,
+    iter_top_level_blocks as _shared_iter_top_level_blocks,
+    iter_top_level_uses as _shared_iter_top_level_uses,
+    resolve_includes as _shared_resolve_includes,
+    is_submodule as _shared_is_submodule,
+)
 
 class OpenConfigToOpenAPI:
     """Convert OpenConfig YANG modules to OpenAPI 3.0 with proper YANG parsing"""
@@ -22,38 +32,12 @@ class OpenConfigToOpenAPI:
         self.total_paths = 0
 
     def find_balanced_braces(self, text: str, start_pos: int) -> int:
-        """Find the end position of balanced braces"""
-        if start_pos >= len(text) or text[start_pos] != '{':
-            return -1
-        count = 0
-        for i in range(start_pos, len(text)):
-            if text[i] == '{':
-                count += 1
-            elif text[i] == '}':
-                count -= 1
-                if count == 0:
-                    return i
-        return -1
+        return _shared_find_balanced_braces(text, start_pos)
 
     def extract_groupings(self, content: str):
-        """Extract all groupings from YANG content and cache them"""
-        pos = 0
-        while True:
-            grouping_match = re.search(r'\bgrouping\s+(\S+)\s*\{', content[pos:])
-            if not grouping_match:
-                break
-
-            grouping_name = grouping_match.group(1)
-            grouping_start = pos + grouping_match.end() - 1
-            grouping_end = self.find_balanced_braces(content, grouping_start)
-
-            if grouping_end == -1:
-                pos += grouping_match.end()
-                continue
-
-            grouping_body = content[grouping_start + 1:grouping_end]
-            self.groupings_cache[grouping_name] = grouping_body
-            pos = grouping_end + 1
+        """Cache all top-level groupings (depth-aware)."""
+        for name, body in _shared_iter_top_level_blocks(content, 'grouping'):
+            self.groupings_cache[name] = body
 
     def read_yang_file(self, filepath: Path) -> str:
         """Read YANG file content"""
@@ -163,139 +147,60 @@ class OpenConfigToOpenAPI:
         return schema
 
     def parse_container_or_grouping(self, content: str, name: str, depth: int = 0) -> Dict[str, Any]:
-        """Recursively parse container/grouping"""
+        """Recursively parse container/grouping (depth-aware)."""
         if depth > 20:
             return {'type': 'object', 'description': f'{name} (max depth reached)'}
 
         properties = {}
         required = []
 
-        # Resolve 'uses' statements
-        uses_pattern = r'\buses\s+(\S+);'
-        for uses_match in re.finditer(uses_pattern, content):
-            grouping_ref = uses_match.group(1)
-            grouping_name = grouping_ref.split(':')[-1]
-            if grouping_name in self.groupings_cache:
-                grouping_content = self.groupings_cache[grouping_name]
-                grouping_schema = self.parse_container_or_grouping(grouping_content, grouping_name, depth + 1)
-                if 'properties' in grouping_schema and grouping_schema['properties']:
-                    properties.update(grouping_schema['properties'])
-                if 'required' in grouping_schema:
-                    required.extend(grouping_schema['required'])
-
-        # Parse leaves
-        pos = 0
-        while True:
-            leaf_match = re.search(r'\bleaf\s+(\S+)\s*\{', content[pos:])
-            if not leaf_match:
-                break
-
-            leaf_name = leaf_match.group(1)
-            leaf_start = pos + leaf_match.end() - 1
-            leaf_end = self.find_balanced_braces(content, leaf_start)
-
-            if leaf_end == -1:
-                pos += leaf_match.end()
+        # Resolve 'uses' statements — top-level only.
+        for grouping_name in _shared_iter_top_level_uses(content):
+            grouping_content = self.groupings_cache.get(grouping_name)
+            if grouping_content is None:
                 continue
+            grouping_schema = self.parse_container_or_grouping(grouping_content, grouping_name, depth + 1)
+            if 'properties' in grouping_schema and grouping_schema['properties']:
+                properties.update(grouping_schema['properties'])
+            if 'required' in grouping_schema:
+                required.extend(grouping_schema['required'])
 
-            leaf_body = content[leaf_start + 1:leaf_end]
+        # Parse leaves — top-level only.
+        for leaf_name, leaf_body in _shared_iter_top_level_blocks(content, 'leaf'):
             leaf_schema = self.parse_leaf(leaf_body, leaf_name)
-
             if leaf_schema.pop('x-mandatory', False):
                 required.append(leaf_name)
-
             properties[leaf_name] = leaf_schema
-            pos = leaf_end + 1
 
-        # Parse leaf-lists
-        pos = 0
-        while True:
-            ll_match = re.search(r'\bleaf-list\s+(\S+)\s*\{', content[pos:])
-            if not ll_match:
-                break
-
-            ll_name = ll_match.group(1)
-            ll_start = pos + ll_match.end() - 1
-            ll_end = self.find_balanced_braces(content, ll_start)
-
-            if ll_end == -1:
-                pos += ll_match.end()
-                continue
-
-            ll_body = content[ll_start + 1:ll_end]
+        # Parse leaf-lists — top-level only.
+        for ll_name, ll_body in _shared_iter_top_level_blocks(content, 'leaf-list'):
             item_schema = self.parse_leaf(ll_body, ll_name)
             item_schema.pop('x-mandatory', None)
-
             properties[ll_name] = {
                 'type': 'array',
                 'items': item_schema
             }
-            pos = ll_end + 1
 
-        # Parse nested containers
-        pos = 0
-        while True:
-            cont_match = re.search(r'\bcontainer\s+(\S+)\s*\{', content[pos:])
-            if not cont_match:
-                break
-
-            cont_name = cont_match.group(1)
-            cont_start = pos + cont_match.end() - 1
-            cont_end = self.find_balanced_braces(content, cont_start)
-
-            if cont_end == -1:
-                pos += cont_match.end()
-                continue
-
-            cont_body = content[cont_start + 1:cont_end]
+        # Parse nested containers — top-level only.
+        for cont_name, cont_body in _shared_iter_top_level_blocks(content, 'container'):
             desc_match = re.search(r'\bdescription\s+"([^"]+)"', cont_body)
             description = desc_match.group(1) if desc_match else None
-
             nested_schema = self.parse_container_or_grouping(cont_body, cont_name, depth + 1)
             if description:
                 nested_schema['description'] = description
-
             properties[cont_name] = nested_schema
-            pos = cont_end + 1
 
-        # Parse choices
-        pos = 0
-        while True:
-            choice_match = re.search(r'\bchoice\s+(\S+)\s*\{', content[pos:])
-            if not choice_match:
-                break
+        # Parse nested lists — top-level only.
+        for list_name, list_body in _shared_iter_top_level_blocks(content, 'list'):
+            item_schema = self.parse_container_or_grouping(list_body, list_name, depth + 1)
+            properties[list_name] = {'type': 'array', 'items': item_schema}
 
-            choice_start = pos + choice_match.end() - 1
-            choice_end = self.find_balanced_braces(content, choice_start)
-
-            if choice_end == -1:
-                pos += choice_match.end()
-                continue
-
-            choice_body = content[choice_start + 1:choice_end]
-
-            # Parse all cases within the choice
-            case_pos = 0
-            while True:
-                case_match = re.search(r'\bcase\s+(\S+)\s*\{', choice_body[case_pos:])
-                if not case_match:
-                    break
-
-                case_start = case_pos + case_match.end() - 1
-                case_end = self.find_balanced_braces(choice_body, case_start)
-
-                if case_end == -1:
-                    case_pos += case_match.end()
-                    continue
-
-                case_body = choice_body[case_start + 1:case_end]
-                case_schema = self.parse_container_or_grouping(case_body, f"case-{depth}", depth + 1)
+        # Parse choices — top-level only; cases flatten into parent.
+        for _choice_name, choice_body in _shared_iter_top_level_blocks(content, 'choice'):
+            for case_name, case_body in _shared_iter_top_level_blocks(choice_body, 'case'):
+                case_schema = self.parse_container_or_grouping(case_body, f"case-{case_name}", depth + 1)
                 if 'properties' in case_schema and case_schema['properties']:
                     properties.update(case_schema['properties'])
-
-                case_pos = case_end + 1
-
-            pos = choice_end + 1
 
         schema = {'type': 'object'}
         if properties:
@@ -666,6 +571,15 @@ class OpenConfigToOpenAPI:
             content = self.read_yang_file(yang_file)
             if not content:
                 return False
+
+            # Submodules are inlined into their parent module \u2014 don't emit
+            # standalone specs for them.
+            if _shared_is_submodule(content):
+                return False
+
+            # Inline `include <submodule>;` bodies so groupings defined in
+            # submodules become visible to the depth-aware scanners.
+            content = _shared_resolve_includes(yang_file, content)
 
             module_name = self.extract_module_name(content)
             if not module_name or not module_name.startswith('openconfig-'):

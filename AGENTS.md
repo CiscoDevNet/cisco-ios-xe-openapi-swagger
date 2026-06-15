@@ -439,17 +439,29 @@ In RFC 7951 RESTCONF JSON, an empty YANG leaf is `[null]` (an array containing n
 
 Earlier versions had `{"Cisco-IOS-XE-native:vlan": {}}` examples that broke device updates. The fix lives in `scripts/enrich_v2_specs.py` (`build_example_from_schema()`, `_build_example_from_path()`, `_populate_empty_example()`). If you see `{}` come back in examples, the fix has regressed.
 
-### RPC submodules and nested choice/case (fixed 2026-06-15)
+### Shared YANG parser — all v2 generators (fixed 2026-06-15, expanded 2026-06-16)
 
-The single RPC generator is [generators/generate_rpc_openapi_v2.py](generators/generate_rpc_openapi_v2.py). Do **not** edit `generate_rpc_from_tree.py` — it is unused by the per-release pipeline.
+All active v2 generators — `generate_native_openapi_v2.py`, `generate_openconfig_openapi_v2.py`, `generate_ietf_openapi_v2.py`, `generate_mib_openapi_v2.py`, `generate_other_openapi_v2.py`, `generate_rpc_openapi_v2.py` — import the shared helper module [generators/_yang_parse.py](generators/_yang_parse.py). Never re-implement these primitives inline.
 
-Two rules that the generator now enforces and that future edits must preserve:
+Public API exposed by `_yang_parse.py`:
 
-1. **YANG `include <submodule>;` must be resolved before parsing.** Parent modules (e.g. `Cisco-IOS-XE-rpc.yang`) declare RPCs like `rpc crypto { input { uses crypto-input-grouping; } }` while the grouping lives in a submodule (e.g. `Cisco-IOS-XE-crypto-rpc.yang`, `belongs-to Cisco-IOS-XE-rpc`). Without `_resolve_includes()` inlining the submodule body, `extract_groupings()` returns nothing and the request schema collapses to `{}`. This silently affected `rpc:crypto` (pki import/export/enroll/authenticate/benchmark/crl/certificate/server), `rpc:clear` (aaa/arp/bgp/dhcp/ospf/platform) and `rpc:debug` (platform/crypto) for years. Submodule files themselves are skipped via the `is_submodule` flag — `analyze_yang_accountability_v2.py` records `reason_excluded="Submodule of <parent> - included in parent spec"`.
+- `find_balanced_braces(content, brace_start)` — matched-brace scanner that respects YANG string literals and `//` / `/* */` comments.
+- `iter_top_level_blocks(content, keyword)` — yields `(name, body)` for every `<keyword> <name> { ... }` at brace-depth 0. Works for `grouping`, `container`, `list`, `leaf`, `leaf-list`, `choice`, `case`, etc.
+- `iter_top_level_uses(content)` — yields each `uses <grouping-name>;` at depth 0.
+- `resolve_includes(yang_file, content)` — recursively follows YANG `include <submodule>;` statements and **injects each submodule body inside the parent module's `{ ... }` wrapper** so the inlined groupings sit at the same brace depth as the parent's own definitions. Tracks `seen` to break circular includes.
+- `is_submodule(content)` — `True` when the file starts with `submodule X { ... }`. Generators must early-return on this so submodules are not emitted as standalone specs (`analyze_yang_accountability_v2.py` records `reason_excluded="Submodule of <parent> - included in parent spec"`).
 
-2. **All keyword scanners (`leaf` / `leaf-list` / `container` / `choice` / `case` / `uses`) must respect brace depth.** A naive `re.search(r'\bleaf\s+(\S+)\s*\{')` will match leaves nested arbitrarily deep and hoist them into the parent schema. Use `_iter_top_level_blocks(content, keyword)` and `_iter_top_level_uses(content)` — they walk character-by-character tracking brace depth, string literals and YANG comments, and only yield matches at `depth==0`.
+Both `iter_top_level_blocks` and `iter_top_level_uses` automatically call `_unwrap_module(content)` first, so callers may pass whole-file YANG content **or** an already-extracted block body and get the same result.
 
-If a customer reports "I can find X in the YANG tree but not in the OpenAPI", check both rules before touching anything else.
+Three rules future edits must preserve:
+
+1. **`include <submodule>;` must be resolved before parsing.** Without `resolve_includes()` inlining the submodule body, `extract_groupings()` returns nothing and the request schema collapses to `{}`. This silently affected `rpc:crypto` (pki import/export/enroll/authenticate/benchmark/crl/certificate/server), `rpc:clear` (aaa/arp/bgp/dhcp/ospf/platform) and `rpc:debug` (platform/crypto) for years, and analogously affected openconfig, native, ietf groupings.
+2. **All keyword scanners (`leaf` / `leaf-list` / `container` / `list` / `choice` / `case` / `uses`) must respect brace depth.** A naive `re.search(r'\bleaf\s+(\S+)\s*\{')` will match leaves nested arbitrarily deep and hoist them into the parent schema. Use `iter_top_level_blocks` / `iter_top_level_uses`.
+3. **`parse_container_or_grouping` must enumerate `list` blocks**, not just `container` blocks. A container whose only child is a YANG `list` (very common in IETF modules — `container interfaces { list interface { ... } }`) will produce an empty PUT body if you forget the list scanner.
+
+After the 2026-06-16 rollout, post-fix empty-body counts (POST/PUT/PATCH whose body is just `{"<module>:<name>": {"type":"object"}}`): rpc 261→43 (26.1.1), openconfig 86→20, ietf 200→216 (now correct — the old "non-empty" bodies had leaves falsely hoisted from nested lists), native percentage 58.1%→52.6%, total 43.6%→39.8% on 26.1.1.
+
+If a customer reports "I can find X in the YANG tree but not in the OpenAPI", check all three rules before touching anything else.
 
 ### `scripts/update_manifests.py` is dead code
 

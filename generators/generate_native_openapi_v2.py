@@ -8,8 +8,18 @@ Splits into logical feature categories for better organization.
 import json
 import re
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Set
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _yang_parse import (
+    find_balanced_braces as _shared_find_balanced_braces,
+    iter_top_level_blocks as _shared_iter_top_level_blocks,
+    iter_top_level_uses as _shared_iter_top_level_uses,
+    resolve_includes as _shared_resolve_includes,
+    is_submodule as _shared_is_submodule,
+)
 
 class NativeToOpenAPI:
     """Convert Cisco-IOS-XE-native YANG to OpenAPI 3.0 with proper YANG parsing"""
@@ -317,24 +327,10 @@ class NativeToOpenAPI:
             return ""
 
     def extract_groupings(self, content: str):
-        """Extract all groupings from YANG content"""
-        pos = 0
-        while True:
-            grouping_match = re.search(r'\bgrouping\s+(\S+)\s*\{', content[pos:])
-            if not grouping_match:
-                break
-
-            grouping_name = grouping_match.group(1)
-            grouping_start = pos + grouping_match.end() - 1
-            grouping_end = self.find_balanced_braces(content, grouping_start)
-
-            if grouping_end == -1:
-                pos += grouping_match.end()
-                continue
-
-            grouping_body = content[grouping_start + 1:grouping_end]
-            self.groupings_cache[grouping_name] = grouping_body
-            pos = grouping_end + 1
+        """Cache all top-level groupings (RFC 7950 §7.12). Depth-aware so
+        nested groupings don't pollute the cache."""
+        for name, body in _shared_iter_top_level_blocks(content, 'grouping'):
+            self.groupings_cache[name] = body
 
     def parse_leaf(self, leaf_content: str, leaf_name: str) -> Dict[str, Any]:
         """Parse a YANG leaf and return OpenAPI schema"""
@@ -393,88 +389,48 @@ class NativeToOpenAPI:
         return schema
 
     def parse_container_or_list(self, content: str, name: str, depth: int = 0) -> Dict[str, Any]:
-        """Recursively parse container/list structure"""
+        """Recursively parse container/list structure (depth-aware)."""
         if depth > 15:
             return {'type': 'object', 'description': f'{name} (depth limit)'}
 
         properties = {}
 
-        # Handle 'uses' statements
-        for uses_match in re.finditer(r'\buses\s+(\S+);', content):
-            grouping_ref = uses_match.group(1).split(':')[-1]
-            if grouping_ref in self.groupings_cache:
-                grouping_schema = self.parse_container_or_list(
-                    self.groupings_cache[grouping_ref], grouping_ref, depth + 1
-                )
-                if 'properties' in grouping_schema:
-                    properties.update(grouping_schema['properties'])
-
-        # Parse leaves
-        pos = 0
-        while True:
-            leaf_match = re.search(r'\bleaf\s+(\S+)\s*\{', content[pos:])
-            if not leaf_match:
-                break
-            leaf_name = leaf_match.group(1)
-            leaf_start = pos + leaf_match.end() - 1
-            leaf_end = self.find_balanced_braces(content, leaf_start)
-            if leaf_end == -1:
-                pos += leaf_match.end()
+        # Handle 'uses' statements (top-level only).
+        for grouping_ref in _shared_iter_top_level_uses(content):
+            grouping_content = self.groupings_cache.get(grouping_ref)
+            if grouping_content is None:
                 continue
-            leaf_body = content[leaf_start + 1:leaf_end]
+            grouping_schema = self.parse_container_or_list(
+                grouping_content, grouping_ref, depth + 1
+            )
+            if 'properties' in grouping_schema:
+                properties.update(grouping_schema['properties'])
+
+        # Parse leaves — top-level only.
+        for leaf_name, leaf_body in _shared_iter_top_level_blocks(content, 'leaf'):
             properties[leaf_name] = self.parse_leaf(leaf_body, leaf_name)
-            pos = leaf_end + 1
 
-        # Parse leaf-lists
-        pos = 0
-        while True:
-            ll_match = re.search(r'\bleaf-list\s+(\S+)\s*\{', content[pos:])
-            if not ll_match:
-                break
-            ll_name = ll_match.group(1)
-            ll_start = pos + ll_match.end() - 1
-            ll_end = self.find_balanced_braces(content, ll_start)
-            if ll_end == -1:
-                pos += ll_match.end()
-                continue
-            ll_body = content[ll_start + 1:ll_end]
+        # Parse leaf-lists — top-level only.
+        for ll_name, ll_body in _shared_iter_top_level_blocks(content, 'leaf-list'):
             item_schema = self.parse_leaf(ll_body, ll_name)
             properties[ll_name] = {'type': 'array', 'items': item_schema}
-            pos = ll_end + 1
 
-        # Parse nested containers
-        pos = 0
-        while True:
-            cont_match = re.search(r'\bcontainer\s+(\S+)\s*\{', content[pos:])
-            if not cont_match:
-                break
-            cont_name = cont_match.group(1)
-            cont_start = pos + cont_match.end() - 1
-            cont_end = self.find_balanced_braces(content, cont_start)
-            if cont_end == -1:
-                pos += cont_match.end()
-                continue
-            cont_body = content[cont_start + 1:cont_end]
+        # Parse nested containers — top-level only.
+        for cont_name, cont_body in _shared_iter_top_level_blocks(content, 'container'):
             nested_schema = self.parse_container_or_list(cont_body, cont_name, depth + 1)
             properties[cont_name] = nested_schema
-            pos = cont_end + 1
 
-        # Parse nested lists
-        pos = 0
-        while True:
-            list_match = re.search(r'\blist\s+(\S+)\s*\{', content[pos:])
-            if not list_match:
-                break
-            list_name = list_match.group(1)
-            list_start = pos + list_match.end() - 1
-            list_end = self.find_balanced_braces(content, list_start)
-            if list_end == -1:
-                pos += list_match.end()
-                continue
-            list_body = content[list_start + 1:list_end]
+        # Parse nested lists — top-level only.
+        for list_name, list_body in _shared_iter_top_level_blocks(content, 'list'):
             item_schema = self.parse_container_or_list(list_body, list_name, depth + 1)
             properties[list_name] = {'type': 'array', 'items': item_schema}
-            pos = list_end + 1
+
+        # Parse choices — cases flatten into parent (RFC 8040).
+        for _choice_name, choice_body in _shared_iter_top_level_blocks(content, 'choice'):
+            for case_name, case_body in _shared_iter_top_level_blocks(choice_body, 'case'):
+                case_schema = self.parse_container_or_list(case_body, f"case-{case_name}", depth + 1)
+                if 'properties' in case_schema:
+                    properties.update(case_schema['properties'])
 
         schema = {'type': 'object'}
         if properties:
@@ -933,25 +889,23 @@ class NativeToOpenAPI:
         return spec
 
     def load_all_yang_content(self) -> str:
-        """Load and combine the native module and all its submodules"""
-        combined_content = ""
-        
-        # Load main native module
+        """Load the native module and inline all `include`d submodules.
+        Uses the shared include resolver which strips each submodule's
+        `submodule X { ... }` wrapper — critical because the parsers below
+        only scan at brace depth 0."""
         native_file = self.yang_dir / "Cisco-IOS-XE-native.yang"
-        if native_file.exists():
-            content = self.read_yang_file(native_file)
-            combined_content += content
-            
-            # Extract included submodules
-            for include_match in re.finditer(r'include\s+(\S+);', content):
-                submodule_name = include_match.group(1)
-                submodule_file = self.yang_dir / f"{submodule_name}.yang"
-                if submodule_file.exists():
-                    sub_content = self.read_yang_file(submodule_file)
-                    combined_content += "\n" + sub_content
-                    print(f"  Loaded submodule: {submodule_name}")
-        
-        return combined_content
+        if not native_file.exists():
+            return ""
+        content = self.read_yang_file(native_file)
+        if not content:
+            return ""
+        resolved = _shared_resolve_includes(native_file, content)
+        if resolved != content:
+            # Report submodules pulled in (informational; preserves prior log
+            # behaviour without re-walking the file).
+            for inc in re.finditer(r'\binclude\s+([\w-]+)', content):
+                print(f"  Loaded submodule: {inc.group(1)}")
+        return resolved
 
     def generate_all(self):
         """Generate OpenAPI specs for all native categories"""

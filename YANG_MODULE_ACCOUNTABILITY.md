@@ -2,8 +2,8 @@
 
 **Date:** June 15, 2026
 **IOS XE Version:** 17.18.1
-**Total YANG Modules:** 1151
-**Modules with OpenAPI Specs:** 698 (60.6%)
+**Total YANG Modules:** 1152
+**Modules with OpenAPI Specs:** 699 (60.7%)
 **Modules with YANG Trees:** 715
 **Modules in Multiple Categories:** 10
 
@@ -32,7 +32,7 @@ This report provides **100% accountability** for every YANG module in the
 | **ietf** | 33 | 21 | 64% |  |
 | **mib** | 150 | 148 | 99% |  |
 | **events** | 41 | 41 | 100% |  |
-| **native** | 154 | 153 | 99% |  |
+| **native** | 155 | 154 | 99% |  |
 | **other** | 30 | 6 | 20% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
@@ -659,7 +659,7 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-pw | Other | [Other](swagger-other-model/index.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Other | [RPC](swagger-rpc-model/index.html#spec=cisco-smart-license) [Other](swagger-other-model/index.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
 
-### NATIVE (154 modules)
+### NATIVE (155 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -784,6 +784,7 @@ This report provides **100% accountability** for every YANG module in the
 | native-service-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-list) | - |
 | native-service-routing | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-routing) | - |
 | native-service-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-service-template) | - |
+| native-services | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services) | - |
 | native-services-1 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-1) | - |
 | native-services-2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-2) | - |
 | native-services-3 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-services-3) | - |
@@ -1344,4 +1345,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-06-15T17:47:54.949665*
+*Report generated: 2026-06-15T18:58:39.593824*
