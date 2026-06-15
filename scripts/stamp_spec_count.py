@@ -22,12 +22,45 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
+_NON_SPECS = {"manifest.json", "_paths_index.json"}
+_OP_METHODS = {"get", "put", "patch", "post", "delete", "head", "options"}
+
+
+def _scan_paths_ops(api_dir: Path) -> tuple[int, int]:
+    """Sum (total_paths, total_operations) across all spec JSONs in a dir."""
+    total_paths = 0
+    total_ops = 0
+    for f in api_dir.glob("*.json"):
+        if f.name in _NON_SPECS:
+            continue
+        try:
+            spec = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        paths = spec.get("paths", {}) if isinstance(spec, dict) else {}
+        if not isinstance(paths, dict):
+            continue
+        total_paths += len(paths)
+        for item in paths.values():
+            if isinstance(item, dict):
+                total_ops += sum(1 for m in item if m in _OP_METHODS)
+    return total_paths, total_ops
+
+
 def stamp(manifest: Path) -> tuple[bool, int]:
-    """Add/update spec_count on a manifest. Returns (changed, on_disk_count)."""
+    """Stamp spec_count and backfill total_paths/total_operations if missing.
+
+    The category viewer pages call ``manifest.total_operations.toLocaleString()``
+    and ``manifest.total_paths.toLocaleString()`` unguarded, so a manifest that
+    is missing either key crashes ``init()`` and the module-list sidebar never
+    renders. Regenerating a category with ``--only <cat>-specs`` rewrites the
+    manifest fresh from the generator, and several generators (ietf, openconfig,
+    other, mib) do not emit ``total_operations`` — so this step must restore it.
+    Returns (changed, on_disk_count).
+    """
     # Exclude bookkeeping files: manifest itself and the cross-chunk paths
     # index produced by build_paths_index.py (Round 6+). Only true OpenAPI
     # spec JSONs should count toward spec_count.
-    _NON_SPECS = {"manifest.json", "_paths_index.json"}
     on_disk = sum(
         1 for f in manifest.parent.glob("*.json") if f.name not in _NON_SPECS
     )
@@ -39,11 +72,27 @@ def stamp(manifest: Path) -> tuple[bool, int]:
     if not isinstance(data, dict):
         print(f"  ! {manifest.relative_to(PROJECT_ROOT)}: not an object; skipping")
         return False, on_disk
-    if data.get("spec_count") == on_disk:
-        return False, on_disk
-    data["spec_count"] = on_disk
-    manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-    return True, on_disk
+
+    changed = False
+    if data.get("spec_count") != on_disk:
+        data["spec_count"] = on_disk
+        changed = True
+
+    # Backfill the stat keys the viewer reads unguarded. Only compute (an O(N)
+    # spec scan) when at least one key is actually missing, to stay cheap and
+    # to avoid disturbing counts already emitted by a generator.
+    if "total_paths" not in data or "total_operations" not in data:
+        scanned_paths, scanned_ops = _scan_paths_ops(manifest.parent)
+        if "total_paths" not in data:
+            data["total_paths"] = scanned_paths
+            changed = True
+        if "total_operations" not in data:
+            data["total_operations"] = scanned_ops
+            changed = True
+
+    if changed:
+        manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return changed, on_disk
 
 
 def main() -> int:
