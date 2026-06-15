@@ -39,48 +39,6 @@
                         "pattern": "[0-2]/[0-3]",
                         "description": "UCSE (Unified Computing System E-Series) subslot"
                       },
-                      "password-reset": {
-                        "type": "object",
-                        "properties": {
-                          "BIOS": {
-                            "type": "string",
-                            "description": "Reset the BIOS password for the server"
-                          }
-                        },
-                        "description": "Reset the password for the server"
-                      },
-                      "cmos-reset": {
-                        "type": "string",
-                        "description": "Reset the CMOS password for the server"
-                      },
-                      "BIOS": {
-                        "type": "string",
-                        "description": "Reset the BIOS password for the server"
-                      },
-                      "reload": {
-                        "type": "string",
-                        "description": "Reload the server"
-                      },
-                      "reset": {
-                        "type": "string",
-                        "description": "Reset the server"
-                      },
-                      "start": {
-                        "type": "string",
-                        "description": "Start the server"
-                      },
-                      "stop": {
-                        "type": "string",
-                        "description": "Stop the server"
-                      },
-                      "shutdown": {
-                        "type": "string",
-                        "description": "Shutdown the UCSE (Unified Computing System E-Series) module"
-                      },
-                      "clear": {
-                        "type": "string",
-                        "description": "Clear the statistics"
-                      },
                       "imc": {
                         "type": "object",
                         "properties": {
@@ -98,9 +56,15 @@
                             "type": "string",
                             "description": "Reset the CMOS password for the server"
                           },
-                          "BIOS": {
-                            "type": "string",
-                            "description": "Reset the BIOS password for the server"
+                          "password-reset": {
+                            "type": "object",
+                            "properties": {
+                              "BIOS": {
+                                "type": "string",
+                                "description": "Reset the BIOS password for the server"
+                              }
+                            },
+                            "description": "Reset the password for the server"
                           },
                           "reload": {
                             "type": "string",
@@ -117,19 +81,57 @@
                           "stop": {
                             "type": "string",
                             "description": "Stop the server"
-                          },
-                          "password-reset": {
-                            "type": "object",
-                            "properties": {
-                              "BIOS": {
-                                "type": "string",
-                                "description": "Reset the BIOS password for the server"
-                              }
-                            },
-                            "description": "Reset the password for the server"
                           }
                         },
+                        "x-yang-choices": [
+                          {
+                            "name": "server-command-choice",
+                            "mandatory": false,
+                            "cases": [
+                              {
+                                "name": "server-cmos-password-reset",
+                                "properties": [
+                                  "cmos-reset"
+                                ]
+                              },
+                              {
+                                "name": "server-password-reset",
+                                "properties": [
+                                  "password-reset"
+                                ]
+                              },
+                              {
+                                "name": "server-reload",
+                                "properties": [
+                                  "reload"
+                                ]
+                              },
+                              {
+                                "name": "server-reset",
+                                "properties": [
+                                  "reset"
+                                ]
+                              },
+                              {
+                                "name": "server-start",
+                                "properties": [
+                                  "start"
+                                ]
+                              },
+                              {
+                                "name": "server-stop",
+                                "properties": [
+                                  "stop"
+                                ]
+                              }
+                            ]
+                          }
+                        ],
                         "description": "Server commands"
+                      },
+                      "shutdown": {
+                        "type": "string",
+                        "description": "Shutdown the UCSE (Unified Computing System E-Series) module"
                       },
                       "statistics": {
                         "type": "object",
@@ -144,38 +146,60 @@
                     },
                     "required": [
                       "subslot"
-                    ]
+                    ],
+                    "x-yang-choices": [
+                      {
+                        "name": "command-choice",
+                        "mandatory": true,
+                        "cases": [
+                          {
+                            "name": "imc-case",
+                            "properties": [
+                              "imc"
+                            ]
+                          },
+                          {
+                            "name": "server-case",
+                            "properties": [
+                              "server"
+                            ]
+                          },
+                          {
+                            "name": "shutdown-case",
+                            "properties": [
+                              "shutdown"
+                            ]
+                          },
+                          {
+                            "name": "statistics-case",
+                            "properties": [
+                              "statistics"
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "description": "YANG choice \u2014 mutually exclusive case groups: choice 'command-choice' (mandatory): imc-case | server-case | shutdown-case | statistics-case."
                   }
                 }
               },
               "example": {
                 "ucse_rpc:ucse": {
                   "subslot": "example-string",
-                  "password-reset": {
-                    "BIOS": "example-string"
-                  },
-                  "cmos-reset": "example-string",
-                  "BIOS": "example-string",
-                  "reload": "example-string",
-                  "reset": "example-string",
-                  "start": "example-string",
-                  "stop": "example-string",
-                  "shutdown": "example-string",
-                  "clear": "example-string",
                   "imc": {
                     "password-reset": "Cisco123!"
                   },
                   "server": {
                     "cmos-reset": "example-string",
-                    "BIOS": "example-string",
+                    "password-reset": {
+                      "BIOS": "example-string"
+                    },
                     "reload": "example-string",
                     "reset": "example-string",
                     "start": "example-string",
-                    "stop": "example-string",
-                    "password-reset": {
-                      "BIOS": "example-string"
-                    }
+                    "stop": "example-string"
                   },
+                  "shutdown": "example-string",
                   "statistics": {
                     "clear": "example-string"
                   }

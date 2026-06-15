@@ -1,6 +1,6 @@
 # YANG Module Accountability Report
 
-**Date:** June 01, 2026
+**Date:** June 15, 2026
 **IOS XE Version:** 17.18.1
 **Total YANG Modules:** 1151
 **Modules with OpenAPI Specs:** 698 (60.6%)
@@ -1344,4 +1344,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-06-01T12:38:34.284786*
+*Report generated: 2026-06-15T17:47:54.949665*

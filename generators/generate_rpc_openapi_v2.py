@@ -35,7 +35,108 @@ class RPCYANGToOpenAPIConverter:
                 if count == 0:
                     return i
         return -1
-    
+
+    # Walk `content` and yield only matches at brace depth 0, skipping
+    # strings and YANG comments. Without this, every nested `leaf` /
+    # `container` / `choice` would be hoisted into the parent schema.
+    def _iter_top_level_blocks(self, content: str, keyword: str):
+        """Yield (name, body) for each `keyword <name> { ... }` at depth 0."""
+        n = len(content)
+        i = 0
+        depth = 0
+        kw_re = re.compile(rf'{re.escape(keyword)}\b\s+(\S+)\s*\{{')
+        while i < n:
+            c = content[i]
+            if c == '"' or c == "'":
+                q = c
+                i += 1
+                while i < n:
+                    if content[i] == '\\' and i + 1 < n:
+                        i += 2
+                        continue
+                    if content[i] == q:
+                        i += 1
+                        break
+                    i += 1
+                continue
+            if c == '/' and i + 1 < n:
+                if content[i + 1] == '/':
+                    nl = content.find('\n', i)
+                    i = n if nl < 0 else nl + 1
+                    continue
+                if content[i + 1] == '*':
+                    end = content.find('*/', i + 2)
+                    i = n if end < 0 else end + 2
+                    continue
+            if c == '{':
+                depth += 1
+                i += 1
+                continue
+            if c == '}':
+                depth -= 1
+                i += 1
+                continue
+            if depth == 0:
+                prev_ok = (i == 0) or not (content[i - 1].isalnum() or content[i - 1] in '_-')
+                if prev_ok:
+                    m = kw_re.match(content, i)
+                    if m:
+                        name = m.group(1)
+                        block_start = m.end() - 1
+                        block_end = self.find_balanced_braces(content, block_start)
+                        if block_end != -1:
+                            yield name, content[block_start + 1:block_end]
+                            i = block_end + 1
+                            continue
+            i += 1
+
+    def _iter_top_level_uses(self, content: str):
+        """Yield grouping names from `uses <name>;` (or `uses <name> {...};`) at depth 0."""
+        n = len(content)
+        i = 0
+        depth = 0
+        uses_re = re.compile(r'uses\s+(?:[\w-]+:)?(\S+?)\s*(?:\{)?')
+        while i < n:
+            c = content[i]
+            if c == '"' or c == "'":
+                q = c
+                i += 1
+                while i < n:
+                    if content[i] == '\\' and i + 1 < n:
+                        i += 2
+                        continue
+                    if content[i] == q:
+                        i += 1
+                        break
+                    i += 1
+                continue
+            if c == '/' and i + 1 < n:
+                if content[i + 1] == '/':
+                    nl = content.find('\n', i)
+                    i = n if nl < 0 else nl + 1
+                    continue
+                if content[i + 1] == '*':
+                    end = content.find('*/', i + 2)
+                    i = n if end < 0 else end + 2
+                    continue
+            if c == '{':
+                depth += 1
+                i += 1
+                continue
+            if c == '}':
+                depth -= 1
+                i += 1
+                continue
+            if depth == 0:
+                prev_ok = (i == 0) or not (content[i - 1].isalnum() or content[i - 1] in '_-')
+                if prev_ok and content.startswith('uses', i):
+                    m = re.match(r'uses\s+(?:[\w-]+:)?([\w-]+)\s*(?:\{([^{}]*)\})?\s*;', content[i:])
+                    if m:
+                        yield m.group(1)
+                        i += m.end()
+                        continue
+            i += 1
+
     def extract_groupings(self, content: str):
         """Extract all groupings from YANG content and cache them"""
         self.groupings_cache = {}  # Reset cache
@@ -165,10 +266,8 @@ class RPCYANGToOpenAPIConverter:
         # Check for presence container (RFC 7950 Section 7.5.1)
         is_presence = 'presence' in content or re.search(r'\bpresence\s+"[^"]+"', content)
         
-        # Resolve 'uses' statements (RFC 7950 Section 7.13)
-        uses_pattern = r'\buses\s+(?:[\w-]+:)?(\S+);'
-        for uses_match in re.finditer(uses_pattern, content):
-            grouping_name = uses_match.group(1)
+        # Resolve 'uses' statements (RFC 7950 Section 7.13) — top-level only.
+        for grouping_name in self._iter_top_level_uses(content):
             # Try with and without prefix
             grouping_content = None
             if grouping_name in self.groupings_cache:
@@ -188,134 +287,61 @@ class RPCYANGToOpenAPIConverter:
                 if 'required' in grouping_schema:
                     required.extend(grouping_schema['required'])
         
-        # Parse leaves (RFC 7950 Section 7.6)
-        pos = 0
-        while True:
-            leaf_match = re.search(r'\bleaf\s+(\S+)\s*\{', content[pos:])
-            if not leaf_match:
-                break
-            
-            leaf_name = leaf_match.group(1)
-            leaf_start = pos + leaf_match.end() - 1
-            leaf_end = self.find_balanced_braces(content, leaf_start)
-            
-            if leaf_end == -1:
-                pos += leaf_match.end()
-                continue
-            
-            leaf_body = content[leaf_start + 1:leaf_end]
+        # Parse leaves (RFC 7950 Section 7.6) — top-level only.
+        for leaf_name, leaf_body in self._iter_top_level_blocks(content, 'leaf'):
             leaf_schema = self.parse_leaf(leaf_body, leaf_name)
-            
             if leaf_schema.pop('x-mandatory', False):
                 required.append(leaf_name)
-            
             properties[leaf_name] = leaf_schema
             has_properties = True
-            pos = leaf_end + 1
         
-        # Parse leaf-lists (RFC 7950 Section 7.7)
-        pos = 0
-        while True:
-            ll_match = re.search(r'\bleaf-list\s+(\S+)\s*\{', content[pos:])
-            if not ll_match:
-                break
-            
-            ll_name = ll_match.group(1)
-            ll_start = pos + ll_match.end() - 1
-            ll_end = self.find_balanced_braces(content, ll_start)
-            
-            if ll_end == -1:
-                pos += ll_match.end()
-                continue
-            
-            ll_body = content[ll_start + 1:ll_end]
+        # Parse leaf-lists (RFC 7950 Section 7.7) — top-level only.
+        for ll_name, ll_body in self._iter_top_level_blocks(content, 'leaf-list'):
             item_schema = self.parse_leaf(ll_body, ll_name)
             item_schema.pop('x-mandatory', None)
-            
             properties[ll_name] = {
                 'type': 'array',
                 'items': item_schema
             }
             has_properties = True
-            pos = ll_end + 1
         
-        # Parse nested containers (RFC 7950 Section 7.5)
-        pos = 0
-        while True:
-            cont_match = re.search(r'\bcontainer\s+(\S+)\s*\{', content[pos:])
-            if not cont_match:
-                break
-            
-            cont_name = cont_match.group(1)
-            cont_start = pos + cont_match.end() - 1
-            cont_end = self.find_balanced_braces(content, cont_start)
-            
-            if cont_end == -1:
-                pos += cont_match.end()
-                continue
-            
-            cont_body = content[cont_start + 1:cont_end]
-            
-            # Extract description
+        # Parse nested containers (RFC 7950 Section 7.5) — top-level only.
+        for cont_name, cont_body in self._iter_top_level_blocks(content, 'container'):
             desc_match = re.search(r'\bdescription\s+"([^"]+)"', cont_body)
             description = desc_match.group(1) if desc_match else None
-            
             nested_schema = self.parse_container_or_grouping(cont_body, cont_name, depth + 1)
             if description:
                 nested_schema['description'] = description
-            
             properties[cont_name] = nested_schema
             has_properties = True
-            pos = cont_end + 1
         
-        # Parse choices (RFC 7950 Section 7.9)
-        # Choices represent mutually exclusive options
-        pos = 0
-        while True:
-            choice_match = re.search(r'\bchoice\s+(\S+)\s*\{', content[pos:])
-            if not choice_match:
-                break
-            
-            choice_name = choice_match.group(1)
-            choice_start = pos + choice_match.end() - 1
-            choice_end = self.find_balanced_braces(content, choice_start)
-            
-            if choice_end == -1:
-                pos += choice_match.end()
-                continue
-            
-            choice_body = content[choice_start + 1:choice_end]
-            
+        # Parse choices (RFC 7950 Section 7.9) — top-level only.
+        # Choices represent mutually exclusive options.
+        choices_meta: List[Dict[str, Any]] = []
+        for choice_name, choice_body in self._iter_top_level_blocks(content, 'choice'):
             # Check if choice is mandatory
-            choice_mandatory = re.search(r'\bmandatory\s+true\b', choice_body[:100])
-            
-            # Parse all cases within the choice
-            case_pos = 0
-            while True:
-                case_match = re.search(r'\bcase\s+(\S+)\s*\{', choice_body[case_pos:])
-                if not case_match:
-                    break
-                
-                case_name = case_match.group(1)
-                case_start = case_pos + case_match.end() - 1
-                case_end = self.find_balanced_braces(choice_body, case_start)
-                
-                if case_end == -1:
-                    case_pos += case_match.end()
-                    continue
-                
-                case_body = choice_body[case_start + 1:case_end]
-                
-                # Parse case content and merge properties
-                # According to RFC 8040, all choice cases become optional properties
-                case_schema = self.parse_container_or_grouping(case_body, f"{name}-{case_name}", depth + 1, is_choice_case=True)
-                if 'properties' in case_schema and case_schema['properties']:
+            choice_mandatory = bool(re.search(r'\bmandatory\s+true\b', choice_body[:100]))
+
+            cases_meta: List[Dict[str, Any]] = []
+
+            # Parse all cases within the choice — top-level within the choice body.
+            for case_name, case_body in self._iter_top_level_blocks(choice_body, 'case'):
+                # According to RFC 8040, all choice cases become optional properties.
+                case_schema = self.parse_container_or_grouping(
+                    case_body, f"{name}-{case_name}", depth + 1, is_choice_case=True
+                )
+                case_props = list(case_schema.get('properties', {}).keys()) if case_schema.get('properties') else []
+                if case_props:
                     properties.update(case_schema['properties'])
                     has_properties = True
-                
-                case_pos = case_end + 1
-            
-            pos = choice_end + 1
+                cases_meta.append({'name': case_name, 'properties': case_props})
+
+            if cases_meta:
+                choices_meta.append({
+                    'name': choice_name,
+                    'mandatory': choice_mandatory,
+                    'cases': cases_meta,
+                })
         
         # Build schema
         schema = {
@@ -330,7 +356,23 @@ class RPCYANGToOpenAPIConverter:
         
         if is_presence:
             schema['description'] = schema.get('description', '') + ' (presence container)'
-        
+
+        if choices_meta:
+            # Record the YANG choice constraint as a non-standard extension so
+            # clients can see that case groups are mutually exclusive. Swagger
+            # UI still renders the flat property list, which is what users
+            # want for discoverability.
+            schema['x-yang-choices'] = choices_meta
+            blurbs = []
+            for ch in choices_meta:
+                case_names = ' | '.join(c['name'] for c in ch['cases'])
+                m = ' (mandatory)' if ch['mandatory'] else ''
+                blurbs.append(f"choice '{ch['name']}'{m}: {case_names}")
+            note = 'YANG choice — mutually exclusive case groups: ' + '; '.join(blurbs) + '.'
+            schema['description'] = (
+                (schema.get('description') + ' ' if schema.get('description') else '') + note
+            )
+
         return schema
     
     def create_example_data(self, schema: Dict[str, Any], prop_name: str = '') -> Any:
@@ -421,11 +463,48 @@ class RPCYANGToOpenAPIConverter:
         
         return None
     
+    def _resolve_includes(self, yang_file: Path, content: str) -> str:
+        # Inline every `include <submodule>;` body so groupings and RPCs
+        # defined in submodules become visible to extract_groupings/extract_rpcs.
+        # Without this, parents like Cisco-IOS-XE-rpc collapse `uses
+        # crypto-input-grouping;` into an empty schema (crypto pki import,
+        # clear aaa/arp/bgp/dhcp/ospf, debug platform, etc.).
+        out = [content]
+        yang_dir = yang_file.parent
+        seen: set[str] = set()
+        for inc in re.finditer(r'\binclude\s+([\w-]+)\s*(?:\{[^}]*\})?\s*;', content):
+            submod = inc.group(1)
+            if submod in seen:
+                continue
+            seen.add(submod)
+            path = yang_dir / f"{submod}.yang"
+            if not path.is_file():
+                continue
+            try:
+                sub_content = path.read_text(encoding='utf-8')
+            except OSError:
+                continue
+            m = re.search(r'^\s*submodule\s+\S+\s*\{', sub_content, re.MULTILINE)
+            if m:
+                body_start = m.end() - 1
+                body_end = self.find_balanced_braces(sub_content, body_start)
+                if body_end != -1:
+                    out.append('\n')
+                    out.append(sub_content[body_start + 1:body_end])
+                    continue
+            out.append('\n')
+            out.append(sub_content)
+        return ''.join(out)
+
     def parse_yang_file(self, yang_file: Path) -> Dict[str, Any]:
         """Parse YANG file and extract module info"""
         with open(yang_file, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
+        is_submodule = bool(re.search(r'^\s*submodule\s+', content, re.MULTILINE))
+        if not is_submodule:
+            content = self._resolve_includes(yang_file, content)
+
         module_match = re.search(r'(?:sub)?module\s+(\S+)', content)
         module_name = module_match.group(1) if module_match else yang_file.stem
         
@@ -451,9 +530,10 @@ class RPCYANGToOpenAPIConverter:
             'version': version,
             'organization': organization,
             'contact': contact,
-            'content': content
+            'content': content,
+            'is_submodule': is_submodule,
         }
-    
+
     def extract_rpcs(self, content: str) -> List[Dict[str, Any]]:
         """Extract all RPC definitions from YANG content"""
         rpcs = []
@@ -593,6 +673,9 @@ class RPCYANGToOpenAPIConverter:
         print(f"Processing {yang_file.name}...")
         
         yang_info = self.parse_yang_file(yang_file)
+        if yang_info.get('is_submodule'):
+            print(f"  Skipped (submodule — contributes via parent module's include)")
+            return None
         rpcs = self.extract_rpcs(yang_info['content'])
         
         if not rpcs:
