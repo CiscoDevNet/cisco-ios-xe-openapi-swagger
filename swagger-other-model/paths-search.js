@@ -77,7 +77,7 @@
         if (__index || __indexLoading || __indexFailed) return;
         __indexLoading = true;
         var url = apiBase() + '/_paths_index.json';
-        fetch(url, { cache: 'force-cache' })
+        fetch(url, { cache: 'no-cache' })
             .then(function (r) {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();
