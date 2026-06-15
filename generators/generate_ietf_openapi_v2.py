@@ -226,20 +226,37 @@ class IETFToOpenAPI:
 
         return schema
 
-    def parse_container_or_grouping(self, content: str, name: str, depth: int = 0) -> Dict[str, Any]:
+    def parse_container_or_grouping(self, content: str, name: str, depth: int = 0,
+                                    _seen_groupings: set = None) -> Dict[str, Any]:
         """Recursively parse container/grouping"""
-        if depth > 20:
-            return {'type': 'object', 'description': f'{name} (max depth reached)'}
+        # Bound recursion to avoid pathological inline-schema blow-up. Some IETF
+        # models (notably ietf-ospf) nest lists-within-lists very deeply and, since
+        # every nested node also becomes its own RESTCONF path carrying a full inline
+        # copy of its subtree, an unbounded expansion is O(N^2) in document size
+        # (ietf-ospf reached 70 MB and broke the browser). Real config rarely needs
+        # more than ~8 levels; deeper nodes are reachable via their own dedicated paths.
+        if depth > 8:
+            return {'type': 'object', 'description': f'{name} (truncated; use the dedicated sub-path)'}
+
+        if _seen_groupings is None:
+            _seen_groupings = frozenset()
 
         properties = {}
         required = []
 
         # Resolve 'uses' statements (RFC 7950 §7.13) — top-level only.
+        # Guard against recursive grouping expansion: a grouping that is already
+        # being expanded on the current path is skipped to avoid combinatorial /
+        # cyclic blow-up (e.g. ietf-ospf groupings reference each other heavily).
         for grouping_name in _shared_iter_top_level_uses(content):
+            if grouping_name in _seen_groupings:
+                continue
             grouping_content = self.groupings_cache.get(grouping_name)
             if grouping_content is None:
                 continue
-            grouping_schema = self.parse_container_or_grouping(grouping_content, grouping_name, depth + 1)
+            grouping_schema = self.parse_container_or_grouping(
+                grouping_content, grouping_name, depth + 1,
+                _seen_groupings | {grouping_name})
             if 'properties' in grouping_schema and grouping_schema['properties']:
                 properties.update(grouping_schema['properties'])
             if 'required' in grouping_schema:
@@ -265,20 +282,20 @@ class IETFToOpenAPI:
         for cont_name, cont_body in _shared_iter_top_level_blocks(content, 'container'):
             desc_match = re.search(r'\bdescription\s+"([^"]+)"', cont_body)
             description = desc_match.group(1) if desc_match else None
-            nested_schema = self.parse_container_or_grouping(cont_body, cont_name, depth + 1)
+            nested_schema = self.parse_container_or_grouping(cont_body, cont_name, depth + 1, _seen_groupings)
             if description:
                 nested_schema['description'] = description
             properties[cont_name] = nested_schema
 
         # Parse nested lists (RFC 7950 §7.8) — top-level only.
         for list_name, list_body in _shared_iter_top_level_blocks(content, 'list'):
-            item_schema = self.parse_container_or_grouping(list_body, list_name, depth + 1)
+            item_schema = self.parse_container_or_grouping(list_body, list_name, depth + 1, _seen_groupings)
             properties[list_name] = {'type': 'array', 'items': item_schema}
 
         # Parse choices (RFC 7950 §7.9) — top-level only.
         for _choice_name, choice_body in _shared_iter_top_level_blocks(content, 'choice'):
             for case_name, case_body in _shared_iter_top_level_blocks(choice_body, 'case'):
-                case_schema = self.parse_container_or_grouping(case_body, f"case-{case_name}", depth + 1)
+                case_schema = self.parse_container_or_grouping(case_body, f"case-{case_name}", depth + 1, _seen_groupings)
                 if 'properties' in case_schema and case_schema['properties']:
                     properties.update(case_schema['properties'])
 

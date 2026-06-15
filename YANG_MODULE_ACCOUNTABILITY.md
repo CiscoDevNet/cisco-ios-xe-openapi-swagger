@@ -1345,4 +1345,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-06-15T18:58:39.593824*
+*Report generated: 2026-06-15T19:27:11.751958*
