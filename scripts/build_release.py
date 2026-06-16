@@ -120,6 +120,11 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("stamp-spec-count",    ["python", str(SCRIPTS / "stamp_spec_count.py"),
                              "--version", "$VER"]),
+    # Normalize manifest module names and reconcile counts against the specs
+    # actually on disk. Self-heals name-prefix drift (e.g. curated bundles
+    # listed as "voice" while the file is "native-voice.json"), which would
+    # otherwise make the viewer 404 those specs ("Failed to load spec ...").
+    ("fix-manifest-schema", ["python", str(SCRIPTS / "fix_manifest_schema.py")]),
     ("accountability",      ["python", str(SCRIPTS / "analyze_yang_accountability_v2.py"),
                              "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),
