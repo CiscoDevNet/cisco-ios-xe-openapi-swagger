@@ -558,8 +558,11 @@ Items flagged **Needs verification** or that fell outside this static read:
    [archive/test-swagger.html](archive/test-swagger.html) exist; sitemap and nav
    exclude them, service-worker bypasses `archive/`. Confirm none are still
    reachable.
-5. **`index-v2.html` redirect stubs** — 9 of them. Confirm there are no external
-   inbound links still pointing at the `-v2` filenames before deleting.
+5. **`index-v2.html` redirect stubs** — **KEPT (2026-06-16).** The 9
+   `swagger-*-model/index-v2.html` files are intentional zero-delay redirect
+   stubs (preserving `#hash`/`?query`) that catch old external bookmarks to the
+   legacy `-v2` filenames. Not in the sitemap, nav, or service-worker precache,
+   so they add no user-facing noise; retained as inbound-link safety nets.
 6. **Auth model** — Not applicable (static site), but the
    [code-generator.html](code-generator.html) form ships a default password
    (`cisco123`) and the hub modal embeds the same. Confirm acceptable for a
@@ -589,20 +592,23 @@ Items flagged **Needs verification** or that fell outside this static read:
 
 Where the audit found duplication, drift, or unfinished surface area.
 
-1. **Single source of truth for headline counts.** Bind every "specs / paths /
-   ops / modules" number in [about.html](about.html) and the hub project-summary
-   section to `version-stats.json` via `data-stat-summary` (the pattern already
-   used elsewhere). Removes the "April 25, 2026" / "608 specs" drift.
-2. **Retire `index-v2.html` stubs** (or document why they are kept). 9 redirector
-   files add noise to search and grep.
+1. **Single source of truth for headline counts.** **DONE (2026-06-16).** Every
+   "specs / paths / ops / modules" number in [about.html](about.html) and the hub
+   project-summary / category-table sections is now bound to `version-stats.json`
+   via `data-stat-*` hooks (about-stats.js / index-app.js). The
+   "April 25, 2026" / "608 specs" drift is resolved.
+2. **Retire `index-v2.html` stubs** — **KEPT (2026-06-16).** Documented above as
+   intentional inbound-link redirect safety nets; not deleted.
 3. **Consider moving `native-augment-accountability.html` into `archive/`** unless
    it is wired into the release pipeline. Today it pins to 17.18.1 and is
    reachable only via direct URL.
 4. **Centralize the version-detect helper.** Five files re-implement
    `_activeVersion()` (`search.js`, `yang-accountability.js`, `code-generator.js`,
    `telemetry.js`, `tree-compare.js`, each Swagger viewer). One shared helper in
-   `assets/js/` would prevent subtle behavioural drift (e.g. `localStorage` key
-   capitalisation: `iosxeActiveVersion` vs `iosxe-active-version`).
+   `assets/js/` would prevent subtle behavioural drift. *(2026-06-16: the
+   concrete `localStorage` key-capitalisation bug — `code-generator.js` read
+   `iosxeActiveVersion` while every writer uses `iosxe-active-version` — has been
+   fixed; all readers/writers now share the canonical kebab-case key.)*
 5. **Promote per-viewer inline CSS into shared stylesheets.** `tree-compare.html`,
    `platform-coverage.html`, `exports.html`, and `yang-accountability-compare.html`
    each carry hundreds of lines of inline CSS that duplicate
