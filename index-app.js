@@ -569,6 +569,13 @@
                     + fmtNum(totals.modules_total) + ' tracked modules.';
                 banner.style.display = '';
             }
+            // 6. Universal search placeholder module count.
+            var searchBox = document.getElementById('universalSearch');
+            if (searchBox && totals.modules_total) {
+                searchBox.placeholder = 'Search across all '
+                    + fmtNum(totals.modules_total)
+                    + ' modules, APIs, and trees... (press / or Ctrl+K)';
+            }
         });
     }
 
