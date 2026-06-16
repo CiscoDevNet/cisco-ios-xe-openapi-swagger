@@ -605,10 +605,17 @@ Where the audit found duplication, drift, or unfinished surface area.
 4. **Centralize the version-detect helper.** Five files re-implement
    `_activeVersion()` (`search.js`, `yang-accountability.js`, `code-generator.js`,
    `telemetry.js`, `tree-compare.js`, each Swagger viewer). One shared helper in
-   `assets/js/` would prevent subtle behavioural drift. *(2026-06-16: the
-   concrete `localStorage` key-capitalisation bug — `code-generator.js` read
-   `iosxeActiveVersion` while every writer uses `iosxe-active-version` — has been
-   fixed; all readers/writers now share the canonical kebab-case key.)*
+   `assets/js/` would prevent subtle behavioural drift. *(2026-06-16: hardened
+   against the concrete drift risks rather than forcing a sweeping cross-page
+   refactor — (a) the `localStorage` key-capitalisation bug in `code-generator.js`
+   (`iosxeActiveVersion` vs canonical `iosxe-active-version`) is fixed;
+   (b) `hub-search-ops.js`'s baked `TARGET_VER` fallback is now re-stamped from
+   `releases/index.json` by `scripts/patch_viewers_version_aware.py` so it can no
+   longer go stale when the default advances; (c) that patch script's
+   `build_helper` was itself stale — it would have re-introduced a removed
+   default-version `api/` short-circuit (404s) and a space-form `Cisco IOS XE`
+   title regex that no longer matches the hyphenated `Cisco IOS-XE` viewer titles
+   — now corrected so the generator is idempotent against the live viewers.)*
 5. **Promote per-viewer inline CSS into shared stylesheets.** `tree-compare.html`,
    `platform-coverage.html`, `exports.html`, and `yang-accountability-compare.html`
    each carry hundreds of lines of inline CSS that duplicate
