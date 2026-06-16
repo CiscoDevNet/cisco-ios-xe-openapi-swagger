@@ -64,6 +64,20 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # subtrees are missing from the viewer entirely.
     ("native-augment-specs", ["python", str(SCRIPTS / "generate_native_augment_specs.py"),
                              "--version", "$VER"]),
+    # Deep augment/uses resolution for the rest of `container native`. The
+    # base native generator and the placeholder step above still miss the
+    # branches that external Cisco-IOS-XE-* modules contribute via `augment`
+    # / cross-module `uses` (snmp-server, line, ip, ipv6, license, parser,
+    # vrf, logging, etc.). This step harvests the fully-merged YANG tree and
+    # emits the missing RESTCONF paths as additive `native-aug-*.json` specs.
+    #   interface-mode=representative collapses the ~58 near-identical
+    #   interface list-types to one canonical shape (avoids a 58x duplicate
+    #   ~670 MB blow-up). Size cost ≈ +285 MB / release at depth 5; build
+    #   only the releases you intend to commit (GitHub Pages 1 GB site cap).
+    ("native-augment-deep-specs", ["python", str(SCRIPTS / "generate_native_augmented.py"),
+                             "--version", "$VER",
+                             "--interface-mode", "representative",
+                             "--max-depth", "5"]),
     ("openconfig-specs",    ["python", str(GENERATORS / "generate_openconfig_openapi_v2.py"),
                              "--version", "$VER"]),
     ("ietf-specs",          ["python", str(GENERATORS / "generate_ietf_openapi_v2.py"),
