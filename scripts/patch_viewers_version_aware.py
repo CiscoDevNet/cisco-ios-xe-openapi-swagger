@@ -3,9 +3,9 @@
 
 Replaces hardcoded `api/...` fetches with a base computed from the active
 version (read from `?ver=` query string, `#ver=` hash, localStorage, or the
-parent window). The default version (read from releases/index.json) keeps the
-legacy relative `api/` path; any other version fetches from
-`../releases/<ver>/swagger-<cat>-model/api/`.
+parent window). All releases — including the default — fetch from
+`../releases/<ver>/swagger-<cat>-model/api/`; the top-level `swagger-*-model/api/`
+directories were removed, so there is no default-version shortcut.
 
 The allow-list of valid versions is also baked in at patch time so that bad
 URLs (`?ver=../etc`, `?ver=v0.0.0`) silently fall back to the default instead
@@ -66,14 +66,12 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
     }}
     function __apiBase() {{
         var ver = __activeVer();
-        if (ver === __IOSXE_DEFAULT_VER__) return 'api';
         var m = location.pathname.match(/\\/(swagger-[^/]+-model)\\//);
         var cat = m ? m[1] : '';
         return '../releases/' + encodeURIComponent(ver) + '/' + cat + '/api';
     }}
     function __treeBase() {{
         var ver = __activeVer();
-        if (ver === __IOSXE_DEFAULT_VER__) return '../yang-trees';
         return '../releases/' + encodeURIComponent(ver) + '/yang-trees';
     }}
     // Expose for mib-metadata side card and other consumers.
@@ -91,7 +89,7 @@ def build_helper(default_ver: str, allowed: list[str]) -> str:
                 // Also keep the browser tab title in sync.
                 if (document.title) {{
                     document.title = document.title.replace(
-                        /Cisco IOS XE [0-9.x]+/, 'Cisco IOS XE ' + v);
+                        /Cisco IOS-XE [0-9.x]+/, 'Cisco IOS-XE ' + v);
                 }}
             }} catch (_) {{}}
         }}
@@ -174,6 +172,30 @@ def patch(p: Path, helper: str) -> bool:
     return False
 
 
+def patch_hub_search_ops(default_ver: str) -> bool:
+    """Keep hub-search-ops.js's TARGET_VER fallback in sync with the default.
+
+    hub-search-ops.js prefers the live ``window.__IOSXE_ACTIVE_VERSION__`` set
+    by index-app.js, but falls back to a baked ``TARGET_VER`` constant when the
+    global is absent. Re-stamping it here from releases/index.json prevents that
+    fallback from going stale when the default release advances. Idempotent.
+    """
+    p = ROOT / "hub-search-ops.js"
+    if not p.is_file():
+        return False
+    src = p.read_text(encoding="utf-8")
+    new = re.sub(
+        r"var TARGET_VER = '[^']*';",
+        f"var TARGET_VER = '{default_ver}';",
+        src,
+        count=1,
+    )
+    if new != src:
+        p.write_text(new, encoding="utf-8")
+        return True
+    return False
+
+
 def main() -> int:
     default_ver, allowed = load_release_config()
     print(f"[patch] default={default_ver} allowed={allowed}")
@@ -186,7 +208,12 @@ def main() -> int:
             changed += 1
         else:
             print(f"  unchanged {f.relative_to(ROOT)}")
-    print(f"\n[patch] {changed}/{len(files)} files updated")
+    if patch_hub_search_ops(default_ver):
+        print(f"  patched   hub-search-ops.js (TARGET_VER -> {default_ver})")
+        changed += 1
+    else:
+        print("  unchanged hub-search-ops.js")
+    print(f"\n[patch] {changed}/{len(files) + 1} files updated")
     return 0
 
 
