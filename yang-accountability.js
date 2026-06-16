@@ -27,8 +27,12 @@
     // === Load data ===
 
     function _activeVersion() {
-        // Honor ?ver=… or #ver=… on this page, then fall back to the parent
-        // hub's __IOSXE_ACTIVE_VERSION__ when navigated to from index.html.
+        // Honor ?ver=… or #ver=… on this page, then the parent hub's
+        // __IOSXE_ACTIVE_VERSION__ (when navigated from index.html), then the
+        // persisted localStorage selection (so a direct visit after picking a
+        // non-default release on the hub still resolves to that release rather
+        // than silently falling back to the root default). Mirrors the
+        // precedence in code-generator.js / tree-compare.js.
         try {
             var qs = new URLSearchParams(location.search).get('ver');
             if (qs) return qs;
@@ -36,6 +40,10 @@
             if (m) return decodeURIComponent(m[1]);
         } catch (_) { /* noop */ }
         if (window.__IOSXE_ACTIVE_VERSION__) return window.__IOSXE_ACTIVE_VERSION__;
+        try {
+            var ls = localStorage.getItem('iosxe-active-version');
+            if (ls) return ls;
+        } catch (_) { /* noop */ }
         return null;
     }
 

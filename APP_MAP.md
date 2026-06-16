@@ -615,7 +615,12 @@ Where the audit found duplication, drift, or unfinished surface area.
    `build_helper` was itself stale — it would have re-introduced a removed
    default-version `api/` short-circuit (404s) and a space-form `Cisco IOS XE`
    title regex that no longer matches the hyphenated `Cisco IOS-XE` viewer titles
-   — now corrected so the generator is idempotent against the live viewers.)*
+   — now corrected so the generator is idempotent against the live viewers;
+   (d) `yang-accountability.js`'s `_activeVersion()` was missing the
+   `localStorage` fallback tier, so a direct visit to `yang-accountability.html`
+   after picking a non-default release on the hub silently fell back to the root
+   default — normalised to the canonical `?ver=` → `#ver=` → hub global →
+   `localStorage` precedence used by `code-generator.js` / `tree-compare.js`.)*
 5. **Promote per-viewer inline CSS into shared stylesheets.** `tree-compare.html`,
    `platform-coverage.html`, `exports.html`, and `yang-accountability-compare.html`
    each carry hundreds of lines of inline CSS that duplicate
