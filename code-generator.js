@@ -19,7 +19,7 @@
         } catch (_) { /* noop */ }
         if (window.__IOSXE_ACTIVE_VERSION__) return window.__IOSXE_ACTIVE_VERSION__;
         try {
-            var ls = localStorage.getItem('iosxeActiveVersion');
+            var ls = localStorage.getItem('iosxe-active-version');
             if (ls) return ls;
         } catch (_) { /* noop */ }
         return null;
