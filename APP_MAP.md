@@ -539,18 +539,20 @@ URL/hash params recognized:
 
 Items flagged **Needs verification** or that fell outside this static read:
 
-1. **Stale static numbers** —
-   - [about.html](about.html) hard-codes "608 specs / 37,072 paths" while
-     [version-stats.json](version-stats.json) reports 739 specs / 42,557 paths
-     for `26.1.1`. Likely drift; needs a regeneration step or `data-stat-summary`
-     binding.
-   - [index.html](index.html) hub cards have hard-coded counts (e.g. "205 specs"
-     for oper); the `data-stat-num` hooks suggest [index-app.js](index-app.js)
-     hydrates them at runtime, but several counts (e.g. "790 modules" in the
-     search placeholder, "Last Updated: April 25, 2026") are pure markup.
-2. **native-augment-accountability.html** — labelled "Phase 2 Complete / IOS XE
-   17.18.1". Confirm whether it is still linked anywhere user-facing or should
-   move to `archive/`.
+1. **Stale static numbers** — **RESOLVED (2026-06-16).** [about.html](about.html)
+   now hydrates its "By the numbers" cards from
+   [version-stats.json](version-stats.json) via [about-stats.js](about-stats.js)
+   (`data-stat-about` hooks), and [index.html](index.html) hub cards, category
+   table, search placeholder, project-summary boxes and "Last Updated" date are
+   all synced to the 26.1.1 default (988 specs / 82,856 paths / 246,677 ops /
+   1,469 tracked modules) via `data-stat-*` hydration. Static markup remains only
+   as no-JS fallbacks.
+2. **native-augment-accountability.html** — **REVIEWED, KEPT (2026-06-16).**
+   Labelled "Phase 2 Complete / IOS XE 17.18.1"; has no live inbound links
+   (reachable only by direct URL). Left in place rather than moved/deleted to
+   avoid breaking external bookmarks; the canonical, version-aware reports are
+   [yang-accountability.html](yang-accountability.html) and
+   [yang-accountability-compare.html](yang-accountability-compare.html).
 3. **per-spec `paths-search.js`** — referenced from every Swagger viewer but not
    read here; assume per-category enhancer mirroring `hub-search-ops.js`.
 4. **archive/** vs live pages — [archive/debug.html](archive/debug.html),
@@ -570,13 +572,15 @@ Items flagged **Needs verification** or that fell outside this static read:
 7. **Telemetry-index data flow** — `releases/<ver>/telemetry-index.json` and
    `telemetry-skipped.json` exist on disk but the consumption path inside
    [telemetry.js](telemetry.js) was not traced end-to-end here.
-8. **Search index drift** — [search.js](search.js) prefers
-   `releases/<ver>/search-index.json` but falls back to the root file; verify the
-   root file is still regenerated to avoid mismatched results for users who
-   land mid-deploy.
-9. **`hub-search-ops.js`** hard-codes `TARGET_VER = '26.1.1'` as a fallback; if
-   the default release advances, the constant should be updated together with
-   `scripts/patch_viewers_version_aware.py`.
+8. **Search index drift** — **RESOLVED (2026-06-16).** [search.js](search.js)
+   prefers `releases/<ver>/search-index.json` but falls back to the root file;
+   `scripts/generate_search_index.py` rebuilds the root `search-index.json` from
+   `releases/<default_version>/` on every run, so the fallback always matches the
+   default release (no mismatch for users who land mid-deploy).
+9. **`hub-search-ops.js`** baked `TARGET_VER = '26.1.1'` as a fallback —
+   **RESOLVED (2026-06-16).** `scripts/patch_viewers_version_aware.py` now
+   re-stamps the constant from `releases/index.json`'s `default`, so it advances
+   automatically with the default release.
 10. **MIB-specific UI** — references to `mib-metadata.json` and
     `mib-platform-matrix.json` suggest extra side cards in the MIB viewer not
     fully captured here.
@@ -599,9 +603,11 @@ Where the audit found duplication, drift, or unfinished surface area.
    "April 25, 2026" / "608 specs" drift is resolved.
 2. **Retire `index-v2.html` stubs** — **KEPT (2026-06-16).** Documented above as
    intentional inbound-link redirect safety nets; not deleted.
-3. **Consider moving `native-augment-accountability.html` into `archive/`** unless
-   it is wired into the release pipeline. Today it pins to 17.18.1 and is
-   reachable only via direct URL.
+3. **Consider moving `native-augment-accountability.html` into `archive/`** —
+   **REVIEWED, KEPT (2026-06-16).** No live inbound links (direct-URL only) and
+   pins to 17.18.1. Left in place to avoid breaking external bookmarks; the
+   canonical, version-aware reports are [yang-accountability.html](yang-accountability.html)
+   and [yang-accountability-compare.html](yang-accountability-compare.html).
 4. **Centralize the version-detect helper.** Five files re-implement
    `_activeVersion()` (`search.js`, `yang-accountability.js`, `code-generator.js`,
    `telemetry.js`, `tree-compare.js`, each Swagger viewer). One shared helper in
