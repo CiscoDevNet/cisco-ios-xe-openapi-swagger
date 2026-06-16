@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v39-2026.06.16b';
+const CACHE_VERSION = 'v40-2026.06.16c';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
