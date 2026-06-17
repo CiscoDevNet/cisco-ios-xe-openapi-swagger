@@ -29,8 +29,77 @@
                 if (cy && cy.parentNode) cy.parentNode.insertBefore(ct, cy);
                 else document.head.appendChild(ct);
             }
+            setClarityTags();
+            // Viewers/compare pages mutate the hash as the user picks a spec,
+            // module, or release without a full navigation — re-tag on change so
+            // the dashboards reflect what is actually on screen.
+            window.addEventListener('hashchange', setClarityTags);
         }
     } catch (e) { }
+
+    // Derive a small set of custom dimensions from the URL + path so the
+    // Clarity dashboard can filter by release, model flavour/type, page, and
+    // the specific spec/module a user is looking at. Pure string parsing — no
+    // dependency on any page-specific globals, fail-silent on every branch.
+    function setClarityTags() {
+        try {
+            if (typeof window.clarity !== 'function') return;
+            var set = function (k, v) {
+                if (v == null || v === '') return;
+                try { window.clarity('set', k, String(v)); } catch (e) { /* noop */ }
+            };
+
+            var path = (location.pathname || '');
+            var segs = path.split('/').filter(Boolean);
+            var last = segs.length ? segs[segs.length - 1] : 'index.html';
+            var dir = segs.length > 1 ? segs[segs.length - 2] : '';
+
+            // --- release / version: ?ver= → #ver= → hub global → localStorage ---
+            var ver = '';
+            try {
+                ver = new URLSearchParams(location.search).get('ver') || '';
+                if (!ver) {
+                    var hm = (location.hash || '').match(/[#&]ver=([^&]+)/);
+                    if (hm) ver = decodeURIComponent(hm[1]);
+                }
+                if (!ver && window.__IOSXE_ACTIVE_VERSION__) ver = window.__IOSXE_ACTIVE_VERSION__;
+                if (!ver) { try { ver = localStorage.getItem('iosxe-active-version') || ''; } catch (e) { } }
+            } catch (e) { /* noop */ }
+            set('release', ver);
+
+            // --- model category / flavour: swagger-<cat>-model dir, or
+            //     ?category= / #category= / #cat= params on hub tools ---
+            var cat = '';
+            var dm = dir.match(/^swagger-(.+)-model$/);
+            if (dm) cat = dm[1];
+            if (!cat) {
+                try {
+                    cat = new URLSearchParams(location.search).get('category') || '';
+                    if (!cat) {
+                        var cm = (location.hash || '').match(/[#&](?:category|cat)=([^&]+)/);
+                        if (cm) cat = decodeURIComponent(cm[1]);
+                    }
+                } catch (e) { /* noop */ }
+            }
+            set('model_category', cat);
+
+            // --- page type: friendly label for the surface being viewed ---
+            var page;
+            if (dm) page = 'swagger-viewer';
+            else if (last === '' || last === 'index.html') page = 'hub';
+            else page = last.replace(/\.html?$/i, '');
+            set('page', page);
+
+            // --- spec / module: #spec= (viewers) or ?spec=/#spec= (code-gen) ---
+            var spec = '';
+            try {
+                var sm = (location.hash || '').match(/[#&]spec=([^&]+)/);
+                if (sm) spec = decodeURIComponent(sm[1]);
+                if (!spec) spec = new URLSearchParams(location.search).get('spec') || '';
+            } catch (e) { /* noop */ }
+            set('spec', spec);
+        } catch (e) { /* noop */ }
+    }
 
     if (!('serviceWorker' in navigator)) return;
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
