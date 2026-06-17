@@ -698,6 +698,15 @@ function performSearch() {
     // Update URL hash for deep-linking
     updateUrlHash(query);
     
+    // Analytics: a zero-result search is a direct signal of a module/spec a
+    // user wanted but we don't surface — track the query so the gaps are
+    // visible in the dashboard. (Only fired for real searches, not browse.)
+    try {
+        if ((!results || results.length === 0) && typeof window.__iosxeTrack === 'function') {
+            window.__iosxeTrack('search_no_results', { search_query: query });
+        }
+    } catch (e) { /* noop */ }
+    
     // Render results
     renderResults(results);
 }

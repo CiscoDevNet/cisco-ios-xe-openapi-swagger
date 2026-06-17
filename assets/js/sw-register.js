@@ -12,6 +12,29 @@
  * also /service-worker.js, scope /).
  */
 (function () {
+    // Tracks the last spec we emitted a 'spec_opened' event for, so re-tagging
+    // on hashchange doesn't double-count the same module. Declared first so it
+    // is initialised before setClarityTags() runs below.
+    var _lastTaggedSpec = '';
+
+    // Shared, CSP-safe tracking helper for action events fired from the other
+    // page scripts (code-generator, search, exports, …). Sends a Clarity custom
+    // event and, optionally, a set of custom tags to slice it by. Fail-silent
+    // and a no-op if Clarity is absent, so callers never need to guard.
+    window.__iosxeTrack = function (name, data) {
+        try {
+            if (!name || typeof window.clarity !== 'function') return;
+            window.clarity('event', String(name));
+            if (data && typeof data === 'object') {
+                Object.keys(data).forEach(function (k) {
+                    var v = data[k];
+                    if (v == null || v === '') return;
+                    try { window.clarity('set', k, String(v)); } catch (e) { /* noop */ }
+                });
+            }
+        } catch (e) { /* noop */ }
+    };
+
     // Microsoft Clarity bootstrap (shared across all pages that include this file).
     // Kept here (external JS) so we do not need inline script tags per page.
     try {
@@ -98,6 +121,28 @@
                 if (!spec) spec = new URLSearchParams(location.search).get('spec') || '';
             } catch (e) { /* noop */ }
             set('spec', spec);
+
+            // --- http method: #method= / ?method= (code-generator deep links) ---
+            var httpMethod = '';
+            try {
+                var mm = (location.hash || '').match(/[#&]method=([^&]+)/);
+                if (mm) httpMethod = decodeURIComponent(mm[1]);
+                if (!httpMethod) httpMethod = new URLSearchParams(location.search).get('method') || '';
+            } catch (e) { /* noop */ }
+            set('http_method', httpMethod ? httpMethod.toUpperCase() : '');
+
+            // --- theme: light/dark from the persisted preference ---
+            var theme = '';
+            try { theme = localStorage.getItem('theme') || ''; } catch (e) { /* noop */ }
+            set('theme', theme);
+
+            // Fire a 'spec_opened' event the first time we see each spec on this
+            // page view (the hashchange re-tag means a user browsing several
+            // modules in one session produces one event per distinct spec).
+            if (spec && spec !== _lastTaggedSpec) {
+                _lastTaggedSpec = spec;
+                try { window.__iosxeTrack('spec_opened', { spec: spec, model_category: cat, release: ver }); } catch (e) { /* noop */ }
+            }
         } catch (e) { /* noop */ }
     }
 

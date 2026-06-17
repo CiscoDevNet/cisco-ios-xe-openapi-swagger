@@ -220,6 +220,18 @@
         // Show output section
         document.getElementById('outputSection').style.display = 'block';
         document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+
+        // Analytics: highest-intent action on the site — someone produced a
+        // ready-to-run snippet. Tag by method + selected spec only (never the
+        // host, username, or password values).
+        try {
+            if (typeof window.__iosxeTrack === 'function') {
+                var _picker = document.getElementById('specPicker');
+                var _spec = (_picker && _picker.selectedOptions && _picker.selectedOptions[0]
+                    && _picker.selectedOptions[0].dataset.name) || '';
+                window.__iosxeTrack('code_generated', { http_method: (method || '').toUpperCase(), spec: _spec });
+            }
+        } catch (e) { /* noop */ }
     }
 
     function switchTab(tab, btn) {
@@ -240,6 +252,13 @@
         }).catch(function () {
             // Fallback: select text for manual copy
         });
+        // Analytics: which language snippet people actually take away.
+        try {
+            if (typeof window.__iosxeTrack === 'function') {
+                var lang = String(elementId || '').replace(/Code$/, '');
+                window.__iosxeTrack('snippet_copied', { snippet_language: lang });
+            }
+        } catch (e) { /* noop */ }
     }
 
     function clearForm() {
