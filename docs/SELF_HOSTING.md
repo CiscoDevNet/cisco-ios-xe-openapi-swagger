@@ -180,13 +180,13 @@ What ships:
   any of the files under `assets/vendor/` is detected by the browser and the
   resource is rejected.
 - **`X-Content-Type-Options: nosniff`** is set via `<meta>` on the home page.
-- **No analytics, no telemetry, no third-party tracking.** Confirmed by
-  `grep -r 'gtag\|analytics\|telemetry\|sentry\|datadog'` returning zero
-  matches in user-facing code (the word "telemetry" only appears in YANG model
-  context).
+- **No analytics, no telemetry, no third-party tracking** in a self-hosted
+  install once the Microsoft Clarity block is removed from
+  `assets/js/sw-register.js`. The public GitHub Pages site intentionally loads
+  Clarity (`*.clarity.ms`) for usage analytics; everything else is same-origin.
 - **No outbound network calls** from any page in a fresh, freshly-served
-  install. Verify with browser DevTools → Network: every request should be
-  same-origin.
+  install (with Clarity removed). Verify with browser DevTools → Network: every
+  request should be same-origin.
 
 Recommended for high-security deployments:
 
