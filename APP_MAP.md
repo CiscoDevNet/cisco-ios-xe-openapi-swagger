@@ -514,10 +514,11 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | `releases/<ver>/path_depth_audit.json`, `tree_audit.json` | inferred QA artifacts | not directly bound to UI |
 | `tools/IOS-XE-RESTCONF-v*.postman_collection.json` (and v2 parts) | manual / generators | hub downloads, exports |
 
-External: **none.** Every third-party library is vendored under
+External: Microsoft Clarity telemetry to `*.clarity.ms` (always-on in this
+deployment). Every core third-party UI library is still vendored under
 `assets/vendor/` with SHA-384 SRI verification (Swagger UI 5.31.0,
-fuse.js 7.0.0, chart.js 4.4.0). No CDN, no web fonts. Site runs with
-zero outbound traffic. See [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md).
+fuse.js 7.0.0, chart.js 4.4.0). No CDN or web-font dependencies for the
+site shell itself. See [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md).
 
 LocalStorage keys observed:
 - `theme`
