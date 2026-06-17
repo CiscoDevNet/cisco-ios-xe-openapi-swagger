@@ -12,6 +12,26 @@
  * also /service-worker.js, scope /).
  */
 (function () {
+    // Microsoft Clarity bootstrap (shared across all pages that include this file).
+    // Kept here (external JS) so we do not need inline script tags per page.
+    try {
+        var CLARITY_PROJECT_ID = 'x8i204pxvc';
+        if (CLARITY_PROJECT_ID && typeof window !== 'undefined' && typeof document !== 'undefined') {
+            window.clarity = window.clarity || function () {
+                (window.clarity.q = window.clarity.q || []).push(arguments);
+            };
+            if (!document.querySelector('script[data-clarity-loader="1"]')) {
+                var ct = document.createElement('script');
+                ct.async = true;
+                ct.src = 'https://www.clarity.ms/tag/' + encodeURIComponent(CLARITY_PROJECT_ID);
+                ct.setAttribute('data-clarity-loader', '1');
+                var cy = document.getElementsByTagName('script')[0];
+                if (cy && cy.parentNode) cy.parentNode.insertBefore(ct, cy);
+                else document.head.appendChild(ct);
+            }
+        }
+    } catch (e) { }
+
     if (!('serviceWorker' in navigator)) return;
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
     var self = document.currentScript;
