@@ -1,7 +1,10 @@
 # Vendored third-party libraries
 
 These files are byte-identical copies of upstream npm releases, vendored so the
-site runs with zero egress (air-gapped / high-security environments). SHA-384
+site's UI libraries run with zero egress (air-gapped / high-security
+environments). Note: the public GitHub Pages deployment additionally loads
+Microsoft Clarity analytics (`*.clarity.ms`) via `assets/js/sw-register.js`;
+remove that block for a fully air-gapped install. SHA-384
 hashes below were verified against the same SRI values previously pinned in our
 HTML when the assets were served from `cdn.jsdelivr.net`.
 

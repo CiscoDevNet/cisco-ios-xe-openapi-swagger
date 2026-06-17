@@ -28,8 +28,11 @@ activate the new version; the page refreshes exactly once.
 Yes &mdash; `git clone` and `python -m http.server 8000`. The repo vendors
 every third-party library (Swagger UI, Fuse.js, Chart.js) under
 `assets/vendor/` with SHA-384 SRI verification, drops Google Fonts in favour
-of the system font stack, and enforces `default-src 'self'` CSP, so the site
-runs with **zero outbound traffic**. See
+of the system font stack, and enforces `default-src 'self'` CSP. The only
+outbound dependency is **Microsoft Clarity** analytics (`*.clarity.ms`), which
+is loaded by the public GitHub Pages site; remove the Clarity block at the top
+of `assets/js/sw-register.js` (and the `*.clarity.ms` CSP entries) for a
+**zero outbound traffic** air-gapped deployment. See
 [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) for nginx / IIS / Apache
 recipes, security hardening, and a minimum file set for production.
 
