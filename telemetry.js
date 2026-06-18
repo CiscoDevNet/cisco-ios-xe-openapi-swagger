@@ -20,15 +20,16 @@
 
   // Categories rendered in the builder's category dropdown. "oper" is the
   // default because MDT subscriptions are overwhelmingly against
-  // operational state.
+  // operational state. Only categories whose paths are genuinely
+  // subscribable as YANG data nodes are listed — RPCs (actions, not
+  // subscribable) and MIB translations (SNMP-native, no MDT prefix) are
+  // intentionally excluded so the builder never shows a non-derivable path.
   var CATEGORIES = [
     { id: 'oper',          label: 'Operational state (oper)' },
     { id: 'cfg',           label: 'Configuration (cfg)' },
     { id: 'native-config', label: 'Native config' },
     { id: 'openconfig',    label: 'OpenConfig' },
     { id: 'ietf',          label: 'IETF' },
-    { id: 'mib',           label: 'MIB-aligned' },
-    { id: 'rpc',           label: 'RPCs' },
     { id: 'other',         label: 'Other' }
   ];
 
@@ -300,13 +301,17 @@
     var el = $('b-info');
     if (!name) { el.hidden = true; el.innerHTML = ''; return; }
     var prefix = state.prefixes[name] || null;
-    var pathCount = state.spec && state.spec.paths
-      ? Object.keys(state.spec.paths).length
-      : 0;
-    var sample = '/data/' + name + ':<container>';
-    var derived = prefix
-      ? '/' + prefix + ':<container>'
-      : '<unknown — no prefix mapped>';
+    var paths = (state.spec && state.spec.paths) ? Object.keys(state.spec.paths) : [];
+    var pathCount = paths.length;
+
+    // Build a real worked example from the module's first derivable path,
+    // so users see actual values instead of <container> placeholders.
+    var exampleApi = null, exampleXpath = null;
+    for (var i = 0; i < paths.length; i++) {
+      var xp = deriveXpath(paths[i], state.prefixes);
+      if (xp) { exampleApi = paths[i]; exampleXpath = xp; break; }
+    }
+
     var html =
       '<div><strong>' + escapeHtml(name) + '</strong>' +
       (prefix ? '' :
@@ -315,13 +320,20 @@
       '</div>' +
       '<dl>' +
       '<dt>YANG prefix</dt><dd>' + escapeHtml(prefix || '(unknown)') + '</dd>' +
-      '<dt>OpenAPI paths</dt><dd>' + pathCount + '</dd>' +
-      '<dt>Sample input</dt><dd>' + escapeHtml(sample) + '</dd>' +
-      '<dt>Derived xpath</dt><dd>' + escapeHtml(derived) + '</dd>' +
-      '</dl>' +
-      '<div class="formula">filter xpath /' +
-        escapeHtml(prefix || '&lt;prefix&gt;') +
-        ':&lt;path-without-leading-slash&gt;</div>';
+      '<dt>Subscribable paths</dt><dd>' + pathCount + '</dd>' +
+      '</dl>';
+
+    if (exampleApi) {
+      html +=
+        '<div style="margin-top:6px;font-size:.82rem;color:var(--muted);">' +
+        'Example &mdash; the RESTCONF path on the left becomes the telemetry ' +
+        'filter xpath on the right:</div>' +
+        '<div class="formula" style="margin-top:6px;">' +
+        '<span style="color:var(--muted);">' + escapeHtml(exampleApi) + '</span>' +
+        '<span style="margin:0 8px;">&rarr;</span>' +
+        '<strong>' + escapeHtml(exampleXpath) + '</strong></div>';
+    }
+
     el.innerHTML = html;
     el.hidden = false;
   }
@@ -373,10 +385,10 @@
     rows.forEach(function (r) {
       var tr = document.createElement('tr');
       var xpathCell = r.xpath
-        ? '<td class="xpath">' + escapeHtml(r.xpath) + '</td>'
-        : '<td class="xpath" style="color:var(--muted);">(can\'t derive — unknown module prefix)</td>';
+        ? '<td class="xpath copyable" title="Click to copy this xpath" data-xp="' + escapeHtml(r.xpath) + '">' + escapeHtml(r.xpath) + '</td>'
+        : '<td class="xpath" style="color:var(--muted);">(not subscribable)</td>';
       var copyCell = r.xpath
-        ? '<td><button class="copy-btn" type="button" data-xp="' + escapeHtml(r.xpath) + '">Use</button></td>'
+        ? '<td><button class="copy-btn" type="button" data-use="' + escapeHtml(r.xpath) + '">Use in config</button></td>'
         : '<td></td>';
       tr.innerHTML =
         '<td><span class="method ' + r.method + '">' + r.method + '</span></td>' +
@@ -385,19 +397,38 @@
       tbody.appendChild(tr);
     });
 
-    Array.prototype.forEach.call(tbody.querySelectorAll('button[data-xp]'),
-      function (btn) {
-        btn.addEventListener('click', function () {
-          var xp = btn.getAttribute('data-xp');
-          $('b-snippet').textContent = buildSubscriptionSnippet(xp);
-          btn.classList.add('ok');
-          btn.textContent = 'Used';
-          setTimeout(function () {
-            btn.classList.remove('ok');
-            btn.textContent = 'Use';
-          }, 1200);
+    // Click an xpath cell to copy just the xpath string.
+    Array.prototype.forEach.call(tbody.querySelectorAll('td.copyable'),
+      function (cell) {
+        cell.addEventListener('click', function () {
+          copyText(cell.getAttribute('data-xp'), null);
+          var prev = cell.style.background;
+          cell.style.background = 'rgba(56,142,60,.15)';
+          setTimeout(function () { cell.style.background = prev; }, 600);
+          track('telemetry_xpath_copied');
         });
       });
+
+    // "Use in config" populates the subscription template below.
+    Array.prototype.forEach.call(tbody.querySelectorAll('button[data-use]'),
+      function (btn) {
+        btn.addEventListener('click', function () {
+          var xp = btn.getAttribute('data-use');
+          $('b-snippet').textContent = buildSubscriptionSnippet(xp);
+          btn.classList.add('ok');
+          btn.textContent = 'Added \u2713';
+          setTimeout(function () {
+            btn.classList.remove('ok');
+            btn.textContent = 'Use in config';
+          }, 1200);
+          track('telemetry_xpath_used');
+        });
+      });
+  }
+
+  function track(name) {
+    try { if (typeof window.__iosxeTrack === 'function') window.__iosxeTrack(name, { release: state.ver }); }
+    catch (_) { /* noop */ }
   }
 
   // === CSV export ====================================================
