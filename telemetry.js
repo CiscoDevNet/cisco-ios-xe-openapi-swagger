@@ -59,7 +59,8 @@
     spec: null,
     specName: null,
     xport: 'grpc',  // selected subscription transport: grpc | netconf | gnmi
-    lastXpath: null // last xpath sent to the config box (for transport switching)
+    lastXpath: null, // last xpath sent to the config box (for transport switching)
+    versionStats: {} // per-release totals from version-stats.json (big numbers)
   };
 
   // --- DOM helpers -----------------------------------------------------------
@@ -80,6 +81,17 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .catch(function () { return null; })
     .then(initReleases);
+
+  // Precomputed per-release totals (spec/path/module counts) power the
+  // headline metric cards so they show big, release-wide numbers without
+  // having to fetch and parse every spec.
+  fetch('version-stats.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (vs) {
+      state.versionStats = (vs && vs.totals) || {};
+      renderStats();
+    });
 
   // Two-tab layout: "Telemetry XPaths" (this builder) and "Event
   // Notifications" (the catalog rendered by notifications.js into
@@ -386,35 +398,40 @@
     el.hidden = false;
   }
 
-  // Top-of-page metric cards, mirroring the Event Notifications tab. Counts
-  // are category-level (Modules) plus the selected module's operation and
-  // subscribable-xpath totals. The fixed "3 transports" card ties to the
-  // gRPC / NETCONF / gNMI selector on the config box below.
+  // Top-of-page metric cards, mirroring the Event Notifications tab. The
+  // headline numbers are release-wide totals from version-stats.json (total
+  // modules and the full RESTCONF/telemetry path surface); the last two cards
+  // drill into the current category and selected module so the grid stays
+  // responsive to the picker.
   function renderStats() {
     var el = $('b-stats');
     if (!el) return;
+    var rel = (state.versionStats && state.versionStats[state.ver]) || null;
     var modules = (state.manifest && state.manifest.modules) || [];
-    var ops = '\u2014', sub = '\u2014';
+    var sub = '\u2014';
     if (state.spec && state.spec.paths) {
       var mib = isMibCat();
-      var t = 0, d = 0;
+      var d = 0;
       Object.keys(state.spec.paths).forEach(function (apiPath) {
         var methods = state.spec.paths[apiPath] || {};
         Object.keys(methods).forEach(function (m) {
           if (['get','post','put','patch','delete'].indexOf(m) === -1) return;
           var xp = deriveXpath(apiPath, state.prefixes, mib);
           if (mib && !xp) return;  // bare-entry duplicates are not real targets
-          t++;
           if (xp) d++;
         });
       });
-      ops = t; sub = d;
+      sub = d;
+    }
+    function fmt(n) {
+      return (typeof n === 'number') ? n.toLocaleString('en-US') : n;
     }
     var cards = [
+      { num: rel ? fmt(rel.modules_with_specs) : '\u2014', lbl: 'Modules in release' },
+      { num: rel ? fmt(rel.paths) : '\u2014', lbl: 'RESTCONF data paths' },
+      { num: rel ? fmt(rel.yang_modules) : '\u2014', lbl: 'YANG modules' },
       { num: modules.length || 0, lbl: 'Modules in category' },
-      { num: ops, lbl: 'OpenAPI operations' },
-      { num: sub, lbl: 'Subscribable xpaths' },
-      { num: 3, lbl: 'Transports (NETCONF \u00b7 gRPC \u00b7 gNMI)' }
+      { num: fmt(sub), lbl: 'Subscribable xpaths (module)' }
     ];
     el.innerHTML = cards.map(function (c) {
       return '<div class="stat"><div class="num">' + c.num +
