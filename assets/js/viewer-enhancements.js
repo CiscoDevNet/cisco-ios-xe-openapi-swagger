@@ -159,6 +159,120 @@
         attachSlashFocus();
         attachOperationTracking();
         attachTreeViewTracking();
+        attachNotificationsPanel();
+    }
+
+    // ---------- (4d) per-module notifications capability panel -----------
+    // When a module is selected in any Swagger viewer, surface whether it
+    // defines YANG notifications (the catalog the per-model OpenAPI specs do
+    // not include — MIB SNMP traps in particular). Reads the shared
+    // notifications index once and injects a compact panel above the spec,
+    // linking to the full catalog filtered to this module. Fail-silent.
+    var _notifIndex = undefined;   // undefined=not loaded, null=unavailable
+    function attachNotificationsPanel() {
+        try {
+            if (!document.getElementById('swagger-ui')) return;
+            updateNotificationsPanel();
+            window.addEventListener('hashchange', updateNotificationsPanel);
+        } catch (_) { /* noop */ }
+    }
+
+    function _currentSpecFromHash() {
+        try {
+            var m = (location.hash || '').match(/[#&]spec=([^&]+)/);
+            if (m) {
+                var v = decodeURIComponent(m[1]);
+                // Some viewers encode spec as "<category>/<module>"; keep the tail.
+                return v.indexOf('/') >= 0 ? v.split('/').pop() : v;
+            }
+        } catch (_) { /* noop */ }
+        return '';
+    }
+
+    function _notifIndexUrls() {
+        // Version-aware, viewer pages live one directory deep.
+        var ver = '';
+        try {
+            ver = new URLSearchParams(location.search).get('ver') || '';
+            if (!ver) {
+                var hm = (location.hash || '').match(/[#&]ver=([^&]+)/);
+                if (hm) ver = decodeURIComponent(hm[1]);
+            }
+            if (!ver && window.__IOSXE_ACTIVE_VERSION__) ver = window.__IOSXE_ACTIVE_VERSION__;
+            if (!ver) { ver = localStorage.getItem('iosxe-active-version') || ''; }
+        } catch (_) { /* noop */ }
+        var urls = [];
+        if (ver) urls.push('../releases/' + encodeURIComponent(ver) + '/notifications.json');
+        urls.push('../notifications.json');   // default-release root copy
+        return urls;
+    }
+
+    function _loadNotifIndex() {
+        if (_notifIndex !== undefined) return Promise.resolve(_notifIndex);
+        var urls = _notifIndexUrls();
+        var i = 0;
+        function tryNext() {
+            if (i >= urls.length) { _notifIndex = null; return _notifIndex; }
+            var url = urls[i++];
+            return fetch(url, { cache: 'default' })
+                .then(function (r) { return r.ok ? r.json() : tryNext(); })
+                .then(function (doc) {
+                    if (doc && doc.modules) {
+                        _notifIndex = {};
+                        doc.modules.forEach(function (m) { _notifIndex[m.module] = m; });
+                        return _notifIndex;
+                    }
+                    return tryNext();
+                })
+                .catch(function () { return tryNext(); });
+        }
+        return Promise.resolve(tryNext());
+    }
+
+    function _ensurePanelEl() {
+        var panel = document.getElementById('iosxe-notif-panel');
+        if (panel) return panel;
+        var ui = document.getElementById('swagger-ui');
+        if (!ui || !ui.parentNode) return null;
+        panel = document.createElement('div');
+        panel.id = 'iosxe-notif-panel';
+        panel.style.cssText =
+            'display:none;margin:0 0 12px;padding:10px 14px;border:1px solid #e0c068;'
+            + 'border-left:4px solid #EF6C00;border-radius:4px;background:#fff8ec;'
+            + 'font:13px/1.5 system-ui,-apple-system,sans-serif;color:#333;';
+        ui.parentNode.insertBefore(panel, ui);
+        return panel;
+    }
+
+    function updateNotificationsPanel() {
+        var spec = _currentSpecFromHash();
+        var panel = document.getElementById('iosxe-notif-panel');
+        if (!spec) { if (panel) panel.style.display = 'none'; return; }
+        _loadNotifIndex().then(function (idx) {
+            if (!idx) return;
+            var mod = idx[spec];
+            panel = _ensurePanelEl();
+            if (!panel) return;
+            if (!mod || !mod.notification_count) { panel.style.display = 'none'; return; }
+            var names = (mod.notifications || []).map(function (n) { return n.name; });
+            var preview = names.slice(0, 6).join(', ')
+                + (names.length > 6 ? ', +' + (names.length - 6) + ' more' : '');
+            var consume = mod.restconf_consumable
+                ? '<span style="color:#2E7D32;font-weight:600;">subscribable via RESTCONF/NETCONF</span>'
+                : '<span style="color:#9E6000;font-weight:600;">delivered over SNMP (not RESTCONF-subscribable)</span>';
+            var href = '../notifications.html?q=' + encodeURIComponent(spec);
+            panel.innerHTML =
+                '<strong>' + mod.notification_count + ' YANG notification'
+                + (mod.notification_count === 1 ? '' : 's')
+                + '</strong> defined by this module &mdash; ' + consume + '.'
+                + '<div style="margin-top:4px;color:#555;font-family:Consolas,Monaco,monospace;font-size:12px;">'
+                + names.map(function (n) { return n.replace(/[&<>"]/g, ''); }).slice(0, 6).join(' &middot; ')
+                + (names.length > 6 ? ' &middot; +' + (names.length - 6) + ' more' : '')
+                + '</div>'
+                + '<a href="' + href + '" style="display:inline-block;margin-top:6px;color:#EF6C00;'
+                + 'font-weight:600;text-decoration:none;">View in Notification Catalog &rarr;</a>';
+            panel.style.display = 'block';
+        });
     }
 
     // ---------- (4b) analytics: which operation, for which module -------
