@@ -20,18 +20,22 @@
 
   // Categories rendered in the builder's category dropdown. "oper" is the
   // default because MDT subscriptions are overwhelmingly against
-  // operational state. Only categories whose paths are genuinely
-  // subscribable as YANG data nodes are listed — RPCs (actions, not
-  // subscribable) and MIB translations (SNMP-native, no MDT prefix) are
-  // intentionally excluded so the builder never shows a non-derivable path.
+  // operational state. RPCs (actions, not subscribable) stay excluded. MIBs
+  // ARE subscribable, but only via the SNMP -> MDT bridge: their xpath is
+  // derived by a different, deterministic rule (/<MOD>:<MOD>/...) and they
+  // need an SNMP community configured, so the page surfaces an extra
+  // prerequisite block when a MIB module is selected.
   var CATEGORIES = [
     { id: 'oper',          label: 'Operational state (oper)' },
     { id: 'cfg',           label: 'Configuration (cfg)' },
     { id: 'native-config', label: 'Native config' },
     { id: 'openconfig',    label: 'OpenConfig' },
     { id: 'ietf',          label: 'IETF' },
+    { id: 'mib',           label: 'MIB (via SNMP \u2192 MDT bridge)' },
     { id: 'other',         label: 'Other' }
   ];
+
+  function isMibCat() { return state.cat === 'mib'; }
 
   // For 17.18.1 (legacy in-place layout) the prefix map sits at the repo
   // root; every other release gets a per-release file.
@@ -152,6 +156,12 @@
     $('b-copy-snippet').addEventListener('click', function () {
       var btn = $('b-copy-snippet');
       copyText($('b-snippet').textContent, btn);
+    });
+    var comm = $('b-comm');
+    if (comm) comm.addEventListener('input', updateSnmpCli);
+    var copySnmp = $('b-copy-snmp');
+    if (copySnmp) copySnmp.addEventListener('click', function () {
+      copyText($('b-snmp-cli').textContent, copySnmp);
     });
     var csvBtn = $('b-csv');
     if (csvBtn) csvBtn.addEventListener('click', function () { exportRowsCsv(csvBtn); });
@@ -275,7 +285,19 @@
   // List keys (e.g. ``foo=KEY``) are dropped because MDT subscriptions take
   // an unkeyed root xpath. Returns ``null`` if the path can't be normalised
   // (no ``/data/`` prefix, no module qualifier, or unknown module prefix).
-  function deriveXpath(opPath, prefixes) {
+  //
+  // MIB modules (``isMib``) derive by a different, prefix-map-free rule. A
+  // MIB OpenAPI path
+  //    /data/IF-MIB:ifTable/ifEntry
+  // becomes the telemetry filter xpath
+  //    /IF-MIB:IF-MIB/ifTable/ifEntry
+  // i.e. the module name is BOTH the prefix and the repeated top container
+  // (validated against a live device). Keyed entry rows collapse to their
+  // keyless table/entry target (all rows stream; keys come back as tags).
+  // The flattened bare-entry duplicate paths some generators emit (e.g.
+  // /data/IF-MIB:ifEntry, with no parent table) are dropped — their derived
+  // xpath would be invalid because the model nests the entry under its table.
+  function deriveXpath(opPath, prefixes, isMib) {
     if (!opPath) return null;
     var p = opPath;
     if (p.indexOf('/data/') === 0) p = p.substring('/data/'.length);
@@ -287,11 +309,16 @@
     var colon = first.indexOf(':');
     if (colon === -1) return null;
     var moduleName = first.substring(0, colon);
-    var head = first.substring(colon + 1);
+    var head = first.substring(colon + 1).replace(/=[^/]*$/, '');
+    var tail = rest.replace(/=[^/]*(?=\/|$)/g, '');
+    if (isMib) {
+      // Drop flattened bare-entry duplicates (canonical entries live under
+      // their *Table parent, where head is the table and tail is /...Entry).
+      if (/Entry$/.test(head)) return null;
+      return '/' + moduleName + ':' + moduleName + '/' + head + tail;
+    }
     var prefix = prefixes[moduleName];
     if (!prefix) return null;
-    head = head.replace(/=[^/]*$/, '');
-    var tail = rest.replace(/=[^/]*(?=\/|$)/g, '');
     return '/' + prefix + ':' + head + tail;
   }
 
@@ -299,28 +326,39 @@
 
   function renderModuleInfo(name) {
     var el = $('b-info');
+    var mib = isMibCat();
+    renderSnmpPrereq(mib && !!name);
     if (!name) { el.hidden = true; el.innerHTML = ''; return; }
-    var prefix = state.prefixes[name] || null;
+    var prefix = mib ? null : (state.prefixes[name] || null);
     var paths = (state.spec && state.spec.paths) ? Object.keys(state.spec.paths) : [];
-    var pathCount = paths.length;
 
     // Build a real worked example from the module's first derivable path,
-    // so users see actual values instead of <container> placeholders.
-    var exampleApi = null, exampleXpath = null;
+    // so users see actual values instead of <container> placeholders. The
+    // count reflects genuinely-derivable (subscribable) paths.
+    var exampleApi = null, exampleXpath = null, derivable = 0;
     for (var i = 0; i < paths.length; i++) {
-      var xp = deriveXpath(paths[i], state.prefixes);
-      if (xp) { exampleApi = paths[i]; exampleXpath = xp; break; }
+      var xp = deriveXpath(paths[i], state.prefixes, mib);
+      if (xp) {
+        derivable++;
+        if (!exampleApi) { exampleApi = paths[i]; exampleXpath = xp; }
+      }
     }
 
+    var badge = mib
+      ? ' <span class="mib-badge" title="Streams via the SNMP \u2192 MDT bridge; requires an SNMP community (see below)">via SNMP \u2192 MDT</span>'
+      : '';
+
     var html =
-      '<div><strong>' + escapeHtml(name) + '</strong>' +
-      (prefix ? '' :
+      '<div><strong>' + escapeHtml(name) + '</strong>' + badge +
+      (mib || prefix ? '' :
         ' &mdash; <span style="color:var(--hot);">no prefix entry in yang-prefix-map.json' +
         ' for this release</span>') +
       '</div>' +
       '<dl>' +
-      '<dt>YANG prefix</dt><dd>' + escapeHtml(prefix || '(unknown)') + '</dd>' +
-      '<dt>Subscribable paths</dt><dd>' + pathCount + '</dd>' +
+      (mib
+        ? '<dt>MDT prefix</dt><dd>' + escapeHtml(name + ':' + name) + '</dd>'
+        : '<dt>YANG prefix</dt><dd>' + escapeHtml(prefix || '(unknown)') + '</dd>') +
+      '<dt>Subscribable paths</dt><dd>' + derivable + '</dd>' +
       '</dl>';
 
     if (exampleApi) {
@@ -338,16 +376,45 @@
     el.hidden = false;
   }
 
+  // SNMP prerequisite block: only MIB telemetry needs it. MDT reads MIB data
+  // through the SNMP subsystem, so the device needs an SNMP community that
+  // the NETCONF/MDT internal agent is told to use — and the two community
+  // strings MUST match. The community field is editable and live-fills both
+  // CLI lines.
+  function renderSnmpPrereq(show) {
+    var box = $('b-snmp');
+    if (!box) return;
+    box.hidden = !show;
+    if (show) updateSnmpCli();
+  }
+
+  function updateSnmpCli() {
+    var pre = $('b-snmp-cli');
+    if (!pre) return;
+    var input = $('b-comm');
+    var comm = (input && input.value.trim()) || 'mycommunity';
+    pre.textContent = [
+      'netconf-yang',
+      'snmp-server community ' + comm + ' RO',
+      'netconf-yang cisco-ia snmp-community-string ' + comm
+    ].join('\n');
+  }
+
   function _builderRows() {
     if (!state.spec || !state.spec.paths) return [];
     var q = ($('b-filter').value || '').trim().toLowerCase();
+    var mib = isMibCat();
     var paths = state.spec.paths;
     var rows = [];
     Object.keys(paths).sort().forEach(function (apiPath) {
       var ops = paths[apiPath] || {};
       Object.keys(ops).forEach(function (method) {
         if (['get','post','put','patch','delete'].indexOf(method) === -1) return;
-        var xpath = deriveXpath(apiPath, state.prefixes);
+        var xpath = deriveXpath(apiPath, state.prefixes, mib);
+        // For MIBs, the flattened bare-entry duplicates derive to null and are
+        // not real subscribe targets, so drop them rather than show a wall of
+        // "(not subscribable)" rows.
+        if (mib && !xpath) return;
         rows.push({ method: method.toUpperCase(), api: apiPath, xpath: xpath });
       });
     });
