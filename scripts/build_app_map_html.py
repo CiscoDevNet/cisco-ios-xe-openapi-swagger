@@ -236,7 +236,7 @@ HEADER_NAV = [
     ("Code Generator", "code-generator.html"),
     ("Compare Trees", "tree-compare.html"),
     ("YANG Report", "yang-accountability.html"),
-    ("MDT Telemetry", "telemetry.html"),
+    ("Telemetry & Notifications", "telemetry.html"),
     ("Platform Coverage", "platform-coverage.html"),
     ("About", "about.html"),
 ]
