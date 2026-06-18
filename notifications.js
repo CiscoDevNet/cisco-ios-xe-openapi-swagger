@@ -145,13 +145,22 @@
                   return '<li>' + objHtml(o) + '</li>';
               }).join('') + '</ul>'
             : '<div class="obj-list" style="padding-left:0;font-style:italic;">no carried objects</div>';
-        return '<li><span class="notif-name">' + esc(n.name) + '</span>' + objList + '</li>';
+        var example = '';
+        if (n.example) {
+            var pretty = JSON.stringify(n.example, null, 2);
+            example = '<div class="notif-example">'
+                + '<div class="ex-head">Example payload (RFC 7951 JSON)'
+                + '<button type="button" class="ex-copy" data-copy="' + esc(pretty) + '">Copy</button>'
+                + '</div><pre>' + esc(pretty) + '</pre></div>';
+        }
+        return '<li><span class="notif-name">' + esc(n.name) + '</span>'
+            + objList + example + '</li>';
     }
 
     function moduleHtml(mod, q) {
         var consumeBadge = mod.restconf_consumable
-            ? '<span class="badge consume-yes" title="Subscribable via RESTCONF/NETCONF">RESTCONF \u2713</span>'
-            : '<span class="badge consume-no" title="Delivered over SNMP \u2014 not RESTCONF-subscribable">RESTCONF \u2715</span>';
+            ? '<span class="badge consume-yes" title="Subscribable via NETCONF / gRPC dial-out">RESTCONF \u2715 · NETCONF \u2713</span>'
+            : '<span class="badge consume-no" title="Not RESTCONF-subscribable">RESTCONF \u2715</span>';
         var links = '';
         if (mod.spec_url) links += '<a href="' + esc(mod.spec_url) + '">Spec</a>';
         if (mod.tree_url) links += '<a class="tree" href="' + esc(mod.tree_url) + '" target="_blank" rel="noopener noreferrer">Tree</a>';
@@ -164,10 +173,13 @@
             + (mod.notification_count === 1 ? '' : 's') + '</span>'
             + '<span class="links">' + links + '</span>'
             + '</div>';
+        var consume = mod.consumption
+            ? '<div class="mod-consume"><strong>How to consume:</strong> ' + esc(mod.consumption) + '</div>'
+            : '';
         var body = '<ul class="notif-list">'
             + mod.notifications.map(function (n) { return notifHtml(n, q); }).join('')
             + '</ul>';
-        return '<div class="mod-card">' + head + body + '</div>';
+        return '<div class="mod-card">' + head + consume + body + '</div>';
     }
 
     function render() {
@@ -178,6 +190,27 @@
         }
         var q = (filterEl.value || '').trim().toLowerCase();
         catalogEl.innerHTML = mods.map(function (m) { return moduleHtml(m, q); }).join('');
+        // Wire copy buttons (CSP-safe: no inline handlers).
+        var btns = catalogEl.querySelectorAll('.ex-copy');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].addEventListener('click', onCopyExample);
+        }
+    }
+
+    function onCopyExample(ev) {
+        var btn = ev.currentTarget;
+        var text = btn.getAttribute('data-copy') || '';
+        var done = function () {
+            var orig = btn.textContent;
+            btn.textContent = 'Copied \u2713';
+            setTimeout(function () { btn.textContent = orig; }, 1500);
+        };
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done, function () {});
+            }
+        } catch (_) { /* noop */ }
+        track('notification_example_copied', { release: current && current.version });
     }
 
     function exportCsv() {

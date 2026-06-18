@@ -255,22 +255,21 @@
             if (!panel) return;
             if (!mod || !mod.notification_count) { panel.style.display = 'none'; return; }
             var names = (mod.notifications || []).map(function (n) { return n.name; });
-            var preview = names.slice(0, 6).join(', ')
-                + (names.length > 6 ? ', +' + (names.length - 6) + ' more' : '');
             var consume = mod.restconf_consumable
-                ? '<span style="color:#2E7D32;font-weight:600;">subscribable via RESTCONF/NETCONF</span>'
-                : '<span style="color:#9E6000;font-weight:600;">delivered over SNMP (not RESTCONF-subscribable)</span>';
+                ? '<span style="color:#2E7D32;font-weight:600;">consumed via NETCONF subscription / gRPC dial-out</span>'
+                : '<span style="color:#9E6000;font-weight:600;">delivered over SNMP (not RESTCONF/NETCONF)</span>';
             var href = '../notifications.html?q=' + encodeURIComponent(spec);
             panel.innerHTML =
                 '<strong>' + mod.notification_count + ' YANG notification'
                 + (mod.notification_count === 1 ? '' : 's')
                 + '</strong> defined by this module &mdash; ' + consume + '.'
+                + (mod.consumption ? '<div style="margin-top:3px;color:#6a5a3a;font-size:12px;">' + mod.consumption.replace(/[<>]/g, '') + '</div>' : '')
                 + '<div style="margin-top:4px;color:#555;font-family:Consolas,Monaco,monospace;font-size:12px;">'
                 + names.map(function (n) { return n.replace(/[&<>"]/g, ''); }).slice(0, 6).join(' &middot; ')
                 + (names.length > 6 ? ' &middot; +' + (names.length - 6) + ' more' : '')
                 + '</div>'
                 + '<a href="' + href + '" style="display:inline-block;margin-top:6px;color:#EF6C00;'
-                + 'font-weight:600;text-decoration:none;">View in Notification Catalog &rarr;</a>';
+                + 'font-weight:600;text-decoration:none;">View payloads &amp; examples in Notification Catalog &rarr;</a>';
             panel.style.display = 'block';
         });
     }

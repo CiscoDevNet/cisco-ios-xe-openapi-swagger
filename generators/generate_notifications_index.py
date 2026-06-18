@@ -35,11 +35,21 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent
+
+# Reuse the shared YANG value engine for realistic leaf example values
+# (YANG default -> first enum -> None), keyed by leaf name.
+sys.path.insert(0, str(ROOT / 'generators'))
+try:
+    from yang_value_index import lookup_example as _yang_lookup_example
+except Exception:  # pragma: no cover - engine is best-effort
+    def _yang_lookup_example(_name):
+        return None
 
 # Category dir -> (short type, display label). Mirrors generate_search_index.py.
 CATEGORY_LABELS = {
@@ -60,6 +70,27 @@ _NETCONF_STREAM_MODULES = {
     'ietf-event-notifications',
     'ietf-restconf-monitoring',
 }
+
+# How each transport is actually consumed on a device. Deliberately honest:
+# none of these are dynamic-subscription-over-RESTCONF, which IOS-XE does not
+# usefully support — the catalog documents the real mechanism instead.
+_CONSUMPTION = {
+    'yang-push': (
+        'Subscribe via NETCONF <establish-subscription> (RFC 8639/8641) or '
+        'configure gRPC dial-out telemetry; events arrive as YANG-Push '
+        'notifications. Not retrievable with a RESTCONF GET.'
+    ),
+    'snmp-trap': (
+        'Delivered as an SNMP notification (trap/inform). Enable the '
+        'corresponding *NotifEnable object and configure an snmp-server host. '
+        'Not available over RESTCONF/NETCONF.'
+    ),
+    'netconf-stream': (
+        'Subscribe over NETCONF (create-subscription / establish-subscription) '
+        'to the relevant event stream. Not retrievable with a RESTCONF GET.'
+    ),
+}
+
 
 
 def _release_dirs(version: str):
@@ -94,6 +125,83 @@ def _classify(module: str, category_dir: Optional[str]):
         return 'netconf-stream', False
     # Native YANG-Push notification streams (events / oper / other native).
     return 'yang-push', True
+
+
+# ---------------------------------------------------------------------------
+# Realistic example values (RFC 7951 JSON payloads).
+# ---------------------------------------------------------------------------
+
+# Name-substring heuristics for leafs the YANG value engine doesn't cover.
+# Checked in order; first hit wins. Keeps examples aligned to what a real
+# notification payload looks like rather than the literal string "example".
+_NAME_HINTS = [
+    (re.compile(r'(address[-_ ]?family|^af$|af[-_]?type)', re.I), 'ipv4'),
+    (re.compile(r'(^|[-_])(oper)?state$|status$|state$', re.I), 'up'),
+    (re.compile(r'reason', re.I), 'none'),
+    (re.compile(r'(host[-_]?name)', re.I), 'router1'),
+    (re.compile(r'(vrf|vpn)[-_]?name|^vrf', re.I), 'default'),
+    (re.compile(r'(if[-_]?name|interface)', re.I), 'GigabitEthernet1'),
+    (re.compile(r'(severity|level)', re.I), 'major'),
+    (re.compile(r'(index|number|num|count|id$|ifindex)', re.I), 1),
+    (re.compile(r'(time|timestamp)', re.I), '2026-06-18T15:30:00.000Z'),
+    (re.compile(r'(addr|address|ip)$|ipv4|ipv6', re.I), '192.0.2.1'),
+    (re.compile(r'version', re.I), 'ipv4'),
+    (re.compile(r'class', re.I), 'module'),
+    (re.compile(r'name$', re.I), 'example-name'),
+    (re.compile(r'type$', re.I), 'example-type'),
+]
+
+# Concrete (non-string) type defaults applied before name heuristics. 'string'
+# is deliberately excluded so descriptive leaf names get a realistic value from
+# the heuristics instead of the bare literal "example".
+_TYPE_DEFAULTS = {
+    'boolean': True, 'empty': None,
+    'uint8': 1, 'uint16': 1, 'uint32': 1, 'uint64': 1,
+    'int8': 1, 'int16': 1, 'int32': 1, 'int64': 1,
+    'counter32': 0, 'counter64': 0, 'gauge32': 0, 'gauge64': 0,
+    'decimal64': 1.0, 'timestamp': '2026-06-18T15:30:00.000Z',
+    'timeticks': 0,
+}
+
+
+def _leaf_basename(obj: dict) -> str:
+    """For a leafref, the meaningful name is the target's last path segment
+    (e.g. cefPeerOperState), which the value engine / hints understand better
+    than a generic 'object-1' wrapper."""
+    if obj.get('target'):
+        tail = obj['target'].rstrip('/').split('/')[-1]
+        return tail.split(':')[-1] or obj.get('name', '')
+    return obj.get('name', '')
+
+
+def example_value(obj: dict):
+    """Best-effort realistic value for one carried notification object."""
+    name = _leaf_basename(obj)
+    # 1. YANG default / first-enum from the source modules.
+    v = _yang_lookup_example(name)
+    if v is not None:
+        return v
+    # 2. Concrete (non-string) type default.
+    ytype = (obj.get('type') or '').split(':')[-1].lower()
+    if ytype in _TYPE_DEFAULTS:
+        return _TYPE_DEFAULTS[ytype]
+    # 3. Name-substring heuristics (covers most leafref-carried objects and
+    #    descriptive string leafs).
+    for rx, val in _NAME_HINTS:
+        if rx.search(name):
+            return val
+    return 'example'
+
+
+def build_example(module: str, notif: dict) -> dict:
+    """Build an RFC 7951 namespace-qualified example payload for a notification:
+
+        { "<module>:<notification>": { "<obj>": <value>, ... } }
+    """
+    body = {}
+    for obj in notif.get('objects', []):
+        body[obj['name']] = example_value(obj)
+    return {module + ':' + notif['name']: body}
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +318,10 @@ def build_index(version: str) -> dict:
             category_dir, ('unknown', 'Uncategorized'))
         transport, consumable = _classify(module, category_dir)
 
+        # Attach a realistic RFC 7951 example payload to each notification.
+        for n in notifs:
+            n['example'] = build_example(module, n)
+
         entry = {
             'module': module,
             'category': short_cat,
@@ -217,6 +329,7 @@ def build_index(version: str) -> dict:
             'display_category': display_cat,
             'transport': transport,
             'restconf_consumable': consumable,
+            'consumption': _CONSUMPTION.get(transport, ''),
             'notification_count': len(notifs),
             'tree_url': f"yang-trees/{module}.html",
             'notifications': notifs,
