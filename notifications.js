@@ -217,6 +217,19 @@
         catch (_) { /* noop */ }
     }
 
+    // Pre-fill the text filter from ?q= / #q= so other pages (e.g. the Swagger
+    // viewers' per-module notifications panel) can deep-link straight to a
+    // module's notifications.
+    function initialFilter() {
+        try {
+            var q = new URLSearchParams(location.search).get('q');
+            if (q) return q;
+            var m = (location.hash || '').match(/[#&]q=([^&]+)/);
+            if (m) return decodeURIComponent(m[1]);
+        } catch (_) { /* noop */ }
+        return '';
+    }
+
     function init() {
         fetch('releases/index.json', { cache: 'no-store' })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -231,6 +244,8 @@
                     if (v === want) opt.selected = true;
                     releaseSel.appendChild(opt);
                 });
+                var pre = initialFilter();
+                if (pre) filterEl.value = pre;
                 releaseSel.addEventListener('change', function () { loadRelease(releaseSel.value); });
                 filterEl.addEventListener('input', render);
                 transportSel.addEventListener('change', render);
