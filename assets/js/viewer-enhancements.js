@@ -157,6 +157,57 @@
         injectVersionSwitcher();
         injectSidebarToggle();
         attachSlashFocus();
+        attachOperationTracking();
+    }
+
+    // ---------- (4b) analytics: which operation, for which module -------
+    // Capture every time a user expands an operation in the Swagger UI so the
+    // Clarity dashboard can answer "which method (GET/POST/DELETE/…) for which
+    // module/path". One delegated listener covers both direct opblock clicks
+    // and the paths-search "jump to operation" flow (which clicks the opblock
+    // for us). Fail-silent; a no-op when Clarity / the tracker is absent.
+    function attachOperationTracking() {
+        try {
+            var _lastOpKey = '';
+            document.addEventListener('click', function (ev) {
+                try {
+                    var t = ev.target;
+                    if (!t || typeof t.closest !== 'function') return;
+                    var summary = t.closest('.opblock-summary');
+                    if (!summary) return;
+
+                    var methodEl = summary.querySelector('.opblock-summary-method');
+                    var pathEl = summary.querySelector('.opblock-summary-path');
+                    var method = methodEl ? (methodEl.textContent || '').trim().toUpperCase() : '';
+                    var opPath = '';
+                    if (pathEl) {
+                        opPath = pathEl.getAttribute('data-path')
+                            || (pathEl.textContent || '').trim();
+                    }
+                    if (!method && !opPath) return;
+
+                    // Current module/spec from the hash (#spec=<name>).
+                    var spec = '';
+                    try {
+                        var sm = (location.hash || '').match(/[#&]spec=([^&]+)/);
+                        if (sm) spec = decodeURIComponent(sm[1]);
+                    } catch (_) { /* noop */ }
+
+                    // De-dupe repeated expand/collapse clicks on the same op.
+                    var key = method + ' ' + spec + ' ' + opPath;
+                    if (key === _lastOpKey) return;
+                    _lastOpKey = key;
+
+                    if (typeof window.__iosxeTrack === 'function') {
+                        window.__iosxeTrack('operation_selected', {
+                            http_method: method,
+                            spec: spec,
+                            op_path: opPath
+                        });
+                    }
+                } catch (_) { /* noop */ }
+            }, true);
+        } catch (_) { /* noop */ }
     }
 
     // ---------- (5) phone/tablet hamburger -----------------------------

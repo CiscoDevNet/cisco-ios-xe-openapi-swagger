@@ -222,14 +222,14 @@
         document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
 
         // Analytics: highest-intent action on the site — someone produced a
-        // ready-to-run snippet. Tag by method + selected spec only (never the
-        // host, username, or password values).
+        // ready-to-run snippet. Tag by method + selected spec + RESTCONF path
+        // only (never the host, username, or password field values).
         try {
             if (typeof window.__iosxeTrack === 'function') {
                 var _picker = document.getElementById('specPicker');
                 var _spec = (_picker && _picker.selectedOptions && _picker.selectedOptions[0]
                     && _picker.selectedOptions[0].dataset.name) || '';
-                window.__iosxeTrack('code_generated', { http_method: (method || '').toUpperCase(), spec: _spec });
+                window.__iosxeTrack('code_generated', { http_method: (method || '').toUpperCase(), spec: _spec, op_path: path || '' });
             }
         } catch (e) { /* noop */ }
     }
