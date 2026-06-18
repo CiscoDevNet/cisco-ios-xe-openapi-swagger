@@ -409,7 +409,7 @@
         });
       });
 
-    // "Use in config" populates the subscription template below.
+    // "Use in config" populates the subscription template at the top.
     Array.prototype.forEach.call(tbody.querySelectorAll('button[data-use]'),
       function (btn) {
         btn.addEventListener('click', function () {
@@ -421,6 +421,13 @@
             btn.classList.remove('ok');
             btn.textContent = 'Use in config';
           }, 1200);
+          // Flash the (sticky) config box so the user sees where it went.
+          var box = document.querySelector('.snippet-box');
+          if (box) {
+            box.classList.remove('flash');
+            void box.offsetWidth;  // restart the animation
+            box.classList.add('flash');
+          }
           track('telemetry_xpath_used');
         });
       });
