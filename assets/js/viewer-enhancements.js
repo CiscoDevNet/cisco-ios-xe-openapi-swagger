@@ -258,7 +258,7 @@
             var consume = mod.restconf_consumable
                 ? '<span style="color:#2E7D32;font-weight:600;">consumed via NETCONF subscription / gRPC dial-out</span>'
                 : '<span style="color:#9E6000;font-weight:600;">delivered over SNMP (not RESTCONF/NETCONF)</span>';
-            var href = '../notifications.html?q=' + encodeURIComponent(spec);
+            var href = '../telemetry.html?tab=notifications&q=' + encodeURIComponent(spec);
             panel.innerHTML =
                 '<strong>' + mod.notification_count + ' YANG notification'
                 + (mod.notification_count === 1 ? '' : 's')

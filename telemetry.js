@@ -1,11 +1,17 @@
-/* telemetry.js — Module-Driven Telemetry XPath Builder.
+/* telemetry.js — "Telemetry & Notifications" page controller.
  *
- * Implements the formula documented in MDT_XPATH_SPEC.md:
- *   filter xpath = "/" + <prefix> + ":" + <path-without-leading-slash>
+ * Hosts two tabs:
+ *   1. Telemetry XPaths — the MDT filter-xpath builder. Implements the
+ *      formula documented in MDT_XPATH_SPEC.md:
+ *        filter xpath = "/" + <prefix> + ":" + <path-without-leading-slash>
+ *      Pick any release / category / module and we compute the MDT filter
+ *      xpath for every operation in that spec, derived live. The xpath is
+ *      always derived; there is no curated catalog.
+ *   2. Event Notifications — the YANG notification catalog, rendered into
+ *      #pane-notifications by notifications.js.
  *
- * Pick any release / category / module and we compute the MDT
- * filter xpath for every operation in that spec, derived live from the
- * formula. The xpath is always derived; there is no curated catalog.
+ * This file owns tab switching (incl. ?tab= / #notifications deep-links) and
+ * the xpath builder; the catalog is self-contained in notifications.js.
  */
 (function () {
   'use strict';
@@ -22,7 +28,6 @@
     { id: 'openconfig',    label: 'OpenConfig' },
     { id: 'ietf',          label: 'IETF' },
     { id: 'mib',           label: 'MIB-aligned' },
-    { id: 'events',        label: 'Events / notifications' },
     { id: 'rpc',           label: 'RPCs' },
     { id: 'other',         label: 'Other' }
   ];
@@ -62,10 +67,57 @@
 
   // --- Boot ------------------------------------------------------------------
 
+  initTabs();
+
   fetch('releases/index.json', { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.json() : null; })
     .catch(function () { return null; })
     .then(initReleases);
+
+  // Two-tab layout: "Telemetry XPaths" (this builder) and "Event
+  // Notifications" (the catalog rendered by notifications.js into
+  // #pane-notifications). Switching is pure show/hide; both panes' scripts
+  // initialise on load. ?tab=notifications (or #notifications) deep-links the
+  // catalog tab — used by the per-module panel in the Swagger viewers.
+  function selectTab(name) {
+    var tabs = document.querySelectorAll('.tabs [data-tab]');
+    for (var i = 0; i < tabs.length; i++) {
+      var t = tabs[i];
+      var on = t.getAttribute('data-tab') === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    }
+    var panes = document.querySelectorAll('.pane[data-pane]');
+    for (var j = 0; j < panes.length; j++) {
+      var p = panes[j];
+      p.classList.toggle('active', p.getAttribute('data-pane') === name);
+    }
+    try {
+      if (typeof window.__iosxeTrack === 'function') {
+        window.__iosxeTrack('telemetry_tab', { tab: name });
+      }
+    } catch (_) { /* noop */ }
+  }
+
+  function initTabs() {
+    var tabs = document.querySelectorAll('.tabs [data-tab]');
+    if (!tabs.length) return;
+    for (var i = 0; i < tabs.length; i++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          selectTab(btn.getAttribute('data-tab'));
+        });
+      })(tabs[i]);
+    }
+    // Initial tab from ?tab= or #<tab>.
+    var want = 'telemetry';
+    try {
+      var qp = new URLSearchParams(location.search).get('tab');
+      if (qp) want = qp;
+      else if (/(^|#)notifications\b/.test(location.hash)) want = 'notifications';
+    } catch (_) { /* noop */ }
+    selectTab(want === 'notifications' ? 'notifications' : 'telemetry');
+  }
 
   function initReleases(data) {
     var releases = (data && data.releases) || [{ ver: '26.1.1', label: '26.1.1' }];

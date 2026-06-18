@@ -37,7 +37,6 @@ UI_FILES = [
     "telemetry.html",
     "about.html",
     "404.html",
-    "notifications.html",
     "index-app.js",
     "code-generator.js",
     "search.js",
