@@ -386,7 +386,7 @@
     if (exampleApi) {
       html +=
         '<div style="margin-top:6px;font-size:.82rem;color:var(--muted);">' +
-        'Example &mdash; the RESTCONF path on the left becomes the telemetry ' +
+        'Example &mdash; the OpenAPI path on the left becomes the telemetry ' +
         'filter xpath on the right:</div>' +
         '<div class="formula" style="margin-top:6px;">' +
         '<span style="color:var(--muted);">' + escapeHtml(exampleApi) + '</span>' +
@@ -400,9 +400,9 @@
 
   // Top-of-page metric cards, mirroring the Event Notifications tab. The
   // headline numbers are release-wide totals from version-stats.json (total
-  // modules and the full RESTCONF/telemetry path surface); the last two cards
-  // drill into the current category and selected module so the grid stays
-  // responsive to the picker.
+  // modules and the full YANG data-path / telemetry surface); the last two
+  // cards drill into the current category and selected module so the grid
+  // stays responsive to the picker.
   function renderStats() {
     var el = $('b-stats');
     if (!el) return;
@@ -428,7 +428,7 @@
     }
     var cards = [
       { num: rel ? fmt(rel.modules_with_specs) : '\u2014', lbl: 'Modules in release' },
-      { num: rel ? fmt(rel.paths) : '\u2014', lbl: 'RESTCONF data paths' },
+      { num: rel ? fmt(rel.paths) : '\u2014', lbl: 'Data paths' },
       { num: rel ? fmt(rel.yang_modules) : '\u2014', lbl: 'YANG modules' },
       { num: modules.length || 0, lbl: 'Modules in category' },
       { num: fmt(sub), lbl: 'Subscribable xpaths (module)' }
