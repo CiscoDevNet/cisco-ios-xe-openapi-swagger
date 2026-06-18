@@ -840,7 +840,7 @@ function handleDeepLink() {
             // because `window.location.href = "javascript:..."` runs the
             // payload. Whitelist short-circuits that path.
             var ALLOWED_MODEL_DIRS = [
-                'swagger-cfg-model', 'swagger-events-model', 'swagger-ietf-model',
+                'swagger-cfg-model', 'swagger-ietf-model',
                 'swagger-mib-model', 'swagger-native-config-model', 'swagger-oper-model',
                 'swagger-openconfig-model', 'swagger-other-model', 'swagger-rpc-model'
             ];

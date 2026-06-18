@@ -95,7 +95,6 @@ MODEL_FOLDERS = {
     "swagger-ietf-model": {"label": "IETF", "emoji": "📜"},
     "swagger-mib-model": {"label": "MIB", "emoji": "📡"},
     "swagger-rpc-model": {"label": "RPC", "emoji": "⚡"},
-    "swagger-events-model": {"label": "Events", "emoji": "🔔"},
     "swagger-other-model": {"label": "Other", "emoji": "📦"},
 }
 

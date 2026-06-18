@@ -60,9 +60,15 @@ CATEGORY_LABELS = {
     'swagger-ietf-model': ('ietf', 'IETF Standards'),
     'swagger-mib-model': ('mib', 'MIB Translations'),
     'swagger-rpc-model': ('rpc', 'RPC Operations'),
-    'swagger-events-model': ('events', 'Event Notifications'),
     'swagger-other-model': ('other', 'Other Models'),
 }
+
+# Native event-notification modules no longer have a dedicated OpenAPI viewer
+# (the swagger-events-model category was retired because its RESTCONF GET
+# endpoints were not callable on a device). They are still first-class YANG
+# notification capabilities, so the catalog keeps labelling them "Event
+# Notifications" via this name pattern even though they have no spec dir.
+_EVENTS_NAME_RE = re.compile(r'-events(-oper)?$', re.I)
 
 # IETF modules whose notifications are NETCONF-stream rather than YANG-Push.
 _NETCONF_STREAM_MODULES = {
@@ -316,6 +322,10 @@ def build_index(version: str) -> dict:
         category_dir = cat_map.get(module)
         short_cat, display_cat = CATEGORY_LABELS.get(
             category_dir, ('unknown', 'Uncategorized'))
+        # Events modules without a spec dir (retired viewer) keep an honest
+        # "Event Notifications" label via name pattern.
+        if category_dir is None and _EVENTS_NAME_RE.search(module):
+            short_cat, display_cat = 'events', 'Event Notifications'
         transport, consumable = _classify(module, category_dir)
 
         # Attach a realistic RFC 7951 example payload to each notification.

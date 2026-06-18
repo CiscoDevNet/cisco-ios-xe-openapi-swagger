@@ -1,11 +1,11 @@
 # YANG Module Accountability Report
 
-**Date:** June 15, 2026
+**Date:** June 18, 2026
 **IOS XE Version:** 17.18.1
 **Total YANG Modules:** 1152
-**Modules with OpenAPI Specs:** 699 (60.7%)
+**Modules with OpenAPI Specs:** 667 (57.9%)
 **Modules with YANG Trees:** 715
-**Modules in Multiple Categories:** 10
+**Modules in Multiple Categories:** 4
 
 > **Interactive Report:** [View the HTML accountability report](yang-accountability.html) with search, filtering, and clickable links.
 
@@ -31,7 +31,7 @@ This report provides **100% accountability** for every YANG module in the
 | **openconfig** | 66 | 41 | 62% |  |
 | **ietf** | 33 | 21 | 64% |  |
 | **mib** | 150 | 148 | 99% |  |
-| **events** | 41 | 41 | 100% |  |
+| **events** | 41 | 9 | 22% |  |
 | **native** | 155 | 154 | 99% |  |
 | **other** | 30 | 6 | 20% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
@@ -611,50 +611,50 @@ This report provides **100% accountability** for every YANG module in the
 | TOKENRING-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=TOKENRING-MIB) | [🌳](yang-trees/TOKENRING-MIB.html) |
 | TUNNEL-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=TUNNEL-MIB) | [🌳](yang-trees/TUNNEL-MIB.html) |
 | UDP-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=UDP-MIB) | [🌳](yang-trees/UDP-MIB.html) |
-| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Events, Other | [Operational](swagger-oper-model/index.html#spec=_paths_index) [Configuration](swagger-cfg-model/index.html#spec=_paths_index) [Native Config](swagger-native-config-model/index.html#spec=_paths_index) [OpenConfig](swagger-openconfig-model/index.html#spec=_paths_index) [IETF](swagger-ietf-model/index.html#spec=_paths_index) [MIB](swagger-mib-model/index.html#spec=_paths_index) [RPC](swagger-rpc-model/index.html#spec=_paths_index) [Events](swagger-events-model/index.html#spec=_paths_index) [Other](swagger-other-model/index.html#spec=_paths_index) | - |
+| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Other | [Operational](swagger-oper-model/index.html#spec=_paths_index) [Configuration](swagger-cfg-model/index.html#spec=_paths_index) [Native Config](swagger-native-config-model/index.html#spec=_paths_index) [OpenConfig](swagger-openconfig-model/index.html#spec=_paths_index) [IETF](swagger-ietf-model/index.html#spec=_paths_index) [MIB](swagger-mib-model/index.html#spec=_paths_index) [RPC](swagger-rpc-model/index.html#spec=_paths_index) [Other](swagger-other-model/index.html#spec=_paths_index) | - |
 
 ### EVENTS (41 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
-| Cisco-IOS-XE-aaa-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-aaa-events) | [🌳](yang-trees/Cisco-IOS-XE-aaa-events.html) |
-| Cisco-IOS-XE-appqoe-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-appqoe-events) | [🌳](yang-trees/Cisco-IOS-XE-appqoe-events.html) |
-| Cisco-IOS-XE-controller-shdsl-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-controller-shdsl-events) | [🌳](yang-trees/Cisco-IOS-XE-controller-shdsl-events.html) |
-| Cisco-IOS-XE-crypto-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-crypto-events) | [🌳](yang-trees/Cisco-IOS-XE-crypto-events.html) |
-| Cisco-IOS-XE-crypto-pki-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-crypto-pki-events) | [🌳](yang-trees/Cisco-IOS-XE-crypto-pki-events.html) |
-| Cisco-IOS-XE-dca-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-dca-events) | [🌳](yang-trees/Cisco-IOS-XE-dca-events.html) |
-| Cisco-IOS-XE-endpoint-tracker-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-endpoint-tracker-events) | [🌳](yang-trees/Cisco-IOS-XE-endpoint-tracker-events.html) |
-| Cisco-IOS-XE-fib-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-fib-events) | [🌳](yang-trees/Cisco-IOS-XE-fib-events.html) |
-| Cisco-IOS-XE-geo-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-geo-events) | [🌳](yang-trees/Cisco-IOS-XE-geo-events.html) |
-| Cisco-IOS-XE-hsrp-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-hsrp-events) | [🌳](yang-trees/Cisco-IOS-XE-hsrp-events.html) |
-| Cisco-IOS-XE-im-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-im-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-im-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-im-events-oper.html) |
-| Cisco-IOS-XE-install-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-install-events) | [🌳](yang-trees/Cisco-IOS-XE-install-events.html) |
-| Cisco-IOS-XE-interface-bw-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-interface-bw-events) | [🌳](yang-trees/Cisco-IOS-XE-interface-bw-events.html) |
-| Cisco-IOS-XE-ios-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-ios-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-ios-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-ios-events-oper.html) |
-| Cisco-IOS-XE-ip-sla-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-ip-sla-events) | [🌳](yang-trees/Cisco-IOS-XE-ip-sla-events.html) |
-| Cisco-IOS-XE-line-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-line-events) | [🌳](yang-trees/Cisco-IOS-XE-line-events.html) |
-| Cisco-IOS-XE-loop-detect-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-loop-detect-events) | [🌳](yang-trees/Cisco-IOS-XE-loop-detect-events.html) |
-| Cisco-IOS-XE-matm-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-matm-events) | [🌳](yang-trees/Cisco-IOS-XE-matm-events.html) |
-| Cisco-IOS-XE-mcast-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-mcast-events) | [🌳](yang-trees/Cisco-IOS-XE-mcast-events.html) |
-| Cisco-IOS-XE-nat-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-nat-events) | [🌳](yang-trees/Cisco-IOS-XE-nat-events.html) |
-| Cisco-IOS-XE-ngfw-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-ngfw-events) | [🌳](yang-trees/Cisco-IOS-XE-ngfw-events.html) |
-| Cisco-IOS-XE-ospf-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-ospf-events) | [🌳](yang-trees/Cisco-IOS-XE-ospf-events.html) |
-| Cisco-IOS-XE-perf-measure-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-perf-measure-events) | [🌳](yang-trees/Cisco-IOS-XE-perf-measure-events.html) |
-| Cisco-IOS-XE-platform-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-platform-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-platform-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-platform-events-oper.html) |
-| Cisco-IOS-XE-platform-software-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-platform-software-events) | [🌳](yang-trees/Cisco-IOS-XE-platform-software-events.html) |
-| Cisco-IOS-XE-port-bounce-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-port-bounce-events) | [🌳](yang-trees/Cisco-IOS-XE-port-bounce-events.html) |
-| Cisco-IOS-XE-qfp-resource-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-qfp-resource-events) | [🌳](yang-trees/Cisco-IOS-XE-qfp-resource-events.html) |
-| Cisco-IOS-XE-red-app-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-red-app-events) | [🌳](yang-trees/Cisco-IOS-XE-red-app-events.html) |
-| Cisco-IOS-XE-sm-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-sm-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-sm-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-sm-events-oper.html) |
-| Cisco-IOS-XE-spanning-tree-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-spanning-tree-events) | [🌳](yang-trees/Cisco-IOS-XE-spanning-tree-events.html) |
-| Cisco-IOS-XE-stack-mgr-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-stack-mgr-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-stack-mgr-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-stack-mgr-events-oper.html) |
-| Cisco-IOS-XE-tech-support-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-tech-support-events) | [🌳](yang-trees/Cisco-IOS-XE-tech-support-events.html) |
-| Cisco-IOS-XE-trace-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-trace-events) | [🌳](yang-trees/Cisco-IOS-XE-trace-events.html) |
-| Cisco-IOS-XE-udld-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-udld-events) | [🌳](yang-trees/Cisco-IOS-XE-udld-events.html) |
-| Cisco-IOS-XE-utd-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-utd-events) | [🌳](yang-trees/Cisco-IOS-XE-utd-events.html) |
-| Cisco-IOS-XE-verify-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-verify-events) | [🌳](yang-trees/Cisco-IOS-XE-verify-events.html) |
-| Cisco-IOS-XE-wireless-events-oper | Operational, Events | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-wireless-events-oper) [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-wireless-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-wireless-events-oper.html) |
-| Cisco-IOS-XE-xcopy-events | Events | [Events](swagger-events-model/index.html#spec=Cisco-IOS-XE-xcopy-events) | [🌳](yang-trees/Cisco-IOS-XE-xcopy-events.html) |
+| Cisco-IOS-XE-aaa-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-aaa-events.html) |
+| Cisco-IOS-XE-appqoe-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-appqoe-events.html) |
+| Cisco-IOS-XE-controller-shdsl-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-controller-shdsl-events.html) |
+| Cisco-IOS-XE-crypto-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-crypto-events.html) |
+| Cisco-IOS-XE-crypto-pki-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-crypto-pki-events.html) |
+| Cisco-IOS-XE-dca-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-dca-events.html) |
+| Cisco-IOS-XE-endpoint-tracker-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-endpoint-tracker-events.html) |
+| Cisco-IOS-XE-fib-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-fib-events.html) |
+| Cisco-IOS-XE-geo-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-geo-events.html) |
+| Cisco-IOS-XE-hsrp-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-hsrp-events.html) |
+| Cisco-IOS-XE-im-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-im-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-im-events-oper.html) |
+| Cisco-IOS-XE-install-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-install-events.html) |
+| Cisco-IOS-XE-interface-bw-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-interface-bw-events.html) |
+| Cisco-IOS-XE-ios-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-ios-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-ios-events-oper.html) |
+| Cisco-IOS-XE-ip-sla-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-ip-sla-events.html) |
+| Cisco-IOS-XE-line-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-line-events.html) |
+| Cisco-IOS-XE-loop-detect-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-loop-detect-events.html) |
+| Cisco-IOS-XE-matm-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-matm-events.html) |
+| Cisco-IOS-XE-mcast-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-mcast-events.html) |
+| Cisco-IOS-XE-nat-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-nat-events.html) |
+| Cisco-IOS-XE-ngfw-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-ngfw-events.html) |
+| Cisco-IOS-XE-ospf-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-ospf-events.html) |
+| Cisco-IOS-XE-perf-measure-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-perf-measure-events.html) |
+| Cisco-IOS-XE-platform-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-platform-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-platform-events-oper.html) |
+| Cisco-IOS-XE-platform-software-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-platform-software-events.html) |
+| Cisco-IOS-XE-port-bounce-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-port-bounce-events.html) |
+| Cisco-IOS-XE-qfp-resource-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-qfp-resource-events.html) |
+| Cisco-IOS-XE-red-app-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-red-app-events.html) |
+| Cisco-IOS-XE-sm-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-sm-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-sm-events-oper.html) |
+| Cisco-IOS-XE-spanning-tree-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-spanning-tree-events.html) |
+| Cisco-IOS-XE-stack-mgr-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-stack-mgr-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-stack-mgr-events-oper.html) |
+| Cisco-IOS-XE-tech-support-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-tech-support-events.html) |
+| Cisco-IOS-XE-trace-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-trace-events.html) |
+| Cisco-IOS-XE-udld-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-udld-events.html) |
+| Cisco-IOS-XE-utd-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-utd-events.html) |
+| Cisco-IOS-XE-verify-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-verify-events.html) |
+| Cisco-IOS-XE-wireless-events-oper | Operational | [Operational](swagger-oper-model/index.html#spec=Cisco-IOS-XE-wireless-events-oper) | [🌳](yang-trees/Cisco-IOS-XE-wireless-events-oper.html) |
+| Cisco-IOS-XE-xcopy-events | - | ❌ No spec | [🌳](yang-trees/Cisco-IOS-XE-xcopy-events.html) |
 | cisco-bridge-domain | RPC, Other | [RPC](swagger-rpc-model/index.html#spec=cisco-bridge-domain) [Other](swagger-other-model/index.html#spec=cisco-bridge-domain) | [🌳](yang-trees/cisco-bridge-domain.html) |
 | cisco-pw | Other | [Other](swagger-other-model/index.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Other | [RPC](swagger-rpc-model/index.html#spec=cisco-smart-license) [Other](swagger-other-model/index.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
@@ -1316,20 +1316,14 @@ This report provides **100% accountability** for every YANG module in the
 
 ---
 
-## Modules in Multiple Categories (10)
+## Modules in Multiple Categories (4)
 
 These modules appear in more than one swagger category:
 
 | Module | Categories |
 |--------|------------|
-| Cisco-IOS-XE-im-events-oper | Operational, Events |
-| Cisco-IOS-XE-ios-events-oper | Operational, Events |
-| Cisco-IOS-XE-platform-events-oper | Operational, Events |
-| Cisco-IOS-XE-sm-events-oper | Operational, Events |
-| Cisco-IOS-XE-stack-mgr-events-oper | Operational, Events |
 | Cisco-IOS-XE-wireless-access-point-cfg-rpc | Configuration, RPC |
-| Cisco-IOS-XE-wireless-events-oper | Operational, Events |
-| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Events, Other |
+| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Other |
 | cisco-bridge-domain | RPC, Other |
 | cisco-smart-license | RPC, Other |
 
@@ -1345,4 +1339,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-06-15T19:27:11.751958*
+*Report generated: 2026-06-18T11:41:24.868659*
