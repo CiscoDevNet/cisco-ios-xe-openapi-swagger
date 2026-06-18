@@ -90,6 +90,11 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("other-specs",         ["python", str(GENERATORS / "generate_other_openapi_v2.py"),
                              "--version", "$VER"]),
+    # 2b. Cross-model notification capability index (catalogs every YANG
+    # notification node across all models — MIB SNMP traps, native YANG-Push
+    # streams, IETF NETCONF streams — into releases/<ver>/notifications.json).
+    ("notifications-index", ["python", str(GENERATORS / "generate_notifications_index.py"),
+                             "--version", "$VER"]),
     # 3. Post-processing / enrichment
     # 3a. Make operationIds globally unique per spec (OpenAPI 3.0 requires it).
     # The generators historically derived ids from just the last path
