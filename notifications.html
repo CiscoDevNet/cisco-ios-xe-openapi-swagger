@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms;">
+    <title>Event &amp; Notification Capabilities — Cisco IOS-XE</title>
+    <meta name="description" content="Browse every YANG notification across all Cisco IOS-XE models — native YANG-Push event streams, SNMP MIB traps, and IETF NETCONF streams — in one capability catalog.">
+    <style>
+        :root {
+            --bg:#f5f5f5; --panel:#fff; --text:#222; --muted:#666; --border:#e0e0e0;
+            --accent:#D32F2F; --accent-dark:#B71C1C;
+            --yang-push:#2E7D32; --snmp-trap:#EF6C00; --netconf:#1565C0;
+        }
+        * { box-sizing: border-box; }
+        body { margin:0; font-family:'Roboto',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text); }
+        .header { background:linear-gradient(135deg,#D32F2F,#B71C1C); color:#fff; padding:24px 20px; }
+        .header h1 { margin:0 0 6px; font-size:1.6rem; }
+        .header p { margin:0; opacity:.92; font-size:.95rem; max-width:900px; }
+        .nav-bar { background:#1b1b1b; padding:8px 20px; display:flex; gap:14px; flex-wrap:wrap; }
+        .nav-bar a { color:#fff; text-decoration:none; padding:6px 12px; border-radius:4px; font-size:13px; }
+        .nav-bar a:hover { background:#333; }
+        .nav-bar a.active { background:#D32F2F; }
+        .container { max-width:1400px; margin:0 auto; padding:20px; }
+        .controls { background:var(--panel); padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.06); display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-bottom:16px; }
+        .controls label { font-size:.85rem; color:var(--muted); font-weight:500; }
+        .controls select, .controls input[type="search"] { padding:7px 10px; border:1px solid var(--border); border-radius:4px; font-size:.9rem; font-family:inherit; }
+        .controls input[type="search"] { min-width:260px; }
+        .controls button { background:var(--accent); color:#fff; border:0; padding:7px 14px; border-radius:4px; cursor:pointer; font-size:.85rem; font-weight:500; }
+        .controls button:hover { background:var(--accent-dark); }
+        .controls .chk { display:flex; align-items:center; gap:5px; font-size:.85rem; color:var(--muted); }
+        .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:20px; }
+        .summary-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+        .summary-card .num { font-size:1.7rem; font-weight:700; color:var(--accent); }
+        .summary-card .lbl { font-size:.8rem; color:var(--muted); margin-top:2px; }
+        #status { padding:14px 18px; color:var(--muted); font-style:italic; }
+        #status.error { color:#c62828; font-style:normal; }
+        .mod-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; margin-bottom:14px; overflow:hidden; }
+        .mod-head { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border); background:#fafafa; }
+        .mod-head .mod-name { font-family:'Consolas','Monaco',monospace; font-size:1rem; font-weight:600; color:var(--text); }
+        .mod-head .count { color:var(--muted); font-size:.82rem; }
+        .mod-head .links { margin-left:auto; display:flex; gap:8px; }
+        .mod-head .links a { font-size:.78rem; text-decoration:none; color:#fff; background:var(--accent); padding:4px 10px; border-radius:4px; }
+        .mod-head .links a.tree { background:#4CAF50; }
+        .badge { display:inline-block; padding:2px 9px; border-radius:11px; font-size:.72rem; font-weight:600; color:#fff; }
+        .badge.transport-yang-push { background:var(--yang-push); }
+        .badge.transport-snmp-trap { background:var(--snmp-trap); }
+        .badge.transport-netconf-stream { background:var(--netconf); }
+        .badge.cat { background:#607D8B; }
+        .badge.consume-yes { background:#2E7D32; }
+        .badge.consume-no { background:#9E9E9E; }
+        .notif-list { list-style:none; margin:0; padding:0; }
+        .notif-list > li { padding:10px 16px; border-bottom:1px solid #f2f2f2; }
+        .notif-list > li:last-child { border-bottom:none; }
+        .notif-name { font-family:'Consolas','Monaco',monospace; font-size:.9rem; color:var(--accent-dark); font-weight:600; }
+        .obj-list { margin:6px 0 0; padding-left:18px; color:var(--muted); font-size:.8rem; }
+        .obj-list li { margin:1px 0; }
+        .obj-list .objn { font-family:'Consolas','Monaco',monospace; color:var(--text); }
+        .obj-list .objt { color:#999; }
+        .obj-list .tgt { color:#1565C0; }
+        .empty { padding:40px; text-align:center; color:var(--muted); }
+        .legend { font-size:.8rem; color:var(--muted); margin:0 0 16px; line-height:1.6; }
+        .legend .badge { margin-right:4px; }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
+    <script src="version-label.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Event &amp; Notification Capabilities <span class="header-version">26.1.1</span></h1>
+        <p>Every YANG <code>notification</code> across all Cisco IOS-XE models — native YANG-Push event streams,
+           SNMP MIB traps, and IETF NETCONF streams. This catalogs the full notification capability surface;
+           note that SNMP traps are delivered over SNMP and are <strong>not</strong> consumable via RESTCONF.</p>
+    </div>
+    <nav class="nav-bar">
+        <a href="index.html">Home</a>
+        <a href="swagger-events-model/index.html">Event Streams</a>
+        <a href="notifications.html" class="active">Notification Catalog</a>
+        <a href="swagger-mib-model/index.html">MIB</a>
+        <a href="telemetry.html">Telemetry</a>
+        <a href="yang-accountability.html">Module Accountability</a>
+        <a href="yang-trees/">Tree Browser</a>
+    </nav>
+    <div class="container">
+        <div class="summary-grid" id="summaryGrid"></div>
+        <p class="legend">
+            <span class="badge transport-yang-push">yang-push</span> native RESTCONF/NETCONF/gRPC subscribable stream
+            &nbsp;·&nbsp;
+            <span class="badge transport-snmp-trap">snmp-trap</span> SNMP NOTIFICATION-TYPE (delivered over SNMP, not RESTCONF)
+            &nbsp;·&nbsp;
+            <span class="badge transport-netconf-stream">netconf-stream</span> IETF NETCONF event stream
+        </p>
+        <div class="controls">
+            <label for="releaseSel">Release</label>
+            <select id="releaseSel"></select>
+            <label for="filter">Filter</label>
+            <input type="search" id="filter" placeholder="Module or notification name (e.g. cef, bgp, peer)…">
+            <label for="transportSel">Transport</label>
+            <select id="transportSel">
+                <option value="">(all)</option>
+                <option value="yang-push">yang-push</option>
+                <option value="snmp-trap">snmp-trap</option>
+                <option value="netconf-stream">netconf-stream</option>
+            </select>
+            <label for="catSel">Category</label>
+            <select id="catSel"><option value="">(all)</option></select>
+            <label class="chk"><input type="checkbox" id="consumableOnly"> RESTCONF-consumable only</label>
+            <button id="exportBtn" type="button">Export CSV</button>
+        </div>
+        <div id="status">Loading…</div>
+        <div id="catalog"></div>
+    </div>
+    <script src="assets/js/sw-register.js" defer></script>
+    <script src="notifications.js" defer></script>
+</body>
+</html>

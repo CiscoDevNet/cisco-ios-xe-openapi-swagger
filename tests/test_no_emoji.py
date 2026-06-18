@@ -37,6 +37,7 @@ UI_FILES = [
     "telemetry.html",
     "about.html",
     "404.html",
+    "notifications.html",
     "index-app.js",
     "code-generator.js",
     "search.js",
@@ -44,6 +45,7 @@ UI_FILES = [
     "yang-accountability.js",
     "recent-favorites.js",
     "hub-search-ops.js",
+    "notifications.js",
 ]
 
 
