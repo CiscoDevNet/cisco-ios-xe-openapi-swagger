@@ -79,7 +79,7 @@
         writeHash(buildHash(next));
     }
 
-    function setSpecOp(name, op) {
+    function setSpecOp(name, op, skipAutoExpand) {
         if (!name) return;
         var cur = parseHash();
         var next = { spec: name, op: op || undefined };
@@ -90,7 +90,13 @@
         // new spec would never start the observer that scrolls/expands the
         // target op. Kick it explicitly so the op pops into view as soon as
         // Swagger UI finishes rendering it.
-        if (op) {
+        //
+        // skipAutoExpand is set when the hash update originates from the user
+        // physically clicking an .opblock-summary: Swagger UI's own handler
+        // will toggle that operation, so kicking tryExpandOp here too would
+        // fire a SECOND, competing toggle on the same click (expand, then the
+        // native handler collapses it) — the "needs a second click" bug.
+        if (op && !skipAutoExpand) {
             try { attachAutoExpand(); } catch (_) { /* DOM not ready */ }
         }
     }
@@ -224,7 +230,11 @@
             var cur = parseHash();
             if (!cur.spec) return;
             // setSpecOp uses replaceState — does not trigger another reload.
-            setSpecOp(cur.spec, opId);
+            // Pass skipAutoExpand=true: this is a physical click on the
+            // opblock, so Swagger UI will toggle it natively; kicking our own
+            // tryExpandOp here would double-toggle and leave it collapsed
+            // (the "needs a second click to expand" defect).
+            setSpecOp(cur.spec, opId, true);
         }, true); // capture phase so we run before Swagger UI's own handlers
     }
 
