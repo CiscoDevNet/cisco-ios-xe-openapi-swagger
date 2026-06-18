@@ -12,7 +12,6 @@ MODEL_DIRS = {
     'swagger-ietf-model': ('ietf', 'IETF Standards', '📜'),
     'swagger-mib-model': ('mib', 'MIB Translations', '📡'),
     'swagger-rpc-model': ('rpc', 'RPC Operations', '⚡'),
-    'swagger-events-model': ('events', 'Event Notifications', '🔔'),
     'swagger-other-model': ('other', 'Other Models', '📦'),
 }
 

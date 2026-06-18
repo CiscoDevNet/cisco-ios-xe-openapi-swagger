@@ -86,13 +86,14 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("rpc-specs",           ["python", str(GENERATORS / "generate_rpc_openapi_v2.py"),
                              "--version", "$VER"]),
-    ("events-specs",        ["python", str(GENERATORS / "generate_events_from_tree.py"),
-                             "--version", "$VER"]),
     ("other-specs",         ["python", str(GENERATORS / "generate_other_openapi_v2.py"),
                              "--version", "$VER"]),
     # 2b. Cross-model notification capability index (catalogs every YANG
     # notification node across all models — MIB SNMP traps, native YANG-Push
     # streams, IETF NETCONF streams — into releases/<ver>/notifications.json).
+    # NOTE: the former 'events-specs' step (swagger-events-model) was retired:
+    # its RESTCONF GET endpoints were not callable on a device. The native
+    # event-notification capabilities live in this index / the catalog instead.
     ("notifications-index", ["python", str(GENERATORS / "generate_notifications_index.py"),
                              "--version", "$VER"]),
     # 3. Post-processing / enrichment
