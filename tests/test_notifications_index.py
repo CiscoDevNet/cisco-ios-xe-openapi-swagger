@@ -79,6 +79,40 @@ def test_cef_mib_traps_present(index):
     } <= names
 
 
+def test_every_notification_has_realistic_example(index):
+    # Each notification must carry an RFC 7951 namespace-qualified example
+    # payload so the catalog/viewer can show realistic data (not a fake GET).
+    for m in index["modules"]:
+        for n in m["notifications"]:
+            ex = n.get("example")
+            assert isinstance(ex, dict) and ex, (m["module"], n["name"])
+            key = m["module"] + ":" + n["name"]
+            assert key in ex, key
+            # The wrapped body keys must match the carried object names.
+            body = ex[key]
+            assert isinstance(body, dict)
+            obj_names = {o["name"] for o in n.get("objects", [])}
+            assert set(body.keys()) == obj_names, (m["module"], n["name"])
+            # No leaf should be the bare literal "example" placeholder when it
+            # has a descriptive name handled by the heuristics — spot-check the
+            # CEF inconsistency timestamp specifically.
+    cef = next(m for m in index["modules"] if m["module"] == "CISCO-CEF-MIB")
+    inc = next(n for n in cef["notifications"]
+               if n["name"] == "cefInconsistencyDetection")
+    val = inc["example"]["CISCO-CEF-MIB:cefInconsistencyDetection"][
+        "entLastInconsistencyDetectTime"]
+    assert "T" in str(val) and "Z" in str(val), val
+
+
+def test_consumption_note_present(index):
+    for m in index["modules"]:
+        assert m.get("consumption"), m["module"]
+        # The note must be honest about RESTCONF for non-consumable transports.
+        if not m["restconf_consumable"]:
+            assert "RESTCONF" in m["consumption"]
+
+
+
 def test_transport_classification(index):
     for m in index["modules"]:
         assert m["transport"] in ("snmp-trap", "yang-push", "netconf-stream")
