@@ -498,7 +498,7 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | `releases/<ver>/telemetry-index.json`, `telemetry-skipped.json` | inferred from filenames; presumed telemetry pipeline | telemetry.js / build inputs |
 | `releases/<ver>/mib-metadata.json`, `mib-platform-matrix.json` | inferred | MIB viewer side cards |
 | `releases/<ver>/path_depth_audit.json`, `tree_audit.json` | inferred QA artifacts | not directly bound to UI |
-| `tools/IOS-XE-RESTCONF-v*.postman_collection.json` (and v2 parts) | manual / generators | hub downloads, exports |
+| `releases/<ver>/exports/postman/*.json`, `exports/bruno/**` | scripts/build_release.py | hub download card → exports.html (per-release, split <50 MB) |
 
 External: Microsoft Clarity telemetry to `*.clarity.ms` (always-on in this
 deployment). Every core third-party UI library is still vendored under

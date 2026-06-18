@@ -284,7 +284,7 @@ a11y are informational.
 | P-3 | `a11y.yml` workflow | Informational | Record violations in report |
 | P-4 | `htmlcheck.yml` workflow | Informational | Record validation errors in report |
 | P-5 | Total deploy artifact size growth | Informational | Workflow prints `du -sh deploy`; flag if > +10 MB in one commit |
-| P-6 | Large-file warning (>50 MB) | Informational | Known: `tools/IOS-XE-RESTCONF-v2-deep-part1.postman_collection.json` (91 MB), `tools/IOS-XE-RESTCONF-v1.postman_collection.json` (65 MB) — do not add more |
+| P-6 | Large-file warning (>50 MB) | Informational | Legacy monolithic root collections retired 2026-06-18 (replaced by per-release split exports under `releases/<ver>/exports/`, served via exports.html). Do not re-add >50 MB tracked files. |
 
 ---
 
