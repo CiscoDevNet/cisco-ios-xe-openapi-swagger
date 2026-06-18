@@ -92,9 +92,6 @@ mindmap
         Module x platform matrix
         Family color coding
         CSV export
-      native-augment-accountability.html
-        163 native augments
-        Tree vs Swagger pivot
     Distribution
       exports.html
         Per-release Postman shards
@@ -283,16 +280,7 @@ not repeated below.
   schemas, leafs, lists, choices) sourced from
   `releases/<ver>/native-capabilities.json`. Release picker + filter + counts.
 
-### 3.15 [swagger-native-config-model/native-augment-accountability.html](swagger-native-config-model/native-augment-accountability.html)
-- **Inferred-stale**: header says "IOS XE 17.18.1 | Phase 2 Complete", numbers are
-  static (163 augments, 146 with trees, 151 with Swagger). Not wired to the release
-  selector. Marked **Needs verification** for whether it is still linked from the UI.
-
-### 3.16 `swagger-*-model/index-v2.html` (×9)
-- Tiny redirect stubs (`<title>Redirecting</title>`). Forward to the current
-  `index.html`. Safe to ignore; keep as URL stability shims.
-
-### 3.17 Per-release tree pages
+### 3.15 Per-release tree pages
 - `releases/<ver>/yang-trees/index.html` — release-scoped tree browser with a
   filter box and a card per YANG module that links to `<module>.html`.
 - `releases/<ver>/yang-trees/<module>.html` — pre-rendered pyang tree per module
@@ -368,8 +356,6 @@ Grouped by capability, not by page.
   module matrix, filters, CSV, pagination).
 - **Cross-version**: [yang-accountability-compare.html](yang-accountability-compare.html)
   (presence matrix, API growth, deltas).
-- **Native-augment-specific** (legacy/static):
-  [swagger-native-config-model/native-augment-accountability.html](swagger-native-config-model/native-augment-accountability.html).
 - **Data producers** (inferred from comments): `scripts/build_accountability_compare.py`,
   `scripts/build_version_stats.py`.
 
@@ -548,12 +534,10 @@ Items flagged **Needs verification** or that fell outside this static read:
    all synced to the 26.1.1 default (988 specs / 82,856 paths / 246,677 ops /
    1,469 tracked modules) via `data-stat-*` hydration. Static markup remains only
    as no-JS fallbacks.
-2. **native-augment-accountability.html** — **REVIEWED, KEPT (2026-06-16).**
-   Labelled "Phase 2 Complete / IOS XE 17.18.1"; has no live inbound links
-   (reachable only by direct URL). Left in place rather than moved/deleted to
-   avoid breaking external bookmarks; the canonical, version-aware reports are
-   [yang-accountability.html](yang-accountability.html) and
-   [yang-accountability-compare.html](yang-accountability-compare.html).
+2. **native-augment-accountability.html** — **REMOVED (2026-06-18).** Deleted as
+   a stale static page (pinned to 17.18.1, no live inbound links). The canonical,
+   version-aware reports are [yang-accountability.html](yang-accountability.html)
+   and [yang-accountability-compare.html](yang-accountability-compare.html).
 3. **per-spec `paths-search.js`** — referenced from every Swagger viewer but not
    read here; assume per-category enhancer mirroring `hub-search-ops.js`.
 4. **archive/** vs live pages — [archive/debug.html](archive/debug.html),
@@ -561,11 +545,11 @@ Items flagged **Needs verification** or that fell outside this static read:
    [archive/test-swagger.html](archive/test-swagger.html) exist; sitemap and nav
    exclude them, service-worker bypasses `archive/`. Confirm none are still
    reachable.
-5. **`index-v2.html` redirect stubs** — **KEPT (2026-06-16).** The 9
-   `swagger-*-model/index-v2.html` files are intentional zero-delay redirect
-   stubs (preserving `#hash`/`?query`) that catch old external bookmarks to the
-   legacy `-v2` filenames. Not in the sitemap, nav, or service-worker precache,
-   so they add no user-facing noise; retained as inbound-link safety nets.
+5. **`index-v2.html` redirect stubs** — **REMOVED (2026-06-18).** The 8 remaining
+   `swagger-*-model/index-v2.html` redirect stubs were deleted (the events one
+   went with swagger-events-model). They were never in the sitemap, nav, or
+   service-worker precache; per the backwards-breaking-changes policy, old
+   `-v2` bookmarks now resolve via the 404 page to the hub.
 6. **Auth model** — Not applicable (static site), but the
    [code-generator.html](code-generator.html) form ships a default password
    (`cisco123`) and the hub modal embeds the same. Confirm acceptable for a
@@ -602,12 +586,11 @@ Where the audit found duplication, drift, or unfinished surface area.
    project-summary / category-table sections is now bound to `version-stats.json`
    via `data-stat-*` hooks (about-stats.js / index-app.js). The
    "April 25, 2026" / "608 specs" drift is resolved.
-2. **Retire `index-v2.html` stubs** — **KEPT (2026-06-16).** Documented above as
-   intentional inbound-link redirect safety nets; not deleted.
-3. **Consider moving `native-augment-accountability.html` into `archive/`** —
-   **REVIEWED, KEPT (2026-06-16).** No live inbound links (direct-URL only) and
-   pins to 17.18.1. Left in place to avoid breaking external bookmarks; the
-   canonical, version-aware reports are [yang-accountability.html](yang-accountability.html)
+2. **Retire `index-v2.html` stubs** — **DONE (2026-06-18).** All 8 remaining
+   redirect stubs deleted.
+3. **Remove `native-augment-accountability.html`** — **DONE (2026-06-18).**
+   Deleted (stale, pinned to 17.18.1, no live inbound links). The canonical,
+   version-aware reports are [yang-accountability.html](yang-accountability.html)
    and [yang-accountability-compare.html](yang-accountability-compare.html).
 4. **Centralize the version-detect helper.** Five files re-implement
    `_activeVersion()` (`search.js`, `yang-accountability.js`, `code-generator.js`,
