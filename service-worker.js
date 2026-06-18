@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v54-2026.06.18g';
+const CACHE_VERSION = 'v55-2026.06.18h';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
@@ -34,7 +34,6 @@ const PRECACHE_URLS = [
   'code-generator.html',
   'exports.html',
   'app-map.html',
-  'notifications.html',
   'notifications.js',
   'assets/css/site.css',
   'assets/js/site-chrome.js',
