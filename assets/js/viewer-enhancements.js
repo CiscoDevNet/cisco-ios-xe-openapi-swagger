@@ -158,6 +158,7 @@
         injectSidebarToggle();
         attachSlashFocus();
         attachOperationTracking();
+        attachTreeViewTracking();
     }
 
     // ---------- (4b) analytics: which operation, for which module -------
@@ -204,6 +205,65 @@
                             spec: spec,
                             op_path: opPath
                         });
+                    }
+                } catch (_) { /* noop */ }
+            }, true);
+        } catch (_) { /* noop */ }
+    }
+
+    // ---------- (4c) analytics: which module's YANG tree view is opened --
+    // The "View YANG Tree" button opens the standalone pyang tree page for the
+    // current module in a new tab. Those generated tree pages (under releases/)
+    // carry no shared script, so we record the intent here at click time — the
+    // dashboard can then answer "is anyone looking at the <module> tree view"
+    // (e.g. an RPC module's tree). One delegated listener; fail-silent.
+    function attachTreeViewTracking() {
+        try {
+            document.addEventListener('click', function (ev) {
+                try {
+                    var t = ev.target;
+                    if (!t || typeof t.closest !== 'function') return;
+                    var link = t.closest('#treeLink, a[data-tree-view]');
+                    if (!link) return;
+
+                    // Module: prefer the hash spec; fall back to the tree file
+                    // name in the link href (<treeBase>/<module>.html).
+                    var spec = '';
+                    try {
+                        var sm = (location.hash || '').match(/[#&]spec=([^&]+)/);
+                        if (sm) spec = decodeURIComponent(sm[1]);
+                    } catch (_) { /* noop */ }
+                    if (!spec) {
+                        try {
+                            var href = link.getAttribute('href') || '';
+                            var file = href.split('/').pop() || '';
+                            spec = file.replace(/\.html?$/i, '');
+                        } catch (_) { /* noop */ }
+                    }
+
+                    // Model category from the swagger-<cat>-model directory.
+                    var cat = '';
+                    try {
+                        var segs = (location.pathname || '').split('/').filter(Boolean);
+                        var dir = segs.length > 1 ? segs[segs.length - 2] : '';
+                        var dm = dir.match(/^swagger-(.+)-model$/);
+                        if (dm) cat = dm[1];
+                    } catch (_) { /* noop */ }
+
+                    // Release from ?ver / #ver / hub global / localStorage.
+                    var ver = '';
+                    try {
+                        ver = new URLSearchParams(location.search).get('ver') || '';
+                        if (!ver) {
+                            var hm = (location.hash || '').match(/[#&]ver=([^&]+)/);
+                            if (hm) ver = decodeURIComponent(hm[1]);
+                        }
+                        if (!ver && window.__IOSXE_ACTIVE_VERSION__) ver = window.__IOSXE_ACTIVE_VERSION__;
+                        if (!ver) { ver = localStorage.getItem('iosxe-active-version') || ''; }
+                    } catch (_) { /* noop */ }
+
+                    if (typeof window.__iosxeTrack === 'function') {
+                        window.__iosxeTrack('tree_viewed', { spec: spec, model_category: cat, release: ver });
                     }
                 } catch (_) { /* noop */ }
             }, true);
