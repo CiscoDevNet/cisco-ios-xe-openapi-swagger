@@ -57,7 +57,9 @@
     cat: null,
     manifest: null,
     spec: null,
-    specName: null
+    specName: null,
+    xport: 'grpc',  // selected subscription transport: grpc | netconf | gnmi
+    lastXpath: null // last xpath sent to the config box (for transport switching)
   };
 
   // --- DOM helpers -----------------------------------------------------------
@@ -163,6 +165,13 @@
     if (copySnmp) copySnmp.addEventListener('click', function () {
       copyText($('b-snmp-cli').textContent, copySnmp);
     });
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.xport-tabs [data-xport]'),
+      function (btn) {
+        btn.addEventListener('click', function () {
+          selectXport(btn.getAttribute('data-xport'));
+        });
+      });
     var csvBtn = $('b-csv');
     if (csvBtn) csvBtn.addEventListener('click', function () { exportRowsCsv(csvBtn); });
 
@@ -328,6 +337,7 @@
     var el = $('b-info');
     var mib = isMibCat();
     renderSnmpPrereq(mib && !!name);
+    renderStats();
     if (!name) { el.hidden = true; el.innerHTML = ''; return; }
     var prefix = mib ? null : (state.prefixes[name] || null);
     var paths = (state.spec && state.spec.paths) ? Object.keys(state.spec.paths) : [];
@@ -373,6 +383,43 @@
     }
 
     el.innerHTML = html;
+    el.hidden = false;
+  }
+
+  // Top-of-page metric cards, mirroring the Event Notifications tab. Counts
+  // are category-level (Modules) plus the selected module's operation and
+  // subscribable-xpath totals. The fixed "3 transports" card ties to the
+  // gRPC / NETCONF / gNMI selector on the config box below.
+  function renderStats() {
+    var el = $('b-stats');
+    if (!el) return;
+    var modules = (state.manifest && state.manifest.modules) || [];
+    var ops = '\u2014', sub = '\u2014';
+    if (state.spec && state.spec.paths) {
+      var mib = isMibCat();
+      var t = 0, d = 0;
+      Object.keys(state.spec.paths).forEach(function (apiPath) {
+        var methods = state.spec.paths[apiPath] || {};
+        Object.keys(methods).forEach(function (m) {
+          if (['get','post','put','patch','delete'].indexOf(m) === -1) return;
+          var xp = deriveXpath(apiPath, state.prefixes, mib);
+          if (mib && !xp) return;  // bare-entry duplicates are not real targets
+          t++;
+          if (xp) d++;
+        });
+      });
+      ops = t; sub = d;
+    }
+    var cards = [
+      { num: modules.length || 0, lbl: 'Modules in category' },
+      { num: ops, lbl: 'OpenAPI operations' },
+      { num: sub, lbl: 'Subscribable xpaths' },
+      { num: 3, lbl: 'Transports (NETCONF \u00b7 gRPC \u00b7 gNMI)' }
+    ];
+    el.innerHTML = cards.map(function (c) {
+      return '<div class="stat"><div class="num">' + c.num +
+        '</div><div class="lbl">' + escapeHtml(c.lbl) + '</div></div>';
+    }).join('');
     el.hidden = false;
   }
 
@@ -481,7 +528,8 @@
       function (btn) {
         btn.addEventListener('click', function () {
           var xp = btn.getAttribute('data-use');
-          $('b-snippet').textContent = buildSubscriptionSnippet(xp);
+          state.lastXpath = xp;
+          $('b-snippet').textContent = buildSubscriptionSnippet(xp, state.xport);
           btn.classList.add('ok');
           btn.textContent = 'Added \u2713';
           setTimeout(function () {
@@ -548,7 +596,59 @@
     setTimeout(function () { btn.textContent = origLabel; }, 2500);
   }
 
-  function buildSubscriptionSnippet(xpath) {
+  // The three subscription "proofs" share one derived xpath. gRPC dial-out is
+  // the configured (model-driven telemetry) form; NETCONF is a dynamic
+  // RFC 8641 yang-push <establish-subscription> RPC; gNMI is a gnmic sample
+  // subscribe. Switching the selector rebuilds the box for the last xpath.
+  function selectXport(x) {
+    if (['grpc', 'netconf', 'gnmi'].indexOf(x) === -1) x = 'grpc';
+    state.xport = x;
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.xport-tabs [data-xport]'),
+      function (b) {
+        var on = b.getAttribute('data-xport') === x;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    var titles = {
+      grpc: 'gRPC dial-out subscription config',
+      netconf: 'NETCONF dynamic subscription RPC',
+      gnmi: 'gNMI subscribe command'
+    };
+    var titleEl = $('b-snippet-title');
+    if (titleEl) titleEl.textContent = titles[x];
+    if (state.lastXpath) {
+      $('b-snippet').textContent = buildSubscriptionSnippet(state.lastXpath, x);
+    }
+    track('telemetry_xport_' + x);
+  }
+
+  function buildSubscriptionSnippet(xpath, xport) {
+    if (xport === 'netconf') {
+      // RFC 8641 yang-push dynamic subscription, sent over the NETCONF
+      // session (TCP 830). period is in centiseconds (3000 = 30s).
+      return [
+        '<rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">',
+        '  <establish-subscription',
+        '      xmlns="urn:ietf:params:xml:ns:yang:ietf-event-notifications"',
+        '      xmlns:yp="urn:ietf:params:xml:ns:yang:ietf-yang-push">',
+        '    <stream>yp:yang-push</stream>',
+        '    <yp:xpath-filter>' + xpath + '</yp:xpath-filter>',
+        '    <yp:period>3000</yp:period>',
+        '  </establish-subscription>',
+        '</rpc>'
+      ].join('\n');
+    }
+    if (xport === 'gnmi') {
+      // gNMI streaming subscription (sample mode) via gnmic. gNMI listens on
+      // TCP 57400 by default on IOS-XE.
+      return [
+        'gnmic -a <DEVICE-IP>:57400 -u <user> -p <pass> --insecure \\',
+        '  subscribe --mode stream --stream-mode sample --sample-interval 30s \\',
+        '  --path "' + xpath + '"'
+      ].join('\n');
+    }
+    // Default: gRPC dial-out (configured model-driven telemetry).
     return [
       'telemetry ietf subscription 101',
       ' encoding encode-kvgpb',

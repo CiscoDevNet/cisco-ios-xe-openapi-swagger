@@ -86,8 +86,15 @@
              border-radius:6px; padding:12px; font-family:"SF Mono",Consolas,monospace;
              font-size:.8rem; white-space:pre; overflow-x:auto; margin:8px 0 0; }
   .snippet-head { display:flex; justify-content:space-between; align-items:center;
-                  margin:0 0 4px; }
+                  flex-wrap:wrap; gap:8px; margin:0 0 4px; }
   .snippet-head h3 { margin:0; font-size:.95rem; }
+  /* Segmented selector for the three subscription transports (gRPC / NETCONF / gNMI). */
+  .xport-tabs { display:flex; gap:2px; }
+  .xport-tabs button { background:transparent; border:1px solid var(--border);
+                       border-radius:5px; padding:3px 10px; font-size:.74rem; font-weight:600;
+                       cursor:pointer; color:var(--muted); }
+  .xport-tabs button:hover { background:var(--code-bg); }
+  .xport-tabs button.active { background:var(--accent); color:#fff; border-color:var(--accent); }
   /* Subscription config sits above the (long) path table and sticks to the
      top of the viewport so the result of "Use in config" is always visible. */
   .snippet-box { position:sticky; top:0; z-index:5; background:var(--bg);
@@ -229,14 +236,17 @@
   <div class="pane active" data-pane="telemetry">
   <div class="info-card" style="margin-bottom:14px;">
     Pick a release, category, and module to list every subscribable path and the
-    <strong>gRPC dial-out filter xpath</strong> it maps to. Click an xpath to copy it,
-    or <strong>Use in config</strong> to build a ready-to-paste subscription at the top of the page.
+    <strong>MDT filter xpath</strong> it maps to. Click an xpath to copy it, or
+    <strong>Use in config</strong> to build a ready-to-paste subscription &mdash; as
+    <strong>gRPC dial-out</strong>, a <strong>NETCONF</strong> dynamic subscription, or a
+    <strong>gNMI</strong> subscribe &mdash; at the top of the page.
     <div class="formula" style="margin-top:8px;">
       <span style="color:var(--muted);">/data/Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization</span>
       <span style="margin:0 8px;">&rarr;</span>
       <strong>/process-cpu-ios-xe-oper:cpu-usage/cpu-utilization</strong>
     </div>
   </div>
+  <div class="stats" id="b-stats" hidden></div>
   <div class="picker">
     <label>Release:
       <select id="release"></select>
@@ -270,10 +280,15 @@
   </div>
   <div class="snippet-box">
     <div class="snippet-head">
-      <h3>gRPC dial-out subscription config</h3>
-      <button id="b-copy-snippet" class="copy-btn" type="button">Copy config</button>
+      <h3 id="b-snippet-title">gRPC dial-out subscription config</h3>
+      <div class="xport-tabs" role="tablist" aria-label="Subscription transport">
+        <button type="button" data-xport="grpc" class="active" role="tab" aria-selected="true">gRPC dial-out</button>
+        <button type="button" data-xport="netconf" role="tab" aria-selected="false">NETCONF</button>
+        <button type="button" data-xport="gnmi" role="tab" aria-selected="false">gNMI</button>
+      </div>
+      <button id="b-copy-snippet" class="copy-btn" type="button">Copy</button>
     </div>
-    <div id="b-snippet" class="snippet">Pick a module below, then click <strong>Use in config</strong> on any row to build a ready-to-paste subscription here.</div>
+    <div id="b-snippet" class="snippet">Pick a module below, then click <strong>Use in config</strong> on any row to build a ready-to-paste subscription here &mdash; switch between gRPC dial-out, NETCONF, and gNMI above.</div>
   </div>
   <div class="table-wrap">
     <table id="b-tbl">
