@@ -277,6 +277,19 @@
       });
   }
 
+  // Display label for a module option. Native-config specs are split into
+  // generator chunks named native-<container> (with native-NN-* foundational
+  // bundles), which reads as "by category". Strip the native- and numeric
+  // ordering prefixes so the dropdown lists clean container names (router-bgp,
+  // aaa, interface…) alphabetically, like the Swagger API. The option *value*
+  // stays the real module name so the right spec still loads.
+  function moduleLabel(name) {
+    if (state.cat === 'native-config') {
+      return name.replace(/^native-/, '').replace(/^\d+-/, '');
+    }
+    return name;
+  }
+
   // Populate the module dropdown, optionally narrowed by a filter string.
   // Large categories (native-config has 400+ modules) are unusable as a flat
   // dropdown, so the filter input live-narrows the options.
@@ -284,7 +297,10 @@
     var msel = $('b-mod');
     if (!msel) return;
     clearChildren(msel);
-    var mods = state.modules || [];
+    var mods = (state.modules || []).slice().sort(function (a, b) {
+      var la = moduleLabel(a).toLowerCase(), lb = moduleLabel(b).toLowerCase();
+      return la < lb ? -1 : (la > lb ? 1 : 0);
+    });
     if (!mods.length) {
       var none = document.createElement('option');
       none.value = '';
@@ -295,7 +311,10 @@
     }
     var q = (filter || '').trim().toLowerCase();
     var shown = q
-      ? mods.filter(function (m) { return m.toLowerCase().indexOf(q) !== -1; })
+      ? mods.filter(function (m) {
+          return m.toLowerCase().indexOf(q) !== -1 ||
+                 moduleLabel(m).toLowerCase().indexOf(q) !== -1;
+        })
       : mods;
     var placeholder = document.createElement('option');
     placeholder.value = '';
@@ -306,7 +325,7 @@
     shown.forEach(function (name) {
       var o = document.createElement('option');
       o.value = name;
-      o.textContent = name;
+      o.textContent = moduleLabel(name);
       msel.appendChild(o);
     });
   }
