@@ -642,7 +642,7 @@
       });
     var titles = {
       grpc: 'gRPC dial-out subscription config',
-      netconf: 'NETCONF dynamic subscription RPC',
+      netconf: 'NETCONF dynamic subscription (ncc + raw RPC)',
       gnmi: 'gNMI subscribe command'
     };
     var titleEl = $('b-snippet-title');
@@ -655,9 +655,18 @@
 
   function buildSubscriptionSnippet(xpath, xport) {
     if (xport === 'netconf') {
-      // RFC 8641 yang-push dynamic subscription, sent over the NETCONF
+      // RFC 8641 yang-push dynamic subscription. Two equivalent forms: a
+      // quick one-liner using the ncc validation tool (so the subscription
+      // can be confirmed end-to-end), and the raw RPC sent over the NETCONF
       // session (TCP 830). period is in centiseconds (3000 = 30s).
       return [
+        '# Quick validation with the ncc tool (github.com/CiscoDevNet/ncc):',
+        './ncc-establish-subscription.py --host <DEVICE-IP> --port 830 \\',
+        '    -u <user> -p <pass> \\',
+        '    --xpath ' + xpath + ' \\',
+        '    --period 3000',
+        '',
+        '# --- equivalent raw RFC 8641 yang-push RPC over the NETCONF session: ---',
         '<rpc message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">',
         '  <establish-subscription',
         '      xmlns="urn:ietf:params:xml:ns:yang:ietf-event-notifications"',
