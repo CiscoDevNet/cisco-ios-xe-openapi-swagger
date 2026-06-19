@@ -17,6 +17,8 @@
     var filterEl = document.getElementById('filter');
     var transportSel = document.getElementById('transportSel');
     var catSel = document.getElementById('catSel');
+    var modSel = document.getElementById('modSel');
+    var modFilter = document.getElementById('modFilter');
     var consumableOnly = document.getElementById('consumableOnly');
     var exportBtn = document.getElementById('exportBtn');
 
@@ -64,6 +66,7 @@
                 current = doc;
                 try { localStorage.setItem('iosxe-active-version', ver); } catch (_) {}
                 populateCategoryFilter(doc);
+                populateModuleSelect('');
                 renderSummary(doc);
                 render();
                 setStatus('');
@@ -87,6 +90,34 @@
             catSel.appendChild(opt);
         });
         if (prev) catSel.value = prev;
+    }
+
+    // Module picker, mirroring the Telemetry XPaths tab: type in modFilter to
+    // live-narrow the dropdown, or choose a module to focus the catalog on it.
+    function populateModuleSelect(filter) {
+        if (!modSel) return;
+        var prev = modSel.value;
+        var names = {};
+        ((current && current.modules) || []).forEach(function (m) { names[m.module] = 1; });
+        var all = Object.keys(names).sort();
+        var q = (filter || '').trim().toLowerCase();
+        var shown = q
+            ? all.filter(function (n) { return n.toLowerCase().indexOf(q) !== -1; })
+            : all;
+        modSel.innerHTML = '';
+        var ph = document.createElement('option');
+        ph.value = '';
+        ph.textContent = q
+            ? '(' + shown.length + ' of ' + all.length + ' modules)'
+            : '(all modules)';
+        modSel.appendChild(ph);
+        shown.forEach(function (n) {
+            var o = document.createElement('option');
+            o.value = n; o.textContent = n;
+            modSel.appendChild(o);
+        });
+        // Preserve the focused module when it still matches the filter.
+        if (prev && shown.indexOf(prev) !== -1) modSel.value = prev;
     }
 
     function renderSummary(doc) {
@@ -122,8 +153,10 @@
         var q = (filterEl.value || '').trim().toLowerCase();
         var transport = transportSel.value || '';
         var cat = catSel.value || '';
+        var selMod = (modSel && modSel.value) || '';
         var consume = !!consumableOnly.checked;
         return current.modules.filter(function (m) {
+            if (selMod && m.module !== selMod) return false;
             return moduleMatches(m, q, transport, cat, consume);
         });
     }
@@ -283,6 +316,8 @@
                 filterEl.addEventListener('input', render);
                 transportSel.addEventListener('change', render);
                 catSel.addEventListener('change', render);
+                if (modFilter) modFilter.addEventListener('input', function () { populateModuleSelect(modFilter.value); });
+                if (modSel) modSel.addEventListener('change', render);
                 consumableOnly.addEventListener('change', render);
                 exportBtn.addEventListener('click', exportCsv);
                 loadRelease(want);
