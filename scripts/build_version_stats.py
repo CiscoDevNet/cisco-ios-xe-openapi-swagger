@@ -15,6 +15,7 @@ Output schema:
       "totals": {
         "<ver>": {
           "specs": int, "paths": int, "operations": int,
+          "telemetry_xpaths": int,   # unique derivable MDT filter xpaths
           "modules_total": int, "modules_with_specs": int,
           "modules_with_trees": int
         }, ...
@@ -33,6 +34,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,6 +48,13 @@ from _release_paths import (  # type: ignore  # noqa: E402
 )
 
 OP_METHODS = ("get", "post", "put", "patch", "delete")
+
+# Telemetry filter xpaths derive from every category except RPC (RPCs are
+# actions, not subscribable). Mirrors the deriveXpath rule in telemetry.js.
+TELEMETRY_CATEGORIES = tuple(c for c in MODEL_CATEGORIES if c != "swagger-rpc-model")
+_KEY_TAIL = re.compile(r"=[^/]*$")
+_KEY_MID = re.compile(r"=[^/]*(?=/|$)")
+_ENTRY_SUFFIX = re.compile(r"Entry$")
 
 
 def _scan_category(spec_dir: Path) -> dict:
@@ -70,6 +79,74 @@ def _scan_category(spec_dir: Path) -> dict:
                 if m in ops_obj:
                     ops += 1
     return {"specs": specs, "paths": paths, "operations": ops}
+
+
+def _derive_xpath(op_path: str, prefixes: dict, is_mib: bool):
+    """Port of telemetry.js deriveXpath: turn an OpenAPI path into its MDT
+    filter xpath, or None when it can't be normalised."""
+    if not op_path:
+        return None
+    p = op_path
+    if p.startswith("/data/"):
+        p = p[len("/data/"):]
+    elif p.startswith("/restconf/data/"):
+        p = p[len("/restconf/data/"):]
+    elif p.startswith("/"):
+        p = p[1:]
+    fs = p.find("/")
+    first = p if fs == -1 else p[:fs]
+    rest = "" if fs == -1 else p[fs:]
+    colon = first.find(":")
+    if colon == -1:
+        return None
+    module_name = first[:colon]
+    head = _KEY_TAIL.sub("", first[colon + 1:])
+    tail = _KEY_MID.sub("", rest)
+    if is_mib:
+        if _ENTRY_SUFFIX.search(head):
+            return None
+        return "/" + module_name + ":" + module_name + "/" + head + tail
+    prefix = prefixes.get(module_name)
+    if not prefix:
+        return None
+    return "/" + prefix + ":" + head + tail
+
+
+def _prefix_map(rp: ReleasePaths) -> dict:
+    candidates = [rp.release_root / "yang-prefix-map.json"]
+    if rp.legacy:
+        candidates.append(PROJECT_ROOT / "yang-prefix-map.json")
+    for c in candidates:
+        if c.is_file():
+            try:
+                return (json.loads(c.read_text(encoding="utf-8")) or {}).get("modules", {})
+            except Exception:
+                return {}
+    return {}
+
+
+def _telemetry_xpaths(rp: ReleasePaths) -> int:
+    """Count the unique derived MDT filter xpaths across all telemetry
+    categories (everything except RPC) — the true subscribable surface."""
+    prefixes = _prefix_map(rp)
+    uniq: set[str] = set()
+    for cat in TELEMETRY_CATEGORIES:
+        spec_dir = rp.spec_dir(cat)
+        if not spec_dir.is_dir():
+            continue
+        is_mib = (cat == "swagger-mib-model")
+        for f in sorted(spec_dir.glob("*.json")):
+            if f.name == "manifest.json":
+                continue
+            try:
+                data = json.loads(f.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            for ap in (data.get("paths") or {}):
+                xp = _derive_xpath(ap, prefixes, is_mib)
+                if xp:
+                    uniq.add(xp)
+    return len(uniq)
 
 
 def _module_counts(version: str) -> dict:
@@ -141,6 +218,7 @@ def main() -> int:
             "specs": sum_specs,
             "paths": sum_paths,
             "operations": sum_ops,
+            "telemetry_xpaths": _telemetry_xpaths(rp),
             **_module_counts(v),
             "label": r.get("label") or v,
             "date": r.get("date") or "",
@@ -159,12 +237,12 @@ def main() -> int:
     target = PROJECT_ROOT / "version-stats.json"
     target.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
     print(f"[version-stats] wrote {target.relative_to(PROJECT_ROOT)}")
-    print(f"{'version':<12} {'specs':>6} {'paths':>8} {'ops':>8}  modules: total/specs/trees")
+    print(f"{'version':<12} {'specs':>6} {'paths':>8} {'ops':>8} {'xpaths':>8}  modules: total/specs/trees")
     print("-" * 78)
     for v in versions:
         t = totals[v]
         mc = f"{t['modules_total']}/{t['modules_with_specs']}/{t['modules_with_trees']}"
-        print(f"{v:<12} {t['specs']:>6} {t['paths']:>8} {t['operations']:>8}  {mc}")
+        print(f"{v:<12} {t['specs']:>6} {t['paths']:>8} {t['operations']:>8} {t['telemetry_xpaths']:>8}  {mc}")
     return 0
 
 

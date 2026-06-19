@@ -56,6 +56,7 @@
     prefixes: {},   // { moduleName: prefix }
     cat: null,
     manifest: null,
+    modules: [],    // sorted module names in the current category
     spec: null,
     specName: null,
     xport: 'grpc',  // selected subscription transport: grpc | netconf | gnmi
@@ -179,6 +180,10 @@
     csel.value = 'oper';
     csel.addEventListener('change', function () { loadCategory(csel.value); });
     $('b-mod').addEventListener('change', function () { loadModule($('b-mod').value); });
+    var modFilter = $('b-mod-filter');
+    if (modFilter) modFilter.addEventListener('input', function () {
+      populateModuleSelect(modFilter.value);
+    });
     $('b-filter').addEventListener('input', renderBuilderTable);
     $('b-copy-snippet').addEventListener('click', function () {
       var btn = $('b-copy-snippet');
@@ -248,8 +253,11 @@
   function loadCategory(cat) {
     state.cat = cat;
     state.manifest = null;
+    state.modules = [];
     state.spec = null;
     state.specName = null;
+    var filt = $('b-mod-filter');
+    if (filt) filt.value = '';
     var msel = $('b-mod');
     clearChildren(msel);
     var loading = document.createElement('option');
@@ -262,30 +270,45 @@
       .catch(function () { return null; })
       .then(function (data) {
         state.manifest = data;
-        clearChildren(msel);
-        var modules = (data && data.modules) || [];
-        if (!modules.length) {
-          var none = document.createElement('option');
-          none.textContent = '(no modules in this category for this release)';
-          none.disabled = true;
-          msel.appendChild(none);
-          renderModuleInfo(null);
-          renderBuilderTable();
-          return;
-        }
-        var placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = '— choose a module (' + modules.length + ' available) —';
-        msel.appendChild(placeholder);
-        modules.slice().sort().forEach(function (name) {
-          var o = document.createElement('option');
-          o.value = name;
-          o.textContent = name;
-          msel.appendChild(o);
-        });
+        state.modules = ((data && data.modules) || []).slice().sort();
+        populateModuleSelect('');
         renderModuleInfo(null);
         renderBuilderTable();
       });
+  }
+
+  // Populate the module dropdown, optionally narrowed by a filter string.
+  // Large categories (native-config has 400+ modules) are unusable as a flat
+  // dropdown, so the filter input live-narrows the options.
+  function populateModuleSelect(filter) {
+    var msel = $('b-mod');
+    if (!msel) return;
+    clearChildren(msel);
+    var mods = state.modules || [];
+    if (!mods.length) {
+      var none = document.createElement('option');
+      none.value = '';
+      none.textContent = '(no modules in this category for this release)';
+      none.disabled = true;
+      msel.appendChild(none);
+      return;
+    }
+    var q = (filter || '').trim().toLowerCase();
+    var shown = q
+      ? mods.filter(function (m) { return m.toLowerCase().indexOf(q) !== -1; })
+      : mods;
+    var placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = q
+      ? '— ' + shown.length + ' of ' + mods.length + ' modules match —'
+      : '— choose a module (' + mods.length + ' available) —';
+    msel.appendChild(placeholder);
+    shown.forEach(function (name) {
+      var o = document.createElement('option');
+      o.value = name;
+      o.textContent = name;
+      msel.appendChild(o);
+    });
   }
 
   function loadModule(name) {
@@ -424,24 +447,26 @@
     var sub = '\u2014';
     if (state.spec && state.spec.paths) {
       var mib = isMibCat();
+      // Count *unique* derived xpaths (the subscribable filter targets), not
+      // operations — a path with GET/PUT/PATCH/DELETE still maps to one xpath.
+      var seen = {};
       var d = 0;
       Object.keys(state.spec.paths).forEach(function (apiPath) {
-        var methods = state.spec.paths[apiPath] || {};
-        Object.keys(methods).forEach(function (m) {
-          if (['get','post','put','patch','delete'].indexOf(m) === -1) return;
-          var xp = deriveXpath(apiPath, state.prefixes, mib);
-          if (mib && !xp) return;  // bare-entry duplicates are not real targets
-          if (xp) d++;
-        });
+        var xp = deriveXpath(apiPath, state.prefixes, mib);
+        if (!xp) return;  // underivable / MIB bare-entry duplicates
+        if (!seen[xp]) { seen[xp] = 1; d++; }
       });
       sub = d;
     }
     function fmt(n) {
       return (typeof n === 'number') ? n.toLocaleString('en-US') : n;
     }
+    var relXpaths = rel
+      ? (rel.telemetry_xpaths != null ? rel.telemetry_xpaths : rel.paths)
+      : null;
     var cards = [
       { num: rel ? fmt(rel.modules_with_specs) : '\u2014', lbl: 'Modules in release' },
-      { num: rel ? fmt(rel.paths) : '\u2014', lbl: 'Data paths' },
+      { num: relXpaths != null ? fmt(relXpaths) : '\u2014', lbl: 'Telemetry xpaths' },
       { num: rel ? fmt(rel.yang_modules) : '\u2014', lbl: 'YANG modules' },
       { num: modules.length || 0, lbl: 'Modules in category' },
       { num: fmt(sub), lbl: 'Subscribable xpaths (module)' }
