@@ -77,6 +77,8 @@
   .badge { display:inline-block; padding:2px 6px; border-radius:4px; font-size:.7rem;
            background:var(--border); color:var(--fg); margin-right:4px; }
   a.spec-link { color:var(--accent); text-decoration:none; font-size:.78rem; }
+  .tablink { color:var(--accent); font-weight:600; text-decoration:none; }
+  .tablink:hover { text-decoration:underline; }
   .empty { padding:30px; text-align:center; color:var(--muted); }
   .copy-btn { background:transparent; border:1px solid var(--border); border-radius:4px;
               cursor:pointer; padding:2px 8px; font-size:.72rem; color:var(--accent); }
@@ -215,10 +217,11 @@
 <body>
 <header>
   <h1>Telemetry &amp; Notifications</h1>
-  <p>Two ways to stream off Cisco IOS-XE <span class="header-version">26.1.1</span> &mdash;
-     derive gRPC dial-out <code>filter xpath</code> filters for any data path, or browse every
-     YANG <code>notification</code> (event streams &amp; MIB traps) with realistic payloads.
-     Both consumed via NETCONF subscription / gRPC dial-out (notifications also via SNMP).</p>
+  <p>The two halves of model-driven telemetry off Cisco IOS-XE <span class="header-version">26.1.1</span>.
+     <strong>Telemetry XPaths</strong> derives subscribable <code>filter xpath</code> filters for any data
+     path (stream them via gRPC dial-out, NETCONF, or gNMI). <strong>Event Notifications</strong> catalogs
+     every event stream &mdash; SNMP traps and NETCONF / yang-push <code>notification</code>s &mdash; with
+     realistic payloads.</p>
 </header>
 <div class="nav">
   <a href="index.html">&larr; Hub</a>
@@ -244,6 +247,10 @@
       <span style="color:var(--muted);">/data/Cisco-IOS-XE-process-cpu-oper:cpu-usage/cpu-utilization</span>
       <span style="margin:0 8px;">&rarr;</span>
       <strong>/process-cpu-ios-xe-oper:cpu-usage/cpu-utilization</strong>
+    </div>
+    <div style="margin-top:8px;font-size:.82rem;color:var(--muted);">
+      Looking for event streams (SNMP traps, NETCONF notifications)?
+      <a href="#" data-goto-tab="notifications" class="tablink">See Event Notifications &rarr;</a>
     </div>
   </div>
   <div class="stats" id="b-stats" hidden></div>
@@ -305,13 +312,24 @@
   </div>
 
   <div class="pane" data-pane="notifications" id="pane-notifications">
+    <div class="info-card" style="margin-bottom:14px;">
+      Browse every YANG <strong>notification</strong> IOS-XE can emit, classified by how it is
+      delivered. There are two <strong>event-stream</strong> transports &mdash;
+      <strong>SNMP traps</strong> and <strong>NETCONF event streams</strong> &mdash; plus the
+      model-driven <strong>yang-push</strong> stream. Filter by transport, category, or name.
+      <div style="margin-top:8px;font-size:.82rem;color:var(--muted);">
+        Need the subscribable data paths instead?
+        <a href="#" data-goto-tab="telemetry" class="tablink">Build Telemetry XPaths &rarr;</a>
+      </div>
+    </div>
     <div class="summary-grid" id="summaryGrid"></div>
     <p class="legend">
-      <span class="badge transport-yang-push">yang-push</span> native stream &mdash; subscribe via NETCONF or gRPC dial-out (not RESTCONF GET)
+      <strong>Delivery transports &mdash; two event streams plus model-driven yang-push:</strong><br>
+      <span class="badge transport-snmp-trap">snmp-trap</span> SNMP NOTIFICATION-TYPE event stream (delivered over SNMP)
       &nbsp;&middot;&nbsp;
-      <span class="badge transport-snmp-trap">snmp-trap</span> SNMP NOTIFICATION-TYPE (delivered over SNMP only)
+      <span class="badge transport-netconf-stream">netconf-stream</span> IETF NETCONF event stream (RFC 5277)
       &nbsp;&middot;&nbsp;
-      <span class="badge transport-netconf-stream">netconf-stream</span> IETF NETCONF event stream
+      <span class="badge transport-yang-push">yang-push</span> model-driven stream &mdash; subscribe via NETCONF or gRPC dial-out (not RESTCONF GET)
     </p>
     <div class="n-controls">
       <label for="releaseSel">Release</label>
