@@ -128,6 +128,19 @@
         });
       })(tabs[i]);
     }
+    // CSP-safe cross-tab links (e.g. "See Event Notifications") that switch
+    // panes in place and scroll back to the top.
+    var jumps = document.querySelectorAll('[data-goto-tab]');
+    for (var g = 0; g < jumps.length; g++) {
+      (function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          selectTab(link.getAttribute('data-goto-tab'));
+          try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+          catch (_) { window.scrollTo(0, 0); }
+        });
+      })(jumps[g]);
+    }
     // Initial tab from ?tab= or #<tab>.
     var want = 'telemetry';
     try {
