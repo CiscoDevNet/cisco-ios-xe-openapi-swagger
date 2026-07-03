@@ -53,6 +53,16 @@
         return 'yang_accountability.json';
     }
 
+    // Individual YANG tree pages live under releases/<ver>/yang-trees/, but the
+    // accountability JSON stores them as bare "yang-trees/<mod>.html" (which
+    // 404s from the site root). Prefix the release the data belongs to
+    // (reportData.ios_xe_version), falling back to the active/selected version.
+    function _resolveTreeUrl(url) {
+        if (!url || !/^yang-trees\//.test(url)) return url;
+        var ver = (typeof reportData !== 'undefined' && reportData && reportData.ios_xe_version) || _activeVersion();
+        return ver ? 'releases/' + encodeURIComponent(ver) + '/' + url : url;
+    }
+
     // === Hash deep-link (search + filters + version) ===
     // URL hash shape:
     //   #ver=<release>&q=<search>&cat=<classification>&status=<status>
@@ -174,7 +184,7 @@
                 m.has_spec ? 'yes' : 'no',
                 m.tree_url ? 'yes' : 'no',
                 specUrls,
-                m.tree_url || '',
+                _resolveTreeUrl(m.tree_url) || '',
                 m.reason_excluded || ''
             ]));
         });
@@ -482,8 +492,9 @@
                 }).join(' ');
             }
 
-            var treeHtml = module.tree_url
-                ? '<a href="' + escapeHtml(module.tree_url) + '" class="tree-link" title="View YANG Tree">\ud83c\udf33 Tree</a>'
+            var _treeUrl = _resolveTreeUrl(module.tree_url);
+            var treeHtml = _treeUrl
+                ? '<a href="' + escapeHtml(_treeUrl) + '" class="tree-link" title="View YANG Tree">\ud83c\udf33 Tree</a>'
                 : '<span style="color:#ccc;">\u2014</span>';
 
             return '<tr>' +
@@ -513,6 +524,7 @@
             ' <button type="button" id="pagerAll" class="filter-btn" aria-label="Show all ' + total + ' rows">Show all (' + total + ')</button>';
         document.getElementById('pagerMore').onclick = function () { visibleRows += PAGE_SIZE; renderTable(); };
         document.getElementById('pagerAll').onclick = function () { visibleRows = Number.MAX_SAFE_INTEGER; renderTable(); };
+    }
 
     // === Utilities ===
 
