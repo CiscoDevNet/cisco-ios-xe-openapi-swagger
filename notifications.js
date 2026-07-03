@@ -190,13 +190,24 @@
             + objList + example + '</li>';
     }
 
+    // Individual YANG tree pages live under releases/<ver>/yang-trees/, but the
+    // notifications index stores them as bare "yang-trees/<mod>.html" (which
+    // 404s from the site root). Prefix the release the loaded catalog belongs
+    // to (current.version) so the Tree links resolve.
+    function resolveTreeUrl(url) {
+        if (!url || !/^yang-trees\//.test(url)) return url;
+        var ver = current && current.version;
+        return ver ? 'releases/' + encodeURIComponent(ver) + '/' + url : url;
+    }
+
     function moduleHtml(mod, q) {
         var consumeBadge = mod.restconf_consumable
             ? '<span class="badge consume-yes" title="Subscribable via NETCONF / gRPC dial-out">RESTCONF \u2715 · NETCONF \u2713</span>'
             : '<span class="badge consume-no" title="Not RESTCONF-subscribable">RESTCONF \u2715</span>';
         var links = '';
         if (mod.spec_url) links += '<a href="' + esc(mod.spec_url) + '">Spec</a>';
-        if (mod.tree_url) links += '<a class="tree" href="' + esc(mod.tree_url) + '" target="_blank" rel="noopener noreferrer">Tree</a>';
+        var treeUrl = resolveTreeUrl(mod.tree_url);
+        if (treeUrl) links += '<a class="tree" href="' + esc(treeUrl) + '" target="_blank" rel="noopener noreferrer">Tree</a>';
         var head = '<div class="mod-head">'
             + '<span class="mod-name">' + esc(mod.module) + '</span>'
             + '<span class="badge cat">' + esc(mod.display_category) + '</span>'
