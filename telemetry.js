@@ -347,6 +347,12 @@
         state.spec = spec;
         renderModuleInfo(name);
         renderBuilderTable();
+        try {
+          if (window.analytics) window.analytics.trackDataModelSelected({
+            yang_model: name, model_category: state.cat,
+            release: state.ver, page_or_section: 'telemetry'
+          });
+        } catch (e) { /* noop */ }
       });
   }
 
@@ -618,6 +624,14 @@
             box.classList.add('flash');
           }
           track('telemetry_xpath_used');
+          try {
+            if (window.analytics) window.analytics.trackWorkflowCompleted({
+              workflow: 'telemetry_subscription_built',
+              yang_model: state.specName, model_category: state.cat,
+              transport: state.xport, release: state.ver,
+              page_or_section: 'telemetry'
+            });
+          } catch (e) { /* noop */ }
         });
       });
   }
@@ -668,6 +682,13 @@
     var origLabel = btn.textContent;
     btn.textContent = 'Exported ' + rows.length;
     setTimeout(function () { btn.textContent = origLabel; }, 2500);
+    try {
+      if (window.analytics) window.analytics.trackExportResults({
+        export_type: 'telemetry_csv', row_count: rows.length,
+        yang_model: state.specName, model_category: state.cat,
+        release: state.ver, result: 'success', page_or_section: 'telemetry'
+      });
+    } catch (e) { /* noop */ }
   }
 
   // The three subscription "proofs" share one derived xpath. gRPC dial-out is

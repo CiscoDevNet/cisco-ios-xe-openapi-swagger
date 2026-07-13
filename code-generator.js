@@ -230,6 +230,12 @@
                 var _spec = (_picker && _picker.selectedOptions && _picker.selectedOptions[0]
                     && _picker.selectedOptions[0].dataset.name) || '';
                 window.__iosxeTrack('code_generated', { http_method: (method || '').toUpperCase(), spec: _spec, op_path: path || '' });
+                if (window.analytics) window.analytics.trackWorkflowCompleted({
+                    workflow: 'code_generated',
+                    api_operation: ((method || '').toUpperCase() + ' ' + (path || '')).trim(),
+                    yang_model: _spec, http_method: (method || '').toUpperCase(),
+                    page_or_section: 'code-generator'
+                });
             }
         } catch (e) { /* noop */ }
     }

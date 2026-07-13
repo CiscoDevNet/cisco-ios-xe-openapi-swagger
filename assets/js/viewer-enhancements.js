@@ -159,6 +159,7 @@
         attachSlashFocus();
         attachOperationTracking();
         attachTreeViewTracking();
+        attachTryItOutTracking();
         attachNotificationsPanel();
     }
 
@@ -319,6 +320,13 @@
                             op_path: opPath
                         });
                     }
+                    try {
+                        if (window.analytics) window.analytics.trackApiOperationSelected({
+                            api_operation: (method + ' ' + opPath).trim(),
+                            yang_model: spec, http_method: method,
+                            page_or_section: 'swagger-viewer'
+                        });
+                    } catch (_) { /* noop */ }
                 } catch (_) { /* noop */ }
             }, true);
         } catch (_) { /* noop */ }
@@ -378,8 +386,92 @@
                     if (typeof window.__iosxeTrack === 'function') {
                         window.__iosxeTrack('tree_viewed', { spec: spec, model_category: cat, release: ver });
                     }
+                    try {
+                        if (window.analytics) window.analytics.trackDataModelSelected({
+                            yang_model: spec, model_category: cat, release: ver,
+                            page_or_section: 'swagger-viewer'
+                        });
+                    } catch (_) { /* noop */ }
                 } catch (_) { /* noop */ }
             }, true);
+        } catch (_) { /* noop */ }
+    }
+
+    // ---------- (4e) analytics: real Swagger UI "Try it out" executions --
+    // When a user actually runs an operation against a device (Try it out),
+    // Swagger UI issues a cross-origin fetch. We wrap fetch to record the
+    // outcome as api_request (with http_code + result) / api_error, so the
+    // PostHog dashboards can show HTTP-status distribution and error rate.
+    // Same-origin asset/spec loads and the Clarity/PostHog beacons are ignored.
+    function _currentOpContext() {
+        var spec = '';
+        try {
+            var sm = (location.hash || '').match(/[#&]spec=([^&]+)/);
+            if (sm) spec = decodeURIComponent(sm[1]);
+        } catch (_) { /* noop */ }
+        var op = '';
+        try {
+            var open = document.querySelector('.opblock.is-open .opblock-summary')
+                || document.querySelector('.opblock-summary');
+            if (open) {
+                var m = open.querySelector('.opblock-summary-method');
+                var pth = open.querySelector('.opblock-summary-path');
+                var method = m ? (m.textContent || '').trim().toUpperCase() : '';
+                var opPath = pth ? (pth.getAttribute('data-path') || (pth.textContent || '').trim()) : '';
+                op = (method + ' ' + opPath).trim();
+            }
+        } catch (_) { /* noop */ }
+        return { spec: spec, op: op };
+    }
+
+    function attachTryItOutTracking() {
+        try {
+            if (window.__iosxeFetchWrapped || typeof window.fetch !== 'function') return;
+            window.__iosxeFetchWrapped = true;
+            var origFetch = window.fetch;
+            window.fetch = function (input, init) {
+                var url = '';
+                try { url = (typeof input === 'string') ? input : (input && input.url) || ''; } catch (_) { url = ''; }
+                var isExec = false;
+                try {
+                    if (url) {
+                        var u = new URL(url, location.href);
+                        isExec = (u.origin !== location.origin)
+                            && u.hostname.indexOf('clarity.ms') === -1
+                            && u.hostname.indexOf('posthog.com') === -1;
+                    }
+                } catch (_) { isExec = false; }
+                var p = origFetch.apply(this, arguments);
+                if (isExec && p && typeof p.then === 'function') {
+                    var method = 'GET';
+                    try { method = (init && init.method) || (typeof input === 'object' && input && input.method) || 'GET'; } catch (_) { method = 'GET'; }
+                    var ctx = _currentOpContext();
+                    p.then(function (resp) {
+                        try {
+                            if (window.analytics) window.analytics.trackApiRequest({
+                                api_operation: ctx.op || String(method).toUpperCase(),
+                                yang_model: ctx.spec,
+                                http_code: resp && resp.status,
+                                result: (resp && resp.ok) ? 'success' : 'error',
+                                page_or_section: 'swagger-viewer'
+                            });
+                        } catch (_) { /* noop */ }
+                    }, function (err) {
+                        try {
+                            var msg = String((err && err.message) || err || '');
+                            var isTimeout = /timeout|abort/i.test(msg);
+                            if (window.analytics) window.analytics.trackApiError({
+                                api_operation: ctx.op || String(method).toUpperCase(),
+                                yang_model: ctx.spec,
+                                result: isTimeout ? 'timeout' : 'error',
+                                error_type: (err && err.name) || 'network_error',
+                                page_or_section: 'swagger-viewer'
+                            });
+                        } catch (_) { /* noop */ }
+                    });
+                }
+                return p;
+            };
         } catch (_) { /* noop */ }
     }
 
