@@ -152,6 +152,10 @@ How it is enforced in `assets/js/analytics.js`:
 - PostHog is initialized with `autocapture: false`, `capture_pageview: false`,
   `disable_session_recording: true`, `person_profiles: 'identified_only'` — no
   DOM text capture, no anonymous person profiles.
+- **Do-Not-Track**: when the browser sends a DNT signal, the wrapper sends
+  **nothing** (to PostHog *or* Clarity) and PostHog is not even loaded; Clarity
+  bootstrap in `sw-register.js` is likewise skipped. Controlled by
+  `respectDoNotTrack` in `analytics-config.js` (default `true`).
 - Enable **"Discard client IP data"** in the PostHog project settings to drop the
   server-observed IP.
 

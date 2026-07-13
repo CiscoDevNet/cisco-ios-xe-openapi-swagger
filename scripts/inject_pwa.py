@@ -44,6 +44,8 @@ TOP_LEVEL = [
     "exports.html",
     "yang-accountability.html",
     "yang-accountability-compare.html",
+    "about.html",
+    "platform-coverage.html",
     "404.html",
 ]
 VIEWERS = [

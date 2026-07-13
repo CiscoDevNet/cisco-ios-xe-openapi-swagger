@@ -38,8 +38,13 @@
     // Microsoft Clarity bootstrap (shared across all pages that include this file).
     // Kept here (external JS) so we do not need inline script tags per page.
     try {
+        // Honor Do-Not-Track (unless disabled via the analytics config), so
+        // Clarity respects the same privacy signal as PostHog.
+        var _acfg = (window.__ANALYTICS_CONFIG__ || {});
+        var _dntRaw = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+        var _dnt = (_acfg.respectDoNotTrack !== false) && (_dntRaw === '1' || _dntRaw === 'yes');
         var CLARITY_PROJECT_ID = 'x8i204pxvc';
-        if (CLARITY_PROJECT_ID && typeof window !== 'undefined' && typeof document !== 'undefined') {
+        if (CLARITY_PROJECT_ID && !_dnt && typeof window !== 'undefined' && typeof document !== 'undefined') {
             window.clarity = window.clarity || function () {
                 (window.clarity.q = window.clarity.q || []).push(arguments);
             };
