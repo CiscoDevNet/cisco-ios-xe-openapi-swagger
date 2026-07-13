@@ -220,6 +220,12 @@
             var orig = btn.textContent;
             btn.textContent = 'Exported ' + rows.length + ' rows';
             setTimeout(function () { btn.textContent = orig; }, 3000);
+            try {
+                if (window.analytics) window.analytics.trackExportResults({
+                    export_type: 'accountability_csv', row_count: rows.length,
+                    release: ver, result: 'success', page_or_section: 'yang-accountability'
+                });
+            } catch (e) { /* noop */ }
         });
     }
 

@@ -287,6 +287,12 @@
         document.body.appendChild(a); a.click();
         setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 100);
         track('notifications_csv_exported', { release: current.version });
+        try {
+            if (window.analytics) window.analytics.trackExportResults({
+                export_type: 'notifications_csv', release: current.version,
+                result: 'success', page_or_section: 'notifications'
+            });
+        } catch (_) { /* noop */ }
     }
 
     function track(name, data) {
@@ -328,7 +334,15 @@
                 transportSel.addEventListener('change', render);
                 catSel.addEventListener('change', render);
                 if (modFilter) modFilter.addEventListener('input', function () { populateModuleSelect(modFilter.value); });
-                if (modSel) modSel.addEventListener('change', render);
+                if (modSel) modSel.addEventListener('change', function () {
+                    render();
+                    try {
+                        if (window.analytics && modSel.value) window.analytics.trackDataModelSelected({
+                            yang_model: modSel.value, release: current && current.version,
+                            page_or_section: 'notifications'
+                        });
+                    } catch (_) { /* noop */ }
+                });
                 consumableOnly.addEventListener('change', render);
                 exportBtn.addEventListener('click', exportCsv);
                 loadRelease(want);
