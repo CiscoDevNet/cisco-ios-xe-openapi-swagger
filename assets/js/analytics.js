@@ -37,6 +37,18 @@
   var ENV = CFG.environment || detectEnv();
   var APP_VERSION = CFG.appVersion || 'unknown';
 
+  // Honor the browser Do-Not-Track signal (unless the site owner disabled it
+  // via CFG.respectDoNotTrack === false). When DNT is on we send NOTHING to
+  // PostHog or Clarity from the wrapper, and PostHog is not even loaded.
+  function dntEnabled() {
+    try {
+      if (CFG.respectDoNotTrack === false) return false;
+      var d = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      return d === '1' || d === 'yes';
+    } catch (e) { return false; }
+  }
+  var DNT = dntEnabled();
+
   // Friendly label for the current surface, mirroring sw-register.js. Used as
   // the default `page_or_section` when a caller does not pass one.
   function pageOrSection() {
@@ -143,7 +155,7 @@
 
   function track(name, props) {
     try {
-      if (!name) return;
+      if (!name || DNT) return;
       var enriched = withContext(props || {});
       toPostHog(name, enriched);
       toClarity(name, enriched);
@@ -191,6 +203,7 @@
   // Official async loader stub: queues calls until static/array.js arrives and
   // replaces window.posthog with the real client (which replays the queue).
   function loadPostHog(key, host) {
+    if (DNT) return false;                                        // Do-Not-Track
     if (!key || key.indexOf('PLACEHOLDER') !== -1) return false;  // not configured
     if (window.__iosxePostHogInit) return true;
     window.__iosxePostHogInit = true;
@@ -228,6 +241,9 @@
         disable_session_recording: true,
         disable_surveys: true,
         person_profiles: 'identified_only',
+        // Honor Do-Not-Track inside PostHog too (redundant with our own gate
+        // but explicit); respects CFG.respectDoNotTrack.
+        respect_dnt: (CFG.respectDoNotTrack !== false),
         // Defensive second layer: strip PII + raw URLs/referrers/IP again
         // inside PostHog itself, on every capture.
         sanitize_properties: function (props) {
@@ -244,9 +260,11 @@
   function fireAppLoaded() {
     analytics.trackAppLoaded({});
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fireAppLoaded);
-  } else {
-    fireAppLoaded();
+  if (!DNT) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fireAppLoaded);
+    } else {
+      fireAppLoaded();
+    }
   }
 })();

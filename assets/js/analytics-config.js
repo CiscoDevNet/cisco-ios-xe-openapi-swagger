@@ -28,8 +28,11 @@ window.__ANALYTICS_CONFIG__ = {
   },
   // Web-app build version reported as the `app_version` event property.
   // Keep roughly in step with the service-worker CACHE_VERSION on releases.
-  appVersion: 'v73-2026.07.13b',
+  appVersion: 'v74-2026.07.13c',
   // Leave blank to auto-detect from the hostname
   // (localhost -> development, CiscoDevNet -> production, jeremycohoe -> staging).
-  environment: ''
+  environment: '',
+  // Honor the browser Do-Not-Track signal for BOTH PostHog and Clarity.
+  // Set to false to always track (not recommended).
+  respectDoNotTrack: true
 };

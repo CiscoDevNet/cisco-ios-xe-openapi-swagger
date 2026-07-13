@@ -394,6 +394,12 @@
             filterPathPicker();
             pathPickerGroup.style.display = 'block';
             _writeHash();
+            try {
+                if (window.analytics) window.analytics.trackDataModelSelected({
+                    yang_model: name, model_category: category,
+                    page_or_section: 'code-generator'
+                });
+            } catch (e) { /* noop */ }
         } catch (e) {
             console.error('Failed to load spec:', e);
             pathPickerGroup.style.display = 'none';
@@ -432,6 +438,18 @@
             }
         }
         _writeHash();
+        try {
+            var _pp = document.getElementById('pathPicker');
+            var _sp = document.getElementById('specPicker');
+            var _mo = document.getElementById('method');
+            if (window.analytics && _pp && _pp.value) window.analytics.trackApiOperationSelected({
+                api_operation: (((_mo && _mo.value) || '') + ' ' + _pp.value).trim(),
+                yang_model: (_sp && _sp.selectedOptions && _sp.selectedOptions[0]
+                    && _sp.selectedOptions[0].dataset.name) || '',
+                http_method: (_mo && _mo.value) || '',
+                page_or_section: 'code-generator'
+            });
+        } catch (e) { /* noop */ }
     }
 
     // Restore picker state from #spec=<name>&category=<cat>&path=<p>&method=<m>.
