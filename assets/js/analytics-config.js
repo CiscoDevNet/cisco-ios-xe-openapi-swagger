@@ -22,13 +22,13 @@
 window.__ANALYTICS_CONFIG__ = {
   posthog: {
     // PostHog project API key (public write key, "phc_..."). Injected at deploy.
-    apiKey: 'PLACEHOLDER_POSTHOG_KEY',
+    apiKey: 'phc_oyKEQ3fweMKaM9Hzo8ppJMod3RNNP54zPrRH8HpECPaS',
     // Ingestion host. US cloud: https://us.i.posthog.com | EU: https://eu.i.posthog.com
     host: 'https://us.i.posthog.com'
   },
   // Web-app build version reported as the `app_version` event property.
   // Keep roughly in step with the service-worker CACHE_VERSION on releases.
-  appVersion: 'v72-2026.07.13a',
+  appVersion: 'v73-2026.07.13b',
   // Leave blank to auto-detect from the hostname
   // (localhost -> development, CiscoDevNet -> production, jeremycohoe -> staging).
   environment: ''
