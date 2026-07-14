@@ -98,25 +98,6 @@
     return out;
   }
 
-  // PostHog auto-attaches URL/referrer/IP properties to every capture. Strip
-  // them to a page path (no query/hash/origin), drop external referrers, and
-  // never keep a client IP, before applying the shared sanitize().
-  function pathOnly(u) {
-    try { return new URL(String(u), location.origin).pathname; } catch (e) { return ''; }
-  }
-  function sanitizePosthog(props) {
-    try {
-      var p = props || {};
-      if (p.$current_url != null) p.$current_url = pathOnly(p.$current_url);
-      if (p.$initial_current_url != null) p.$initial_current_url = pathOnly(p.$initial_current_url);
-      ['$referrer', '$initial_referrer', '$referring_domain',
-       '$initial_referring_domain', '$ip', '$geoip_disable'].forEach(function (k) {
-        if (k in p) { try { delete p[k]; } catch (e) { p[k] = undefined; } }
-      });
-      return sanitize(p);
-    } catch (e) { return props; }
-  }
-
   // Attach the standard context (app_version, environment, page_or_section)
   // that every event should carry, unless the caller already supplied it.
   function withContext(props) {
@@ -232,6 +213,11 @@
 
       window.posthog.init(key, {
         api_host: host || 'https://us.i.posthog.com',
+        // Opt into PostHog's current default behaviors (ingestion + payload
+        // encoding). Matches the official snippet; without it the current
+        // array.js posts a body the server rejects with 401 "without an
+        // api_key".
+        defaults: '2026-05-30',
         // We use Clarity for session recording + autocapture; PostHog is for
         // explicit, structured events only. This also keeps the CSP minimal
         // (no blob/worker needed) and avoids capturing raw DOM text.
@@ -241,14 +227,17 @@
         disable_session_recording: true,
         disable_surveys: true,
         person_profiles: 'identified_only',
-        // Honor Do-Not-Track inside PostHog too (redundant with our own gate
-        // but explicit); respects CFG.respectDoNotTrack.
-        respect_dnt: (CFG.respectDoNotTrack !== false),
-        // Defensive second layer: strip PII + raw URLs/referrers/IP again
-        // inside PostHog itself, on every capture.
-        sanitize_properties: function (props) {
-          try { return sanitizePosthog(props); } catch (e) { return props; }
-        }
+        // Privacy: drop PostHog's auto-captured raw URL + referrer properties.
+        // Uses the native property_denylist (a plain array) rather than a
+        // sanitize_properties function — a rebuilding function corrupts the
+        // payload so the server rejects it with 401 "without an api_key".
+        // ($ip is dropped by the project's "Discard client IP data" setting;
+        // our own event props are already sanitized in the wrapper.)
+        property_denylist: [
+          '$current_url', '$initial_current_url',
+          '$referrer', '$initial_referrer',
+          '$referring_domain', '$initial_referring_domain'
+        ]
       });
       return true;
     } catch (e) { return false; }

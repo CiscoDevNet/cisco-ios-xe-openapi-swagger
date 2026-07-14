@@ -146,9 +146,11 @@ How it is enforced in `assets/js/analytics.js`:
 - **Value redaction** drops any value that looks like an email or an IPv4
   address, and never sends objects/arrays.
 - **Truncation** caps string values at 160 chars.
-- **PostHog auto-properties** are additionally sanitized (`sanitize_properties`):
-  `$current_url`/`$initial_current_url` are reduced to a path (no query/hash/
-  origin), and `$referrer`/`$referring_domain`/`$ip` are removed.
+- **PostHog auto-properties**: `$current_url`, `$initial_current_url`, and the
+  `$referrer*`/`$referring_domain*` properties are dropped via PostHog's native
+  `property_denylist` (a plain array). Do NOT use a `sanitize_properties`
+  function that rebuilds the properties object — that corrupts the payload and
+  PostHog rejects every event with `401 "event submitted without an api_key"`.
 - PostHog is initialized with `autocapture: false`, `capture_pageview: false`,
   `disable_session_recording: true`, `person_profiles: 'identified_only'` — no
   DOM text capture, no anonymous person profiles.
