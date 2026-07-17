@@ -218,12 +218,15 @@
         // array.js posts a body the server rejects with 401 "without an
         // api_key".
         defaults: '2026-05-30',
-        // We use Clarity for session recording + autocapture; PostHog is for
-        // explicit, structured events only. This also keeps the CSP minimal
-        // (no blob/worker needed) and avoids capturing raw DOM text.
+        // Clarity handles session recording + click autocapture. PostHog
+        // captures our structured events PLUS pageviews (for the Web Analytics
+        // dashboard: sessions, unique visitors, top paths). $current_url is
+        // still denylisted below, so only page paths ($pathname) are sent -
+        // no query strings / hashes.
         autocapture: false,
-        capture_pageview: false,
-        capture_pageleave: false,
+        capture_pageview: true,
+        capture_pageleave: true,
+        capture_performance: false,
         disable_session_recording: true,
         disable_surveys: true,
         person_profiles: 'identified_only',

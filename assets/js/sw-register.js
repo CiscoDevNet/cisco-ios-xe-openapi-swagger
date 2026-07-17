@@ -146,7 +146,7 @@
             // modules in one session produces one event per distinct spec).
             if (spec && spec !== _lastTaggedSpec) {
                 _lastTaggedSpec = spec;
-                try { window.__iosxeTrack('spec_opened', { spec: spec, model_category: cat, release: ver }); } catch (e) { /* noop */ }
+                try { window.__iosxeTrack('spec_opened', { spec: spec, yang_model: spec, model_category: cat, release: ver }); } catch (e) { /* noop */ }
             }
         } catch (e) { /* noop */ }
     }
