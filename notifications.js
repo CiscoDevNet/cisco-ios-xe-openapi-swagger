@@ -21,9 +21,42 @@
     var modFilter = document.getElementById('modFilter');
     var consumableOnly = document.getElementById('consumableOnly');
     var exportBtn = document.getElementById('exportBtn');
+    var copyLinkBtn = document.getElementById('nCopyLinkBtn');
 
     var current = null;      // loaded index document
     var defaultVer = null;
+    var _pending = null;     // deep-link category/module to apply once loaded
+
+    // --- Deep-link hash (shareable URLs) ---------------------------------------
+    // This pane owns the hash keys q, ntransport, ncat, nmod (+ shared ver/tab);
+    // the Telemetry XPaths pane owns cat/mod/xpath/xport. _writeHash preserves
+    // keys it does not own so the two panes never clobber each other.
+    function _readHash() {
+        var out = {};
+        var h = (location.hash || '').replace(/^#/, '');
+        h.split('&').forEach(function (kv) {
+            if (!kv) return;
+            var i = kv.indexOf('=');
+            var k = i < 0 ? kv : kv.slice(0, i);
+            var v = i < 0 ? '' : kv.slice(i + 1);
+            if (k) { try { out[k] = decodeURIComponent(v); } catch (_) { out[k] = v; } }
+        });
+        return out;
+    }
+    function _writeHash(updates) {
+        try {
+            var cur = _readHash();
+            Object.keys(updates).forEach(function (k) {
+                var v = updates[k];
+                if (v == null || v === '') delete cur[k];
+                else cur[k] = v;
+            });
+            var s = Object.keys(cur).map(function (k) {
+                return k + '=' + encodeURIComponent(cur[k]);
+            }).join('&');
+            history.replaceState(null, '', location.pathname + location.search + (s ? '#' + s : ''));
+        } catch (_) { /* noop */ }
+    }
 
     function setStatus(msg, err) {
         statusEl.textContent = msg || '';
@@ -67,6 +100,15 @@
                 try { localStorage.setItem('iosxe-active-version', ver); } catch (_) {}
                 populateCategoryFilter(doc);
                 populateModuleSelect('');
+                // Deep-link restore: category + module options now exist.
+                if (_pending) {
+                    if (_pending.ncat) catSel.value = _pending.ncat;
+                    if (_pending.nmod && modSel) {
+                        var ok = Array.prototype.some.call(modSel.options, function (o) { return o.value === _pending.nmod; });
+                        if (ok) modSel.value = _pending.nmod;
+                    }
+                    _pending = null;
+                }
                 renderSummary(doc);
                 render();
                 setStatus('');
@@ -329,12 +371,24 @@
                 });
                 var pre = initialFilter();
                 if (pre) filterEl.value = pre;
-                releaseSel.addEventListener('change', function () { loadRelease(releaseSel.value); });
-                filterEl.addEventListener('input', render);
-                transportSel.addEventListener('change', render);
-                catSel.addEventListener('change', render);
+                // Deep-link restore: transport (static options) now; category /
+                // module are staged for after the release doc loads.
+                var hp = _readHash();
+                if (hp.ntransport && transportSel) {
+                    var tok = Array.prototype.some.call(transportSel.options, function (o) { return o.value === hp.ntransport; });
+                    if (tok) transportSel.value = hp.ntransport;
+                }
+                if (hp.ncat || hp.nmod) _pending = { ncat: hp.ncat || null, nmod: hp.nmod || null };
+                releaseSel.addEventListener('change', function () {
+                    _writeHash({ ver: releaseSel.value, ncat: null, nmod: null });
+                    loadRelease(releaseSel.value);
+                });
+                filterEl.addEventListener('input', function () { _writeHash({ q: filterEl.value }); render(); });
+                transportSel.addEventListener('change', function () { _writeHash({ ntransport: transportSel.value }); render(); });
+                catSel.addEventListener('change', function () { _writeHash({ ncat: catSel.value, nmod: null }); render(); });
                 if (modFilter) modFilter.addEventListener('input', function () { populateModuleSelect(modFilter.value); });
                 if (modSel) modSel.addEventListener('change', function () {
+                    _writeHash({ nmod: modSel.value });
                     render();
                     try {
                         if (window.analytics && modSel.value) window.analytics.trackDataModelSelected({
@@ -345,6 +399,20 @@
                 });
                 consumableOnly.addEventListener('change', render);
                 exportBtn.addEventListener('click', exportCsv);
+                if (copyLinkBtn) copyLinkBtn.addEventListener('click', function () {
+                    var prevTxt = copyLinkBtn.textContent;
+                    function done() { copyLinkBtn.textContent = 'Copied!'; setTimeout(function () { copyLinkBtn.textContent = prevTxt; }, 1200); }
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(location.href).then(done, done);
+                        } else { done(); }
+                    } catch (_) { done(); }
+                    track('notifications_link_copied', {
+                        release: current && current.version,
+                        transport: transportSel && transportSel.value,
+                        yang_model: modSel && modSel.value
+                    });
+                });
                 loadRelease(want);
             })
             .catch(function (e) {
