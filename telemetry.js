@@ -61,7 +61,8 @@
     specName: null,
     xport: 'grpc',  // selected subscription transport: grpc | netconf | gnmi
     lastXpath: null, // last xpath sent to the config box (for transport switching)
-    versionStats: {} // per-release totals from version-stats.json (big numbers)
+    versionStats: {}, // per-release totals from version-stats.json (big numbers)
+    pendingRestore: null // deep-link state to reapply once async loads finish
   };
 
   // --- DOM helpers -----------------------------------------------------------
@@ -73,6 +74,39 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function clearChildren(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+  // --- Deep-link hash (shareable URLs) ---------------------------------------
+  // The URL hash carries the full selection so a link reopens the same view.
+  // This tab owns the keys: tab, ver, cat, mod, xpath, xport. The notifications
+  // pane owns q, ntransport, ncat, nmod. _writeHash preserves any key it does
+  // not own, so the two panes never clobber each other. replaceState is used so
+  // updates don't spam history or fire a hashchange loop.
+  function _readHash() {
+    var out = {};
+    var h = (location.hash || '').replace(/^#/, '');
+    h.split('&').forEach(function (kv) {
+      if (!kv) return;
+      var i = kv.indexOf('=');
+      var k = i < 0 ? kv : kv.slice(0, i);
+      var v = i < 0 ? '' : kv.slice(i + 1);
+      if (k) { try { out[k] = decodeURIComponent(v); } catch (_) { out[k] = v; } }
+    });
+    return out;
+  }
+  function _writeHash(updates) {
+    try {
+      var cur = _readHash();
+      Object.keys(updates).forEach(function (k) {
+        var v = updates[k];
+        if (v == null || v === '') delete cur[k];
+        else cur[k] = v;
+      });
+      var s = Object.keys(cur).map(function (k) {
+        return k + '=' + encodeURIComponent(cur[k]);
+      }).join('&');
+      history.replaceState(null, '', location.pathname + location.search + (s ? '#' + s : ''));
+    } catch (_) { /* noop */ }
+  }
 
   // --- Boot ------------------------------------------------------------------
 
@@ -112,6 +146,7 @@
       var p = panes[j];
       p.classList.toggle('active', p.getAttribute('data-pane') === name);
     }
+    _writeHash({ tab: name });
     try {
       if (typeof window.__iosxeTrack === 'function') {
         window.__iosxeTrack('telemetry_tab', { tab: name });
@@ -142,12 +177,16 @@
         });
       })(jumps[g]);
     }
-    // Initial tab from ?tab= or #<tab>.
+    // Initial tab from #tab= (deep-link), then ?tab= / #<tab>.
     var want = 'telemetry';
     try {
-      var qp = new URLSearchParams(location.search).get('tab');
-      if (qp) want = qp;
-      else if (/(^|#)notifications\b/.test(location.hash)) want = 'notifications';
+      var hp = _readHash();
+      if (hp.tab) want = hp.tab;
+      else {
+        var qp = new URLSearchParams(location.search).get('tab');
+        if (qp) want = qp;
+        else if (/(^|#|&)notifications\b/.test(location.hash)) want = 'notifications';
+      }
     } catch (_) { /* noop */ }
     selectTab(want === 'notifications' ? 'notifications' : 'telemetry');
   }
@@ -168,7 +207,10 @@
       if (r.ver === current) o.selected = true;
       rsel.appendChild(o);
     });
-    rsel.addEventListener('change', function () { loadRelease(rsel.value); });
+    rsel.addEventListener('change', function () {
+      loadRelease(rsel.value);
+      _writeHash({ ver: rsel.value, mod: null, xpath: null, xport: null });
+    });
 
     var csel = $('b-cat');
     CATEGORIES.forEach(function (c) {
@@ -177,9 +219,22 @@
       o.textContent = c.label;
       csel.appendChild(o);
     });
-    csel.value = 'oper';
-    csel.addEventListener('change', function () { loadCategory(csel.value); });
-    $('b-mod').addEventListener('change', function () { loadModule($('b-mod').value); });
+    // Restore category + stage module/xpath/transport from a shared link.
+    var hp0 = _readHash();
+    if (hp0.cat && CATEGORIES.some(function (c) { return c.id === hp0.cat; })) csel.value = hp0.cat;
+    else csel.value = 'oper';
+    if (hp0.mod) {
+      state.pendingRestore = { mod: hp0.mod, xpath: hp0.xpath || null, xport: hp0.xport || null };
+    }
+    csel.addEventListener('change', function () {
+      loadCategory(csel.value);
+      _writeHash({ cat: csel.value, mod: null, xpath: null, xport: null });
+    });
+    $('b-mod').addEventListener('change', function () {
+      var v = $('b-mod').value;
+      loadModule(v);
+      _writeHash({ mod: v, xpath: null, xport: null });
+    });
     var modFilter = $('b-mod-filter');
     if (modFilter) modFilter.addEventListener('input', function () {
       populateModuleSelect(modFilter.value);
@@ -199,11 +254,20 @@
       document.querySelectorAll('.xport-tabs [data-xport]'),
       function (btn) {
         btn.addEventListener('click', function () {
-          selectXport(btn.getAttribute('data-xport'));
+          var x = btn.getAttribute('data-xport');
+          selectXport(x);
+          if (state.lastXpath) _writeHash({ xport: x });
         });
       });
     var csvBtn = $('b-csv');
     if (csvBtn) csvBtn.addEventListener('click', function () { exportRowsCsv(csvBtn); });
+    var copyLinkBtn = $('b-copylink');
+    if (copyLinkBtn) copyLinkBtn.addEventListener('click', function () {
+      copyText(location.href, copyLinkBtn);
+      track('telemetry_link_copied', {
+        yang_model: state.specName, model_category: state.cat, xpath: state.lastXpath
+      });
+    });
 
     registerShortcuts();
 
@@ -274,6 +338,15 @@
         populateModuleSelect('');
         renderModuleInfo(null);
         renderBuilderTable();
+        // Deep-link restore: auto-select the module named in the shared URL.
+        if (state.pendingRestore && state.pendingRestore.mod &&
+            state.modules.indexOf(state.pendingRestore.mod) !== -1) {
+          var msel2 = $('b-mod');
+          if (msel2) msel2.value = state.pendingRestore.mod;
+          loadModule(state.pendingRestore.mod);
+        } else if (state.pendingRestore && !state.pendingRestore.xpath) {
+          state.pendingRestore = null;  // module missing and nothing else to restore
+        }
       });
   }
 
@@ -353,6 +426,14 @@
             release: state.ver, page_or_section: 'telemetry'
           });
         } catch (e) { /* noop */ }
+        // Deep-link restore: rebuild the subscription for the shared xpath.
+        if (state.pendingRestore && state.pendingRestore.xpath) {
+          var pr = state.pendingRestore; state.pendingRestore = null;
+          state.lastXpath = pr.xpath;
+          selectXport(pr.xport || state.xport);  // builds the snippet from lastXpath
+        } else {
+          state.pendingRestore = null;
+        }
       });
   }
 
@@ -599,7 +680,10 @@
           var prev = cell.style.background;
           cell.style.background = 'rgba(56,142,60,.15)';
           setTimeout(function () { cell.style.background = prev; }, 600);
-          track('telemetry_xpath_copied');
+          track('telemetry_xpath_copied', {
+            yang_model: state.specName, model_category: state.cat,
+            xpath: cell.getAttribute('data-xp')
+          });
         });
       });
 
@@ -623,7 +707,11 @@
             void box.offsetWidth;  // restart the animation
             box.classList.add('flash');
           }
-          track('telemetry_xpath_used');
+          track('telemetry_xpath_used', {
+            yang_model: state.specName, model_category: state.cat,
+            xpath: xp, transport: state.xport
+          });
+          _writeHash({ xpath: xp, xport: state.xport });
           try {
             if (window.analytics) window.analytics.trackWorkflowCompleted({
               workflow: 'telemetry_subscription_built',
@@ -636,9 +724,12 @@
       });
   }
 
-  function track(name) {
-    try { if (typeof window.__iosxeTrack === 'function') window.__iosxeTrack(name, { release: state.ver }); }
-    catch (_) { /* noop */ }
+  function track(name, props) {
+    try {
+      var data = { release: state.ver };
+      if (props) Object.keys(props).forEach(function (k) { if (props[k] != null) data[k] = props[k]; });
+      if (typeof window.__iosxeTrack === 'function') window.__iosxeTrack(name, data);
+    } catch (_) { /* noop */ }
   }
 
   // === CSV export ====================================================
