@@ -145,6 +145,29 @@
         .dark-mode-toggle { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; width: 50px; height: 50px; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(10px); }
         .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
 
+        /* Quick-nav toolbar: one compact, left-aligned bar with three labeled
+           groups (Tools / Models / Docs) separated by vertical dividers. */
+        .qn-bar { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px 14px; }
+        .qn-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .qn-group + .qn-group { border-left: 1px solid var(--border-color); padding-left: 14px; }
+        .qn-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-secondary); margin-right: 2px; }
+        .qn-pill { padding: 5px 12px; border-radius: 16px; font-size: 0.82rem; font-weight: 500; color: #fff; text-decoration: none; transition: opacity 0.2s, transform 0.1s; }
+        .qn-pill:hover { opacity: 0.88; transform: translateY(-1px); }
+        .qn-chip { padding: 4px 10px; border-radius: 13px; font-size: 0.76rem; font-weight: 500; color: #fff; text-decoration: none; transition: opacity 0.2s; }
+        .qn-chip:hover { opacity: 0.85; }
+        /* CSS-only "More" dropdown (native <details>, no JS -> CSP-safe). */
+        .qn-more { position: relative; }
+        .qn-more > summary { list-style: none; cursor: pointer; padding: 5px 12px; border-radius: 16px; font-size: 0.82rem; font-weight: 500; color: #fff; background: #546E7A; user-select: none; }
+        .qn-more > summary::-webkit-details-marker { display: none; }
+        .qn-more > summary:hover { opacity: 0.88; }
+        .qn-more[open] > summary { background: #37474F; }
+        .qn-more-panel { position: absolute; top: calc(100% + 6px); left: 0; z-index: 200; min-width: 180px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 6px 22px rgba(0,0,0,0.18); }
+        .qn-more-panel a { padding: 7px 12px; border-radius: 6px; font-size: 0.82rem; color: var(--text-primary); text-decoration: none; white-space: nowrap; }
+        .qn-more-panel a:hover { background: var(--bg-secondary); }
+        @media (max-width: 768px) {
+            .qn-group + .qn-group { border-left: none; padding-left: 0; }
+        }
+
         /* App Map teaser ribbon */
         .app-map-teaser { display:block; max-width:1200px; margin:24px auto 0; padding:18px 24px; background:linear-gradient(135deg,#5E35B1,#311B92); color:#fff; text-decoration:none; border-radius:10px; box-shadow:0 4px 14px rgba(49,27,146,0.25); transition:transform .15s, box-shadow .15s; }
         .app-map-teaser:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(49,27,146,0.35); }
@@ -344,37 +367,45 @@
     </header>
     
     <!-- Quick Navigation Toolbar -->
-    <div id="quickNav" style="background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 10px 20px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); z-index: 100; transition: background 0.3s, max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease; overflow: hidden;">
-        <!-- Row 1: core app features (interactive tools) -->
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;">
-            <a href="#" id="navSearchLink" style="padding: 6px 14px; background: var(--accent-color); color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Search</a>
-            <a href="code-generator.html" style="padding: 6px 14px; background: #667eea; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Code Generator</a>
-            <a href="tree-compare.html" style="padding: 6px 14px; background: #FB8C00; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Compare Trees</a>
-            <a href="yang-accountability.html" style="padding: 6px 14px; background: #4CAF50; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">YANG Report</a>
-            <a href="yang-accountability-compare.html" style="padding: 6px 14px; background: #2E7D32; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Compare Versions</a>
-            <a href="telemetry.html" style="padding: 6px 14px; background: #1976D2; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;" title="Derive MDT xpath filters and browse the YANG notification catalog">Telemetry &amp; Notifications</a>
-            <a href="exports.html" style="padding: 6px 14px; background: #6A1B9A; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Exports</a>
-            <a href="yang-trees/" style="padding: 6px 14px; background: #009688; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Trees</a>
-            <a href="platform-coverage.html" style="padding: 6px 14px; background: #00838F; color: white; text-decoration: none; border-radius: 20px; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s;">Platform Coverage</a>
-        </div>
-        <!-- Row 2: data-model quick links -->
-        <div style="max-width: 1200px; margin: 6px auto 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Models:</span>
-            <a href="swagger-oper-model/index.html" style="padding: 4px 10px; background: #2196F3; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">Oper</a>
-            <a href="swagger-rpc-model/index.html" style="padding: 4px 10px; background: #FFC107; color: #333; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">RPC</a>
-            <a href="swagger-native-config-model/index.html" style="padding: 4px 10px; background: #4CAF50; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">Native</a>
-            <a href="swagger-cfg-model/index.html" style="padding: 4px 10px; background: #00BCD4; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">Config</a>
-            <a href="swagger-openconfig-model/index.html" style="padding: 4px 10px; background: #009688; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">OpenConfig</a>
-            <a href="swagger-ietf-model/index.html" style="padding: 4px 10px; background: #FF5722; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">IETF</a>
-            <a href="swagger-mib-model/index.html" style="padding: 4px 10px; background: #9C27B0; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">MIB</a>
-            <a href="swagger-other-model/index.html" style="padding: 4px 10px; background: #757575; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">Other</a>
-        </div>
-        <!-- Row 3: documentation & project links -->
-        <div style="max-width: 1200px; margin: 6px auto 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; align-items: center;">
-            <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;">Docs:</span>
-            <a href="app-map.html" style="padding: 4px 10px; background: #5E35B1; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;" title="Architectural map of the entire site">App Map</a>
-            <a href="about.html" style="padding: 4px 10px; background: #455A64; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">About</a>
-            <a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger" target="_blank" rel="noopener noreferrer" style="padding: 4px 10px; background: #333; color: white; text-decoration: none; border-radius: 14px; font-size: 0.78rem; font-weight: 500; transition: opacity 0.2s;">GitHub</a>
+    <div id="quickNav" style="background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 10px 20px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); z-index: 100; transition: background 0.3s, max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease; overflow: visible;">
+        <div class="qn-bar">
+            <!-- Group 1: core tools (primary visible + secondary in a "More" menu) -->
+            <div class="qn-group">
+                <span class="qn-label">Tools:</span>
+                <a href="#" id="navSearchLink" class="qn-pill" style="background: var(--accent-color);">Search</a>
+                <a href="code-generator.html" class="qn-pill" style="background: #667eea;">Code Generator</a>
+                <a href="yang-accountability.html" class="qn-pill" style="background: #4CAF50;">YANG Report</a>
+                <a href="telemetry.html" class="qn-pill" style="background: #1976D2;" title="Derive MDT xpath filters and browse the YANG notification catalog">Telemetry &amp; Notifications</a>
+                <a href="exports.html" class="qn-pill" style="background: #6A1B9A;">Exports</a>
+                <details class="qn-more">
+                    <summary title="More tools">More &#9662;</summary>
+                    <div class="qn-more-panel">
+                        <a href="tree-compare.html">Compare Trees</a>
+                        <a href="yang-accountability-compare.html">Compare Versions</a>
+                        <a href="yang-trees/">Trees</a>
+                        <a href="platform-coverage.html">Platform Coverage</a>
+                    </div>
+                </details>
+            </div>
+            <!-- Group 2: data-model quick links -->
+            <div class="qn-group">
+                <span class="qn-label">Models:</span>
+                <a href="swagger-oper-model/index.html" class="qn-chip" style="background: #2196F3;">Oper</a>
+                <a href="swagger-rpc-model/index.html" class="qn-chip" style="background: #FFC107; color: #333;">RPC</a>
+                <a href="swagger-native-config-model/index.html" class="qn-chip" style="background: #4CAF50;">Native</a>
+                <a href="swagger-cfg-model/index.html" class="qn-chip" style="background: #00BCD4;">Config</a>
+                <a href="swagger-openconfig-model/index.html" class="qn-chip" style="background: #009688;">OpenConfig</a>
+                <a href="swagger-ietf-model/index.html" class="qn-chip" style="background: #FF5722;">IETF</a>
+                <a href="swagger-mib-model/index.html" class="qn-chip" style="background: #9C27B0;">MIB</a>
+                <a href="swagger-other-model/index.html" class="qn-chip" style="background: #757575;">Other</a>
+            </div>
+            <!-- Group 3: documentation & project links -->
+            <div class="qn-group">
+                <span class="qn-label">Docs:</span>
+                <a href="app-map.html" class="qn-chip" style="background: #5E35B1;" title="Architectural map of the entire site">App Map</a>
+                <a href="about.html" class="qn-chip" style="background: #455A64;">About</a>
+                <a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger" target="_blank" rel="noopener noreferrer" class="qn-chip" style="background: #333;">GitHub</a>
+            </div>
         </div>
     </div>
     
