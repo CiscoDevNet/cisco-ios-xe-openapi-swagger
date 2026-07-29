@@ -79,6 +79,7 @@ STRICT_CSP_PAGES = [
     "yang-accountability.html",
     "platform-coverage.html",
     "app-map.html",
+    "changelog.html",
 ]
 INLINE_EXEC_SCRIPT = re.compile(
     r"<script(?![^>]*\bsrc=)(?![^>]*type\s*=\s*['\"]application/ld\+json)"
