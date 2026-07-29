@@ -119,7 +119,7 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 - **Service worker** precaches the analytics files; consolidated at
   `v76-2026.07.17a`.
 
-### Security \u2014 externalize SW registration + regression tests (round 25, 2026)
+### Security — externalize SW registration + regression tests (round 25, 2026)
 
 - **Closed the CSP / inline-script gap.** Top-level pages ship
   `script-src 'self'` (no `'unsafe-inline'`), but the PWA service
@@ -144,7 +144,7 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
   `assets/js/sw-register.js` so offline reloads still see the new
   module.
 
-## [Pre-Unreleased \u2014 round 24]
+## [Pre-Unreleased — round 24]
 ### Security — Reflected-XSS fixes in 404 + hub deep-link (round 24, 2026)
 
 - **Fixed reflected XSS in `404.html` hash-recovery flow.** When the

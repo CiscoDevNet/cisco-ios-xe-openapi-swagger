@@ -25,6 +25,7 @@ TOP_LEVEL_PAGES = [
     ("yang-accountability-compare.html", 0.6, "monthly"),
     ("platform-coverage.html", 0.7, "monthly"),
     ("app-map.html", 0.6, "monthly"),
+    ("changelog.html", 0.6, "monthly"),
     ("about.html", 0.6, "monthly"),
 ]
 VIEWER_DIRS = [

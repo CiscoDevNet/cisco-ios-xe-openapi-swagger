@@ -281,7 +281,7 @@
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues/new" target="_blank" rel="noopener noreferrer">Open an issue</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a href="' + prefix + 'CHANGELOG.md">Changelog</a>' +
+                    '<a href="' + prefix + 'changelog.html">Changelog</a>' +
                     (editHref ? ' <span class="site-footer-sep">\u00b7</span> ' +
                                 '<a href="' + editHref + '" target="_blank" rel="noopener noreferrer" title="Open this page\u2019s source in the GitHub editor">Edit on GitHub</a>'
                               : '') +
@@ -289,7 +289,7 @@
                 '<div class="site-footer-meta">' +
                     '<span>Cisco IOS XE OpenAPI Documentation Hub</span>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
-                    '<a class="site-footer-build" href="' + prefix + 'CHANGELOG.md#unreleased" title="View what changed in this build">Build ' + escapeHtml(SITE_BUILD) + '</a>' +
+                    '<a class="site-footer-build" href="' + prefix + 'changelog.html#unreleased" title="View what changed in this build">Build ' + escapeHtml(SITE_BUILD) + '</a>' +
                     ' <span class="site-footer-sep">\u00b7</span> ' +
                     '<span>\u00a9 ' + year + ' Cisco Systems</span>' +
                 '</div>' +
