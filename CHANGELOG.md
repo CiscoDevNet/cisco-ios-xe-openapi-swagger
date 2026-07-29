@@ -53,6 +53,72 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 ---
 
 ## [Unreleased]
+
+### Changed — Hub navigation redesign: compact Tools / Models / Docs bar (round 28, 2026-07)
+
+- **One tidy, left-aligned quick-nav bar.** The hub's top toolbar was a
+  crowded, centre-justified wrap of a dozen equally-weighted pills (a lone
+  "Platform Coverage" kept orphaning onto its own line). It is now a single
+  compact bar split into three labelled, divider-separated groups:
+  **Tools** (interactive features), **Models** (the 9 data-model viewers),
+  and **Docs** (App Map, About, GitHub, Changelog).
+- **Primary tools stay visible; secondary tools fold into a "More" menu.**
+  Search, Code Generator, YANG Report, Telemetry & Notifications, and Exports
+  remain as top-level pills. Compare Trees, Compare Versions, Trees, and
+  Platform Coverage moved into a **More** dropdown. The dropdown is a pure-CSS
+  native `<details>` element with **no JavaScript**, so it respects the hub's
+  strict `script-src 'self'` CSP and is keyboard-accessible for free.
+- **Auto-hide hardened.** The scroll-away nav collapse now also toggles
+  `visibility` and `pointer-events`, so switching the bar to `overflow:visible`
+  (needed so the dropdown can escape the bar) never leaves invisible but
+  still-clickable links hovering over the page when the nav is hidden.
+- **Service worker** bumped to `v79-2026.07.17d`.
+
+### Added — Shareable deep-links + xpath usage analytics on Telemetry & Notifications (round 27, 2026-07)
+
+- **Copy-a-link, reopen-the-same-view.** Both panes of `telemetry.html` — the
+  **Telemetry XPaths** builder and the **Event Notifications** catalog — now
+  serialize their full selection into the URL hash via `history.replaceState`
+  (no history spam, no `hashchange` loops). A shared link restores the exact
+  release, category, module, xpath, transport, and filters, and rebuilds the
+  subscription snippet.
+- **Non-clobbering hash schema.** The two panes own disjoint keys — Telemetry
+  XPaths owns `tab / ver / cat / mod / xpath / xport`; Event Notifications owns
+  `q / ntransport / ncat / nmod`; `ver` and `tab` are shared. Each pane
+  preserves the other's keys when it writes, so switching tabs never wipes the
+  other pane's state. A new **Copy link** button was added to each pane.
+- **XPath usage analytics.** `telemetry_xpath_used` and `telemetry_xpath_copied`
+  now carry `xpath`, `yang_model`, `model_category`, and `transport`, so the
+  analytics dashboards can report which telemetry xpaths and YANG models people
+  actually build subscriptions from. All keys pass the analytics PII allow-list.
+- **Service worker** bumped to `v77-2026.07.17b`.
+
+### Added — Privacy-first product analytics: PostHog + Microsoft Clarity (round 26, 2026-07)
+
+- **One wrapper, two providers.** Added `assets/js/analytics.js` exposing
+  `window.analytics`, which fans every event out to both **PostHog** (product
+  analytics / funnels / breakdowns) and **Microsoft Clarity** (heatmaps and
+  session recordings). It also re-points the legacy `window.__iosxeTrack` hook
+  through itself, so existing call sites reach PostHog too.
+- **Public, swappable config.** `assets/js/analytics-config.js` holds the
+  PostHog public `phc_` project key + host and the app-version / environment
+  overrides. The key is a client-side write key (safe to ship, like a Clarity
+  id); leaving the placeholder disables PostHog while Clarity keeps working
+  (fail-open, never breaks a page).
+- **Privacy by default.** Honors the browser **Do-Not-Track** signal for both
+  providers; a `sanitize()` layer drops or redacts PII (emails, IPv4s,
+  hostnames, serials, tokens, full URLs) before any event leaves the browser;
+  autocapture, pageview URL capture, and cross-page session URLs are off, and
+  only a curated allow-list of non-PII keys (`yang_model`, `xpath`, `api_path`,
+  `model_category`, `release`, `transport`, `http_code`, `result`,
+  `page_or_section`) is forwarded.
+- **Events wired across the site.** `app_loaded`, `data_model_selected`,
+  `api_operation_selected`, `api_request` / `api_error`, `export_results`,
+  and `workflow_completed`, plus the telemetry / notifications specifics above.
+  See `docs/ANALYTICS.md` for the full event table and dashboard breakdowns.
+- **Service worker** precaches the analytics files; consolidated at
+  `v76-2026.07.17a`.
+
 ### Security \u2014 externalize SW registration + regression tests (round 25, 2026)
 
 - **Closed the CSP / inline-script gap.** Top-level pages ship
