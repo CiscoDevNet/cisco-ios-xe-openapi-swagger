@@ -52,6 +52,83 @@ For a hands-on walkthrough of common tasks, see [CONTRIBUTING.md](CONTRIBUTING.m
 
 ---
 
+## Development Effort
+
+Estimated active development time, derived from git commit timestamps with a
+git-hours model: commits within **120 minutes** of each other count as one
+working session, and each session is credited **+30 minutes** of ramp-up for
+its first commit. This is an approximation — git records *when* work was
+committed, not hours actually worked — so read it as a relative-effort signal,
+not a timesheet. Refresh or re-tune the numbers anytime with:
+
+    python -X utf8 scripts/estimate_dev_hours.py --by day
+
+**Totals (as of 2026-07-28):** 480 commits across 67 sessions, roughly
+**147 hours** of active development between 2026-02-01 and 2026-07-28
+(~0.83 h/day averaged over the 178-day span; work is bursty, so per-day rows
+below are far more representative than the average).
+
+### By month
+
+| Month   | Commits | Est. hours |
+|---------|--------:|-----------:|
+| 2026-02 | 234     | 59.5 |
+| 2026-03 | 14      | 6.5  |
+| 2026-04 | 69      | 21.7 |
+| 2026-05 | 69      | 26.1 |
+| 2026-06 | 82      | 29.6 |
+| 2026-07 | 12      | 4.1  |
+
+### By active day
+
+| Date       | Commits | Est. hours |
+|------------|--------:|-----------:|
+| 2026-02-01 | 86      | 13.8 |
+| 2026-02-02 | 18      | 6.1  |
+| 2026-02-03 | 16      | 2.1  |
+| 2026-02-06 | 51      | 10.0 |
+| 2026-02-07 | 20      | 5.3  |
+| 2026-02-09 | 11      | 7.2  |
+| 2026-02-10 | 12      | 7.4  |
+| 2026-02-11 | 6       | 2.3  |
+| 2026-02-13 | 9       | 2.3  |
+| 2026-02-14 | 4       | 2.3  |
+| 2026-02-28 | 1       | 0.5  |
+| 2026-03-03 | 3       | 1.1  |
+| 2026-03-27 | 8       | 4.2  |
+| 2026-03-31 | 3       | 1.2  |
+| 2026-04-01 | 5       | 2.7  |
+| 2026-04-03 | 1       | 0.5  |
+| 2026-04-25 | 17      | 6.0  |
+| 2026-04-26 | 37      | 10.3 |
+| 2026-04-27 | 9       | 2.2  |
+| 2026-05-07 | 2       | 0.7  |
+| 2026-05-11 | 1       | 0.5  |
+| 2026-05-17 | 4       | 1.5  |
+| 2026-05-18 | 5       | 2.7  |
+| 2026-05-20 | 15      | 5.4  |
+| 2026-05-21 | 1       | 0.5  |
+| 2026-05-22 | 16      | 8.1  |
+| 2026-05-23 | 14      | 3.1  |
+| 2026-05-25 | 4       | 1.3  |
+| 2026-05-29 | 1       | 0.5  |
+| 2026-05-30 | 6       | 1.8  |
+| 2026-06-01 | 9       | 3.0  |
+| 2026-06-02 | 5       | 1.2  |
+| 2026-06-09 | 8       | 2.4  |
+| 2026-06-10 | 6       | 1.5  |
+| 2026-06-15 | 6       | 4.9  |
+| 2026-06-16 | 15      | 4.6  |
+| 2026-06-17 | 4       | 1.0  |
+| 2026-06-18 | 29      | 10.9 |
+| 2026-07-02 | 2       | 0.7  |
+| 2026-07-13 | 3       | 1.2  |
+| 2026-07-14 | 1       | 0.5  |
+| 2026-07-17 | 1       | 0.5  |
+| 2026-07-28 | 5       | 1.3  |
+
+---
+
 ## [Unreleased]
 
 ### Changed — Hub navigation redesign: compact Tools / Models / Docs bar (round 28, 2026-07)
