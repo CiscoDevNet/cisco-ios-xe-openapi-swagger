@@ -242,6 +242,8 @@
                     nav.style.opacity = '0';
                     nav.style.padding = '0 20px';
                     nav.style.borderBottom = 'none';
+                    nav.style.visibility = 'hidden';
+                    nav.style.pointerEvents = 'none';
                     requestAnimationFrame(function () { nav.style.transition = ''; });
                     return;
                 }
@@ -251,11 +253,15 @@
                 nav.style.opacity = '1';
                 nav.style.padding = '10px 20px 8px';
                 nav.style.borderBottom = '1px solid var(--border-color)';
+                nav.style.visibility = 'visible';
+                nav.style.pointerEvents = '';
             } else {
                 nav.style.maxHeight = '0';
                 nav.style.opacity = '0';
                 nav.style.padding = '0 20px';
                 nav.style.borderBottom = 'none';
+                nav.style.visibility = 'hidden';
+                nav.style.pointerEvents = 'none';
             }
         }, { threshold: 0 });
         observer.observe(header);
