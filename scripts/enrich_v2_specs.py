@@ -142,7 +142,10 @@ def get_example_for_field(field_name, module_name=""):
     # ── Hardware / Platform ──────────────────────────────────────────────
     if fl in ("serial-number", "serial", "sn"):
         return "FOC2145L0QS"
-    if fl in ("pid", "product-id", "model"):
+    if fl == "pid":
+        # process id (number) in process/cpu oper; product id elsewhere
+        return 1 if ("cpu" in ml or "process" in ml) else "C9300-48P"
+    if fl in ("product-id", "model"):
         return "C9300-48P"
     if fl in ("version", "sw-version", "software-version", "ios-version"):
         return "17.18.1"
@@ -162,7 +165,8 @@ def get_example_for_field(field_name, module_name=""):
         return "2025-03-15T10:30:45Z"
     if "date" in fl and "time" not in fl:
         return "2025-03-15"
-    if "time" in fl and "stamp" not in fl and "date" not in fl:
+    if ("time" in fl and "stamp" not in fl and "date" not in fl
+            and "run-time" not in fl and "runtime" not in fl):
         return "10:30:45"
 
     # ── Environment ──────────────────────────────────────────────────────
@@ -306,6 +310,30 @@ def get_example_for_field(field_name, module_name=""):
     if fl in ("day",):
         return "monday"
 
+    # -- Operational rates / load windows / durations (telemetry realism) --
+    if fl in ("five-seconds", "one-minute", "five-minutes", "fifteen-minutes",
+              "five-seconds-intr", "one-minute-average", "five-minute-average"):
+        return 12
+    if "utilization" in fl:
+        return 15
+    if fl in ("total-run-time", "runtime", "run-time", "avg-run-time", "max-run-time"):
+        return 84520
+    if fl.endswith("-rate") or fl in ("rate", "input-rate", "output-rate", "tx-rate",
+                                       "rx-rate", "bps", "pps", "bits-per-sec", "pkts-per-sec"):
+        return 128000
+    if "octet" in fl and "total" in fl:
+        return 84239104
+    if "packet" in fl and "total" in fl:
+        return 90241
+    if "throttle" in fl or "giveup" in fl or "overrun" in fl or "underrun" in fl or "ignored" in fl:
+        return 0
+    if fl == "tty":
+        return 0
+    if fl in ("msec", "millisecond", "milliseconds", "elapsed-ms", "duration-ms"):
+        return 250
+    if fl in ("seconds", "elapsed-seconds", "elapsed-time", "age", "age-seconds"):
+        return 3600
+
     # ── Fallback based on name patterns ──────────────────────────────────
     if "name" in fl:
         return "example-1"
@@ -341,9 +369,27 @@ def build_example_from_schema(schema, module_name="", depth=0, max_depth=6):
 
     schema_type = schema.get("type", "object")
 
-    # Leaf types — return a single value
+    # Enum -> always emit a schema-valid value.
+    _enum = schema.get("enum")
+    if isinstance(_enum, list) and _enum:
+        return _enum[0]
+
+    # Leaf types -- return a single value
     if schema_type == "string":
-        return schema.get("example") or "configured-value"
+        if schema.get("example"):
+            return schema["example"]
+        _fmt = str(schema.get("format", "")).lower()
+        if _fmt in ("date-time", "date_time"):
+            return "2026-01-15T10:30:00Z"
+        if _fmt == "date":
+            return "2026-01-15"
+        if "ipv6" in _fmt:
+            return "2001:db8::1"
+        if "ip" in _fmt:
+            return "10.1.1.1"
+        if "mac" in _fmt:
+            return "00:1a:2b:3c:4d:5e"
+        return "configured-value"
     if schema_type == "integer":
         ex = schema.get("example")
         return ex if isinstance(ex, int) and not isinstance(ex, bool) else 1
@@ -377,8 +423,12 @@ def build_example_from_schema(schema, module_name="", depth=0, max_depth=6):
                     # Empty object for nested objects without properties
                     result[prop_name] = {} if prop_type == "object" else []
             else:
-                val = get_example_for_field(prop_name, module_name)
-                result[prop_name] = convert_example(val, prop_type)
+                _penum = prop_schema.get("enum")
+                if isinstance(_penum, list) and _penum:
+                    result[prop_name] = _penum[0]
+                else:
+                    val = get_example_for_field(prop_name, module_name)
+                    result[prop_name] = convert_example(val, prop_type)
         return result if result else None
 
     return None
@@ -704,6 +754,13 @@ def enrich_top_level_example(example_obj, module_name):
                 if conv != 1:
                     example_obj[key] = conv
                     changes += 1
+        elif isinstance(val, float) and val == 1.0:
+            new_val = get_example_for_field(key, module_name)
+            if isinstance(new_val, (int, float)) and not isinstance(new_val, bool):
+                conv = float(new_val)
+                if conv != 1.0:
+                    example_obj[key] = conv
+                    changes += 1
     return changes
 
 
@@ -970,16 +1027,25 @@ V2_DIRS = [
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser(description="Enrich v2 spec examples + descriptions")
+    ap.add_argument("--version", help="Enrich releases/<version>/<dir>/api instead of top-level dirs")
+    ap.add_argument("--only", action="append", help="Limit to these model dir(s), e.g. swagger-oper-model")
+    args = ap.parse_args()
+
     root = Path(__file__).resolve().parent.parent
+    base = (root / "releases" / args.version) if args.version else root
+    dirs = args.only if args.only else V2_DIRS
     print("=" * 70)
-    print("Enrich v2 Deep-Path Specs — Examples + Descriptions")
+    print("Enrich v2 Deep-Path Specs — Examples + Descriptions" +
+          (f"  (release {args.version})" if args.version else ""))
     print("=" * 70)
 
     grand_specs = 0
     grand_changes = 0
 
-    for model_dir in V2_DIRS:
-        api_v2 = root / model_dir / "api"
+    for model_dir in dirs:
+        api_v2 = base / model_dir / "api"
         if not api_v2.exists():
             print(f"\n⚠  {model_dir}/api not found — skipping")
             continue
