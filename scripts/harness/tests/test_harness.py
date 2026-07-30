@@ -362,7 +362,7 @@ def test_overlay_dry_run_writes_nothing(tmp_path):
     assert spec_file.read_text(encoding="utf-8") == before  # untouched
 
 
-def test_overlay_injects_example_and_provenance(tmp_path):
+def test_overlay_injects_live_examples(tmp_path):
     caps = tmp_path / "captures"
     specs = tmp_path / "specs"
     _write_capture(caps, "sw1", "oper", "m", "/data/x", 200,
@@ -372,20 +372,17 @@ def test_overlay_injects_example_and_provenance(tmp_path):
     overlay_mod.apply_overlay(caps, specs, write=True)
     spec = json.loads(spec_file.read_text(encoding="utf-8"))
     media = spec["paths"]["/data/x"]["get"]["responses"]["200"]["content"]["application/yang-data+json"]
-    # singular example migrated, live example added
-    assert "example" not in media
-    assert media["examples"]["schema-default"]["value"] == {"pkts": 0}
-    live = media["examples"]["live-C9300-48T"]
+    # synthetic example is left UNTOUCHED; no plural examples map is created
+    assert media["example"] == {"pkts": 0}
+    assert "examples" not in media
+    # real data under the x-cisco-live-examples vendor extension, keyed by PID
+    live = media["x-cisco-live-examples"]["C9300-48T"]
     assert live["value"]["pkts"] == 633024
     assert live["value"]["password"] == redact.REDACTED          # defensively redacted
-    assert "Real device capture" in live["summary"]
-    assert media["x-cisco-observed"]["live-C9300-48T"]["source"] == "live-device"
-    assert media["x-cisco-observed"]["live-C9300-48T"]["pid"] == "C9300-48T"
-    # Provenance must carry the OpenAPI path, never the device IP / restconf_url.
-    obs = media["x-cisco-observed"]["live-C9300-48T"]
-    assert obs["path"] == "/data/x"
-    assert "restconf_url" not in obs
-    assert not any("10.0.0" in str(v) for v in obs.values())
+    assert live["os_version"] and live["path"] == "/data/x"      # provenance present
+    # never the device IP / restconf_url / host
+    assert "restconf_url" not in live and "host" not in live
+    assert "10.0.0.9" not in json.dumps(live)
 
 
 def test_overlay_skips_too_large_example(tmp_path):
@@ -427,7 +424,7 @@ def test_overlay_is_idempotent(tmp_path):
     assert spec_file.read_text(encoding="utf-8") == first
 
 
-def test_overlay_multi_pid_adds_separate_examples(tmp_path):
+def test_overlay_multi_pid_adds_separate_live_entries(tmp_path):
     caps = tmp_path / "captures"
     specs = tmp_path / "specs"
     _write_capture(caps, "sw1", "oper", "m", "/data/x", 200, {"pkts": 1}, pid="C9200-48P")
@@ -435,8 +432,10 @@ def test_overlay_multi_pid_adds_separate_examples(tmp_path):
     spec_file = _write_get_spec(specs, "oper", "m", "/data/x")
     overlay_mod.apply_overlay(caps, specs, write=True)
     spec = json.loads(spec_file.read_text(encoding="utf-8"))
-    examples = spec["paths"]["/data/x"]["get"]["responses"]["200"]["content"]["application/yang-data+json"]["examples"]
-    assert "live-C9200-48P" in examples and "live-C9300-48T" in examples
+    live = spec["paths"]["/data/x"]["get"]["responses"]["200"]["content"]["application/yang-data+json"]["x-cisco-live-examples"]
+    assert "C9200-48P" in live and "C9300-48T" in live
+    assert live["C9200-48P"]["value"]["pkts"] == 1
+    assert live["C9300-48T"]["value"]["pkts"] == 2
 
 
 def test_overlay_skips_non200_and_missing_path(tmp_path):

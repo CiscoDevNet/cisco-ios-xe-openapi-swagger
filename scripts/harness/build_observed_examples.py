@@ -1,20 +1,24 @@
-"""Overlay real captured GET responses into the OpenAPI specs as examples.
+"""Overlay real captured GET responses into the OpenAPI specs (x-cisco-live-examples).
 
-Part of the Track B GET harness (DEVICE_DATA_COLLECTION.md §11.A.2 / §11.B.4). Reads
-the local captures under scripts/harness/captures/ and, for every successful
-(HTTP 200, non-empty) GET, injects the verbatim (light-redacted) response body
-into that path's ``get`` 200-response as an OpenAPI 3.0 ``examples`` entry,
-keyed per device PID and tagged with machine-readable ``x-cisco-observed``
-provenance so it is unmistakably real device data, not a synthetic default.
+Part of the Track B GET harness (DEVICE_DATA_COLLECTION.md §11.0). Reads the local
+captures under scripts/harness/captures/ and, for every successful (HTTP 200,
+non-empty) GET, adds the verbatim (light-redacted) response under the
+``x-cisco-live-examples`` vendor extension on that path's ``get`` 200-response,
+keyed by device PID. The existing synthetic ``example`` is left UNTOUCHED — the
+web app's viewer hook (assets/js/viewer-enhancements.js) renders the per-PID real
+data in a "Live device sample - <PID>" panel beside it.
 
-Multiple PIDs capturing the same path produce multiple example entries
-(``live-<pid>``) which Swagger UI surfaces natively in its examples dropdown
-(the §11.B per-PID switcher, for free).
+Shape written per media type:
+    "x-cisco-live-examples": {
+        "C9300-24UX": { "os_version": "26.1.1", "fetched_at": "...", "http_status": 200,
+                        "path": "/data/...", "value": {<real redacted response>} }
+    }
+Multiple PIDs capturing the same path simply add more keys (per-PID switcher).
 
 Default is a DRY RUN (prints what would change, writes nothing). Pass --write to
-apply the overlay in place to the spec files under --specs-root. Injecting
-example content does NOT change path/operation/module counts, so the G-6
-baseline is unaffected; bump service-worker CACHE_VERSION after applying.
+apply the overlay in place to the spec files under --specs-root. This is additive
+vendor-extension content: it does NOT change path/operation/module counts, so the
+G-6 baseline is unaffected; bump service-worker CACHE_VERSION after applying.
 
 Run:
   python -X utf8 -m scripts.harness.build_observed_examples                 # dry run
@@ -92,50 +96,43 @@ def _response_object(op: dict) -> dict:
     return resp
 
 
-def _example_entry(record: dict) -> tuple[str, dict, dict]:
-    """Build (key, example_object, x_cisco_observed) for one capture."""
+def _live_entry(record: dict) -> tuple[str, dict]:
+    """Build (pid, per-PID live-example entry) for one capture.
+
+    Per the agreed Phase 4 decision (DEVICE_DATA_COLLECTION.md §11.0) the real
+    data is exposed under the ``x-cisco-live-examples`` vendor extension keyed by
+    PID; the entry carries the redacted response plus minimal provenance so the
+    viewer can render a "Live device sample - <PID> v<os_version>" panel. The
+    device IP / restconf_url is deliberately excluded.
+    """
     pid = str(record.get("pid", "unknown")) or "unknown"
-    device = str(record.get("device", "?"))
-    os_version = str(record.get("os_version", "unknown"))
-    fetched_at = str(record.get("fetched_at", ""))
     # Defensive re-redaction; captures are already light-redacted on write.
     value = redaction.redact(record.get("response"))
-    key = f"live-{pid}"
-    summary = f"Real device capture - {pid} - IOS XE {os_version}" + (f" - {fetched_at[:10]}" if fetched_at else "")
-    example_obj = {
-        "summary": summary,
-        "description": (
-            "Verbatim RESTCONF GET response from a real Catalyst 9000 device, "
-            "lightly redacted (secrets only). Not a synthetic schema default."
-        ),
+    entry = {
+        "os_version": str(record.get("os_version", "unknown")),
+        "fetched_at": str(record.get("fetched_at", "")),
+        "http_status": record.get("http_status"),
+        "path": record.get("path", ""),   # OpenAPI path only — never the device IP
         "value": value,
     }
-    observed = {
-        "source": "live-device",
-        "device": device,
-        "pid": pid,
-        "os_version": os_version,
-        "http_status": record.get("http_status"),
-        "fetched_at": fetched_at,
-        # OpenAPI path only — never the restconf_url, which carries the device IP.
-        "path": record.get("path", ""),
-    }
-    return key, example_obj, observed
+    return pid, entry
 
 
 def _inject(op: dict, record: dict, max_bytes: int) -> str:
     """Inject the capture into the GET op's 200 response (idempotent).
 
-    Returns a status: ``annotated`` on success, or ``too_large`` / ``secret``
-    when a guard refuses the example (in which case the spec is left untouched).
+    Adds the real response under ``x-cisco-live-examples[<PID>]`` and leaves the
+    existing synthetic ``example`` UNTOUCHED (agreed convention). Returns
+    ``annotated`` on success, or ``too_large`` / ``secret`` when a guard refuses
+    the example (spec left unchanged).
     """
-    key, example_obj, observed = _example_entry(record)
-    value_text = json.dumps(example_obj["value"], ensure_ascii=False)
+    pid, entry = _live_entry(record)
+    value_text = json.dumps(entry["value"], ensure_ascii=False)
     # Safety valve: skip a runaway payload rather than bloat the spec.
     if max_bytes and len(value_text.encode("utf-8")) > max_bytes:
         return "too_large"
-    # Basic secret gate: never commit an example that still looks secret-bearing
-    # after light redaction. Reuses the existing (deliberately simple) scanner.
+    # Basic secret gate: never commit data that still looks secret-bearing after
+    # light redaction. Reuses the existing (deliberately simple) scanner.
     if secret_scan.find_secrets(value_text):
         return "secret"
 
@@ -147,20 +144,13 @@ def _inject(op: dict, record: dict, max_bytes: int) -> str:
     for _mt, media in list(content.items()):
         if not isinstance(media, dict):
             continue
-        # OpenAPI forbids singular `example` alongside `examples`; migrate it.
-        examples = media.setdefault("examples", {})
-        if not isinstance(examples, dict):
-            examples = {}
-            media["examples"] = examples
-        if "example" in media:
-            examples.setdefault("schema-default", {"value": media.pop("example")})
-        examples[key] = example_obj
-        # Provenance sits beside the example on the media-type object.
-        obs = media.setdefault("x-cisco-observed", {})
-        if not isinstance(obs, dict):
-            obs = {}
-            media["x-cisco-observed"] = obs
-        obs[key] = observed
+        # Synthetic `example` stays UNTOUCHED; real per-PID data goes in the
+        # x-cisco-live-examples vendor extension (matches x-yang-module/x-model-type).
+        live = media.setdefault("x-cisco-live-examples", {})
+        if not isinstance(live, dict):
+            live = {}
+            media["x-cisco-live-examples"] = live
+        live[pid] = entry
     return "annotated"
 
 
