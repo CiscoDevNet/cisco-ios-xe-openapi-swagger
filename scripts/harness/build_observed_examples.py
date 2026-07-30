@@ -31,6 +31,7 @@ import argparse
 import json
 import sys
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -208,12 +209,56 @@ def apply_overlay(captures_dir: Path, specs_root: Path, write: bool,
     return stats
 
 
+def build_sidecar(captures_dir: Path, max_bytes: int = DEFAULT_MAX_EXAMPLE_BYTES):
+    """Extract committable per-PID live-example entries from the local captures.
+
+    Returns (sidecar_dict, stats). The sidecar is the COMMITTED data source that
+    the build-time overlay (scripts/apply_cisco_live_examples_overlay.py) applies
+    to the release specs — CI has no captures, so the data must be committed. Each
+    entry is { category, module, path, pids: { <PID>: {os_version, fetched_at,
+    http_status, path, value} } }. The same size + secret guards as the direct
+    overlay apply here.
+    """
+    stats: Counter = Counter()
+    by_path: dict[tuple[str, str, str], dict] = {}
+    os_version = None
+    for record in _iter_captures(captures_dir):
+        stats["captures"] += 1
+        if not _is_usable(record):
+            stats["skipped_not200_or_empty"] += 1
+            continue
+        pid, entry = _live_entry(record)
+        value_text = json.dumps(entry["value"], ensure_ascii=False)
+        if max_bytes and len(value_text.encode("utf-8")) > max_bytes:
+            stats["skipped_too_large"] += 1
+            continue
+        if secret_scan.find_secrets(value_text):
+            stats["skipped_secret"] += 1
+            continue
+        os_version = os_version or entry.get("os_version")
+        key = (str(record.get("category")), str(record.get("module")), str(record.get("path")))
+        by_path.setdefault(key, {})[pid] = entry
+        stats["entries"] += 1
+    entries = [
+        {"category": c, "module": m, "path": p, "pids": pids}
+        for (c, m, p), pids in sorted(by_path.items())
+    ]
+    sidecar = {
+        "os_version": os_version or "unknown",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "entry_count": len(entries),
+        "entries": entries,
+    }
+    return sidecar, stats
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     ap.add_argument("--captures", help="Captures dir (default scripts/harness/captures)")
     ap.add_argument("--specs-root", help="Specs root (default releases/26.1.1)")
+    ap.add_argument("--sidecar", help="Instead of writing specs, emit a committable live-examples sidecar JSON to this path")
     ap.add_argument("--write", action="store_true", help="Apply the overlay in place (default: dry run)")
     ap.add_argument(
         "--max-example-bytes",
@@ -227,6 +272,17 @@ def main(argv: Optional[list[str]] = None) -> int:
     if not captures_dir.is_dir():
         print(f"No captures dir yet: {captures_dir}. Run the collector first.", file=sys.stderr)
         return 2
+
+    if args.sidecar:
+        sidecar, sstats = build_sidecar(captures_dir, max_bytes=args.max_example_bytes)
+        out = Path(args.sidecar)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(sidecar, indent=2) + "\n", encoding="utf-8")
+        print(f"Sidecar written: {out}")
+        print(f"  {sidecar['entry_count']} path entries, os {sidecar['os_version']}; "
+              f"skipped too_large={sstats['skipped_too_large']} secret={sstats['skipped_secret']}")
+        return 0
+
     try:
         specs_root = spec_paths.resolve_specs_root(args.specs_root)
     except spec_paths.SpecsNotFoundError as exc:

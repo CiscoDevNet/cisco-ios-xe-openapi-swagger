@@ -124,6 +124,12 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("native-example-overlay", ["python", str(SCRIPTS / "apply_example_overlay.py"),
                              "--version", "$VER"]),
+    # Real captured RESTCONF GET responses (x-cisco-live-examples vendor
+    # extension) from references/live-examples-$VER.json. Additive metadata
+    # only; a no-op when the sidecar is absent. Leaves the synthetic example
+    # untouched. See scripts/apply_cisco_live_examples_overlay.py.
+    ("live-examples-overlay", ["python", str(SCRIPTS / "apply_cisco_live_examples_overlay.py"),
+                             "--version", "$VER"]),
     ("wrap-body-schemas",   ["python", str(SCRIPTS / "wrap_body_schemas.py"),
                              "--version", "$VER"]),
     # Top-level /native coverage guard. Compares every container/list/leaf
