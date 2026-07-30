@@ -493,7 +493,7 @@ def _gen_leaf(name, stype, module_name=""):
 
 
 _PLACEHOLDER_LEAVES = (None, "example", "example-1", "example-value",
-                       "configured-value", "string", "item-1")
+                       "example-string", "configured-value", "string", "item-1")
 
 
 def _fix_leaf(ex, name, stype, module_name):
@@ -850,7 +850,7 @@ def enrich_top_level_example(example_obj, module_name):
                 if isinstance(item, dict):
                     changes += enrich_top_level_example(item, module_name)
         elif isinstance(val, str) and val in ("example", "example-value", "string",
-                                              "configured-value", "example-1", "item-1"):
+                                              "example-string", "configured-value", "example-1", "item-1"):
             new_val = get_example_for_field(key, module_name)
             example_obj[key] = str(new_val) if isinstance(new_val, (int, float, bool)) else new_val
             changes += 1
