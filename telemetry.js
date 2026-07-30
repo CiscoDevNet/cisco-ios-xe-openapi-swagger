@@ -426,6 +426,15 @@
             release: state.ver, page_or_section: 'telemetry'
           });
         } catch (e) { /* noop */ }
+        // Open a subscription-build workflow on module load; closed on "Use in config".
+        try {
+          if (window.analytics && window.analytics.startWorkflow) {
+            window.__iosxeWf = window.__iosxeWf || {};
+            window.__iosxeWf.telemetry = window.analytics.startWorkflow('telemetry_subscription_built', {
+              yang_model: name, model_category: state.cat, release: state.ver, page_or_section: 'telemetry'
+            });
+          }
+        } catch (e) { /* noop */ }
         // Deep-link restore: rebuild the subscription for the shared xpath.
         if (state.pendingRestore && state.pendingRestore.xpath) {
           var pr = state.pendingRestore; state.pendingRestore = null;
@@ -713,12 +722,18 @@
           });
           _writeHash({ xpath: xp, xport: state.xport });
           try {
-            if (window.analytics) window.analytics.trackWorkflowCompleted({
-              workflow: 'telemetry_subscription_built',
-              yang_model: state.specName, model_category: state.cat,
-              transport: state.xport, release: state.ver,
-              page_or_section: 'telemetry'
-            });
+            if (window.analytics && window.analytics.completeWorkflow) {
+              window.__iosxeWf = window.__iosxeWf || {};
+              var _twf = window.__iosxeWf.telemetry
+                || (window.analytics.startWorkflow && window.analytics.startWorkflow('telemetry_subscription_built', { yang_model: state.specName, model_category: state.cat, release: state.ver, page_or_section: 'telemetry' }));
+              window.analytics.completeWorkflow(_twf, {
+                workflow: 'telemetry_subscription_built', status: 'success',
+                yang_model: state.specName, model_category: state.cat,
+                transport: state.xport, release: state.ver,
+                page_or_section: 'telemetry'
+              });
+              window.__iosxeWf.telemetry = null;
+            }
           } catch (e) { /* noop */ }
         });
       });

@@ -313,17 +313,14 @@
                     if (key === _lastOpKey) return;
                     _lastOpKey = key;
 
-                    if (typeof window.__iosxeTrack === 'function') {
-                        window.__iosxeTrack('operation_selected', {
-                            http_method: method,
-                            spec: spec,
-                            op_path: opPath
-                        });
-                    }
+                    // Single canonical selection event (dropped the duplicate
+                    // operation_selected that fired at the same instant).
                     try {
+                        var _cat = '';
+                        try { var _cm = (location.pathname || '').match(/swagger-([a-z0-9-]+)-model/i); if (_cm) _cat = _cm[1].toLowerCase(); } catch (_) { /* noop */ }
                         if (window.analytics) window.analytics.trackApiOperationSelected({
                             api_operation: (method + ' ' + opPath).trim(),
-                            yang_model: spec, http_method: method,
+                            yang_model: spec, model_category: _cat, http_method: method,
                             page_or_section: 'swagger-viewer'
                         });
                     } catch (_) { /* noop */ }
