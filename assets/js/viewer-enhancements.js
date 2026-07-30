@@ -287,9 +287,22 @@
 
     function attachLiveExamplesPanel() {
         try {
-            if (!document.getElementById('swagger-ui')) return;
+            var ui = document.getElementById('swagger-ui');
+            if (!ui) return;
             updateLiveExamplesPanel();
+            // The viewer switches modules via history.replaceState (see
+            // deeplink.js), which does NOT fire 'hashchange'. So in addition
+            // to hashchange (covers pasted deep links / back-forward), watch
+            // the Swagger UI container for the re-render that every in-page
+            // spec switch triggers, and refresh the panel then. Debounced so
+            // the many mutations during a single render collapse into one call.
             window.addEventListener('hashchange', updateLiveExamplesPanel);
+            var t = null;
+            var observer = new MutationObserver(function () {
+                clearTimeout(t);
+                t = setTimeout(updateLiveExamplesPanel, 120);
+            });
+            observer.observe(ui, { childList: true, subtree: true });
         } catch (_) { /* noop */ }
     }
 
