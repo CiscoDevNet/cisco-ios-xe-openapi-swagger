@@ -335,6 +335,23 @@ def get_example_for_field(field_name, module_name=""):
         return 3600
 
     # ── Fallback based on name patterns ──────────────────────────────────
+    # -- Typed-field substrings (mac / ip / prefix / type / color) --
+    if fl.endswith("-type"):
+        return "default"
+    if "mac" in fl:
+        return "00:1a:2b:3c:4d:5e"
+    if "ipv6" in fl:
+        return "2001:db8::1"
+    if ("addr" in fl or "system-ip" in fl or "nexthop" in fl or "next-hop" in fl
+            or fl.endswith("-ip") or fl.startswith("ip-")):
+        return "10.1.1.1"
+    if "prefix" in fl and "length" not in fl and "len" not in fl:
+        return "10.0.0.0/24"
+    if "encap" in fl:
+        return "dot1q"
+    if "color" in fl:
+        return "green"
+
     if "name" in fl:
         return "example-1"
     if "address" in fl:
@@ -452,6 +469,95 @@ def convert_example(example, schema_type):
     if schema_type == "boolean":
         return bool(example)
     return example
+
+
+def _gen_leaf(name, stype, module_name=""):
+    """Type-correct realistic value for a leaf given its name + schema type."""
+    v = get_example_for_field(name, module_name)
+    if stype == "integer":
+        if isinstance(v, bool):
+            return 1
+        if isinstance(v, (int, float)):
+            return int(v)
+        low = (name or "").lower()
+        return 0 if any(w in low for w in ("error", "drop", "discard", "fail", "collision")) else 1
+    if stype == "number":
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            return float(v)
+        return 1.0
+    if stype == "boolean":
+        return v if isinstance(v, bool) else True
+    if isinstance(v, (dict, list)):
+        return "configured-value"
+    return str(v)
+
+
+_PLACEHOLDER_LEAVES = (None, "example", "example-1", "example-value",
+                       "configured-value", "string", "item-1")
+
+
+def _fix_leaf(ex, name, stype, module_name):
+    """Replace a placeholder or type-mismatched leaf with a type-correct value."""
+    if stype is None:
+        # No schema type (leaf absent from schema) -> keep the value's own type.
+        if isinstance(ex, bool):
+            stype = "boolean"
+        elif isinstance(ex, int):
+            stype = "integer"
+        elif isinstance(ex, float):
+            stype = "number"
+        elif isinstance(ex, str):
+            stype = "string"
+    is_ph = (ex in _PLACEHOLDER_LEAVES
+             or (isinstance(ex, int) and not isinstance(ex, bool) and ex == 1)
+             or (isinstance(ex, float) and ex == 1.0))
+    mismatch = False
+    if stype == "integer" and not (isinstance(ex, int) and not isinstance(ex, bool)):
+        mismatch = True
+    elif stype == "number" and not (isinstance(ex, (int, float)) and not isinstance(ex, bool)):
+        mismatch = True
+    elif stype == "string" and not isinstance(ex, str):
+        mismatch = True
+    elif stype == "boolean" and not isinstance(ex, bool):
+        mismatch = True
+    if is_ph or mismatch:
+        new = _gen_leaf(name, stype, module_name)
+        if new != ex:
+            return new, 1
+    return ex, 0
+
+
+def enrich_with_schema(ex, schema, module_name="", name="", depth=0):
+    """Walk example + schema together so every leaf is type-correct + realistic.
+
+    Preserves the example's structure; uses the schema only to learn each leaf's
+    type (these specs carry no enum/format, so type is the only signal).
+    Returns (new_example, changes).
+    """
+    if depth > 40:
+        return ex, 0
+    stype = schema.get("type") if isinstance(schema, dict) else None
+    if isinstance(ex, dict):
+        props = (schema.get("properties") or {}) if isinstance(schema, dict) else {}
+        changes = 0
+        for k in list(ex.keys()):
+            sub = props.get(k)
+            if isinstance(sub, dict):
+                ex[k], c = enrich_with_schema(ex[k], sub, module_name, k, depth + 1)
+            elif isinstance(ex[k], (dict, list)):
+                ex[k], c = enrich_with_schema(ex[k], {}, module_name, k, depth + 1)
+            else:
+                ex[k], c = _fix_leaf(ex[k], k, None, module_name)
+            changes += c
+        return ex, changes
+    if isinstance(ex, list):
+        items = (schema.get("items") or {}) if isinstance(schema, dict) else {}
+        changes = 0
+        for i in range(len(ex)):
+            ex[i], c = enrich_with_schema(ex[i], items, module_name, name, depth + 1)
+            changes += c
+        return ex, changes
+    return _fix_leaf(ex, name, stype, module_name)
 
 
 # ── Operation description templates ──────────────────────────────────────────
@@ -743,7 +849,8 @@ def enrich_top_level_example(example_obj, module_name):
             for item in val:
                 if isinstance(item, dict):
                     changes += enrich_top_level_example(item, module_name)
-        elif isinstance(val, str) and val in ("example", "example-value", "string"):
+        elif isinstance(val, str) and val in ("example", "example-value", "string",
+                                              "configured-value", "example-1", "item-1"):
             new_val = get_example_for_field(key, module_name)
             example_obj[key] = str(new_val) if isinstance(new_val, (int, float, bool)) else new_val
             changes += 1
@@ -979,6 +1086,10 @@ def enrich_operation(method, op, path, module_name):
             if "example" in media_obj and "schema" in media_obj:
                 changes += _populate_empty_example(media_obj["example"],
                                                    media_obj["schema"], module_name, path)
+            if "example" in media_obj and "schema" in media_obj:
+                media_obj["example"], _c = enrich_with_schema(
+                    media_obj["example"], media_obj["schema"], module_name)
+                changes += _c
             if "example" in media_obj:
                 changes += enrich_top_level_example(media_obj["example"], module_name)
 
