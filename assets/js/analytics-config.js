@@ -28,7 +28,7 @@ window.__ANALYTICS_CONFIG__ = {
   },
   // Web-app build version reported as the `app_version` event property.
   // Keep roughly in step with the service-worker CACHE_VERSION on releases.
-  appVersion: 'v85-2026.07.17j',
+  appVersion: 'v86-2026.07.17k',
   // Leave blank to auto-detect from the hostname
   // (localhost -> development, CiscoDevNet -> production, jeremycohoe -> staging).
   environment: '',
