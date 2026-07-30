@@ -72,14 +72,18 @@ Every event automatically carries `app_version`, `environment`, and
 | `api_request` | A Swagger UI **Try it out** call completes. | `api_operation`, `yang_model`, `http_code`, `result` |
 | `api_error` | A Try-it-out call fails (network/timeout). | `api_operation`, `yang_model`, `result`, `error_type` |
 | `export_results` | A CSV/export download runs. | `export_type`, `row_count`, `result` |
-| `workflow_started` | A multi-step task begins (module loaded in telemetry; op picked in code gen). | `workflow`, `workflow_id`, `page_or_section` |
-| `workflow_completed` | The task finishes (subscription built, code generated). | `workflow`, `workflow_id`, `status`, `duration_ms`, `yang_model`, `transport` |
+| `workflow_started` | A multi-step task begins (module loaded in telemetry; op picked in code gen; spec opened in a viewer; event model picked in notifications). | `workflow`, `workflow_id`, `page_or_section` |
+| `workflow_completed` | The task finishes, fails, or is abandoned. | `workflow`, `workflow_id`, `status`, `duration_ms`, `yang_model`, `transport`, `error_type` |
 
 `result` is one of `success | error | timeout`. `status` (on workflows) is
 `success | failed | abandoned`. Each workflow run emits one `workflow_started`
 and one `workflow_completed` sharing a `workflow_id`, so PostHog can build a
 funnel and duration trend. Canonical `workflow` names: `telemetry_subscription_built`,
-`code_generated`. `model_category` is always lowercased by the wrapper. (The old
+`code_generated`, `spec_explored`, `data_model_explored`. A workflow that is still
+open when the page is left is flushed as `status: 'abandoned'` on the `pagehide`
+event; genuine failures emit `status: 'failed'` with an `error_type`
+(`missing_host` / `missing_path` for code gen, `spec_load_failed` for telemetry).
+`model_category` is always lowercased by the wrapper. (The old
 `operation_selected` event was removed as a duplicate of `api_operation_selected`.)
 
 The headline call (matches the agreed shape exactly):
