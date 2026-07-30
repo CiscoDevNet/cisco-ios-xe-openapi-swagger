@@ -3,7 +3,7 @@
   "info": {
     "title": "CISCO-IP-URPF-MIB MIB API",
     "version": "1.0.0",
-    "description": "Unicast Reverse Path Forwarding (URPF) is a function that\n    checks the validity of the source address of IP packets\n    received on an interface. This in an attempt to prevent\n    Denial of Service attacks based on IP address spoofing.\n    \n    URPF checks validity of a source address by determining\n    whether the packet would be successfully routed as a\n    destination address. \n    Based on configuration, the check made\n    can be for existence of any route for the address, or more\n    strictly for a route out the interface on which the packet\n    was received by the device. When a violating packet is\n    detected, it can be dropped. \n    This MIB allows detection of\n    spoofingevents.\n\n\u26a0\ufe0f **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
+    "description": "Unicast Reverse Path Forwarding (URPF) is a function that\n    checks the validity of the source address of IP packets\n    received on an interface. This in an attempt to prevent\n    Denial of Service attacks based on IP address spoofing.\n    \n    URPF checks validity of a source address by determining\n    whether the packet would be successfully routed as a\n    destination address. \n    Based on configuration, the check made\n    can be for existence of any route for the address, or more\n    strictly for a route out the interface on which the packet\n    was received by the device. When a violating packet is\n    detected, it can be dropped. \n    This MIB allows detection of\n    spoofingevents.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
     "contact": {
       "name": "Cisco DevNet",
       "url": "https://developer.cisco.com"
@@ -39,23 +39,28 @@
                           "type": "integer",
                           "description": "The window of time in the recent past over which the drop\n          count used in the drop rate computation is collected. \n          This global value applies for the computation of all URPF \n          rates, global and per-interface. \n          \n          Once the period over which computations have been \n          performed exceeds cipUrpfDropRateWindow, every time a \n          computation is performed, the window slides up to end \n          at the current time and start at cipUrpfDropRateWindow \n          seconds before. \n          \n          The cipUrpfDropRateWindow must be greater than\n          or equal to the interval between computations \n          (cipUrpfComputeInterval).\n          \n          Since the agent must save the drop count values\n          for each compute interval in order to slide the window,\n          the number of counts saved is the quotient of\n          cipUrpfDropRateWindow divided by cipUrpfComputeInterval.",
                           "minimum": -2147483648,
-                          "maximum": 2147483647
+                          "maximum": 2147483647,
+                          "example": 0
                         },
                         "cipUrpfComputeInterval": {
                           "type": "integer",
                           "description": "The time between rate computations. This global value\n          applies for the computation of all URPF rates, global\n          and per-interface.\n          \n          When the value of cipUrpfComputeInterval is changed,\n          the interval in-progress proceeds as though the value\n          had not changed. The change will apply to the length\n          of subsequent intervals.\n          \n          The cipUrpfComputeInterval must be less than or equal \n          to the cipUrpfDropRateWindow.",
                           "minimum": -2147483648,
-                          "maximum": 2147483647
+                          "maximum": 2147483647,
+                          "example": 1
                         },
                         "cipUrpfDropNotifyHoldDownTime": {
                           "type": "integer",
                           "description": "The minimum time between issuance of\n          cipUrpfIfDropRateNotify notifications for a \n          particular interface and packet forwarding type.\n          \n          Notifications are generated for each interface and\n          packet forwarding type that exceeds the drop-rate. \n          When a Notify is sent because the drop-rate is \n          exceeded for a particular interface and forwarding\n          type, the time specified by this object is used to \n          specify the minimum time that must elapse before \n          another Notify can be sent for that interface and\n          forwarding type. The time is specified globally but \n          used individually.",
                           "minimum": -2147483648,
-                          "maximum": 2147483647
+                          "maximum": 2147483647,
+                          "example": 0
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfScalar": {
@@ -98,26 +103,33 @@
                             "properties": {
                               "cipUrpfIpVersion": {
                                 "type": "string",
-                                "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                                "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                                "example": "configured-value"
                               },
                               "cipUrpfDrops": {
                                 "type": "integer",
                                 "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               },
                               "cipUrpfDropRate": {
                                 "type": "integer",
                                 "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfTable": {
@@ -170,24 +182,30 @@
                         "properties": {
                           "cipUrpfIpVersion": {
                             "type": "string",
-                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                            "example": "configured-value"
                           },
                           "cipUrpfDrops": {
                             "type": "integer",
                             "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfDropRate": {
                             "type": "integer",
                             "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfEntry": [
@@ -236,23 +254,28 @@
                       "properties": {
                         "cipUrpfIpVersion": {
                           "type": "string",
-                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                          "example": "configured-value"
                         },
                         "cipUrpfDrops": {
                           "type": "integer",
                           "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfDropRate": {
                           "type": "integer",
                           "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfEntry": {
@@ -296,41 +319,51 @@
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cipUrpfIfIpVersion": {
                                 "type": "string",
-                                "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                                "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                                "example": "configured-value"
                               },
                               "cipUrpfIfDrops": {
                                 "type": "integer",
                                 "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               },
                               "cipUrpfIfSuppressedDrops": {
                                 "type": "integer",
                                 "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               },
                               "cipUrpfIfDropRate": {
                                 "type": "integer",
                                 "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               },
                               "cipUrpfIfDiscontinuityTime": {
                                 "type": "string",
                                 "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                                "x-yang-type": "yang:timestamp"
+                                "x-yang-type": "yang:timestamp",
+                                "example": "10:30:45"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfIfMonTable": {
@@ -393,44 +426,53 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cipUrpfIfIpVersion": {
                             "type": "string",
-                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                            "example": "configured-value"
                           },
                           "cipUrpfIfDrops": {
                             "type": "integer",
                             "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfSuppressedDrops": {
                             "type": "integer",
                             "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfDropRate": {
                             "type": "integer",
                             "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfDiscontinuityTime": {
                             "type": "string",
                             "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                            "x-yang-type": "yang:timestamp"
+                            "x-yang-type": "yang:timestamp",
+                            "example": "10:30:45"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": [
                     {
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cipUrpfIfIpVersion": "192.168.1.1",
                       "cipUrpfIfDrops": 0,
                       "cipUrpfIfSuppressedDrops": 0,
@@ -478,42 +520,50 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cipUrpfIfIpVersion": {
                           "type": "string",
-                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                          "example": "configured-value"
                         },
                         "cipUrpfIfDrops": {
                           "type": "integer",
                           "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfSuppressedDrops": {
                           "type": "integer",
                           "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfDropRate": {
                           "type": "integer",
                           "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfDiscontinuityTime": {
                           "type": "string",
                           "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                          "x-yang-type": "yang:timestamp"
+                          "x-yang-type": "yang:timestamp",
+                          "example": "10:30:45"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cipUrpfIfIpVersion": "192.168.1.1",
                     "cipUrpfIfDrops": 0,
                     "cipUrpfIfSuppressedDrops": 0,
@@ -556,30 +606,38 @@
                               "cipUrpfVrfName": {
                                 "type": "string",
                                 "description": "cipUrpfVrfName",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "example-1"
                               },
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cipUrpfVrfIfDrops": {
                                 "type": "integer",
                                 "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 0
                               },
                               "cipUrpfVrfIfDiscontinuityTime": {
                                 "type": "string",
                                 "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                                "x-yang-type": "yang:timestamp"
+                                "x-yang-type": "yang:timestamp",
+                                "example": "10:30:45"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfIfTable": {
@@ -636,34 +694,41 @@
                           "cipUrpfVrfName": {
                             "type": "string",
                             "description": "cipUrpfVrfName",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "example-1"
                           },
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cipUrpfVrfIfDrops": {
                             "type": "integer",
                             "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfVrfIfDiscontinuityTime": {
                             "type": "string",
                             "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                            "x-yang-type": "yang:timestamp"
+                            "x-yang-type": "yang:timestamp",
+                            "example": "10:30:45"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": [
                     {
                       "cipUrpfVrfName": "192.168.1.1",
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cipUrpfVrfIfDrops": 0,
                       "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
                     }
@@ -708,32 +773,38 @@
                         "cipUrpfVrfName": {
                           "type": "string",
                           "description": "cipUrpfVrfName",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "example-1"
                         },
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cipUrpfVrfIfDrops": {
                           "type": "integer",
                           "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfVrfIfDiscontinuityTime": {
                           "type": "string",
                           "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                          "x-yang-type": "yang:timestamp"
+                          "x-yang-type": "yang:timestamp",
+                          "example": "10:30:45"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
                     "cipUrpfVrfName": "192.168.1.1",
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cipUrpfVrfIfDrops": 0,
                     "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
                   }
@@ -773,14 +844,19 @@
                               "cipUrpfVrfName": {
                                 "type": "string",
                                 "description": "This field is used to specify the VRF Table\n            name.",
-                                "x-yang-type": "snmp-framework:SnmpAdminString"
+                                "x-yang-type": "snmp-framework:SnmpAdminString",
+                                "example": "example-1"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfTable": {
@@ -828,12 +904,16 @@
                           "cipUrpfVrfName": {
                             "type": "string",
                             "description": "This field is used to specify the VRF Table\n            name.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfEntry": [
@@ -881,11 +961,14 @@
                         "cipUrpfVrfName": {
                           "type": "string",
                           "description": "This field is used to specify the VRF Table\n            name.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfEntry": {
@@ -922,24 +1005,30 @@
                         "properties": {
                           "cipUrpfIpVersion": {
                             "type": "string",
-                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                            "example": "configured-value"
                           },
                           "cipUrpfDrops": {
                             "type": "integer",
                             "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfDropRate": {
                             "type": "integer",
                             "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfEntry": [
@@ -988,23 +1077,28 @@
                       "properties": {
                         "cipUrpfIpVersion": {
                           "type": "string",
-                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                          "example": "configured-value"
                         },
                         "cipUrpfDrops": {
                           "type": "integer",
                           "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfDropRate": {
                           "type": "integer",
                           "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfEntry": {
@@ -1044,44 +1138,53 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cipUrpfIfIpVersion": {
                             "type": "string",
-                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                            "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                            "example": "configured-value"
                           },
                           "cipUrpfIfDrops": {
                             "type": "integer",
                             "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfSuppressedDrops": {
                             "type": "integer",
                             "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfDropRate": {
                             "type": "integer",
                             "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfIfDiscontinuityTime": {
                             "type": "string",
                             "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                            "x-yang-type": "yang:timestamp"
+                            "x-yang-type": "yang:timestamp",
+                            "example": "10:30:45"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": [
                     {
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cipUrpfIfIpVersion": "192.168.1.1",
                       "cipUrpfIfDrops": 0,
                       "cipUrpfIfSuppressedDrops": 0,
@@ -1129,42 +1232,50 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cipUrpfIfIpVersion": {
                           "type": "string",
-                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                          "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                          "example": "configured-value"
                         },
                         "cipUrpfIfDrops": {
                           "type": "integer",
                           "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfSuppressedDrops": {
                           "type": "integer",
                           "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfDropRate": {
                           "type": "integer",
                           "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfIfDiscontinuityTime": {
                           "type": "string",
                           "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                          "x-yang-type": "yang:timestamp"
+                          "x-yang-type": "yang:timestamp",
+                          "example": "10:30:45"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfIfMonEntry": {
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cipUrpfIfIpVersion": "192.168.1.1",
                     "cipUrpfIfDrops": 0,
                     "cipUrpfIfSuppressedDrops": 0,
@@ -1203,34 +1314,41 @@
                           "cipUrpfVrfName": {
                             "type": "string",
                             "description": "cipUrpfVrfName",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "example-1"
                           },
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cipUrpfVrfIfDrops": {
                             "type": "integer",
                             "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 0
                           },
                           "cipUrpfVrfIfDiscontinuityTime": {
                             "type": "string",
                             "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                            "x-yang-type": "yang:timestamp"
+                            "x-yang-type": "yang:timestamp",
+                            "example": "10:30:45"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": [
                     {
                       "cipUrpfVrfName": "192.168.1.1",
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cipUrpfVrfIfDrops": 0,
                       "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
                     }
@@ -1275,32 +1393,38 @@
                         "cipUrpfVrfName": {
                           "type": "string",
                           "description": "cipUrpfVrfName",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "example-1"
                         },
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cipUrpfVrfIfDrops": {
                           "type": "integer",
                           "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 0
                         },
                         "cipUrpfVrfIfDiscontinuityTime": {
                           "type": "string",
                           "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                          "x-yang-type": "yang:timestamp"
+                          "x-yang-type": "yang:timestamp",
+                          "example": "10:30:45"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfIfEntry": {
                     "cipUrpfVrfName": "192.168.1.1",
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cipUrpfVrfIfDrops": 0,
                     "cipUrpfVrfIfDiscontinuityTime": "192.168.1.1"
                   }
@@ -1336,12 +1460,16 @@
                           "cipUrpfVrfName": {
                             "type": "string",
                             "description": "This field is used to specify the VRF Table\n            name.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfEntry": [
@@ -1389,11 +1517,14 @@
                         "cipUrpfVrfName": {
                           "type": "string",
                           "description": "This field is used to specify the VRF Table\n            name.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "CISCO-IP-URPF-MIB:cipUrpfVrfEntry": {
@@ -1422,22 +1553,27 @@
               "properties": {
                 "cipUrpfIpVersion": {
                   "type": "string",
-                  "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                  "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                  "example": "configured-value"
                 },
                 "cipUrpfDrops": {
                   "type": "integer",
                   "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 },
                 "cipUrpfDropRate": {
                   "type": "integer",
                   "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cipUrpfIfMonEntry": {
             "type": "array",
@@ -1448,37 +1584,45 @@
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cipUrpfIfIpVersion": {
                   "type": "string",
-                  "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                  "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                  "example": "configured-value"
                 },
                 "cipUrpfIfDrops": {
                   "type": "integer",
                   "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 },
                 "cipUrpfIfSuppressedDrops": {
                   "type": "integer",
                   "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 },
                 "cipUrpfIfDropRate": {
                   "type": "integer",
                   "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 },
                 "cipUrpfIfDiscontinuityTime": {
                   "type": "string",
                   "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                  "x-yang-type": "yang:timestamp"
+                  "x-yang-type": "yang:timestamp",
+                  "example": "10:30:45"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cipUrpfVrfIfEntry": {
             "type": "array",
@@ -1489,26 +1633,32 @@
                 "cipUrpfVrfName": {
                   "type": "string",
                   "description": "cipUrpfVrfName",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "example-1"
                 },
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cipUrpfVrfIfDrops": {
                   "type": "integer",
                   "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 0
                 },
                 "cipUrpfVrfIfDiscontinuityTime": {
                   "type": "string",
                   "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                  "x-yang-type": "yang:timestamp"
+                  "x-yang-type": "yang:timestamp",
+                  "example": "10:30:45"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cipUrpfVrfEntry": {
             "type": "array",
@@ -1519,10 +1669,13 @@
                 "cipUrpfVrfName": {
                   "type": "string",
                   "description": "This field is used to specify the VRF Table\n            name.",
-                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                  "x-yang-type": "snmp-framework:SnmpAdminString",
+                  "example": "example-1"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cipUrpfScalar": {
             "type": "object",
@@ -1532,21 +1685,25 @@
                 "type": "integer",
                 "description": "The window of time in the recent past over which the drop\n          count used in the drop rate computation is collected. \n          This global value applies for the computation of all URPF \n          rates, global and per-interface. \n          \n          Once the period over which computations have been \n          performed exceeds cipUrpfDropRateWindow, every time a \n          computation is performed, the window slides up to end \n          at the current time and start at cipUrpfDropRateWindow \n          seconds before. \n          \n          The cipUrpfDropRateWindow must be greater than\n          or equal to the interval between computations \n          (cipUrpfComputeInterval).\n          \n          Since the agent must save the drop count values\n          for each compute interval in order to slide the window,\n          the number of counts saved is the quotient of\n          cipUrpfDropRateWindow divided by cipUrpfComputeInterval.",
                 "minimum": -2147483648,
-                "maximum": 2147483647
+                "maximum": 2147483647,
+                "example": 0
               },
               "cipUrpfComputeInterval": {
                 "type": "integer",
                 "description": "The time between rate computations. This global value\n          applies for the computation of all URPF rates, global\n          and per-interface.\n          \n          When the value of cipUrpfComputeInterval is changed,\n          the interval in-progress proceeds as though the value\n          had not changed. The change will apply to the length\n          of subsequent intervals.\n          \n          The cipUrpfComputeInterval must be less than or equal \n          to the cipUrpfDropRateWindow.",
                 "minimum": -2147483648,
-                "maximum": 2147483647
+                "maximum": 2147483647,
+                "example": 1
               },
               "cipUrpfDropNotifyHoldDownTime": {
                 "type": "integer",
                 "description": "The minimum time between issuance of\n          cipUrpfIfDropRateNotify notifications for a \n          particular interface and packet forwarding type.\n          \n          Notifications are generated for each interface and\n          packet forwarding type that exceeds the drop-rate. \n          When a Notify is sent because the drop-rate is \n          exceeded for a particular interface and forwarding\n          type, the time specified by this object is used to \n          specify the minimum time that must elapse before \n          another Notify can be sent for that interface and\n          forwarding type. The time is specified globally but \n          used individually.",
                 "minimum": -2147483648,
-                "maximum": 2147483647
+                "maximum": 2147483647,
+                "example": 0
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cipUrpfTable": {
             "type": "object",
@@ -1560,24 +1717,30 @@
                   "properties": {
                     "cipUrpfIpVersion": {
                       "type": "string",
-                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+                      "example": "configured-value"
                     },
                     "cipUrpfDrops": {
                       "type": "integer",
                       "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     },
                     "cipUrpfDropRate": {
                       "type": "integer",
                       "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cipUrpfIfMonTable": {
             "type": "object",
@@ -1592,39 +1755,48 @@
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cipUrpfIfIpVersion": {
                       "type": "string",
-                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+                      "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+                      "example": "configured-value"
                     },
                     "cipUrpfIfDrops": {
                       "type": "integer",
                       "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     },
                     "cipUrpfIfSuppressedDrops": {
                       "type": "integer",
                       "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     },
                     "cipUrpfIfDropRate": {
                       "type": "integer",
                       "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     },
                     "cipUrpfIfDiscontinuityTime": {
                       "type": "string",
                       "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-                      "x-yang-type": "yang:timestamp"
+                      "x-yang-type": "yang:timestamp",
+                      "example": "10:30:45"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cipUrpfVrfIfTable": {
             "type": "object",
@@ -1639,28 +1811,35 @@
                     "cipUrpfVrfName": {
                       "type": "string",
                       "description": "cipUrpfVrfName",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "example-1"
                     },
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cipUrpfVrfIfDrops": {
                       "type": "integer",
                       "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 0
                     },
                     "cipUrpfVrfIfDiscontinuityTime": {
                       "type": "string",
                       "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-                      "x-yang-type": "yang:timestamp"
+                      "x-yang-type": "yang:timestamp",
+                      "example": "10:30:45"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cipUrpfVrfTable": {
             "type": "object",
@@ -1675,14 +1854,19 @@
                     "cipUrpfVrfName": {
                       "type": "string",
                       "description": "This field is used to specify the VRF Table\n            name.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                      "x-yang-type": "snmp-framework:SnmpAdminString",
+                      "example": "example-1"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           }
-        }
+        },
+        "example": "configured-value"
       },
       "CISCO-IP-URPF-MIB_object-1": {
         "type": "object",
@@ -1691,19 +1875,23 @@
           "ifIndex": {
             "type": "string",
             "description": "ifIndex",
-            "x-yang-type": "leafref"
+            "x-yang-type": "leafref",
+            "example": "configured-value"
           },
           "cipUrpfIfIpVersion": {
             "type": "string",
             "description": "cipUrpfIfIpVersion",
-            "x-yang-type": "leafref"
+            "x-yang-type": "leafref",
+            "example": "configured-value"
           },
           "cipUrpfIfDropRate": {
             "type": "string",
             "description": "cipUrpfIfDropRate",
-            "x-yang-type": "leafref"
+            "x-yang-type": "leafref",
+            "example": "0"
           }
-        }
+        },
+        "example": "configured-value"
       },
       "CISCO-IP-URPF-MIB_cipUrpfEntry": {
         "type": "array",
@@ -1713,22 +1901,27 @@
           "properties": {
             "cipUrpfIpVersion": {
               "type": "string",
-              "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply."
+              "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and\n            configuration apply.",
+              "example": "configured-value"
             },
             "cipUrpfDrops": {
               "type": "integer",
               "description": "Sum of dropped IP version cipUrpfIpVersion packets failing\n            a URPF check. This value is the sum of drops of packets \n            received on all interfaces of the managed device.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             },
             "cipUrpfDropRate": {
               "type": "integer",
               "description": "The rate of packet drops of IP version cipUrpfIpVersion\n            packets due to URPF for the managed device. The\n            per-interface drop rate notification is issued on rates\n            exceeding a limit (rising rate). This dropping may indicate\n            an security attack on the network. To determine whether the\n            attack/event is over, the NMS must consult the managed\n            device. This object can be polled to determine the recent\n            drop rate for the managed device as a whole, in addition to\n            querying particular interface objects. \n            This object is the\n            average rate of dropping over the most recent window of\n            time. The rate is computed by dividing the number of packets\n            dropped over a window by the window time in seconds. The\n            window time is specified by cipUrpfDropRateWindow. Each time\n            the drop rate is computed, and at system startup, a snapshot\n            is taken of the latest value of cipUrpfDrops. Subtracting\n            from this the snapshot of cipUrpfDrops at the start of the\n            current window of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds. As an example, let cipUrpfDropRateWindow be 300\n            seconds, and cipUrpfComputeInterval 30 seconds. Every 30\n            seconds, the drop count five minutes previous is subtracted\n            from the current drop count, and the result is divided by\n            300 to arrive at the drop rate. \n            At device start-up, until\n            the device has been up more than cipUrpfDropRateWindow, when\n            drop rate is computed, the value of cipUrpfDrops is divided\n            by the time the device has been up. \n            After the device has\n            been up for cipUrpfDropRateWindow, when drop rate is\n            computed, the number of packet drops counted from interval\n            start time to the computation time is divided by\n            cipUrpfDropRateWindow. \n            Changes to cipUrpfDropRateWindow are\n            not reflected in this object until the next computation\n            time. \n            The rate from the most recent computation is the\n            value fetched until the subsequent computation is\n            performed.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       },
       "CISCO-IP-URPF-MIB_cipUrpfIfMonEntry": {
         "type": "array",
@@ -1739,37 +1932,45 @@
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cipUrpfIfIpVersion": {
               "type": "string",
-              "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply."
+              "description": "Specifies the version of IP forwarding on an interface\n            to which the table row URPF counts, rates, and \n            configuration apply.",
+              "example": "configured-value"
             },
             "cipUrpfIfDrops": {
               "type": "integer",
               "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check and dropped by the managed device\n            on a particular interface.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             },
             "cipUrpfIfSuppressedDrops": {
               "type": "integer",
               "description": "The number of IP packets of version cipUrpfIfIpVersion\n            failing the URPF check but given a reprieve and not \n            dropped by the managed device. Depending on the \n            device configuration and capabilities, the following \n            cases may cause incrementing of the counter: \n            - if the managed device is configured to allow self-pings \n              and the managed device pings itself.\n            - if the managed device is configured for loose URPF (if any\n              interface has a route to the source), and the strict\n              case fails while the loose case passes.\n            - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) \n              will pass after initially being marked for drop.\n            - RIP routing on unnumbered interfaces will pass after \n              initially being marked for drop.\n            - multicast packets will pass after initially being marked \n              for drop\n            - ACL's can be applied to permit packets after initially \n              being marked for drop.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfIfDiscontinuityTime.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             },
             "cipUrpfIfDropRate": {
               "type": "integer",
               "description": "The rate of packet drops of IP version cipUrpfIfIpVersion\n            packets due to URPF on the interface. \n            \n            This object is the average rate of dropping over the most \n            recent interval of time. The rate is computed by dividing\n            the number of packets dropped over an interval by the \n            interval time in seconds. Each time the drop rate\n            is computed, and at system startup, a snapshot is taken\n            of the latest value of cipUrpfIfDrops. Subtracting from this\n            the snapshot of cipUrpfIfDrops at the start of the current\n            interval of time gives the number of packets dropped.\n            The drop rate is computed every cipUrpfComputeInterval\n            seconds.\n            \n            When drop rate is computed, if time since the creation of \n            a row in cipUrpfIfMonTable is less than \n            cipUrpfDropRateWindow, the value of cipUrpfIfDrops is \n            divided by the time since row was created.\n            \n            After the row has been in existence for \n            cipUrpfDropRateWindow, when drop rate is computed, the \n            number of packet drops counted on the interface from \n            interval start time to the computation time is divided \n            by cipUrpfDropRateWindow.\n            \n            Changes to cipUrpfDropRateWindow are not reflected in this\n            object until the next computation time.\n            \n            The rate from the  most recent computation is the value \n            fetched until the subsequent computation is performed.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             },
             "cipUrpfIfDiscontinuityTime": {
               "type": "string",
               "description": "The value of sysUpTime on the most recent\n            occasion at which this interface's  counters\n            suffered  a discontinuity.\n            If no such discontinuities have occurred\n            since the last re-initialization of the\n            local management subsystem, then this\n            object contains a value of zero.",
-              "x-yang-type": "yang:timestamp"
+              "x-yang-type": "yang:timestamp",
+              "example": "10:30:45"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       },
       "CISCO-IP-URPF-MIB_cipUrpfVrfIfEntry": {
         "type": "array",
@@ -1780,26 +1981,32 @@
             "cipUrpfVrfName": {
               "type": "string",
               "description": "cipUrpfVrfName",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "example-1"
             },
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cipUrpfVrfIfDrops": {
               "type": "integer",
               "description": "The number of packets failing the URPF check for a VRF on\n            the interface and dropped by the managed device.\n            \n            Discontinuities in the value of this variable can occur \n            at re-initialization of the management system, and at \n            other times as indicated by the values of \n            cipUrpfVrfIfDiscontinuityTime.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 0
             },
             "cipUrpfVrfIfDiscontinuityTime": {
               "type": "string",
               "description": "The value of sysUpTime on the most recent occasion at\n            which the URPF counters for this VRF on this interface \n            suffered  a discontinuity.  If no such discontinuities \n            have occurred since the last re-initialization of the\n            local management subsystem, then this object contains a \n            value of zero.",
-              "x-yang-type": "yang:timestamp"
+              "x-yang-type": "yang:timestamp",
+              "example": "10:30:45"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       },
       "CISCO-IP-URPF-MIB_cipUrpfVrfEntry": {
         "type": "array",
@@ -1810,10 +2017,13 @@
             "cipUrpfVrfName": {
               "type": "string",
               "description": "This field is used to specify the VRF Table\n            name.",
-              "x-yang-type": "snmp-framework:SnmpAdminString"
+              "x-yang-type": "snmp-framework:SnmpAdminString",
+              "example": "example-1"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       }
     },
     "securitySchemes": {
