@@ -131,6 +131,56 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — Native completeness, workflow analytics, dark mode & richer examples (round 29, 2026-07-30)
+
+- **Native config model — deep augment backfill to every release.** Only 26.1.1
+  shipped the fully augment/uses-resolved `native-aug-*.json` specs; the four
+  older releases carried a *shallow* native model (base `container native` only),
+  missing the routing / ip / ipv6 / crypto / snmp-server / nat / line / vrf /
+  logging / parameter-map subtrees that ~130 external `Cisco-IOS-XE-*` modules
+  contribute via `augment` and cross-module `uses`. Ran
+  `scripts/generate_native_augmented.py --interface-mode skip --max-depth 5` for
+  17.9.x / 17.12.x / 17.15.x / 17.18.1, adding **+21,141 / +21,556 / +23,356 /
+  +24,265** RESTCONF config paths respectively. The `/native/interface`
+  mega-container is left as already shipped on the older releases to stay within
+  the site size budget; 26.1.1 continues to carry full interface augments.
+  Per-release `search-index.json` + `_paths_index.json` rebuilt, manifests
+  reconciled, `release_counts.json` baseline refreshed. All five releases pass
+  `validate_release.py` gates 1–6, the strict path-depth audit, and the G-1 gate.
+  `releases/**` is service-worker network-only, so no cache bump is required.
+
+- **Complete workflow analytics lifecycle.** `assets/js/analytics.js` gained
+  `startWorkflow()` / `completeWorkflow()` with a correlated `workflow_id`,
+  `duration_ms`, and a `status` of `success | failed | abandoned`. Failures now
+  emit `status: 'failed'` with an `error_type` — `missing_host` / `missing_path`
+  when the code generator has no runnable target, `spec_load_failed` when a
+  telemetry module spec cannot be fetched. Any workflow still open when the page
+  is left is flushed as `abandoned` on `pagehide` (not `visibilitychange`, so a
+  tab-switch-and-return is not miscounted). Two new canonical workflows join
+  `code_generated` and `telemetry_subscription_built`: **`spec_explored`**
+  (opening a spec in a viewer → expanding an operation) and
+  **`data_model_explored`** (selecting an event model in Notifications → copying
+  an example). This enables free PostHog funnels and drop-off/duration trends.
+
+- **Dark-mode correctness across the site.** The hub, `tree-compare.html`, and
+  all nine `swagger-*-model` viewers now render correctly in dark mode. The hub
+  and compare page had an inline `[data-theme="dark"]` variable block that tied
+  with `site.css`'s `--c-surface` tokens at equal specificity (site.css loaded
+  later, so it won and surfaces stayed light); raising the inline block to
+  `:root[data-theme="dark"]` fixes it. The viewers already had an extensive dark
+  theme in `assets/css/viewer.css`; the one remaining gap — the hardcoded
+  `body { background:#fafafa }` in each viewer's inline `<style>` — is now
+  overridden with a dark base background applied to all nine viewers at once.
+
+- **Richer, schema-typed examples.** `scripts/enrich_v2_specs.py` gained
+  schema-type-paired enrichment (enum/format awareness, operational-telemetry
+  heuristics, PID disambiguation, placeholder replacement) and was applied across
+  all five releases and all nine categories, replacing generic placeholder values
+  with realistic, type-correct example data wherever the flattened GET schemas
+  allow it.
+
+- **Category card icons + service worker** bumped to `v88-2026.07.30a`.
+
 ### Changed — Hub navigation redesign: compact Tools / Models / Docs bar (round 28, 2026-07)
 
 - **One tidy, left-aligned quick-nav bar.** The hub's top toolbar was a

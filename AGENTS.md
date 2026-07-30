@@ -31,7 +31,7 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 
 **What ships:**
 
-- 608 OpenAPI 3.0 specs in the default 26.1.1 release (`releases/26.1.1/swagger-*-model/api/*.json`); 506\u2013608 across the five tracked releases. See [version-stats.json](version-stats.json) for per-release counts.
+- 945 OpenAPI 3.0 specs in the default 26.1.1 release (`releases/26.1.1/swagger-*-model/api/*.json`); 785–945 across the five tracked releases (the older releases grew substantially once the deep native augment specs were backfilled). See [version-stats.json](version-stats.json) for per-release counts.
 - 765 YANG tree HTML visualizations per release (`releases/<ver>/yang-trees/`)
 - 6 vanilla-JS pages (index, code generator, tree compare, accountability, plus 9 model index pages)
 - A per-release search index (`releases/<ver>/search-index.json`) consumed by Fuse.js fuzzy search
