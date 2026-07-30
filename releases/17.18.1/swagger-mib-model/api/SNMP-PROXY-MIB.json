@@ -3,7 +3,7 @@
   "info": {
     "title": "SNMP-PROXY-MIB MIB API",
     "version": "1.0.0",
-    "description": "This MIB module defines MIB objects which provide\n    mechanisms to remotely configure the parameters\n    used by a proxy forwarding application.\n    \n    Copyright (C) The Internet Society (2002). This\n    version of this MIB module is part of RFC 3413;\n    see the RFC itself for full legal notices.\n\n\u26a0\ufe0f **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
+    "description": "This MIB module defines MIB objects which provide\n    mechanisms to remotely configure the parameters\n    used by a proxy forwarding application.\n    \n    Copyright (C) The Internet Society (2002). This\n    version of this MIB module is part of RFC 3413;\n    see the RFC itself for full legal notices.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
     "contact": {
       "name": "Cisco DevNet",
       "url": "https://developer.cisco.com"
@@ -44,53 +44,66 @@
                               "snmpProxyName": {
                                 "type": "string",
                                 "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                                "x-yang-type": "snmp-framework:SnmpAdminString"
+                                "x-yang-type": "snmp-framework:SnmpAdminString",
+                                "example": "example-1"
                               },
                               "snmpProxyType": {
                                 "type": "string",
-                                "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                                "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                                "example": "configured-value"
                               },
                               "snmpProxyContextEngineID": {
                                 "type": "string",
                                 "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                                "x-yang-type": "snmp-framework:SnmpEngineID"
+                                "x-yang-type": "snmp-framework:SnmpEngineID",
+                                "example": "1"
                               },
                               "snmpProxyContextName": {
                                 "type": "string",
                                 "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                                "x-yang-type": "snmp-framework:SnmpAdminString"
+                                "x-yang-type": "snmp-framework:SnmpAdminString",
+                                "example": "example-1"
                               },
                               "snmpProxyTargetParamsIn": {
                                 "type": "string",
                                 "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                                "x-yang-type": "snmp-framework:SnmpAdminString"
+                                "x-yang-type": "snmp-framework:SnmpAdminString",
+                                "example": "configured-value"
                               },
                               "snmpProxySingleTargetOut": {
                                 "type": "string",
                                 "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                                "x-yang-type": "snmp-framework:SnmpAdminString"
+                                "x-yang-type": "snmp-framework:SnmpAdminString",
+                                "example": "configured-value"
                               },
                               "snmpProxyMultipleTargetOut": {
                                 "type": "string",
                                 "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                                "x-yang-type": "snmp-target:SnmpTagValue"
+                                "x-yang-type": "snmp-target:SnmpTagValue",
+                                "example": "configured-value"
                               },
                               "snmpProxyStorageType": {
                                 "type": "string",
                                 "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                                "x-yang-type": "snmpv2-tc:StorageType"
+                                "x-yang-type": "snmpv2-tc:StorageType",
+                                "example": "configured-value"
                               },
                               "snmpProxyRowStatus": {
                                 "type": "string",
                                 "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                                "x-yang-type": "snmpv2-tc:RowStatus"
+                                "x-yang-type": "snmpv2-tc:RowStatus",
+                                "example": "active"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "SNMP-PROXY-MIB:snmpProxyTable": {
@@ -98,10 +111,10 @@
                       {
                         "snmpProxyName": "interface-1",
                         "snmpProxyType": "ethernetCsmacd(6)",
-                        "snmpProxyContextEngineID": "example-string",
+                        "snmpProxyContextEngineID": "1",
                         "snmpProxyContextName": "interface-1",
-                        "snmpProxyTargetParamsIn": "example-string",
-                        "snmpProxySingleTargetOut": "example-string",
+                        "snmpProxyTargetParamsIn": "configured-value",
+                        "snmpProxySingleTargetOut": "configured-value",
                         "snmpProxyMultipleTargetOut": "192.168.1.1",
                         "snmpProxyStorageType": "ethernetCsmacd(6)",
                         "snmpProxyRowStatus": "up(1)"
@@ -109,10 +122,10 @@
                       {
                         "snmpProxyName": "interface-1",
                         "snmpProxyType": "ethernetCsmacd(6)",
-                        "snmpProxyContextEngineID": "example-string",
+                        "snmpProxyContextEngineID": "1",
                         "snmpProxyContextName": "interface-1",
-                        "snmpProxyTargetParamsIn": "example-string",
-                        "snmpProxySingleTargetOut": "example-string",
+                        "snmpProxyTargetParamsIn": "configured-value",
+                        "snmpProxySingleTargetOut": "configured-value",
                         "snmpProxyMultipleTargetOut": "192.168.1.1",
                         "snmpProxyStorageType": "ethernetCsmacd(6)",
                         "snmpProxyRowStatus": "up(1)"
@@ -120,10 +133,10 @@
                       {
                         "snmpProxyName": "interface-1",
                         "snmpProxyType": "ethernetCsmacd(6)",
-                        "snmpProxyContextEngineID": "example-string",
+                        "snmpProxyContextEngineID": "1",
                         "snmpProxyContextName": "interface-1",
-                        "snmpProxyTargetParamsIn": "example-string",
-                        "snmpProxySingleTargetOut": "example-string",
+                        "snmpProxyTargetParamsIn": "configured-value",
+                        "snmpProxySingleTargetOut": "configured-value",
                         "snmpProxyMultipleTargetOut": "192.168.1.1",
                         "snmpProxyStorageType": "ethernetCsmacd(6)",
                         "snmpProxyRowStatus": "up(1)"
@@ -162,61 +175,73 @@
                           "snmpProxyName": {
                             "type": "string",
                             "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           },
                           "snmpProxyType": {
                             "type": "string",
-                            "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                            "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                            "example": "configured-value"
                           },
                           "snmpProxyContextEngineID": {
                             "type": "string",
                             "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                            "x-yang-type": "snmp-framework:SnmpEngineID"
+                            "x-yang-type": "snmp-framework:SnmpEngineID",
+                            "example": "1"
                           },
                           "snmpProxyContextName": {
                             "type": "string",
                             "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           },
                           "snmpProxyTargetParamsIn": {
                             "type": "string",
                             "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "configured-value"
                           },
                           "snmpProxySingleTargetOut": {
                             "type": "string",
                             "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "configured-value"
                           },
                           "snmpProxyMultipleTargetOut": {
                             "type": "string",
                             "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                            "x-yang-type": "snmp-target:SnmpTagValue"
+                            "x-yang-type": "snmp-target:SnmpTagValue",
+                            "example": "configured-value"
                           },
                           "snmpProxyStorageType": {
                             "type": "string",
                             "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                            "x-yang-type": "snmpv2-tc:StorageType"
+                            "x-yang-type": "snmpv2-tc:StorageType",
+                            "example": "configured-value"
                           },
                           "snmpProxyRowStatus": {
                             "type": "string",
                             "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "SNMP-PROXY-MIB:snmpProxyEntry": [
                     {
                       "snmpProxyName": "interface-1",
                       "snmpProxyType": "ethernetCsmacd(6)",
-                      "snmpProxyContextEngineID": "example-string",
+                      "snmpProxyContextEngineID": "1",
                       "snmpProxyContextName": "interface-1",
-                      "snmpProxyTargetParamsIn": "example-string",
-                      "snmpProxySingleTargetOut": "example-string",
+                      "snmpProxyTargetParamsIn": "configured-value",
+                      "snmpProxySingleTargetOut": "configured-value",
                       "snmpProxyMultipleTargetOut": "192.168.1.1",
                       "snmpProxyStorageType": "ethernetCsmacd(6)",
                       "snmpProxyRowStatus": "up(1)"
@@ -262,59 +287,70 @@
                         "snmpProxyName": {
                           "type": "string",
                           "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         },
                         "snmpProxyType": {
                           "type": "string",
-                          "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                          "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                          "example": "configured-value"
                         },
                         "snmpProxyContextEngineID": {
                           "type": "string",
                           "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                          "x-yang-type": "snmp-framework:SnmpEngineID"
+                          "x-yang-type": "snmp-framework:SnmpEngineID",
+                          "example": "1"
                         },
                         "snmpProxyContextName": {
                           "type": "string",
                           "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         },
                         "snmpProxyTargetParamsIn": {
                           "type": "string",
                           "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "configured-value"
                         },
                         "snmpProxySingleTargetOut": {
                           "type": "string",
                           "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "configured-value"
                         },
                         "snmpProxyMultipleTargetOut": {
                           "type": "string",
                           "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                          "x-yang-type": "snmp-target:SnmpTagValue"
+                          "x-yang-type": "snmp-target:SnmpTagValue",
+                          "example": "configured-value"
                         },
                         "snmpProxyStorageType": {
                           "type": "string",
                           "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                          "x-yang-type": "snmpv2-tc:StorageType"
+                          "x-yang-type": "snmpv2-tc:StorageType",
+                          "example": "configured-value"
                         },
                         "snmpProxyRowStatus": {
                           "type": "string",
                           "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "SNMP-PROXY-MIB:snmpProxyEntry": {
                     "snmpProxyName": "interface-1",
                     "snmpProxyType": "ethernetCsmacd(6)",
-                    "snmpProxyContextEngineID": "example-string",
+                    "snmpProxyContextEngineID": "1",
                     "snmpProxyContextName": "interface-1",
-                    "snmpProxyTargetParamsIn": "example-string",
-                    "snmpProxySingleTargetOut": "example-string",
+                    "snmpProxyTargetParamsIn": "configured-value",
+                    "snmpProxySingleTargetOut": "configured-value",
                     "snmpProxyMultipleTargetOut": "192.168.1.1",
                     "snmpProxyStorageType": "ethernetCsmacd(6)",
                     "snmpProxyRowStatus": "up(1)"
@@ -351,61 +387,73 @@
                           "snmpProxyName": {
                             "type": "string",
                             "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           },
                           "snmpProxyType": {
                             "type": "string",
-                            "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                            "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                            "example": "configured-value"
                           },
                           "snmpProxyContextEngineID": {
                             "type": "string",
                             "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                            "x-yang-type": "snmp-framework:SnmpEngineID"
+                            "x-yang-type": "snmp-framework:SnmpEngineID",
+                            "example": "1"
                           },
                           "snmpProxyContextName": {
                             "type": "string",
                             "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "example-1"
                           },
                           "snmpProxyTargetParamsIn": {
                             "type": "string",
                             "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "configured-value"
                           },
                           "snmpProxySingleTargetOut": {
                             "type": "string",
                             "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                            "x-yang-type": "snmp-framework:SnmpAdminString"
+                            "x-yang-type": "snmp-framework:SnmpAdminString",
+                            "example": "configured-value"
                           },
                           "snmpProxyMultipleTargetOut": {
                             "type": "string",
                             "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                            "x-yang-type": "snmp-target:SnmpTagValue"
+                            "x-yang-type": "snmp-target:SnmpTagValue",
+                            "example": "configured-value"
                           },
                           "snmpProxyStorageType": {
                             "type": "string",
                             "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                            "x-yang-type": "snmpv2-tc:StorageType"
+                            "x-yang-type": "snmpv2-tc:StorageType",
+                            "example": "configured-value"
                           },
                           "snmpProxyRowStatus": {
                             "type": "string",
                             "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "SNMP-PROXY-MIB:snmpProxyEntry": [
                     {
                       "snmpProxyName": "interface-1",
                       "snmpProxyType": "ethernetCsmacd(6)",
-                      "snmpProxyContextEngineID": "example-string",
+                      "snmpProxyContextEngineID": "1",
                       "snmpProxyContextName": "interface-1",
-                      "snmpProxyTargetParamsIn": "example-string",
-                      "snmpProxySingleTargetOut": "example-string",
+                      "snmpProxyTargetParamsIn": "configured-value",
+                      "snmpProxySingleTargetOut": "configured-value",
                       "snmpProxyMultipleTargetOut": "192.168.1.1",
                       "snmpProxyStorageType": "ethernetCsmacd(6)",
                       "snmpProxyRowStatus": "up(1)"
@@ -451,59 +499,70 @@
                         "snmpProxyName": {
                           "type": "string",
                           "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         },
                         "snmpProxyType": {
                           "type": "string",
-                          "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                          "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                          "example": "configured-value"
                         },
                         "snmpProxyContextEngineID": {
                           "type": "string",
                           "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                          "x-yang-type": "snmp-framework:SnmpEngineID"
+                          "x-yang-type": "snmp-framework:SnmpEngineID",
+                          "example": "1"
                         },
                         "snmpProxyContextName": {
                           "type": "string",
                           "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "example-1"
                         },
                         "snmpProxyTargetParamsIn": {
                           "type": "string",
                           "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "configured-value"
                         },
                         "snmpProxySingleTargetOut": {
                           "type": "string",
                           "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                          "x-yang-type": "snmp-framework:SnmpAdminString"
+                          "x-yang-type": "snmp-framework:SnmpAdminString",
+                          "example": "configured-value"
                         },
                         "snmpProxyMultipleTargetOut": {
                           "type": "string",
                           "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                          "x-yang-type": "snmp-target:SnmpTagValue"
+                          "x-yang-type": "snmp-target:SnmpTagValue",
+                          "example": "configured-value"
                         },
                         "snmpProxyStorageType": {
                           "type": "string",
                           "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                          "x-yang-type": "snmpv2-tc:StorageType"
+                          "x-yang-type": "snmpv2-tc:StorageType",
+                          "example": "configured-value"
                         },
                         "snmpProxyRowStatus": {
                           "type": "string",
                           "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "example-1"
                 },
                 "example": {
                   "SNMP-PROXY-MIB:snmpProxyEntry": {
                     "snmpProxyName": "interface-1",
                     "snmpProxyType": "ethernetCsmacd(6)",
-                    "snmpProxyContextEngineID": "example-string",
+                    "snmpProxyContextEngineID": "1",
                     "snmpProxyContextName": "interface-1",
-                    "snmpProxyTargetParamsIn": "example-string",
-                    "snmpProxySingleTargetOut": "example-string",
+                    "snmpProxyTargetParamsIn": "configured-value",
+                    "snmpProxySingleTargetOut": "configured-value",
                     "snmpProxyMultipleTargetOut": "192.168.1.1",
                     "snmpProxyStorageType": "ethernetCsmacd(6)",
                     "snmpProxyRowStatus": "up(1)"
@@ -532,49 +591,60 @@
                 "snmpProxyName": {
                   "type": "string",
                   "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                  "x-yang-type": "snmp-framework:SnmpAdminString",
+                  "example": "example-1"
                 },
                 "snmpProxyType": {
                   "type": "string",
-                  "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                  "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                  "example": "configured-value"
                 },
                 "snmpProxyContextEngineID": {
                   "type": "string",
                   "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                  "x-yang-type": "snmp-framework:SnmpEngineID"
+                  "x-yang-type": "snmp-framework:SnmpEngineID",
+                  "example": "1"
                 },
                 "snmpProxyContextName": {
                   "type": "string",
                   "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                  "x-yang-type": "snmp-framework:SnmpAdminString",
+                  "example": "example-1"
                 },
                 "snmpProxyTargetParamsIn": {
                   "type": "string",
                   "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                  "x-yang-type": "snmp-framework:SnmpAdminString",
+                  "example": "configured-value"
                 },
                 "snmpProxySingleTargetOut": {
                   "type": "string",
                   "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                  "x-yang-type": "snmp-framework:SnmpAdminString"
+                  "x-yang-type": "snmp-framework:SnmpAdminString",
+                  "example": "configured-value"
                 },
                 "snmpProxyMultipleTargetOut": {
                   "type": "string",
                   "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                  "x-yang-type": "snmp-target:SnmpTagValue"
+                  "x-yang-type": "snmp-target:SnmpTagValue",
+                  "example": "configured-value"
                 },
                 "snmpProxyStorageType": {
                   "type": "string",
                   "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                  "x-yang-type": "snmpv2-tc:StorageType"
+                  "x-yang-type": "snmpv2-tc:StorageType",
+                  "example": "configured-value"
                 },
                 "snmpProxyRowStatus": {
                   "type": "string",
                   "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                  "x-yang-type": "snmpv2-tc:RowStatus"
+                  "x-yang-type": "snmpv2-tc:RowStatus",
+                  "example": "active"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "snmpProxyTable": {
             "type": "object",
@@ -589,53 +659,66 @@
                     "snmpProxyName": {
                       "type": "string",
                       "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                      "x-yang-type": "snmp-framework:SnmpAdminString",
+                      "example": "example-1"
                     },
                     "snmpProxyType": {
                       "type": "string",
-                      "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+                      "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+                      "example": "configured-value"
                     },
                     "snmpProxyContextEngineID": {
                       "type": "string",
                       "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-                      "x-yang-type": "snmp-framework:SnmpEngineID"
+                      "x-yang-type": "snmp-framework:SnmpEngineID",
+                      "example": "1"
                     },
                     "snmpProxyContextName": {
                       "type": "string",
                       "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                      "x-yang-type": "snmp-framework:SnmpAdminString",
+                      "example": "example-1"
                     },
                     "snmpProxyTargetParamsIn": {
                       "type": "string",
                       "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                      "x-yang-type": "snmp-framework:SnmpAdminString",
+                      "example": "configured-value"
                     },
                     "snmpProxySingleTargetOut": {
                       "type": "string",
                       "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-                      "x-yang-type": "snmp-framework:SnmpAdminString"
+                      "x-yang-type": "snmp-framework:SnmpAdminString",
+                      "example": "configured-value"
                     },
                     "snmpProxyMultipleTargetOut": {
                       "type": "string",
                       "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-                      "x-yang-type": "snmp-target:SnmpTagValue"
+                      "x-yang-type": "snmp-target:SnmpTagValue",
+                      "example": "configured-value"
                     },
                     "snmpProxyStorageType": {
                       "type": "string",
                       "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-                      "x-yang-type": "snmpv2-tc:StorageType"
+                      "x-yang-type": "snmpv2-tc:StorageType",
+                      "example": "configured-value"
                     },
                     "snmpProxyRowStatus": {
                       "type": "string",
                       "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
+                      "x-yang-type": "snmpv2-tc:RowStatus",
+                      "example": "active"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           }
-        }
+        },
+        "example": "configured-value"
       },
       "SNMP-PROXY-MIB_snmpProxyEntry": {
         "type": "array",
@@ -646,49 +729,60 @@
             "snmpProxyName": {
               "type": "string",
               "description": "The locally arbitrary, but unique identifier associated\n            with this snmpProxyEntry.",
-              "x-yang-type": "snmp-framework:SnmpAdminString"
+              "x-yang-type": "snmp-framework:SnmpAdminString",
+              "example": "example-1"
             },
             "snmpProxyType": {
               "type": "string",
-              "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry."
+              "description": "The type of message that may be forwarded using\n            the translation parameters defined by this entry.",
+              "example": "configured-value"
             },
             "snmpProxyContextEngineID": {
               "type": "string",
               "description": "The contextEngineID contained in messages that\n            may be forwarded using the translation parameters\n            defined by this entry.",
-              "x-yang-type": "snmp-framework:SnmpEngineID"
+              "x-yang-type": "snmp-framework:SnmpEngineID",
+              "example": "1"
             },
             "snmpProxyContextName": {
               "type": "string",
               "description": "The contextName contained in messages that may be\n            forwarded using the translation parameters defined\n            by this entry.\n            \n            This object is optional, and if not supported, the\n            contextName contained in a message is ignored when\n            selecting an entry in the snmpProxyTable.",
-              "x-yang-type": "snmp-framework:SnmpAdminString"
+              "x-yang-type": "snmp-framework:SnmpAdminString",
+              "example": "example-1"
             },
             "snmpProxyTargetParamsIn": {
               "type": "string",
               "description": "This object selects an entry in the snmpTargetParamsTable.\n            The selected entry is used to determine which row of the\n            snmpProxyTable to use for forwarding received messages.",
-              "x-yang-type": "snmp-framework:SnmpAdminString"
+              "x-yang-type": "snmp-framework:SnmpAdminString",
+              "example": "configured-value"
             },
             "snmpProxySingleTargetOut": {
               "type": "string",
               "description": "This object selects a management target defined in the\n            snmpTargetAddrTable (in the SNMP-TARGET-MIB).  The\n            selected target is defined by an entry in the\n            snmpTargetAddrTable whose index value (snmpTargetAddrName)\n            is equal to this object.\n            \n            This object is only used when selection of a single\n            target is required (i.e. when forwarding an incoming\n            read or write request).",
-              "x-yang-type": "snmp-framework:SnmpAdminString"
+              "x-yang-type": "snmp-framework:SnmpAdminString",
+              "example": "configured-value"
             },
             "snmpProxyMultipleTargetOut": {
               "type": "string",
               "description": "This object selects a set of management targets defined\n            in the snmpTargetAddrTable (in the SNMP-TARGET-MIB).\n            \n            This object is only used when selection of multiple\n            targets is required (i.e. when forwarding an incoming\n            notification).",
-              "x-yang-type": "snmp-target:SnmpTagValue"
+              "x-yang-type": "snmp-target:SnmpTagValue",
+              "example": "configured-value"
             },
             "snmpProxyStorageType": {
               "type": "string",
               "description": "The storage type of this conceptual row.\n            Conceptual rows having the value 'permanent' need not\n            allow write-access to any columnar objects in the row.",
-              "x-yang-type": "snmpv2-tc:StorageType"
+              "x-yang-type": "snmpv2-tc:StorageType",
+              "example": "configured-value"
             },
             "snmpProxyRowStatus": {
               "type": "string",
               "description": "The status of this conceptual row.\n            \n            To create a row in this table, a manager must\n            set this object to either createAndGo(4) or\n            createAndWait(5).\n            \n            The following objects may not be modified while the\n            value of this object is active(1):\n                - snmpProxyType\n                - snmpProxyContextEngineID\n                - snmpProxyContextName\n                - snmpProxyTargetParamsIn\n                - snmpProxySingleTargetOut\n                - snmpProxyMultipleTargetOut",
-              "x-yang-type": "snmpv2-tc:RowStatus"
+              "x-yang-type": "snmpv2-tc:RowStatus",
+              "example": "active"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       }
     },
     "securitySchemes": {

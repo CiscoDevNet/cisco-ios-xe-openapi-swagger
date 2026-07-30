@@ -3,7 +3,7 @@
   "info": {
     "title": "CISCO-HSRP-EXT-MIB MIB API",
     "version": "1.0.0",
-    "description": "The Extension MIB module for the CISCO-HSRP-MIB which is\n    based on RFC2281.\n    \n    This MIB provides an extension to the CISCO-HSRP-MIB which \n    defines Cisco's proprietary Hot Standby Routing Protocol \n    (HSRP), defined in RFC2281. The extensions cover assigning \n    of secondary HSRP ip addresses, modifying an HSRP Group's \n    priority by tracking the operational status of interfaces, \n    etc. \n    \n    Terminology:\n    HSRP is a protocol used amoung a group of routers for the \n    purpose of selecting an active router and a standby router. \n    \n    An active router is the router of choice for routing \n    packets.\n    \n    A standby router is a router that takes over the routing \n    duties when an active router fails, or when preset \n    conditions have been met.\n    \n    A HSRP group or a standby group is a set of routers \n    which communicate using HSRP. An HSRP group has a group \n    MAC address and a group IP address. These are the \n    designated addresses. The active router assumes  \n    (i.e. inherits) these group addresses. An HSRP group is\n    identified by a ( ifIndex, cHsrpGrpNumber ) pair.\n    \n    BIA stands for Burned In Address.\n\n\u26a0\ufe0f **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
+    "description": "The Extension MIB module for the CISCO-HSRP-MIB which is\n    based on RFC2281.\n    \n    This MIB provides an extension to the CISCO-HSRP-MIB which \n    defines Cisco's proprietary Hot Standby Routing Protocol \n    (HSRP), defined in RFC2281. The extensions cover assigning \n    of secondary HSRP ip addresses, modifying an HSRP Group's \n    priority by tracking the operational status of interfaces, \n    etc. \n    \n    Terminology:\n    HSRP is a protocol used amoung a group of routers for the \n    purpose of selecting an active router and a standby router. \n    \n    An active router is the router of choice for routing \n    packets.\n    \n    A standby router is a router that takes over the routing \n    duties when an active router fails, or when preset \n    conditions have been met.\n    \n    A HSRP group or a standby group is a set of routers \n    which communicate using HSRP. An HSRP group has a group \n    MAC address and a group IP address. These are the \n    designated addresses. The active router assumes  \n    (i.e. inherits) these group addresses. An HSRP group is\n    identified by a ( ifIndex, cHsrpGrpNumber ) pair.\n    \n    BIA stands for Burned In Address.\n\n⚠️ **IMPORTANT - MIB DATA ACCESS**:\nThis YANG model exists for SMIv2-to-YANG translation purposes, but MIB data on IOS-XE devices is primarily accessed via **SNMP protocol**, not RESTCONF.\n\n**RESTCONF Limitation**: Many MIB paths may return 404 errors via RESTCONF `/data` endpoints because the device exposes MIB data through SNMP, not the YANG datastore.\n\n**Recommended Access Methods**:\n- Use SNMP (v2c/v3) to query MIB data directly\n- Use NETCONF `<get>` operations for devices supporting YANG-modeled MIB access\n- Check device capabilities: some newer IOS-XE versions may support limited RESTCONF access to specific MIBs\n\n**YANG Model Purpose**: These YANG models define the structure of SNMP MIBs in YANG format for tooling compatibility, but do not guarantee RESTCONF data availability.\n",
     "contact": {
       "name": "Cisco DevNet",
       "url": "https://developer.cisco.com"
@@ -44,63 +44,73 @@
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cHsrpGrpNumber": {
                                 "type": "string",
                                 "description": "cHsrpGrpNumber",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "10"
                               },
                               "cHsrpExtIfTracked": {
                                 "type": "string",
                                 "description": "The ifIndex value of the tracked interface.",
-                                "x-yang-type": "if-mib:InterfaceIndex"
+                                "x-yang-type": "if-mib:InterfaceIndex",
+                                "example": "configured-value"
                               },
                               "cHsrpExtIfTrackedPriority": {
                                 "type": "integer",
                                 "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 1
                               },
                               "cHsrpExtIfTrackedRowStatus": {
                                 "type": "string",
                                 "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                                "x-yang-type": "snmpv2-tc:RowStatus"
+                                "x-yang-type": "snmpv2-tc:RowStatus",
+                                "example": "active"
                               },
                               "cHsrpExtIfTrackedIpNone": {
                                 "type": "boolean",
-                                "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                                "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                                "example": true
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTrackedTable": {
                     "cHsrpExtIfTrackedEntry": [
                       {
                         "ifIndex": "1",
-                        "cHsrpGrpNumber": "example-string",
-                        "cHsrpExtIfTracked": "example-string",
+                        "cHsrpGrpNumber": "10",
+                        "cHsrpExtIfTracked": "configured-value",
                         "cHsrpExtIfTrackedPriority": 0,
                         "cHsrpExtIfTrackedRowStatus": "up(1)",
                         "cHsrpExtIfTrackedIpNone": true
                       },
                       {
                         "ifIndex": "2",
-                        "cHsrpGrpNumber": "example-string",
-                        "cHsrpExtIfTracked": "example-string",
+                        "cHsrpGrpNumber": "10",
+                        "cHsrpExtIfTracked": "configured-value",
                         "cHsrpExtIfTrackedPriority": 0,
                         "cHsrpExtIfTrackedRowStatus": "up(1)",
                         "cHsrpExtIfTrackedIpNone": true
                       },
                       {
                         "ifIndex": "3",
-                        "cHsrpGrpNumber": "example-string",
-                        "cHsrpExtIfTracked": "example-string",
+                        "cHsrpGrpNumber": "10",
+                        "cHsrpExtIfTracked": "configured-value",
                         "cHsrpExtIfTrackedPriority": 0,
                         "cHsrpExtIfTrackedRowStatus": "up(1)",
                         "cHsrpExtIfTrackedIpNone": true
@@ -139,44 +149,53 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtIfTracked": {
                             "type": "string",
                             "description": "The ifIndex value of the tracked interface.",
-                            "x-yang-type": "if-mib:InterfaceIndex"
+                            "x-yang-type": "if-mib:InterfaceIndex",
+                            "example": "configured-value"
                           },
                           "cHsrpExtIfTrackedPriority": {
                             "type": "integer",
                             "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 1
                           },
                           "cHsrpExtIfTrackedRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           },
                           "cHsrpExtIfTrackedIpNone": {
                             "type": "boolean",
-                            "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                            "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                            "example": true
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTrackedEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
-                      "cHsrpExtIfTracked": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
+                      "cHsrpExtIfTracked": "configured-value",
                       "cHsrpExtIfTrackedPriority": 0,
                       "cHsrpExtIfTrackedRowStatus": "up(1)",
                       "cHsrpExtIfTrackedIpNone": true
@@ -222,42 +241,50 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtIfTracked": {
                           "type": "string",
                           "description": "The ifIndex value of the tracked interface.",
-                          "x-yang-type": "if-mib:InterfaceIndex"
+                          "x-yang-type": "if-mib:InterfaceIndex",
+                          "example": "configured-value"
                         },
                         "cHsrpExtIfTrackedPriority": {
                           "type": "integer",
                           "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 1
                         },
                         "cHsrpExtIfTrackedRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         },
                         "cHsrpExtIfTrackedIpNone": {
                           "type": "boolean",
-                          "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                          "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                          "example": true
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 10
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTrackedEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
-                    "cHsrpExtIfTracked": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
+                    "cHsrpExtIfTracked": "configured-value",
                     "cHsrpExtIfTrackedPriority": 0,
                     "cHsrpExtIfTrackedRowStatus": "up(1)",
                     "cHsrpExtIfTrackedIpNone": true
@@ -298,48 +325,56 @@
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cHsrpGrpNumber": {
                                 "type": "string",
                                 "description": "cHsrpGrpNumber",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "10"
                               },
                               "cHsrpExtSecAddrAddress": {
                                 "type": "string",
                                 "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                                "format": "inet:ipv4-address"
+                                "format": "inet:ipv4-address",
+                                "example": "10.1.1.1"
                               },
                               "cHsrpExtSecAddrRowStatus": {
                                 "type": "string",
                                 "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                                "x-yang-type": "snmpv2-tc:RowStatus"
+                                "x-yang-type": "snmpv2-tc:RowStatus",
+                                "example": "active"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "10.1.1.1"
                         }
-                      }
+                      },
+                      "example": "10.1.1.1"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtSecAddrTable": {
                     "cHsrpExtSecAddrEntry": [
                       {
                         "ifIndex": "1",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtSecAddrAddress": "192.168.1.1",
                         "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                       },
                       {
                         "ifIndex": "2",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtSecAddrAddress": "192.168.1.1",
                         "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                       },
                       {
                         "ifIndex": "3",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtSecAddrAddress": "192.168.1.1",
                         "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                       }
@@ -377,33 +412,40 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtSecAddrAddress": {
                             "type": "string",
                             "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                            "format": "inet:ipv4-address"
+                            "format": "inet:ipv4-address",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtSecAddrRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "10.1.1.1"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtSecAddrEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
                       "cHsrpExtSecAddrAddress": "192.168.1.1",
                       "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                     }
@@ -448,31 +490,37 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtSecAddrAddress": {
                           "type": "string",
                           "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                          "format": "inet:ipv4-address"
+                          "format": "inet:ipv4-address",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtSecAddrRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "10.1.1.1"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtSecAddrEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
                     "cHsrpExtSecAddrAddress": "192.168.1.1",
                     "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                   }
@@ -512,57 +560,69 @@
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cHsrpGrpNumber": {
                                 "type": "string",
                                 "description": "cHsrpGrpNumber",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "10"
                               },
                               "cHsrpExtIfStandbyIndex": {
                                 "type": "integer",
                                 "description": "This object defines the index of the standby table.",
                                 "minimum": 0,
-                                "maximum": 4294967295
+                                "maximum": 4294967295,
+                                "example": 1
                               },
                               "cHsrpExtIfStandbyDestAddrType": {
                                 "type": "string",
                                 "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                                "x-yang-type": "inet-address:InetAddressType"
+                                "x-yang-type": "inet-address:InetAddressType",
+                                "example": "10.1.1.1"
                               },
                               "cHsrpExtIfStandbyDestAddr": {
                                 "type": "string",
                                 "description": "This object specifies the destination IP address of\n            the standby router.",
-                                "x-yang-type": "inet-address:InetAddress"
+                                "x-yang-type": "inet-address:InetAddress",
+                                "example": "10.1.1.1"
                               },
                               "cHsrpExtIfStandbySourceAddrType": {
                                 "type": "string",
                                 "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                                "x-yang-type": "inet-address:InetAddressType"
+                                "x-yang-type": "inet-address:InetAddressType",
+                                "example": "10.1.1.1"
                               },
                               "cHsrpExtIfStandbySourceAddr": {
                                 "type": "string",
                                 "description": "This object specifies the source IP address of\n            the standby router.",
-                                "x-yang-type": "inet-address:InetAddress"
+                                "x-yang-type": "inet-address:InetAddress",
+                                "example": "10.1.1.1"
                               },
                               "cHsrpExtIfStandbyRowStatus": {
                                 "type": "string",
                                 "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                                "x-yang-type": "snmpv2-tc:RowStatus"
+                                "x-yang-type": "snmpv2-tc:RowStatus",
+                                "example": "active"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfStandbyTable": {
                     "cHsrpExtIfStandbyEntry": [
                       {
                         "ifIndex": "1",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtIfStandbyIndex": 1,
                         "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                         "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -572,7 +632,7 @@
                       },
                       {
                         "ifIndex": "2",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtIfStandbyIndex": 2,
                         "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                         "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -582,7 +642,7 @@
                       },
                       {
                         "ifIndex": "3",
-                        "cHsrpGrpNumber": "example-string",
+                        "cHsrpGrpNumber": "10",
                         "cHsrpExtIfStandbyIndex": 3,
                         "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                         "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -624,54 +684,65 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtIfStandbyIndex": {
                             "type": "integer",
                             "description": "This object defines the index of the standby table.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 1
                           },
                           "cHsrpExtIfStandbyDestAddrType": {
                             "type": "string",
                             "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                            "x-yang-type": "inet-address:InetAddressType"
+                            "x-yang-type": "inet-address:InetAddressType",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbyDestAddr": {
                             "type": "string",
                             "description": "This object specifies the destination IP address of\n            the standby router.",
-                            "x-yang-type": "inet-address:InetAddress"
+                            "x-yang-type": "inet-address:InetAddress",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbySourceAddrType": {
                             "type": "string",
                             "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                            "x-yang-type": "inet-address:InetAddressType"
+                            "x-yang-type": "inet-address:InetAddressType",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbySourceAddr": {
                             "type": "string",
                             "description": "This object specifies the source IP address of\n            the standby router.",
-                            "x-yang-type": "inet-address:InetAddress"
+                            "x-yang-type": "inet-address:InetAddress",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbyRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfStandbyEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
                       "cHsrpExtIfStandbyIndex": 1,
                       "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                       "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -720,52 +791,62 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtIfStandbyIndex": {
                           "type": "integer",
                           "description": "This object defines the index of the standby table.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 1
                         },
                         "cHsrpExtIfStandbyDestAddrType": {
                           "type": "string",
                           "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                          "x-yang-type": "inet-address:InetAddressType"
+                          "x-yang-type": "inet-address:InetAddressType",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbyDestAddr": {
                           "type": "string",
                           "description": "This object specifies the destination IP address of\n            the standby router.",
-                          "x-yang-type": "inet-address:InetAddress"
+                          "x-yang-type": "inet-address:InetAddress",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbySourceAddrType": {
                           "type": "string",
                           "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                          "x-yang-type": "inet-address:InetAddressType"
+                          "x-yang-type": "inet-address:InetAddressType",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbySourceAddr": {
                           "type": "string",
                           "description": "This object specifies the source IP address of\n            the standby router.",
-                          "x-yang-type": "inet-address:InetAddress"
+                          "x-yang-type": "inet-address:InetAddress",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbyRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 10
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfStandbyEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
                     "cHsrpExtIfStandbyIndex": 1,
                     "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                     "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -809,23 +890,30 @@
                               "ifIndex": {
                                 "type": "string",
                                 "description": "ifIndex",
-                                "x-yang-type": "leafref"
+                                "x-yang-type": "leafref",
+                                "example": "configured-value"
                               },
                               "cHsrpExtIfUseBIA": {
                                 "type": "boolean",
-                                "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                                "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                                "example": true
                               },
                               "cHsrpExtIfRowStatus": {
                                 "type": "string",
                                 "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                                "x-yang-type": "snmpv2-tc:RowStatus"
+                                "x-yang-type": "snmpv2-tc:RowStatus",
+                                "example": "active"
                               }
-                            }
-                          }
+                            },
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTable": {
@@ -879,26 +967,32 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpExtIfUseBIA": {
                             "type": "boolean",
-                            "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                            "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                            "example": true
                           },
                           "cHsrpExtIfRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfEntry": [
                     {
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cHsrpExtIfUseBIA": true,
                       "cHsrpExtIfRowStatus": "up(1)"
                     }
@@ -943,24 +1037,29 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpExtIfUseBIA": {
                           "type": "boolean",
-                          "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                          "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                          "example": true
                         },
                         "cHsrpExtIfRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfEntry": {
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cHsrpExtIfUseBIA": true,
                     "cHsrpExtIfRowStatus": "up(1)"
                   }
@@ -996,44 +1095,53 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtIfTracked": {
                             "type": "string",
                             "description": "The ifIndex value of the tracked interface.",
-                            "x-yang-type": "if-mib:InterfaceIndex"
+                            "x-yang-type": "if-mib:InterfaceIndex",
+                            "example": "configured-value"
                           },
                           "cHsrpExtIfTrackedPriority": {
                             "type": "integer",
                             "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 1
                           },
                           "cHsrpExtIfTrackedRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           },
                           "cHsrpExtIfTrackedIpNone": {
                             "type": "boolean",
-                            "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                            "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                            "example": true
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTrackedEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
-                      "cHsrpExtIfTracked": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
+                      "cHsrpExtIfTracked": "configured-value",
                       "cHsrpExtIfTrackedPriority": 0,
                       "cHsrpExtIfTrackedRowStatus": "up(1)",
                       "cHsrpExtIfTrackedIpNone": true
@@ -1079,42 +1187,50 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtIfTracked": {
                           "type": "string",
                           "description": "The ifIndex value of the tracked interface.",
-                          "x-yang-type": "if-mib:InterfaceIndex"
+                          "x-yang-type": "if-mib:InterfaceIndex",
+                          "example": "configured-value"
                         },
                         "cHsrpExtIfTrackedPriority": {
                           "type": "integer",
                           "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 1
                         },
                         "cHsrpExtIfTrackedRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         },
                         "cHsrpExtIfTrackedIpNone": {
                           "type": "boolean",
-                          "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                          "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                          "example": true
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 10
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfTrackedEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
-                    "cHsrpExtIfTracked": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
+                    "cHsrpExtIfTracked": "configured-value",
                     "cHsrpExtIfTrackedPriority": 0,
                     "cHsrpExtIfTrackedRowStatus": "up(1)",
                     "cHsrpExtIfTrackedIpNone": true
@@ -1151,33 +1267,40 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtSecAddrAddress": {
                             "type": "string",
                             "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                            "format": "inet:ipv4-address"
+                            "format": "inet:ipv4-address",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtSecAddrRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "10.1.1.1"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtSecAddrEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
                       "cHsrpExtSecAddrAddress": "192.168.1.1",
                       "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                     }
@@ -1222,31 +1345,37 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtSecAddrAddress": {
                           "type": "string",
                           "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                          "format": "inet:ipv4-address"
+                          "format": "inet:ipv4-address",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtSecAddrRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "10.1.1.1"
                     }
-                  }
+                  },
+                  "example": "10.1.1.1"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtSecAddrEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
                     "cHsrpExtSecAddrAddress": "192.168.1.1",
                     "cHsrpExtSecAddrRowStatus": "192.168.1.1"
                   }
@@ -1282,54 +1411,65 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpGrpNumber": {
                             "type": "string",
                             "description": "cHsrpGrpNumber",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "10"
                           },
                           "cHsrpExtIfStandbyIndex": {
                             "type": "integer",
                             "description": "This object defines the index of the standby table.",
                             "minimum": 0,
-                            "maximum": 4294967295
+                            "maximum": 4294967295,
+                            "example": 1
                           },
                           "cHsrpExtIfStandbyDestAddrType": {
                             "type": "string",
                             "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                            "x-yang-type": "inet-address:InetAddressType"
+                            "x-yang-type": "inet-address:InetAddressType",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbyDestAddr": {
                             "type": "string",
                             "description": "This object specifies the destination IP address of\n            the standby router.",
-                            "x-yang-type": "inet-address:InetAddress"
+                            "x-yang-type": "inet-address:InetAddress",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbySourceAddrType": {
                             "type": "string",
                             "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                            "x-yang-type": "inet-address:InetAddressType"
+                            "x-yang-type": "inet-address:InetAddressType",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbySourceAddr": {
                             "type": "string",
                             "description": "This object specifies the source IP address of\n            the standby router.",
-                            "x-yang-type": "inet-address:InetAddress"
+                            "x-yang-type": "inet-address:InetAddress",
+                            "example": "10.1.1.1"
                           },
                           "cHsrpExtIfStandbyRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfStandbyEntry": [
                     {
-                      "ifIndex": "example-string",
-                      "cHsrpGrpNumber": "example-string",
+                      "ifIndex": "configured-value",
+                      "cHsrpGrpNumber": "10",
                       "cHsrpExtIfStandbyIndex": 1,
                       "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                       "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -1378,52 +1518,62 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpGrpNumber": {
                           "type": "string",
                           "description": "cHsrpGrpNumber",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "10"
                         },
                         "cHsrpExtIfStandbyIndex": {
                           "type": "integer",
                           "description": "This object defines the index of the standby table.",
                           "minimum": 0,
-                          "maximum": 4294967295
+                          "maximum": 4294967295,
+                          "example": 1
                         },
                         "cHsrpExtIfStandbyDestAddrType": {
                           "type": "string",
                           "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                          "x-yang-type": "inet-address:InetAddressType"
+                          "x-yang-type": "inet-address:InetAddressType",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbyDestAddr": {
                           "type": "string",
                           "description": "This object specifies the destination IP address of\n            the standby router.",
-                          "x-yang-type": "inet-address:InetAddress"
+                          "x-yang-type": "inet-address:InetAddress",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbySourceAddrType": {
                           "type": "string",
                           "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                          "x-yang-type": "inet-address:InetAddressType"
+                          "x-yang-type": "inet-address:InetAddressType",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbySourceAddr": {
                           "type": "string",
                           "description": "This object specifies the source IP address of\n            the standby router.",
-                          "x-yang-type": "inet-address:InetAddress"
+                          "x-yang-type": "inet-address:InetAddress",
+                          "example": "10.1.1.1"
                         },
                         "cHsrpExtIfStandbyRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": 10
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfStandbyEntry": {
-                    "ifIndex": "example-string",
-                    "cHsrpGrpNumber": "example-string",
+                    "ifIndex": "configured-value",
+                    "cHsrpGrpNumber": "10",
                     "cHsrpExtIfStandbyIndex": 1,
                     "cHsrpExtIfStandbyDestAddrType": "192.168.1.1",
                     "cHsrpExtIfStandbyDestAddr": "192.168.1.1",
@@ -1463,26 +1613,32 @@
                           "ifIndex": {
                             "type": "string",
                             "description": "ifIndex",
-                            "x-yang-type": "leafref"
+                            "x-yang-type": "leafref",
+                            "example": "configured-value"
                           },
                           "cHsrpExtIfUseBIA": {
                             "type": "boolean",
-                            "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                            "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                            "example": true
                           },
                           "cHsrpExtIfRowStatus": {
                             "type": "string",
                             "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                            "x-yang-type": "snmpv2-tc:RowStatus"
+                            "x-yang-type": "snmpv2-tc:RowStatus",
+                            "example": "active"
                           }
-                        }
-                      }
+                        },
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfEntry": [
                     {
-                      "ifIndex": "example-string",
+                      "ifIndex": "configured-value",
                       "cHsrpExtIfUseBIA": true,
                       "cHsrpExtIfRowStatus": "up(1)"
                     }
@@ -1527,24 +1683,29 @@
                         "ifIndex": {
                           "type": "string",
                           "description": "ifIndex",
-                          "x-yang-type": "leafref"
+                          "x-yang-type": "leafref",
+                          "example": "configured-value"
                         },
                         "cHsrpExtIfUseBIA": {
                           "type": "boolean",
-                          "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                          "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                          "example": true
                         },
                         "cHsrpExtIfRowStatus": {
                           "type": "string",
                           "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                          "x-yang-type": "snmpv2-tc:RowStatus"
+                          "x-yang-type": "snmpv2-tc:RowStatus",
+                          "example": "active"
                         }
-                      }
+                      },
+                      "example": "configured-value"
                     }
-                  }
+                  },
+                  "example": "configured-value"
                 },
                 "example": {
                   "CISCO-HSRP-EXT-MIB:cHsrpExtIfEntry": {
-                    "ifIndex": "example-string",
+                    "ifIndex": "configured-value",
                     "cHsrpExtIfUseBIA": true,
                     "cHsrpExtIfRowStatus": "up(1)"
                   }
@@ -1572,35 +1733,43 @@
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cHsrpGrpNumber": {
                   "type": "string",
                   "description": "cHsrpGrpNumber",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "10"
                 },
                 "cHsrpExtIfTracked": {
                   "type": "string",
                   "description": "The ifIndex value of the tracked interface.",
-                  "x-yang-type": "if-mib:InterfaceIndex"
+                  "x-yang-type": "if-mib:InterfaceIndex",
+                  "example": "configured-value"
                 },
                 "cHsrpExtIfTrackedPriority": {
                   "type": "integer",
                   "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 1
                 },
                 "cHsrpExtIfTrackedRowStatus": {
                   "type": "string",
                   "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                  "x-yang-type": "snmpv2-tc:RowStatus"
+                  "x-yang-type": "snmpv2-tc:RowStatus",
+                  "example": "active"
                 },
                 "cHsrpExtIfTrackedIpNone": {
                   "type": "boolean",
-                  "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                  "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                  "example": true
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cHsrpExtSecAddrEntry": {
             "type": "array",
@@ -1611,25 +1780,31 @@
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cHsrpGrpNumber": {
                   "type": "string",
                   "description": "cHsrpGrpNumber",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "10"
                 },
                 "cHsrpExtSecAddrAddress": {
                   "type": "string",
                   "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                  "format": "inet:ipv4-address"
+                  "format": "inet:ipv4-address",
+                  "example": "10.1.1.1"
                 },
                 "cHsrpExtSecAddrRowStatus": {
                   "type": "string",
                   "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                  "x-yang-type": "snmpv2-tc:RowStatus"
+                  "x-yang-type": "snmpv2-tc:RowStatus",
+                  "example": "active"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "10.1.1.1"
           },
           "cHsrpExtIfStandbyEntry": {
             "type": "array",
@@ -1640,46 +1815,56 @@
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cHsrpGrpNumber": {
                   "type": "string",
                   "description": "cHsrpGrpNumber",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "10"
                 },
                 "cHsrpExtIfStandbyIndex": {
                   "type": "integer",
                   "description": "This object defines the index of the standby table.",
                   "minimum": 0,
-                  "maximum": 4294967295
+                  "maximum": 4294967295,
+                  "example": 1
                 },
                 "cHsrpExtIfStandbyDestAddrType": {
                   "type": "string",
                   "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                  "x-yang-type": "inet-address:InetAddressType"
+                  "x-yang-type": "inet-address:InetAddressType",
+                  "example": "10.1.1.1"
                 },
                 "cHsrpExtIfStandbyDestAddr": {
                   "type": "string",
                   "description": "This object specifies the destination IP address of\n            the standby router.",
-                  "x-yang-type": "inet-address:InetAddress"
+                  "x-yang-type": "inet-address:InetAddress",
+                  "example": "10.1.1.1"
                 },
                 "cHsrpExtIfStandbySourceAddrType": {
                   "type": "string",
                   "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                  "x-yang-type": "inet-address:InetAddressType"
+                  "x-yang-type": "inet-address:InetAddressType",
+                  "example": "10.1.1.1"
                 },
                 "cHsrpExtIfStandbySourceAddr": {
                   "type": "string",
                   "description": "This object specifies the source IP address of\n            the standby router.",
-                  "x-yang-type": "inet-address:InetAddress"
+                  "x-yang-type": "inet-address:InetAddress",
+                  "example": "10.1.1.1"
                 },
                 "cHsrpExtIfStandbyRowStatus": {
                   "type": "string",
                   "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                  "x-yang-type": "snmpv2-tc:RowStatus"
+                  "x-yang-type": "snmpv2-tc:RowStatus",
+                  "example": "active"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cHsrpExtIfEntry": {
             "type": "array",
@@ -1690,19 +1875,24 @@
                 "ifIndex": {
                   "type": "string",
                   "description": "ifIndex",
-                  "x-yang-type": "leafref"
+                  "x-yang-type": "leafref",
+                  "example": "configured-value"
                 },
                 "cHsrpExtIfUseBIA": {
                   "type": "boolean",
-                  "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                  "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                  "example": true
                 },
                 "cHsrpExtIfRowStatus": {
                   "type": "string",
                   "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                  "x-yang-type": "snmpv2-tc:RowStatus"
+                  "x-yang-type": "snmpv2-tc:RowStatus",
+                  "example": "active"
                 }
-              }
-            }
+              },
+              "example": "configured-value"
+            },
+            "example": "configured-value"
           },
           "cHsrpExtIfTrackedTable": {
             "type": "object",
@@ -1717,37 +1907,46 @@
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cHsrpGrpNumber": {
                       "type": "string",
                       "description": "cHsrpGrpNumber",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "10"
                     },
                     "cHsrpExtIfTracked": {
                       "type": "string",
                       "description": "The ifIndex value of the tracked interface.",
-                      "x-yang-type": "if-mib:InterfaceIndex"
+                      "x-yang-type": "if-mib:InterfaceIndex",
+                      "example": "configured-value"
                     },
                     "cHsrpExtIfTrackedPriority": {
                       "type": "integer",
                       "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 1
                     },
                     "cHsrpExtIfTrackedRowStatus": {
                       "type": "string",
                       "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
+                      "x-yang-type": "snmpv2-tc:RowStatus",
+                      "example": "active"
                     },
                     "cHsrpExtIfTrackedIpNone": {
                       "type": "boolean",
-                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+                      "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+                      "example": true
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cHsrpExtSecAddrTable": {
             "type": "object",
@@ -1762,27 +1961,34 @@
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cHsrpGrpNumber": {
                       "type": "string",
                       "description": "cHsrpGrpNumber",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "10"
                     },
                     "cHsrpExtSecAddrAddress": {
                       "type": "string",
                       "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-                      "format": "inet:ipv4-address"
+                      "format": "inet:ipv4-address",
+                      "example": "10.1.1.1"
                     },
                     "cHsrpExtSecAddrRowStatus": {
                       "type": "string",
                       "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
+                      "x-yang-type": "snmpv2-tc:RowStatus",
+                      "example": "active"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "10.1.1.1"
               }
-            }
+            },
+            "example": "10.1.1.1"
           },
           "cHsrpExtIfStandbyTable": {
             "type": "object",
@@ -1797,48 +2003,59 @@
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cHsrpGrpNumber": {
                       "type": "string",
                       "description": "cHsrpGrpNumber",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "10"
                     },
                     "cHsrpExtIfStandbyIndex": {
                       "type": "integer",
                       "description": "This object defines the index of the standby table.",
                       "minimum": 0,
-                      "maximum": 4294967295
+                      "maximum": 4294967295,
+                      "example": 1
                     },
                     "cHsrpExtIfStandbyDestAddrType": {
                       "type": "string",
                       "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-                      "x-yang-type": "inet-address:InetAddressType"
+                      "x-yang-type": "inet-address:InetAddressType",
+                      "example": "10.1.1.1"
                     },
                     "cHsrpExtIfStandbyDestAddr": {
                       "type": "string",
                       "description": "This object specifies the destination IP address of\n            the standby router.",
-                      "x-yang-type": "inet-address:InetAddress"
+                      "x-yang-type": "inet-address:InetAddress",
+                      "example": "10.1.1.1"
                     },
                     "cHsrpExtIfStandbySourceAddrType": {
                       "type": "string",
                       "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-                      "x-yang-type": "inet-address:InetAddressType"
+                      "x-yang-type": "inet-address:InetAddressType",
+                      "example": "10.1.1.1"
                     },
                     "cHsrpExtIfStandbySourceAddr": {
                       "type": "string",
                       "description": "This object specifies the source IP address of\n            the standby router.",
-                      "x-yang-type": "inet-address:InetAddress"
+                      "x-yang-type": "inet-address:InetAddress",
+                      "example": "10.1.1.1"
                     },
                     "cHsrpExtIfStandbyRowStatus": {
                       "type": "string",
                       "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
+                      "x-yang-type": "snmpv2-tc:RowStatus",
+                      "example": "active"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           },
           "cHsrpExtIfTable": {
             "type": "object",
@@ -1853,23 +2070,30 @@
                     "ifIndex": {
                       "type": "string",
                       "description": "ifIndex",
-                      "x-yang-type": "leafref"
+                      "x-yang-type": "leafref",
+                      "example": "configured-value"
                     },
                     "cHsrpExtIfUseBIA": {
                       "type": "boolean",
-                      "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+                      "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+                      "example": true
                     },
                     "cHsrpExtIfRowStatus": {
                       "type": "string",
                       "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-                      "x-yang-type": "snmpv2-tc:RowStatus"
+                      "x-yang-type": "snmpv2-tc:RowStatus",
+                      "example": "active"
                     }
-                  }
-                }
+                  },
+                  "example": "configured-value"
+                },
+                "example": "configured-value"
               }
-            }
+            },
+            "example": "configured-value"
           }
-        }
+        },
+        "example": "configured-value"
       },
       "CISCO-HSRP-EXT-MIB_cHsrpExtIfTrackedEntry": {
         "type": "array",
@@ -1880,35 +2104,43 @@
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cHsrpGrpNumber": {
               "type": "string",
               "description": "cHsrpGrpNumber",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "10"
             },
             "cHsrpExtIfTracked": {
               "type": "string",
               "description": "The ifIndex value of the tracked interface.",
-              "x-yang-type": "if-mib:InterfaceIndex"
+              "x-yang-type": "if-mib:InterfaceIndex",
+              "example": "configured-value"
             },
             "cHsrpExtIfTrackedPriority": {
               "type": "integer",
               "description": "Priority of the tracked interface for the corresponding\n            { ifIndex, cHsrpGrpNumber } pair. In the range of 0 to 255, 0\n            is the lowest priority and 255 is the highest. When a tracked \n            interface is unavailable, the cHsrpGrpPriority of the router \n            is decreased by the value of this object instance (If the \n            cHsrpGrpPriority is less than the \n            cHsrpExtIfTrackedPriority, then the HSRP priority \n            becomes 0). This allows a standby router to be configured \n            with a priority such that if the currently active router's \n            priority is lowered because the tracked interface goes down, \n            the standby router can takeover.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 1
             },
             "cHsrpExtIfTrackedRowStatus": {
               "type": "string",
               "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfTrackedEntry.",
-              "x-yang-type": "snmpv2-tc:RowStatus"
+              "x-yang-type": "snmpv2-tc:RowStatus",
+              "example": "active"
             },
             "cHsrpExtIfTrackedIpNone": {
               "type": "boolean",
-              "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address."
+              "description": "This object specifies the disable HSRP IPv4 virtual\n            IP address.",
+              "example": true
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       },
       "CISCO-HSRP-EXT-MIB_cHsrpExtSecAddrEntry": {
         "type": "array",
@@ -1919,25 +2151,31 @@
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cHsrpGrpNumber": {
               "type": "string",
               "description": "cHsrpGrpNumber",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "10"
             },
             "cHsrpExtSecAddrAddress": {
               "type": "string",
               "description": "A secondary IpAddress for the {ifIndex, cHsrpGrpNumber} pair.\n            As explained in the DESCRIPTION for cHsrpExtSecAddrEntry, a\n            primary address must exist before a secondary address for \n            the same {ifIndex, cHsrpGrpNumber} pair can be created.",
-              "format": "inet:ipv4-address"
+              "format": "inet:ipv4-address",
+              "example": "10.1.1.1"
             },
             "cHsrpExtSecAddrRowStatus": {
               "type": "string",
               "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtSecAddrEntry.",
-              "x-yang-type": "snmpv2-tc:RowStatus"
+              "x-yang-type": "snmpv2-tc:RowStatus",
+              "example": "active"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "10.1.1.1"
       },
       "CISCO-HSRP-EXT-MIB_cHsrpExtIfStandbyEntry": {
         "type": "array",
@@ -1948,46 +2186,56 @@
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cHsrpGrpNumber": {
               "type": "string",
               "description": "cHsrpGrpNumber",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "10"
             },
             "cHsrpExtIfStandbyIndex": {
               "type": "integer",
               "description": "This object defines the index of the standby table.",
               "minimum": 0,
-              "maximum": 4294967295
+              "maximum": 4294967295,
+              "example": 1
             },
             "cHsrpExtIfStandbyDestAddrType": {
               "type": "string",
               "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbyDestAddr.",
-              "x-yang-type": "inet-address:InetAddressType"
+              "x-yang-type": "inet-address:InetAddressType",
+              "example": "10.1.1.1"
             },
             "cHsrpExtIfStandbyDestAddr": {
               "type": "string",
               "description": "This object specifies the destination IP address of\n            the standby router.",
-              "x-yang-type": "inet-address:InetAddress"
+              "x-yang-type": "inet-address:InetAddress",
+              "example": "10.1.1.1"
             },
             "cHsrpExtIfStandbySourceAddrType": {
               "type": "string",
               "description": "This object specifies the type of Internet address\n            denoted by cHsrpExtIfStandbySourceAddr.",
-              "x-yang-type": "inet-address:InetAddressType"
+              "x-yang-type": "inet-address:InetAddressType",
+              "example": "10.1.1.1"
             },
             "cHsrpExtIfStandbySourceAddr": {
               "type": "string",
               "description": "This object specifies the source IP address of\n            the standby router.",
-              "x-yang-type": "inet-address:InetAddress"
+              "x-yang-type": "inet-address:InetAddress",
+              "example": "10.1.1.1"
             },
             "cHsrpExtIfStandbyRowStatus": {
               "type": "string",
               "description": "The control that allows modification, creation,\n            and deletion of entries. Entries may not be created\n            via SNMP without explicitly setting\n            cHsrpExtIfStandbyRowStatus to either\n            'createAndGo' or 'createAndWait'.",
-              "x-yang-type": "snmpv2-tc:RowStatus"
+              "x-yang-type": "snmpv2-tc:RowStatus",
+              "example": "active"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       },
       "CISCO-HSRP-EXT-MIB_cHsrpExtIfEntry": {
         "type": "array",
@@ -1998,19 +2246,24 @@
             "ifIndex": {
               "type": "string",
               "description": "ifIndex",
-              "x-yang-type": "leafref"
+              "x-yang-type": "leafref",
+              "example": "configured-value"
             },
             "cHsrpExtIfUseBIA": {
               "type": "boolean",
-              "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces."
+              "description": "If set to TRUE, the HSRP Group MAC Address for all groups\n            on this  interface will be the burned-in-address. Otherwise,\n            this will be determined by ciscoHsrpGroupNumber. In case of\n            sub-interfaces, UseBIA applies to all sub-interfaces on an \n            interface and to all groups on those sub-interfaces.",
+              "example": true
             },
             "cHsrpExtIfRowStatus": {
               "type": "string",
               "description": "The control that allows modification, creation, and deletion\n            of entries. For detailed rules see the DESCRIPTION for\n            cHsrpExtIfEntry.",
-              "x-yang-type": "snmpv2-tc:RowStatus"
+              "x-yang-type": "snmpv2-tc:RowStatus",
+              "example": "active"
             }
-          }
-        }
+          },
+          "example": "configured-value"
+        },
+        "example": "configured-value"
       }
     },
     "securitySchemes": {
