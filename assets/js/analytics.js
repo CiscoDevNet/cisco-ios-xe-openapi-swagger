@@ -105,6 +105,7 @@
     if (props.app_version == null) props.app_version = APP_VERSION;
     if (props.environment == null) props.environment = ENV;
     if (props.page_or_section == null) props.page_or_section = pageOrSection();
+    if (props.model_category != null) props.model_category = String(props.model_category).toLowerCase();
     return props;
   }
 
@@ -143,6 +144,50 @@
     } catch (e) { /* noop */ }
   }
 
+  // --- workflow instrumentation ---------------------------------------------
+  // A workflow is a multi-step user goal (build a subscription, generate code).
+  // startWorkflow() opens it with a correlation id + start time; completeWorkflow()
+  // closes it with status + duration_ms so funnels + drop-off are measurable.
+  function _uuid() {
+    try { if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID(); } catch (e) { /* noop */ }
+    return 'wf-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+  function _now() {
+    try { return (window.performance && typeof performance.now === 'function') ? performance.now() : Date.now(); }
+    catch (e) { return Date.now(); }
+  }
+
+  function startWorkflow(workflow, context) {
+    var handle = { workflow: workflow, workflow_id: _uuid(), _t0: _now() };
+    try {
+      var props = {};
+      if (context) Object.keys(context).forEach(function (k) { props[k] = context[k]; });
+      props.workflow = workflow;
+      props.workflow_id = handle.workflow_id;
+      track('workflow_started', props);
+    } catch (e) { /* noop */ }
+    return handle;
+  }
+
+  function completeWorkflow(handle, outcome) {
+    try {
+      handle = handle || {};
+      outcome = outcome || {};
+      var props = {};
+      Object.keys(outcome).forEach(function (k) {
+        if (k === 'status' || k === 'error_type' || k === 'step_count') return;
+        props[k] = outcome[k];
+      });
+      props.workflow = outcome.workflow || handle.workflow;
+      if (handle.workflow_id) props.workflow_id = handle.workflow_id;
+      props.status = outcome.status || 'success';
+      if (handle._t0 != null) props.duration_ms = Math.round(_now() - handle._t0);
+      if (outcome.step_count != null) props.step_count = outcome.step_count;
+      if (outcome.error_type != null) props.error_type = outcome.error_type;
+      track('workflow_completed', props);
+    } catch (e) { /* noop */ }
+  }
+
   // --- public wrapper --------------------------------------------------------
 
   var analytics = {
@@ -169,7 +214,9 @@
     trackApiOperationSelected: function (d) { track('api_operation_selected', d || {}); },
     trackApiError: function (d) { track('api_error', d || {}); },
     trackExportResults: function (d) { track('export_results', d || {}); },
-    trackWorkflowCompleted: function (d) { track('workflow_completed', d || {}); }
+    trackWorkflowCompleted: function (d) { track('workflow_completed', d || {}); },
+    startWorkflow: startWorkflow,
+    completeWorkflow: completeWorkflow
   };
 
   window.analytics = analytics;

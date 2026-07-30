@@ -230,12 +230,18 @@
                 var _spec = (_picker && _picker.selectedOptions && _picker.selectedOptions[0]
                     && _picker.selectedOptions[0].dataset.name) || '';
                 window.__iosxeTrack('code_generated', { http_method: (method || '').toUpperCase(), spec: _spec, op_path: path || '' });
-                if (window.analytics) window.analytics.trackWorkflowCompleted({
-                    workflow: 'code_generated',
-                    api_operation: ((method || '').toUpperCase() + ' ' + (path || '')).trim(),
-                    yang_model: _spec, http_method: (method || '').toUpperCase(),
-                    page_or_section: 'code-generator'
-                });
+                if (window.analytics && window.analytics.completeWorkflow) {
+                    window.__iosxeWf = window.__iosxeWf || {};
+                    var _cgw = window.__iosxeWf.codegen
+                        || (window.analytics.startWorkflow && window.analytics.startWorkflow('code_generated', { page_or_section: 'code-generator' }));
+                    window.analytics.completeWorkflow(_cgw, {
+                        workflow: 'code_generated', status: 'success',
+                        api_operation: ((method || '').toUpperCase() + ' ' + (path || '')).trim(),
+                        yang_model: _spec, http_method: (method || '').toUpperCase(),
+                        page_or_section: 'code-generator'
+                    });
+                    window.__iosxeWf.codegen = null;
+                }
             }
         } catch (e) { /* noop */ }
     }
@@ -449,6 +455,18 @@
                 http_method: (_mo && _mo.value) || '',
                 page_or_section: 'code-generator'
             });
+            // Open a code_generated workflow when an operation is chosen; it is
+            // closed in generate() so we can measure select -> generate funnel + duration.
+            if (window.analytics && window.analytics.startWorkflow && _pp && _pp.value) {
+                window.__iosxeWf = window.__iosxeWf || {};
+                window.__iosxeWf.codegen = window.analytics.startWorkflow('code_generated', {
+                    api_operation: (((_mo && _mo.value) || '') + ' ' + _pp.value).trim(),
+                    yang_model: (_sp && _sp.selectedOptions && _sp.selectedOptions[0]
+                        && _sp.selectedOptions[0].dataset.name) || '',
+                    http_method: (_mo && _mo.value) || '',
+                    page_or_section: 'code-generator'
+                });
+            }
         } catch (e) { /* noop */ }
     }
 
