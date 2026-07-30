@@ -68,13 +68,19 @@ Every event automatically carries `app_version`, `environment`, and
 |-------|-----------|----------------|
 | `app_loaded` | Each page view (wrapper, on ready). | — |
 | `data_model_selected` | A YANG model/module is chosen (telemetry, notifications, viewer tree). | `yang_model`, `model_category`, `release` |
-| `api_operation_selected` | An operation is expanded in a viewer (or code generated). | `api_operation`, `yang_model`, `http_method` |
+| `api_operation_selected` | An operation is expanded in a viewer, or an op is picked in the code generator. | `api_operation`, `yang_model`, `model_category`, `http_method` |
 | `api_request` | A Swagger UI **Try it out** call completes. | `api_operation`, `yang_model`, `http_code`, `result` |
 | `api_error` | A Try-it-out call fails (network/timeout). | `api_operation`, `yang_model`, `result`, `error_type` |
 | `export_results` | A CSV/export download runs. | `export_type`, `row_count`, `result` |
-| `workflow_completed` | A multi-step task finishes (subscription built, code generated). | `workflow`, `api_operation`, `yang_model` |
+| `workflow_started` | A multi-step task begins (module loaded in telemetry; op picked in code gen). | `workflow`, `workflow_id`, `page_or_section` |
+| `workflow_completed` | The task finishes (subscription built, code generated). | `workflow`, `workflow_id`, `status`, `duration_ms`, `yang_model`, `transport` |
 
-`result` is one of `success | error | timeout`.
+`result` is one of `success | error | timeout`. `status` (on workflows) is
+`success | failed | abandoned`. Each workflow run emits one `workflow_started`
+and one `workflow_completed` sharing a `workflow_id`, so PostHog can build a
+funnel and duration trend. Canonical `workflow` names: `telemetry_subscription_built`,
+`code_generated`. `model_category` is always lowercased by the wrapper. (The old
+`operation_selected` event was removed as a duplicate of `api_operation_selected`.)
 
 The headline call (matches the agreed shape exactly):
 
@@ -98,6 +104,10 @@ Wrapper API (`window.analytics`):
 - `trackApiError(props)`
 - `trackExportResults(props)`
 - `trackWorkflowCompleted(props)`
+- `startWorkflow(workflow, context)` → returns a handle; emits `workflow_started`.
+- `completeWorkflow(handle, outcome)` → emits `workflow_completed` with `workflow_id`,
+  `status`, and `duration_ms` derived from the handle. Pair every `startWorkflow`
+  with a `completeWorkflow` (use `status: 'failed'` + `error_type` on failure).
 
 Each call fans out to:
 - **PostHog** → `posthog.capture(name, properties)` (dashboards/exports).
@@ -187,6 +197,10 @@ All the required dashboards are breakdowns of the `api_request` event (plus
    in the error series if desired.)
 6. **Usage by app version / section** — event `app_loaded` → **Break down by**
    `app_version` (or `page_or_section`).
+7. **Workflow funnel + duration** — Insight → *Funnel* → step 1 `workflow_started`,
+   step 2 `workflow_completed` (filter `status = success`), **Break down by**
+   `workflow`. For duration, Insight → *Trends* on `workflow_completed` →
+   property `duration_ms` → p50/p95.
 
 Add each insight to a **Dashboard** ("IOS-XE Docs — API Usage"). Use the global
 `environment` filter to separate production from staging/development. Exports:
