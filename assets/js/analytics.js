@@ -157,6 +157,8 @@
     catch (e) { return Date.now(); }
   }
 
+  var _openWf = {};   // workflow_id -> { handle, ctx } for abandonment reporting
+
   function startWorkflow(workflow, context) {
     var handle = { workflow: workflow, workflow_id: _uuid(), _t0: _now() };
     try {
@@ -164,6 +166,7 @@
       if (context) Object.keys(context).forEach(function (k) { props[k] = context[k]; });
       props.workflow = workflow;
       props.workflow_id = handle.workflow_id;
+      _openWf[handle.workflow_id] = { handle: handle, ctx: context || {} };
       track('workflow_started', props);
     } catch (e) { /* noop */ }
     return handle;
@@ -173,6 +176,7 @@
     try {
       handle = handle || {};
       outcome = outcome || {};
+      if (handle.workflow_id) delete _openWf[handle.workflow_id];
       var props = {};
       Object.keys(outcome).forEach(function (k) {
         if (k === 'status' || k === 'error_type' || k === 'step_count') return;
@@ -187,6 +191,27 @@
       track('workflow_completed', props);
     } catch (e) { /* noop */ }
   }
+
+  // Any workflow still open when the page is left is reported abandoned, so the
+  // funnel shows real drop-off. pagehide (not visibilitychange) => a tab switch
+  // the user returns from is not counted as abandonment.
+  function _flushAbandoned() {
+    try {
+      Object.keys(_openWf).forEach(function (id) {
+        var rec = _openWf[id];
+        delete _openWf[id];
+        if (!rec) return;
+        var props = {};
+        Object.keys(rec.ctx).forEach(function (k) { props[k] = rec.ctx[k]; });
+        props.workflow = rec.handle.workflow;
+        props.workflow_id = id;
+        props.status = 'abandoned';
+        if (rec.handle._t0 != null) props.duration_ms = Math.round(_now() - rec.handle._t0);
+        track('workflow_completed', props);
+      });
+    } catch (e) { /* noop */ }
+  }
+  try { window.addEventListener('pagehide', _flushAbandoned); } catch (e) { /* noop */ }
 
   // --- public wrapper --------------------------------------------------------
 
