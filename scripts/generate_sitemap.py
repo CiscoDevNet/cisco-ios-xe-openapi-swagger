@@ -21,6 +21,7 @@ TOP_LEVEL_PAGES = [
     ("tree-compare.html", 0.8, "monthly"),
     ("telemetry.html", 0.8, "monthly"),
     ("exports.html", 0.7, "monthly"),
+    ("live-data.html", 0.8, "monthly"),
     ("yang-accountability.html", 0.7, "monthly"),
     ("yang-accountability-compare.html", 0.6, "monthly"),
     ("platform-coverage.html", 0.7, "monthly"),

@@ -151,6 +151,11 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # listed as "voice" while the file is "native-voice.json"), which would
     # otherwise make the viewer 404 those specs ("Failed to load spec ...").
     ("fix-manifest-schema", ["python", str(SCRIPTS / "fix_manifest_schema.py")]),
+    # Lightweight coverage + navigation index for the interactive Live Data
+    # page (live-data.html). Runs after manifests so per-category totals are
+    # accurate. Reads the x-cisco-live-examples the overlay injected above.
+    ("live-examples-index", ["python", str(SCRIPTS / "build_live_examples_index.py"),
+                             "--version", "$VER"]),
     ("accountability",      ["python", str(SCRIPTS / "analyze_yang_accountability_v2.py"),
                              "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),

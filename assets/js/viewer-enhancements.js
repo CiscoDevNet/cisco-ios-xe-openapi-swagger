@@ -276,26 +276,26 @@
         });
     }
 
-    // ---------- (4e) per-module live device sample panel ----------------
-    // When a module is selected, surface the REAL captured RESTCONF GET
-    // responses that were injected into the spec as the x-cisco-live-examples
-    // vendor extension (captured from a physical Catalyst switch for Cisco
-    // Live 2026, DEVNET-1232). Reads the same per-module spec the viewer just
-    // loaded (cache-shared) and renders a compact, collapsible panel above the
-    // Swagger UI. The synthetic schema example is left as-is. Fail-silent.
-    var _liveExCache = {};   // module -> collected data (or null when none)
+    // ---------- (4e) per-module live device data banner ------------------
+    // When a module is selected, if we captured real RESTCONF responses from
+    // physical devices for it, show a compact banner that deep-links into the
+    // full interactive Live Data browser (live-data.html). Uses the small
+    // per-release index (not the full spec) so it stays light and always
+    // tracks the current module. The synthetic schema example is left as-is.
+    // Fail-silent.
+    var _liveIdxPromise = null;       // cached fetch of the release index
+    var _liveIdxByModule = null;      // module -> index entry
+    var _liveIdxOsByPid = null;       // pid -> os_version
 
     function attachLiveExamplesPanel() {
         try {
             var ui = document.getElementById('swagger-ui');
             if (!ui) return;
             updateLiveExamplesPanel();
-            // The viewer switches modules via history.replaceState (see
-            // deeplink.js), which does NOT fire 'hashchange'. So in addition
-            // to hashchange (covers pasted deep links / back-forward), watch
-            // the Swagger UI container for the re-render that every in-page
-            // spec switch triggers, and refresh the panel then. Debounced so
-            // the many mutations during a single render collapse into one call.
+            // The viewer switches modules via history.replaceState (deeplink.js),
+            // which does NOT fire 'hashchange'. Cover both: hashchange (pasted
+            // deep links / back-forward) AND the #swagger-ui re-render that
+            // every in-page spec switch triggers (debounced).
             window.addEventListener('hashchange', updateLiveExamplesPanel);
             var t = null;
             var observer = new MutationObserver(function () {
@@ -320,41 +320,25 @@
         return ver;
     }
 
-    function _liveExSpecUrl(module) {
+    function _loadLiveIndex() {
+        if (_liveIdxPromise) return _liveIdxPromise;
         var ver = _liveExActiveVer();
-        if (!ver || !module) return '';
-        var m = location.pathname.match(/\/(swagger-[^/]+-model)\//);
-        var cat = m ? m[1] : '';
-        if (!cat) return '';
-        return '../releases/' + encodeURIComponent(ver) + '/' + cat
-            + '/api/' + encodeURIComponent(module) + '.json';
-    }
-
-    function _collectLiveExamples(spec) {
-        var out = { pids: {}, ops: [], os: '' };
-        var paths = (spec && spec.paths) || {};
-        Object.keys(paths).forEach(function (p) {
-            var item = paths[p];
-            if (!item || typeof item !== 'object' || !item.get) return;
-            var responses = item.get.responses || {};
-            var resp = responses['200'] || responses['default'];
-            if (!resp || !resp.content) return;
-            var content = resp.content, media = null;
-            Object.keys(content).forEach(function (k) {
-                if (!media && content[k] && content[k]['x-cisco-live-examples']) media = content[k];
-            });
-            if (!media) return;
-            var live = media['x-cisco-live-examples'] || {};
-            var pidKeys = Object.keys(live);
-            if (!pidKeys.length) return;
-            pidKeys.forEach(function (pid) {
-                out.pids[pid] = true;
-                if (!out.os && live[pid]) out.os = live[pid].os_version || '';
-            });
-            var first = live[pidKeys[0]] || {};
-            out.ops.push({ path: p, pid: pidKeys[0], value: first.value });
-        });
-        return out;
+        if (!ver) { _liveIdxPromise = Promise.resolve(null); return _liveIdxPromise; }
+        _liveIdxPromise = fetch('../releases/' + encodeURIComponent(ver) + '/live-examples-index.json', { cache: 'default' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (idx) {
+                _liveIdxByModule = {};
+                _liveIdxOsByPid = {};
+                if (idx && idx.modules) {
+                    idx.modules.forEach(function (m) { _liveIdxByModule[m.module] = m; });
+                }
+                if (idx && idx.devices) {
+                    idx.devices.forEach(function (d) { _liveIdxOsByPid[d.pid] = d.os_version || ''; });
+                }
+                return idx;
+            })
+            .catch(function () { _liveIdxByModule = {}; _liveIdxOsByPid = {}; return null; });
+        return _liveIdxPromise;
     }
 
     function _ensureLiveExPanelEl() {
@@ -372,23 +356,31 @@
         return panel;
     }
 
-    function _renderLiveExPanel(data) {
+    function _renderLiveExPanel(module, entry) {
         var panel = document.getElementById('iosxe-liveex-panel');
-        if (!data || !data.ops.length) { if (panel) panel.style.display = 'none'; return; }
+        if (!entry || !entry.paths || !entry.paths.length) {
+            if (panel) panel.style.display = 'none';
+            return;
+        }
+        // Guard against a stale async render: only paint if this module is
+        // still the one selected (fixes "old module's data" on fast switches).
+        if (_currentSpecFromHash() !== module) return;
         panel = _ensureLiveExPanelEl();
         if (!panel) return;
         panel.textContent = '';
-        var pids = Object.keys(data.pids);
+
+        var pids = entry.pids || [];
+        var os = (pids.length && _liveIdxOsByPid) ? (_liveIdxOsByPid[pids[0]] || '') : '';
 
         var head = document.createElement('div');
         var strong = document.createElement('strong');
-        strong.textContent = 'Live device sample';
+        strong.textContent = 'Live device data';
         head.appendChild(strong);
         head.appendChild(document.createTextNode(
-            ' \u2014 real RESTCONF GET responses captured from ' + pids.join(', ')
-            + (data.os ? ' running IOS XE ' + data.os : '')
-            + ' \u2014 ' + data.ops.length + ' operation' + (data.ops.length === 1 ? '' : 's')
-            + ' with captured data.'));
+            ' \u2014 real RESTCONF responses captured from ' + pids.join(', ')
+            + (os ? ' running IOS XE ' + os : '')
+            + ' \u2014 ' + entry.paths.length + ' path' + (entry.paths.length === 1 ? '' : 's')
+            + ' with data for this module.'));
         panel.appendChild(head);
 
         var note = document.createElement('div');
@@ -396,38 +388,15 @@
         note.textContent = 'Captured for Cisco Live 2026 (DEVNET-1232), shown alongside the synthetic schema example.';
         panel.appendChild(note);
 
-        var details = document.createElement('details');
-        details.style.marginTop = '6px';
-        var summary = document.createElement('summary');
-        summary.style.cssText = 'cursor:pointer;color:#1976D2;font-weight:600;';
-        summary.textContent = 'Show captured responses';
-        details.appendChild(summary);
+        var ver = _liveExActiveVer();
+        var link = document.createElement('a');
+        link.href = '../live-data.html?ver=' + encodeURIComponent(ver)
+            + '#module=' + encodeURIComponent(module)
+            + (pids[0] ? '&pid=' + encodeURIComponent(pids[0]) : '');
+        link.textContent = 'Open in Live Data browser \u2192';
+        link.style.cssText = 'display:inline-block;margin-top:6px;color:#1976D2;font-weight:600;text-decoration:none;';
+        panel.appendChild(link);
 
-        var LIMIT = 25;
-        data.ops.slice(0, LIMIT).forEach(function (op) {
-            var wrap = document.createElement('div');
-            wrap.style.marginTop = '8px';
-            var code = document.createElement('div');
-            code.style.cssText = 'font-family:Consolas,Monaco,monospace;font-size:12px;color:#334e68;';
-            code.textContent = 'GET ' + op.path;
-            wrap.appendChild(code);
-            var pre = document.createElement('pre');
-            pre.style.cssText = 'margin:4px 0 0;padding:8px;background:#0b1f33;color:#d6e4f0;'
-                + 'border-radius:4px;overflow:auto;max-height:240px;font-size:12px;';
-            var txt = '';
-            try { txt = JSON.stringify(op.value, null, 2); } catch (_) { txt = String(op.value); }
-            if (txt && txt.length > 4000) txt = txt.slice(0, 4000) + '\n\u2026 (truncated)';
-            pre.textContent = txt || '(empty)';
-            wrap.appendChild(pre);
-            details.appendChild(wrap);
-        });
-        if (data.ops.length > LIMIT) {
-            var more = document.createElement('div');
-            more.style.cssText = 'margin-top:8px;color:#486581;font-size:12px;';
-            more.textContent = '+ ' + (data.ops.length - LIMIT) + ' more operation(s) with captured data.';
-            details.appendChild(more);
-        }
-        panel.appendChild(details);
         panel.style.display = 'block';
     }
 
@@ -435,21 +404,10 @@
         var module = _currentSpecFromHash();
         var panel = document.getElementById('iosxe-liveex-panel');
         if (!module) { if (panel) panel.style.display = 'none'; return; }
-        if (Object.prototype.hasOwnProperty.call(_liveExCache, module)) {
-            _renderLiveExPanel(_liveExCache[module]);
-            return;
-        }
-        var url = _liveExSpecUrl(module);
-        if (!url) { if (panel) panel.style.display = 'none'; return; }
-        fetch(url, { cache: 'default' })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (spec) {
-                var data = spec ? _collectLiveExamples(spec) : null;
-                if (data && !data.ops.length) data = null;
-                _liveExCache[module] = data;
-                _renderLiveExPanel(data);
-            })
-            .catch(function () { _liveExCache[module] = null; _renderLiveExPanel(null); });
+        _loadLiveIndex().then(function () {
+            var entry = _liveIdxByModule ? _liveIdxByModule[module] : null;
+            _renderLiveExPanel(module, entry);
+        });
     }
 
     // ---------- (4b) analytics: which operation, for which module -------

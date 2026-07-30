@@ -258,7 +258,7 @@
         var REPO = 'https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger';
         var EDITABLE = ['index.html', 'about.html', 'yang-accountability.html',
                          'tree-compare.html', 'exports.html', 'code-generator.html',
-                         'telemetry.html'];
+                         'telemetry.html', 'live-data.html'];
         if (!isSubdir && EDITABLE.indexOf(herePage) !== -1) {
             editHref = REPO + '/edit/main/' + herePage;
         }
