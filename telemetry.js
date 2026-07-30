@@ -427,12 +427,22 @@
           });
         } catch (e) { /* noop */ }
         // Open a subscription-build workflow on module load; closed on "Use in config".
+        // If the spec failed to load there is nothing to build -> report failed.
         try {
           if (window.analytics && window.analytics.startWorkflow) {
             window.__iosxeWf = window.__iosxeWf || {};
             window.__iosxeWf.telemetry = window.analytics.startWorkflow('telemetry_subscription_built', {
               yang_model: name, model_category: state.cat, release: state.ver, page_or_section: 'telemetry'
             });
+            if (!spec && window.analytics.completeWorkflow) {
+              window.analytics.completeWorkflow(window.__iosxeWf.telemetry, {
+                workflow: 'telemetry_subscription_built', status: 'failed',
+                error_type: 'spec_load_failed',
+                yang_model: name, model_category: state.cat, release: state.ver,
+                page_or_section: 'telemetry'
+              });
+              window.__iosxeWf.telemetry = null;
+            }
           }
         } catch (e) { /* noop */ }
         // Deep-link restore: rebuild the subscription for the shared xpath.

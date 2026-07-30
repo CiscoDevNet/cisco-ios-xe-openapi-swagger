@@ -297,6 +297,16 @@
             }
         } catch (_) { /* noop */ }
         track('notification_example_copied', { release: current && current.version });
+        // Copying an example = the event data model was explored: complete it.
+        try {
+            if (window.analytics && window.analytics.completeWorkflow && window.__iosxeWf && window.__iosxeWf.dataModel) {
+                window.analytics.completeWorkflow(window.__iosxeWf.dataModel, {
+                    workflow: 'data_model_explored', status: 'success',
+                    release: current && current.version, page_or_section: 'notifications'
+                });
+                window.__iosxeWf.dataModel = null;
+            }
+        } catch (_) { /* noop */ }
     }
 
     function exportCsv() {
@@ -395,6 +405,22 @@
                             yang_model: modSel.value, release: current && current.version,
                             page_or_section: 'notifications'
                         });
+                    } catch (_) { /* noop */ }
+                    // data_model_explored workflow: selecting an event model starts
+                    // it; copying an example completes it. Re-selecting closes the
+                    // prior one as abandoned.
+                    try {
+                        if (window.analytics && window.analytics.startWorkflow && modSel.value) {
+                            window.__iosxeWf = window.__iosxeWf || {};
+                            if (window.__iosxeWf.dataModel && window.analytics.completeWorkflow) {
+                                window.analytics.completeWorkflow(window.__iosxeWf.dataModel, {
+                                    workflow: 'data_model_explored', status: 'abandoned', page_or_section: 'notifications'
+                                });
+                            }
+                            window.__iosxeWf.dataModel = window.analytics.startWorkflow('data_model_explored', {
+                                yang_model: modSel.value, release: current && current.version, page_or_section: 'notifications'
+                            });
+                        }
                     } catch (_) { /* noop */ }
                 });
                 consumableOnly.addEventListener('change', render);

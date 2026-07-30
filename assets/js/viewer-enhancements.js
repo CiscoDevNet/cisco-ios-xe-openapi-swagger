@@ -323,6 +323,16 @@
                             yang_model: spec, model_category: _cat, http_method: method,
                             page_or_section: 'swagger-viewer'
                         });
+                        // Expanding an operation = the spec was explored: complete it.
+                        if (window.analytics && window.analytics.completeWorkflow && window.__iosxeWf && window.__iosxeWf.specExplore) {
+                            window.analytics.completeWorkflow(window.__iosxeWf.specExplore, {
+                                workflow: 'spec_explored', status: 'success',
+                                yang_model: spec, model_category: _cat,
+                                api_operation: (method + ' ' + opPath).trim(),
+                                page_or_section: 'swagger-viewer'
+                            });
+                            window.__iosxeWf.specExplore = null;
+                        }
                     } catch (_) { /* noop */ }
                 } catch (_) { /* noop */ }
             }, true);
@@ -388,6 +398,22 @@
                             yang_model: spec, model_category: cat, release: ver,
                             page_or_section: 'swagger-viewer'
                         });
+                    } catch (_) { /* noop */ }
+                    // spec_explored workflow: opening a spec starts it; expanding
+                    // an operation (attachOperationTracking) completes it. Opening
+                    // a different spec first closes the prior one as abandoned.
+                    try {
+                        if (window.analytics && window.analytics.startWorkflow) {
+                            window.__iosxeWf = window.__iosxeWf || {};
+                            if (window.__iosxeWf.specExplore && window.analytics.completeWorkflow) {
+                                window.analytics.completeWorkflow(window.__iosxeWf.specExplore, {
+                                    workflow: 'spec_explored', status: 'abandoned', page_or_section: 'swagger-viewer'
+                                });
+                            }
+                            window.__iosxeWf.specExplore = window.analytics.startWorkflow('spec_explored', {
+                                yang_model: spec, model_category: cat, release: ver, page_or_section: 'swagger-viewer'
+                            });
+                        }
                     } catch (_) { /* noop */ }
                 } catch (_) { /* noop */ }
             }, true);
