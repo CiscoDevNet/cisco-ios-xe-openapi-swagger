@@ -85,6 +85,22 @@ scripts/harness/find_value.py:
 - Emit a per-PID coverage matrix (module/path x PID -> has-data / 404 / empty).
 Optional: a small offline HTML/JSON report to browse results.
 
+## 5a. Phase 4 - web-app injection DECISION (user-confirmed 2026-07-30)
+How the collected real data shows up in the web app (built AFTER captures exist):
+- Keep the existing synthetic `example` UNTOUCHED (YANG-aligned baseline; always renders in Swagger UI).
+- ADD real captures as an OpenAPI vendor EXTENSION field next to it (NOT an HTTP header):
+    "content": { "application/yang-data+json": {
+        "schema": {...}, "example": {...synthetic...},
+        "x-cisco-live-examples": { "C9300-48P": {...real...}, "C9500-40X": {...}, ... }  // per PID
+    }}
+  Matches the repo's existing x- convention (specs already carry x-yang-module, x-model-type).
+- Swagger UI IGNORES unknown x- fields, so a viewer hook is required to display them:
+  add to assets/js/viewer-enhancements.js a "Live device sample - <PID> v" panel that reads
+  x-cisco-live-examples and renders per-PID real data beside the synthetic example.
+- Non-destructive: user sees BOTH the synthetic example and the real per-PID device data.
+- Wire the injection into build_release.py (an overlay/merge step, apply_example_overlay-style)
+  so it survives regeneration; releases/** is SW network-only (no SW bump for spec content).
+
 ## 6. Sanitization / safety (repo is PUBLIC - CiscoDevNet)
 - Raw captures stay LOCAL and GITIGNORED. Nothing device-real is committed until scrubbed + reviewed.
 - Redaction level chosen: LIGHT (strip obvious secrets/keys - passwords, community strings,
