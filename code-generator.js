@@ -234,8 +234,12 @@
                     window.__iosxeWf = window.__iosxeWf || {};
                     var _cgw = window.__iosxeWf.codegen
                         || (window.analytics.startWorkflow && window.analytics.startWorkflow('code_generated', { page_or_section: 'code-generator' }));
+                    // A snippet with no host or no RESTCONF path is not runnable ->
+                    // report the workflow as failed rather than a false success.
+                    var _cgOk = !!(host && path);
                     window.analytics.completeWorkflow(_cgw, {
-                        workflow: 'code_generated', status: 'success',
+                        workflow: 'code_generated', status: _cgOk ? 'success' : 'failed',
+                        error_type: _cgOk ? undefined : (!host ? 'missing_host' : 'missing_path'),
                         api_operation: ((method || '').toUpperCase() + ' ' + (path || '')).trim(),
                         yang_model: _spec, http_method: (method || '').toUpperCase(),
                         page_or_section: 'code-generator'
