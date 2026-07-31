@@ -131,6 +131,35 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Changed — Live Data hardening, honest coverage, depth verification (round 31, 2026-07-31)
+
+- **Redaction hardened for bare auth leaves.** `scripts/harness/redact.py` now
+  also masks module-prefixed secret leaves whose names don't contain
+  "password"/"secret" — radius/tacacs `key`, routing-auth `md5`,
+  `message-digest-key`, key-chains — and strips the RESTCONF module prefix
+  (`Cisco-IOS-XE-aaa:key`) before matching so a namespace can't dodge redaction.
+  `build_live_examples_index.py` re-scrubs every value at publish time, so
+  committed data files never carry a secret even if a capture predates the fix.
+  `secret_scan.py` gained a matching prefix-aware pattern.
+- **Honest coverage metric.** The Live Data coverage bar now shows **module
+  coverage** (captured modules ÷ modules in that category) instead of a per-leaf
+  path percentage — the path total is dominated by keyed-list entries and deep
+  native-config leaves, which made the old figure misleadingly low (~1–3%).
+- **Capture date + coverage note.** The page shows "Captured `<date>` · IOS XE
+  `<ver>`" (from new `captured_from`/`captured_to` in the index) and a note
+  explaining the coverage denominator.
+- **Simple release gate.** A test scans `releases/26.1.1/live-data` for secrets
+  as a backstop to publish-time redaction.
+- **Refresh wrapper.** `scripts/refresh_live_data.py --version 26.1.1 [--capture]`
+  rebuilds the sidecar from local captures and regenerates the index + per-path
+  files in one command.
+- **Depth probe (read-only).** `scripts/harness/depth_probe.py` answers "does a
+  deeper keyed GET return more data than the parent?" — see
+  [DEVICE_DATA_COLLECTION.md §4.1](DEVICE_DATA_COLLECTION.md). Sweep of C9600
+  oper (26.1.1) found **0 modules hide data**: 70/91 captured oper modules have
+  fully-populated roots, and the 21 with empty/absent nested nodes (169 keyed
+  probes) returned nothing — so the root GETs are complete for the captured set.
+
 ### Added — Live device data: real captured RESTCONF responses + interactive browser (round 30, 2026-07-31)
 
 - **Real device responses captured, kept out of the specs.** Every operational,

@@ -21,6 +21,7 @@ design intent; the modules below already implement it.
 | Offline raw-capture browser | `scripts/harness/report.py` | Built — emits `capture-report.html` (gitignored) |
 | Real-data example overlay | `scripts/harness/build_observed_examples.py` | Built — emits the `x-cisco-live-examples` sidecar; see §11.0 (SHIPPED) |
 | Secret-scan guard | `scripts/harness/secret_scan.py` | Built |
+| Depth probe (does a deeper GET return more?) | `scripts/harness/depth_probe.py` | Built — read-only `--discover` / single-probe; see §4.1 |
 | Tests | `scripts/harness/tests/` | Built (pytest) |
 | Inventory template | `scripts/harness/inventory.example.json` | Committed (6 placeholder devices) |
 
@@ -96,6 +97,35 @@ Directory: scripts/harness/ (dev-only; NOT wired into build_release.py, CI, or t
   Handle 204/empty bodies and non-JSON gracefully.
 - pilot first: capture ONE device, just the switch-dp-punt-inject-oper path, to prove the
   pipeline end-to-end, then scale to all modules and all 6 devices.
+
+### 4.1 Depth verification: does a deeper (keyed) GET return more data?
+The `--roots-only` assumption is that a module-root GET already returns the whole
+subtree. Some IOS XE oper models *could* instead return a container skeleton
+while a nested list is only populated when you GET the keyed deeper path
+directly. `scripts/harness/depth_probe.py` verifies this empirically, READ-ONLY:
+
+- **single-probe** — `--parent-path/--key-leaf/--child` GETs one list's keyed
+  child paths and classifies each vs. the parent slice: `ADDS_DATA` /
+  `REDUNDANT` / `EMPTY` / `ERROR`.
+- **`--discover`** — scans every captured module for nested nodes that are
+  EMPTY (`[]`/`{}`) or ABSENT (defined in the spec, missing from the root),
+  resolves list keys (spec `={param}` + data), GETs the keyed deep paths, and
+  reports which modules actually hide data.
+
+Correctness notes (learned the hard way):
+- Percent-encode list-key VALUES (`/`, `:`, space) but do **not** re-quote through
+  `build_restconf_url` — that double-encodes `%2F`→`%252F` and the device 404s.
+- Classify by **structure** (key-path sets), not values: volatile oper counters
+  drift between capture and probe time and otherwise look like "new data".
+- Use `requests.Session().trust_env = False` to bypass the corp proxy for direct
+  device GETs.
+
+**Finding (C9600, IOS XE 26.1.1, oper): 0 modules hide data.** 70/91 captured
+oper modules have fully-populated roots; the 21 with empty/absent nested nodes
+(169 probes) returned nothing on a direct keyed GET — those features are simply
+unconfigured. So the root GET (and thus `--roots-only`) is complete for the
+captured oper set; per-container drilling adds no data there. Re-run per device
+/ per category (`--device`, `--category`) before assuming the same elsewhere.
 
 ## 5. Value-discovery index
 scripts/harness/build_capture_index.py (mirror scripts/build_paths_index.py):
