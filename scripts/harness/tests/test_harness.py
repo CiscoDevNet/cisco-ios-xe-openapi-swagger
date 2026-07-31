@@ -46,6 +46,55 @@ def test_restconf_get_refuses_non_get_before_network():
         restconf_get("10.0.0.1", 443, "/data/x", ("u", "p"), _method="POST")
 
 
+class _FakeResp:
+    def __init__(self, status, body=None, ctype="application/yang-data+json"):
+        self.status_code = status
+        self._body = body
+        self.headers = {"Content-Type": ctype}
+        self.text = "" if body is None else json.dumps(body)
+
+    def json(self):
+        return self._body
+
+
+class _FakeSession:
+    """Returns a scripted sequence of responses, one per .get() call."""
+    def __init__(self, responses):
+        self._responses = list(responses)
+        self.calls = 0
+
+    def get(self, *args, **kwargs):
+        self.calls += 1
+        return self._responses.pop(0)
+
+
+def test_restconf_get_retries_on_409_then_succeeds(monkeypatch):
+    # 409 Conflict = datastore busy serving a prior read; the client must wait
+    # and retry rather than record a conflict. Two 409s then a 200 -> success.
+    monkeypatch.setattr("scripts.harness.request.time.sleep", lambda *a, **k: None)
+    sess = _FakeSession([
+        _FakeResp(409),
+        _FakeResp(409),
+        _FakeResp(200, {"data": {"x": 1}}),
+    ])
+    res = restconf_get("10.0.0.1", 443, "/data/x", ("u", "p"), session=sess)
+    assert res.ok and res.http_status == 200
+    assert res.body == {"data": {"x": 1}}
+    assert sess.calls == 3
+    assert res.attempts == 3
+
+
+def test_restconf_get_gives_up_after_conflict_budget(monkeypatch):
+    # A path that never frees up must eventually return the 409 (bounded budget),
+    # using exactly conflict_retries + 1 calls.
+    monkeypatch.setattr("scripts.harness.request.time.sleep", lambda *a, **k: None)
+    sess = _FakeSession([_FakeResp(409) for _ in range(20)])
+    res = restconf_get("10.0.0.1", 443, "/data/x", ("u", "p"),
+                       session=sess, conflict_retries=3)
+    assert res.http_status == 409
+    assert sess.calls == 4  # initial + 3 conflict retries
+
+
 def test_build_restconf_url():
     url = build_restconf_url("dev.example.com", 443, "/data/Cisco-IOS-XE-native:native/hostname")
     assert url == "https://dev.example.com:443/restconf/data/Cisco-IOS-XE-native:native/hostname"

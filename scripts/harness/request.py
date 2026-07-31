@@ -16,6 +16,7 @@ live in a separate, explicitly-gated module — never by relaxing this one.
 """
 from __future__ import annotations
 
+import random
 import time
 import urllib.parse
 from dataclasses import dataclass
@@ -102,6 +103,8 @@ def restconf_get(
     session: Optional[requests.Session] = None,
     retries: int = 2,
     backoff: float = 1.5,
+    conflict_retries: int = 8,
+    conflict_backoff: float = 0.25,
     _method: str = "GET",
 ) -> GetResult:
     """Issue a single RESTCONF GET and return a normalized :class:`GetResult`.
@@ -120,12 +123,12 @@ def restconf_get(
     owns_session = session is None
     sess = session or requests.Session()
     last_error: Optional[str] = None
-    attempt = 0
+    attempt = 0            # transient (5xx / connection) retry counter
+    conflict_tries = 0     # 409/429 "datastore busy" waits (separate budget)
     reset_seen = False
     start_all = time.monotonic()
     try:
-        while attempt <= retries:
-            attempt += 1
+        while True:
             start = time.monotonic()
             try:
                 resp = sess.get(
@@ -138,9 +141,25 @@ def restconf_get(
                 elapsed_ms = int((time.monotonic() - start) * 1000)
 
                 # Retry on transient server-side failures.
-                if resp.status_code >= 500 and attempt <= retries:
+                if resp.status_code >= 500 and attempt < retries:
+                    attempt += 1
                     last_error = f"HTTP {resp.status_code}"
                     time.sleep(backoff ** attempt)
+                    continue
+
+                # 409 Conflict / 429 Too Many Requests: the RESTCONF datastore
+                # is busy serving a prior read (IOS XE serializes config-datastore
+                # GETs, so parallel workers collide). This is NOT a real failure
+                # — the request will succeed once the in-flight read completes.
+                # Wait briefly and retry, with jitter so parallel workers don't
+                # retry in lockstep. Uses its own budget so it never consumes the
+                # 5xx / connection retry allotment. This lets the collector run
+                # concurrently and self-throttle to whatever the device can serve.
+                if resp.status_code in (409, 429) and conflict_tries < conflict_retries:
+                    conflict_tries += 1
+                    last_error = f"HTTP {resp.status_code}"
+                    time.sleep(conflict_backoff * conflict_tries
+                               + random.uniform(0.0, conflict_backoff))
                     continue
 
                 text = resp.text or ""
@@ -170,7 +189,7 @@ def restconf_get(
                     elapsed_ms=int((time.monotonic() - start_all) * 1000),
                     url=url,
                     reset=reset_seen,
-                    attempts=attempt,
+                    attempts=attempt + conflict_tries + 1,
                 )
             except (requests.Timeout, requests.ConnectionError,
                     requests.exceptions.ChunkedEncodingError) as exc:
@@ -180,9 +199,11 @@ def restconf_get(
                 # not necessarily a reset.)
                 if not isinstance(exc, requests.Timeout):
                     reset_seen = True
-                if attempt <= retries:
+                if attempt < retries:
+                    attempt += 1
                     time.sleep(backoff ** attempt)
                     continue
+                break
             except requests.RequestException as exc:
                 last_error = f"{type(exc).__name__}: {exc}"
                 break
@@ -197,7 +218,7 @@ def restconf_get(
             elapsed_ms=int((time.monotonic() - start_all) * 1000),
             url=url,
             reset=reset_seen,
-            attempts=attempt,
+            attempts=attempt + conflict_tries + 1,
         )
     finally:
         if owns_session:
