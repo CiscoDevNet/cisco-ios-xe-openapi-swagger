@@ -248,15 +248,18 @@ not repeated below.
 ### 3.10 [live-data.html](live-data.html) — Live Device Data Browser
 - **Route**: `/live-data.html`
 - **Purpose**: Browse *real* RESTCONF GET responses captured from physical
-  Catalyst switches (injected into the specs as the `x-cisco-live-examples`
-  vendor extension), by device platform, YANG module, and path.
+  Catalyst switches, by device platform, YANG module, and path. Bodies are
+  **not** injected into the specs (kept lean/fast); they are served as per-path
+  data files consumed only by this page.
 - **UI**: Device platform tabs (one per PID), per-category coverage cards
   (captured vs total paths for the active device), a searchable module / path
-  browser with category filters, and a drill-down that fetches the per-module
-  spec on demand to show the exact captured response. Deep-linkable
+  browser with category filters, and a drill-down that fetches the single
+  per-path data file on demand to show the exact captured response. Deep-linkable
   (`?ver=…#module=…&path=…&pid=…`).
 - **Data sources**: [releases/index.json](releases/index.json),
-  `releases/<ver>/live-examples-index.json`, per-spec OpenAPI JSON (on demand).
+  `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies), and
+  `releases/<ver>/live-data/<category>/<module>/<hash>.json` (per-path bodies,
+  fetched on demand).
 - **Scripts**: [live-data.js](live-data.js).
 - **CSP note**: strict hub CSP (`script-src 'self'`); external JS, DOM-only,
   no `innerHTML`.

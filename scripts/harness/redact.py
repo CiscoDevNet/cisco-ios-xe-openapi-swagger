@@ -24,6 +24,26 @@ _SECRET_KEY_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+# Ambiguous short leaf names that hold a secret only as an exact match, so we
+# don't over-redact names like "key-id", "primary-key", "public-key",
+# "keychain-name". These cover radius/tacacs server ``key``, routing-auth
+# ``md5`` / ``message-digest-key`` / ``authentication-key``, and key chains.
+_EXACT_SECRET_KEYS = {
+    "key", "md5", "key-string", "message-digest-key",
+    "authentication-key", "hello-authentication-key",
+}
+
+
+def _is_secret_key(key: str) -> bool:
+    # RESTCONF keys are often module-qualified (e.g. "Cisco-IOS-XE-aaa:key");
+    # match against the local leaf name too so a prefix can't dodge redaction.
+    local = key.rsplit(":", 1)[-1]
+    return (
+        bool(_SECRET_KEY_PATTERNS.search(key))
+        or key.lower() in _EXACT_SECRET_KEYS
+        or local.lower() in _EXACT_SECRET_KEYS
+    )
+
 # Multiline blobs to mask by value pattern (PEM keys/certs) regardless of key.
 _PEM_BLOCK = re.compile(
     r"-----BEGIN [^-]+-----.*?-----END [^-]+-----",
@@ -47,7 +67,7 @@ def redact(obj: Any) -> Any:
     if isinstance(obj, dict):
         out: dict[str, Any] = {}
         for key, val in obj.items():
-            if isinstance(key, str) and _SECRET_KEY_PATTERNS.search(key):
+            if isinstance(key, str) and _is_secret_key(key):
                 out[key] = REDACTED
             else:
                 out[key] = redact(val)

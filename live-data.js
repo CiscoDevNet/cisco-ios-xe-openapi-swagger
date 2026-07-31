@@ -177,6 +177,7 @@
 
                 renderDeviceTabs();
                 renderCatFilter();
+                renderCapturedOn();
                 renderCoverage();
                 renderOverview();
                 renderSummary();
@@ -218,6 +219,23 @@
     }
 
     // ---------- coverage cards (computed for the active device) ----------
+    function fmtDay(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function renderCapturedOn() {
+        var host = document.getElementById('capturedOn');
+        if (!host) return;
+        var from = fmtDay(state.index.captured_from), to = fmtDay(state.index.captured_to);
+        if (!from && !to) { host.textContent = ''; return; }
+        host.textContent = (from && to && from !== to)
+            ? 'Captured ' + from + ' \u2013 ' + to + ' \u00b7 IOS XE ' + (state.index.os_version || '')
+            : 'Captured ' + (to || from) + ' \u00b7 IOS XE ' + (state.index.os_version || '');
+    }
+
     function deviceCoverage(pid) {
         var byCat = {};
         (state.index.modules || []).forEach(function (m) {
@@ -247,6 +265,14 @@
             ]);
             host.appendChild(card);
         });
+        var note = document.getElementById('coverageNote');
+        if (note) {
+            note.textContent = '\u201cCaptured\u201d counts the paths that returned real data on ' + state.pid
+                + '. \u201cTotal paths\u201d is every GET path enumerated across the OpenAPI specs \u2014 on a lab '
+                + 'device most of the remainder is simply not applicable (unconfigured features, list-keyed '
+                + 'or empty containers, or platform-specific paths), so a low percentage is expected and does '
+                + 'not indicate missing data.';
+        }
     }
 
     // ---------- summary: stat tiles + charts + largest payloads ----------

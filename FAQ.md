@@ -117,12 +117,13 @@ IOS XE 26.1.1). Pick a device platform tab, then drill into a module and path to
 see exactly what that switch returned; per-category coverage cards show how much
 was captured for the selected device.
 
-The same captures are embedded in each spec as the `x-cisco-live-examples`
-vendor extension (keyed by device PID) alongside the synthetic schema `example`,
-and every `swagger-*-model` viewer shows a "Live device data" banner that
-deep-links into the browser. Coverage is a snapshot — not every path is captured,
-and it is read-only sample data, so treat it as illustrative rather than
-exhaustive.
+The captures are served on demand as small per-path data files consumed by the
+Live Data page — they are **not** embedded in the OpenAPI specs, which keeps the
+specs lean and the Swagger viewers fast. Each spec keeps only its synthetic
+schema `example`, and every `swagger-*-model` viewer shows a "Live device data"
+banner that deep-links into the browser. Coverage is a snapshot — not every path
+is captured, and it is read-only sample data, so treat it as illustrative rather
+than exhaustive.
 
 ---
 

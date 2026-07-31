@@ -31,11 +31,16 @@ import argparse
 import hashlib
 import json
 import shutil
+import sys
 from collections import OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.harness.redact import redact
 
 # harness category label -> swagger model dir (for per-category totals).
 CATEGORY_MODEL = {
@@ -96,6 +101,7 @@ def build(version: str):
     modules_out = []
     device_stats: dict = {}
     cat_captured = {c: {"modules": 0, "paths": 0} for c in CATEGORY_MODEL}
+    fetched_ats: list = []
 
     for (category, module), es in sorted(by_module.items()):
         paths_out = []
@@ -113,6 +119,9 @@ def build(version: str):
                 if not isinstance(entry, dict):
                     continue
                 value = entry.get("value")
+                # Re-scrub at publish time so the committed data files never
+                # carry a secret, even if the capture predates a redaction fix.
+                value = redact(value)
                 nbytes = len(json.dumps(value, ensure_ascii=False).encode("utf-8"))
                 data_pids[pid] = {
                     "os_version": entry.get("os_version"),
@@ -122,6 +131,9 @@ def build(version: str):
                 }
                 index_pids[pid] = {"status": entry.get("http_status"), "bytes": nbytes}
                 module_pids.add(pid)
+                fa = entry.get("fetched_at")
+                if isinstance(fa, str) and fa:
+                    fetched_ats.append(fa)
                 ds = device_stats.setdefault(
                     pid,
                     {"pid": pid, "os_version": entry.get("os_version") or version,
@@ -172,6 +184,8 @@ def build(version: str):
         "version": version,
         "os_version": sidecar.get("os_version") or version,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "captured_from": min(fetched_ats) if fetched_ats else None,
+        "captured_to": max(fetched_ats) if fetched_ats else None,
         "devices": devices,
         "categories": categories,
         "totals": {

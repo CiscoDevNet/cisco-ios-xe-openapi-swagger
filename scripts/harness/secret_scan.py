@@ -18,6 +18,12 @@ _PATTERNS: list[tuple[str, re.Pattern]] = [
     ("secret_field", re.compile(r'"[^"]*secret"\s*:\s*"(?!\*\*\*REDACTED\*\*\*)[^"]+"', re.IGNORECASE)),
     ("snmp_community", re.compile(r'"[^"]*community[^"]*"\s*:\s*"(?!\*\*\*REDACTED\*\*\*)[^"]+"', re.IGNORECASE)),
     ("preshared_key", re.compile(r'"[^"]*(pre-?shared-?key|psk)"\s*:\s*"(?!\*\*\*REDACTED\*\*\*)[^"]+"', re.IGNORECASE)),
+    # Bare auth leaves (radius/tacacs "key", routing-auth "md5", key chains).
+    # Anchored to an exact leaf name (optionally module-qualified) so benign
+    # names like "key-id" / "public-key" / "keychain-name" don't trip it.
+    ("auth_key_field", re.compile(
+        r'"(?:[A-Za-z0-9-]+:)?(key|md5|key-string|message-digest-key|authentication-key)"'
+        r'\s*:\s*"(?!\*\*\*REDACTED\*\*\*)[^"]+"', re.IGNORECASE)),
 ]
 
 

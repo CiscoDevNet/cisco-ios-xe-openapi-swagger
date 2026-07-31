@@ -181,6 +181,33 @@ def test_secret_scan_flags_and_clears():
     assert not secret_scan.find_secrets(clean)
 
 
+def test_redaction_masks_bare_auth_keys_incl_module_prefix():
+    # radius/tacacs server "key" and routing-auth "md5" have leaf names that do
+    # NOT contain "password"/"secret"; RESTCONF also module-qualifies them.
+    payload = {
+        "Cisco-IOS-XE-aaa:key": "***REDACTED***",       # tacacs key (prefixed)
+        "key": {"encryption": "7", "key": "0812"},    # whole container is suspect
+        "md5": "0300abcd",                            # ospf/bgp message digest
+        "key-id": 7,                                  # benign -> kept
+        "public-key": "AAAA",                        # benign -> kept
+    }
+    out = redact.redact(payload)
+    assert out["Cisco-IOS-XE-aaa:key"] == redact.REDACTED
+    # a container named "key" is fully redacted (all content is suspect)
+    assert out["key"] == redact.REDACTED
+    assert out["md5"] == redact.REDACTED
+    assert out["key-id"] == 7                          # kept
+    assert out["public-key"] == "AAAA"                # kept
+
+
+def test_secret_scan_flags_bare_auth_key():
+    dirty = json.dumps({"Cisco-IOS-XE-aaa:key": "***REDACTED***"})
+    assert secret_scan.find_secrets(dirty)
+    assert not secret_scan.find_secrets('{"key-id": 7, "public-key": "AAAA"}')
+    clean = json.dumps(redact.redact({"Cisco-IOS-XE-aaa:key": "***REDACTED***"}))
+    assert not secret_scan.find_secrets(clean)
+
+
 def test_no_secrets_in_committed_json_artifacts():
     # The guard's intent (DEVICE_DATA_COLLECTION.md §6) is to scan committed *data*
     # (scrubbed captures + example files), not the scanner/redactor source which
@@ -508,6 +535,59 @@ def test_overlay_reports_missing_spec(tmp_path):
     stats = overlay_mod.apply_overlay(caps, specs, write=True)
     assert stats["spec_missing"] == 1
     assert stats["operations_annotated"] == 0
+
+
+# --- Live-data index/data-file generation ------------------------------------
+
+import scripts.build_live_examples_index as live_index  # noqa: E402
+
+
+def test_build_live_index_writes_per_path_files_and_redacts(tmp_path, monkeypatch):
+    monkeypatch.setattr(live_index, "PROJECT_ROOT", tmp_path)
+    version = "99.9.9"
+    sidecar_dir = tmp_path / "references"
+    sidecar_dir.mkdir(parents=True)
+    (sidecar_dir / f"live-examples-{version}.json").write_text(json.dumps({
+        "os_version": version,
+        "entries": [{
+            "category": "native-config",
+            "module": "native-aug-tacacs-server",
+            "path": "/data/Cisco-IOS-XE-native:native/tacacs-server/key",
+            "pids": {
+                "C9300-24UX": {
+                    "os_version": version,
+                    "fetched_at": "2026-01-01T00:00:00Z",
+                    "http_status": 200,
+                    "value": {"Cisco-IOS-XE-aaa:key": "***REDACTED***"},
+                },
+            },
+        }],
+    }), encoding="utf-8")
+
+    index = live_index.build(version)
+    assert index is not None
+    release_dir = tmp_path / "releases" / version
+
+    # per-path data file exists under the hashed name
+    data_files = list((release_dir / "live-data").rglob("*.json"))
+    assert len(data_files) == 1
+    body = json.loads(data_files[0].read_text(encoding="utf-8"))
+    # publish-time re-redaction scrubbed the tacacs key
+    assert body["pids"]["C9300-24UX"]["value"]["Cisco-IOS-XE-aaa:key"] == redact.REDACTED
+
+    # top-level index references the file but carries no body
+    assert index["modules"][0]["paths"][0]["file"].startswith("live-data/")
+    assert "value" not in index["modules"][0]["paths"][0]["pids"]["C9300-24UX"]
+
+    # tiny per-release summary is emitted
+    summary = json.loads((release_dir / "live-modules.json").read_text(encoding="utf-8"))
+    assert "native-aug-tacacs-server" in summary["modules"]
+    assert summary["devices"]["C9300-24UX"] == version
+
+
+def test_build_live_index_noop_without_sidecar(tmp_path, monkeypatch):
+    monkeypatch.setattr(live_index, "PROJECT_ROOT", tmp_path)
+    assert live_index.build("no-such-version") is None
 
 
 if __name__ == "__main__":
