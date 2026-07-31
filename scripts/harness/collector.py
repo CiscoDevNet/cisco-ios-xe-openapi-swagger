@@ -180,6 +180,8 @@ def capture_device(
     rate_limit: float,
     resume: bool,
     breaker_threshold: int = 8,
+    conflict_retries: int = 8,
+    conflict_backoff: float = 0.25,
     marker=None,
 ) -> Counter:
     """Capture all ``paths`` for one device. Returns a status Counter.
@@ -223,6 +225,8 @@ def capture_device(
             auth=auth,
             timeout=timeout,
             session=sess,
+            conflict_retries=conflict_retries,
+            conflict_backoff=conflict_backoff,
         )
         _write_capture(device, gp, result)
         status = _classify(result)
@@ -368,6 +372,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     ap.add_argument("--timeout", type=int, default=30, help="Per-request timeout seconds")
     ap.add_argument("--rate-limit", type=float, default=0.0, help="Sleep seconds between requests per worker")
     ap.add_argument("--breaker", type=int, default=8, help="Abort a device after N consecutive connection/timeout failures (0 = disable)")
+    ap.add_argument("--conflict-retries", type=int, default=8, help="Retries for a 409/429 (datastore busy) before giving up on a path")
+    ap.add_argument("--conflict-backoff", type=float, default=0.25, help="Base seconds between 409/429 retries (grows per attempt, jittered)")
     ap.add_argument("--log-marker", action="store_true", help="SSH to the device and 'send log' the module/path BEFORE each GET (crash diagnosis; forces --concurrency 1)")
     ap.add_argument("--log-severity", type=int, default=6, help="Severity for the device-side 'send log' marker (default 6)")
     ap.add_argument("--ssh-port", type=int, default=22, help="SSH port for --log-marker (default 22)")
@@ -468,6 +474,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             rate_limit=args.rate_limit,
             resume=not args.no_resume,
             breaker_threshold=args.breaker,
+            conflict_retries=args.conflict_retries,
+            conflict_backoff=args.conflict_backoff,
             marker=marker,
         )
         if dev_logger is not None:

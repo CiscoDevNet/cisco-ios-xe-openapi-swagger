@@ -164,6 +164,20 @@ below are far more representative than the average).
   no bodies) that the page and banner consume. Both steps are wired into
   `scripts/build_release.py`. Raw captures and credentials stay local (gitignored);
   only the injected specs and the small index are published.
+- **Multi-device capture.** Real responses were collected from five physical
+  platforms — C9300-24UX, C9400, C9500, C9600, and a C9800 wireless controller
+  (all IOS XE 26.1.1) — giving 275 modules / 2,653 captured paths keyed by PID.
+  Devices are collected as independent per-device processes (parallelizable),
+  since each box's datastore contends only with itself.
+- **409/429 (datastore busy) retry.** IOS XE serializes config-datastore
+  RESTCONF GETs, so parallel workers collide and the device returns `409` (on the
+  4 newer devices ~49k config paths `409`'d at concurrency 6, while single-
+  threaded they return `200`). `scripts/harness/request.py` now treats `409`/`429`
+  as retryable — it waits (jittered backoff) and retries on a budget separate
+  from the 5xx/connection retries, so the collector stays concurrent and self-
+  throttles to whatever the datastore can serve. Tunable via the collector's
+  `--conflict-retries` / `--conflict-backoff` flags. This recovered the config /
+  openconfig / ietf / mib / other coverage those devices were missing.
 - **Service worker** bumped to `v92-2026.07.30e`; `live-data.html` + `live-data.js`
   added to the precache list.
 
