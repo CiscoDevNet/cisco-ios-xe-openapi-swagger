@@ -135,7 +135,7 @@ below are far more representative than the average).
 
 - **Real device responses injected into the specs.** Every operational and
   config GET was captured from physical Catalyst hardware (starting with a
-  C9300-24UX on IOS XE 26.1.1, for Cisco Live 2026 / DEVNET-1232) and folded
+  C9300-24UX on IOS XE 26.1.1) and folded
   into the OpenAPI specs as a new `x-cisco-live-examples` vendor extension on
   the GET `200` media type. The synthetic, schema-typed `example` is left
   untouched — the real data sits alongside it. The extension is keyed by device

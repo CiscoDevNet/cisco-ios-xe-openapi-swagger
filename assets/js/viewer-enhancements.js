@@ -385,7 +385,7 @@
 
         var note = document.createElement('div');
         note.style.cssText = 'margin-top:3px;color:#486581;font-size:12px;';
-        note.textContent = 'Captured for Cisco Live 2026 (DEVNET-1232), shown alongside the synthetic schema example.';
+        note.textContent = 'Real example data captured from a live device, shown alongside the synthetic schema example.';
         panel.appendChild(note);
 
         var ver = _liveExActiveVer();

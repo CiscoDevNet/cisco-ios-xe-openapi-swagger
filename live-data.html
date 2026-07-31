@@ -88,6 +88,22 @@
                        background:var(--card); color:var(--fg); cursor:pointer; font:inherit; font-size:.76rem; }
   .chipfilter button.active { color:#fff; border-color:transparent; }
   .summary { color:var(--muted); font-family:var(--mono); font-size:.78rem; }
+  .overview { margin-bottom:20px; }
+  .stat-tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
+  .stat-tile { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .stat-tile .num { font-size:1.55rem; font-weight:700; color:var(--accent); line-height:1.1; }
+  .stat-tile .lbl { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:4px; }
+  .overview .note { font-size:.75rem; color:var(--muted); margin:-2px 0 10px; }
+  .charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-bottom:14px; }
+  .chartcard { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .chartcard h3 { margin:0 0 8px; font-size:.88rem; font-weight:600; }
+  .chartcard h3 .count { color:var(--muted); font-weight:400; font-size:.8rem; }
+  .cwrap { position:relative; height:220px; }
+  .toplist { margin:0; padding:0; list-style:none; max-height:260px; overflow:auto; }
+  .toplist li { display:flex; justify-content:space-between; gap:10px; padding:6px 8px; border-top:1px solid var(--border); font-family:var(--mono); font-size:.75rem; cursor:pointer; }
+  .toplist li:hover { background:rgba(21,101,192,.07); }
+  .toplist li .p { color:var(--accent); word-break:break-all; }
+  .toplist li .b { color:var(--muted); white-space:nowrap; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site-chrome.js" defer></script>
@@ -124,10 +140,11 @@
 </div>
 <main>
   <div class="help" id="intro">
-    Each entry below is a real response captured from a lab device for
-    Cisco Live 2026 (DEVNET-1232) &mdash; not synthetic schema data. Pick a
-    device platform, then drill into a module and path to see exactly what
-    that switch returned. Coverage is a snapshot; not every path is captured.
+    Each entry below is a <strong>real RESTCONF response</strong> captured from a
+    physical Cisco Catalyst switch running IOS XE 26.1.1 &mdash; real example
+    data from a live device, not synthetic schema. Pick a device platform, then
+    drill into a module and path to see exactly what that switch returned.
+    Coverage is a snapshot; not every path is captured.
   </div>
 
   <div class="toolbar">
@@ -135,6 +152,20 @@
     <span class="spacer" style="flex:1"></span>
     <span class="summary" id="summary" aria-live="polite"></span>
   </div>
+
+  <section class="overview" id="overview" aria-label="Data summary">
+    <div class="stat-tiles" id="statTiles"></div>
+    <div class="note" id="chartsNote"></div>
+    <div class="charts">
+      <div class="chartcard"><h3>Captured paths by category</h3><div class="cwrap"><canvas id="chartCat"></canvas></div></div>
+      <div class="chartcard"><h3>Data paths per device</h3><div class="cwrap"><canvas id="chartDev"></canvas></div></div>
+      <div class="chartcard"><h3>Payload volume by category</h3><div class="cwrap"><canvas id="chartBytes"></canvas></div></div>
+    </div>
+    <div class="chartcard">
+      <h3>Largest captured responses <span class="count" id="topDev"></span></h3>
+      <ol class="toplist" id="topPayloads"></ol>
+    </div>
+  </section>
 
   <div class="cards" id="coverageCards"></div>
 
@@ -158,6 +189,7 @@
     rebuild the release to populate it.
   </div>
 </main>
+<script src="assets/vendor/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
 <script src="live-data.js" defer></script>
 </body>
 </html>

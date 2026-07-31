@@ -38,7 +38,8 @@
 
     var state = {
         ver: '', index: null, pid: '', cat: 'all', q: '',
-        specCache: {}, sel: null /* {cat, module, path} */
+        specCache: {}, sel: null, /* {cat, module, path} */
+        charts: {}
     };
 
     // ---------- tiny DOM helper (no innerHTML) ----------
@@ -158,12 +159,14 @@
                 if (!idx || !idx.modules || !idx.modules.length) {
                     document.querySelector('.layout').style.display = 'none';
                     document.getElementById('coverageCards').style.display = 'none';
+                    document.getElementById('overview').style.display = 'none';
                     document.getElementById('emptyState').hidden = false;
                     document.getElementById('summary').textContent = '';
                     return;
                 }
                 document.querySelector('.layout').style.display = '';
                 document.getElementById('coverageCards').style.display = '';
+                document.getElementById('overview').style.display = '';
                 document.getElementById('emptyState').hidden = true;
 
                 // choose active device
@@ -175,6 +178,7 @@
                 renderDeviceTabs();
                 renderCatFilter();
                 renderCoverage();
+                renderOverview();
                 renderSummary();
                 renderBrowser();
 
@@ -201,7 +205,7 @@
                 onclick: function () {
                     if (state.pid === d.pid) return;
                     state.pid = d.pid;
-                    renderDeviceTabs(); renderCoverage(); renderSummary(); renderBrowser();
+                    renderDeviceTabs(); renderCoverage(); renderOverview(); renderSummary(); renderBrowser();
                     if (state.sel) selectPath(state.sel.module, state.sel.path, {});
                     writeHash();
                 }
@@ -242,6 +246,125 @@
                 el('div', { className: 'bar' }, [el('span', { style: 'width:' + pct.toFixed(1) + '%;background:' + color })])
             ]);
             host.appendChild(card);
+        });
+    }
+
+    // ---------- summary: stat tiles + charts + largest payloads ----------
+    function computeStats(pid) {
+        var byCat = {};   // category -> {paths, bytes, mods:{}}
+        var byDev = {};   // pid -> {paths, bytes}
+        var top = [];
+        var totalPaths = 0, totalBytes = 0;
+        (state.index.modules || []).forEach(function (m) {
+            m.paths.forEach(function (p) {
+                var pids = p.pids || {};
+                Object.keys(pids).forEach(function (dp) {
+                    var b = (pids[dp] && pids[dp].bytes) || 0;
+                    var dv = byDev[dp] || (byDev[dp] = { paths: 0, bytes: 0 });
+                    dv.paths += 1; dv.bytes += b;
+                });
+                var info = pids[pid];
+                if (info) {
+                    var c = byCat[m.category] || (byCat[m.category] = { paths: 0, bytes: 0, mods: {} });
+                    c.paths += 1; c.bytes += info.bytes || 0; c.mods[m.module] = 1;
+                    totalPaths += 1; totalBytes += info.bytes || 0;
+                    top.push({ path: p.path, module: m.module, bytes: info.bytes || 0 });
+                }
+            });
+        });
+        top.sort(function (a, b) { return b.bytes - a.bytes; });
+        return { byCat: byCat, byDev: byDev, top: top.slice(0, 12), totalPaths: totalPaths, totalBytes: totalBytes };
+    }
+
+    function renderOverview() {
+        var stats = computeStats(state.pid);
+        renderStatTiles(stats);
+        renderTopPayloads(stats);
+        renderCharts(stats);
+        var note = document.getElementById('chartsNote');
+        if (note) note.textContent = 'Charts and the largest-response list reflect the selected device: ' + state.pid + '. Coverage cards below show captured vs total paths per category.';
+    }
+
+    function renderStatTiles(stats) {
+        var host = document.getElementById('statTiles');
+        if (!host) return;
+        clear(host);
+        var t = state.index.totals || {};
+        var allBytes = 0;
+        Object.keys(stats.byDev).forEach(function (d) { allBytes += stats.byDev[d].bytes; });
+        var tiles = [
+            [String((state.index.devices || []).length), 'Devices'],
+            [(t.modules_with_data || 0).toLocaleString(), 'Modules with data'],
+            [(t.captured_paths || 0).toLocaleString(), 'Captured paths'],
+            [fmtBytes(allBytes), 'Total payload'],
+            [stats.totalPaths.toLocaleString(), state.pid + ' paths'],
+            [fmtBytes(stats.totalBytes), state.pid + ' payload']
+        ];
+        tiles.forEach(function (tt) {
+            host.appendChild(el('div', { className: 'stat-tile' }, [
+                el('div', { className: 'num', text: tt[0] }),
+                el('div', { className: 'lbl', text: tt[1] })
+            ]));
+        });
+    }
+
+    function renderTopPayloads(stats) {
+        var host = document.getElementById('topPayloads');
+        var dev = document.getElementById('topDev');
+        if (dev) dev.textContent = 'on ' + state.pid;
+        if (!host) return;
+        clear(host);
+        if (!stats.top.length) { host.appendChild(el('li', { className: 'placeholder', text: 'No data for this device.' })); return; }
+        stats.top.forEach(function (row) {
+            host.appendChild(el('li', {
+                title: 'Open ' + row.module,
+                onclick: function () { selectPath(row.module, row.path, { scroll: true }); }
+            }, [
+                el('span', { className: 'p', text: row.path }),
+                el('span', { className: 'b', text: fmtBytes(row.bytes) })
+            ]));
+        });
+    }
+
+    function _destroyChart(key) {
+        if (state.charts[key]) { try { state.charts[key].destroy(); } catch (_) { /* noop */ } state.charts[key] = null; }
+    }
+
+    function renderCharts(stats) {
+        if (typeof window.Chart === 'undefined') return;  // vendored chart.js unavailable
+        var cats = (state.index.categories || [])
+            .map(function (c) { return c.category; })
+            .filter(function (c) { return stats.byCat[c] && stats.byCat[c].paths; });
+        var catLabels = cats.map(function (c) { return CAT_LABEL[c] || c; });
+        var catColors = cats.map(function (c) { return CAT_COLOR[c] || '#607D8B'; });
+        var catPaths = cats.map(function (c) { return stats.byCat[c].paths; });
+        var catKB = cats.map(function (c) { return Math.round(stats.byCat[c].bytes / 1024); });
+
+        var devs = (state.index.devices || []).map(function (d) { return d.pid; });
+        var devPaths = devs.map(function (d) { return (stats.byDev[d] || {}).paths || 0; });
+        var devColors = devs.map(function (d) { return d === state.pid ? '#1565c0' : '#9fb3c8'; });
+
+        var base = { animation: false, responsive: true, maintainAspectRatio: false };
+
+        _destroyChart('cat');
+        state.charts.cat = new window.Chart(document.getElementById('chartCat'), {
+            type: 'doughnut',
+            data: { labels: catLabels, datasets: [{ data: catPaths, backgroundColor: catColors, borderWidth: 0 }] },
+            options: Object.assign({}, base, { plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 } } } } })
+        });
+
+        _destroyChart('dev');
+        state.charts.dev = new window.Chart(document.getElementById('chartDev'), {
+            type: 'bar',
+            data: { labels: devs, datasets: [{ data: devPaths, backgroundColor: devColors }] },
+            options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } })
+        });
+
+        _destroyChart('bytes');
+        state.charts.bytes = new window.Chart(document.getElementById('chartBytes'), {
+            type: 'bar',
+            data: { labels: catLabels, datasets: [{ label: 'KB', data: catKB, backgroundColor: catColors }] },
+            options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'KB' } } } })
         });
     }
 
