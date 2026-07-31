@@ -64,6 +64,11 @@ KNOWN_UNSAFE_MODULES = {
         "(ChunkedEncodingError) and stalls the RESTCONF/DMI process for minutes — "
         "device reset (observed C9300, IOS XE 26.1.1)"
     ),
+    "CISCO-VOICE-DIAL-CONTROL-MIB": (
+        "GET of /data/CISCO-VOICE-DIAL-CONTROL-MIB resets the connection "
+        "mid-response (device-crash signature; tripped the circuit breaker) — "
+        "observed C9800 WLC, IOS XE 26.1.1"
+    ),
 }
 
 
