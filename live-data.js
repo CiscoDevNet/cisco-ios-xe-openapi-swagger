@@ -254,24 +254,26 @@
         var cov = deviceCoverage(state.pid);
         (state.index.categories || []).forEach(function (c) {
             var got = cov[c.category] || { paths: 0, modules: 0 };
-            if (!c.total_paths && !got.paths) return;
-            var pct = c.total_paths ? Math.min(100, (got.paths / c.total_paths) * 100) : 0;
+            if (!c.total_modules && !got.paths) return;
+            // Coverage % is module-based (captured modules / total modules) — an
+            // honest denominator. The per-leaf path total is enormous (keyed
+            // lists, deep native config) and makes a path-% misleading.
+            var pct = c.total_modules ? Math.min(100, (got.modules / c.total_modules) * 100) : 0;
             var color = CAT_COLOR[c.category] || '#607D8B';
             var card = el('div', { className: 'cvcard' }, [
                 el('span', { className: 'cat', text: CAT_LABEL[c.category] || c.category, style: 'background:' + color }),
                 el('div', { className: 'big', text: got.paths.toLocaleString() }),
-                el('div', { className: 'sub', text: 'of ' + c.total_paths.toLocaleString() + ' paths · ' + got.modules + ' modules' }),
+                el('div', { className: 'sub', text: 'paths captured · ' + got.modules.toLocaleString() + ' of ' + (c.total_modules || 0).toLocaleString() + ' modules' }),
                 el('div', { className: 'bar' }, [el('span', { style: 'width:' + pct.toFixed(1) + '%;background:' + color })])
             ]);
             host.appendChild(card);
         });
         var note = document.getElementById('coverageNote');
         if (note) {
-            note.textContent = '\u201cCaptured\u201d counts the paths that returned real data on ' + state.pid
-                + '. \u201cTotal paths\u201d is every GET path enumerated across the OpenAPI specs \u2014 on a lab '
-                + 'device most of the remainder is simply not applicable (unconfigured features, list-keyed '
-                + 'or empty containers, or platform-specific paths), so a low percentage is expected and does '
-                + 'not indicate missing data.';
+            note.textContent = 'The bar shows module coverage (modules with data \u00f7 modules in that category) for ' + state.pid
+                + '; the big number is paths that returned real data. Coverage is measured by module, not by leaf path \u2014 '
+                + 'the per-path total is dominated by keyed list entries and deep native-config leaves that are empty or '
+                + 'not-applicable on a lab device, so a path percentage would understate real coverage.';
         }
     }
 

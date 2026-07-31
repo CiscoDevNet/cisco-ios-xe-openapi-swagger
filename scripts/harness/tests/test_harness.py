@@ -208,6 +208,20 @@ def test_secret_scan_flags_bare_auth_key():
     assert not secret_scan.find_secrets(clean)
 
 
+def test_no_secrets_in_published_live_data():
+    # Simple release gate: the committed per-path Live Data files must never
+    # carry a secret. Redaction runs at publish time; this is the backstop.
+    live_root = REPO_ROOT / "releases" / "26.1.1" / "live-data"
+    if not live_root.is_dir():
+        pytest.skip("no published live-data tree")
+    offenders = []
+    for path in live_root.rglob("*.json"):
+        hits = secret_scan.scan_file(path)
+        if hits:
+            offenders.append((path.relative_to(REPO_ROOT).as_posix(), hits[:2]))
+    assert not offenders, f"secrets in published live-data: {offenders[:5]}"
+
+
 def test_no_secrets_in_committed_json_artifacts():
     # The guard's intent (DEVICE_DATA_COLLECTION.md §6) is to scan committed *data*
     # (scrubbed captures + example files), not the scanner/redactor source which
