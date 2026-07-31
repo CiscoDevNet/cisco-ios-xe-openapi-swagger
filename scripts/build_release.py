@@ -124,12 +124,6 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("native-example-overlay", ["python", str(SCRIPTS / "apply_example_overlay.py"),
                              "--version", "$VER"]),
-    # Real captured RESTCONF GET responses (x-cisco-live-examples vendor
-    # extension) from references/live-examples-$VER.json. Additive metadata
-    # only; a no-op when the sidecar is absent. Leaves the synthetic example
-    # untouched. See scripts/apply_cisco_live_examples_overlay.py.
-    ("live-examples-overlay", ["python", str(SCRIPTS / "apply_cisco_live_examples_overlay.py"),
-                             "--version", "$VER"]),
     ("wrap-body-schemas",   ["python", str(SCRIPTS / "wrap_body_schemas.py"),
                              "--version", "$VER"]),
     # Top-level /native coverage guard. Compares every container/list/leaf
@@ -151,9 +145,11 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # listed as "voice" while the file is "native-voice.json"), which would
     # otherwise make the viewer 404 those specs ("Failed to load spec ...").
     ("fix-manifest-schema", ["python", str(SCRIPTS / "fix_manifest_schema.py")]),
-    # Lightweight coverage + navigation index for the interactive Live Data
-    # page (live-data.html). Runs after manifests so per-category totals are
-    # accurate. Reads the x-cisco-live-examples the overlay injected above.
+    # Live Data page artifacts: a lightweight coverage/navigation index plus
+    # per-path response-body files under releases/<ver>/live-data/. Reads the
+    # gitignored sidecar (references/live-examples-$VER.json); a no-op without
+    # it. Runs after manifests so per-category totals are accurate. Response
+    # bodies stay OUT of the OpenAPI specs so the Swagger viewers load fast.
     ("live-examples-index", ["python", str(SCRIPTS / "build_live_examples_index.py"),
                              "--version", "$VER"]),
     ("accountability",      ["python", str(SCRIPTS / "analyze_yang_accountability_v2.py"),

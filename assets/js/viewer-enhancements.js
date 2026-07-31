@@ -324,18 +324,14 @@
         if (_liveIdxPromise) return _liveIdxPromise;
         var ver = _liveExActiveVer();
         if (!ver) { _liveIdxPromise = Promise.resolve(null); return _liveIdxPromise; }
-        _liveIdxPromise = fetch('../releases/' + encodeURIComponent(ver) + '/live-examples-index.json', { cache: 'default' })
+        // Tiny per-release summary (module -> pids + path count), NOT the full
+        // index or any bodies, so the viewer stays fast.
+        _liveIdxPromise = fetch('../releases/' + encodeURIComponent(ver) + '/live-modules.json', { cache: 'default' })
             .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (idx) {
-                _liveIdxByModule = {};
-                _liveIdxOsByPid = {};
-                if (idx && idx.modules) {
-                    idx.modules.forEach(function (m) { _liveIdxByModule[m.module] = m; });
-                }
-                if (idx && idx.devices) {
-                    idx.devices.forEach(function (d) { _liveIdxOsByPid[d.pid] = d.os_version || ''; });
-                }
-                return idx;
+            .then(function (doc) {
+                _liveIdxByModule = (doc && doc.modules) || {};
+                _liveIdxOsByPid = (doc && doc.devices) || {};
+                return doc;
             })
             .catch(function () { _liveIdxByModule = {}; _liveIdxOsByPid = {}; return null; });
         return _liveIdxPromise;
@@ -358,7 +354,7 @@
 
     function _renderLiveExPanel(module, entry) {
         var panel = document.getElementById('iosxe-liveex-panel');
-        if (!entry || !entry.paths || !entry.paths.length) {
+        if (!entry || !entry.paths) {
             if (panel) panel.style.display = 'none';
             return;
         }
@@ -371,6 +367,7 @@
 
         var pids = entry.pids || [];
         var os = (pids.length && _liveIdxOsByPid) ? (_liveIdxOsByPid[pids[0]] || '') : '';
+        var nPaths = entry.paths || 0;
 
         var head = document.createElement('div');
         var strong = document.createElement('strong');
@@ -379,13 +376,13 @@
         head.appendChild(document.createTextNode(
             ' \u2014 real RESTCONF responses captured from ' + pids.join(', ')
             + (os ? ' running IOS XE ' + os : '')
-            + ' \u2014 ' + entry.paths.length + ' path' + (entry.paths.length === 1 ? '' : 's')
+            + ' \u2014 ' + nPaths + ' path' + (nPaths === 1 ? '' : 's')
             + ' with data for this module.'));
         panel.appendChild(head);
 
         var note = document.createElement('div');
         note.style.cssText = 'margin-top:3px;color:#486581;font-size:12px;';
-        note.textContent = 'Real example data captured from a live device, shown alongside the synthetic schema example.';
+        note.textContent = 'Real device data lives in the Live Data browser — the API spec keeps only the synthetic schema example.';
         panel.appendChild(note);
 
         var ver = _liveExActiveVer();

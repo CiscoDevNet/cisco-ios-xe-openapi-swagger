@@ -133,42 +133,45 @@ below are far more representative than the average).
 
 ### Added — Live device data: real captured RESTCONF responses + interactive browser (round 30, 2026-07-31)
 
-- **Real device responses injected into the specs.** Every operational and
-  config GET was captured from physical Catalyst hardware (starting with a
-  C9300-24UX on IOS XE 26.1.1) and folded
-  into the OpenAPI specs as a new `x-cisco-live-examples` vendor extension on
-  the GET `200` media type. The synthetic, schema-typed `example` is left
-  untouched — the real data sits alongside it. The extension is keyed by device
-  **PID**, so the same path can carry samples from multiple platforms
-  (`C9300-24UX`, `C9400`, `C9500`, `C9600`, …). Additive metadata only: path /
-  operation / module counts are unchanged (G-6 safe).
+- **Real device responses captured, kept out of the specs.** Every operational,
+  config and MIB GET was captured from physical Catalyst hardware (C9200 / C9300 /
+  C9400 / C9500 / C9600 and a C9800 wireless controller, IOS XE 26.1.1). The
+  OpenAPI specs keep ONLY their synthetic, schema-typed `example`, so the Swagger
+  viewers stay lean and fast; the real responses are served separately (below),
+  keyed by device **PID** so the same path carries samples from multiple
+  platforms. No path / operation / module counts change (G-6 safe).
 - **New interactive Live Data browser — [live-data.html](live-data.html).**
   A dedicated hub page for exploring the captured responses: **device platform
   tabs** (one per PID), **per-category coverage cards** (captured vs total paths
   for the active device), a **searchable module / path browser** with category
-  filters, and a **drill-down** that fetches the single per-module spec on demand
-  and shows the exact response the switch returned. Deep-linkable
+  filters, and a **drill-down** that fetches a single small per-path data file on
+  demand and shows the exact response the switch returned. Deep-linkable
   (`?ver=…#module=…&path=…&pid=…`); CSP-safe (external JS, DOM-only, no
   `innerHTML`). Reachable from the hub Tools bar.
-- **In-viewer banner.** Every `swagger-*-model` viewer now shows a compact
+- **In-viewer banner.** Every `swagger-*-model` viewer shows a compact
   "Live device data" banner above a module's spec when real captures exist for
-  it, deep-linking into the Live Data browser. It reads a small per-release
-  index (not the full spec) and refreshes on in-page module switches — fixing a
-  stale-panel bug where a previous module's data could linger (the viewer swaps
-  modules via `history.replaceState`, which does not fire `hashchange`).
+  it, deep-linking into the Live Data browser. It reads a tiny per-release module
+  summary (`live-modules.json`, ~32 KB — no bodies) and refreshes on in-page
+  module switches — fixing a stale-panel bug where a previous module's data could
+  linger (the viewer swaps modules via `history.replaceState`, which does not
+  fire `hashchange`).
 - **Build pipeline + committable data.** The harness emits a gitignored sidecar
   (`references/live-examples-<ver>.json`) from the local captures;
-  `scripts/apply_cisco_live_examples_overlay.py` stamps it onto the release
-  specs, and `scripts/build_live_examples_index.py` emits the committed
-  lightweight `releases/<ver>/live-examples-index.json` (coverage + navigation,
-  no bodies) that the page and banner consume. Both steps are wired into
-  `scripts/build_release.py`. Raw captures and credentials stay local (gitignored);
-  only the injected specs and the small index are published.
-- **Multi-device capture.** Real responses were collected from five physical
-  platforms — C9300-24UX, C9400, C9500, C9600, and a C9800 wireless controller
-  (all IOS XE 26.1.1) — giving 275 modules / 2,653 captured paths keyed by PID.
+  `scripts/build_live_examples_index.py` turns it into the committed, served
+  artifacts under `releases/<ver>/`: a lightweight `live-examples-index.json`
+  (coverage + navigation, no bodies), a tiny `live-modules.json` (for the viewer
+  banner), and one small `live-data/<category>/<module>/<hash>.json` per captured
+  path holding the actual response body. The Swagger specs are never modified —
+  they stay lean. Wired into `scripts/build_release.py`; raw captures and
+  credentials stay local (gitignored).
+- **Multi-device capture.** Real responses were collected from six physical
+  platforms — C9200, C9300-24UX, C9400, C9500, C9600, and a C9800 wireless
+  controller (all IOS XE 26.1.1) — giving 311 modules / 2,699 captured paths
+  keyed by PID (oper, config, MIB, OpenConfig, IETF and other categories).
   Devices are collected as independent per-device processes (parallelizable),
-  since each box's datastore contends only with itself.
+  since each box's datastore contends only with itself. MIB coverage requires
+  the SNMP agent + `netconf-yang cisco-ia snmp-community-string` bridge, which
+  was configured on the switches to expose MIB data over RESTCONF.
 - **409/429 (datastore busy) retry.** IOS XE serializes config-datastore
   RESTCONF GETs, so parallel workers collide and the device returns `409` (on the
   4 newer devices ~49k config paths `409`'d at concurrency 6, while single-

@@ -205,22 +205,26 @@ Phase 4 is built and deployed. End-to-end pipeline, multi-device (aggregates per
    `python -X utf8 -m scripts.harness.collector --device <name> [--device ...]`
 2. **Build the committable sidecar** from ALL device captures:
    `python -X utf8 -m scripts.harness.build_observed_examples --sidecar references/live-examples-26.1.1.json`
-3. **Inject** `x-cisco-live-examples` onto the release specs (build-time overlay):
-   `python scripts/apply_cisco_live_examples_overlay.py --version 26.1.1`
-4. **Emit the lightweight index** (coverage + navigation, no bodies):
+3. **Emit the served artifacts** (index + tiny module summary + per-path body files):
    `python scripts/build_live_examples_index.py --version 26.1.1`
 
-Steps 3-4 are wired into `scripts/build_release.py` (after `native-example-overlay`
-and after `manifests`, respectively), so they survive release regeneration.
+Step 3 is wired into `scripts/build_release.py` (after `manifests`). The OpenAPI
+specs are **never modified** — they keep only their synthetic example, so the
+Swagger viewers stay lean. The real bodies live in
+`releases/<ver>/live-data/<category>/<module>/<hash>.json` and are fetched by the
+Live Data page on demand.
 
 **Surfaces:**
 - Interactive page `live-data.html` (+ `live-data.js`): device tabs (per PID),
-  per-category coverage cards, module/path browser, real-response drill-down.
-- In-viewer "Live device data" banner in `assets/js/viewer-enhancements.js` that
+  per-category coverage cards + summary charts, module/path browser, real-response
+  drill-down (fetches one small per-path data file).
+- Lightweight in-viewer "Live device data" banner in
+  `assets/js/viewer-enhancements.js` (reads the ~32 KB `live-modules.json`) that
   deep-links into the page.
 
-**Committed vs local:** `releases/<ver>/live-examples-index.json` and the injected
-specs are committed; raw captures, `inventory.json`, `.env`, and
+**Committed vs local:** `releases/<ver>/live-examples-index.json`,
+`releases/<ver>/live-modules.json`, and `releases/<ver>/live-data/**` are
+committed/served; raw captures, `inventory.json`, `.env`, and
 `references/live-examples-*.json` stay local (gitignored).
 
 ### 11.0 AGREED DECISION (user-confirmed 2026-07-30; from webapp main §5a) — SUPERSEDES 11.A.2

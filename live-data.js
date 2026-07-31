@@ -462,7 +462,7 @@
         (state.index.modules || []).some(function (m) {
             if (m.module !== module) return false;
             return m.paths.some(function (p) {
-                if (p.path === path) { found = { category: m.category, module: module, path: path, pids: p.pids }; return true; }
+                if (p.path === path) { found = { category: m.category, module: module, path: path, pids: p.pids, file: p.file }; return true; }
                 return false;
             });
         });
@@ -514,39 +514,28 @@
         var pre = el('pre', { className: 'resp', text: 'Loading captured response…' });
         host.appendChild(pre);
 
-        getResponseValue(entry.category, entry.module, entry.path, pid).then(function (rec) {
-            if (rec == null) { pre.textContent = '(no captured body found in spec)'; return; }
+        getResponseValue(entry.file, pid).then(function (rec) {
+            if (rec == null) { pre.textContent = '(no captured body available)'; return; }
             var body = rec.value;
             var txt;
             try { txt = JSON.stringify(body, null, 2); } catch (_) { txt = String(body); }
             pre.textContent = txt;
         }).catch(function () {
-            pre.textContent = 'Failed to load the module spec for this path.';
+            pre.textContent = 'Failed to load the captured response.';
         });
     }
 
-    function getResponseValue(cat, module, path, pid) {
-        var key = cat + '/' + module;
-        var cached = state.specCache[key];
-        var specPromise = cached
+    function getResponseValue(file, pid) {
+        if (!file) return Promise.resolve(null);
+        var cached = state.specCache[file];
+        var docPromise = cached
             ? Promise.resolve(cached)
-            : fetch('releases/' + encodeURIComponent(state.ver) + '/' + MODEL_DIR[cat] + '/api/'
-                + encodeURIComponent(module) + '.json', { cache: 'default' })
+            : fetch('releases/' + encodeURIComponent(state.ver) + '/' + file, { cache: 'default' })
                 .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
-                .then(function (spec) { state.specCache[key] = spec; return spec; });
-        return specPromise.then(function (spec) {
-            var item = (spec.paths || {})[path];
-            if (!item || !item.get) return null;
-            var responses = item.get.responses || {};
-            var resp = responses['200'] || responses['default'];
-            var content = resp && resp.content;
-            if (!content) return null;
-            var keys = Object.keys(content);
-            for (var i = 0; i < keys.length; i++) {
-                var media = content[keys[i]];
-                if (media && media[LIVE_KEY] && media[LIVE_KEY][pid]) return media[LIVE_KEY][pid];
-            }
-            return null;
+                .then(function (doc) { state.specCache[file] = doc; return doc; });
+        return docPromise.then(function (doc) {
+            var pids = (doc && doc.pids) || {};
+            return pids[pid] || null;  // {os_version, fetched_at, http_status, value}
         });
     }
 

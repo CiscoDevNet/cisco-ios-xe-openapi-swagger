@@ -212,12 +212,12 @@ def apply_overlay(captures_dir: Path, specs_root: Path, write: bool,
 def build_sidecar(captures_dir: Path, max_bytes: int = DEFAULT_MAX_EXAMPLE_BYTES):
     """Extract committable per-PID live-example entries from the local captures.
 
-    Returns (sidecar_dict, stats). The sidecar is the COMMITTED data source that
-    the build-time overlay (scripts/apply_cisco_live_examples_overlay.py) applies
-    to the release specs — CI has no captures, so the data must be committed. Each
-    entry is { category, module, path, pids: { <PID>: {os_version, fetched_at,
-    http_status, path, value} } }. The same size + secret guards as the direct
-    overlay apply here.
+    Returns (sidecar_dict, stats). The sidecar is the local source that
+    scripts/build_live_examples_index.py turns into the served Live Data
+    artifacts (index + per-path body files under releases/<ver>/live-data/) — the
+    OpenAPI specs are never touched. Each entry is
+    { category, module, path, pids: { <PID>: {os_version, fetched_at,
+    http_status, path, value} } }. Size + secret guards applied here.
     """
     stats: Counter = Counter()
     by_path: dict[tuple[str, str, str], dict] = {}
