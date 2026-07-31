@@ -19,7 +19,7 @@ design intent; the modules below already implement it.
 | Value-discovery index | `scripts/harness/build_capture_index.py` | Built — flattens captures to rows |
 | Value/keyword search + coverage | `scripts/harness/find_value.py` | Built — `--value` / `--keyword` / `--coverage` |
 | Offline raw-capture browser | `scripts/harness/report.py` | Built — emits `capture-report.html` (gitignored) |
-| Real-data example overlay | `scripts/harness/build_observed_examples.py` | Built — injects captured GET bodies into spec examples |
+| Real-data example overlay | `scripts/harness/build_observed_examples.py` | Built — emits the `x-cisco-live-examples` sidecar; see §11.0 (SHIPPED) |
 | Secret-scan guard | `scripts/harness/secret_scan.py` | Built |
 | Tests | `scripts/harness/tests/` | Built (pytest) |
 | Inventory template | `scripts/harness/inventory.example.json` | Committed (6 placeholder devices) |
@@ -28,7 +28,7 @@ design intent; the modules below already implement it.
 - Fill `inventory.json` with the 6 real devices and set `IOSXE_USER`/`IOSXE_PASS`.
 - Run `--preflight`, then `--pilot`, then scale (see §9 run guide).
 - Confirm no real capture has been committed (all under gitignored `captures/`).
-- Phase 4 (web-app injection) and Phase 5 (CRUD) are still design-only.
+- Phase 4 (web-app injection) is **SHIPPED** (see §11.0); Phase 5 (CRUD) is still design-only.
 
 ## 1. What we're building
 A dev-only Python harness (Track B) that connects to 6 real Catalyst 9000
@@ -196,7 +196,32 @@ python -X utf8 -m pytest scripts/harness/tests -q
 - The 6 devices' mgmt IPs + exact PIDs + whether lab (affects redaction depth).
 - Data classification: is keeping serials/MACs/IPs acceptable for the PUBLIC repo?
 
-## 11. Phase 4 - web-app representation of captured data (design)
+## 11. Phase 4 - web-app representation of captured data (SHIPPED)
+
+### 11.0.1 SHIPPED (2026-07-31)
+Phase 4 is built and deployed. End-to-end pipeline, multi-device (aggregates per PID):
+
+1. **Collect** (per device, resume-safe; crashers auto-excluded):
+   `python -X utf8 -m scripts.harness.collector --device <name> [--device ...]`
+2. **Build the committable sidecar** from ALL device captures:
+   `python -X utf8 -m scripts.harness.build_observed_examples --sidecar references/live-examples-26.1.1.json`
+3. **Inject** `x-cisco-live-examples` onto the release specs (build-time overlay):
+   `python scripts/apply_cisco_live_examples_overlay.py --version 26.1.1`
+4. **Emit the lightweight index** (coverage + navigation, no bodies):
+   `python scripts/build_live_examples_index.py --version 26.1.1`
+
+Steps 3-4 are wired into `scripts/build_release.py` (after `native-example-overlay`
+and after `manifests`, respectively), so they survive release regeneration.
+
+**Surfaces:**
+- Interactive page `live-data.html` (+ `live-data.js`): device tabs (per PID),
+  per-category coverage cards, module/path browser, real-response drill-down.
+- In-viewer "Live device data" banner in `assets/js/viewer-enhancements.js` that
+  deep-links into the page.
+
+**Committed vs local:** `releases/<ver>/live-examples-index.json` and the injected
+specs are committed; raw captures, `inventory.json`, `.env`, and
+`references/live-examples-*.json` stay local (gitignored).
 
 ### 11.0 AGREED DECISION (user-confirmed 2026-07-30; from webapp main §5a) — SUPERSEDES 11.A.2
 How the collected real data shows up in the web app (built AFTER captures exist):

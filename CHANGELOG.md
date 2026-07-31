@@ -131,6 +131,42 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — Live device data: real captured RESTCONF responses + interactive browser (round 30, 2026-07-31)
+
+- **Real device responses injected into the specs.** Every operational and
+  config GET was captured from physical Catalyst hardware (starting with a
+  C9300-24UX on IOS XE 26.1.1, for Cisco Live 2026 / DEVNET-1232) and folded
+  into the OpenAPI specs as a new `x-cisco-live-examples` vendor extension on
+  the GET `200` media type. The synthetic, schema-typed `example` is left
+  untouched — the real data sits alongside it. The extension is keyed by device
+  **PID**, so the same path can carry samples from multiple platforms
+  (`C9300-24UX`, `C9400`, `C9500`, `C9600`, …). Additive metadata only: path /
+  operation / module counts are unchanged (G-6 safe).
+- **New interactive Live Data browser — [live-data.html](live-data.html).**
+  A dedicated hub page for exploring the captured responses: **device platform
+  tabs** (one per PID), **per-category coverage cards** (captured vs total paths
+  for the active device), a **searchable module / path browser** with category
+  filters, and a **drill-down** that fetches the single per-module spec on demand
+  and shows the exact response the switch returned. Deep-linkable
+  (`?ver=…#module=…&path=…&pid=…`); CSP-safe (external JS, DOM-only, no
+  `innerHTML`). Reachable from the hub Tools bar.
+- **In-viewer banner.** Every `swagger-*-model` viewer now shows a compact
+  "Live device data" banner above a module's spec when real captures exist for
+  it, deep-linking into the Live Data browser. It reads a small per-release
+  index (not the full spec) and refreshes on in-page module switches — fixing a
+  stale-panel bug where a previous module's data could linger (the viewer swaps
+  modules via `history.replaceState`, which does not fire `hashchange`).
+- **Build pipeline + committable data.** The harness emits a gitignored sidecar
+  (`references/live-examples-<ver>.json`) from the local captures;
+  `scripts/apply_cisco_live_examples_overlay.py` stamps it onto the release
+  specs, and `scripts/build_live_examples_index.py` emits the committed
+  lightweight `releases/<ver>/live-examples-index.json` (coverage + navigation,
+  no bodies) that the page and banner consume. Both steps are wired into
+  `scripts/build_release.py`. Raw captures and credentials stay local (gitignored);
+  only the injected specs and the small index are published.
+- **Service worker** bumped to `v92-2026.07.30e`; `live-data.html` + `live-data.js`
+  added to the precache list.
+
 ### Added — Native completeness, workflow analytics, dark mode & richer examples (round 29, 2026-07-30)
 
 - **Native config model — deep augment backfill to every release.** Only 26.1.1

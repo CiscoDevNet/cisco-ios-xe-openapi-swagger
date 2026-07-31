@@ -102,6 +102,7 @@ Standalone and vendor-specific modules.
 
 ## Recent Improvements
 
+- **Live device data browser** — [live-data.html](live-data.html) shows *real* RESTCONF GET responses captured from physical Catalyst switches, browsable by device platform (PID), YANG module, and path, with per-category coverage stats. The same data is injected into each spec as the `x-cisco-live-examples` vendor extension (alongside the synthetic example) and surfaced by an in-viewer banner. See [scripts/build_live_examples_index.py](scripts/build_live_examples_index.py) and the [CHANGELOG](CHANGELOG.md).
 - **Realistic write-operation examples** — Every POST/PUT/PATCH body across the spec set ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
 - **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.

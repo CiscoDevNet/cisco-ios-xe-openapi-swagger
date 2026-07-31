@@ -109,6 +109,21 @@ correct viewer automatically.
 **Keyboard shortcuts:** `/` or `Ctrl+K` focuses the search box on the home
 page and every viewer.
 
+### Can I see real data from a device, not just the schema example?
+
+Yes. [live-data.html](live-data.html) shows **real RESTCONF GET responses
+captured from physical Catalyst switches** (e.g. C9300 / C9400 / C9500 / C9600 on
+IOS XE 26.1.1). Pick a device platform tab, then drill into a module and path to
+see exactly what that switch returned; per-category coverage cards show how much
+was captured for the selected device.
+
+The same captures are embedded in each spec as the `x-cisco-live-examples`
+vendor extension (keyed by device PID) alongside the synthetic schema `example`,
+and every `swagger-*-model` viewer shows a "Live device data" banner that
+deep-links into the browser. Coverage is a snapshot — not every path is captured,
+and it is read-only sample data, so treat it as illustrative rather than
+exhaustive.
+
 ---
 
 ## Postman / Bruno exports

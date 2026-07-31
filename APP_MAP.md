@@ -92,6 +92,11 @@ mindmap
         Module x platform matrix
         Family color coding
         CSV export
+      live-data.html
+        Device platform tabs (per PID)
+        Per-category coverage cards
+        Module / path browser
+        Real captured-response drill-down
     Distribution
       exports.html
         Per-release Postman shards
@@ -240,22 +245,38 @@ not repeated below.
 - **Scripts**: [assets/js/platform-coverage.js](assets/js/platform-coverage.js).
 - **CSP note**: Page declares its own CSP (no external hosts).
 
-### 3.10 [yang-trees/index.html](yang-trees/index.html) — Redirector
+### 3.10 [live-data.html](live-data.html) — Live Device Data Browser
+- **Route**: `/live-data.html`
+- **Purpose**: Browse *real* RESTCONF GET responses captured from physical
+  Catalyst switches (injected into the specs as the `x-cisco-live-examples`
+  vendor extension), by device platform, YANG module, and path.
+- **UI**: Device platform tabs (one per PID), per-category coverage cards
+  (captured vs total paths for the active device), a searchable module / path
+  browser with category filters, and a drill-down that fetches the per-module
+  spec on demand to show the exact captured response. Deep-linkable
+  (`?ver=…#module=…&path=…&pid=…`).
+- **Data sources**: [releases/index.json](releases/index.json),
+  `releases/<ver>/live-examples-index.json`, per-spec OpenAPI JSON (on demand).
+- **Scripts**: [live-data.js](live-data.js).
+- **CSP note**: strict hub CSP (`script-src 'self'`); external JS, DOM-only,
+  no `innerHTML`.
+
+### 3.11 [yang-trees/index.html](yang-trees/index.html) — Redirector
 - **Route**: `/yang-trees/`
 - **Purpose**: Reads [releases/index.json](releases/index.json) and `window.location.replace`s
   to `../releases/<default>/yang-trees/`. Pure compatibility shim — legacy
   `href="yang-trees/"` links keep working.
 - **UI**: Single message and a manual fallback link.
 
-### 3.11 [yang-trees/mib-trees-index.html](yang-trees/mib-trees-index.html)
+### 3.12 [yang-trees/mib-trees-index.html](yang-trees/mib-trees-index.html)
 - Same pattern as 3.10, redirects to `releases/<default>/yang-trees/mib-trees-index.html`.
 
-### 3.12 [404.html](404.html) — Not Found
+### 3.13 [404.html](404.html) — Not Found
 - **Route**: served for unknown paths by GitHub Pages.
 - **UI**: Static "404", main hub link, color-coded quick-links to all 9 viewers.
 - **Scripts**: sw-register only.
 
-### 3.13 [swagger-{oper,cfg,native-config,openconfig,ietf,mib,rpc,events,other}-model/index.html]
+### 3.14 [swagger-{oper,cfg,native-config,openconfig,ietf,mib,rpc,events,other}-model/index.html]
 - **Route**: `/swagger-<category>-model/index.html` — one per category.
 - **Purpose**: Swagger UI 5.31.0 viewer over the active release's
   `releases/<ver>/swagger-<category>-model/api/*.json` specs.
@@ -494,6 +515,7 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | [platform-support-index.json](platform-support-index.json) + `releases/<ver>/platform-support.json` | scripts/build_platform_support.py (inferred) | platform-coverage.js, platform-support.js |
 | [yang-prefix-map.json](yang-prefix-map.json) + per-release variant | generators (inferred) | telemetry.js |
 | `releases/<ver>/exports/{postman,bruno}-manifest.json` | scripts/build_release.py | exports.html |
+| `releases/<ver>/live-examples-index.json` | scripts/build_live_examples_index.py | live-data.js, viewer-enhancements.js |
 | `releases/<ver>/native-capabilities.json` | scripts/build_native_capabilities.py | swagger-native-config-model/capabilities.html |
 | `releases/<ver>/telemetry-index.json`, `telemetry-skipped.json` | inferred from filenames; presumed telemetry pipeline | telemetry.js / build inputs |
 | `releases/<ver>/mib-metadata.json`, `mib-platform-matrix.json` | inferred | MIB viewer side cards |
