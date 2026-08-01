@@ -26,6 +26,7 @@ PLAN_FILE = HERE / "output" / "fleet-plan.json"
 OUTPUT_FILE = REPO / "telemetry-live-data.json"
 
 MAX_FIELDS_PER_PATH = 24
+MAX_SAMPLES = 8  # distinct keyed instances kept per path for the detail view
 
 
 def category_of(path: str) -> str:
@@ -94,6 +95,7 @@ def main():
 
     # aggregate[(pid, path)] = {pid, source, category, records, fields{...}}
     aggregate: dict[tuple, dict] = {}
+    sig_seen: dict[tuple, set] = {}  # (pid,path) -> set of instance signatures
     for f in files:
         pid = pid_from_file(f.name, inv_pids)
         for line in f.read_text(encoding="utf-8").splitlines():
@@ -111,15 +113,32 @@ def main():
             key = (pid, path)
             entry = aggregate.setdefault(key, {
                 "pid": pid, "source": tags.get("source", ""), "category": category_of(path),
-                "path": path, "records": 0, "keys": {}, "fields": {},
+                "path": path, "records": 0, "instances": 0, "keys": {}, "fields": {}, "samples": [],
             })
             entry["records"] += 1
-            for tk, tv in tags.items():
-                if tk in ("path", "source", "subscription"):
-                    continue
-                if len(entry["keys"]) < 12 and tk not in entry["keys"]:
-                    entry["keys"][tk] = tv
-            for fname, fval in (rec.get("fields") or {}).items():
+
+            # This record's list keys (tags) and leaf fields.
+            rkeys = {tk: tv for tk, tv in tags.items()
+                     if tk not in ("path", "source", "subscription")}
+            rfields = dict(rec.get("fields") or {})
+
+            # Signature identifies a distinct list instance (e.g. one interface).
+            sig = (tuple(sorted(rkeys.items())) if rkeys
+                   else ("_leaf_" + "|".join(sorted(rfields.keys())),))
+            seen = sig_seen.setdefault(key, set())
+            if sig not in seen:
+                seen.add(sig)
+                entry["instances"] += 1
+                if len(entry["samples"]) < MAX_SAMPLES:
+                    entry["samples"].append({
+                        "keys": {k: v for k, v in list(rkeys.items())[:12]},
+                        "fields": {k: v for k, v in list(rfields.items())[:MAX_FIELDS_PER_PATH]},
+                    })
+
+            # Backward-compatible first-instance summary.
+            if not entry["keys"] and rkeys:
+                entry["keys"] = {k: v for k, v in list(rkeys.items())[:12]}
+            for fname, fval in rfields.items():
                 if len(entry["fields"]) < MAX_FIELDS_PER_PATH and fname not in entry["fields"]:
                     entry["fields"][fname] = fval
 

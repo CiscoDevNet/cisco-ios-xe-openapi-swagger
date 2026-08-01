@@ -127,23 +127,50 @@
         var p = (state.data.paths || []).filter(function (x) { return x.pid + '|' + x.path === state.sel; })[0];
         if (!p) { panel.appendChild(el('div', { className: 'placeholder', text: 'Not found.' })); return; }
 
+        var samples = p.samples || [];
+        var instances = p.instances || samples.length || 1;
+        var metaBits = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid + ' · ' + fmt(p.records) + ' records';
+        if (instances > 1) metaBits += ' · ' + fmt(instances) + ' instances';
         var head = el('div', { className: 'dhead' }, [
             el('div', { className: 'dpath', text: p.path }),
-            el('div', { className: 'dmeta', text: (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid + ' · ' + fmt(p.records) + ' records' })
+            el('div', { className: 'dmeta', text: metaBits })
         ]);
         panel.appendChild(head);
 
         var body = el('div', { className: 'body' });
+        if (samples.length) {
+            samples.forEach(function (s, i) {
+                body.appendChild(renderInstance(s, samples.length > 1 ? instanceLabel(s, i) : null));
+            });
+            if (instances > samples.length) {
+                body.appendChild(el('div', { className: 'instmore',
+                    text: 'Showing ' + samples.length + ' of ' + fmt(instances) + ' instances. The full set streams live from the device — rebuild the dataset to refresh.' }));
+            }
+        } else {
+            body.appendChild(renderInstance({ keys: p.keys || {}, fields: p.fields || {} }, null));
+        }
+        panel.appendChild(body);
+    }
+
+    function instanceLabel(s, i) {
+        var keys = s.keys || {};
+        var vals = Object.keys(keys).map(function (k) { return keys[k]; });
+        return vals.length ? vals.join(' · ') : 'Instance ' + (i + 1);
+    }
+
+    function renderInstance(s, label) {
+        var wrap = el('div', { className: 'inst' });
+        if (label != null) wrap.appendChild(el('div', { className: 'insthead', text: label }));
         var table = el('table', { className: 'ftable' });
         var tbody = el('tbody');
-        var keys = p.keys || {};
+        var keys = s.keys || {};
         Object.keys(keys).forEach(function (k) {
             tbody.appendChild(el('tr', {}, [
                 el('td', { className: 'k' }, [document.createTextNode(k), el('span', { className: 'keybadge', text: 'key' })]),
                 el('td', { className: 'v', text: String(keys[k]) })
             ]));
         });
-        var fields = p.fields || {};
+        var fields = s.fields || {};
         Object.keys(fields).forEach(function (f) {
             tbody.appendChild(el('tr', {}, [
                 el('td', { className: 'k', text: f }),
@@ -152,8 +179,8 @@
         });
         if (!tbody.firstChild) tbody.appendChild(el('tr', {}, [el('td', { className: 'k', text: '(no sampled fields)' })]));
         table.appendChild(tbody);
-        body.appendChild(table);
-        panel.appendChild(body);
+        wrap.appendChild(table);
+        return wrap;
     }
 
     function updateSummary() {
