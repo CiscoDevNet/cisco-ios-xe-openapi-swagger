@@ -28,7 +28,7 @@
         cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null };
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat' };
     var charts = {};
     var payloadCache = {};
 
@@ -53,6 +53,15 @@
         return (n / 1048576).toFixed(1) + ' MB';
     }
     function catClass(c) { return 'cat-' + c; }
+
+    // Size proxy per transport: RESTCONF = response bytes; MDT = records captured.
+    function sizeOf(p) { return state.transport === 'restconf' ? (p.bytes || 0) : (p.records || 0); }
+    function shortLabel(path) { var parts = path.split('/'); return parts.slice(-2).join('/'); }
+    function sortComparator(a, b) {
+        if (state.sort === 'size') return sizeOf(b) - sizeOf(a) || a.path.localeCompare(b.path);
+        if (state.sort === 'path') return a.path.localeCompare(b.path);
+        return a.category.localeCompare(b.category) || a.path.localeCompare(b.path);
+    }
 
     // ---------- filtering ----------
     function devicePaths(pid) {
@@ -123,8 +132,8 @@
     function renderList() {
         var wrap = $('browser');
         clear(wrap);
-        var rows = devicePaths(state.pid).filter(matches)
-            .sort(function (a, b) { return a.category.localeCompare(b.category) || a.path.localeCompare(b.path); });
+        var rows = devicePaths(state.pid).filter(matches);
+        rows.sort(sortComparator);
         $('browserCount').textContent = rows.length;
         if (!rows.length) {
             wrap.appendChild(el('div', { className: 'placeholder', text: 'No streamed paths match.' }));
@@ -368,6 +377,36 @@
         renderList();
         renderDetail();
         updateSummary();
+        renderTopChart();
+    }
+
+    // ---------- largest-paths chart (active device + flavor filter) ----------
+    function renderTopChart() {
+        if (typeof window.Chart === 'undefined') return;
+        var restconf = state.transport === 'restconf';
+        var rows = devicePaths(state.pid).filter(matches).slice()
+            .sort(function (a, b) { return sizeOf(b) - sizeOf(a); }).slice(0, 12);
+        var labels = rows.map(function (p) { return shortLabel(p.path); });
+        var vals = rows.map(sizeOf);
+        var colors = rows.map(function (p) { return CAT_COLOR[p.category] || '#607D8B'; });
+        var metric = restconf ? 'bytes' : 'records';
+        var scope = state.cat === 'all' ? 'all flavors' : (CAT_LABEL[state.cat] || state.cat);
+        var titleEl = $('chartTopTitle');
+        if (titleEl) titleEl.textContent = 'Largest paths — ' + state.pid + ' · ' + scope + ' (' + metric + ')';
+        destroyChart('top');
+        if (!rows.length) return;
+        charts.top = new window.Chart($('chartTop'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: vals, backgroundColor: colors }] },
+            options: {
+                animation: false, responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { title: function (items) { return rows[items[0].dataIndex].path; } } }
+                },
+                scales: { x: { beginAtZero: true }, y: { ticks: { font: { size: 9 } } } }
+            }
+        });
     }
 
     function init() {
@@ -376,6 +415,12 @@
             state.q = search.value.trim().toLowerCase();
             renderList();
             updateSummary();
+            renderTopChart();
+        });
+        var sortSel = $('sortBy');
+        if (sortSel) sortSel.addEventListener('change', function () {
+            state.sort = sortSel.value;
+            renderList();
         });
         var mdtBtn = $('tMdt'), rcBtn = $('tRestconf');
         if (mdtBtn) mdtBtn.addEventListener('click', function () { setTransport('mdt'); });
