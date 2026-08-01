@@ -155,10 +155,15 @@ below are far more representative than the average).
   files in one command.
 - **Depth probe (read-only).** `scripts/harness/depth_probe.py` answers "does a
   deeper keyed GET return more data than the parent?" — see
-  [DEVICE_DATA_COLLECTION.md §4.1](DEVICE_DATA_COLLECTION.md). Sweep of C9600
-  oper (26.1.1) found **0 modules hide data**: 70/91 captured oper modules have
-  fully-populated roots, and the 21 with empty/absent nested nodes (169 keyed
-  probes) returned nothing — so the root GETs are complete for the captured set.
+  [DEVICE_DATA_COLLECTION.md §4.1](DEVICE_DATA_COLLECTION.md). Full fleet sweep
+  (6 devices × 7 categories, 26.1.1) ran with a circuit breaker armed — **zero
+  crashes, zero breaker trips**. Only three modules ever returned a container the
+  module-root GET omitted (`aaa-oper/aaa-users`, `mdt-oper-v2/mdt-subscriptions`,
+  `yang-interfaces-cfg/general`), and **all three are already captured
+  independently** by the exhaustive per-path GET — so there is no data gap and no
+  keyed-list path hid data a parent GET didn't already return. The probe reuses
+  `restconf_get` (retry/backoff + reset detection), a circuit breaker, the
+  known-unsafe-module skip, and `--resume`.
 
 ### Added — Live device data: real captured RESTCONF responses + interactive browser (round 30, 2026-07-31)
 

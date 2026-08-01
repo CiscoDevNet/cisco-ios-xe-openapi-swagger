@@ -113,19 +113,35 @@ directly. `scripts/harness/depth_probe.py` verifies this empirically, READ-ONLY:
   reports which modules actually hide data.
 
 Correctness notes (learned the hard way):
-- Percent-encode list-key VALUES (`/`, `:`, space) but do **not** re-quote through
-  `build_restconf_url` — that double-encodes `%2F`→`%252F` and the device 404s.
+- Percent-encode list-key VALUES (`/`, `:`, space); `build_restconf_url` keeps
+  `%` safe so a pre-encoded key is not double-encoded (`%2F`→`%252F` → 404).
 - Classify by **structure** (key-path sets), not values: volatile oper counters
   drift between capture and probe time and otherwise look like "new data".
-- Use `requests.Session().trust_env = False` to bypass the corp proxy for direct
-  device GETs.
+- Crash safety: every GET routes through `restconf_get` (retry/backoff + 409/429
+  + connection-reset detection); a circuit breaker aborts a device on a reset
+  (crash signature) or N consecutive errors; `KNOWN_UNSAFE_MODULES` are skipped;
+  `--resume` skips finished modules. `Session.trust_env = False` bypasses the
+  corp proxy for direct device GETs.
 
-**Finding (C9600, IOS XE 26.1.1, oper): 0 modules hide data.** 70/91 captured
-oper modules have fully-populated roots; the 21 with empty/absent nested nodes
-(169 probes) returned nothing on a direct keyed GET — those features are simply
-unconfigured. So the root GET (and thus `--roots-only`) is complete for the
-captured oper set; per-container drilling adds no data there. Re-run per device
-/ per category (`--device`, `--category`) before assuming the same elsewhere.
+**Finding — full fleet sweep (6 devices × 7 categories, IOS XE 26.1.1).** Ran
+with the circuit breaker armed; **zero crashes, zero breaker trips**. Only three
+modules ever returned a container that the module-root GET omitted (all
+`absent`-kind, never keyed-list hidden data):
+
+| Module | Container | Devices |
+|---|---|---|
+| `Cisco-IOS-XE-aaa-oper` | `/aaa-data/aaa-users` (active sessions) | C9200/9300/9400/9500 |
+| `Cisco-IOS-XE-mdt-oper-v2` | `/mdt-oper-v2-data/mdt-subscriptions` | C9200/9400/9500/9800 |
+| `Cisco-IOS-XE-yang-interfaces-cfg` | `/…-cfg-data/general` (snmp-community) | C9200/9500/9800 |
+
+**These are NOT data gaps.** All three paths are spec-enumerated (non-keyed) and
+are **already captured independently** by the collector's exhaustive per-path GET
+— they appear as their own Live Data entries even though the root GET doesn't
+nest them inline. No keyed-list path on any device hid data that a parent GET
+didn't already return. Conclusion: exhaustive per-path GET (the default, not
+`--roots-only`) covers containers the root omits, and the keyed-list contents
+come back with their parents — so the captured set is complete. `--roots-only`
+alone would MISS the three containers above; the full per-path mode does not.
 
 ## 5. Value-discovery index
 scripts/harness/build_capture_index.py (mirror scripts/build_paths_index.py):
