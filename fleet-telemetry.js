@@ -46,8 +46,22 @@
     }
     function matches(p) {
         if (state.cat !== 'all' && p.category !== state.cat) return false;
-        if (state.q && p.path.toLowerCase().indexOf(state.q) === -1) return false;
+        if (state.q && haystack(p).indexOf(state.q) === -1) return false;
         return true;
+    }
+    // Lazily build a lowercase search string per path covering the xpath plus
+    // every captured instance's keys and leaf values (cached on the path).
+    function haystack(p) {
+        if (p._hay != null) return p._hay;
+        var parts = [p.path];
+        (p.samples || []).forEach(function (s) {
+            var keys = s.keys || {};
+            Object.keys(keys).forEach(function (k) { parts.push(k, String(keys[k])); });
+            var f = s.fields || {};
+            Object.keys(f).forEach(function (k) { parts.push(k, String(f[k])); });
+        });
+        p._hay = parts.join(' ').toLowerCase();
+        return p._hay;
     }
 
     // ---------- device tabs ----------
@@ -133,7 +147,11 @@
         if (instances > 1) metaBits += ' · ' + fmt(instances) + ' instances';
         var head = el('div', { className: 'dhead' }, [
             el('div', { className: 'dpath', text: p.path }),
-            el('div', { className: 'dmeta', text: metaBits })
+            el('div', { className: 'dmeta', text: metaBits }),
+            el('div', { className: 'dbtns' }, [
+                copyBtn('Copy payload', function () { return JSON.stringify(payloadOf(p), null, 2); }),
+                copyBtn('Copy path', function () { return p.path; })
+            ])
         ]);
         panel.appendChild(head);
 
@@ -156,6 +174,46 @@
         var keys = s.keys || {};
         var vals = Object.keys(keys).map(function (k) { return keys[k]; });
         return vals.length ? vals.join(' · ') : 'Instance ' + (i + 1);
+    }
+
+    // Full payload for the selected path (all captured instances) as clipboard JSON.
+    function payloadOf(p) {
+        return {
+            pid: p.pid, source: p.source, category: p.category, path: p.path,
+            records: p.records, instances: p.instances,
+            samples: p.samples && p.samples.length ? p.samples : [{ keys: p.keys || {}, fields: p.fields || {} }]
+        };
+    }
+    function copyBtn(label, getText) {
+        return el('button', {
+            className: 'cbtn', text: label,
+            onclick: function (e) { copyText(getText(), e.currentTarget, label); }
+        });
+    }
+    function copyText(text, btn, label) {
+        function flash(ok) {
+            btn.textContent = ok ? 'Copied!' : 'Copy failed';
+            setTimeout(function () { btn.textContent = label; }, 1200);
+        }
+        function legacyCopy() {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = text; ta.setAttribute('readonly', '');
+                ta.style.position = 'absolute'; ta.style.left = '-9999px';
+                document.body.appendChild(ta); ta.select();
+                var ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                return ok;
+            } catch (_) { return false; }
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(
+                function () { flash(true); },
+                function () { flash(legacyCopy()); }  // fall back if the async API is blocked
+            );
+            return;
+        }
+        flash(legacyCopy());
     }
 
     function renderInstance(s, label) {
