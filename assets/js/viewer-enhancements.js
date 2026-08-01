@@ -387,7 +387,7 @@
 
         var ver = _liveExActiveVer();
         var link = document.createElement('a');
-        link.href = '../live-data.html?ver=' + encodeURIComponent(ver)
+        link.href = '../device-data.html?ver=' + encodeURIComponent(ver)
             + '#module=' + encodeURIComponent(module)
             + (pids[0] ? '&pid=' + encodeURIComponent(pids[0]) : '');
         link.textContent = 'Open in Live Data browser \u2192';

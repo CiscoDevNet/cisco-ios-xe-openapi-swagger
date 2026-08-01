@@ -1,9 +1,15 @@
-/* fleet-telemetry.js — browse REAL live MDT captured from the fleet.
+/* device-data.js — browse REAL collected device data across two transports.
  *
- * Loads telemetry-live-data.json (built by build_live_dataset.py from the
- * per-device Telegraf capture files) and renders it as device (PID) tabs, a
- * model-flavor filter, a streamed-path list, and a per-path detail showing the
- * list keys and leaf values that streamed.
+ * Loads two datasets in the same shape and lets the user toggle between them:
+ *   - Model-Driven Telemetry (push): telemetry-live-data.json, built by
+ *     build_live_dataset.py from the per-device Telegraf capture files.
+ *   - RESTCONF (pull): restconf-live-data.json, built by
+ *     build_restconf_dataset.py from the release's live-examples index; the
+ *     actual GET payloads are fetched lazily per path on selection.
+ *
+ * Renders device (PID) tabs, a model-flavor filter, a path list, summary
+ * tiles + charts, and a per-path detail (streamed keys/values for MDT, the
+ * GET response payload for RESTCONF).
  *
  * CSP note: strict CSP (no inline scripts); every node is built with
  * createElement / textContent — never innerHTML.
@@ -11,18 +17,20 @@
 (function () {
     'use strict';
 
-    var DATA_URL = 'telemetry-live-data.json';
+    var MDT_URL = 'telemetry-live-data.json';
+    var RESTCONF_URL = 'restconf-live-data.json';
     var CAT_LABEL = {
         oper: 'Oper', openconfig: 'OpenConfig', 'native-config': 'Native',
-        cfg: 'Config', ietf: 'IETF', other: 'Other', mib: 'MIB', wireless: 'Wireless'
+        cfg: 'Config', ietf: 'IETF', other: 'Other', mib: 'MIB', wireless: 'Wireless', rpc: 'RPC'
     };
     var CAT_COLOR = {
         oper: '#2196F3', openconfig: '#009688', 'native-config': '#4CAF50',
-        cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63'
+        cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { data: null, pid: '', cat: 'all', q: '', sel: null };
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null };
     var charts = {};
+    var payloadCache = {};
 
     function el(tag, opts, kids) {
         var n = document.createElement(tag);
@@ -38,6 +46,12 @@
     function clear(n) { while (n && n.firstChild) n.removeChild(n.firstChild); }
     function $(id) { return document.getElementById(id); }
     function fmt(n) { return (n == null) ? '' : Number(n).toLocaleString('en-US'); }
+    function fmtBytes(n) {
+        n = n || 0;
+        if (n < 1024) return n + ' B';
+        if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+        return (n / 1048576).toFixed(1) + ' MB';
+    }
     function catClass(c) { return 'cat-' + c; }
 
     // ---------- filtering ----------
@@ -124,7 +138,7 @@
             }, [
                 el('span', { className: 'catdot ' + catClass(p.category), title: p.category }),
                 el('span', { className: 'p', text: p.path }),
-                el('span', { className: 'rc', text: fmt(p.records) + ' rec' })
+                el('span', { className: 'rc', text: state.transport === 'restconf' ? fmtBytes(p.bytes) : fmt(p.records) + ' rec' })
             ]);
             wrap.appendChild(row);
         });
@@ -140,6 +154,8 @@
         }
         var p = (state.data.paths || []).filter(function (x) { return x.pid + '|' + x.path === state.sel; })[0];
         if (!p) { panel.appendChild(el('div', { className: 'placeholder', text: 'Not found.' })); return; }
+
+        if (state.transport === 'restconf') { renderRestconfDetail(panel, p); return; }
 
         var samples = p.samples || [];
         var instances = p.instances || samples.length || 1;
@@ -216,6 +232,44 @@
         flash(legacyCopy());
     }
 
+    // ---------- RESTCONF detail (lazy payload fetch) ----------
+    function renderRestconfDetail(panel, p) {
+        var metaBits = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid
+            + ' · HTTP ' + (p.status == null ? '?' : p.status) + ' · ' + fmtBytes(p.bytes);
+        var head = el('div', { className: 'dhead' }, [
+            el('div', { className: 'dpath', text: p.path }),
+            el('div', { className: 'dmeta', text: metaBits }),
+            el('div', { className: 'dbtns' }, [copyBtn('Copy path', function () { return p.path; })])
+        ]);
+        panel.appendChild(head);
+        var body = el('div', { className: 'body' });
+        var pre = el('pre', { className: 'jsonbox', text: 'Loading payload…' });
+        body.appendChild(pre);
+        panel.appendChild(body);
+        var btns = head.querySelector('.dbtns');
+        fetchRestconfPayload(p).then(function (value) {
+            var text = JSON.stringify(value, null, 2);
+            pre.textContent = text;
+            btns.insertBefore(copyBtn('Copy payload', function () { return text; }), btns.firstChild);
+        }, function (err) {
+            pre.textContent = 'Could not load payload: ' + ((err && err.message) || err);
+        });
+    }
+    function fetchRestconfPayload(p) {
+        var cacheKey = p.file + '#' + p.pid;
+        if (payloadCache[cacheKey]) return Promise.resolve(payloadCache[cacheKey]);
+        return fetch(p.file)
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (doc) {
+                var pids = doc.pids || {};
+                var entry = pids[p.pid] || {};
+                var value = (entry.value != null) ? entry.value
+                    : (doc.value != null ? doc.value : doc);
+                payloadCache[cacheKey] = value;
+                return value;
+            });
+    }
+
     function renderInstance(s, label) {
         var wrap = el('div', { className: 'inst' });
         if (label != null) wrap.appendChild(el('div', { className: 'insthead', text: label }));
@@ -242,8 +296,9 @@
     }
 
     function updateSummary() {
+        var all = devicePaths(state.pid).length;
         var shown = devicePaths(state.pid).filter(matches).length;
-        $('summary').textContent = shown + ' paths · ' + fmt((state.data.totals || {}).records) + ' records total';
+        $('summary').textContent = shown + (shown === all ? '' : ' / ' + all) + ' paths';
     }
 
     // ---------- fleet summary (tiles + charts) ----------
@@ -259,8 +314,13 @@
         var host = $('mtiles');
         clear(host);
         host.appendChild(tile(fmt(t.devices), 'Devices'));
-        host.appendChild(tile(fmt(t.paths), 'Streamed paths'));
-        host.appendChild(tile(fmt(t.records), 'Records'));
+        host.appendChild(tile(fmt(t.paths), 'Captured paths'));
+        if (state.transport === 'restconf') {
+            var totBytes = (state.data.devices || []).reduce(function (s, d) { return s + (d.bytes || 0); }, 0);
+            host.appendChild(tile(fmtBytes(totBytes), 'Response payload'));
+        } else {
+            host.appendChild(tile(fmt(t.records), 'Records'));
+        }
         host.appendChild(tile(fmt(cats.length), 'Model flavors'));
         renderCharts();
     }
@@ -276,7 +336,10 @@
         var devs = state.data.devices || [];
         var devLabels = devs.map(function (d) { return d.pid; });
         var devPaths = devs.map(function (d) { return d.paths; });
-        var devRecs = devs.map(function (d) { return d.records; });
+        var restconf = state.transport === 'restconf';
+        var thirdData = restconf ? devs.map(function (d) { return d.bytes || 0; }) : devs.map(function (d) { return d.records; });
+        var thirdTitle = restconf ? 'Response bytes per device' : 'Records captured per device';
+        var titleEl = $('chartRecTitle'); if (titleEl) titleEl.textContent = thirdTitle;
         var base = { animation: false, responsive: true, maintainAspectRatio: false };
 
         destroyChart('cat');
@@ -294,7 +357,7 @@
         destroyChart('rec');
         charts.rec = new window.Chart($('chartRec'), {
             type: 'bar',
-            data: { labels: devLabels, datasets: [{ data: devRecs, backgroundColor: '#00838F' }] },
+            data: { labels: devLabels, datasets: [{ data: thirdData, backgroundColor: '#00838F' }] },
             options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } })
         });
     }
@@ -314,21 +377,47 @@
             renderList();
             updateSummary();
         });
-        fetch(DATA_URL)
-            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(function (data) {
-                state.data = data;
-                var d = (data.devices || [])[0];
-                state.pid = d ? d.pid : '';
-                var prov = data.platform || 'IOS XE';
-                $('prov').textContent = (data.totals ? fmt(data.totals.devices) + ' devices · ' + fmt(data.totals.paths) + ' paths · ' + fmt(data.totals.records) + ' records' : '') + '  ·  ' + (data.transport || '');
-                renderSummary();
-                render();
-            })
-            .catch(function () {
-                $('browser').textContent = '';
-                $('emptyState').hidden = false;
-            });
+        var mdtBtn = $('tMdt'), rcBtn = $('tRestconf');
+        if (mdtBtn) mdtBtn.addEventListener('click', function () { setTransport('mdt'); });
+        if (rcBtn) rcBtn.addEventListener('click', function () { setTransport('restconf'); });
+
+        Promise.all([
+            fetchJson(MDT_URL).catch(function () { return null; }),
+            fetchJson(RESTCONF_URL).catch(function () { return null; })
+        ]).then(function (res) {
+            state.datasets.mdt = res[0];
+            state.datasets.restconf = res[1];
+            if (!res[0] && !res[1]) { $('browser').textContent = ''; $('emptyState').hidden = false; return; }
+            if (!res[1] && rcBtn) { rcBtn.disabled = true; }
+            if (!res[0] && mdtBtn) { mdtBtn.disabled = true; }
+            setTransport(res[0] ? 'mdt' : 'restconf');
+        });
+    }
+
+    function fetchJson(url) {
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
+    function setTransport(t) {
+        if (!state.datasets[t]) return;
+        state.transport = t;
+        state.data = state.datasets[t];
+        state.cat = 'all'; state.q = ''; state.sel = null;
+        var sb = $('searchBox'); if (sb) sb.value = '';
+        var d = (state.data.devices || [])[0];
+        state.pid = d ? d.pid : '';
+        var mdtBtn = $('tMdt'), rcBtn = $('tRestconf');
+        if (mdtBtn) mdtBtn.classList.toggle('active', t === 'mdt');
+        if (rcBtn) rcBtn.classList.toggle('active', t === 'restconf');
+        updateProv();
+        renderSummary();
+        render();
+    }
+    function updateProv() {
+        var data = state.data || {};
+        var totals = data.totals || {};
+        $('prov').textContent = (totals.paths != null
+            ? fmt(totals.devices) + ' devices · ' + fmt(totals.paths) + ' paths' : '')
+            + '  ·  ' + (data.transport || '');
     }
 
     if (document.readyState === 'loading') {

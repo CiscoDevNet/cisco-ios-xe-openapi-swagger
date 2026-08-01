@@ -28,15 +28,11 @@ SCAN = [
     "tree-compare.js",
     "yang-accountability.js",
     "recent-favorites.js",
-    "live-data.js",
-    "telemetry-data.js",
-    "fleet-telemetry.js",
+    "device-data.js",
     "404.html",
     "index.html",
     "exports.html",
-    "live-data.html",
-    "telemetry-data.html",
-    "fleet-telemetry.html",
+    "device-data.html",
     "telemetry.html",
     "about.html",
     "code-generator.html",
@@ -86,7 +82,7 @@ STRICT_CSP_PAGES = [
     "platform-coverage.html",
     "app-map.html",
     "changelog.html",
-    "live-data.html",
+    "device-data.html",
 ]
 INLINE_EXEC_SCRIPT = re.compile(
     r"<script(?![^>]*\bsrc=)(?![^>]*type\s*=\s*['\"]application/ld\+json)"

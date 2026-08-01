@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
-<title>Fleet Telemetry — Cisco IOS XE</title>
+<title>Device Data — Cisco IOS XE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
   :root { --bg:#f7f8fa; --fg:#1f2933; --card:#fff; --border:#e3e8ef; --accent:#1565c0;
@@ -76,14 +76,21 @@
   .cbtn:hover { background:rgba(21,101,192,.08); }
   .empty { padding:50px 20px; text-align:center; color:var(--muted); }
   .help { background:rgba(21,101,192,.06); border-left:3px solid var(--accent); padding:10px 14px; border-radius:4px; margin-bottom:14px; font-size:.84rem; }
+  .transport { display:inline-flex; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:14px; }
+  .tbtn { font:inherit; font-size:.86rem; font-weight:600; padding:9px 18px; border:none; background:var(--card); color:var(--fg); cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; border-right:1px solid var(--border); }
+  .tbtn:last-child { border-right:none; }
+  .tbtn.active { background:var(--accent); color:#fff; }
+  .tbtn:disabled { opacity:.45; cursor:not-allowed; }
+  .tsub { font-size:.68rem; font-weight:400; opacity:.75; }
+  .jsonbox { margin:0; padding:12px 16px; font-family:var(--mono); font-size:.74rem; white-space:pre-wrap; word-break:break-word; color:var(--fg); max-height:70vh; overflow:auto; }
   .keybadge { display:inline-block; font-size:.66rem; background:var(--accent2); color:#003; padding:1px 6px; border-radius:8px; margin-left:6px; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site-chrome.js" defer></script>
-<meta name="description" content="Browse REAL Model-Driven Telemetry captured live from a fleet of Cisco Catalyst switches and a 9800 WLC — per device (PID) and per model flavor (oper, OpenConfig, native, MIB, wireless), with the actual keys and leaf values that streamed.">
+<meta name="description" content="Browse REAL data collected from a fleet of Cisco Catalyst switches and a 9800 WLC over Model-Driven Telemetry (push) and RESTCONF (pull) — per device and model flavor, with the actual keys, values, and GET payloads captured.">
 <meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/fleet-telemetry.html">
+<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/device-data.html">
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
@@ -95,31 +102,34 @@
 <body>
 <header class="page">
   <div class="wrap">
-    <h1>Fleet Telemetry</h1>
-    <p>Real Model-Driven Telemetry captured live from the lab fleet — per device and per model flavor (oper, OpenConfig, native, MIB, wireless), showing the actual keys and leaf values each XPath streamed.</p>
+    <h1>Device Data</h1>
+    <p>Real data collected from a fleet of physical Cisco Catalyst switches and a 9800 WLC — over both Model-Driven Telemetry (push) and RESTCONF (pull). Switch transport, then browse per device and model flavor with the actual keys, values, and payloads.</p>
   </div>
 </header>
 <div class="nav">
   <div class="wrap">
     <a href="index.html">&larr; Hub</a>
     <a href="telemetry.html">Telemetry &amp; Notifications</a>
-    <a href="telemetry-data.html">Telemetry Data</a>
-    <a href="live-data.html">Live Device Data</a>
+    <a href="swagger-oper-model/index.html">Operational APIs</a>
     <span class="prov" id="prov"></span>
   </div>
 </div>
 <main>
+  <div class="transport" role="tablist" aria-label="Transport">
+    <button class="tbtn active" id="tMdt" type="button" role="tab">Model-Driven Telemetry<span class="tsub">push · gRPC dial-out</span></button>
+    <button class="tbtn" id="tRestconf" type="button" role="tab">RESTCONF<span class="tsub">pull · HTTPS GET</span></button>
+  </div>
   <div class="help">
-    Each entry is a real payload streamed over gRPC dial-out from a physical device. Pick a
-    <strong>device</strong>, filter by <strong>model flavor</strong>, then a path to see the streamed
-    <strong>keys</strong> <span class="keybadge">key</span> and leaf values. Coverage grows as the
-    exhaustive collection runs.
+    Pick a <strong>transport</strong> above, then a <strong>device</strong>, filter by
+    <strong>model flavor</strong>, and choose a path. MDT shows the streamed
+    <strong>keys</strong> <span class="keybadge">key</span> and leaf values; RESTCONF shows the
+    captured GET <strong>payload</strong>. Use search to match paths, keys, and values.
   </div>
   <section class="mtiles" id="mtiles" aria-label="Summary metrics"></section>
   <section class="charts" aria-label="Summary charts">
     <div class="chartcard"><h3>Streamed paths by model flavor</h3><div class="cwrap"><canvas id="chartCat"></canvas></div></div>
     <div class="chartcard"><h3>Streamed paths per device</h3><div class="cwrap"><canvas id="chartDev"></canvas></div></div>
-    <div class="chartcard"><h3>Records captured per device</h3><div class="cwrap"><canvas id="chartRec"></canvas></div></div>
+    <div class="chartcard"><h3 id="chartRecTitle">Records captured per device</h3><div class="cwrap"><canvas id="chartRec"></canvas></div></div>
   </section>
   <div class="toolbar">
     <div class="device-tabs" id="deviceTabs" role="tablist" aria-label="Devices"></div>
@@ -143,6 +153,6 @@
   </div>
 </main>
 <script src="assets/vendor/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
-<script src="fleet-telemetry.js" defer></script>
+<script src="device-data.js" defer></script>
 </body>
 </html>
