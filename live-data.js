@@ -527,6 +527,23 @@
                     + (info.bytes != null ? ' · ' + fmtBytes(info.bytes) : '')
             })
         ]);
+        // Copy-to-clipboard for the payload (enabled once the body loads).
+        var loadedText = null;
+        var copyBtn = el('button', {
+            className: 'copy-btn', text: 'Copy payload', title: 'Copy the JSON payload to the clipboard',
+            onclick: function () {
+                if (loadedText == null) return;
+                copyToClipboard(loadedText).then(function () {
+                    copyBtn.textContent = 'Copied \u2713';
+                    setTimeout(function () { copyBtn.textContent = 'Copy payload'; }, 1500);
+                }).catch(function () {
+                    copyBtn.textContent = 'Copy failed';
+                    setTimeout(function () { copyBtn.textContent = 'Copy payload'; }, 1500);
+                });
+            }
+        });
+        copyBtn.disabled = true;
+        head.appendChild(copyBtn);
         if (pids.length > 1) {
             var subtabs = el('div', { className: 'dsub-tabs' });
             pids.forEach(function (pp) {
@@ -548,8 +565,31 @@
             var txt;
             try { txt = JSON.stringify(body, null, 2); } catch (_) { txt = String(body); }
             pre.textContent = txt;
+            loadedText = txt;
+            copyBtn.disabled = false;
         }).catch(function () {
             pre.textContent = 'Failed to load the captured response.';
+        });
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text);
+        }
+        // Fallback for non-secure contexts (e.g. plain-http localhost).
+        return new Promise(function (resolve, reject) {
+            try {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                var ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                ok ? resolve() : reject(new Error('execCommand failed'));
+            } catch (e) { reject(e); }
         });
     }
 
