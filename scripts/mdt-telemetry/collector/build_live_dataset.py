@@ -26,7 +26,8 @@ PLAN_FILE = HERE / "output" / "fleet-plan.json"
 OUTPUT_FILE = REPO / "telemetry-live-data.json"
 
 MAX_FIELDS_PER_PATH = 24
-MAX_SAMPLES = 8  # distinct keyed instances kept per path for the detail view
+MAX_SAMPLES = 5000  # distinct keyed instances kept per path (effectively "all";
+                    # high bound guards against a single pathological path)
 
 
 def category_of(path: str) -> str:
@@ -181,7 +182,7 @@ def main():
     }
 
     out = Path(args.out)
-    out.write_text(json.dumps(dataset, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(dataset, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
     kb = out.stat().st_size / 1024
     print(f"devices={len(devices)} paths={len(paths)} records={dataset['totals']['records']}")
     for d in devices:
