@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+<title>Telemetry Data — Cisco IOS XE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+  :root { --bg:#f7f8fa; --fg:#1f2933; --card:#fff; --border:#e3e8ef; --accent:#1565c0;
+          --accent2:#00bceb; --muted:#7b8794; --ok:#2e7d32; --warn:#b26500; --danger:#c62828;
+          --hot:#c62828; --warm:#f57c00; --cool:#1976d2;
+          --mono:"Roboto Mono","SF Mono",Consolas,Menlo,monospace; }
+  body.dark { --bg:#0f1419; --fg:#e6edf3; --card:#1a2028; --border:#2d3742; --accent:#42a5f5;
+              --accent2:#00bceb; --muted:#8b96a4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+         background:var(--bg); color:var(--fg); }
+  header.page { background:linear-gradient(135deg,#0d47a1 0%,#1565c0 55%,#00bceb 100%); color:#fff;
+                padding:22px 20px 18px; }
+  header.page .wrap { max-width:1400px; margin:0 auto; }
+  header.page h1 { margin:0 0 4px; font-size:1.55rem; }
+  header.page p { margin:0; opacity:.9; font-size:.9rem; }
+  .nav { padding:9px 20px; background:var(--card); border-bottom:1px solid var(--border); }
+  .nav .wrap { max-width:1400px; margin:0 auto; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .nav a { color:var(--accent); text-decoration:none; font-weight:500; font-size:.85rem; }
+  .nav a:hover { text-decoration:underline; }
+  .nav .spacer { flex:1; }
+  .nav .prov { font-size:.78rem; color:var(--muted); font-family:var(--mono); }
+  select, input[type=search] { background:var(--bg); color:var(--fg); border:1px solid var(--border);
+         border-radius:6px; padding:6px 10px; font:inherit; font-size:.85rem; }
+  main { max-width:1400px; margin:18px auto; padding:0 20px 60px; }
+
+  .toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+  .tier-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .tier-tab { padding:6px 14px; border-radius:18px; border:1px solid var(--border); background:var(--card);
+              color:var(--fg); cursor:pointer; font:inherit; font-size:.82rem; font-weight:500;
+              display:flex; align-items:center; gap:7px; }
+  .tier-tab .n { font-size:.72rem; color:var(--muted); }
+  .tier-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tier-tab.active .n { color:rgba(255,255,255,.85); }
+  .summary { color:var(--muted); font-family:var(--mono); font-size:.78rem; }
+
+  .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin-bottom:20px; }
+  .cvcard { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .cvcard .lbl { font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; font-weight:700;
+                 color:var(--muted); margin-bottom:6px; }
+  .cvcard .big { font-size:1.5rem; font-weight:700; }
+  .cvcard .sub { font-size:.75rem; color:var(--muted); }
+  .bar { height:6px; border-radius:4px; background:var(--border); margin-top:8px; overflow:hidden; }
+  .bar > span { display:block; height:100%; background:var(--accent2); }
+
+  .layout { display:grid; grid-template-columns:minmax(320px,460px) 1fr; gap:18px; align-items:start; }
+  @media (max-width:900px){ .layout { grid-template-columns:1fr; } }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:10px; }
+  .panel .phead { padding:10px 14px; border-bottom:1px solid var(--border); font-weight:600; font-size:.9rem;
+                  display:flex; align-items:center; gap:8px; }
+  .panel .phead .count { color:var(--muted); font-weight:400; font-size:.8rem; }
+  .browser { max-height:72vh; overflow:auto; }
+
+  .subrow { padding:9px 14px; cursor:pointer; border-bottom:1px solid var(--border);
+            display:flex; align-items:center; gap:10px; }
+  .subrow:hover { background:rgba(21,101,192,.06); }
+  .subrow.sel { background:rgba(21,101,192,.12); }
+  .subrow.silent { opacity:.62; }
+  .tierdot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .tierdot.hot { background:var(--hot); } .tierdot.warm { background:var(--warm); } .tierdot.cool { background:var(--cool); }
+  .subrow .meta { min-width:0; flex:1; }
+  .subrow .nm { font-size:.85rem; font-weight:600; }
+  .subrow .mod { font-family:var(--mono); font-size:.72rem; color:var(--muted); word-break:break-all; }
+  .subrow .id { font-family:var(--mono); font-size:.72rem; color:var(--muted); flex:none; }
+  .subrow .pts { font-size:.7rem; color:var(--muted); flex:none; text-align:right; }
+  .pill { font-size:.66rem; font-weight:700; padding:2px 7px; border-radius:10px; color:#fff; flex:none; }
+  .pill.hot { background:var(--hot); } .pill.warm { background:var(--warm); } .pill.cool { background:var(--cool); }
+  .pill.silent { background:var(--muted); }
+
+  .detail { min-height:320px; }
+  .detail .dhead { padding:14px 16px; border-bottom:1px solid var(--border); }
+  .detail .dtitle { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .detail .dpath { font-family:var(--mono); font-size:.8rem; word-break:break-all; color:var(--accent);
+                   background:rgba(21,101,192,.06); padding:6px 10px; border-radius:6px; margin-top:10px; }
+  .detail dl { display:grid; grid-template-columns:max-content 1fr; gap:4px 16px; margin:12px 0 0; font-size:.8rem; }
+  .detail dt { color:var(--muted); font-weight:500; }
+  .detail dd { margin:0; font-family:var(--mono); word-break:break-all; }
+  .detail .body { padding:14px 16px; }
+  .mtable { width:100%; border-collapse:collapse; font-size:.78rem; }
+  .mtable th, .mtable td { padding:7px 9px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }
+  .mtable th { position:sticky; top:0; background:var(--card); font-weight:600; font-size:.72rem;
+               text-transform:uppercase; letter-spacing:.03em; color:var(--muted); }
+  .mtable td.leaf { font-family:var(--mono); font-size:.74rem; word-break:break-all; }
+  .mtable td.card { text-align:right; color:var(--muted); white-space:nowrap; }
+  .mtable .samp { font-family:var(--mono); font-size:.72rem; }
+  .mtable .samp .v { color:var(--fg); font-weight:600; }
+  .mtable .samp .l { color:var(--muted); }
+  .mtable tr.mclass-keys td.leaf { color:var(--accent2); }
+  .silentbox { padding:30px 20px; text-align:center; color:var(--muted); font-size:.9rem; }
+  .placeholder { padding:40px 20px; text-align:center; color:var(--muted); font-size:.9rem; }
+  .empty { padding:50px 20px; text-align:center; color:var(--muted); }
+  .help { background:rgba(21,101,192,.06); border-left:3px solid var(--accent); padding:10px 14px;
+          border-radius:4px; margin-bottom:16px; font-size:.84rem; }
+  .chipfilter { display:flex; gap:6px; flex-wrap:wrap; }
+  .chipfilter button { padding:4px 10px; border-radius:12px; border:1px solid var(--border);
+                       background:var(--card); color:var(--fg); cursor:pointer; font:inherit; font-size:.76rem; }
+  .chipfilter button.active { color:#fff; border-color:transparent; background:var(--accent); }
+  .source-switch { display:inline-flex; gap:2px; margin:0 0 16px; border:1px solid var(--border);
+                   border-radius:10px; padding:3px; background:var(--card); }
+  .source-switch .ss-tab { padding:6px 14px; border-radius:8px; text-decoration:none;
+                           font-size:.82rem; font-weight:600; color:var(--muted); }
+  .source-switch .ss-tab:hover { color:var(--fg); }
+  .source-switch .ss-tab.active { background:var(--accent); color:#fff; }
+</style>
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site-chrome.js" defer></script>
+<meta name="description" content="Browse real Model-Driven Telemetry (MDT) streamed from physical Cisco Catalyst switches — subscriptions by polling tier and YANG module, with the exact metrics and sample values each XPath produced.">
+<meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/telemetry-data.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/"},{"@type":"ListItem","position":2,"name":"Telemetry Data","item":"https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/telemetry-data.html"}]}</script>
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script src="assets/js/analytics-config.js"></script>
+<script src="assets/js/sw-register.js" defer></script>
+<script src="assets/js/analytics.js" defer></script>
+</head>
+<body>
+<header class="page">
+  <div class="wrap">
+    <h1>Telemetry Data</h1>
+    <p>Real Model-Driven Telemetry (MDT) streamed from physical Cisco Catalyst switches, browsable by polling tier, YANG module, and the exact metrics each subscription produced.</p>
+  </div>
+</header>
+<div class="nav">
+  <div class="wrap">
+    <a href="index.html">&larr; Hub</a>
+    <a href="telemetry.html">Telemetry &amp; Notifications</a>
+    <a href="live-data.html">Live Device Data</a>
+    <a href="fleet-telemetry.html">Fleet Telemetry</a>
+    <a href="swagger-oper-model/index.html">Operational APIs</a>
+    <span class="spacer"></span>
+    <span class="prov" id="prov"></span>
+  </div>
+</div>
+<main>
+  <div class="source-switch" role="tablist" aria-label="Real device data source">
+    <a class="ss-tab active" href="telemetry-data.html" aria-current="page">Telemetry (MDT)</a>
+    <a class="ss-tab" href="live-data.html">RESTCONF (GET)</a>
+  </div>
+  <div class="help" id="intro">
+    Each subscription below was streamed from a real lab switch over gRPC
+    dial-out &mdash; not synthetic schema data. Pick a polling tier, then a
+    subscription to see the exact <code>cisco.content.*</code> / <code>cisco.keys.*</code>
+    metrics and sample values that XPath produced. Subscriptions that streamed
+    no data (feature not configured) are marked <em>silent</em>.
+  </div>
+
+  <div class="cards" id="statCards"></div>
+
+  <div class="toolbar">
+    <div class="tier-tabs" id="tierTabs" role="tablist" aria-label="Polling tiers"></div>
+    <span class="spacer" style="flex:1"></span>
+    <span class="summary" id="summary" aria-live="polite"></span>
+  </div>
+
+  <div class="toolbar">
+    <input type="search" id="searchBox" placeholder="Filter by name, module, or XPath…" aria-label="Filter subscriptions" style="min-width:260px;">
+    <div class="chipfilter" id="statusFilter" aria-label="Filter by status"></div>
+  </div>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="phead">Subscriptions <span class="count" id="browserCount"></span></div>
+      <div class="browser" id="browser"><div class="placeholder">Loading…</div></div>
+    </div>
+    <div class="panel detail" id="detail">
+      <div class="placeholder">Select a subscription on the left to view its streamed metrics.</div>
+    </div>
+  </div>
+
+  <div class="empty" id="emptyState" hidden>
+    No telemetry dataset found. Run
+    <code>python scripts/build_telemetry_dataset.py</code> to generate
+    <code>telemetry-data.json</code>.
+  </div>
+</main>
+<script src="telemetry-data.js" defer></script>
+</body>
+</html>

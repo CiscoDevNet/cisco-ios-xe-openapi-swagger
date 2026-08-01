@@ -1,0 +1,892 @@
+# ============================================================
+# MDT Subscription Definitions
+# ============================================================
+# This file defines the 66 current telemetry subscriptions.
+# Used by: validate.py, generate_ios_config.py, collector-config.yaml
+#
+# Subscription IDs use tier-based numbering:
+#   30xxx = HOT (30s), 60xxx = WARM (60s), 50xxx = COOL (300s)
+#
+# Each entry maps a subscription ID to its XPath, polling tier,
+# YANG module, and expected key/metric fields for validation.
+# ============================================================
+
+receiver:
+  ip: RECEIVER_IP
+  port: 57500
+  protocol: grpc-tcp
+tiers:
+  hot:
+    interval_sec: 30
+    interval_cs: 3000
+  warm:
+    interval_sec: 60
+    interval_cs: 6000
+  cool:
+    interval_sec: 300
+    interval_cs: 30000
+subscriptions:
+  30001:
+    section: 1
+    name: CPU Utilization
+    yang_module: Cisco-IOS-XE-process-cpu-oper
+    xpath: /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization
+    tier: hot
+    expected_keys: []
+    expected_metrics:
+    - five-seconds
+    - one-minute
+    - five-minutes
+    expected_dimensions:
+    - source
+  30002:
+    section: 3
+    name: Process Memory
+    yang_module: Cisco-IOS-XE-process-memory-oper
+    xpath: /process-memory-ios-xe-oper:memory-usage-processes
+    tier: hot
+    expected_keys:
+    - pid
+    - name
+    expected_metrics:
+    - allocated-memory
+    - freed-memory
+    - holding-memory
+    expected_dimensions: []
+  30003:
+    section: 7
+    name: Interface Statistics
+    yang_module: Cisco-IOS-XE-interfaces-oper
+    xpath: /interfaces-ios-xe-oper:interfaces/interface
+    tier: hot
+    expected_keys:
+    - name
+    expected_metrics:
+    - statistics/in-octets
+    - statistics/out-octets
+    - statistics/in-errors
+    - statistics/out-errors
+    - statistics/in-discards
+    - statistics/out-discards
+    - statistics/rx-kbps
+    - statistics/tx-kbps
+    - statistics/num-flaps
+    expected_dimensions:
+    - admin-status
+    - oper-status
+    - interface-type
+  30004:
+    section: 44
+    name: CPU Punt/Inject Counters
+    yang_module: Cisco-IOS-XE-switch-dp-punt-inject-oper
+    xpath: /switch-dp-punt-inject-oper:switch-dp-punt-inject-oper-data/location/punt-inject-cpuq-brief-stats
+    tier: hot
+    expected_keys:
+    - cpuq-id
+    expected_metrics:
+    - rx-recv-cur
+    - rx-dropped-cur
+    expected_dimensions:
+    - cpu-punt-queue-name
+  60001:
+    section: 2
+    name: Memory Statistics
+    yang_module: Cisco-IOS-XE-memory-oper
+    xpath: /memory-ios-xe-oper:memory-statistics/memory-statistic
+    tier: warm
+    expected_keys:
+    - name
+    expected_metrics:
+    - total-memory
+    - used-memory
+    - free-memory
+    - lowest-usage
+    expected_dimensions: []
+  60002:
+    section: 4
+    name: System DRAM
+    yang_module: Cisco-IOS-XE-platform-software-oper
+    xpath: /platform-sw-ios-xe-oper:cisco-platform-software/control-processes
+    tier: warm
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  60003:
+    section: 5
+    name: Environment Sensors
+    yang_module: Cisco-IOS-XE-environment-oper
+    xpath: /environment-ios-xe-oper:environment-sensors
+    tier: warm
+    expected_keys:
+    - name
+    - location
+    expected_metrics:
+    - current-reading
+    expected_dimensions:
+    - state
+    - sensor-units
+    - sensor-name
+  60004:
+    section: 6
+    name: PoE Operational Data
+    yang_module: Cisco-IOS-XE-poe-oper
+    xpath: /poe-ios-xe-oper:poe-oper-data
+    tier: warm
+    expected_keys:
+    - intf-name
+    expected_metrics:
+    - power-used
+    - oper-power
+    expected_dimensions:
+    - oper-state
+    - pd-class
+  60005:
+    section: 8
+    name: Spanning Tree
+    yang_module: Cisco-IOS-XE-spanning-tree-oper
+    xpath: /stp-ios-xe-oper:stp-details
+    tier: warm
+    expected_keys:
+    - instance
+    expected_metrics:
+    - interfaces/interface/cost
+    - interfaces/interface/forward-transitions
+    expected_dimensions:
+    - interfaces/interface/role
+    - interfaces/interface/state
+  60006:
+    section: 9
+    name: Stack Health
+    yang_module: Cisco-IOS-XE-stack-oper
+    xpath: /stack-ios-xe-oper:stack-oper-data
+    tier: warm
+    expected_keys:
+    - chassis-number
+    expected_metrics:
+    - latency
+    expected_dimensions:
+    - role
+    - node-state
+    - priority
+  60007:
+    section: 15
+    name: Platform Components
+    yang_module: Cisco-IOS-XE-platform-oper
+    xpath: /platform-ios-xe-oper:components
+    tier: warm
+    expected_keys:
+    - cname
+    expected_metrics: []
+    expected_dimensions:
+    - state/type
+    - state/status
+  60008:
+    section: 24
+    name: BGP State
+    yang_module: Cisco-IOS-XE-bgp-oper
+    xpath: /bgp-ios-xe-oper:bgp-state-data
+    tier: warm
+    expected_keys:
+    - vrf
+    expected_metrics:
+    - prefix-activity/received/current-prefixes
+    - prefix-activity/sent/current-prefixes
+    expected_dimensions:
+    - session-state
+  60009:
+    section: 25
+    name: OSPF State
+    yang_module: Cisco-IOS-XE-ospf-oper
+    xpath: /ospf-ios-xe-oper:ospf-oper-data
+    tier: warm
+    expected_keys:
+    - router-id
+    expected_metrics: []
+    expected_dimensions:
+    - state
+  60010:
+    section: 33
+    name: NTP Synchronization
+    yang_module: Cisco-IOS-XE-ntp-oper
+    xpath: /ntp-ios-xe-oper:ntp-oper-data/ntp-status-info
+    tier: warm
+    expected_keys:
+    - assoc-id
+    expected_metrics:
+    - delay
+    - offset
+    - jitter
+    expected_dimensions:
+    - peer-selection-status
+  60011:
+    section: 34
+    name: BFD Sessions
+    yang_module: Cisco-IOS-XE-bfd-oper
+    xpath: /bfd-ios-xe-oper:bfd-state/sessions
+    tier: warm
+    expected_keys:
+    - type
+    expected_metrics: []
+    expected_dimensions:
+    - state
+  60012:
+    section: 35
+    name: HSRP State
+    yang_module: Cisco-IOS-XE-hsrp-oper
+    xpath: /hsrp-ios-xe-oper:hsrp-oper-data/hsrp-group-info
+    tier: warm
+    expected_keys:
+    - group-id
+    - if-name
+    expected_metrics:
+    - priority
+    expected_dimensions:
+    - state
+    - virtual-ip
+  60013:
+    section: 36
+    name: VRRP State
+    yang_module: Cisco-IOS-XE-vrrp-oper
+    xpath: /vrrp-ios-xe-oper:vrrp-oper-data/vrrp-oper-state
+    tier: warm
+    expected_keys:
+    - if-number
+    - group-id
+    - addr-type
+    expected_metrics:
+    - priority
+    expected_dimensions:
+    - vrrp-state
+  60014:
+    section: 37
+    name: Flow Monitor
+    yang_module: Cisco-IOS-XE-flow-monitor-oper
+    xpath: /flow-monitor-ios-xe-oper:flow-monitors/flow-monitor
+    tier: warm
+    expected_keys:
+    - name
+    expected_metrics:
+    - flows-added
+    - flows-aged
+    expected_dimensions: []
+  60015:
+    section: 38
+    name: IP SLA Probes
+    yang_module: Cisco-IOS-XE-ip-sla-oper
+    xpath: /ip-sla-ios-xe-oper:ip-sla-stats/sla-oper-entry
+    tier: warm
+    expected_keys:
+    - oper-id
+    expected_metrics:
+    - success-count
+    - failure-count
+    expected_dimensions:
+    - oper-type
+    - latest-return-code
+  60016:
+    section: 46
+    name: CEF / FIB State
+    yang_module: Cisco-IOS-XE-fib-oper
+    xpath: /fib-ios-xe-oper:fib-oper-data
+    tier: warm
+    expected_keys: []
+    expected_metrics:
+    - adjacency-table/num-adjacencies
+    - adjacency-table/num-complete-adjacencies
+    - adjacency-table/num-incomplete-adjacencies
+    expected_dimensions: []
+  60017:
+    section: 49
+    name: BGP Neighbor Detail
+    yang_module: Cisco-IOS-XE-bgp-nbr-oper
+    xpath: /bgp-nbr-ios-xe-oper:bgp-nbr-oper-data
+    tier: warm
+    expected_keys:
+    - bgp-nbr-data/ip
+    - bgp-nbr-data/if-name
+    - bgp-nbr-data/af
+    - bgp-nbr-data/ni-name
+    expected_metrics:
+    - bgp-nbr-cntrs/prfx-act/rcvd/cur-prfx
+    - bgp-nbr-cntrs/prfx-act/sent/cur-prfx
+    - bgp-nbr-cntrs/rcvd/updates
+    - bgp-nbr-cntrs/sent/updates
+    - bgp-nbr-cntrs/outq-dep
+    expected_dimensions:
+    - bgp-nbr-data/conn/state
+    - bgp-nbr-data/conn/mode
+  60018:
+    section: 53
+    name: IS-IS Interface Detail
+    yang_module: Cisco-IOS-XE-isis-intf-oper
+    xpath: /isis-intf-ios-xe-oper:isis-intf-oper-data/isis-if-tag-type
+    tier: warm
+    expected_keys:
+    - tag
+    - isis-if/if-name
+    - isis-if-nbr/system-id
+    - isis-if-nbr/level
+    expected_metrics: []
+    expected_dimensions:
+    - isis-if/circuit-type
+    - isis-if/is-enabled
+    - isis-if-nbr/adj-state
+  60019:
+    section: 54
+    name: Multicast Routing State
+    yang_module: Cisco-IOS-XE-mroute-oper
+    xpath: /mroute-ios-xe-oper:mroute-oper-data/mroute-state
+    tier: warm
+    expected_keys:
+    - source
+    - group
+    - vrf
+    - af
+    expected_metrics:
+    - sw-total
+    - sw-packets-per-second
+    - sw-kbits-per-second
+    - sw-rpf-failed
+    expected_dimensions:
+    - ingress-if/if-name
+    - rpf-nbr
+    - mroute-mode
+  60020:
+    section: 55
+    name: Stack Member / Stackwise Virtual Detail
+    yang_module: Cisco-IOS-XE-stack-member-oper
+    xpath: /stack-member-ios-xe-oper:stack-member-oper-data/location/stack-member-info
+    tier: warm
+    expected_keys:
+    - chassis-num
+    expected_metrics:
+    - latency
+    - svl-bw
+    expected_dimensions:
+    - stack-mode
+  60021:
+    section: 56
+    name: Tunnel Interface State
+    yang_module: Cisco-IOS-XE-tunnel-oper
+    xpath: /ios-tunnel-oper:tunnel-oper-data/tunnel-if
+    tier: warm
+    expected_keys:
+    - name
+    expected_metrics:
+    - mtu
+    - ip-mtu
+    - transport-mtu
+    - tx-bandwidth
+    - rx-bandwidth
+    expected_dimensions:
+    - mode
+    - admin-status
+    - status
+    - intf-vrf
+  60022:
+    section: 59
+    name: PIM Multicast State
+    yang_module: Cisco-IOS-XE-pim-oper
+    xpath: /pim-ios-xe-oper:pim-oper-data
+    tier: warm
+    expected_keys:
+    - af
+    - vrf
+    - if-name
+    expected_metrics:
+    - dr-priority
+    expected_dimensions:
+    - nbr-addr
+    - is-dr
+    - pim-mode
+  60023:
+    section: 60
+    name: MPLS LDP Operational State
+    yang_module: Cisco-IOS-XE-mpls-ldp-oper
+    xpath: /mpls-ldp-ios-xe-oper:mpls-ldp-oper-data
+    tier: warm
+    expected_keys:
+    - vrf-name
+    expected_metrics: []
+    expected_dimensions:
+    - peer-id
+    - state
+    - sess-up-time
+    - graceful-restart-enabled
+  60024:
+    section: 62
+    name: LISP Operational State
+    yang_module: Cisco-IOS-XE-lisp-oper
+    xpath: /lisp-ios-xe-oper:lisp-state
+    tier: warm
+    expected_keys:
+    - instance-id
+    - af
+    expected_metrics: []
+    expected_dimensions:
+    - local-eids/local-eid/prefix
+    - map-servers/map-server/addr
+    - map-servers/map-server/state
+  60025:
+    section: 63
+    name: VXLAN NVE Tunnel Endpoints
+    yang_module: Cisco-IOS-XE-nve-oper
+    xpath: /nve-ios-xe-oper:nve-oper-data
+    tier: warm
+    expected_keys:
+    - if-name
+    expected_metrics: []
+    expected_dimensions:
+    - src-if-name
+    - admin-state
+    - oper-state
+    - vni/vni-id
+    - vni/vni-state
+  60026:
+    section: 64
+    name: EVPN Operational State
+    yang_module: Cisco-IOS-XE-evpn-oper
+    xpath: /evpn-ios-xe-oper:evpn-oper-data
+    tier: warm
+    expected_keys:
+    - evi
+    expected_metrics:
+    - mac-count
+    - ip-count
+    expected_dimensions:
+    - encap-type
+    - rd
+    - import-rt
+    - export-rt
+  60027:
+    section: 67
+    name: IETF Interfaces Operational State
+    yang_module: ietf-interfaces
+    xpath: /if:interfaces-state/interface
+    tier: warm
+    expected_keys:
+    - name
+    expected_metrics:
+    - statistics/in-octets
+    - statistics/out-octets
+    - statistics/in-unicast-pkts
+    - statistics/out-unicast-pkts
+    - statistics/in-errors
+    - statistics/out-errors
+    - statistics/in-discards
+    - statistics/out-discards
+    expected_dimensions:
+    - admin-status
+    - oper-status
+    - speed
+  60028:
+    section: 26
+    name: IETF Routing State
+    yang_module: ietf-routing
+    xpath: /rt:routing-state
+    tier: warm
+    expected_keys:
+    - routing-instance/name
+    expected_metrics: []
+    expected_dimensions:
+    - routing-instance/type
+    - routing-instance/ribs/rib/name
+  60029:
+    section: 45
+    name: PoE Health
+    yang_module: Cisco-IOS-XE-poe-health-oper
+    xpath: /poe-health-xe:poe-health-oper-data
+    tier: warm
+    expected_keys:
+    - port-num
+    expected_metrics:
+    - port-voltage
+    - signal-pair-info/consumed-power
+    expected_dimensions:
+    - port-state
+    - port-event
+  50001:
+    section: 10
+    name: VLANs
+    yang_module: Cisco-IOS-XE-vlan-oper
+    xpath: /vlan-ios-xe-oper:vlans
+    tier: cool
+    expected_keys:
+    - id
+    expected_metrics: []
+    expected_dimensions:
+    - name
+    - status
+  50002:
+    section: 11
+    name: MAC Address Table
+    yang_module: Cisco-IOS-XE-matm-oper
+    xpath: /matm-ios-xe-oper:matm-oper-data
+    tier: cool
+    expected_keys:
+    - vlan-id-number
+    expected_metrics: []
+    expected_dimensions:
+    - table-type
+  50003:
+    section: 12
+    name: ARP Table
+    yang_module: Cisco-IOS-XE-arp-oper
+    xpath: /arp-ios-xe-oper:arp-data
+    tier: cool
+    expected_keys:
+    - vrf
+    - address
+    expected_metrics: []
+    expected_dimensions:
+    - hardware
+    - interface
+    - mode
+  50004:
+    section: 13
+    name: LLDP Neighbors
+    yang_module: Cisco-IOS-XE-lldp-oper
+    xpath: /lldp-ios-xe-oper:lldp-entries
+    tier: cool
+    expected_keys:
+    - local-interface
+    expected_metrics: []
+    expected_dimensions:
+    - identifier
+    - port-id
+    - system-name
+  50005:
+    section: 14
+    name: CDP Neighbors
+    yang_module: Cisco-IOS-XE-cdp-oper
+    xpath: /cdp-ios-xe-oper:cdp-neighbor-details
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions:
+    - device-name
+    - local-intf-name
+    - platform-name
+  50006:
+    section: 16
+    name: Device Hardware
+    yang_module: Cisco-IOS-XE-device-hardware-oper
+    xpath: /device-hardware-xe-oper:device-hardware-data/device-hardware
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions:
+    - software-version
+    - boot-time
+    - last-reboot-reason
+  50007:
+    section: 17
+    name: Switchport
+    yang_module: Cisco-IOS-XE-switchport-oper
+    xpath: /switchport-ios-xe-oper:switchport-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50008:
+    section: 18
+    name: Transceiver / Optics
+    yang_module: Cisco-IOS-XE-transceiver-oper
+    xpath: /xcvr-ios-xe-oper:transceiver-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50009:
+    section: 19
+    name: UDLD
+    yang_module: Cisco-IOS-XE-udld-oper
+    xpath: /udld-ios-xe-oper:udld-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50010:
+    section: 20
+    name: 802.1X / Identity Sessions
+    yang_module: Cisco-IOS-XE-identity-oper
+    xpath: /identity-ios-xe-oper:identity-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions:
+    - state
+  50011:
+    section: 21
+    name: TCAM Utilization
+    yang_module: Cisco-IOS-XE-tcam-oper
+    xpath: /tcam-ios-xe-oper:tcam-details
+    tier: cool
+    expected_keys:
+    - asic-no
+    - name
+    expected_metrics:
+    - tcam-entries-used
+    expected_dimensions: []
+  50012:
+    section: 22
+    name: MDT Subscription Health
+    yang_module: Cisco-IOS-XE-mdt-oper-v2
+    xpath: /mdt-oper-v2:mdt-oper-v2-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50013:
+    section: 23
+    name: Software Install
+    yang_module: Cisco-IOS-XE-install-oper
+    xpath: /install-ios-xe-oper:install-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50014:
+    section: 27
+    name: DHCP Pool Stats
+    yang_module: Cisco-IOS-XE-dhcp-oper
+    xpath: /dhcp-ios-xe-oper:dhcp-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50015:
+    section: 28
+    name: High Availability
+    yang_module: Cisco-IOS-XE-ha-oper
+    xpath: /ha-ios-xe-oper:ha-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50016:
+    section: 29
+    name: Linecard Status
+    yang_module: Cisco-IOS-XE-linecard-oper
+    xpath: /linecard-ios-xe-oper:linecard-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50017:
+    section: 30
+    name: TrustSec
+    yang_module: Cisco-IOS-XE-trustsec-oper
+    xpath: /trustsec-ios-xe-oper:trustsec-state
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  50018:
+    section: 31
+    name: LACP / Port-Channel
+    yang_module: Cisco-IOS-XE-interfaces-oper
+    xpath: /interfaces-ios-xe-oper:interfaces/interface/lag-aggregate-state
+    tier: cool
+    expected_keys:
+    - name
+    expected_metrics: []
+    expected_dimensions: []
+  50019:
+    section: 32
+    name: ACL Hit Counters
+    yang_module: Cisco-IOS-XE-acl-oper
+    xpath: /acl-ios-xe-oper:access-lists/access-list
+    tier: cool
+    expected_keys:
+    - access-control-list-name
+    expected_metrics:
+    - match-counter
+    expected_dimensions: []
+  50020:
+    section: 39
+    name: AAA / RADIUS
+    yang_module: Cisco-IOS-XE-aaa-oper
+    xpath: /aaa-ios-xe-oper:aaa-data/aaa-radius-stats
+    tier: cool
+    expected_keys:
+    - group-name
+    - radius-server-ip
+    expected_metrics:
+    - authen-access-accepts
+    - authen-access-rejects
+    expected_dimensions: []
+  50021:
+    section: 40
+    name: Port Security
+    yang_module: Cisco-IOS-XE-psecure-oper
+    xpath: /psecure-ios-xe-oper:psecure-oper-data/psecure-state
+    tier: cool
+    expected_keys:
+    - if-name
+    expected_metrics: []
+    expected_dimensions: []
+  50022:
+    section: 41a
+    name: MACsec
+    yang_module: Cisco-IOS-XE-macsec-oper
+    xpath: /macsec-ios-xe-oper:macsec-oper-data/macsec-statistics
+    tier: cool
+    expected_keys:
+    - if-name
+    expected_metrics:
+    - tx-untag-pkts
+    - rx-notag-pkts
+    - sc-encrypt-pkts
+    expected_dimensions: []
+  50023:
+    section: 41b
+    name: MKA
+    yang_module: Cisco-IOS-XE-mka-oper
+    xpath: /mka-ios-xe-oper:mka-oper-data/mka-statistics
+    tier: cool
+    expected_keys:
+    - if-name
+    expected_metrics:
+    - mkpdu-stats-rx
+    - mkpdu-stats-tx
+    expected_dimensions: []
+  50024:
+    section: 42
+    name: VRF
+    yang_module: Cisco-IOS-XE-vrf-oper
+    xpath: /vrf-ios-xe-oper:vrf-oper-data/vrf-entry
+    tier: cool
+    expected_keys:
+    - vrf-name
+    expected_metrics: []
+    expected_dimensions:
+    - address-family
+  50025:
+    section: 43
+    name: Data Plane Resources
+    yang_module: Cisco-IOS-XE-switch-dp-resources-oper
+    xpath: /dp-resources-oper:switch-dp-resources-oper-data/location/dp-feature-resource
+    tier: cool
+    expected_keys:
+    - feature
+    - protocol
+    - direction
+    expected_metrics:
+    - max-tcam-percentage-used
+    - max-em-percentage-used
+    expected_dimensions: []
+  50026:
+    section: 47
+    name: EIGRP
+    yang_module: Cisco-IOS-XE-eigrp-oper
+    xpath: /eigrp-ios-xe-oper:eigrp-oper-data/eigrp-instance
+    tier: cool
+    expected_keys:
+    - afi
+    - vrf-name
+    - as-num
+    expected_metrics: []
+    expected_dimensions: []
+  50027:
+    section: 48
+    name: IS-IS
+    yang_module: Cisco-IOS-XE-isis-oper
+    xpath: /isis-ios-xe-oper:isis-oper-data/isis-instance
+    tier: cool
+    expected_keys:
+    - tag
+    expected_metrics: []
+    expected_dimensions:
+    - state
+  50028:
+    section: 50
+    name: BGP RIB Detail
+    yang_module: Cisco-IOS-XE-bgp-rib-oper
+    xpath: /bgp-ios-rib-xe-oper:bgp-rib-oper-data/bgp-route
+    tier: cool
+    expected_keys:
+    - prefix
+    - ni-name
+    - afi-safi
+    expected_metrics:
+    - version
+    - avail-paths
+    - bgp-path/metric
+    - bgp-path/lp
+    - bgp-path/weight
+    expected_dimensions:
+    - ni-type
+    - bgp-path/origin
+  50029:
+    section: 51
+    name: High-Scale ARP
+    yang_module: Cisco-IOS-XE-ip-arp-oper
+    xpath: /ip-arp-ios-xe-oper:ip-arp-oper-data/ni-ip-arp/ip-arp-entry
+    tier: cool
+    expected_keys:
+    - addr
+    - if-name
+    expected_metrics: []
+    expected_dimensions:
+    - hw-addr
+    - mode
+  50030:
+    section: 52
+    name: IPv6 Neighbor Discovery
+    yang_module: Cisco-IOS-XE-ipv6-nd-oper
+    xpath: /ipv6-nd-ios-xe-oper:ipv6-nd-oper-data/ni-ipv6-nd/ipv6-nd-entry
+    tier: cool
+    expected_keys:
+    - v6addr
+    - if-name
+    expected_metrics: []
+    expected_dimensions:
+    - mac-addr
+    - mode
+    - state
+    - is-router
+  50031:
+    section: 57
+    name: YANG Management Plane Interfaces
+    yang_module: Cisco-IOS-XE-yang-interfaces-oper
+    xpath: /yang-interfaces-oper:yang-interfaces-oper-data
+    tier: cool
+    expected_keys:
+    - local-vrf/vrf-name
+    expected_metrics: []
+    expected_dimensions:
+    - local-vrf/state
+    - ssh-server/hostkey-name
+    - ssh-server/hostkey-alg/rsa-sha2-256
+  50032:
+    section: 61
+    name: MPLS Forwarding (LFIB)
+    yang_module: Cisco-IOS-XE-mpls-forwarding-oper
+    xpath: /mpls-forwarding-ios-xe-oper:mpls-forwarding-oper-data
+    tier: cool
+    expected_keys:
+    - local-label
+    expected_metrics:
+    - bytes-switched
+    expected_dimensions:
+    - outgoing-label
+    - prefix
+    - outgoing-interface
+    - next-hop
+  50033:
+    section: 65
+    name: PTP / SyncE Timing
+    yang_module: Cisco-IOS-XE-ptp-synce-oper
+    xpath: /ptp-synce-ios-xe-oper:ptp-synce-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics:
+    - mean-path-delay
+    - offset-from-master
+    - steps-removed
+    expected_dimensions:
+    - clock-id
+    - domain
+    - clock-state
+    - gm-clock-id

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+<title>Fleet Telemetry — Cisco IOS XE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+  :root { --bg:#f7f8fa; --fg:#1f2933; --card:#fff; --border:#e3e8ef; --accent:#1565c0;
+          --accent2:#00bceb; --muted:#7b8794; --ok:#2e7d32; --mono:"Roboto Mono","SF Mono",Consolas,Menlo,monospace; }
+  body.dark { --bg:#0f1419; --fg:#e6edf3; --card:#1a2028; --border:#2d3742; --accent:#42a5f5; --muted:#8b96a4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--fg); }
+  header.page { background:linear-gradient(135deg,#0d47a1 0%,#1565c0 55%,#00bceb 100%); color:#fff; padding:22px 20px 18px; }
+  header.page .wrap { max-width:1500px; margin:0 auto; }
+  header.page h1 { margin:0 0 4px; font-size:1.55rem; }
+  header.page p { margin:0; opacity:.9; font-size:.9rem; }
+  .nav { padding:9px 20px; background:var(--card); border-bottom:1px solid var(--border); }
+  .nav .wrap { max-width:1500px; margin:0 auto; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .nav a { color:var(--accent); text-decoration:none; font-weight:500; font-size:.85rem; }
+  .nav a:hover { text-decoration:underline; }
+  .nav .prov { margin-left:auto; font-size:.78rem; color:var(--muted); font-family:var(--mono); }
+  input[type=search] { background:var(--bg); color:var(--fg); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font:inherit; font-size:.85rem; }
+  main { max-width:1500px; margin:18px auto; padding:0 20px 60px; }
+  .toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .device-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .device-tab { padding:6px 14px; border-radius:18px; border:1px solid var(--border); background:var(--card); color:var(--fg);
+                cursor:pointer; font:inherit; font-size:.82rem; font-weight:600; display:flex; align-items:center; gap:7px; }
+  .device-tab .n { font-size:.72rem; color:var(--muted); font-weight:400; }
+  .device-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .device-tab.active .n { color:rgba(255,255,255,.85); }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { padding:4px 10px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--fg);
+          cursor:pointer; font:inherit; font-size:.76rem; display:flex; align-items:center; gap:6px; }
+  .chip .n { color:var(--muted); font-size:.72rem; }
+  .chip.active { color:#fff; border-color:transparent; }
+  .cat-oper{background:#2196F3}.cat-openconfig{background:#009688}.cat-native-config{background:#4CAF50}
+  .cat-cfg{background:#00BCD4}.cat-ietf{background:#FF5722}.cat-other{background:#757575}
+  .cat-mib{background:#9C27B0}.cat-wireless{background:#E91E63}
+  .catdot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .summary { color:var(--muted); font-family:var(--mono); font-size:.78rem; }
+  .mtiles { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .mtile { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 18px; min-width:130px; flex:1 1 130px; }
+  .mtile .big { font-size:1.7rem; font-weight:700; font-family:var(--mono); line-height:1.1; }
+  .mtile .lbl { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:3px; }
+  .charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-bottom:22px; }
+  .chartcard { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .chartcard h3 { margin:0 0 8px; font-size:.85rem; font-weight:600; }
+  .chartcard .cwrap { position:relative; height:230px; }
+  .layout { display:grid; grid-template-columns:minmax(340px,480px) 1fr; gap:18px; align-items:start; }
+  @media (max-width:900px){ .layout { grid-template-columns:1fr; } }
+  .panel { background:var(--card); border:1px solid var(--border); border-radius:10px; }
+  .panel .phead { padding:10px 14px; border-bottom:1px solid var(--border); font-weight:600; font-size:.9rem; display:flex; gap:8px; align-items:center; }
+  .panel .phead .count { color:var(--muted); font-weight:400; font-size:.8rem; }
+  .browser { max-height:74vh; overflow:auto; }
+  .prow { padding:9px 14px; cursor:pointer; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:9px; }
+  .prow:hover { background:rgba(21,101,192,.06); }
+  .prow.sel { background:rgba(21,101,192,.12); }
+  .prow .p { min-width:0; flex:1; font-family:var(--mono); font-size:.76rem; word-break:break-all; color:var(--accent); }
+  .prow .rc { font-size:.7rem; color:var(--muted); flex:none; }
+  .detail { min-height:320px; }
+  .detail .dhead { padding:14px 16px; border-bottom:1px solid var(--border); }
+  .detail .dpath { font-family:var(--mono); font-size:.82rem; word-break:break-all; }
+  .detail .dmeta { font-size:.75rem; color:var(--muted); margin-top:6px; }
+  .detail .body { padding:6px 0 10px; }
+  .ftable { width:100%; border-collapse:collapse; font-size:.78rem; }
+  .ftable td { padding:6px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .ftable td.k { font-family:var(--mono); font-size:.74rem; color:var(--muted); word-break:break-all; width:55%; }
+  .ftable td.v { font-family:var(--mono); font-size:.74rem; color:var(--fg); word-break:break-all; }
+  .placeholder { padding:40px 20px; text-align:center; color:var(--muted); font-size:.9rem; }
+  .empty { padding:50px 20px; text-align:center; color:var(--muted); }
+  .help { background:rgba(21,101,192,.06); border-left:3px solid var(--accent); padding:10px 14px; border-radius:4px; margin-bottom:14px; font-size:.84rem; }
+  .keybadge { display:inline-block; font-size:.66rem; background:var(--accent2); color:#003; padding:1px 6px; border-radius:8px; margin-left:6px; }
+</style>
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site-chrome.js" defer></script>
+<meta name="description" content="Browse REAL Model-Driven Telemetry captured live from a fleet of Cisco Catalyst switches and a 9800 WLC — per device (PID) and per model flavor (oper, OpenConfig, native, MIB, wireless), with the actual keys and leaf values that streamed.">
+<meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/fleet-telemetry.html">
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script src="assets/js/analytics-config.js"></script>
+<script src="assets/js/sw-register.js" defer></script>
+<script src="assets/js/analytics.js" defer></script>
+</head>
+<body>
+<header class="page">
+  <div class="wrap">
+    <h1>Fleet Telemetry</h1>
+    <p>Real Model-Driven Telemetry captured live from the lab fleet — per device and per model flavor (oper, OpenConfig, native, MIB, wireless), showing the actual keys and leaf values each XPath streamed.</p>
+  </div>
+</header>
+<div class="nav">
+  <div class="wrap">
+    <a href="index.html">&larr; Hub</a>
+    <a href="telemetry.html">Telemetry &amp; Notifications</a>
+    <a href="telemetry-data.html">Telemetry Data</a>
+    <a href="live-data.html">Live Device Data</a>
+    <span class="prov" id="prov"></span>
+  </div>
+</div>
+<main>
+  <div class="help">
+    Each entry is a real payload streamed over gRPC dial-out from a physical device. Pick a
+    <strong>device</strong>, filter by <strong>model flavor</strong>, then a path to see the streamed
+    <strong>keys</strong> <span class="keybadge">key</span> and leaf values. Coverage grows as the
+    exhaustive collection runs.
+  </div>
+  <section class="mtiles" id="mtiles" aria-label="Summary metrics"></section>
+  <section class="charts" aria-label="Summary charts">
+    <div class="chartcard"><h3>Streamed paths by model flavor</h3><div class="cwrap"><canvas id="chartCat"></canvas></div></div>
+    <div class="chartcard"><h3>Streamed paths per device</h3><div class="cwrap"><canvas id="chartDev"></canvas></div></div>
+    <div class="chartcard"><h3>Records captured per device</h3><div class="cwrap"><canvas id="chartRec"></canvas></div></div>
+  </section>
+  <div class="toolbar">
+    <div class="device-tabs" id="deviceTabs" role="tablist" aria-label="Devices"></div>
+    <span class="summary" id="summary" aria-live="polite" style="margin-left:auto;"></span>
+  </div>
+  <div class="toolbar">
+    <input type="search" id="searchBox" placeholder="Filter paths…" aria-label="Filter paths" style="min-width:220px;">
+    <div class="chips" id="catChips" aria-label="Model flavors"></div>
+  </div>
+  <div class="layout">
+    <div class="panel">
+      <div class="phead">Streamed paths <span class="count" id="browserCount"></span></div>
+      <div class="browser" id="browser"><div class="placeholder">Loading…</div></div>
+    </div>
+    <div class="panel detail" id="detail">
+      <div class="placeholder">Select a path to view its streamed keys and values.</div>
+    </div>
+  </div>
+  <div class="empty" id="emptyState" hidden>
+    No live dataset yet. Run <code>build_live_dataset.py</code> to generate <code>telemetry-live-data.json</code>.
+  </div>
+</main>
+<script src="assets/vendor/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
+<script src="fleet-telemetry.js" defer></script>
+</body>
+</html>

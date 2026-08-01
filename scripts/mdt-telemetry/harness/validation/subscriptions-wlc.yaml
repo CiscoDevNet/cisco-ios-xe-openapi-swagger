@@ -1,0 +1,124 @@
+# ============================================================
+# WLC (Catalyst 9800) MDT Subscription Definitions
+# ============================================================
+# Wireless telemetry subscriptions for Catalyst 9800 controllers.
+# The switching set (subscriptions.yaml) targets wired/switching oper
+# models; a C9800 streams the Cisco-IOS-XE-wireless-* oper models instead,
+# so it needs this separate, platform-specific set.
+#
+# XPaths are the top-level oper-data containers that IOS XE advertises as
+# MDT-capable in Cisco-IOS-XE-mdt-capabilities-oper (verified against the
+# 26.1.1 oper specs in this repo). expected_keys / expected_metrics are left
+# empty on purpose: run validate.py against a live C9800 to discover the exact
+# keys/metrics/dimensions each container returns, then fill them in.
+#
+# Subscription IDs use a WLC-specific range so they never collide with the
+# switching set:  61xxx = WLC WARM (60s),  51xxx = WLC COOL (300s).
+# Wireless containers can be large; none are placed in the 30s HOT tier.
+# ============================================================
+
+receiver:
+  ip: RECEIVER_IP
+  port: 57500
+  protocol: grpc-tcp
+tiers:
+  hot:
+    interval_sec: 30
+    interval_cs: 3000
+  warm:
+    interval_sec: 60
+    interval_cs: 6000
+  cool:
+    interval_sec: 300
+    interval_cs: 30000
+subscriptions:
+  61001:
+    section: w1
+    name: Wireless Clients
+    yang_module: Cisco-IOS-XE-wireless-client-oper
+    xpath: /wireless-client-oper:client-oper-data
+    tier: warm
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  61002:
+    section: w2
+    name: Access Points
+    yang_module: Cisco-IOS-XE-wireless-access-point-oper
+    xpath: /wireless-access-point-oper:access-point-oper-data
+    tier: warm
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51001:
+    section: w3
+    name: Radio Resource Management (RRM)
+    yang_module: Cisco-IOS-XE-wireless-rrm-oper
+    xpath: /wireless-rrm-oper:rrm-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51002:
+    section: w4
+    name: Rogue Detection
+    yang_module: Cisco-IOS-XE-wireless-rogue-oper
+    xpath: /wireless-rogue-oper:rogue-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51003:
+    section: w5
+    name: Mobility
+    yang_module: Cisco-IOS-XE-wireless-mobility-oper
+    xpath: /wireless-mobility-oper:mobility-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51004:
+    section: w6
+    name: Mesh
+    yang_module: Cisco-IOS-XE-wireless-mesh-oper
+    xpath: /wireless-mesh-oper:mesh-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51005:
+    section: w7
+    name: General / System
+    yang_module: Cisco-IOS-XE-wireless-general-oper
+    xpath: /wireless-general-oper:general-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51006:
+    section: w8
+    name: Location
+    yang_module: Cisco-IOS-XE-wireless-location-oper
+    xpath: /wireless-location-oper:location-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51007:
+    section: w9
+    name: NMSP (Network Mobility Services)
+    yang_module: Cisco-IOS-XE-wireless-nmsp-oper
+    xpath: /wireless-nmsp-oper:nmsp-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []
+  51008:
+    section: w10
+    name: Wireless Multicast
+    yang_module: Cisco-IOS-XE-wireless-mcast-oper
+    xpath: /wireless-mcast-oper:mcast-oper-data
+    tier: cool
+    expected_keys: []
+    expected_metrics: []
+    expected_dimensions: []

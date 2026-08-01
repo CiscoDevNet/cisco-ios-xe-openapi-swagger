@@ -1,0 +1,992 @@
+<dashboard version="1.1" theme="dark">
+  <label>Catalyst 9300 MDT Telemetry</label>
+  <description>Model-Driven Telemetry dashboard for Catalyst 9300 switching — 48 YANG operational data models via gRPC dial-out to Splunk Metrics Index</description>
+
+  <!-- ============================================================ -->
+  <!-- Global Inputs                                                 -->
+  <!-- ============================================================ -->
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="timeRange" searchWhenChanged="true">
+      <label>Time Range</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>Switch</label>
+      <choice value="*">All Switches</choice>
+      <default>*</default>
+      <search>
+        <query>| mstats count WHERE index=cisco_mdt BY host | fields host</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+  </fieldset>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Device Overview (§16)                                    -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§16 — Device Overview</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS value WHERE index=cisco_mdt source="*device-hardware*" host="$host$" BY host, software_version, boot_time, last_reboot_reason, serial_number span=5m
+| stats latest(software_version) AS "SW Version", latest(boot_time) AS "Boot Time", latest(last_reboot_reason) AS "Reboot Reason", latest(serial_number) AS "Serial" BY host
+| eval Uptime = tostring(now() - strptime('Boot Time', "%Y-%m-%dT%H:%M:%S"), "duration")
+| rename host AS "Switch"
+| table Switch, "SW Version", Uptime, "Reboot Reason", Serial</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: CPU, Memory, DRAM (§1, §2, §4)                          -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§1 — CPU Utilization (%)</title>
+      <chart>
+        <search>
+          <query>| mstats avg(five_seconds) AS "5s", avg(one_minute) AS "1m", avg(five_minutes) AS "5m" WHERE index=cisco_mdt source="*cpu-usage*" host="$host$" BY host span=1m
+| timechart avg("5s") AS "5-Second", avg("1m") AS "1-Minute", avg("5m") AS "5-Minute"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">CPU %</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§1 — CPU 5-Second (Current)</title>
+      <single>
+        <search>
+          <query>| mstats latest(five_seconds) AS cpu WHERE index=cisco_mdt source="*cpu-usage*" host="$host$" BY host span=1m
+| stats latest(cpu) AS cpu BY host</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[50,80]</option>
+        <option name="unit">%</option>
+        <option name="useColors">true</option>
+      </single>
+    </panel>
+    <panel>
+      <title>§2 — Memory Utilization</title>
+      <chart>
+        <search>
+          <query>| mstats latest(used_memory) AS used, latest(free_memory) AS free WHERE index=cisco_mdt source="*memory-statistics*" host="$host$" name="Processor" BY host span=1m
+| eval used_gb = round(used/1073741824, 2), free_gb = round(free/1073741824, 2)
+| timechart latest(used_gb) AS "Used (GB)", latest(free_gb) AS "Free (GB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">GB</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§4 — System DRAM</title>
+      <single>
+        <search>
+          <query>| mstats latest(memory_stats_used_number) AS used, latest(memory_stats_total) AS total WHERE index=cisco_mdt source="*platform-software*" host="$host$" BY host span=5m
+| stats latest(used) AS used, latest(total) AS total BY host
+| eval pct = round(used/total*100, 1)
+| stats avg(pct) AS pct</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[70,90]</option>
+        <option name="unit">%</option>
+        <option name="useColors">true</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Process Memory (§3)                                      -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§3 — Top 10 Processes by Holding Memory</title>
+      <chart>
+        <search>
+          <query>| mstats latest(holding_memory) AS holding WHERE index=cisco_mdt source="*process-memory*" host="$host$" BY name span=5m
+| stats latest(holding) AS holding BY name
+| sort -holding
+| head 10
+| eval holding_mb = round(holding/1048576, 2)
+| fields name, holding_mb</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleX.text">Process</option>
+        <option name="charting.axisTitleY.text">MB</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Environment Sensors (§5)                                 -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§5 — Temperature Sensors</title>
+      <chart>
+        <search>
+          <query>| mstats avg(current_reading) AS reading WHERE index=cisco_mdt source="*environment*" host="$host$" sensor_units="celsius" BY name, host span=1m
+| timechart avg(reading) BY name</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">°C</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§5 — Power Supply Status</title>
+      <table>
+        <search>
+          <query>| mstats latest(current_reading) AS watts WHERE index=cisco_mdt source="*environment*" host="$host$" sensor_name="power*" BY name, location, state, host span=5m
+| stats latest(watts) AS Watts, latest(state) AS State BY host, name, location
+| rename host AS Switch, name AS Sensor, location AS Location</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§5 — Fan Status</title>
+      <table>
+        <search>
+          <query>| mstats latest(current_reading) AS rpm WHERE index=cisco_mdt source="*environment*" host="$host$" sensor_name="fan*" BY name, location, state, host span=5m
+| stats latest(rpm) AS RPM, latest(state) AS State BY host, name
+| rename host AS Switch, name AS Sensor</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: PoE (§6)                                                 -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§6 — PoE Per-Port Power Consumption</title>
+      <chart>
+        <search>
+          <query>| mstats latest(power_used) AS power WHERE index=cisco_mdt source="*poe-oper*" host="$host$" BY intf_name, host span=5m
+| stats latest(power) AS power_mw BY host, intf_name
+| where power_mw > 0
+| sort -power_mw
+| head 24
+| eval power_w = round(power_mw/1000, 2)
+| rename host AS Switch, intf_name AS Interface, power_w AS "Power (W)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleY.text">Watts</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§6 — PoE Status Table</title>
+      <table>
+        <search>
+          <query>| mstats latest(power_used) AS power, latest(oper_power) AS oper WHERE index=cisco_mdt source="*poe-oper*" host="$host$" BY intf_name, oper_state, pd_class, host span=5m
+| stats latest(power) AS "Power (mW)", latest(oper) AS "Oper Power", latest(oper_state) AS Status, latest(pd_class) AS "PD Class" BY host, intf_name
+| where 'Power (mW)' > 0
+| rename host AS Switch, intf_name AS Interface</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Interface Statistics (§7)                                -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§7 — Interface RX/TX (Kbps)</title>
+      <input type="dropdown" token="intf_filter" searchWhenChanged="true">
+        <label>Interface</label>
+        <choice value="*">All</choice>
+        <default>*</default>
+        <search>
+          <query>| mstats count WHERE index=cisco_mdt source="*interfaces*" host="$host$" BY name | where NOT match(name, "^(Vlan|Loop|Null|Port-channel)") | fields name | sort name</query>
+          <earliest>-1h</earliest>
+          <latest>now</latest>
+        </search>
+        <fieldForLabel>name</fieldForLabel>
+        <fieldForValue>name</fieldForValue>
+      </input>
+      <chart>
+        <search>
+          <query>| mstats avg(statistics_rx_kbps) AS rx, avg(statistics_tx_kbps) AS tx WHERE index=cisco_mdt source="*interfaces*" host="$host$" name="$intf_filter$" BY name span=1m
+| timechart avg(rx) AS "RX Kbps", avg(tx) AS "TX Kbps"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleY.text">Kbps</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§7 — Interface Errors &amp; Discards</title>
+      <chart>
+        <search>
+          <query>| mstats rate(statistics_in_errors) AS in_err, rate(statistics_out_errors) AS out_err, rate(statistics_in_discards) AS in_disc, rate(statistics_out_discards) AS out_disc WHERE index=cisco_mdt source="*interfaces*" host="$host$" name="$intf_filter$" BY name span=1m
+| timechart sum(in_err) AS "In Errors", sum(out_err) AS "Out Errors", sum(in_disc) AS "In Discards", sum(out_disc) AS "Out Discards"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleY.text">Errors/sec</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>§7 — Interface Status Table</title>
+      <table>
+        <search>
+          <query>| mstats latest(statistics_rx_kbps) AS rx, latest(statistics_tx_kbps) AS tx, latest(statistics_num_flaps) AS flaps WHERE index=cisco_mdt source="*interfaces*" host="$host$" BY name, oper_status, admin_status, host span=5m
+| stats latest(rx) AS "RX Kbps", latest(tx) AS "TX Kbps", latest(flaps) AS Flaps, latest(oper_status) AS "Oper", latest(admin_status) AS "Admin" BY host, name
+| where NOT match(name, "^(Vlan|Loop|Null)")
+| sort host, name
+| rename host AS Switch, name AS Interface</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§7 — Top 10 Interfaces by Traffic</title>
+      <chart>
+        <search>
+          <query>| mstats avg(statistics_rx_kbps) AS rx, avg(statistics_tx_kbps) AS tx WHERE index=cisco_mdt source="*interfaces*" host="$host$" BY name span=5m
+| stats avg(rx) AS rx, avg(tx) AS tx BY name
+| eval total = rx + tx
+| sort -total
+| head 10
+| fields name, rx, tx</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">Kbps</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: STP (§8)                                                 -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§8 — STP Port States</title>
+      <table>
+        <search>
+          <query>| mstats latest(cost) AS cost WHERE index=cisco_mdt source="*stp*" host="$host$" BY instance, if_name, role, state, host span=5m
+| stats latest(cost) AS Cost, latest(role) AS Role, latest(state) AS State BY host, instance, if_name
+| sort host, instance, if_name
+| rename host AS Switch, instance AS "STP Instance", if_name AS Interface</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§8 — STP Topology Changes</title>
+      <chart>
+        <search>
+          <query>| mstats rate(topology_changes) AS topo_changes WHERE index=cisco_mdt source="*stp*" host="$host$" BY instance span=5m
+| timechart sum(topo_changes) AS "Topology Changes"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleY.text">Changes</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Stack Health (§9)                                        -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§9 — Stack Members</title>
+      <table>
+        <search>
+          <query>| mstats latest(priority) AS priority, latest(latency) AS latency WHERE index=cisco_mdt source="*stack*" host="$host$" BY chassis_number, role, node_state, serial_number, host span=5m
+| stats latest(role) AS Role, latest(node_state) AS State, latest(priority) AS Priority, latest(serial_number) AS Serial, latest(latency) AS "Latency (ms)" BY host, chassis_number
+| rename host AS Switch, chassis_number AS "#"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§9 — Stack Keepalive</title>
+      <chart>
+        <search>
+          <query>| mstats rate(keepalive_counters_sent) AS sent, rate(keepalive_counters_received) AS recv, latest(keepalive_counters_consecutive_losses) AS losses WHERE index=cisco_mdt source="*stack*" host="$host$" BY chassis_number span=1m
+| timechart avg(sent) AS "KA Sent/s", avg(recv) AS "KA Recv/s", max(losses) AS "Consecutive Losses"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Layer 2 Tables (§10, §11, §12)                          -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§10 — VLANs</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*vlan*" host="$host$" BY id, name, status, host span=5m
+| stats latest(name) AS "VLAN Name", latest(status) AS Status BY host, id
+| rename host AS Switch, id AS "VLAN ID"
+| sort Switch, "VLAN ID"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§11 — MAC Table Size</title>
+      <single>
+        <search>
+          <query>| mstats dc(mac) AS mac_count WHERE index=cisco_mdt source="*matm*" host="$host$" span=5m
+| stats latest(mac_count) AS mac_count</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="underLabel">MAC Entries</option>
+      </single>
+    </panel>
+    <panel>
+      <title>§12 — ARP Entry Count</title>
+      <single>
+        <search>
+          <query>| mstats dc(address) AS arp_count WHERE index=cisco_mdt source="*arp*" host="$host$" span=5m
+| stats latest(arp_count) AS arp_count</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="underLabel">ARP Entries</option>
+      </single>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Neighbor Discovery (§13, §14)                            -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§13 — LLDP Neighbors</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*lldp*" host="$host$" BY local_interface, device_id, connecting_interface, host span=5m
+| stats latest(device_id) AS "Neighbor", latest(connecting_interface) AS "Remote Port" BY host, local_interface
+| rename host AS Switch, local_interface AS "Local Interface"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§14 — CDP Neighbors</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*cdp*" host="$host$" BY local_intf_name, device_name, platform_name, port_id, host span=5m
+| stats latest(device_name) AS "Neighbor", latest(platform_name) AS Platform, latest(port_id) AS "Remote Port" BY host, local_intf_name
+| rename host AS Switch, local_intf_name AS "Local Interface"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Platform &amp; Hardware (§15, §17, §18)                  -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§15 — Platform Components</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*components*" host="$host$" BY cname, state_type, state_serial_no, state_status, host span=5m
+| stats latest(state_type) AS Type, latest(state_serial_no) AS Serial, latest(state_status) AS Status BY host, cname
+| sort host, cname
+| rename host AS Switch, cname AS Component</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§18 — Transceiver Optics</title>
+      <table>
+        <search>
+          <query>| mstats latest(output_power_instant) AS tx_dbm, latest(input_power_instant) AS rx_dbm, latest(internal_temp) AS temp WHERE index=cisco_mdt source="*transceiver*" host="$host$" BY name, host span=5m
+| stats latest(tx_dbm) AS "TX dBm", latest(rx_dbm) AS "RX dBm", latest(temp) AS "Temp °C" BY host, name
+| rename host AS Switch, name AS Port</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: TCAM (§21, §43)                                         -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§21 — TCAM Utilization</title>
+      <chart>
+        <search>
+          <query>| mstats latest(tcam_entries_used) AS used WHERE index=cisco_mdt source="*tcam*" host="$host$" BY name, asic_no, host span=5m
+| stats latest(used) AS Used BY host, name, asic_no
+| rename host AS Switch, name AS "Table", asic_no AS ASIC</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleY.text">Entries Used</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§43 — Data Plane Resources (per Feature)</title>
+      <chart>
+        <search>
+          <query>| mstats latest(max_tcam_percentage_used) AS tcam_pct, latest(max_em_percentage_used) AS em_pct WHERE index=cisco_mdt source="*dp-resources*" host="$host$" BY feature, protocol, direction, host span=5m
+| stats latest(tcam_pct) AS "TCAM %", latest(em_pct) AS "EM %" BY host, feature, protocol, direction
+| sort -"TCAM %"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleY.text">% Used</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Control Plane (§44, §46)                                 -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§44 — CPU Punt/Inject Rates</title>
+      <chart>
+        <search>
+          <query>| mstats rate(rx_recv_cur) AS punt_rate, rate(rx_dropped_cur) AS drop_rate WHERE index=cisco_mdt source="*punt-inject*" host="$host$" BY cpu_punt_queue_name span=1m
+| timechart sum(punt_rate) AS "Punt Rate", sum(drop_rate) AS "Drop Rate"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleY.text">pkts/sec</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§46 — CEF Adjacency Summary</title>
+      <single>
+        <search>
+          <query>| mstats latest(adjacency_table_num_adjacencies) AS total, latest(adjacency_table_num_complete_adjacencies) AS complete, latest(adjacency_table_num_incomplete_adjacencies) AS incomplete WHERE index=cisco_mdt source="*fib*" host="$host$" span=5m
+| stats latest(total) AS Total, latest(complete) AS Complete, latest(incomplete) AS Incomplete</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="underLabel">Total Adjacencies</option>
+      </single>
+    </panel>
+    <panel>
+      <title>§46 — CEF Punt/Drop Rate</title>
+      <chart>
+        <search>
+          <query>| mstats rate(cef_statistics_ipv4_switching_total_punt) AS punt, rate(cef_statistics_ipv4_switching_total_drop) AS drop WHERE index=cisco_mdt source="*fib*" host="$host$" span=1m
+| timechart avg(punt) AS "IPv4 Punt/s", avg(drop) AS "IPv4 Drop/s"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">pkts/sec</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Routing Protocols (§24, §25)                             -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§24 — BGP Neighbor State</title>
+      <table>
+        <search>
+          <query>| mstats latest(prefix_activity_received_current_prefixes) AS rx_pfx, latest(prefix_activity_sent_current_prefixes) AS tx_pfx WHERE index=cisco_mdt source="*bgp*" host="$host$" BY neighbor_id, session_state, as, host span=5m
+| stats latest(session_state) AS State, latest(as) AS "Remote AS", latest(rx_pfx) AS "Prefixes RX", latest(tx_pfx) AS "Prefixes TX" BY host, neighbor_id
+| rename host AS Switch, neighbor_id AS Neighbor</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§25 — OSPF Neighbor State</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*ospf*" host="$host$" BY neighbor_id, state, name, host span=5m
+| stats latest(state) AS State, latest(name) AS Interface BY host, neighbor_id
+| rename host AS Switch, neighbor_id AS "Neighbor ID"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: IETF Routing, DHCP (§26, §27)                           -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§26 — Route Count by Protocol</title>
+      <chart>
+        <search>
+          <query>| mstats dc(destination_prefix) AS routes WHERE index=cisco_mdt source="*routing*" host="$host$" BY source_protocol span=5m
+| stats latest(routes) AS Routes BY source_protocol</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§27 — DHCP Pool Utilization</title>
+      <chart>
+        <search>
+          <query>| mstats latest(allocated) AS allocated, latest(available) AS available WHERE index=cisco_mdt source="*dhcp*" host="$host$" BY pool_name span=5m
+| stats latest(allocated) AS Allocated, latest(available) AS Available BY pool_name</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisTitleY.text">Addresses</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: FHRP — HSRP, VRRP (§35, §36)                           -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§35 — HSRP Group State</title>
+      <table>
+        <search>
+          <query>| mstats latest(priority) AS priority WHERE index=cisco_mdt source="*hsrp*" host="$host$" BY group_id, if_name, state, virtual_ip, active_ip, standby_ip, host span=5m
+| stats latest(state) AS State, latest(priority) AS Priority, latest(virtual_ip) AS VIP, latest(active_ip) AS "Active IP", latest(standby_ip) AS "Standby IP" BY host, if_name, group_id
+| rename host AS Switch, if_name AS Interface, group_id AS Group</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§36 — VRRP Group State</title>
+      <table>
+        <search>
+          <query>| mstats latest(priority) AS priority WHERE index=cisco_mdt source="*vrrp*" host="$host$" BY if_number, group_id, vrrp_state, virtual_ip, master_ip, host span=5m
+| stats latest(vrrp_state) AS State, latest(priority) AS Priority, latest(virtual_ip) AS VIP, latest(master_ip) AS "Master IP" BY host, if_number, group_id
+| rename host AS Switch, if_number AS Interface, group_id AS Group</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: NTP, BFD (§33, §34)                                     -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§33 — NTP Offset/Jitter</title>
+      <chart>
+        <search>
+          <query>| mstats avg(offset) AS offset, avg(jitter) AS jitter WHERE index=cisco_mdt source="*ntp*" host="$host$" BY assoc_id span=1m
+| timechart avg(offset) AS "Offset (ms)", avg(jitter) AS "Jitter (ms)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">ms</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§34 — BFD Session Status</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*bfd*" host="$host$" BY type, interface, ip, state, host span=5m
+| stats latest(state) AS State BY host, type, interface, ip
+| rename host AS Switch, type AS "Session Type", interface AS Interface, ip AS Neighbor</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: IP SLA, Flow Monitor (§38, §37)                         -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§38 — IP SLA Probe Results</title>
+      <chart>
+        <search>
+          <query>| mstats latest(success_count) AS success, latest(failure_count) AS failure WHERE index=cisco_mdt source="*ip-sla*" host="$host$" BY oper_id, oper_type span=1m
+| timechart latest(success) AS Successes, latest(failure) AS Failures BY oper_id</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§37 — Flow Monitor Active Flows</title>
+      <chart>
+        <search>
+          <query>| mstats latest(flows_added) AS added, latest(flows_aged) AS aged WHERE index=cisco_mdt source="*flow-monitor*" host="$host$" BY name span=1m
+| eval active = added - aged
+| timechart latest(active) AS "Active Flows" BY name</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleY.text">Flows</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Security — 802.1X, ACL, AAA (§20, §32, §39)            -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§20 — 802.1X Sessions</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*identity*" host="$host$" BY mac, intf_name, state, device_type, vlan_id, host span=5m
+| stats latest(state) AS State, latest(device_type) AS "Device Type", latest(vlan_id) AS VLAN BY host, intf_name, mac
+| rename host AS Switch, intf_name AS Interface, mac AS MAC</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§32 — ACL Hit Rates (Top 10 Rules)</title>
+      <chart>
+        <search>
+          <query>| mstats rate(match_counter) AS hits WHERE index=cisco_mdt source="*access-lists*" host="$host$" BY access_control_list_name, rule_name span=5m
+| stats avg(hits) AS avg_hits BY access_control_list_name, rule_name
+| sort -avg_hits
+| head 10
+| eval label = access_control_list_name . " / " . rule_name</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleY.text">Hits/sec</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§39 — RADIUS Accept/Reject</title>
+      <chart>
+        <search>
+          <query>| mstats rate(authen_access_accepts) AS accepts, rate(authen_access_rejects) AS rejects WHERE index=cisco_mdt source="*aaa*" host="$host$" BY group_name, radius_server_ip span=1m
+| timechart sum(accepts) AS Accepts, sum(rejects) AS Rejects</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">Requests/sec</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Port Security, MACsec (§40, §41)                        -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§40 — Port Security</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*psecure*" host="$host$" BY if_name, vlan, mac, type, host span=5m
+| stats latest(type) AS Type BY host, if_name, vlan, mac
+| rename host AS Switch, if_name AS Interface, vlan AS VLAN, mac AS MAC</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§41 — MACsec Traffic Counters</title>
+      <chart>
+        <search>
+          <query>| mstats rate(tx_untag_pkts) AS untagged, rate(rx_notag_pkts) AS notag WHERE index=cisco_mdt source="*macsec*" host="$host$" BY if_name span=1m
+| timechart sum(untagged) AS "TX Untagged pkts/s", sum(notag) AS "RX No-Tag pkts/s"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisTitleY.text">pkts/sec</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: Switchport, UDLD, LACP (§17, §19, §31)                  -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§17 — Switchport Mode Summary</title>
+      <chart>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*switchport*" host="$host$" BY if_name, admin_mode, host span=5m
+| stats count BY admin_mode
+| rename admin_mode AS Mode</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>§19 — UDLD Status</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*udld*" host="$host$" BY name, neighbor_state, host span=5m
+| stats latest(neighbor_state) AS Status BY host, name
+| rename host AS Switch, name AS Interface</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§31 — Port-Channel Members</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*lag-aggregate*" host="$host$" BY name, member_link, member_oper_status, host span=5m
+| stats latest(member_oper_status) AS Status BY host, name, member_link
+| rename host AS Switch, name AS "Port-Channel", member_link AS Member</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: HA, Linecard, TrustSec (§28, §29, §30)                  -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§28 — HA State</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*ha-oper*" host="$host$" BY ha_state, last_switchover_reason, host span=5m
+| stats latest(ha_state) AS "HA State", latest(last_switchover_reason) AS "Last Switchover" BY host
+| rename host AS Switch</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§29 — Linecard Status</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*linecard*" host="$host$" BY slot, state, type, host span=5m
+| stats latest(state) AS State, latest(type) AS Type BY host, slot
+| rename host AS Switch, slot AS Slot</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§30 — TrustSec SGT/SXP</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*trustsec*" host="$host$" BY sgt, ip, sxp_state, host span=5m
+| stats latest(sgt) AS SGT, latest(sxp_state) AS "SXP State" BY host, ip
+| rename host AS Switch, ip AS "Peer IP"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: VRF, Install, MDT Health (§42, §23, §22)                 -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§42 — VRF Membership</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*vrf-oper*" host="$host$" BY vrf_name, address_family, interface, host span=5m
+| stats values(interface) AS Interfaces, latest(address_family) AS AF BY host, vrf_name
+| rename host AS Switch, vrf_name AS VRF</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§23 — Software Install</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*install*" host="$host$" BY pkg_name, version, pkg_action, host span=5m
+| stats latest(version) AS Version, latest(pkg_action) AS State BY host, pkg_name
+| rename host AS Switch, pkg_name AS Package</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§22 — MDT Subscription Health</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*mdt-oper*" host="$host$" BY subscription_id, tdl_uri, state, host span=5m
+| stats latest(tdl_uri) AS XPath, latest(state) AS State BY host, subscription_id
+| sort host, subscription_id
+| rename host AS Switch, subscription_id AS "Sub ID"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+
+  <!-- ============================================================ -->
+  <!-- ROW: PoE Health, EIGRP, IS-IS (§45, §47, §48)                -->
+  <!-- ============================================================ -->
+  <row>
+    <panel>
+      <title>§45 — PoE Port Health (Fault Counters)</title>
+      <table>
+        <search>
+          <query>| mstats latest(port_voltage) AS voltage, latest(poe_meta_data_port_shutdown_cnt) AS shutdowns, latest(poe_meta_data_mosfet_fault_cnt) AS mosfet_faults, latest(poe_meta_data_over_tmp_cnt) AS overtemp WHERE index=cisco_mdt source="*poe-health*" host="$host$" BY port_num, port_state, host span=5m
+| stats latest(voltage) AS Voltage, latest(port_state) AS State, latest(shutdowns) AS Shutdowns, latest(mosfet_faults) AS "MOSFET Faults", latest(overtemp) AS "Over-Temp" BY host, port_num
+| where shutdowns > 0 OR mosfet_faults > 0 OR overtemp > 0
+| rename host AS Switch, port_num AS Port</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§47 — EIGRP Neighbors</title>
+      <table>
+        <search>
+          <query>| mstats latest(_value) AS v WHERE index=cisco_mdt source="*eigrp*" host="$host$" BY as_num, vrf_name, nbr_address, name, host span=5m
+| stats latest(name) AS Interface BY host, as_num, vrf_name, nbr_address
+| rename host AS Switch, as_num AS AS, vrf_name AS VRF, nbr_address AS Neighbor</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>§48 — IS-IS Neighbors</title>
+      <table>
+        <search>
+          <query>| mstats latest(holdtime) AS hold WHERE index=cisco_mdt source="*isis*" host="$host$" BY tag, system_id, level, if_name, state, host span=5m
+| stats latest(state) AS State, latest(hold) AS "Hold (s)" BY host, tag, system_id, level, if_name
+| rename host AS Switch, tag AS Instance, system_id AS "System ID", if_name AS Interface</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+
+</dashboard>

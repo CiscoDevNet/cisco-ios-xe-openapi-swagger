@@ -1,0 +1,97 @@
+# ============================================================
+# pyATS testbed — MDT fleet (Catalyst switches + C9800 WLC)
+# ============================================================
+# Template only. Copy to `testbed.yaml`, fill in the management IPs, and
+# export credentials as environment variables (NEVER commit real secrets):
+#
+#   export MDT_USER=admin
+#   export MDT_PASS=...            # device login password
+#   export MDT_ENABLE=...          # enable secret (omit if not used)
+#
+# Per-device management IPs are also read from the environment so this file
+# stays free of lab addressing:
+#   export CAT9200_1_IP=...  CAT9300_1_IP=...  CAT9400_1_IP=...
+#   export CAT9500_1_IP=...  CAT9600_1_IP=...  CAT9800_1_IP=...
+#
+# `custom.mdt_role` selects the subscription set the tool pushes:
+#   switch -> harness/validation/subscriptions.yaml
+#   wlc    -> harness/validation/subscriptions-wlc.yaml
+# `custom.mdt_receiver_ip` optionally overrides the collector IP per device
+# (otherwise pass --receiver-ip on the command line).
+# ============================================================
+
+testbed:
+  name: mdt-fleet
+  credentials:
+    default:
+      username: "%ENV{MDT_USER}"
+      password: "%ENV{MDT_PASS}"
+    enable:
+      password: "%ENV{MDT_ENABLE}"
+
+devices:
+  cat9200-1:
+    os: iosxe
+    type: switch
+    platform: cat9k
+    custom: { mdt_role: switch }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9200_1_IP}"
+        port: 22
+
+  cat9300-1:
+    os: iosxe
+    type: switch
+    platform: cat9k
+    custom: { mdt_role: switch }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9300_1_IP}"
+        port: 22
+
+  cat9400-1:
+    os: iosxe
+    type: switch
+    platform: cat9k
+    custom: { mdt_role: switch }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9400_1_IP}"
+        port: 22
+
+  cat9500-1:
+    os: iosxe
+    type: switch
+    platform: cat9k
+    custom: { mdt_role: switch }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9500_1_IP}"
+        port: 22
+
+  cat9600-1:
+    os: iosxe
+    type: switch
+    platform: cat9k
+    custom: { mdt_role: switch }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9600_1_IP}"
+        port: 22
+
+  cat9800-1:
+    os: iosxe
+    type: wlc
+    platform: cat9800
+    custom: { mdt_role: wlc }
+    connections:
+      cli:
+        protocol: ssh
+        ip: "%ENV{CAT9800_1_IP}"
+        port: 22

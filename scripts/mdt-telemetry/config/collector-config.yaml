@@ -1,0 +1,138 @@
+# ============================================================
+# OpenTelemetry Collector Configuration
+# Cisco gRPC MDT Receiver → Splunk HEC
+# ============================================================
+#
+# This config matches the 66 subscriptions defined in
+# validation/subscriptions.yaml and plan.md.
+#
+# Architecture:
+#   C9300 (gRPC dial-out) → OTel Collector (this config) → Splunk HEC
+#
+# Usage:
+#   otelcol --config collector-config.yaml
+#
+# ============================================================
+
+receivers:
+  # Cisco gRPC MDT receiver — listens for dial-out connections
+  # from IOS XE devices streaming kvGPB-encoded telemetry
+  cisco_mdt:
+    # Address to listen on for gRPC dial-out connections
+    # Must match the "receiver ip address" in IOS XE subscription config
+    endpoint: "0.0.0.0:57500"
+    transport: grpc
+    tls: null   # Set TLS cert/key for production
+
+processors:
+  # Batch telemetry data before exporting to Splunk
+  # Reduces HTTP calls to Splunk HEC
+  batch:
+    send_batch_size: 1000
+    timeout: 10s
+
+  # Add resource attributes for Splunk indexing
+  resource:
+    attributes:
+      # Static attributes added to all telemetry
+      - key: deployment
+        value: "mdt-telemetry-demo"
+        action: upsert
+
+  # Transform field names from YANG paths to Splunk-friendly names
+  # Uncomment and customize if your receiver uses raw YANG paths
+  # transform:
+  #   metric_statements:
+  #     - context: datapoint
+  #       statements:
+  #         - replace_pattern(metric.name, "/", "_")
+
+exporters:
+  # Splunk HEC (HTTP Event Collector) — Metrics Index
+  splunk_hec/metrics:
+    token: "${SPLUNK_HEC_TOKEN}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    source: "cisco:mdt"
+    sourcetype: "cisco:ios:mdt"
+    index: "cisco_mdt"
+    tls:
+      insecure_skip_verify: true   # Set to false in production
+    # Splunk HEC metrics mode — sends data to a metrics index
+    splunk_app_name: "mdt-telemetry"
+    splunk_app_version: "1.0.0"
+
+  # Debug exporter — prints telemetry to stdout for troubleshooting
+  # Remove or disable in production
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 100
+
+  # File exporter — writes raw telemetry to disk for offline analysis
+  # Useful during initial validation
+  file/raw:
+    path: "/tmp/mdt-telemetry-raw.json"
+    rotation:
+      max_megabytes: 100
+      max_days: 3
+      max_backups: 3
+
+service:
+  pipelines:
+    metrics:
+      receivers: [cisco_mdt]
+      processors: [batch, resource]
+      exporters: [splunk_hec/metrics, debug]
+
+    # Uncomment to also write raw data to file during validation
+    # metrics/debug:
+    #   receivers: [cisco_mdt]
+    #   processors: [batch]
+    #   exporters: [file/raw]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      address: "0.0.0.0:8888"   # OTel collector's own metrics endpoint
+
+# ============================================================
+# Environment Variables Required
+# ============================================================
+# SPLUNK_HEC_TOKEN  — Splunk HEC token (e.g., "cisco-mdt-token")
+# SPLUNK_HEC_URL    — Splunk HEC endpoint (e.g., "https://splunk.lab:8088/services/collector")
+#
+# Example:
+#   export SPLUNK_HEC_TOKEN="cisco-mdt-token"
+#   export SPLUNK_HEC_URL="https://10.1.1.5:8088/services/collector"
+#   otelcol --config collector-config.yaml
+# ============================================================
+
+# ============================================================
+# Subscription XPath → Splunk Source Mapping
+# ============================================================
+# When data arrives from the switch, the collector maps it as follows:
+#
+# Sub 1001: /process-cpu-ios-xe-oper:cpu-usage/cpu-utilization
+#   → source="cisco:mdt:cpu-usage"
+#   → metric_name: five_seconds, one_minute, five_minutes
+#   → dimensions: host (from gRPC metadata)
+#
+# Sub 1007: /interfaces-ios-xe-oper:interfaces/interface
+#   → source="cisco:mdt:interfaces"
+#   → metric_name: statistics/in_octets, statistics/out_octets, ...
+#   → dimensions: name (interface key), host, oper_status, admin_status
+#
+# Sub 1005: /environment-ios-xe-oper:environment-sensors
+#   → source="cisco:mdt:environment-sensors"
+#   → metric_name: current_reading
+#   → dimensions: name, location, state, sensor_units, sensor_name, host
+#
+# Sub 1006: /poe-ios-xe-oper:poe-oper-data
+#   → source="cisco:mdt:poe-oper-data"
+#   → metric_name: power_used, oper_power
+#   → dimensions: intf_name, oper_state, pd_class, host
+#
+# Full mapping for all 48 subscriptions is documented in plan.md
+# under "YANG Structure to Splunk Field Mapping Guide"
+# ============================================================
