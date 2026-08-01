@@ -111,11 +111,12 @@ page and every viewer.
 
 ### Can I see real data from a device, not just the schema example?
 
-Yes. [live-data.html](live-data.html) shows **real RESTCONF GET responses
-captured from physical Catalyst switches** (e.g. C9300 / C9400 / C9500 / C9600 on
-IOS XE 26.1.1). Pick a device platform tab, then drill into a module and path to
-see exactly what that switch returned; per-category coverage cards show how much
-was captured for the selected device.
+Yes. [device-data.html](device-data.html) — the **Device Data** page — shows
+**real data captured from physical Catalyst switches** over two transports you
+pick with a selector: **Model-Driven Telemetry** (push) and **RESTCONF** (pull ·
+GET responses, e.g. C9300 / C9400 / C9500 / C9600 on IOS XE 26.1.1). Choose a
+device tab, filter by model flavor, then a path to see exactly what that switch
+streamed or returned.
 
 The captures are served on demand as small per-path data files consumed by the
 Live Data page — they are **not** embedded in the OpenAPI specs, which keeps the

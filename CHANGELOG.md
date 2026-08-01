@@ -131,6 +131,30 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — Device Data page: unified MDT + RESTCONF browser (round 32, 2026-08-01)
+
+- **One page for all collected device data — [device-data.html](device-data.html).**
+  Consolidates the previous *Telemetry Data*, *Fleet Telemetry*, and *Live Device
+  Data* pages into a single **Device Data** browser with a **transport selector**:
+  **Model-Driven Telemetry** (push · gRPC dial-out) and **RESTCONF** (pull ·
+  HTTPS GET). One UI for both — device (PID) tabs, model-flavor filter, a
+  searchable path list, transport-aware summary tiles + Chart.js charts, and a
+  per-path detail.
+- **MDT view.** Real telemetry captured live from the lab fleet (C9200 / C9300 /
+  C9400 / C9500 and a C9800 WLC, IOS XE 26.1.1) via a Telegraf
+  `cisco_telemetry_mdt` receiver; the detail shows the streamed list **keys** and
+  every captured instance's leaf values. Search matches paths, keys, and values.
+  Data: `telemetry-live-data.json` (built by `build_live_dataset.py`).
+- **RESTCONF view.** Real GET responses captured per device; the detail lazily
+  fetches and pretty-prints the exact payload. Data: `restconf-live-data.json`
+  (built by `scripts/build_restconf_dataset.py` from the release live-examples
+  index); payloads served on demand from `releases/<ver>/live-data/...`.
+- **Copy.** Each detail has **Copy payload** (full JSON) and **Copy path** buttons.
+- **Removed** the now-redundant `telemetry-data.{html,js,json}` and
+  `live-data.{html,js}` pages (plus the orphaned `build_telemetry_dataset.py`);
+  nav, hub Tools bar, sitemap, service worker, security tests, the in-viewer
+  "Live device data" banner deep-link, and docs are rewired to Device Data.
+
 ### Changed — Live Data hardening, honest coverage, depth verification (round 31, 2026-07-31)
 
 - **Redaction hardened for bare auth leaves.** `scripts/harness/redact.py` now
@@ -174,7 +198,7 @@ below are far more representative than the average).
   viewers stay lean and fast; the real responses are served separately (below),
   keyed by device **PID** so the same path carries samples from multiple
   platforms. No path / operation / module counts change (G-6 safe).
-- **New interactive Live Data browser — [live-data.html](live-data.html).**
+- **New interactive Live Data browser — [device-data.html](device-data.html)** (later merged into the unified Device Data page).
   A dedicated hub page for exploring the captured responses: **device platform
   tabs** (one per PID), **per-category coverage cards** (captured vs total paths
   for the active device), a **searchable module / path browser** with category

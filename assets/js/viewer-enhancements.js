@@ -279,7 +279,7 @@
     // ---------- (4e) per-module live device data banner ------------------
     // When a module is selected, if we captured real RESTCONF responses from
     // physical devices for it, show a compact banner that deep-links into the
-    // full interactive Live Data browser (live-data.html). Uses the small
+    // full interactive Device Data browser (device-data.html). Uses the small
     // per-release index (not the full spec) so it stays light and always
     // tracks the current module. The synthetic schema example is left as-is.
     // Fail-silent.

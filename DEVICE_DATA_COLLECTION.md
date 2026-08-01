@@ -261,9 +261,11 @@ Swagger viewers stay lean. The real bodies live in
 Live Data page on demand.
 
 **Surfaces:**
-- Interactive page `live-data.html` (+ `live-data.js`): device tabs (per PID),
-  per-category coverage cards + summary charts, module/path browser, real-response
-  drill-down (fetches one small per-path data file).
+- Interactive page `device-data.html` (+ `device-data.js`): the **Device Data**
+  browser with an MDT/RESTCONF transport selector — device tabs (per PID),
+  model-flavor filter + summary charts, path browser, and a real-response
+  drill-down (fetches one small per-path data file on demand). The RESTCONF index
+  is built by `scripts/build_restconf_dataset.py` into `restconf-live-data.json`.
 - Lightweight in-viewer "Live device data" banner in
   `assets/js/viewer-enhancements.js` (reads the ~32 KB `live-modules.json`) that
   deep-links into the page.

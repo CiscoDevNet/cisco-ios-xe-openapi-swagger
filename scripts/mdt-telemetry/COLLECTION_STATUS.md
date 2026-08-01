@@ -7,9 +7,10 @@ Last updated: 2026-07-31.
 ## 1. What this is
 
 A dev pipeline that streams **real** MDT from the six lab Catalyst devices into a
-receiver on this host, so the web app's **Telemetry Data** page can show live,
-per-device telemetry across all model categories (oper, OpenConfig, native-config,
-cfg, ietf) — the streaming counterpart to the RESTCONF **Live Data** page.
+receiver on this host, so the web app's **Device Data** page (MDT transport) can
+show live, per-device telemetry across all model categories (oper, OpenConfig,
+native-config, cfg, ietf) — the streaming counterpart to the RESTCONF transport
+on the same page.
 
 ```
 Catalyst device ── gRPC dial-out (kvGPB, :57500) ──▶ Telegraf (cisco_telemetry_mdt)
@@ -135,7 +136,7 @@ $PY scripts/mdt-telemetry/collector/build_live_dataset.py
    monitoring use **on-change**, not periodic (a walker `--update-policy` enhancement, later).
 3. **Let oper/wireless/MIB finish** (checkpointed; resume anytime).
 4. **Then build the payoff**: per-device live dataset from the capture files (+ fix PID mapping)
-   and wire per-PID + category into `telemetry-data.js` — the original goal.
+   and wire per-PID + category into `device-data.js` — the original goal.
 5. **Publish gate.** Nothing pushed to GitHub yet.
 
 ## 9. Safety notes

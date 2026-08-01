@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 build_live_examples_index.py — Emit the committable data the interactive Live
-Data page (live-data.html / live-data.js) needs, WITHOUT putting any response
+Data page (device-data.html / device-data.js) needs, WITHOUT putting any response
 bodies into the OpenAPI specs (which keeps the specs lean and the Swagger
 viewers fast).
 

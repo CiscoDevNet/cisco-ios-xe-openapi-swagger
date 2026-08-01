@@ -92,11 +92,11 @@ mindmap
         Module x platform matrix
         Family color coding
         CSV export
-      live-data.html
+      device-data.html
+        Transport selector (MDT / RESTCONF)
         Device platform tabs (per PID)
-        Per-category coverage cards
-        Module / path browser
-        Real captured-response drill-down
+        Model-flavor filter + summary charts
+        Streamed keys/values + RESTCONF payloads
     Distribution
       exports.html
         Per-release Postman shards
@@ -245,22 +245,26 @@ not repeated below.
 - **Scripts**: [assets/js/platform-coverage.js](assets/js/platform-coverage.js).
 - **CSP note**: Page declares its own CSP (no external hosts).
 
-### 3.10 [live-data.html](live-data.html) — Live Device Data Browser
-- **Route**: `/live-data.html`
-- **Purpose**: Browse *real* RESTCONF GET responses captured from physical
-  Catalyst switches, by device platform, YANG module, and path. Bodies are
-  **not** injected into the specs (kept lean/fast); they are served as per-path
-  data files consumed only by this page.
-- **UI**: Device platform tabs (one per PID), per-category coverage cards
-  (captured vs total paths for the active device), a searchable module / path
-  browser with category filters, and a drill-down that fetches the single
-  per-path data file on demand to show the exact captured response. Deep-linkable
-  (`?ver=…#module=…&path=…&pid=…`).
-- **Data sources**: [releases/index.json](releases/index.json),
-  `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies), and
-  `releases/<ver>/live-data/<category>/<module>/<hash>.json` (per-path bodies,
-  fetched on demand).
-- **Scripts**: [live-data.js](live-data.js).
+### 3.10 [device-data.html](device-data.html) — Device Data Browser (MDT + RESTCONF)
+- **Route**: `/device-data.html`
+- **Purpose**: Browse *real* data collected from physical Catalyst switches and a
+  9800 WLC over two transports, chosen with a selector at the top:
+  **Model-Driven Telemetry** (push · gRPC dial-out) and **RESTCONF** (pull ·
+  HTTPS GET). One UI for both — per device (PID), per model flavor (oper,
+  OpenConfig, native, config, IETF, MIB, wireless), with the actual keys,
+  values, and payloads captured.
+- **UI**: transport selector (MDT / RESTCONF), device (PID) tabs, model-flavor
+  filter chips, a searchable path list, transport-aware summary tiles + charts
+  (Chart.js), and a per-path detail. MDT shows the streamed list **keys** and
+  every captured instance's leaf values; RESTCONF lazily fetches and
+  pretty-prints the GET response payload. Copy payload / Copy path on each detail.
+- **Data sources**: [telemetry-live-data.json](telemetry-live-data.json) (MDT,
+  built by `scripts/mdt-telemetry/collector/build_live_dataset.py`) and
+  [restconf-live-data.json](restconf-live-data.json) (RESTCONF index, built by
+  `scripts/build_restconf_dataset.py` from
+  `releases/<ver>/live-examples-index.json`); RESTCONF payloads are fetched on
+  demand from `releases/<ver>/live-data/<category>/<module>/<hash>.json`.
+- **Scripts**: [device-data.js](device-data.js).
 - **CSP note**: strict hub CSP (`script-src 'self'`); external JS, DOM-only,
   no `innerHTML`.
 
@@ -518,7 +522,9 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | [platform-support-index.json](platform-support-index.json) + `releases/<ver>/platform-support.json` | scripts/build_platform_support.py (inferred) | platform-coverage.js, platform-support.js |
 | [yang-prefix-map.json](yang-prefix-map.json) + per-release variant | generators (inferred) | telemetry.js |
 | `releases/<ver>/exports/{postman,bruno}-manifest.json` | scripts/build_release.py | exports.html |
-| `releases/<ver>/live-examples-index.json` | scripts/build_live_examples_index.py | live-data.js, viewer-enhancements.js |
+| `releases/<ver>/live-examples-index.json` | scripts/build_live_examples_index.py | scripts/build_restconf_dataset.py, viewer-enhancements.js |
+| [telemetry-live-data.json](telemetry-live-data.json) | scripts/mdt-telemetry/collector/build_live_dataset.py | device-data.js (MDT transport) |
+| [restconf-live-data.json](restconf-live-data.json) | scripts/build_restconf_dataset.py | device-data.js (RESTCONF transport) |
 | `releases/<ver>/native-capabilities.json` | scripts/build_native_capabilities.py | swagger-native-config-model/capabilities.html |
 | `releases/<ver>/telemetry-index.json`, `telemetry-skipped.json` | inferred from filenames; presumed telemetry pipeline | telemetry.js / build inputs |
 | `releases/<ver>/mib-metadata.json`, `mib-platform-matrix.json` | inferred | MIB viewer side cards |
