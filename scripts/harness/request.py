@@ -89,8 +89,10 @@ def build_restconf_url(host: str, port: int, openapi_path: str) -> str:
     if not openapi_path.startswith("/"):
         openapi_path = "/" + openapi_path
     # Encode spaces (list-key placeholders may contain them) but keep the
-    # RESTCONF-significant characters (:/=,) intact.
-    safe_path = urllib.parse.quote(openapi_path, safe="/:=,{}[]-.~")
+    # RESTCONF-significant characters (:/=,) intact. ``%`` is kept safe so a
+    # caller that already percent-encoded a key value (e.g. ``%2F`` for a '/'
+    # inside a key) is not double-encoded into ``%252F``.
+    safe_path = urllib.parse.quote(openapi_path, safe="/:=,{}[]-.~%")
     return root + safe_path
 
 

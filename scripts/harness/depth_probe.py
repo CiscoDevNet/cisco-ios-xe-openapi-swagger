@@ -33,11 +33,13 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from scripts.harness import inventory as inv
     from scripts.harness import redact as redaction
-    from scripts.harness.request import RESTCONF_HEADERS
+    from scripts.harness.collector import KNOWN_UNSAFE_MODULES, CircuitBreaker
+    from scripts.harness.request import restconf_get
 else:  # pragma: no cover
     from . import inventory as inv
     from . import redact as redaction
-    from .request import RESTCONF_HEADERS
+    from .collector import KNOWN_UNSAFE_MODULES, CircuitBreaker
+    from .request import restconf_get
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -47,18 +49,9 @@ _KEY_HINTS = ("name", "cname", "id", "index", "number", "if-name", "interface-na
 
 def _encode_key(value) -> str:
     """Percent-encode a single list-key value (RFC 8040): '/', ':', space, etc.
-    must be escaped so they are not read as path separators."""
+    must be escaped so they are not read as path separators. The encoded value is
+    passed to restconf_get whose URL builder keeps ``%`` safe (no double-encode)."""
     return urllib.parse.quote(str(value), safe="")
-
-
-def _deep_url(host, port, deep_path) -> str:
-    """Absolute RESTCONF URL for an already-key-encoded deep path.
-
-    The key value is pre-encoded by ``_encode_key``; we must NOT re-quote it (that
-    would turn ``%2F`` into ``%252F`` and the device would 404). Structural
-    segments here contain only URL-safe characters, so append verbatim.
-    """
-    return f"https://{host.strip()}:{int(port)}/restconf{deep_path}"
 
 
 def _unwrap(body):
@@ -138,6 +131,25 @@ def _classify(parent_slice, got_body):
     return "REDUNDANT"
 
 
+def _do_get(sess, device, auth, deep_path):
+    """One safe GET via restconf_get (retry/backoff + reset detection). Returns
+    (status_bucket, http_status, body, reset)."""
+    r = restconf_get(
+        host=device.host, port=device.port, openapi_path=deep_path,
+        auth=auth, timeout=30, session=sess,
+        conflict_retries=4, conflict_backoff=0.25,
+    )
+    if r.reset:
+        bucket = "reset"
+    elif r.error:
+        bucket = "error"
+    elif r.http_status == 404 or r.empty:
+        bucket = "empty"
+    else:
+        bucket = "ok"
+    return bucket, r.http_status, r.body, r.reset
+
+
 def probe(device, auth, parent_path, key_leaf, children, limit):
     entries = _load_parent(args_version, parent_path, device.pid)
     key_leaf = _pick_key_leaf(entries, key_leaf)
@@ -148,6 +160,7 @@ def probe(device, auth, parent_path, key_leaf, children, limit):
 
     sess = requests.Session()
     sess.trust_env = False  # ignore the corp http proxy; devices are reachable directly
+    breaker = CircuitBreaker(threshold=8)
 
     results = []
     tally = {"ADDS_DATA": 0, "REDUNDANT": 0, "EMPTY": 0, "ERROR": 0}
@@ -158,24 +171,13 @@ def probe(device, auth, parent_path, key_leaf, children, limit):
             continue
         for child in children:
             deep_path = f"{parent_path}={_encode_key(key_val)}/{child}"
-            url = _deep_url(device.host, device.port, deep_path)
-            status = None
-            try:
-                r = sess.get(url, headers=RESTCONF_HEADERS, auth=auth, verify=False, timeout=30)
-                status = r.status_code
-                if r.status_code == 404:
-                    cls = "EMPTY"
-                    body = None
-                elif r.status_code >= 400:
-                    cls = "ERROR"
-                    body = None
-                else:
-                    body = r.json() if r.text.strip() else None
-                    cls = _classify(_slice(entry, child), body)
-            except (requests.RequestException, ValueError) as exc:
+            bucket, status, body, reset = _do_get(sess, device, auth, deep_path)
+            if bucket in ("error", "reset"):
                 cls = "ERROR"
-                body = None
-                print(f"  ! {key_val} /{child}: {exc}", file=sys.stderr)
+            elif bucket == "empty":
+                cls = "EMPTY"
+            else:
+                cls = _classify(_slice(entry, child), body)
             tally[cls] += 1
             probed += 1
             results.append({
@@ -184,6 +186,12 @@ def probe(device, auth, parent_path, key_leaf, children, limit):
                 "class": cls,
                 "sample": redaction.redact(_unwrap(body)) if cls == "ADDS_DATA" else None,
             })
+            if breaker.register("error" if bucket in ("error", "reset") else "ok",
+                                reset=reset, path=deep_path):
+                print(f"\n  !! CIRCUIT BREAKER TRIPPED on {device.pid}: {breaker.reason}\n"
+                      f"     culprit: {breaker.trip_path}", file=sys.stderr)
+                tally["breaker_tripped"] = 1
+                return {"key_leaf": key_leaf, "tally": tally, "results": results}
         if limit and probed >= limit:
             break
     return {"key_leaf": key_leaf, "tally": tally, "results": results}
@@ -281,7 +289,7 @@ def _find_candidates(value, base_path, schema_path, keymap, child_map, max_entri
                     _find_candidates(entry, kpath, sp, keymap, child_map, max_entries, depth + 1, out, cap)
 
 
-def discover(device, auth, version, category, max_entries, cap_per_module, module_filter):
+def discover(device, auth, version, category, max_entries, cap_per_module, module_filter, resume_done=None):
     sidecar = PROJECT_ROOT / "references" / f"live-examples-{version}.json"
     data = json.loads(sidecar.read_text(encoding="utf-8"))
     # module -> module-root value for this device (shortest captured path per module)
@@ -291,6 +299,8 @@ def discover(device, auth, version, category, max_entries, cap_per_module, modul
             continue
         if module_filter and e.get("module") not in module_filter:
             continue
+        if e.get("module") in KNOWN_UNSAFE_MODULES:
+            continue  # never GET a module known to crash the device
         pids = e.get("pids") or {}
         if device.pid not in pids:
             continue
@@ -301,10 +311,15 @@ def discover(device, auth, version, category, max_entries, cap_per_module, modul
 
     sess = requests.Session()
     sess.trust_env = False
+    breaker = CircuitBreaker(threshold=8)
+    resume_done = resume_done or set()
 
     per_module = {}
     total_probes = 0
+    aborted = False
     for mod, (path, cat, value) in sorted(roots.items()):
+        if mod in resume_done:
+            continue  # already probed in a prior (interrupted) run
         keymap = _spec_keymap(version, cat, mod)
         child_map = _spec_child_map(version, cat, mod)
         schema0 = _schema_names(path)
@@ -321,30 +336,37 @@ def discover(device, auth, version, category, max_entries, cap_per_module, modul
         samples = []
         for cand in cands:
             cpath = cand["path"]
-            url = _deep_url(device.host, device.port, cpath)
-            try:
-                r = sess.get(url, headers=RESTCONF_HEADERS, auth=auth, verify=False, timeout=30)
-                total_probes += 1
-                if r.status_code == 200 and r.text.strip():
-                    body = _unwrap(r.json())
-                    if body not in (None, {}, [], ""):
-                        adds += 1
-                        adds_absent += cand["kind"] == "absent"
-                        adds_empty += cand["kind"] == "empty"
-                        if len(samples) < 3:
-                            samples.append({"path": cpath, "kind": cand["kind"],
-                                            "sample": redaction.redact(body)})
-            except (requests.RequestException, ValueError):
-                pass
+            bucket, status, body, reset = _do_get(sess, device, auth, cpath)
+            total_probes += 1
+            if bucket == "ok":
+                body = _unwrap(body)
+                if body not in (None, {}, [], ""):
+                    adds += 1
+                    adds_absent += cand["kind"] == "absent"
+                    adds_empty += cand["kind"] == "empty"
+                    if len(samples) < 3:
+                        samples.append({"path": cpath, "kind": cand["kind"],
+                                        "sample": redaction.redact(body)})
+            if breaker.register("error" if bucket in ("error", "reset") else "ok",
+                                reset=reset, path=cpath):
+                print(f"\n  !! CIRCUIT BREAKER TRIPPED on {device.pid}: {breaker.reason}\n"
+                      f"     culprit: {breaker.trip_path}\n"
+                      f"     probed {total_probes} path(s); resume skips finished modules.",
+                      file=sys.stderr)
+                aborted = True
+                break
         per_module[mod] = {"category": cat, "candidates": len(cands), "adds_data": adds,
                            "adds_empty": adds_empty, "adds_absent": adds_absent, "samples": samples}
         if adds:
             print(f"  {mod}: {len(cands)} candidate(s) probed, {adds} return data "
                   f"(absent={adds_absent} empty={adds_empty})  <== HIDES DATA")
+        if aborted:
+            break
     hiders = sum(1 for m in per_module.values() if m["adds_data"])
     print(f"\n[discover] {hiders} module(s) hide data (empty-node or absent-container) — "
-          f"{total_probes} probes on {device.pid}.")
-    return {"device": device.pid, "modules": per_module}
+          f"{total_probes} probes on {device.pid}"
+          + ("  [ABORTED by circuit breaker]" if aborted else "") + ".")
+    return {"device": device.pid, "modules": per_module, "aborted": aborted}
 
 
 def main(argv=None) -> int:
@@ -363,6 +385,8 @@ def main(argv=None) -> int:
     ap.add_argument("--child", action="append", dest="children",
                     help="Child container/list path under each entry (repeatable), e.g. platform-properties/platform-property")
     ap.add_argument("--limit", type=int, help="Cap number of deep GETs (debug)")
+    ap.add_argument("--resume", action="store_true",
+                    help="Skip modules already present in --out (resume an interrupted discovery)")
     ap.add_argument("--out", help="Write full JSON result to this path")
     args = ap.parse_args(argv)
     args_version = args.version
@@ -379,8 +403,24 @@ def main(argv=None) -> int:
     auth = inv.load_credentials()
 
     if args.discover:
+        resume_done = set()
+        if args.resume and args.out and Path(args.out).is_file():
+            try:
+                prior = json.loads(Path(args.out).read_text(encoding="utf-8"))
+                resume_done = set(prior.get("modules", {}))
+                print(f"[discover] resume: skipping {len(resume_done)} already-probed module(s)")
+            except (OSError, json.JSONDecodeError):
+                pass
         out = discover(device, auth, args.version, args.category,
-                       args.max_entries, args.cap_per_module, set(args.modules or []))
+                       args.max_entries, args.cap_per_module, set(args.modules or []),
+                       resume_done=resume_done)
+        if args.resume and resume_done and args.out and Path(args.out).is_file():
+            try:
+                prior = json.loads(Path(args.out).read_text(encoding="utf-8"))
+                prior.get("modules", {}).update(out["modules"])
+                out["modules"] = prior["modules"]
+            except (OSError, json.JSONDecodeError):
+                pass
         if args.out:
             Path(args.out).write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
             print(f"[discover] wrote {args.out}")
