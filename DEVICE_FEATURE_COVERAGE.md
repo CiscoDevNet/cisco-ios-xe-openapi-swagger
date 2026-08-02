@@ -300,6 +300,39 @@ interface Loopback100
 Rollback (control-plane only): `no interface Loopback100` on all 6; plus
 `no router ospf 1` on the five (NOT C9500 — leave its existing OSPF).
 
+### Phase 1 — APPLIED & SAVED (2026-08-02): routing protocols + platform limits
+OSPF (Phase 1a) applied+saved on the 5 routing-capable devices. A follow-up pass
+added **ISIS + EIGRP + BGP** (loopback/control-plane only) — applied+saved on the
+**4 switches**; `bgp-oper` populates on C9500 via a real (idle) neighbor. Exact
+CLI added per switch (octet = last IP digit):
+```
+router isis
+ net 49.0001.0000.0000.00<oct>.00
+ is-type level-2-only
+interface Loopback100
+ ip router isis
+router eigrp 1
+ network 10.255.0.<oct> 0.0.0.0
+router bgp 65000
+ bgp router-id 10.255.0.<oct>
+ neighbor 10.255.0.254 remote-as 65000        ! dummy -> populates bgp-oper, never establishes
+ address-family ipv4 unicast
+  neighbor 10.255.0.254 activate
+```
+Rollback: `no router isis` / `no router eigrp 1` / `no router bgp 65000` + `no ip router isis` on Loopback100.
+
+**Platform capability matrix (verified on the devices):**
+| Device | OSPF | ISIS | EIGRP | BGP | Notes |
+|---|---|---|---|---|---|
+| C9300 / C9400 / C9500 / C9600 | ✅ | ✅ | ✅ | ✅ | full routing |
+| **C9840 WLC (.83)** | ✅ | ❌ | ❌ | ❌ | **wireless controller — OSPF only**; `router isis/eigrp/bgp` = *Invalid input* |
+| **C9200L (.72)** | ❌ | ❌ | ❌ | ❌ | **C9200L has no routing / no Loopback** interfaces at all |
+
+**Result (oper modules now returning data):** `ospf-oper` 5/5; `isis-oper` 4/5;
+`eigrp-oper` 4/5; `bgp-oper` on C9500 (idle neighbor). An *established* BGP
+session (richer bgp-oper) needs two BGP-capable, same-VRF, mutually-reachable
+peers — deferred to Phase 1b (a spare link).
+
 ### Phase 1b reference config (DEFERRED — do NOT apply without a spare cable)
 The routed-`/31` + iBGP blocks below are kept only as the design for when a
 dedicated spare link exists. **Never convert `Te1/0/3`/`Te0/0/0`** (C9800 mgmt
@@ -373,7 +406,22 @@ populate); confirm with `depth_probe --discover --category oper` + the
 | # | Date | Phase / family | Device(s) | Config summary | `captured_modules` before → after | New modules populated | Device healthy? | Commit |
 |---|------|----------------|-----------|----------------|-----------------------------------|-----------------------|-----------------|--------|
 | 0 | 2026-07 | 0 · SNMP→RESTCONF MIB bridge | all 6 | `snmp-server community`, `snmp ifmib ifindex persist`, `netconf-yang cisco-ia snmp-community-string` | mib 62 → 96 | MIB models | yes | shipped |
-| 1 | _tbd_ | 1 · routing | _tbd_ | _tbd_ | _tbd_ | _tbd_ | _tbd_ | _tbd_ |
+| 1 | 2026-08-02 | 1a · OSPF (loopback) | C9300/C9400/C9600/C9840/C9500 | `router ospf 1` + `Loopback100` in area 0 (C9500 uses existing OSPF) | ospf-oper 0→5 devices | `ospf-oper` | yes, no outage | saved (not yet collected) |
+| 2 | 2026-08-02 | 1 · ISIS+EIGRP+BGP (loopback) | C9300/C9400/C9600/C9500 (switches) | `router isis`/`eigrp 1`/`bgp 65000` on loopback | isis/eigrp 0→4, bgp-oper 0→1 (C9500, idle) | `isis-oper`,`eigrp-oper`,`bgp-oper` | yes, no outage | saved (not yet collected) |
+
+> **Not yet re-collected** (per decision 2026-08-02): the config is applied+saved
+> on-device, but the published live-data has NOT been refreshed to capture these
+> new oper modules. Run `scripts/refresh_live_data.py --version 26.1.1 --capture`
+> when ready to bank the coverage.
+>
+> **Platform limits found:** C9200L has no routing/loopback; C9840 WLC is
+> OSPF-only. Those routing modules will never populate there.
+>
+> **Wireless:** 22/36 wireless oper modules are ALREADY captured (3 APs joined).
+> The 14 remaining need lab hardware/active state and are **not** a config win:
+> `wireless-client-oper` needs an associated client (0 now); `rfid`/`ble-mgmt`/
+> `location` need tags/BLE; `mesh-oper` needs a mesh AP; the rest are niche
+> features. Mark these **not-feasible-in-this-lab** unless hardware is added.
 
 ## Definition of done
 "As much as possible configured and collected" = every family in bucket A is
