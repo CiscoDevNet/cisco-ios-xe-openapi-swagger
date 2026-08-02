@@ -59,6 +59,78 @@ These belong to other platforms and will 404 on a C9K regardless of config:
 `aws-*` (cloud), `cable-*` (CMTS), `cellwan` (LTE/5G WAN modules). Track them as
 **N/A for this fleet**, not as gaps.
 
+## Iteration playbook (run this every cycle)
+This is a **multi-pass** effort — we iterate until as much as possible is
+configured and collected. Each cycle touches one feature family and is fully
+measured before moving on.
+
+1. **Pick** the next family from the Phased backlog (below), lowest phase first.
+2. **Snapshot** current coverage: note `captured_modules` per category from
+   `releases/26.1.1/live-examples-index.json` (or the Live Data coverage cards).
+3. **Health check** the target device(s): reachable, RESTCONF up, no alarms.
+4. **Back up** running-config (`show run`) before changing anything.
+5. **Configure** the family on ONE device (or a device *pair* where an adjacency
+   is needed), via netmiko. Keep changes minimal and reversible.
+6. **Bring it up** — an oper model stays empty until the feature is *active*
+   (adjacency established, flow/traffic present, client joined). Generate the
+   minimum needed (peer, joiner, ping).
+7. **`write memory`** once healthy.
+8. **Re-collect**: `python scripts/refresh_live_data.py --version 26.1.1 --capture`
+   (or targeted `python -m scripts.harness.collector --device <name> --module <mod>`).
+9. **Measure** the delta: which `*-oper`/`*-cfg` modules moved from 404 → data;
+   record the before→after `captured_modules`.
+10. **Verify** no regression/crash: `python -m scripts.harness.depth_probe
+    --device <PID> --discover --category <cat>`; confirm the device is healthy.
+11. **Record** a row in the Iteration log; **commit** the regenerated data +
+    the log update; roll the config to the remaining devices if it paid off.
+
+## Prep / assumptions (do once, Phase 0.5)
+- **Topology.** All 6 devices share the `10.85.134.0/24` management network.
+  Confirm before Phase 1: (a) is mgmt in a VRF (`Mgmt-vrf`)?  (b) are there
+  **data-plane links** between devices, or usable loopbacks, for L3 adjacencies?
+  Routing/MPLS/multicast/MACsec need a peer or a link that is **not** the mgmt
+  path. Document the actual lab cabling / SVIs / loopbacks here first.
+- **Peering model.** Easiest is to peer the switches **to each other** (they are
+  co-located) over a data VLAN/loopbacks — e.g. OSPF area 0 across a shared L2
+  segment, iBGP between loopbacks. Where no data link exists, a single device +
+  a loopback-only config still populates many oper models (process up) even
+  without a neighbor.
+- **Rollback.** Every cycle keeps a `show run` backup; changes are reversible
+  (`no` forms). The capture harness stays GET-only.
+
+## Phased backlog (priority order — iterate lowest-first)
+Counts are the uncaptured **oper** modules this family should unlock on this
+fleet. Mark each ✅ when validated in the Iteration log.
+
+| Phase | Family | Unlocks (examples) | Minimal enable | Needs a peer/link? |
+|---|---|---|---|---|
+| 1 | **Unicast routing** | `ospf`, `isis`, `bgp`, `eigrp`, `rip`, `rpl`, `rib` | `router ospf 1` + net on a loopback/SVI; add ISIS/BGP/EIGRP | Peer for full oper; loopback alone still populates process state |
+| 2 | **L2 / switching** | `bridge-domain`, `cfm`, `mvrp`, `dlr`, MST/VTP | EVC/BD; `ethernet cfm`; `spanning-tree mode mst` | Link between two devices |
+| 3 | **Multicast** | `pim`, `igmp`, `mfib` | `ip multicast-routing`; `ip pim sparse-mode` on SVIs | Source + joiner |
+| 4 | **MPLS / SR** | `mpls-*` (3), `mpls-ldp`, `segment-routing` | `mpls ip` + LDP, or `segment-routing mpls` | IGP up (Phase 1) |
+| 5 | **Services** | `dhcp`, `dns`, `nat`, `nbar` | `ip dhcp pool`; `ip nat`; `ip nbar protocol-discovery` | No (local) |
+| 6 | **Security** | `macsec`, `cts`/trustsec, `matm`, dot1x | `mka policy` + `macsec` on a link; `cts manual` | MACsec needs a link |
+| 7 | **Telemetry / QoS** | `flow-monitor`/`fnf`, `et-analytics`, `diffserv`/`qos` | `flow monitor` on an intf; `policy-map` + `service-policy` | No (traffic helps) |
+| 8 | **Platform / HA** | `stackwise-virtual`, `stack`, `breakout` | SVL on a 9500/9600 pair; `hw-module breakout` | Pair for SVL |
+| 9 | **Wireless (C9800)** | `wireless-*` (14) — AP/client/RRM/mobility | Join ≥1 AP + associate ≥1 client | Physical AP(s) |
+
+Phases 1–7 are software-only on the switches; Phase 8 needs a device pair;
+Phase 9 needs AP hardware. Skip the **platform-inapplicable** families entirely
+(bucket B above).
+
+## Iteration log (fill one row per cycle)
+| # | Date | Phase / family | Device(s) | Config summary | `captured_modules` before → after | New modules populated | Device healthy? | Commit |
+|---|------|----------------|-----------|----------------|-----------------------------------|-----------------------|-----------------|--------|
+| 0 | 2026-07 | 0 · SNMP→RESTCONF MIB bridge | all 6 | `snmp-server community`, `snmp ifmib ifindex persist`, `netconf-yang cisco-ia snmp-community-string` | mib 62 → 96 | MIB models | yes | shipped |
+| 1 | _tbd_ | 1 · routing | _tbd_ | _tbd_ | _tbd_ | _tbd_ | _tbd_ | _tbd_ |
+
+## Definition of done
+"As much as possible configured and collected" = every family in bucket A is
+either ✅ validated (modules populated + logged) or explicitly marked
+**not-feasible-in-this-lab** (no hardware/peer), and bucket B is confirmed
+platform-inapplicable. Re-run the full `depth_probe --discover` fleet sweep at
+the end to reconfirm completeness.
+
 ## Safety
 - **Never** enable in a way that requires the crash-unsafe modules to be walked
   (`Cisco-IOS-XE-lldp-oper`, `CISCO-RTTMON-MIB`, `CISCO-VOICE-DIAL-CONTROL-MIB`);
