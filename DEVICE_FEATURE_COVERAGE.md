@@ -182,18 +182,40 @@ Phase 9 needs AP hardware. Skip the **platform-inapplicable** families entirely
 > anything to a device.** This is the first *write* to the fleet in this project;
 > everything before it was read-only.
 
+> ### ⚠ Risk findings (2026-08-02, verified read-only) — THESE REVISE THE PLAN
+> - **C9800 mgmt is IN-BAND on `Vlan311` (10.85.134.83), not the `Gig0` OOB
+>   port.** Its management therefore rides a **data** path (the `Te0/0/0`→hub
+>   `Te1/0/3` link). **Converting that link to a routed `/31` would cut RESTCONF/
+>   SSH to the C9800.**
+> - **3 APs are joined** to the C9800 (incl. the CW9166 on hub `Te1/0/14`); their
+>   CAPWAP rides the same data path — converting the link would **drop the APs**.
+> - The C9300 hub also **bridges mgmt** for C9500/C9600 (their `Gig0/0` land on
+>   hub ports). Touching the hub's mgmt VLAN/ports cuts those devices too.
+>
+> **Conclusion:** there is **no spare inter-device data link** among our 6 (the
+> only ones are load-bearing for mgmt/CAPWAP; C9600/C9500 data ports are
+> uncabled). So **Phase 1 = loopback-only OSPF on all 6, NO port conversions, NO
+> adjacency, NO BGP.** This is additive/control-plane only and carries ~zero
+> connectivity risk. Real neighbor/BGP oper (the config blocks below) becomes
+> **Phase 1b — deferred until a dedicated spare cable is added** (e.g. C9600
+> `Te0/1`→a free hub port), so no production/mgmt/CAPWAP link is disturbed.
+>
+> **Before ANY write:** confirm out-of-band **console** access (jcohoe-console
+> `C1100T` / CONSOLE2) so a device is recoverable if it drops.
+
 **Goal.** Populate the routing oper models (`ospf`, `bgp`, `rib`, `rpl`, and —
 where a process comes up — `isis`/`eigrp`) with zero recabling, on our 6
 free-standing devices, without disturbing management or the neighboring live
 EVPN fabric.
 
-**Approach.**
-1. **Loopback-only OSPF on all 6** — a dedicated loopback in OSPF area 0 brings up
-   the OSPF process + interface/area oper on every device even with no neighbor.
-2. **One real adjacency** on the existing **C9300 `Te1/0/3` ↔ C9800 `Te0/0/0`**
-   data link (routed `/31`, OSPF p2p) → real neighbor/adjacency oper.
-3. **iBGP session** C9300 ↔ C9800 between loopbacks (AS 65000) → established
-   `bgp` oper (session, AF, RIB) once OSPF makes the loopbacks reachable.
+**Phase 1a (SAFE, apply now once reviewed): loopback-only OSPF on all 6.** A
+dedicated loopback in OSPF area 0 brings up the OSPF process + interface/area
+oper on every device even with no neighbor. **No physical port is touched.**
+
+**Phase 1b (DEFERRED — needs a dedicated spare cable): real adjacency + iBGP.**
+The routed-`/31` + iBGP blocks below stay as the reference design for when a
+spare link exists. **Do NOT convert `Te1/0/3` / `Te0/0/0`** — they carry C9800
+mgmt (Vlan311) + CAPWAP.
 
 **Addressing (proposed — change if it collides with lab allocations).**
 | Device | Mgmt IP | New Loopback100 | OSPF router-id |
@@ -254,25 +276,30 @@ router bgp 65000
   neighbor 10.255.0.70 activate
 ```
 
-**Pre-flight gates (must all pass before applying).**
-- [ ] Back up `show running-config` from each device to a gitignored file.
-- [ ] Confirm C9800 mgmt path = `GigabitEthernet0` (not `Te0/0/0`).
-- [ ] Confirm hub `Te1/0/3` carries no mgmt VLAN and only reaches C9800 `Te0/0/0`.
-- [ ] Confirm `Loopback100` is unused on all 6; confirm `10.255.0.0/24` +
-      `10.254.0.0/31` don't collide with lab/fabric ranges.
-- [ ] Stay OFF hub ports `Te1/0/9`, `Te1/0/10`, `Te1/0/13`, `Te1/0/24` and the
-      mgmt VLAN. Do NOT touch any non-XESWAGGER-L / Meraki / fabric device.
+**Pre-flight gates (must all pass before applying Phase 1a).**
+- [ ] Confirm out-of-band **console** access to all 6 (recovery path if a box drops).
+- [ ] Back up `show running-config` from each device to a gitignored file (exact
+      config, so rollback restores the original — not just `default`).
+- [ ] Confirm `Loopback100` is unused on all 6; confirm `10.255.0.0/24` doesn't
+      collide with lab/fabric ranges.
+- [ ] Use interface-level `ip ospf 1 area 0` on the **loopback only** — no
+      `network` statements, so no data/fabric/mgmt interface is pulled into OSPF.
+- [ ] Do NOT touch any port, VLAN, or SVI (esp. `Vlan311`, the hub mgmt ports
+      `Te1/0/9/10/13/24`, or any Meraki/fabric device).
 
-**Apply / verify / rollback.**
-- Apply via netmiko `send_config_set` (per device), one device at a time,
-  loopback+OSPF first; the two p2p/BGP blocks last. Re-verify RESTCONF (mgmt)
-  reachability after EACH device before continuing.
-- Verify: `show ip ospf neighbor` (expect C9300↔C9800 FULL), `show ip bgp summary`
-  (expect Established), and RESTCONF GET `Cisco-IOS-XE-ospf-oper:ospf-oper-data`
-  / `Cisco-IOS-XE-bgp-oper:bgp-state-data`.
-- Rollback (reverse order): `no router bgp 65000`, `default interface Te…` (or
-  `no ip address` + `switchport`), `no router ospf 1`, `no interface Loopback100`.
-- `write memory` only after health + reachability confirmed.
+**Phase 1b gates (DEFERRED — only after a dedicated spare cable exists).**
+- [ ] A NEW physical link between two of our devices that carries **no** mgmt/
+      CAPWAP/fabric traffic (e.g. C9600 `Te0/1` → a free hub data port).
+- [ ] Never convert `Te1/0/3` / `Te0/0/0` (C9800 mgmt Vlan311 + CAPWAP ride them).
+
+**Apply / verify / rollback (Phase 1a).**
+- Apply via netmiko `send_config_set`, **one device at a time**; re-verify RESTCONF
+  (mgmt) reachability after EACH device before continuing.
+- Verify: RESTCONF GET `Cisco-IOS-XE-ospf-oper:ospf-oper-data` returns the process
+  + `Loopback100` in area 0 (`show ip ospf interface brief`).
+- Rollback: `no router ospf 1`, `no interface Loopback100` (control-plane only;
+  nothing else changed).
+- `write memory` only after health + reachability confirmed on all 6.
 
 **Expected coverage delta.** `oper`: `+ospf`, `+bgp` (and `rib`/`rpl` may
 populate); confirm with `depth_probe --discover --category oper` + the
