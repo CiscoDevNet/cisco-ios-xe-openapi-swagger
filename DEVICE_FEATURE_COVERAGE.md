@@ -127,6 +127,36 @@ data collection. Instead:
   `Te0/1` → a free hub port, C9500 `Hu1/0/33` → a free hub port — and **keep
   `Gig0/0` for management**. A routed p2p (`/31`) + OSPF then brings full oper.
 
+### Rack roster + what is safe to touch (from the VNC2 Lab Matrix, 2026-08-02)
+The rack has **many** devices on `10.85.134.0/24`; only 6 are ours to collect and
+configure (matrix rows highlighted "XESWAGGER-L"). Trust the matrix's **RU**
+column; other columns (roles/versions) may be stale.
+
+**Our 6 (free-standing, safe to configure — pending the C9500 check below):**
+`.70` C9300-24UX (hub, "R1 TOR-2 Rear") · `.71` C9400 · `.72` C9200L · `.75`
+C9600 · `.83` C9840 WLC · `.95` C9500-32QC.
+
+**NOT ours — shared rack/TOR, do NOT reconfigure (many Meraki-managed):**
+- **VNC2 EVPN/Meraki/DT fabric:** `.99/.98/.97/.96` vnc2-leaf1–4, `.94/.92`
+  vnc2-border2 / border1-acr, `.84` vnc2-spine1 (C9500-24Q). A **live** fabric.
+- **Meraki-mode:** `.74` c9350, `.202` c9350-lux, an MX.
+- **Infra:** `.65` TOR (C9300-24), `.79`/`.199` console servers, `.89` ASR1001,
+  `.77` C9300L (needs password recovery), `.78` C9300-X, `.80` C9300LM.
+
+> **⚠ Two hard constraints for Phase ≥1:**
+> 1. **Never CLI-configure a Meraki-managed / live-fabric device** — the dashboard
+>    owns it and will fight/lose the change. Touch only our 6.
+> 2. **Our hub cables to the live EVPN spines** (hub `Te1/0/9`→vnc2-spine1,
+>    `Te1/0/10`→our `.95`/vnc2-spine2). Do **not** push routing/VLAN changes onto
+>    the hub's fabric-facing or mgmt-bridging ports — keep feature config on
+>    **loopbacks and leaf devices**, away from `Te1/0/9`,`Te1/0/10`,`Te1/0/13`,
+>    `Te1/0/24` and the mgmt VLAN.
+
+> **❓ Confirm before Phase 1:** is `.95` (C9500, labeled `vnc2-spine2`) a
+> free-standing lab box we may reconfigure, or still an active spine in the VNC2
+> EVPN fabric? If it's live, drop it from the config set (keep collecting it
+> read-only) and build Phase 1 around `.70`/`.71`/`.72`/`.75`/`.83` instead.
+
 ## Phased backlog (priority order — iterate lowest-first)
 Counts are the uncaptured **oper** modules this family should unlock on this
 fleet. Mark each ✅ when validated in the Iteration log.
