@@ -152,10 +152,10 @@ C9600 · `.83` C9840 WLC · `.95` C9500-32QC.
 >    **loopbacks and leaf devices**, away from `Te1/0/9`,`Te1/0/10`,`Te1/0/13`,
 >    `Te1/0/24` and the mgmt VLAN.
 
-> **❓ Confirm before Phase 1:** is `.95` (C9500, labeled `vnc2-spine2`) a
-> free-standing lab box we may reconfigure, or still an active spine in the VNC2
-> EVPN fabric? If it's live, drop it from the config set (keep collecting it
-> read-only) and build Phase 1 around `.70`/`.71`/`.72`/`.75`/`.83` instead.
+> **✅ Resolved (2026-08-02):** `.95` (C9500) is **no longer in the VNC2 EVPN
+> fabric** — it is free-standing and safe to reconfigure. All 6 XESWAGGER-L
+> devices are in the config set. (Its hub-facing link is now just a lab link, not
+> a live-fabric uplink — but still avoid disturbing the hub's mgmt-bridging role.)
 
 ## Phased backlog (priority order — iterate lowest-first)
 Counts are the uncaptured **oper** modules this family should unlock on this
