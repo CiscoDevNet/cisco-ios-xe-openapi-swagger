@@ -202,6 +202,23 @@ Phase 9 needs AP hardware. Skip the **platform-inapplicable** families entirely
 >
 > **Before ANY write:** confirm out-of-band **console** access (jcohoe-console
 > `C1100T` / CONSOLE2) so a device is recoverable if it drops.
+>
+> ### Recovery model / OOB (know this before writing)
+> - **Console lines** (matrix "Serial Port" col): C9400 `2010`, C9300-2 `2017`,
+>   C9200 `2018`, C9840 WLC `2019`, C9500 `2024`, C9600 `2027`. Telnet the
+>   console server → line → the device serial, independent of the device's
+>   *network* mgmt.
+> - **APs re-join automatically** once the WLC path is restored — no manual step.
+> - **Do not `write memory` until confirmed healthy** — an unsaved bad change is
+>   undone by a reload (and APs rejoin).
+> - **The `/24` is sacred.** The TOR (`.65`) and BOTH console servers (`.79`,
+>   `.199`) live on `10.85.134.0/24`. Breaking the `/24` upstream = losing the
+>   TOR **and** console = no remote recovery. Only touching the hub's
+>   mgmt-bridging ports or the mgmt VLAN can do this — both are forbidden.
+> - Breaking a **single device's own** in-band mgmt (e.g. C9800 `Vlan311`) is
+>   recoverable via that device's console line; the `/24` stays up for everyone
+>   else. **Phase 1a (loopback-only) touches no port/VLAN/SVI, so it cannot break
+>   the `/24` or any device's mgmt.**
 
 **Goal.** Populate the routing oper models (`ospf`, `bgp`, `rib`, `rpl`, and —
 where a process comes up — `isis`/`eigrp`) with zero recabling, on our 6
