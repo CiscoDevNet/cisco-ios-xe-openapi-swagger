@@ -247,16 +247,63 @@ mgmt (Vlan311) + CAPWAP.
 Point-to-point link: **`10.254.0.0/31`** — C9300 = `.0`, C9800 = `.1`.
 OSPF process **1**, area **0**. BGP AS **65000**.
 
-**Per-device config.**
+**Phase 1a — final per-device CLI (verified against current state 2026-08-02).**
+Pre-checks: `Loopback100` free on all 6; no OSPF anywhere **except C9500**, which
+already has `router ospf 1` (`network 0.0.0.0 255.255.255.255 area 0`) + `Loopback0
+192.168.2.2` — leave that process untouched.
 ```
-! --- ALL 6 devices: loopback + OSPF process (control-plane only) ---
-interface Loopback100
- ip address 10.255.0.<octet> 255.255.255.255
- ip ospf 1 area 0
-!
+! C9300-24UX  (10.85.134.70)
 router ospf 1
- router-id 10.255.0.<octet>
+ router-id 10.255.0.70
+interface Loopback100
+ ip address 10.255.0.70 255.255.255.255
+ ip ospf 1 area 0
 ```
+```
+! C9400  (10.85.134.71)
+router ospf 1
+ router-id 10.255.0.71
+interface Loopback100
+ ip address 10.255.0.71 255.255.255.255
+ ip ospf 1 area 0
+```
+```
+! C9200  (10.85.134.72)
+router ospf 1
+ router-id 10.255.0.72
+interface Loopback100
+ ip address 10.255.0.72 255.255.255.255
+ ip ospf 1 area 0
+```
+```
+! C9600  (10.85.134.75)
+router ospf 1
+ router-id 10.255.0.75
+interface Loopback100
+ ip address 10.255.0.75 255.255.255.255
+ ip ospf 1 area 0
+```
+```
+! C9840 WLC  (10.85.134.83)
+router ospf 1
+ router-id 10.255.0.83
+interface Loopback100
+ ip address 10.255.0.83 255.255.255.255
+ ip ospf 1 area 0
+```
+```
+! C9500  (10.85.134.95) — special: do NOT modify its existing "router ospf 1".
+! Its match-all network statement auto-includes this loopback in area 0.
+interface Loopback100
+ ip address 10.255.0.95 255.255.255.255
+```
+Rollback (control-plane only): `no interface Loopback100` on all 6; plus
+`no router ospf 1` on the five (NOT C9500 — leave its existing OSPF).
+
+### Phase 1b reference config (DEFERRED — do NOT apply without a spare cable)
+The routed-`/31` + iBGP blocks below are kept only as the design for when a
+dedicated spare link exists. **Never convert `Te1/0/3`/`Te0/0/0`** (C9800 mgmt
+Vlan311 + CAPWAP ride them).
 ```
 ! --- C9300-24UX (.70) ONLY: routed p2p toward C9800 on Te1/0/3 ---
 ! PRE-CHECK: confirm Te1/0/3 is a plain data link to C9800 Te0/0/0 and is NOT in
