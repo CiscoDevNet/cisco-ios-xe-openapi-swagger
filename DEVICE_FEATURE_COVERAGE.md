@@ -177,6 +177,107 @@ Phases 1–7 are software-only on the switches; Phase 8 needs a device pair;
 Phase 9 needs AP hardware. Skip the **platform-inapplicable** families entirely
 (bucket B above).
 
+## Phase 1 — implementation proposal (DRAFT — review before applying)
+> **Status: NOT APPLIED. Next agent: review this whole section before writing
+> anything to a device.** This is the first *write* to the fleet in this project;
+> everything before it was read-only.
+
+**Goal.** Populate the routing oper models (`ospf`, `bgp`, `rib`, `rpl`, and —
+where a process comes up — `isis`/`eigrp`) with zero recabling, on our 6
+free-standing devices, without disturbing management or the neighboring live
+EVPN fabric.
+
+**Approach.**
+1. **Loopback-only OSPF on all 6** — a dedicated loopback in OSPF area 0 brings up
+   the OSPF process + interface/area oper on every device even with no neighbor.
+2. **One real adjacency** on the existing **C9300 `Te1/0/3` ↔ C9800 `Te0/0/0`**
+   data link (routed `/31`, OSPF p2p) → real neighbor/adjacency oper.
+3. **iBGP session** C9300 ↔ C9800 between loopbacks (AS 65000) → established
+   `bgp` oper (session, AF, RIB) once OSPF makes the loopbacks reachable.
+
+**Addressing (proposed — change if it collides with lab allocations).**
+| Device | Mgmt IP | New Loopback100 | OSPF router-id |
+|---|---|---|---|
+| C9300-24UX (hub) | .70 | 10.255.0.70/32 | 10.255.0.70 |
+| C9400 | .71 | 10.255.0.71/32 | 10.255.0.71 |
+| C9200 | .72 | 10.255.0.72/32 | 10.255.0.72 |
+| C9600 | .75 | 10.255.0.75/32 | 10.255.0.75 |
+| C9840 WLC | .83 | 10.255.0.83/32 | 10.255.0.83 |
+| C9500 | .95 | 10.255.0.95/32 | 10.255.0.95 (keep existing `Loopback0 192.168.2.2`) |
+
+Point-to-point link: **`10.254.0.0/31`** — C9300 = `.0`, C9800 = `.1`.
+OSPF process **1**, area **0**. BGP AS **65000**.
+
+**Per-device config.**
+```
+! --- ALL 6 devices: loopback + OSPF process (control-plane only) ---
+interface Loopback100
+ ip address 10.255.0.<octet> 255.255.255.255
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.255.0.<octet>
+```
+```
+! --- C9300-24UX (.70) ONLY: routed p2p toward C9800 on Te1/0/3 ---
+! PRE-CHECK: confirm Te1/0/3 is a plain data link to C9800 Te0/0/0 and is NOT in
+! the management VLAN and NOT trunking the mgmt subnet (it bridges no mgmt).
+interface TenGigabitEthernet1/0/3
+ no switchport
+ ip address 10.254.0.0 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+!
+router bgp 65000
+ bgp router-id 10.255.0.70
+ neighbor 10.255.0.83 remote-as 65000
+ neighbor 10.255.0.83 update-source Loopback100
+ address-family ipv4 unicast
+  neighbor 10.255.0.83 activate
+```
+```
+! --- C9840 WLC (.83) ONLY: routed p2p toward C9300 on Te0/0/0 ---
+! PRE-CHECK: confirm C9800 management (10.85.134.83) is via GigabitEthernet0
+! (OOB / Mgmt-vrf) and does NOT traverse Te0/0/0. If mgmt rides Te0/0/0, DO NOT
+! convert it — do loopback-only for C9800 and skip the adjacency.
+interface TenGigabitEthernet0/0/0
+ no switchport
+ ip address 10.254.0.1 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+!
+router bgp 65000
+ bgp router-id 10.255.0.83
+ neighbor 10.255.0.70 remote-as 65000
+ neighbor 10.255.0.70 update-source Loopback100
+ address-family ipv4 unicast
+  neighbor 10.255.0.70 activate
+```
+
+**Pre-flight gates (must all pass before applying).**
+- [ ] Back up `show running-config` from each device to a gitignored file.
+- [ ] Confirm C9800 mgmt path = `GigabitEthernet0` (not `Te0/0/0`).
+- [ ] Confirm hub `Te1/0/3` carries no mgmt VLAN and only reaches C9800 `Te0/0/0`.
+- [ ] Confirm `Loopback100` is unused on all 6; confirm `10.255.0.0/24` +
+      `10.254.0.0/31` don't collide with lab/fabric ranges.
+- [ ] Stay OFF hub ports `Te1/0/9`, `Te1/0/10`, `Te1/0/13`, `Te1/0/24` and the
+      mgmt VLAN. Do NOT touch any non-XESWAGGER-L / Meraki / fabric device.
+
+**Apply / verify / rollback.**
+- Apply via netmiko `send_config_set` (per device), one device at a time,
+  loopback+OSPF first; the two p2p/BGP blocks last. Re-verify RESTCONF (mgmt)
+  reachability after EACH device before continuing.
+- Verify: `show ip ospf neighbor` (expect C9300↔C9800 FULL), `show ip bgp summary`
+  (expect Established), and RESTCONF GET `Cisco-IOS-XE-ospf-oper:ospf-oper-data`
+  / `Cisco-IOS-XE-bgp-oper:bgp-state-data`.
+- Rollback (reverse order): `no router bgp 65000`, `default interface Te…` (or
+  `no ip address` + `switchport`), `no router ospf 1`, `no interface Loopback100`.
+- `write memory` only after health + reachability confirmed.
+
+**Expected coverage delta.** `oper`: `+ospf`, `+bgp` (and `rib`/`rpl` may
+populate); confirm with `depth_probe --discover --category oper` + the
+`captured_modules` before/after. Record in the Iteration log.
+
 ## Iteration log (fill one row per cycle)
 | # | Date | Phase / family | Device(s) | Config summary | `captured_modules` before → after | New modules populated | Device healthy? | Commit |
 |---|------|----------------|-----------|----------------|-----------------------------------|-----------------------|-----------------|--------|
