@@ -143,6 +143,11 @@ didn't already return. Conclusion: exhaustive per-path GET (the default, not
 come back with their parents — so the captured set is complete. `--roots-only`
 alone would MISS the three containers above; the full per-path mode does not.
 
+> **Capturing MORE data = configuring more features.** ~626 of 937 modules
+> return 404 because the feature is unconfigured (or is platform-inapplicable on
+> a C9K). The device-configuration runbook for lighting those up lives in
+> [DEVICE_FEATURE_COVERAGE.md](DEVICE_FEATURE_COVERAGE.md).
+
 ## 5. Value-discovery index
 scripts/harness/build_capture_index.py (mirror scripts/build_paths_index.py):
 - Walk every captured response; recursively flatten to rows (device, pid, module, path,
