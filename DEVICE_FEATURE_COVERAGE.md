@@ -98,6 +98,35 @@ measured before moving on.
 - **Rollback.** Every cycle keeps a `show run` backup; changes are reversible
   (`no` forms). The capture harness stays GET-only.
 
+### Discovered topology (2026-08-02, from `cdp-oper` + `interfaces-oper`)
+The **C9300-24UX (10.85.134.70) is the lab aggregation hub** — 14 data ports up,
+CDP neighbors include our C9600, C9800, plus external spines/TORs and a CW9166
+AP. What connects to it, and whether the link is usable for data-plane routing:
+
+| Device | Local port | → C9300 hub port | Link kind | Data-plane usable? |
+|---|---|---|---|---|
+| **C9800** | `Te0/0/0` (data) | `Te1/0/3` | data ↔ data, UP | **YES** — real adjacency, no recabling |
+| C9600 | `Gig0/0` (**mgmt**) | `Te1/0/13` | mgmt ↔ data | No — C9600 side is the OOB Mgmt-vrf port |
+| C9500 | `Gig0/0` (**mgmt**) | `Te1/0/10` | mgmt ↔ data | No — C9500 side is mgmt; already has `Loopback0 192.168.2.2` |
+| C9200 | `Gi1/0/1` (data) | → external `C9300-TOR1` | data ↔ external | Peer not in our inventory |
+| hub → spines | `Te1/0/9`,`Te1/0/10` | VNC2-SPINE1/2 (C9500s) | data ↔ external | Peer not ours (a running fabric) |
+| hub → AP | `Te1/0/14` | CW9166I AP | data ↔ AP | Wireless (Phase 9) |
+
+**C9600 free data ports:** `TenGigabitEthernet0/1` and `0/2` are **admin-up but
+`lower-layer-down`** (enabled, nothing plugged in). **C9500** similarly has
+`HundredGigE1/0/33-48` up-but-no-cable.
+
+**Cabling answer — do NOT move `Gig0/0`.** On Catalyst, `Gig0/0` is the dedicated
+out-of-band **Mgmt-vrf** port that carries our RESTCONF access (e.g. C9600 =
+10.85.134.75); it cannot route data-plane traffic, and moving the cable would cut
+data collection. Instead:
+- **Zero-recabling wins now:** (a) **loopback-only** routing on all 6 (populates
+  OSPF/ISIS/BGP process oper without a neighbor; C9500 already has a loopback);
+  (b) a **real OSPF/BGP adjacency on the existing C9300↔C9800 data link**.
+- **To give C9600/C9500 real neighbors:** add ONE data cable each — e.g. C9600
+  `Te0/1` → a free hub port, C9500 `Hu1/0/33` → a free hub port — and **keep
+  `Gig0/0` for management**. A routed p2p (`/31`) + OSPF then brings full oper.
+
 ## Phased backlog (priority order — iterate lowest-first)
 Counts are the uncaptured **oper** modules this family should unlock on this
 fleet. Mark each ✅ when validated in the Iteration log.
