@@ -529,11 +529,17 @@
         var rows = (m.rows || []).filter(function (r) { return r.pid === state.pid; });
         rows.sort(function (a, b) { return (a.category || '').localeCompare(b.category || '') || a.module.localeCompare(b.module); });
         var info = $('matrixInfo');
-        if (info) info.textContent = state.pid + ' \u00b7 ' + rows.length + ' modules \u00d7 ' + methods.length + ' methods (green = returned data)';
+        if (info) info.textContent = state.pid + ' \u00b7 ' + rows.length + ' modules \u00d7 ' + methods.length
+            + ' methods (green = data, amber = supported/no data, red = rejected)';
         var table = el('table', { className: 'mx' });
         var hr = el('tr', {}, [el('th', { className: 'l', text: 'YANG module' })]);
         methods.forEach(function (mm) { hr.appendChild(el('th', { text: mm.label })); });
         table.appendChild(el('thead', {}, [hr]));
+        var CELL = {
+            data: { cls: 'y', txt: '\u25cf', tip: 'returned data' },
+            ok: { cls: 'ok', txt: '\u25d1', tip: 'supported, no data' },
+            no: { cls: 'no', txt: '\u2715', tip: 'rejected / unsupported' }
+        };
         var tbody = el('tbody');
         rows.forEach(function (r) {
             var tr = el('tr', {}, [el('td', { className: 'l', title: r.category }, [
@@ -541,8 +547,10 @@
                 document.createTextNode(' ' + r.module)
             ])]);
             methods.forEach(function (mm) {
-                var v = r.cells ? r.cells[mm.key] : 0;
-                tr.appendChild(el('td', { className: v ? 'y' : 'n', text: v ? fmtBytes(v) : '\u00b7' }));
+                var v = r.cells ? r.cells[mm.key] : null;
+                var c = CELL[v];
+                tr.appendChild(el('td', c ? { className: c.cls, text: c.txt, attrs: { title: c.tip } }
+                    : { className: 'na', text: '\u00b7', attrs: { title: 'not collected / n/a' } }));
             });
             tbody.appendChild(tr);
         });

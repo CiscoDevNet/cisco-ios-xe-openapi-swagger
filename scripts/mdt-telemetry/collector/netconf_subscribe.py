@@ -143,7 +143,7 @@ def main() -> int:
     for dev in load_devices([args.device] if args.device else None):
         print(f"\n=== NETCONF establish-subscription {dev['pid']} ({dev['host']}) ===")
         try:
-            result = collect_device(dev, env, manifest_roots(dev["pid"]), args.limit,
+            result = collect_device(dev, env, load_roots(), args.limit,
                                     args.period_cs, args.window)
         except Exception as e:  # noqa: BLE001
             print(f"  ! {dev['pid']} failed: {e}")
