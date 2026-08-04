@@ -48,6 +48,42 @@ def load_prefix_to_module() -> dict:
     except (json.JSONDecodeError, OSError):
         return {}
 
+
+def _module_to_prefix() -> dict:
+    """Raw {module: prefix} map from yang-prefix-map.json."""
+    try:
+        data = json.loads(PREFIX_MAP.read_text(encoding="utf-8"))
+        return dict(data.get("modules") or {})
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def resolve_module(prefix: str, container: str, mod_to_prefix: dict) -> str:
+    """Pick the module that actually DEFINES a top-level container.
+
+    Several Cisco-IOS-XE augmentation modules share a prefix (e.g. `ios` is used
+    by Cisco-IOS-XE-native and ~11 modules that augment it). A naive prefix->module
+    inversion picks an arbitrary one, breaking the namespace / gNMI path. The module
+    that owns the top container is the one whose name matches the container name.
+    """
+    candidates = [m for m, p in mod_to_prefix.items() if p == prefix]
+    if len(candidates) == 1:
+        return candidates[0]
+    if not candidates:
+        return prefix
+    want = container.lower()
+    # module name minus the Cisco-IOS-XE- vendor prefix should equal the container
+    exact = [m for m in candidates if m.lower().rsplit("cisco-ios-xe-", 1)[-1] == want]
+    if exact:
+        return exact[0]
+    ends = [m for m in candidates if m.lower().endswith(want)]
+    if ends:
+        return min(ends, key=len)
+    contains = [m for m in candidates if want in m.lower()]
+    if contains:
+        return min(contains, key=len)
+    return sorted(candidates)[0]
+
 # Flavors whose top container is (also) config -> worth a <get-config>.
 CONFIG_FLAVORS = {"cfg", "native-config", "openconfig"}
 MAX_PAYLOAD = 200_000  # cap stored payload per path (chars) to keep files sane
@@ -55,6 +91,7 @@ MAX_PAYLOAD = 200_000  # cap stored payload per path (chars) to keep files sane
 
 def load_roots() -> list[dict]:
     """Depth-1 container of every module, all flavors (+ MIB)."""
+    mod_to_prefix = _module_to_prefix()
     roots: dict[str, dict] = {}
     for path, forced_cat in ((CATALOG, None), (MIB_CATALOG, "mib")):
         if not path.exists():
@@ -71,10 +108,12 @@ def load_roots() -> list[dict]:
                     continue
                 roots["/" + body] = {
                     "prefix": prefix, "container": container,
+                    "module": resolve_module(prefix, container, mod_to_prefix),
                     "category": forced_cat or n.get("category", "other"),
                     "xpath": "/" + body,
                 }
     return list(roots.values())
+
 
 
 def build_ns_map(server_capabilities) -> dict:
@@ -177,7 +216,13 @@ def collect_device(dev, env, roots, limit, out_path=None) -> dict:
     while i < len(ops):
         r, op = ops[i]
         keys = {k: r[k] for k in ("xpath", "prefix", "container", "category")}
-        ns = ns_by_prefix.get(r["prefix"])
+        keys["module"] = r.get("module")
+        module = r.get("module") or prefix2module.get(r["prefix"], r["prefix"])
+        ns = nsmap.get(module)
+        if not ns and module.startswith("Cisco-IOS-XE-"):
+            ns = f"http://cisco.com/ns/yang/{module}"  # Cisco convention fallback
+        if not ns:
+            ns = ns_by_prefix.get(r["prefix"])  # module-name-form xpaths / prefix fallback
         if not ns:
             entries.append({**keys, "op": op, "status": "no-namespace", "bytes": 0, "payload": ""})
             i += 1

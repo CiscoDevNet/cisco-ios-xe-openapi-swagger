@@ -66,8 +66,14 @@ def collect_device(dev, env, roots, limit, period_cs, window):
     print(f"  {dev['pid']}: {len(todo)} roots to subscribe (period {period_cs}cs, window {window}s)")
     entries = []
     for r in todo:
-        ns = ns_by_prefix.get(r["prefix"])
+        module = r.get("module") or p2m.get(r["prefix"], r["prefix"])
+        ns = nsmap.get(module)
+        if not ns and module.startswith("Cisco-IOS-XE-"):
+            ns = f"http://cisco.com/ns/yang/{module}"
+        if not ns:
+            ns = ns_by_prefix.get(r["prefix"])
         keys = {k: r[k] for k in ("xpath", "prefix", "container", "category")}
+        keys["module"] = r.get("module")
         if not ns:
             entries.append({**keys, "status": "no-namespace", "bytes": 0, "payload": ""})
             continue

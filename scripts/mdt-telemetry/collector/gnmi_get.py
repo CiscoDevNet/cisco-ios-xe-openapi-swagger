@@ -66,9 +66,10 @@ def collect_device(dev, env, roots, limit, out_path=None):
     fails = 0
     while i < len(todo):
         r = todo[i]
-        module = p2m.get(r["prefix"], r["prefix"])
+        module = r.get("module") or p2m.get(r["prefix"], r["prefix"])
         path = gnmi_path(r["prefix"], module, r["container"], r["category"])
         keys = {k: r[k] for k in ("xpath", "prefix", "container", "category")}
+        keys["module"] = module
         if path is None:
             entries.append({**keys, "op": "all", "gnmi_path": "", "status": "unsupported", "bytes": 0, "payload": ""})
             i += 1
