@@ -148,18 +148,26 @@
             wrap.appendChild(el('div', { className: 'placeholder', text: 'No streamed paths match.' }));
             return;
         }
-        rows.forEach(function (p) {
-            var key = p.pid + '|' + p.path;
-            var row = el('div', {
-                className: 'prow' + (state.sel === key ? ' sel' : ''),
-                onclick: function () { state.sel = key; renderList(); renderDetail(); }
-            }, [
-                el('span', { className: 'catdot ' + catClass(p.category), title: p.category }),
-                el('span', { className: 'p', text: p.path }),
-                el('span', { className: 'rc', text: (p.records != null ? fmt(p.records) + ' rec' : fmtBytes(p.bytes)) })
-            ]);
-            wrap.appendChild(row);
-        });
+        var withData = [], without = [];
+        rows.forEach(function (p) { (isNoData(p) ? without : withData).push(p); });
+        withData.forEach(function (p) { wrap.appendChild(pathRow(p, false)); });
+        if (without.length) {
+            wrap.appendChild(el('div', { className: 'nodhead',
+                text: 'No data \u00b7 ' + without.length + ' path' + (without.length > 1 ? 's' : '') }));
+            without.forEach(function (p) { wrap.appendChild(pathRow(p, true)); });
+        }
+    }
+    function pathRow(p, dim) {
+        var key = p.pid + '|' + p.path;
+        return el('div', {
+            className: 'prow' + (state.sel === key ? ' sel' : '') + (dim ? ' nodata' : ''),
+            onclick: function () { state.sel = key; renderList(); renderDetail(); }
+        }, [
+            el('span', { className: 'catdot ' + catClass(p.category), title: p.category }),
+            el('span', { className: 'p', text: p.path }),
+            el('span', { className: 'rc', text: dim ? 'no data'
+                : (p.records != null ? fmt(p.records) + ' rec' : fmtBytes(p.bytes)) })
+        ]);
     }
 
     // ---------- detail ----------
@@ -251,6 +259,94 @@
         flash(legacyCopy());
     }
 
+    // ---------- payload formatting & syntax highlighting ----------
+    // Empty NETCONF replies are just an <rpc-reply><data/></rpc-reply> envelope;
+    // treat those (and blank subscribe payloads) as "no data" rather than showing
+    // an empty box. MDT/RESTCONF paths have no inline payload string, so skip them.
+    function isNoData(p) {
+        if (typeof p.payload !== 'string') return false;
+        if (p.status === 'empty' || p.status === 'accepted-nodata') return true;
+        return p.payload.replace(/\s+/g, '') === '';
+    }
+    function detectLang(text) {
+        var t = (text || '').replace(/^\uFEFF/, '').trim();
+        if (t.charAt(0) === '<') return 'xml';
+        if (t.charAt(0) === '{' || t.charAt(0) === '[') return 'json';
+        return 'text';
+    }
+    function formatJson(text) {
+        try { return JSON.stringify(JSON.parse(text), null, 2); } catch (e) { return null; }
+    }
+    // Lightweight, dependency-free XML re-indenter.
+    function formatXml(xml) {
+        var PAD = '  ', pad = 0, out = '';
+        xml = (xml || '').replace(/<\?xml[^>]*\?>/g, '').trim().replace(/>\s+</g, '><');
+        xml = xml.replace(/(>)(<)(\/*)/g, '$1\n$2$3');
+        xml.split('\n').forEach(function (node) {
+            node = node.trim(); if (!node) return;
+            var delta = 0;
+            if (/^<\/\w/.test(node)) { pad = Math.max(pad - 1, 0); }
+            else if (/^<\w[^>]*[^\/]>$/.test(node) && node.indexOf('</') === -1) { delta = 1; }
+            out += PAD.repeat(pad) + node + '\n';
+            pad += delta;
+        });
+        return out.trim();
+    }
+    function formatPayload(text, lang) {
+        if (lang === 'json') { var j = formatJson(text); if (j != null) return j; }
+        if (lang === 'xml') return formatXml(text);
+        return text || '';
+    }
+    function span(cls, txt) { return el('span', { className: cls, text: txt }); }
+    function highlightInto(pre, text, lang) {
+        clear(pre);
+        if (lang === 'json') { highlightJson(pre, text); return; }
+        if (lang === 'xml') { highlightXml(pre, text); return; }
+        pre.appendChild(document.createTextNode(text));
+    }
+    function highlightJson(pre, text) {
+        var re = /("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|([{}\[\],])/g;
+        var last = 0, m;
+        while ((m = re.exec(text))) {
+            if (m.index > last) pre.appendChild(document.createTextNode(text.slice(last, m.index)));
+            if (m[1] != null && m[2] != null) { pre.appendChild(span('t-key', m[1])); pre.appendChild(span('t-punct', m[2])); }
+            else if (m[1] != null) { pre.appendChild(span('t-str', m[1])); }
+            else if (m[3] != null) { pre.appendChild(span('t-lit', m[3])); }
+            else if (m[4] != null) { pre.appendChild(span('t-num', m[4])); }
+            else if (m[5] != null) { pre.appendChild(span('t-punct', m[5])); }
+            last = re.lastIndex;
+        }
+        if (last < text.length) pre.appendChild(document.createTextNode(text.slice(last)));
+    }
+    function highlightXml(pre, text) {
+        var re = /(<\/?)([\w:.-]+)((?:\s+[\w:.-]+="[^"]*")*)(\s*\/?>)|([^<]+)/g;
+        var last = 0, m;
+        while ((m = re.exec(text))) {
+            if (m.index > last) pre.appendChild(document.createTextNode(text.slice(last, m.index)));
+            if (m[5] != null) {
+                pre.appendChild(m[5].trim() ? span('t-text', m[5]) : document.createTextNode(m[5]));
+            } else {
+                pre.appendChild(span('t-punct', m[1]));
+                pre.appendChild(span('t-name', m[2]));
+                if (m[3]) appendXmlAttrs(pre, m[3]);
+                pre.appendChild(span('t-punct', m[4]));
+            }
+            last = re.lastIndex;
+        }
+        if (last < text.length) pre.appendChild(document.createTextNode(text.slice(last)));
+    }
+    function appendXmlAttrs(pre, str) {
+        var re = /([\w:.-]+)(=)("[^"]*")/g, last = 0, m;
+        while ((m = re.exec(str))) {
+            if (m.index > last) pre.appendChild(document.createTextNode(str.slice(last, m.index)));
+            pre.appendChild(span('t-attr', m[1]));
+            pre.appendChild(span('t-punct', m[2]));
+            pre.appendChild(span('t-str', m[3]));
+            last = re.lastIndex;
+        }
+        if (last < str.length) pre.appendChild(document.createTextNode(str.slice(last)));
+    }
+
     // ---------- RESTCONF detail (lazy payload fetch) ----------
     function renderRestconfDetail(panel, p) {
         var metaBits = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid
@@ -262,13 +358,13 @@
         ]);
         panel.appendChild(head);
         var body = el('div', { className: 'body' });
-        var pre = el('pre', { className: 'jsonbox', text: 'Loading payload…' });
+        var pre = el('pre', { className: 'codebox', text: 'Loading payload…' });
         body.appendChild(pre);
         panel.appendChild(body);
         var btns = head.querySelector('.dbtns');
         fetchRestconfPayload(p).then(function (value) {
             var text = JSON.stringify(value, null, 2);
-            pre.textContent = text;
+            highlightInto(pre, text, 'json');
             btns.insertBefore(copyBtn('Copy payload', function () { return text; }), btns.firstChild);
         }, function (err) {
             pre.textContent = 'Could not load payload: ' + ((err && err.message) || err);
@@ -290,18 +386,33 @@
     }
 
     function renderInlineDetail(panel, p) {
+        var noData = isNoData(p);
+        var lang = noData ? 'text' : detectLang(p.payload);
+        var pretty = noData ? '' : formatPayload(p.payload, lang);
         var meta = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid
             + (p.status ? ' · ' + p.status : '') + (p.bytes ? ' · ' + fmtBytes(p.bytes) : '');
-        panel.appendChild(el('div', { className: 'dhead' }, [
+        var head = el('div', { className: 'dhead' }, [
             el('div', { className: 'dpath', text: p.path }),
-            el('div', { className: 'dmeta', text: meta }),
-            el('div', { className: 'dbtns' }, [
-                copyBtn('Copy payload', function () { return p.payload || ''; }),
-                copyBtn('Copy path', function () { return p.path; })
-            ])
-        ]));
+            el('div', { className: 'dmeta' }, [
+                document.createTextNode(meta),
+                (!noData && lang !== 'text') ? el('span', { className: 'langbadge', text: lang.toUpperCase() }) : document.createTextNode('')
+            ]),
+            el('div', { className: 'dbtns' }, noData
+                ? [copyBtn('Copy path', function () { return p.path; })]
+                : [copyBtn('Copy payload', function () { return pretty; }),
+                   copyBtn('Copy path', function () { return p.path; })])
+        ]);
+        panel.appendChild(head);
         var body = el('div', { className: 'body' });
-        body.appendChild(el('pre', { className: 'jsonbox', text: p.payload || '(no payload captured)' }));
+        if (noData) {
+            body.appendChild(el('div', { className: 'nodatanote',
+                text: 'No data returned' + (p.status ? ' (status: ' + p.status + ')' : '')
+                    + '. The path is supported but the datastore had nothing to return.' }));
+        } else {
+            var pre = el('pre', { className: 'codebox' });
+            highlightInto(pre, pretty, lang);
+            body.appendChild(pre);
+        }
         panel.appendChild(body);
     }
 
