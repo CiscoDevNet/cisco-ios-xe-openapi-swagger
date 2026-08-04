@@ -78,13 +78,19 @@
   .cbtn:hover { background:rgba(21,101,192,.08); }
   .empty { padding:50px 20px; text-align:center; color:var(--muted); }
   .help { background:rgba(21,101,192,.06); border-left:3px solid var(--accent); padding:10px 14px; border-radius:4px; margin-bottom:14px; font-size:.84rem; }
-  .transport { display:inline-flex; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:14px; }
-  .tbtn { font:inherit; font-size:.86rem; font-weight:600; padding:9px 18px; border:none; background:var(--card); color:var(--fg); cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; line-height:1.25; border-right:1px solid var(--border); }
-  .tbtn:last-child { border-right:none; }
-  .tbtn.active { background:var(--accent); color:#fff; }
-  .tbtn:disabled { opacity:.45; cursor:not-allowed; }
-  .tsub { font-size:.68rem; font-weight:400; opacity:.75; }
+  .transport { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .tbtn { font:inherit; font-size:.8rem; font-weight:600; padding:7px 12px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--fg); cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; line-height:1.2; }
+  .tbtn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tbtn:disabled { opacity:.4; cursor:not-allowed; }
+  .tsub { font-size:.64rem; font-weight:400; opacity:.75; }
   .jsonbox { margin:0; padding:12px 16px; font-family:var(--mono); font-size:.74rem; white-space:pre-wrap; word-break:break-word; color:var(--fg); max-height:70vh; overflow:auto; }
+  .mx { width:100%; border-collapse:collapse; font-size:.74rem; }
+  .mx th, .mx td { border:1px solid var(--border); padding:5px 8px; text-align:center; }
+  .mx th.l, .mx td.l { text-align:left; font-family:var(--mono); font-size:.72rem; white-space:nowrap; }
+  .mx thead th { position:sticky; top:0; background:var(--card); font-size:.68rem; }
+  .mx td.y { background:rgba(46,125,50,.16); color:var(--ok); font-weight:600; }
+  .mx td.n { color:var(--muted); }
+  .mxwrap { overflow:auto; max-height:76vh; border:1px solid var(--border); border-radius:8px; }
   .keybadge { display:inline-block; font-size:.66rem; background:var(--accent2); color:#003; padding:1px 6px; border-radius:8px; margin-left:6px; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
@@ -117,15 +123,16 @@
   </div>
 </div>
 <main>
-  <div class="transport" role="tablist" aria-label="Transport">
-    <button class="tbtn active" id="tMdt" type="button" role="tab">Model-Driven Telemetry<span class="tsub">push · gRPC dial-out</span></button>
-    <button class="tbtn" id="tRestconf" type="button" role="tab">RESTCONF<span class="tsub">pull · HTTPS GET</span></button>
+  <div class="transport" id="transportBar" role="tablist" aria-label="Access method"></div>
+  <div class="toolbar" style="margin-bottom:12px;">
+    <button class="tbtn" id="matrixToggle" type="button" style="flex-direction:row;">▦ Compare methods (matrix)</button>
+    <span class="summary" id="transportInfo"></span>
   </div>
   <div class="help">
-    Pick a <strong>transport</strong> above, then a <strong>device</strong>, filter by
-    <strong>model flavor</strong>, and choose a path. MDT shows the streamed
-    <strong>keys</strong> <span class="keybadge">key</span> and leaf values; RESTCONF shows the
-    captured GET <strong>payload</strong>. Use search to match paths, keys, and values.
+    Pick an <strong>access method</strong> above — MDT (push), RESTCONF, NETCONF (get / get-config /
+    subscribe), or gNMI (Get / Subscribe) — then a <strong>device</strong> and <strong>flavor</strong>.
+    Each shows the real payload that method returned. <strong>Compare methods</strong> shows a per-module
+    grid of which interfaces can retrieve each model, and the differences between them.
   </div>
   <section class="mtiles" id="mtiles" aria-label="Summary metrics"></section>
   <section class="charts" aria-label="Summary charts">
@@ -138,7 +145,7 @@
     <div class="device-tabs" id="deviceTabs" role="tablist" aria-label="Devices"></div>
     <span class="summary" id="summary" aria-live="polite" style="margin-left:auto;"></span>
   </div>
-  <div class="toolbar">
+  <div class="toolbar" id="filterToolbar">
     <input type="search" id="searchBox" placeholder="Search paths, keys &amp; values…" aria-label="Search paths, keys and values" style="min-width:260px;">
     <label class="sortlbl">Sort
       <select id="sortBy" aria-label="Sort paths">
@@ -161,6 +168,10 @@
   <div class="empty" id="emptyState" hidden>
     No live dataset yet. Run <code>build_live_dataset.py</code> to generate <code>telemetry-live-data.json</code>.
   </div>
+  <section id="matrixView" hidden>
+    <div class="toolbar"><span class="summary" id="matrixInfo"></span></div>
+    <div class="mxwrap"><div id="matrixWrap"><div class="placeholder">Loading comparison matrix…</div></div></div>
+  </section>
 </main>
 <script src="assets/vendor/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
 <script src="device-data.js" defer></script>

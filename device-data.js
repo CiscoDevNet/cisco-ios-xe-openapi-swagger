@@ -17,8 +17,17 @@
 (function () {
     'use strict';
 
-    var MDT_URL = 'telemetry-live-data.json';
-    var RESTCONF_URL = 'restconf-live-data.json';
+    var TRANSPORTS = [
+        { key: 'mdt', url: 'telemetry-live-data.json', label: 'MDT', sub: 'push · gRPC' },
+        { key: 'restconf', url: 'restconf-live-data.json', label: 'RESTCONF', sub: 'GET · HTTPS' },
+        { key: 'netconf-get', url: 'netconf-get-live-data.json', label: 'NETCONF get', sub: 'SSH · 830' },
+        { key: 'netconf-getconfig', url: 'netconf-getconfig-live-data.json', label: 'NETCONF', sub: 'get-config' },
+        { key: 'netconf-sub', url: 'netconf-sub-live-data.json', label: 'NETCONF', sub: 'subscribe' },
+        { key: 'gnmi-get', url: 'gnmi-get-live-data.json', label: 'gNMI Get', sub: 'all · 50052' },
+        { key: 'gnmi-getconfig', url: 'gnmi-getconfig-live-data.json', label: 'gNMI Get', sub: 'config' },
+        { key: 'gnmi-sub', url: 'gnmi-sub-live-data.json', label: 'gNMI Sub', sub: 'ONCE' }
+    ];
+    var MATRIX_URL = 'protocol-matrix.json';
     var CAT_LABEL = {
         oper: 'Oper', openconfig: 'OpenConfig', 'native-config': 'Native',
         cfg: 'Config', ietf: 'IETF', other: 'Other', mib: 'MIB', wireless: 'Wireless', rpc: 'RPC'
@@ -28,7 +37,7 @@
         cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat' };
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false };
     var charts = {};
     var payloadCache = {};
 
@@ -54,8 +63,8 @@
     }
     function catClass(c) { return 'cat-' + c; }
 
-    // Size proxy per transport: RESTCONF = response bytes; MDT = records captured.
-    function sizeOf(p) { return state.transport === 'restconf' ? (p.bytes || 0) : (p.records || 0); }
+    // Size proxy: MDT reports records; the other methods report response bytes.
+    function sizeOf(p) { return (p.records != null ? p.records : p.bytes) || 0; }
     function shortLabel(path) { var parts = path.split('/'); return parts.slice(-2).join('/'); }
     function sortComparator(a, b) {
         if (state.sort === 'size') return sizeOf(b) - sizeOf(a) || a.path.localeCompare(b.path);
@@ -95,7 +104,7 @@
             var btn = el('button', {
                 className: 'device-tab' + (state.pid === d.pid ? ' active' : ''),
                 attrs: { role: 'tab', 'aria-selected': String(state.pid === d.pid) },
-                onclick: function () { state.pid = d.pid; state.cat = 'all'; state.sel = null; render(); }
+                onclick: function () { state.pid = d.pid; state.cat = 'all'; state.sel = null; if (state.matrix) { renderMatrix(); } else { render(); } }
             }, [
                 document.createTextNode(d.pid + ' '),
                 el('span', { className: 'n', text: '(' + fmt(d.paths) + ')' })
@@ -147,7 +156,7 @@
             }, [
                 el('span', { className: 'catdot ' + catClass(p.category), title: p.category }),
                 el('span', { className: 'p', text: p.path }),
-                el('span', { className: 'rc', text: state.transport === 'restconf' ? fmtBytes(p.bytes) : fmt(p.records) + ' rec' })
+                el('span', { className: 'rc', text: (p.records != null ? fmt(p.records) + ' rec' : fmtBytes(p.bytes)) })
             ]);
             wrap.appendChild(row);
         });
@@ -164,7 +173,8 @@
         var p = (state.data.paths || []).filter(function (x) { return x.pid + '|' + x.path === state.sel; })[0];
         if (!p) { panel.appendChild(el('div', { className: 'placeholder', text: 'Not found.' })); return; }
 
-        if (state.transport === 'restconf') { renderRestconfDetail(panel, p); return; }
+        if (state.transport === 'restconf' && p.file) { renderRestconfDetail(panel, p); return; }
+        if (typeof p.payload === 'string') { renderInlineDetail(panel, p); return; }
 
         var samples = p.samples || [];
         var instances = p.instances || samples.length || 1;
@@ -279,6 +289,22 @@
             });
     }
 
+    function renderInlineDetail(panel, p) {
+        var meta = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid
+            + (p.status ? ' · ' + p.status : '') + (p.bytes ? ' · ' + fmtBytes(p.bytes) : '');
+        panel.appendChild(el('div', { className: 'dhead' }, [
+            el('div', { className: 'dpath', text: p.path }),
+            el('div', { className: 'dmeta', text: meta }),
+            el('div', { className: 'dbtns' }, [
+                copyBtn('Copy payload', function () { return p.payload || ''; }),
+                copyBtn('Copy path', function () { return p.path; })
+            ])
+        ]));
+        var body = el('div', { className: 'body' });
+        body.appendChild(el('pre', { className: 'jsonbox', text: p.payload || '(no payload captured)' }));
+        panel.appendChild(body);
+    }
+
     function renderInstance(s, label) {
         var wrap = el('div', { className: 'inst' });
         if (label != null) wrap.appendChild(el('div', { className: 'insthead', text: label }));
@@ -324,7 +350,7 @@
         clear(host);
         host.appendChild(tile(fmt(t.devices), 'Devices'));
         host.appendChild(tile(fmt(t.paths), 'Captured paths'));
-        if (state.transport === 'restconf') {
+        if (state.transport !== 'mdt') {
             var totBytes = (state.data.devices || []).reduce(function (s, d) { return s + (d.bytes || 0); }, 0);
             host.appendChild(tile(fmtBytes(totBytes), 'Response payload'));
         } else {
@@ -345,7 +371,7 @@
         var devs = state.data.devices || [];
         var devLabels = devs.map(function (d) { return d.pid; });
         var devPaths = devs.map(function (d) { return d.paths; });
-        var restconf = state.transport === 'restconf';
+        var restconf = state.transport !== 'mdt';
         var thirdData = restconf ? devs.map(function (d) { return d.bytes || 0; }) : devs.map(function (d) { return d.records; });
         var thirdTitle = restconf ? 'Response bytes per device' : 'Records captured per device';
         var titleEl = $('chartRecTitle'); if (titleEl) titleEl.textContent = thirdTitle;
@@ -383,7 +409,7 @@
     // ---------- largest-paths chart (active device + flavor filter) ----------
     function renderTopChart() {
         if (typeof window.Chart === 'undefined') return;
-        var restconf = state.transport === 'restconf';
+        var restconf = state.transport !== 'mdt';
         var rows = devicePaths(state.pid).filter(matches).slice()
             .sort(function (a, b) { return sizeOf(b) - sizeOf(a); }).slice(0, 12);
         var labels = rows.map(function (p) { return shortLabel(p.path); });
@@ -422,40 +448,106 @@
             state.sort = sortSel.value;
             renderList();
         });
-        var mdtBtn = $('tMdt'), rcBtn = $('tRestconf');
-        if (mdtBtn) mdtBtn.addEventListener('click', function () { setTransport('mdt'); });
-        if (rcBtn) rcBtn.addEventListener('click', function () { setTransport('restconf'); });
-
-        Promise.all([
-            fetchJson(MDT_URL).catch(function () { return null; }),
-            fetchJson(RESTCONF_URL).catch(function () { return null; })
-        ]).then(function (res) {
-            state.datasets.mdt = res[0];
-            state.datasets.restconf = res[1];
-            if (!res[0] && !res[1]) { $('browser').textContent = ''; $('emptyState').hidden = false; return; }
-            if (!res[1] && rcBtn) { rcBtn.disabled = true; }
-            if (!res[0] && mdtBtn) { mdtBtn.disabled = true; }
-            setTransport(res[0] ? 'mdt' : 'restconf');
-        });
+        buildTransportBar();
+        var mt = $('matrixToggle');
+        if (mt) mt.addEventListener('click', toggleMatrix);
+        loadTransport(TRANSPORTS[0].key, true);
     }
 
     function fetchJson(url) {
         return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
     }
-    function setTransport(t) {
-        if (!state.datasets[t]) return;
-        state.transport = t;
-        state.data = state.datasets[t];
+    function buildTransportBar() {
+        var bar = $('transportBar'); clear(bar);
+        TRANSPORTS.forEach(function (t) {
+            bar.appendChild(el('button', {
+                className: 'tbtn', attrs: { role: 'tab', 'data-key': t.key },
+                onclick: function () { loadTransport(t.key, false); }
+            }, [document.createTextNode(t.label + ' '), el('span', { className: 'tsub', text: t.sub })]));
+        });
+    }
+    function transportDef(key) { return TRANSPORTS.filter(function (t) { return t.key === key; })[0]; }
+    function setActiveBtn(key) {
+        Array.prototype.forEach.call($('transportBar').querySelectorAll('.tbtn'), function (b) {
+            b.classList.toggle('active', b.getAttribute('data-key') === key);
+        });
+    }
+    function loadTransport(key, isInitial) {
+        if (state.matrix) setMatrix(false);
+        if (state.datasets[key]) { activateTransport(key); return; }
+        var def = transportDef(key);
+        clear($('browser'));
+        $('browser').appendChild(el('div', { className: 'placeholder', text: 'Loading ' + def.label + '\u2026' }));
+        fetchJson(def.url).then(function (data) {
+            state.datasets[key] = data;
+            activateTransport(key);
+        }, function () {
+            var btn = $('transportBar').querySelector('[data-key="' + key + '"]');
+            if (btn) { btn.disabled = true; btn.title = 'No data captured for this method yet'; }
+            if (isInitial) {
+                var next = TRANSPORTS.filter(function (t) { return t.key !== key; })[0];
+                if (next) { loadTransport(next.key, true); } else { clear($('browser')); $('emptyState').hidden = false; }
+            } else {
+                clear($('browser'));
+                $('browser').appendChild(el('div', { className: 'placeholder', text: 'No data captured for ' + def.label + ' yet.' }));
+            }
+        });
+    }
+    function activateTransport(key) {
+        state.transport = key;
+        state.data = state.datasets[key];
         state.cat = 'all'; state.q = ''; state.sel = null;
         var sb = $('searchBox'); if (sb) sb.value = '';
-        var d = (state.data.devices || [])[0];
-        state.pid = d ? d.pid : '';
-        var mdtBtn = $('tMdt'), rcBtn = $('tRestconf');
-        if (mdtBtn) mdtBtn.classList.toggle('active', t === 'mdt');
-        if (rcBtn) rcBtn.classList.toggle('active', t === 'restconf');
+        var d = (state.data.devices || [])[0]; state.pid = d ? d.pid : '';
+        setActiveBtn(key);
         updateProv();
         renderSummary();
         render();
+    }
+
+    // ---------- comparison matrix ----------
+    function setMatrix(on) {
+        state.matrix = on;
+        var mv = $('matrixView'); if (mv) mv.hidden = !on;
+        ['.charts', '.layout', '#mtiles', '#filterToolbar'].forEach(function (sel) {
+            var n = document.querySelector(sel); if (n) n.style.display = on ? 'none' : '';
+        });
+        var mt = $('matrixToggle'); if (mt) mt.classList.toggle('active', on);
+        if (on) renderMatrix();
+    }
+    function toggleMatrix() { setMatrix(!state.matrix); }
+    function renderMatrix() {
+        var host = $('matrixWrap'); clear(host);
+        if (!state.matrixData) {
+            host.appendChild(el('div', { className: 'placeholder', text: 'Loading comparison matrix\u2026' }));
+            fetchJson(MATRIX_URL).then(function (m) { state.matrixData = m; renderMatrix(); },
+                function () { clear(host); host.appendChild(el('div', { className: 'placeholder', text: 'protocol-matrix.json not available yet.' })); });
+            return;
+        }
+        var m = state.matrixData;
+        var methods = m.methods || [];
+        var rows = (m.rows || []).filter(function (r) { return r.pid === state.pid; });
+        rows.sort(function (a, b) { return (a.category || '').localeCompare(b.category || '') || a.module.localeCompare(b.module); });
+        var info = $('matrixInfo');
+        if (info) info.textContent = state.pid + ' \u00b7 ' + rows.length + ' modules \u00d7 ' + methods.length + ' methods (green = returned data)';
+        var table = el('table', { className: 'mx' });
+        var hr = el('tr', {}, [el('th', { className: 'l', text: 'YANG module' })]);
+        methods.forEach(function (mm) { hr.appendChild(el('th', { text: mm.label })); });
+        table.appendChild(el('thead', {}, [hr]));
+        var tbody = el('tbody');
+        rows.forEach(function (r) {
+            var tr = el('tr', {}, [el('td', { className: 'l', title: r.category }, [
+                el('span', { className: 'catdot ' + catClass(r.category) }),
+                document.createTextNode(' ' + r.module)
+            ])]);
+            methods.forEach(function (mm) {
+                var v = r.cells ? r.cells[mm.key] : 0;
+                tr.appendChild(el('td', { className: v ? 'y' : 'n', text: v ? fmtBytes(v) : '\u00b7' }));
+            });
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        host.appendChild(table);
     }
     function updateProv() {
         var data = state.data || {};
