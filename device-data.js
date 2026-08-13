@@ -38,7 +38,7 @@
         cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', matrixGaps: false };
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', matrixGaps: false, matrixCat: 'all', jump: null };
     var charts = {};
     var payloadCache = {};
 
@@ -636,11 +636,40 @@
         state.data = state.datasets[key];
         state.cat = 'all'; state.q = ''; state.sel = null;
         var sb = $('searchBox'); if (sb) sb.value = '';
-        var d = (state.data.devices || [])[0]; state.pid = d ? d.pid : '';
+        var jump = state.jump; state.jump = null;
+        var d0 = (state.data.devices || [])[0];
+        state.pid = (jump && jump.pid && (state.data.devices || []).some(function (x) { return x.pid === jump.pid; }))
+            ? jump.pid : (d0 ? d0.pid : '');
         setActiveBtn(key);
         updateProv();
         renderSummary();
         render();
+        if (jump) applyJump(jump);
+    }
+    // Open the example payload for a module behind a matrix cell.
+    function jumpToPayload(methodKey, xpath, pid) {
+        if (!transportDef(methodKey)) return;
+        state.jump = { pid: pid, xpath: xpath };
+        loadTransport(methodKey, false);
+    }
+    function applyJump(jump) {
+        var term = jump.xpath || '';
+        var container = term.split('/').pop().split(':').pop();
+        var paths = devicePaths(state.pid);
+        var match = paths.filter(function (p) { return p.path === term; })[0]
+            || paths.filter(function (p) { return container && p.path.indexOf(container) !== -1; })[0];
+        if (match) {
+            state.sel = match.pid + '|' + match.path;
+            state.dataFilter = 'all';
+            var df = $('dataFilter'); if (df) df.value = 'all';
+            renderList(); renderDetail();
+            var selRow = $('browser').querySelector('.prow.sel');
+            if (selRow && selRow.scrollIntoView) selRow.scrollIntoView({ block: 'center' });
+        } else if (container) {
+            state.q = container.toLowerCase();
+            var sb = $('searchBox'); if (sb) sb.value = container;
+            renderList(); updateSummary();
+        }
     }
 
     // ---------- comparison matrix ----------
@@ -664,7 +693,9 @@
         }
         var m = state.matrixData;
         var methods = m.methods || [];
-        var rows = (m.rows || []).filter(function (r) { return r.pid === state.pid; });
+        var allRows = (m.rows || []).filter(function (r) { return r.pid === state.pid; });
+        renderMatrixChips(allRows);
+        var rows = allRows.filter(function (r) { return state.matrixCat === 'all' || r.category === state.matrixCat; });
         if (state.matrixGaps) {
             rows = rows.filter(function (r) {
                 return !methods.some(function (mm) { return (r.cells || {})[mm.key] === 'data'; });
@@ -672,10 +703,9 @@
         }
         rows.sort(function (a, b) { return (a.category || '').localeCompare(b.category || '') || a.module.localeCompare(b.module); });
         var info = $('matrixInfo');
-        if (info) info.textContent = state.pid + ' \u00b7 ' + rows.length + ' modules \u00d7 ' + methods.length
+        if (info) info.textContent = state.pid + ' · ' + rows.length + ' modules × ' + methods.length
             + ' methods'
-            + (state.matrixGaps ? ' \u00b7 showing only models with NO data from any method'
-                : ' (green = data, amber = supported/no data, red = rejected)');
+            + (state.matrixGaps ? ' · only models with NO data from any method' : '');
         var table = el('table', { className: 'mx' });
         var hr = el('tr', {}, [el('th', { className: 'l', text: 'YANG module' })]);
         methods.forEach(function (mm) { hr.appendChild(el('th', { text: mm.label })); });
@@ -694,13 +724,41 @@
             methods.forEach(function (mm) {
                 var v = r.cells ? r.cells[mm.key] : null;
                 var c = CELL[v];
-                tr.appendChild(el('td', c ? { className: c.cls, text: c.txt, attrs: { title: c.tip } }
-                    : { className: 'na', text: '\u00b7', attrs: { title: 'not collected / n/a' } }));
+                if (c && v === 'data' && r.xpath && transportDef(mm.key)) {
+                    tr.appendChild(el('td', {
+                        className: c.cls + ' link', text: c.txt,
+                        attrs: { title: c.tip + ' — click to open payload' },
+                        onclick: function () { jumpToPayload(mm.key, r.xpath, r.pid); }
+                    }));
+                } else {
+                    tr.appendChild(el('td', c ? { className: c.cls, text: c.txt, attrs: { title: c.tip } }
+                        : { className: 'na', text: '·', attrs: { title: 'not applicable (model absent on device or method not run)' } }));
+                }
             });
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
         host.appendChild(table);
+    }
+    function renderMatrixChips(rows) {
+        var wrap = $('matrixChips'); if (!wrap) return; clear(wrap);
+        var counts = {};
+        rows.forEach(function (r) { counts[r.category] = (counts[r.category] || 0) + 1; });
+        wrap.appendChild(matrixChip('all', 'All flavors', rows.length));
+        Object.keys(counts).sort().forEach(function (c) {
+            wrap.appendChild(matrixChip(c, CAT_LABEL[c] || c, counts[c]));
+        });
+    }
+    function matrixChip(cat, label, n) {
+        var active = state.matrixCat === cat;
+        var kids = [];
+        if (cat !== 'all') kids.push(el('span', { className: 'catdot ' + catClass(cat) }));
+        kids.push(document.createTextNode(label + ' '));
+        kids.push(el('span', { className: 'n', text: '(' + fmt(n) + ')' }));
+        return el('button', {
+            className: 'chip' + (active ? ' active ' + catClass(cat) : ''),
+            onclick: function () { state.matrixCat = cat; renderMatrix(); }
+        }, kids);
     }
     function updateProv() {
         var data = state.data || {};

@@ -100,7 +100,7 @@ def collect():
     grid = {}
     devices = set()
 
-    def put(pid, module, cat, method, state):
+    def put(pid, module, cat, method, state, xpath=None):
         devices.add(pid)
         row = grid.setdefault((pid, module), {"pid": pid, "module": module,
                                               "category": cat or "other", "cells": {}})
@@ -109,6 +109,10 @@ def collect():
             row["cells"][method] = state
         if (not row["category"] or row["category"] == "other") and cat:
             row["category"] = cat
+        # keep one representative xpath, preferring the /prefix:container root form
+        if xpath and (not row.get("xpath")
+                      or (row["xpath"].startswith("/data/") and not xpath.startswith("/data/"))):
+            row["xpath"] = xpath
 
     # MDT + RESTCONF from browse datasets (data where present)
     for method, fname in (("mdt", "telemetry-live-data.json"),
@@ -118,7 +122,8 @@ def collect():
             continue
         ds = json.loads(f.read_text(encoding="utf-8"))
         for pth in ds.get("paths", []):
-            put(pth["pid"], to_module(pth["path"], p2m, m2p), pth.get("category"), method, "data")
+            put(pth["pid"], to_module(pth["path"], p2m, m2p), pth.get("category"), method, "data",
+                xpath=pth.get("path"))
 
     # NETCONF get / get-config from raw netconf-<PID>.json
     for f in glob.glob(str(OUT / "netconf-C*.json")):
@@ -129,7 +134,7 @@ def collect():
                 continue  # module not present on device -> not applicable
             method = "netconf-getconfig" if e.get("op") == "get-config" else "netconf-get"
             st = {"data": "data", "empty": "ok"}.get(e.get("status"), "no")
-            put(pid, entry_module(e, p2m, m2p), e.get("category"), method, st)
+            put(pid, entry_module(e, p2m, m2p), e.get("category"), method, st, xpath=e.get("xpath"))
 
     # NETCONF subscribe from netconf-sub-<PID>.json
     for f in glob.glob(str(OUT / "netconf-sub-*.json")):
@@ -139,7 +144,7 @@ def collect():
             if e.get("status") == "no-namespace":
                 continue
             st = {"streamed": "data", "accepted-nodata": "ok"}.get(e.get("status"), "no")
-            put(pid, entry_module(e, p2m, m2p), e.get("category"), "netconf-sub", st)
+            put(pid, entry_module(e, p2m, m2p), e.get("category"), "netconf-sub", st, xpath=e.get("xpath"))
 
     # gNMI get / get-config from gnmi-<PID>.json (excludes gnmi-sub-*)
     for f in glob.glob(str(OUT / "gnmi-C*.json")):
@@ -149,7 +154,7 @@ def collect():
             op = e.get("op")
             method = {"config": "gnmi-getconfig", "state": "gnmi-state"}.get(op, "gnmi-get")
             st = {"data": "data", "empty": "ok"}.get(e.get("status"), "no")
-            put(pid, entry_module(e, p2m, m2p), e.get("category"), method, st)
+            put(pid, entry_module(e, p2m, m2p), e.get("category"), method, st, xpath=e.get("xpath"))
 
     # gNMI subscribe from gnmi-sub-<PID>.json (once support)
     for f in glob.glob(str(OUT / "gnmi-sub-*.json")):
@@ -157,7 +162,7 @@ def collect():
         pid = doc["pid"]
         for e in doc.get("entries", []):
             st = {"streamed": "data", "accepted-nodata": "ok"}.get(e.get("once"), "no")
-            put(pid, entry_module(e, p2m, m2p), e.get("category"), "gnmi-sub", st)
+            put(pid, entry_module(e, p2m, m2p), e.get("category"), "gnmi-sub", st, xpath=e.get("xpath"))
 
     return grid, devices
 
