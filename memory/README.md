@@ -1,8 +1,20 @@
 # memory/ — decision ledger ("why")
 
 Append-only records of **decisions with a tradeoff** for each webapp component.
-This is the project's *why* — the reasoning and the roads not taken, which get
-lost between sessions.
+This is the project's *why* — the reasoning, constraints, and roads not taken,
+which get lost between sessions.
+
+## For AI agents (read this first)
+1. **Before changing a component, read its folder:** `memory/<component>/*.md`.
+   Entries encode **constraints and gotchas** — following them prevents repeating
+   mistakes that already cost someone time (e.g. redaction gaps, the `%2F`
+   double-encode 404, mgmt "shared-fate" that can cut all remote access).
+2. **Treat an `accepted` entry as a constraint**, not a suggestion. If you must
+   go against one, add a **new** entry that `supersedes NNNN` explaining why.
+3. **When you make a decision with a tradeoff, add an entry** (copy `_template.md`).
+   That's how the next agent learns what you learned.
+4. Entries are short by design — a paragraph per section. Skim the folder; it's fast.
+
 
 ## What goes where (don't duplicate)
 
