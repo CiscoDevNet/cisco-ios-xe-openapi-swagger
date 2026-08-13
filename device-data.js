@@ -23,9 +23,10 @@
         { key: 'netconf-get', url: 'netconf-get-live-data.json', label: 'NETCONF get', sub: 'SSH · 830' },
         { key: 'netconf-getconfig', url: 'netconf-getconfig-live-data.json', label: 'NETCONF', sub: 'get-config' },
         { key: 'netconf-sub', url: 'netconf-sub-live-data.json', label: 'NETCONF', sub: 'subscribe' },
-        { key: 'gnmi-get', url: 'gnmi-get-live-data.json', label: 'gNMI Get', sub: 'all · 50052' },
+        { key: 'gnmi-get', url: 'gnmi-get-live-data.json', label: 'gNMI Get', sub: 'all · 9339' },
         { key: 'gnmi-getconfig', url: 'gnmi-getconfig-live-data.json', label: 'gNMI Get', sub: 'config' },
-        { key: 'gnmi-sub', url: 'gnmi-sub-live-data.json', label: 'gNMI Sub', sub: 'ONCE' }
+        { key: 'gnmi-state', url: 'gnmi-state-live-data.json', label: 'gNMI Get', sub: 'state · oper' },
+        { key: 'gnmi-sub', url: 'gnmi-sub-live-data.json', label: 'gNMI Sub', sub: 'once/sample/change' }
     ];
     var MATRIX_URL = 'protocol-matrix.json';
     var CAT_LABEL = {
@@ -37,7 +38,7 @@
         cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false };
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', matrixGaps: false };
     var charts = {};
     var payloadCache = {};
 
@@ -79,6 +80,8 @@
     function matches(p) {
         if (state.cat !== 'all' && p.category !== state.cat) return false;
         if (state.q && haystack(p).indexOf(state.q) === -1) return false;
+        if (state.dataFilter === 'data' && isNoData(p)) return false;
+        if (state.dataFilter === 'nodata' && !isNoData(p)) return false;
         return true;
     }
     // Lazily build a lowercase search string per path covering the xpath plus
@@ -403,6 +406,9 @@
                    copyBtn('Copy path', function () { return p.path; })])
         ]);
         panel.appendChild(head);
+        if (p.once != null || p.sample != null || p.onchange != null) {
+            panel.appendChild(subscribeModes(p));
+        }
         var body = el('div', { className: 'body' });
         if (noData) {
             body.appendChild(el('div', { className: 'nodatanote',
@@ -414,6 +420,15 @@
             body.appendChild(pre);
         }
         panel.appendChild(body);
+    }
+    function subscribeModes(p) {
+        function badge(name, st) {
+            var cls = st === 'streamed' ? 'ok' : (st === 'accepted-nodata' ? 'warn' : 'no');
+            return el('span', { className: 'modebadge mb-' + cls, text: name + ': ' + (st || 'n/a') });
+        }
+        return el('div', { className: 'submodes' }, [
+            badge('ONCE', p.once), badge('SAMPLE', p.sample), badge('ON_CHANGE', p.onchange)
+        ]);
     }
 
     function renderInstance(s, label) {
@@ -559,6 +574,18 @@
             state.sort = sortSel.value;
             renderList();
         });
+        var dfSel = $('dataFilter');
+        if (dfSel) dfSel.addEventListener('change', function () {
+            state.dataFilter = dfSel.value;
+            renderList();
+            updateSummary();
+            renderTopChart();
+        });
+        var mg = $('matrixGaps');
+        if (mg) mg.addEventListener('change', function () {
+            state.matrixGaps = mg.checked;
+            renderMatrix();
+        });
         buildTransportBar();
         var mt = $('matrixToggle');
         if (mt) mt.addEventListener('click', toggleMatrix);
@@ -638,10 +665,17 @@
         var m = state.matrixData;
         var methods = m.methods || [];
         var rows = (m.rows || []).filter(function (r) { return r.pid === state.pid; });
+        if (state.matrixGaps) {
+            rows = rows.filter(function (r) {
+                return !methods.some(function (mm) { return (r.cells || {})[mm.key] === 'data'; });
+            });
+        }
         rows.sort(function (a, b) { return (a.category || '').localeCompare(b.category || '') || a.module.localeCompare(b.module); });
         var info = $('matrixInfo');
         if (info) info.textContent = state.pid + ' \u00b7 ' + rows.length + ' modules \u00d7 ' + methods.length
-            + ' methods (green = data, amber = supported/no data, red = rejected)';
+            + ' methods'
+            + (state.matrixGaps ? ' \u00b7 showing only models with NO data from any method'
+                : ' (green = data, amber = supported/no data, red = rejected)');
         var table = el('table', { className: 'mx' });
         var hr = el('tr', {}, [el('th', { className: 'l', text: 'YANG module' })]);
         methods.forEach(function (mm) { hr.appendChild(el('th', { text: mm.label })); });

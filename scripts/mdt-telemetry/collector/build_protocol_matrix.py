@@ -33,6 +33,7 @@ METHODS = [
     ("netconf-sub", "NETCONF subscribe"),
     ("gnmi-get", "gNMI Get"),
     ("gnmi-getconfig", "gNMI Get config"),
+    ("gnmi-state", "gNMI Get state"),
     ("gnmi-sub", "gNMI Subscribe"),
 ]
 RANK = {"data": 3, "ok": 2, "no": 1}
@@ -145,7 +146,8 @@ def collect():
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]
         for e in doc.get("entries", []):
-            method = "gnmi-getconfig" if e.get("op") == "config" else "gnmi-get"
+            op = e.get("op")
+            method = {"config": "gnmi-getconfig", "state": "gnmi-state"}.get(op, "gnmi-get")
             st = {"data": "data", "empty": "ok"}.get(e.get("status"), "no")
             put(pid, entry_module(e, p2m, m2p), e.get("category"), method, st)
 

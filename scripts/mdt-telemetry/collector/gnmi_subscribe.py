@@ -30,12 +30,13 @@ from pygnmi.client import gNMIclient
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "output"
 MAX_PAYLOAD = 40_000
-SAMPLE_NS = 10_000_000_000  # 10s
+SAMPLE_NS = 60_000_000_000  # 60s sample interval (dial-out style: first update is immediate)
 
 
 def _client(dev, env):
     gc = gNMIclient(target=(dev["host"], GNMI_PORT), username=env["IOSXE_USER"],
-                    password=env["IOSXE_PASS"], insecure=True, timeout=25, no_qos_marking=True)
+                    password=env["IOSXE_PASS"], insecure=False, skip_verify=True,
+                    timeout=25, no_qos_marking=True)
     gc.connect()
     return gc
 
@@ -50,35 +51,49 @@ def probe_once(gc, path):
     return ("streamed" if ups else "accepted-nodata"), len(body), body[:MAX_PAYLOAD]
 
 
-def probe_sample(gc, path, window=5):
-    sub = {"subscription": [{"path": path, "mode": "sample", "sample_interval": SAMPLE_NS}],
-           "mode": "stream", "encoding": "json_ietf"}
-    t0 = time.time()
-    try:
-        for resp in gc.subscribe_stream(subscribe=sub):  # stream mode needs subscribe_stream, not subscribe
-            r = resp if isinstance(resp, dict) else dict(resp)
-            if "update" in r:
-                return "streamed"
-            if time.time() - t0 > window:
-                break
-    except Exception:  # noqa: BLE001
-        return "rejected"
-    return "accepted-nodata"
+def probe_stream(gc, path, mode, window=4):
+    """Probe a STREAM subscription (sample or on_change) with a hard time bound:
+    a supported path emits its first update immediately; if nothing arrives within
+    the window the reader is abandoned (daemon) and we report accepted-nodata so an
+    empty path can't block. sample_interval only applies to sample mode."""
+    subscription = {"path": path, "mode": mode}
+    if mode == "sample":
+        subscription["sample_interval"] = SAMPLE_NS
+    sub = {"subscription": [subscription], "mode": "stream", "encoding": "json_ietf"}
+    out = {"st": "accepted-nodata"}
+
+    def read():
+        try:
+            for resp in gc.subscribe_stream(subscribe=sub):
+                r = resp if isinstance(resp, dict) else dict(resp)
+                if "update" in r:
+                    out["st"] = "streamed"
+                    return
+        except Exception:  # noqa: BLE001
+            out["st"] = "rejected"
+
+    t = threading.Thread(target=read, daemon=True)
+    t.start()
+    t.join(window)
+    return out["st"]
 
 
-def _probe_root(gc, path, timeout=14):
-    """Run ONCE (+SAMPLE if streamed) in a worker thread with a hard timeout so a
-    single unresponsive path can't stall the whole fleet. Returns a dict, or None
-    on timeout (caller must reset the client)."""
+def _probe_root(gc, path, timeout=20):
+    """Run ONCE, then SAMPLE + ON_CHANGE (only where ONCE streamed data) in a worker
+    thread with a hard timeout so one unresponsive path can't stall the fleet.
+    Returns a dict, or None on timeout (caller must reset the client)."""
     result = {}
 
     def work():
         try:
             once_st, nbytes, payload = probe_once(gc, path)
-            # SAMPLE is intentionally skipped: its content equals ONCE (see module
-            # docstring) and its lingering server-side streams destabilise the gNMI
-            # server. The ONCE accept/reject signal is what drives the gap analysis.
-            result.update(once=once_st, sample="skipped", bytes=nbytes, payload=payload)
+            result.update(once=once_st, bytes=nbytes, payload=payload)
+            if once_st == "streamed":
+                result["sample"] = probe_stream(gc, path, "sample")
+                result["onchange"] = probe_stream(gc, path, "on_change")
+            else:  # empty/rejected/unsupported -> the stream modes match ONCE
+                result["sample"] = once_st
+                result["onchange"] = once_st
         except Exception as e:  # noqa: BLE001
             result.update(error=str(e).split("details =")[-1][:120].strip())
 
@@ -139,17 +154,17 @@ def collect_device(dev, env, roots, limit, out_path=None, supported=None):
         keys["module"] = module
         if path is None:
             entries.append({**keys, "gnmi_path": "", "once": "unsupported", "sample": "unsupported",
-                            "bytes": 0, "payload": ""})
+                            "onchange": "unsupported", "bytes": 0, "payload": ""})
             continue
         if supported is not None and path not in supported:
             # gNMI Get rejected this path -> Subscribe rejects it too; record without probing
             entries.append({**keys, "gnmi_path": path, "once": "rejected", "sample": "rejected",
-                            "bytes": 0, "payload": ""})
+                            "onchange": "rejected", "bytes": 0, "payload": ""})
             continue
         res = _probe_root(gc, path)
         if res is None:  # hung path -> reset client and move on
             entries.append({**keys, "gnmi_path": path, "once": "timeout", "sample": "timeout",
-                            "bytes": 0, "payload": ""})
+                            "onchange": "timeout", "bytes": 0, "payload": ""})
             if _reconnect() is None:
                 print(f"    server unreachable after {i} roots; saving partial", flush=True)
                 break
@@ -158,17 +173,20 @@ def collect_device(dev, env, roots, limit, out_path=None, supported=None):
             # client (reconnecting on every reject exhausts the gNMI server).
             err = res["error"]
             entries.append({**keys, "gnmi_path": path, "once": "rejected", "sample": "rejected",
-                            "bytes": 0, "error": err, "payload": ""})
+                            "onchange": "rejected", "bytes": 0, "error": err, "payload": ""})
             if "Channel closed" in err or "Stream removed" in err or "UNAVAILABLE" in err:
                 if _reconnect() is None:
                     print(f"    server unreachable after {i} roots; saving partial", flush=True)
                     break
         else:
             entries.append({**keys, "gnmi_path": path, "once": res["once"], "sample": res["sample"],
+                            "onchange": res.get("onchange", "skipped"),
                             "bytes": res["bytes"], "payload": res["payload"]})
         if i % 10 == 0:
             _save()
             print(f"    ...{i}/{len(todo)} (once ok={sum(1 for e in entries if e['once']=='streamed')})", flush=True)
+        if i % 40 == 0:  # recycle the client to release abandoned stream subscriptions
+            _reconnect()
     try:
         gc.close()
     except Exception:

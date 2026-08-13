@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""gnmi_get.py — gNMI Get of the all-flavor root containers (insecure :50052).
+"""gnmi_get.py — gNMI Get of the all-flavor root containers (secure TLS :9339).
 
 gNMI needs an explicit origin (per the IOS XE config guide):
   - Cisco IOS-XE YANG (oper/native/cfg/ietf/other):  rfc7951:/<module-name>:<container>
   - OpenConfig:                                        openconfig:/<container>
   - MIB (SNMP): not served over gNMI -> recorded as 'unsupported'.
 
-Captures two datatypes per root so config vs state can be compared like NETCONF
-<get> vs <get-config>:
-  - all     (config + state)
-  - config  (config only)
+Captures three GetRequest datatypes per root so config vs operational state are
+cleanly separated (like NETCONF <get-config> vs a state read):
+  - all     (config + operational state)
+  - config  (configured/intended values only)
+  - state   (operational state only)
 
 Writes output/gnmi-<PID>.json for the dataset builder + comparison matrix.
 
@@ -30,9 +31,10 @@ from pygnmi.client import gNMIclient
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "output"
-GNMI_PORT = 50052
+GNMI_PORT = 9339  # secure gNMI (TLS); insecure 50052 is no longer used
 MAX_PAYLOAD = 40_000
-DATATYPES = ("all", "config")
+# gNMI GetRequest.type: all=config+state, config=config-only, state=oper-only.
+DATATYPES = ("all", "config", "state")
 
 
 def gnmi_path(prefix, module, container, category):
@@ -56,7 +58,7 @@ def collect_device(dev, env, roots, limit, out_path=None):
 
     def _connect():
         gc = gNMIclient(target=(dev["host"], GNMI_PORT), username=env["IOSXE_USER"],
-                        password=env["IOSXE_PASS"], insecure=True, timeout=30)
+                        password=env["IOSXE_PASS"], insecure=False, skip_verify=True, timeout=30)
         gc.connect()
         return gc
 

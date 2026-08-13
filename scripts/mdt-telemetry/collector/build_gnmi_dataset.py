@@ -5,7 +5,8 @@ files (output/gnmi-<PID>.json = Get, output/gnmi-sub-<PID>.json = Subscribe).
 Emits (standard device-data shape, payload embedded, encoding json_ietf):
   - gnmi-get-live-data.json        (gNMI Get, datatype=all)
   - gnmi-getconfig-live-data.json  (gNMI Get, datatype=config)
-  - gnmi-sub-live-data.json        (gNMI Subscribe ONCE support; payload == Get)
+  - gnmi-state-live-data.json      (gNMI Get, datatype=state / operational)
+  - gnmi-sub-live-data.json        (gNMI Subscribe ONCE/SAMPLE/ON_CHANGE support)
 """
 from __future__ import annotations
 
@@ -52,8 +53,10 @@ def _write(fname, transport, paths, source, encoding="json_ietf"):
 
 
 def build_get():
-    for op, fname, label in (("all", "gnmi-get-live-data.json", "gNMI Get datatype=all (:50052)"),
-                             ("config", "gnmi-getconfig-live-data.json", "gNMI Get datatype=config (:50052)")):
+    for op, fname, label in (
+            ("all", "gnmi-get-live-data.json", "gNMI Get datatype=all (:9339)"),
+            ("config", "gnmi-getconfig-live-data.json", "gNMI Get datatype=config (:9339)"),
+            ("state", "gnmi-state-live-data.json", "gNMI Get datatype=state / oper (:9339)")):
         paths = []
         for f in sorted(glob.glob(str(OUT / "gnmi-*.json"))):
             if "gnmi-sub-" in f:
@@ -79,10 +82,12 @@ def build_sub():
             paths.append({"pid": doc["pid"], "source": doc.get("host", ""),
                           "category": e["category"], "path": e["xpath"],
                           "status": "data" if e["once"] == "streamed" else "empty",
+                          "once": e.get("once"), "sample": e.get("sample"),
+                          "onchange": e.get("onchange"),
                           "bytes": e.get("bytes", 0), "payload": (e.get("payload") or "")[:PAGE_PAYLOAD_CAP]})
     if paths:
-        _write("gnmi-sub-live-data.json", "gNMI Subscribe ONCE (:50052)", paths,
-               "live device capture (gNMI Subscribe ONCE, pygnmi)")
+        _write("gnmi-sub-live-data.json", "gNMI Subscribe ONCE/SAMPLE/ON_CHANGE (:9339)", paths,
+               "live device capture (gNMI Subscribe, pygnmi)")
     else:
         print("gnmi-sub: no data yet (skipped)")
 
