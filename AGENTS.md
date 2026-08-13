@@ -22,6 +22,7 @@ When making non-trivial changes, the following documents are authoritative. Upda
 | [../MIBS.md](../MIBS.md) | MIB coverage and platform applicability matrix |
 | [../telemetry-reference.md](../telemetry-reference.md) | Per-feature telemetry subscription metadata (feature → xpath, tier, cadence) |
 | [CHANGELOG.md](CHANGELOG.md) | Versions Supported table; release-by-release deltas |
+| [memory/](memory/) | **Decision ledger ("why").** Read the relevant `memory/<component>/` before changing a component; **add an entry when you make a decision with a tradeoff.** CHANGELOG = *what*, spec docs = *how*, memory = *why*. |
 
 If a request conflicts with these docs, prefer updating the doc first (with rationale) and then code.
 
