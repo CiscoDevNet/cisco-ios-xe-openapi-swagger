@@ -17,6 +17,8 @@ When making non-trivial changes, the following documents are authoritative. Upda
 | [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) | High-level scope, model categories, accountability rules |
 | [VERSIONING.md](VERSIONING.md) | Multi-release folder layout, URL contract, CI gates, "add a new release" runbook |
 | [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md) | MDT/gRPC dial-out filter xpath rule + OpenAPI extensions |
+| [DEVICE_DATA_COLLECTION.md](DEVICE_DATA_COLLECTION.md) | **Live Data harness** (`scripts/harness/`): read-only RESTCONF GET collection, depth-probe, lean-spec data-file layout |
+| [DEVICE_FEATURE_COVERAGE.md](DEVICE_FEATURE_COVERAGE.md) | **Device feature-enablement plan** (configure features → collect more data): topology, safety constraints, per-phase CLI, iteration log |
 | [../MIBS.md](../MIBS.md) | MIB coverage and platform applicability matrix |
 | [../telemetry-reference.md](../telemetry-reference.md) | Per-feature telemetry subscription metadata (feature → xpath, tier, cadence) |
 | [CHANGELOG.md](CHANGELOG.md) | Versions Supported table; release-by-release deltas |
@@ -190,6 +192,24 @@ python scripts/smoke_live.py --base-url https://example.com/staging
 ```powershell
 python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --password ***REDACTED*** --patch-only --dry-run
 ```
+
+### Live Data harness — real captured device data (see DEVICE_DATA_COLLECTION.md)
+
+**What it is:** `scripts/harness/` is a **read-only** RESTCONF GET harness that captures real responses from 6 physical Catalyst devices and serves them on the **Live Data** page ([live-data.html](live-data.html) / [live-data.js](live-data.js)).
+
+- **Lean-spec architecture:** response bodies are **NOT** injected into the OpenAPI specs (keeps them fast). They are served as per-path files: `releases/<ver>/live-data/<category>/<module>/<sha1[:16]>.json`, indexed by `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies) + a tiny `live-modules.json` (viewer banner).
+- **Rebuild:** `python scripts/refresh_live_data.py --version 26.1.1 [--capture]` — `--capture` re-collects from devices; without it, just rebuilds the index/data-files from the local (gitignored) sidecar `references/live-examples-<ver>.json`.
+- **Completeness check:** `python -X utf8 -m scripts.harness.depth_probe --device <PID> --discover --category oper` answers "does a deeper keyed GET return more than the parent?" (has a circuit breaker + `KNOWN_UNSAFE_MODULES` skip). Full fleet sweep found root GETs are complete; exhaustive per-path GET already captures containers the root omits.
+- **Secrets:** `scripts/harness/redact.py` masks secrets (incl. bare `key`/`md5`, module-prefixed) before anything is written; a test scans published live-data. `inventory.json`, `.env`, `captures/` are **gitignored** — never commit real device creds/captures.
+- **`live-data.html` / `live-data.js` are shared with a PARALLEL telemetry effort.** Stage MY hunks explicitly (use `git add -p`); NEVER `git add -A`. Verify no `telemetry` content is staged.
+
+**Device access + feature enablement (see DEVICE_FEATURE_COVERAGE.md):**
+
+- **6 collection devices (all creds in `.env`, admin/admin lab):** `.70` C9300-24UX (hub) · `.71` C9400 · `.72` C9200L · `.75` C9600 · `.83` C9840 WLC · `.95` C9500. The rest of the rack (TOR `.65`, vnc2-leaf/spine/border, c9350, consoles) is **not ours** — many are Meraki-managed / a **live EVPN fabric**; NEVER CLI-configure them.
+- **~626 of 937 modules return 404 = unconfigured features.** To collect more, enable features on the 6 (DEVICE_FEATURE_COVERAGE.md is the multi-pass plan). Phase 0 (SNMP→MIB bridge) + Phase 1 routing (OSPF fleet-wide; ISIS/EIGRP/BGP on the 4 switches) are **applied + saved**; live-data not yet re-collected.
+- **Platform limits (verified):** **C9200L** has no routing/loopback; **C9840 WLC** is **OSPF-only** (rejects `router isis/eigrp/bgp`) and its CLI is netmiko-hostile — use an interactive `sshpass ssh` (legacy KEX/host-key algos) for it.
+- **Management is shared-fate:** the C9300 hub bridges the `10.85.134.0/24` mgmt for C9500/C9600; the `/24` also hosts the TOR + both console servers. **Breaking the mgmt VLAN/hub-mgmt-ports = no remote recovery.** Keep feature config on **loopbacks/leaf ports**; console lines are in the VNC2 Lab Matrix ("Serial Port" col, e.g. C9840=2019).
+- Device writes via netmiko (`cisco_xe`); back up `show run` first (to gitignored `captures/*-backups/`); don't `write memory` until healthy (reload reverts).
 
 ---
 
@@ -368,6 +388,8 @@ git push prod main      # promote to CiscoDevNet when ready
 - Generated artifacts (specs, trees, search index) **are committed** — keeps the deploy reproducible without running Python in CI
 - Don't commit large debugging/exploration files; use `archive/` for completed-phase docs
 - Never `git push --force prod` without explicit user confirmation; prefer `--force-with-lease` and verify the remote SHA you're overwriting
+
+**Corporate proxy (this VM):** internet egress needs `http_proxy`/`https_proxy` = `http://proxy.esl.cisco.com:80/`. Before any `git push`, keep those SET but **`unset no_proxy NO_PROXY`** (a global `no_proxy='*'` breaks the push). For device access (`10.85.134.x`), use `curl --noproxy '*'` or a `requests.Session()` with `trust_env=False` — never a global `no_proxy='*'`.
 
 ---
 
