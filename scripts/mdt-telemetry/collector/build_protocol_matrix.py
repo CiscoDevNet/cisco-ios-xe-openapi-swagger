@@ -17,6 +17,7 @@ from __future__ import annotations
 import collections
 import glob
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,6 +38,34 @@ METHODS = [
     ("gnmi-sub", "gNMI Subscribe"),
 ]
 RANK = {"data": 3, "ok": 2, "no": 1}
+
+# Browse dataset backing each method (used for per-method capture freshness).
+METHOD_FILES = {
+    "mdt": "telemetry-live-data.json",
+    "restconf": "restconf-live-data.json",
+    "netconf-get": "netconf-get-live-data.json",
+    "netconf-getconfig": "netconf-getconfig-live-data.json",
+    "netconf-sub": "netconf-sub-live-data.json",
+    "gnmi-get": "gnmi-get-live-data.json",
+    "gnmi-getconfig": "gnmi-getconfig-live-data.json",
+    "gnmi-state": "gnmi-state-live-data.json",
+    "gnmi-sub": "gnmi-sub-live-data.json",
+}
+
+
+def source_generated():
+    """Per-method dataset freshness: the `generated` timestamp of each browse
+    dataset (cheap head-read; avoids parsing multi-MB files in full)."""
+    out = {}
+    for method, fname in METHOD_FILES.items():
+        f = REPO_ROOT / fname
+        if not f.exists():
+            continue
+        head = f.read_text(encoding="utf-8")[:4096]
+        m = re.search(r'"generated"\s*:\s*"([^"]+)"', head)
+        if m:
+            out[method] = {"generated": m.group(1), "file": fname}
+    return out
 
 
 def prefix_to_module():
@@ -176,6 +205,7 @@ def main() -> int:
                    "no": "rejected / unsupported"},
         "methods": [{"key": k, "label": l} for k, l in METHODS],
         "devices": sorted(devices),
+        "sources": source_generated(),
         "totals": {"modules": len({r["module"] for r in rows}), "rows": len(rows)},
         "rows": rows,
     }
