@@ -39,7 +39,7 @@
     };
 
     var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', matrixGaps: false, matrixCat: 'all', jump: null,
-        matrixPivot: 'methods', matrixMethod: null, matrixInconsistent: false, matrixIndex: null };
+        matrixPivot: 'methods', matrixMethod: null, matrixInconsistent: false, matrixIndex: null, matrixClass: null };
     var charts = {};
     var payloadCache = {};
 
@@ -62,6 +62,15 @@
         if (n < 1024) return n + ' B';
         if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
         return (n / 1048576).toFixed(1) + ' MB';
+    }
+    function fmtAge(iso) {
+        var t = iso ? Date.parse(iso) : NaN;
+        if (isNaN(t)) return '';
+        var s = Math.max(0, (Date.now() - t) / 1000);
+        if (s < 90) return 'just now';
+        if (s < 5400) return Math.round(s / 60) + ' min ago';
+        if (s < 129600) return Math.round(s / 3600) + ' h ago';
+        return Math.round(s / 86400) + ' days ago';
     }
     function catClass(c) { return 'cat-' + c; }
 
@@ -484,6 +493,12 @@
             host.appendChild(tile(fmt(t.records), 'Records'));
         }
         host.appendChild(tile(fmt(cats.length), 'Model flavors'));
+        var ti = $('transportInfo');
+        if (ti) {
+            var gen = state.data.generated;
+            ti.textContent = gen ? 'Captured ' + fmtAge(gen) : '';
+            if (gen) { ti.title = 'Dataset generated ' + gen; } else { ti.removeAttribute('title'); }
+        }
         renderCharts();
     }
     function destroyChart(k) {
@@ -686,11 +701,37 @@
     }
 
     // ---------- comparison / coverage view ----------
-    var CELL = {
-        data: { cls: 'y', txt: '\u25cf', tip: 'returned data' },
-        ok: { cls: 'ok', txt: '\u25d1', tip: 'supported, no data' },
-        no: { cls: 'no', txt: '\u2715', tip: 'rejected / unsupported' }
-    };
+    // Precompute per loaded matrix: which (method,category) the fleet ever
+    // returns data for (method "serves" that flavor), and which categories each
+    // device has rows for (model present). Drives expected-vs-real gap calls.
+    function matrixClass() {
+        if (state.matrixClass) return state.matrixClass;
+        var m = state.matrixData || {}, serves = {}, devCat = {};
+        (m.rows || []).forEach(function (r) {
+            (devCat[r.pid] || (devCat[r.pid] = {}))[r.category] = true;
+            var cells = r.cells || {};
+            Object.keys(cells).forEach(function (mk) {
+                if (cells[mk] === 'data') (serves[mk] || (serves[mk] = {}))[r.category] = true;
+            });
+        });
+        state.matrixClass = { serves: serves, devCat: devCat };
+        return state.matrixClass;
+    }
+    // Glyph + tooltip for one cell, separating real (peer-relative) gaps from
+    // expected blanks (method doesn't serve the flavor, or model absent).
+    function cellInfo(row, methodKey, category) {
+        var v = row && row.cells ? row.cells[methodKey] : null;
+        var cls = matrixClass();
+        var served = !!(cls.serves[methodKey] && cls.serves[methodKey][category]);
+        if (v === 'data') return { cls: 'y', txt: '\u25cf', tip: 'returned data \u2014 click to open payload', data: true };
+        if (v === 'ok') return { cls: 'ok', txt: '\u25d1', tip: 'supported \u00b7 returned no data (feature likely not configured on this device)' };
+        if (v === 'no') return served
+            ? { cls: 'no', txt: '\u2715', tip: 'tried \u00b7 rejected by this device \u2014 peers return data here (likely a real gap)', real: true }
+            : { cls: 'no', txt: '\u2715', tip: 'tried \u00b7 not supported (this method does not serve this flavor)' };
+        if (!row) return { cls: 'na', txt: '\u00b7', tip: 'model not present on this device (expected)' };
+        if (served) return { cls: 'na', txt: '\u00b7', tip: 'not collected via this method \u2014 peers return data here (likely a real gap)', real: true };
+        return { cls: 'na', txt: '\u00b7', tip: 'this method does not serve this flavor (expected)' };
+    }
     function setMatrix(on) {
         state.matrix = on;
         var mv = $('matrixView'); if (mv) mv.hidden = !on;
@@ -721,21 +762,20 @@
             state.matrixMethod = methodDef(state.transport) ? state.transport : methods[0].key;
         }
     }
-    function naCell() {
-        return el('td', { className: 'na', text: '\u00b7', attrs: { title: 'not applicable (model absent on device or method not run)' } });
-    }
 
     function renderMatrix() {
         var host = $('matrixWrap'); clear(host);
         if (!state.matrixData) {
             host.appendChild(el('div', { className: 'placeholder', text: 'Loading comparison matrix\u2026' }));
-            fetchJson(MATRIX_URL).then(function (m) { state.matrixData = m; state.matrixIndex = null; renderMatrix(); },
+            fetchJson(MATRIX_URL).then(function (m) { state.matrixData = m; state.matrixIndex = null; state.matrixClass = null; renderMatrix(); },
                 function () { clear(host); host.appendChild(el('div', { className: 'placeholder', text: 'protocol-matrix.json not available yet.' })); });
             return;
         }
         ensureMatrixMethod();
         renderMethodPicker();
         renderFleetOverview();
+        renderFreshness();
+        renderGapSummary();
         syncMatrixControls();
         if (state.matrixPivot === 'devices') { renderMatrixDevices(host); }
         else { renderMatrixMethods(host); }
@@ -803,7 +843,11 @@
         devices.forEach(function (d) { methods.forEach(function (mm) { maxData = Math.max(maxData, counts[d][mm.key].data); }); });
         var table = el('table', { className: 'fleet' });
         var hr = el('tr', {}, [el('th', { className: 'l', text: 'Device' })]);
-        methods.forEach(function (mm) { hr.appendChild(el('th', { text: mm.label })); });
+        methods.forEach(function (mm) {
+            var th = el('th', {}, [document.createTextNode(mm.label)]);
+            if (mm.key === 'mdt') th.appendChild(el('span', { className: 'mdtmark', text: '\u2020', attrs: { title: 'MDT reflects each device\u2019s active subscription set, not its capability \u2014 counts are not directly comparable across devices.' } }));
+            hr.appendChild(th);
+        });
         table.appendChild(el('thead', {}, [hr]));
         var tb = el('tbody');
         devices.forEach(function (d) {
@@ -823,6 +867,101 @@
         });
         table.appendChild(tb);
         host.appendChild(table);
+        host.appendChild(el('div', { className: 'mdtnote', text: '\u2020 MDT = active subscription set, not capability; counts are not directly comparable across devices.' }));
+    }
+
+    // ---- data freshness per method (capture time; flags stale transports) ----
+    function renderFreshness() {
+        var host = $('freshLine'); if (!host) return; clear(host);
+        var m = state.matrixData || {};
+        var src = m.sources || {}, methods = m.methods || [];
+        var times = [];
+        methods.forEach(function (mm) { if (src[mm.key]) { var t = Date.parse(src[mm.key].generated); if (!isNaN(t)) times.push(t); } });
+        if (!times.length) return;
+        var newest = Math.max.apply(null, times);
+        host.appendChild(el('span', { className: 'freshlbl', text: 'Captured:' }));
+        methods.forEach(function (mm) {
+            var s = src[mm.key]; if (!s) return;
+            var t = Date.parse(s.generated); if (isNaN(t)) return;
+            var olderH = (newest - t) / 3.6e6;
+            var chip = el('span', {
+                className: 'freshchip' + (olderH >= 6 ? ' warn' : (olderH >= 2 ? ' old' : '')),
+                title: s.file + ' \u00b7 generated ' + s.generated + (olderH >= 1 ? ' (' + olderH.toFixed(0) + ' h older than the freshest transport)' : ' (freshest)')
+            }, [document.createTextNode(mm.label + ' ')]);
+            chip.appendChild(el('span', { className: 'fresha', text: fmtAge(s.generated) }));
+            if (olderH >= 2) chip.appendChild(el('span', { className: 'freshd', text: '\u00b7 ' + olderH.toFixed(0) + ' h older' }));
+            host.appendChild(chip);
+        });
+        host.appendChild(el('span', { className: 'freshnote', text: 'Older transports may under-report vs the freshest \u2014 re-capture for a fair comparison.' }));
+    }
+
+    // ---- gap summary: real (peer-relative) gaps vs expected blanks ----
+    function renderGapSummary() {
+        var host = $('gapSummary'); if (!host) return; clear(host);
+        var m = state.matrixData; if (!m) return;
+        var methods = m.methods || [], devices = m.devices || [], cls = matrixClass();
+        var serves = cls.serves, devCat = cls.devCat;
+        var dataCnt = {};
+        devices.forEach(function (d) { dataCnt[d] = {}; methods.forEach(function (mm) { dataCnt[d][mm.key] = {}; }); });
+        (m.rows || []).forEach(function (r) {
+            var byM = dataCnt[r.pid]; if (!byM) return;
+            var cells = r.cells || {};
+            methods.forEach(function (mm) {
+                if (cells[mm.key] === 'data') byM[mm.key][r.category] = (byM[mm.key][r.category] || 0) + 1;
+            });
+        });
+        var gapRows = [];
+        devices.forEach(function (d) {
+            methods.forEach(function (mm) {
+                var missing = [], total = 0;
+                Object.keys(dataCnt[d][mm.key]).forEach(function (c) { total += dataCnt[d][mm.key][c]; });
+                Object.keys(serves[mm.key] || {}).forEach(function (cat) {
+                    if (!(devCat[d] && devCat[d][cat])) return;
+                    if ((dataCnt[d][mm.key][cat] || 0) === 0) missing.push(cat);
+                });
+                if (missing.length) { missing.sort(); gapRows.push({ device: d, method: mm, missing: missing, full: total === 0 }); }
+            });
+        });
+        gapRows.sort(function (a, b) { return (b.full ? 1 : 0) - (a.full ? 1 : 0) || b.missing.length - a.missing.length || a.device.localeCompare(b.device); });
+        host.appendChild(el('h3', { className: 'gaph', text: 'Coverage gaps \u2014 what\u2019s missing, and why' }));
+        if (!gapRows.length) {
+            host.appendChild(el('div', { className: 'gapnote', text: 'No real gaps \u2014 every device returns data for every flavor its peers collect. Remaining blank cells are structural (see legend).' }));
+            return;
+        }
+        host.appendChild(el('div', { className: 'gapnote', text: gapRows.length + ' device\u00d7method combinations return no data for a model flavor their peers do collect. Every other blank cell is expected (structural).' }));
+        var table = el('table', { className: 'gaptbl' });
+        table.appendChild(el('thead', {}, [el('tr', {}, [
+            el('th', { text: 'Device' }), el('th', { text: 'Method' }), el('th', { text: 'Missing flavors (n = peers that do collect it)' })
+        ])]));
+        var tb = el('tbody');
+        gapRows.forEach(function (g) {
+            var chips = el('td', {});
+            if (g.full) chips.appendChild(el('span', { className: 'gapfull', text: 'no data at all' }));
+            g.missing.forEach(function (cat) {
+                var peers = 0;
+                devices.forEach(function (d) { if (d !== g.device && (dataCnt[d][g.method.key][cat] || 0) > 0) peers += 1; });
+                chips.appendChild(el('span', {
+                    className: 'gapchip',
+                    title: peers + ' of ' + (devices.length - 1) + ' peer devices return ' + (CAT_LABEL[cat] || cat) + ' data via ' + g.method.label
+                }, [
+                    el('span', { className: 'catdot ' + catClass(cat) }),
+                    document.createTextNode(' ' + (CAT_LABEL[cat] || cat) + ' '),
+                    el('span', { className: 'gapn', text: String(peers) })
+                ]));
+            });
+            tb.appendChild(el('tr', {}, [
+                el('td', {}, [el('button', {
+                    className: 'gaplink', text: g.device,
+                    title: 'Open ' + g.method.label + ' across all devices',
+                    onclick: function () { state.matrixMethod = g.method.key; if (state.matrixPivot === 'devices') renderMatrix(); else setPivot('devices'); }
+                })]),
+                el('td', { text: g.method.label }),
+                chips
+            ]));
+        });
+        table.appendChild(tb);
+        host.appendChild(el('div', { className: 'gapwrap' }, [table]));
+        host.appendChild(el('div', { className: 'gaphint', text: 'Expected blanks (not listed): the method doesn\u2019t serve that flavor (e.g. MIB isn\u2019t served over gNMI; get-config returns only config models), or the model isn\u2019t present on the device (e.g. wireless only on C9800). MDT reflects each device\u2019s active subscription set, not its capability.' }));
     }
 
     function moduleLabelCell(row, meta) {
@@ -833,18 +972,16 @@
         }
         return el('td', { className: 'l', title: row.category }, kids);
     }
-    function dataCell(row, methodKey, pid) {
-        var v = row && row.cells ? row.cells[methodKey] : null;
-        var c = CELL[v];
-        if (!c) return naCell();
-        if (v === 'data' && row.xpath && transportDef(methodKey)) {
+    function dataCell(row, methodKey, pid, category) {
+        var info = cellInfo(row, methodKey, category);
+        if (info.data && row && row.xpath && transportDef(methodKey)) {
             return el('td', {
-                className: c.cls + ' link', text: c.txt,
-                attrs: { title: c.tip + ' \u2014 click to open payload' },
+                className: info.cls + ' link', text: info.txt,
+                attrs: { title: info.tip },
                 onclick: function () { jumpToPayload(methodKey, row.xpath, pid); }
             });
         }
-        return el('td', { className: c.cls, text: c.txt, attrs: { title: c.tip } });
+        return el('td', { className: info.cls + (info.real ? ' gap' : ''), text: info.txt, attrs: { title: info.tip } });
     }
 
     // ---- pivot A: modules x methods for one device ----
@@ -868,7 +1005,7 @@
         var tbody = el('tbody');
         rows.forEach(function (r) {
             var tr = el('tr', {}, [moduleLabelCell(r)]);
-            methods.forEach(function (mm) { tr.appendChild(dataCell(r, mm.key, r.pid)); });
+            methods.forEach(function (mm) { tr.appendChild(dataCell(r, mm.key, r.pid, r.category)); });
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
@@ -917,7 +1054,7 @@
         var tbody = el('tbody');
         modules.forEach(function (x) {
             var tr = el('tr', x.inconsistent ? { className: 'incon' } : {}, [moduleLabelCell(x, x)]);
-            devices.forEach(function (d) { tr.appendChild(dataCell(idx[d + '|' + x.module], method, d)); });
+            devices.forEach(function (d) { tr.appendChild(dataCell(idx[d + '|' + x.module], method, d, x.category)); });
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
