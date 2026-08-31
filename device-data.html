@@ -121,6 +121,30 @@
   .mxlegend .mxhint { font-style:italic; }
   .mxwrap { overflow:auto; max-height:76vh; border:1px solid var(--border); border-radius:8px; }
   .keybadge { display:inline-block; font-size:.66rem; background:var(--accent2); color:#003; padding:1px 6px; border-radius:8px; margin-left:6px; }
+  /* --- compare/coverage view: fleet overview, pivots, consistency --- */
+  .fleetcard { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:14px; }
+  .fleetcard h3.fleeth { margin:0 0 10px; font-size:.85rem; font-weight:600; }
+  .fleetwrap { overflow:auto; }
+  .fleethint { margin-top:8px; font-size:.72rem; color:var(--muted); font-style:italic; }
+  .fleet { border-collapse:collapse; font-size:.74rem; }
+  .fleet th, .fleet td { border:1px solid var(--border); padding:5px 9px; text-align:center; white-space:nowrap; }
+  .fleet th.l, .fleet td.l { text-align:left; font-family:var(--mono); font-size:.72rem; position:sticky; left:0; background:var(--card); z-index:1; }
+  .fleet thead th { position:sticky; top:0; background:var(--card); font-size:.68rem; z-index:2; }
+  .fleet thead th.l { z-index:3; }
+  .fleet td.heat { cursor:pointer; font-variant-numeric:tabular-nums; font-weight:600; }
+  .fleet td.heat:hover { outline:2px solid var(--accent); outline-offset:-2px; }
+  .fleet td.zero { color:var(--muted); font-weight:400; }
+  .mxpivot { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .pvbtn { font:inherit; font-size:.8rem; font-weight:600; padding:6px 12px; border:0; background:var(--card); color:var(--fg); cursor:pointer; }
+  .pvbtn.active { background:var(--accent); color:#fff; }
+  .pvbtn + .pvbtn { border-left:1px solid var(--border); }
+  .mx th.l, .mx td.l { position:sticky; left:0; background:var(--card); z-index:1; }
+  .mx thead th { z-index:2; }
+  .mx thead th.l { z-index:3; }
+  .mx tr.incon td.l { box-shadow:inset 3px 0 0 #e6a800; }
+  .mxcount { color:var(--muted); font-weight:400; font-size:.68rem; margin-left:5px; font-family:var(--mono); }
+  .mxconsist { display:inline-block; font-size:.62rem; font-weight:700; padding:1px 6px; border-radius:8px; margin-left:6px; vertical-align:middle; }
+  .mxconsist.warn { background:rgba(230,160,30,.18); color:#c77b00; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site-chrome.js" defer></script>
@@ -154,14 +178,15 @@
 <main>
   <div class="transport" id="transportBar" role="tablist" aria-label="Access method"></div>
   <div class="toolbar" style="margin-bottom:12px;">
-    <button class="tbtn" id="matrixToggle" type="button" style="flex-direction:row;">▦ Compare methods (matrix)</button>
+    <button class="tbtn" id="matrixToggle" type="button" style="flex-direction:row;">▦ Compare coverage (matrix)</button>
     <span class="summary" id="transportInfo"></span>
   </div>
   <div class="help">
     Pick an <strong>access method</strong> above — MDT (push), RESTCONF, NETCONF (get / get-config /
     subscribe), or gNMI (Get / Subscribe) — then a <strong>device</strong> and <strong>flavor</strong>.
-    Each shows the real payload that method returned. <strong>Compare methods</strong> shows a per-module
-    grid of which interfaces can retrieve each model, and the differences between them.
+    Each shows the real payload that method returned. <strong>Compare coverage</strong> opens a fleet
+    grid: see which methods reach each model <em>per device</em>, or which devices support each model
+    <em>per method</em> — with cross-device inconsistencies flagged.
   </div>
   <section class="mtiles" id="mtiles" aria-label="Summary metrics"></section>
   <section class="charts" aria-label="Summary charts">
@@ -170,7 +195,7 @@
     <div class="chartcard"><h3 id="chartRecTitle">Records captured per device</h3><div class="cwrap"><canvas id="chartRec"></canvas></div></div>
     <div class="chartcard"><h3 id="chartTopTitle">Largest paths</h3><div class="cwrap"><canvas id="chartTop"></canvas></div></div>
   </section>
-  <div class="toolbar">
+  <div class="toolbar" id="deviceBar">
     <div class="device-tabs" id="deviceTabs" role="tablist" aria-label="Devices"></div>
     <span class="summary" id="summary" aria-live="polite" style="margin-left:auto;"></span>
   </div>
@@ -205,17 +230,26 @@
     No live dataset yet. Run <code>build_live_dataset.py</code> to generate <code>telemetry-live-data.json</code>.
   </div>
   <section id="matrixView" hidden>
-    <div class="toolbar">
-      <span class="summary" id="matrixInfo"></span>
-      <label class="sortlbl"><input type="checkbox" id="matrixGaps"> Only models with no data</label>
-    </div>    <div class="chips" id="matrixChips" aria-label="Model flavors"></div>
-    <div class="mxlegend">
-      <span><b class="lg lg-y">&#9679;</b> returned data</span>
-      <span><b class="lg lg-ok">&#9681;</b> supported &middot; no data (empty)</span>
-      <span><b class="lg lg-no">&#10005;</b> tried &middot; rejected / not supported</span>
-      <span><b class="lg lg-na">&middot;</b> not applicable (model absent on device or method not run)</span>
-      <span class="mxhint">Tip: click a green/amber cell to open its example payload.</span>
-    </div>    <div class="mxwrap"><div id="matrixWrap"><div class="placeholder">Loading comparison matrix…</div></div></div>
+    <div class="fleetcard" id="fleetCard">
+      <h3 class="fleeth">Fleet coverage — YANG modules returning data, per device &amp; method</h3>
+      <div class="fleetwrap" id="fleetOverview"></div>
+      <div class="fleethint">Each cell counts modules that returned data. Darker = more coverage; blanks are gaps. Click a cell to compare that method across all devices below.</div>
+    </div>
+    <div class="toolbar mxtoolbar">
+      <div class="mxpivot" role="tablist" aria-label="Comparison axis">
+        <button class="pvbtn active" id="pivotMethods" type="button" role="tab">Methods per device</button>
+        <button class="pvbtn" id="pivotDevices" type="button" role="tab">Devices per method</button>
+      </div>
+      <label class="sortlbl" id="methodPickWrap" hidden>Method
+        <select id="matrixMethod" aria-label="Method to compare across devices"></select>
+      </label>
+      <label class="sortlbl" id="gapsWrap"><input type="checkbox" id="matrixGaps"> Only models with no data</label>
+      <label class="sortlbl" id="inconWrap" hidden><input type="checkbox" id="matrixInconsistent"> Only inconsistent across devices</label>
+      <span class="summary" id="matrixInfo" style="margin-left:auto;"></span>
+    </div>
+    <div class="chips" id="matrixChips" aria-label="Model flavors"></div>
+    <div class="mxlegend" id="mxlegend"></div>
+    <div class="mxwrap"><div id="matrixWrap"><div class="placeholder">Loading comparison matrix…</div></div></div>
   </section>
 </main>
 <script src="assets/vendor/chart.umd.js" integrity="sha384-FcQlsUOd0TJjROrBxhJdUhXTUgNJQxTMcxZe6nHbaEfFL1zjQ+bq/uRoBQxb0KMo" crossorigin="anonymous"></script>
