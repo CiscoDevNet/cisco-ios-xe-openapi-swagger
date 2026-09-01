@@ -154,13 +154,14 @@ def collect():
             put(pth["pid"], to_module(pth["path"], p2m, m2p), pth.get("category"), method, "data",
                 xpath=pth.get("path"))
 
-    # RESTCONF from raw restconf-<PID>.json (self-contained restconf_get.py).
-    # Unions with the browse dataset above: put()'s max-rank merge keeps existing
-    # browse "data" cells while adding modules a device serves that the harness
-    # tree-walk skipped (e.g. the MIB flavor on C9200 / the full flavor set on the
-    # .110 WAN box). Data-only (like the browse dataset's 200-only nature) so the
-    # RESTCONF column stays symmetric across devices — no lone ok/no cells for the
-    # two re-collected devices.
+    # RESTCONF primary source = raw restconf-<PID>.json (self-contained
+    # restconf_get.py), collected for ALL 7 devices — same raw-collector model as
+    # NETCONF/gNMI. The browse read above is retained purely as a non-regressing
+    # union: put()'s max-rank merge keeps the handful of modules the harness
+    # spec-walk reaches that the depth-1 root catalog doesn't enumerate (e.g.
+    # Cisco-IOS-XE-rib-oper, openconfig-macsec, ietf-yang-library, wireless-oper
+    # on C9800). Data-only (like the browse dataset's 200-only nature) so the
+    # RESTCONF column stays symmetric across devices — no lone ok/no cells.
     for f in glob.glob(str(OUT / "restconf-C*.json")):
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]

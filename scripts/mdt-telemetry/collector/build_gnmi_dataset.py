@@ -16,6 +16,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from redact_payload import redact_payload  # mask secrets before embedding
+
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "output"
 REPO_ROOT = HERE.parents[2]
@@ -68,7 +70,7 @@ def build_get():
                 paths.append({"pid": doc["pid"], "source": doc.get("host", ""),
                               "category": e["category"], "path": e["xpath"],
                               "status": e["status"], "bytes": e.get("bytes", 0),
-                              "payload": (e.get("payload") or "")[:PAGE_PAYLOAD_CAP]})
+                              "payload": redact_payload(e.get("payload") or "")[:PAGE_PAYLOAD_CAP]})
         _write(fname, label, paths, "live device capture (gNMI Get, pygnmi)")
 
 
@@ -84,7 +86,7 @@ def build_sub():
                           "status": "data" if e["once"] == "streamed" else "empty",
                           "once": e.get("once"), "sample": e.get("sample"),
                           "onchange": e.get("onchange"),
-                          "bytes": e.get("bytes", 0), "payload": (e.get("payload") or "")[:PAGE_PAYLOAD_CAP]})
+                          "bytes": e.get("bytes", 0), "payload": redact_payload(e.get("payload") or "")[:PAGE_PAYLOAD_CAP]})
     if paths:
         _write("gnmi-sub-live-data.json", "gNMI Subscribe ONCE/SAMPLE/ON_CHANGE (:9339)", paths,
                "live device capture (gNMI Subscribe, pygnmi)")

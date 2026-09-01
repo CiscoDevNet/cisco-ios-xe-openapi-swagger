@@ -17,6 +17,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from redact_payload import redact_payload  # mask secrets before embedding
+
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "output"
 REPO_ROOT = HERE.parents[2]
@@ -44,7 +46,7 @@ def build(op: str) -> dict:
                 "path": e["xpath"],
                 "status": e["status"],
                 "bytes": e.get("bytes", 0),
-                "payload": (e.get("payload") or "")[:PAGE_PAYLOAD_CAP],
+                "payload": redact_payload(e.get("payload") or "")[:PAGE_PAYLOAD_CAP],
             })
     paths.sort(key=lambda e: (e["pid"], e["category"], e["path"]))
 
@@ -90,7 +92,7 @@ def build_sub() -> dict:
             paths.append({
                 "pid": pid, "source": doc.get("host", ""), "category": e["category"],
                 "path": e["xpath"], "status": "data" if e["status"] == "streamed" else "empty",
-                "bytes": e.get("bytes", 0), "payload": (e.get("payload") or "")[:PAGE_PAYLOAD_CAP],
+                "bytes": e.get("bytes", 0), "payload": redact_payload(e.get("payload") or "")[:PAGE_PAYLOAD_CAP],
             })
     paths.sort(key=lambda e: (e["pid"], e["category"], e["path"]))
     dev_paths = collections.Counter(); dev_bytes = collections.Counter()
