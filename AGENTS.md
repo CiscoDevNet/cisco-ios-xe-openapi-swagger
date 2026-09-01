@@ -212,6 +212,22 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 - **Management is shared-fate:** the C9300 hub bridges the `10.85.134.0/24` mgmt for C9500/C9600; the `/24` also hosts the TOR + both console servers. **Breaking the mgmt VLAN/hub-mgmt-ports = no remote recovery.** Keep feature config on **loopbacks/leaf ports**; console lines are in the VNC2 Lab Matrix ("Serial Port" col, e.g. C9840=2019).
 - Device writes via netmiko (`cisco_xe`); back up `show run` first (to gitignored `captures/*-backups/`); don't `write memory` until healthy (reload reverts).
 
+### Multi-transport browse datasets — `device-data.html` (protocol matrix)
+
+A **second** live-data surface, distinct from the harness Live Data page: [device-data.html](device-data.html) / [device-data.js](device-data.js) compares the **same modules across 9 transports** (MDT, RESTCONF, NETCONF get/get-config/subscribe, gNMI get/get-config/state/subscribe) for the 7 devices (the 6 lab boxes + the `.110` C9300-STACK8-WAN production WAN stack). It reads:
+
+- `protocol-matrix.json` — the device x module x method status grid (`scripts/mdt-telemetry/collector/build_protocol_matrix.py`).
+- **9 per-method browse datasets at the repo root**, one per transport button: `telemetry-live-data.json` (MDT), `restconf-live-data.json`, `netconf-{get,getconfig,sub}-live-data.json`, `gnmi-{get,getconfig,state,sub}-live-data.json`. Each is device -> category -> path, with the page lazily fetching the per-path body only on drill-in.
+
+Builders (in `scripts/mdt-telemetry/collector/`, plus `scripts/build_restconf_dataset.py`):
+
+- **RESTCONF is DERIVED, not hand-built.** `scripts/build_restconf_dataset.py` flattens the harness index `releases/<ver>/live-examples-index.json` into `restconf-live-data.json`. Bodies live in `releases/<ver>/live-data/<cat>/<module>/<sha1(path)[:16]>.json` = `{path,category,module,pids:{PID:{value}}}` — **one file per path holding every device's value**. The self-contained collector `restconf_get.py` finds module ROOTS the harness tree-walk skipped (MIB on most boxes; ietf/openconfig/other on `.110`); `build_restconf_augment.py` folds those roots **into the index** (same per-path-file layout) so the flatten reproduces the full dataset. Regenerate: run `build_restconf_augment.py` then `python3 scripts/build_restconf_dataset.py`.
+  - **File-scheme rule (do not reintroduce the old bug):** per-path body files are named `sha1(PATH)`, **never** `sha1(value)`. The index path-entry carries a single `file` for all PIDs, so a value-hash (one-file-per-value) layout cannot represent a path whose devices return different bodies — the flatten would collapse them onto one file.
+- **NETCONF / gNMI** datasets are built by `build_netconf_dataset.py` / `build_gnmi_dataset.py` from the **gitignored** OUT captures (`output/{netconf,gnmi}-<PID>.json`), inlining each body capped at 40K.
+- **Payload redaction:** `redact_payload.py` (masks PEM + XML `<tag>` + JSON `"key"`, strips the module prefix) is folded into the NETCONF/gNMI builders; RESTCONF bodies are redacted before write (harness `redact.py` for walked paths, `redact_payload` for collector roots). `tests/test_dataset_secrets.py` scans the 9 repo-root datasets + `protocol-matrix.json` — run it before committing any rebuilt dataset.
+
+**Ownership boundary:** `telemetry-data.{html,js}`, `telemetry-live-data.json`, `build_telemetry_dataset.py`, and `scripts/mdt-telemetry/docs/` belong to a **parallel telemetry effort** (its own [scripts/mdt-telemetry/docs/AGENTS.md](scripts/mdt-telemetry/docs/AGENTS.md)); it also holds `scripts/harness/*.py` + `releases/<ver>/live-modules.json` dirty. Stage MY files explicitly; **never `git add -A`**.
+
 ---
 
 ## 6. Conventions & Rules
