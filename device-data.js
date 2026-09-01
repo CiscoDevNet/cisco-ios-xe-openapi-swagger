@@ -776,6 +776,7 @@
         renderFleetOverview();
         renderFreshness();
         renderGapSummary();
+        renderFeatureMatrix();
         syncMatrixControls();
         if (state.matrixPivot === 'devices') { renderMatrixDevices(host); }
         else { renderMatrixMethods(host); }
@@ -982,6 +983,73 @@
             });
         }
         return el('td', { className: info.cls + (info.real ? ' gap' : ''), text: info.txt, attrs: { title: info.tip } });
+    }
+
+    // ---- model-family coverage: per-device data presence by feature family ----
+    // Families + module tokens are grounded in DEVICE_FEATURE_COVERAGE.md. Each
+    // cell counts YANG models in the family that returned data (any method), so a
+    // near-zero cell means the feature isn't configured / its models are absent
+    // (not a protocol gap). Honest data-presence heat, not a config assertion.
+    var FEATURE_FAMILIES = [
+        { name: 'Unicast routing', pat: ['ospf', 'bgp', 'isis', 'eigrp', '-rip-', 'rib-oper', 'route-map'] },
+        { name: 'MPLS / SR', pat: ['mpls', 'segment-routing', '-ldp', '-rsvp'] },
+        { name: 'Multicast', pat: ['multicast', 'igmp', '-pim', 'mfib', 'msdp'] },
+        { name: 'L2 / bridging', pat: ['bridge-domain', 'ethernet-cfm', 'spanning-tree', 'matm', '-mvrp', '-cfm-'] },
+        { name: 'MACsec / CTS', pat: ['macsec', 'trustsec', '-cts-', '-mka'] },
+        { name: 'NetFlow', pat: ['-flow-', 'fnf', 'et-analytics'] },
+        { name: 'QoS', pat: ['diffserv', '-qos-', 'policer', 'policy-map'] },
+        { name: 'DHCP/DNS/NAT', pat: ['dhcp', '-dns-', '-nat-', 'nbar'] },
+        { name: 'Security / AAA', pat: ['aaa', 'dot1x', 'crypto', 'ipsec', '-pki-', 'trustpoint'] },
+        { name: 'Platform / stack', pat: ['stackwise', 'platform-', 'redundancy', 'environment', 'device-hardware'] },
+        { name: 'Wireless', pat: ['wireless', '-wlan', 'mobility', '-rrm', '-ap-'] }
+    ];
+    function renderFeatureMatrix() {
+        var host = $('featureMatrix'); if (!host) return; clear(host);
+        var m = state.matrixData; if (!m) return;
+        var devices = m.devices || [];
+        var rowsByDev = {};
+        devices.forEach(function (d) { rowsByDev[d] = []; });
+        (m.rows || []).forEach(function (r) { if (rowsByDev[r.pid]) rowsByDev[r.pid].push(r); });
+        function famHits(dev, fam) {
+            var hits = [];
+            rowsByDev[dev].forEach(function (r) {
+                var mod = (r.module || '').toLowerCase();
+                if (!fam.pat.some(function (p) { return mod.indexOf(p) !== -1; })) return;
+                var cells = r.cells || {};
+                for (var k in cells) { if (cells[k] === 'data') { hits.push(r.module); break; } }
+            });
+            return hits;
+        }
+        var grid = {}, famMax = {};
+        devices.forEach(function (d) {
+            grid[d] = {};
+            FEATURE_FAMILIES.forEach(function (f) {
+                var h = famHits(d, f); grid[d][f.name] = h;
+                famMax[f.name] = Math.max(famMax[f.name] || 1, h.length);
+            });
+        });
+        host.appendChild(el('h3', { className: 'fleeth', text: 'Model-family coverage \u2014 YANG models returning data per feature family (derived)' }));
+        var table = el('table', { className: 'fleet feat' });
+        var hr = el('tr', {}, [el('th', { className: 'l', text: 'Device' })]);
+        FEATURE_FAMILIES.forEach(function (f) { hr.appendChild(el('th', { text: f.name })); });
+        table.appendChild(el('thead', {}, [hr]));
+        var tb = el('tbody');
+        devices.forEach(function (d) {
+            var tr = el('tr', {}, [el('td', { className: 'l', text: d })]);
+            FEATURE_FAMILIES.forEach(function (f) {
+                var h = grid[d][f.name], n = h.length;
+                var tip = n
+                    ? (f.name + ' \u00b7 ' + n + ' model(s) with data: ' + h.slice(0, 10).join(', ') + (n > 10 ? ', \u2026' : ''))
+                    : (f.name + ' \u00b7 no models with data \u2014 feature not configured or models platform-absent (not a protocol gap)');
+                var td = el('td', { className: 'heat' + (n ? '' : ' zero'), text: String(n), attrs: { title: tip } });
+                if (n) td.style.background = 'rgba(46,125,50,' + (0.10 + 0.55 * (n / famMax[f.name])).toFixed(3) + ')';
+                tr.appendChild(td);
+            });
+            tb.appendChild(tr);
+        });
+        table.appendChild(tb);
+        host.appendChild(el('div', { className: 'fleetwrap' }, [table]));
+        host.appendChild(el('div', { className: 'fleethint', text: 'Each cell counts YANG models in that family returning data on the device (any method), shaded per column. Feature-specific families light up only where enabled \u2014 e.g. Wireless on the C9800 only, MPLS richer on the C9800, routing lighter on the WLC. A near-zero cell means the feature isn\u2019t configured or its models are platform-absent \u2014 not a protocol gap. Baseline families (routing RIB, platform) populate on every device. Derived from captured data, not the running-config.' }));
     }
 
     // ---- pivot A: modules x methods for one device ----
