@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from pathlib import Path
 
@@ -48,7 +49,46 @@ def establish_rpc(ns: str, prefix: str, xpath: str, period_cs: int) -> str:
     )
 
 
-def collect_device(dev, env, roots, limit, period_cs, window):
+def _looks_like_drop(conn, exc) -> bool:
+    """True when the SSH/NETCONF session is gone (reconnect needed) rather than a
+    benign per-RPC reject. establish-subscription rejects come back as normal
+    replies, so an *exception* here almost always means the transport died."""
+    if not getattr(conn, "connected", True):
+        return True
+    msg = str(exc).lower()
+    return any(s in msg for s in (
+        "not connected", "session is closed", "session close", "socket",
+        "transport", "eof occurred", "connection reset"))
+
+
+def _subscribe_root(conn, r, ns, keys, period_cs, window):
+    """Establish one periodic yang-push subscription, capture the first push,
+    then delete it. A session-drop on <establish-subscription> propagates to the
+    caller so it can reconnect; a reject reply is recorded as a normal result."""
+    reply = str(conn.dispatch(to_ele(establish_rpc(ns, r["prefix"], r["xpath"], period_cs))))
+    m = re.search(r"subscription-id[^>]*>(\d+)<", reply)
+    sub_id = m.group(1) if m else None
+    if not sub_id:
+        return {**keys, "status": "rejected", "bytes": 0, "payload": reply[:2000]}
+    payload, got = "", False
+    try:
+        note = conn.take_notification(block=True, timeout=window)
+        if note is not None:
+            payload = getattr(note, "notification_xml", "") or ""
+            got = bool(payload)
+    except Exception:  # noqa: BLE001
+        pass
+    entry = {**keys, "status": "streamed" if got else "accepted-nodata",
+             "sub_id": sub_id, "bytes": len(payload), "payload": payload[:MAX_PAYLOAD]}
+    try:
+        conn.dispatch(to_ele(
+            f'<delete-subscription xmlns="{EN_NS}"><subscription-id>{sub_id}</subscription-id></delete-subscription>'))
+    except Exception:  # noqa: BLE001
+        pass
+    return entry
+
+
+def collect_device(dev, env, roots, limit, period_cs, window, out_path=None):
     conn = _connect(dev, env)
     nsmap = build_ns_map(conn.server_capabilities)
     nsmap.update(yang_library_ns(conn))
@@ -65,7 +105,18 @@ def collect_device(dev, env, roots, limit, period_cs, window):
     todo = roots[:limit] if limit else roots
     print(f"  {dev['pid']}: {len(todo)} roots to subscribe (period {period_cs}cs, window {window}s)")
     entries = []
-    for r in todo:
+
+    def _save():
+        if out_path:
+            Path(out_path).write_text(json.dumps(
+                {"pid": dev["pid"], "host": dev["host"], "entries": entries},
+                ensure_ascii=False), encoding="utf-8")
+
+    i = 0
+    reconnects = 0
+    cur_fails = 0
+    while i < len(todo):
+        r = todo[i]
         module = r.get("module") or p2m.get(r["prefix"], r["prefix"])
         ns = nsmap.get(module)
         if not ns and module.startswith("Cisco-IOS-XE-"):
@@ -76,37 +127,51 @@ def collect_device(dev, env, roots, limit, period_cs, window):
         keys["module"] = r.get("module")
         if not ns:
             entries.append({**keys, "status": "no-namespace", "bytes": 0, "payload": ""})
+            i += 1
             continue
         try:
-            reply = str(conn.dispatch(to_ele(establish_rpc(ns, r["prefix"], r["xpath"], period_cs))))
-            import re
-            m = re.search(r"subscription-id[^>]*>(\d+)<", reply)
-            sub_id = m.group(1) if m else None
-            if not sub_id:
-                entries.append({**keys, "status": "rejected", "bytes": 0, "payload": reply[:2000]})
+            entries.append(_subscribe_root(conn, r, ns, keys, period_cs, window))
+            i += 1
+            cur_fails = 0
+            if i % 40 == 0:
+                _save()
+                streamed = sum(1 for e in entries if e["status"] == "streamed")
+                print(f"    ...{i}/{len(todo)} ({streamed} streamed)", flush=True)
+        except Exception as ex:  # noqa: BLE001 — session drop OR a per-RPC error
+            if not _looks_like_drop(conn, ex):
+                entries.append({**keys, "status": "rejected", "bytes": 0,
+                                "error": str(ex)[:200], "payload": ""})
+                i += 1
+                cur_fails = 0
                 continue
-            # wait for the first push-update notification
-            payload, got = "", False
+            # Session dropped mid-run — reconnect and resume. RFC 8639 dynamic
+            # subscriptions are session-bound, so the device tears down the
+            # orphaned subs when the old session closes.
+            cur_fails += 1
             try:
-                note = conn.take_notification(block=True, timeout=window)
-                if note is not None:
-                    payload = getattr(note, "notification_xml", "") or ""
-                    got = bool(payload)
+                conn.close_session()
             except Exception:  # noqa: BLE001
                 pass
-            entries.append({**keys, "status": "streamed" if got else "accepted-nodata",
-                            "sub_id": sub_id, "bytes": len(payload), "payload": payload[:MAX_PAYLOAD]})
+            if cur_fails >= 3:  # poison root: record + skip so we don't loop forever
+                entries.append({**keys, "status": "session-drop", "bytes": 0,
+                                "error": str(ex)[:150], "payload": ""})
+                i += 1
+                cur_fails = 0
+            reconnects += 1
+            if reconnects >= 120:
+                print(f"    too many reconnects ({reconnects}); saving partial at {i}")
+                break
+            time.sleep(2)
             try:
-                conn.dispatch(to_ele(
-                    f'<delete-subscription xmlns="{EN_NS}"><subscription-id>{sub_id}</subscription-id></delete-subscription>'))
-            except Exception:  # noqa: BLE001
-                pass
-        except Exception as e:  # noqa: BLE001
-            entries.append({**keys, "status": "rejected", "bytes": 0, "error": str(e)[:200], "payload": ""})
+                conn = _connect(dev, env)
+            except Exception as e:  # noqa: BLE001
+                print(f"    reconnect failed: {e}; saving partial")
+                break
     try:
         conn.close_session()
     except Exception:
         pass
+    _save()
     return {"pid": dev["pid"], "host": dev["host"], "entries": entries}
 
 
@@ -148,13 +213,13 @@ def main() -> int:
         raise SystemExit("Specify --device <pid> or --all")
     for dev in load_devices([args.device] if args.device else None):
         print(f"\n=== NETCONF establish-subscription {dev['pid']} ({dev['host']}) ===")
+        out = OUT / f"netconf-sub-{dev['pid']}.json"
         try:
             result = collect_device(dev, env, load_roots(), args.limit,
-                                    args.period_cs, args.window)
+                                    args.period_cs, args.window, out_path=out)
         except Exception as e:  # noqa: BLE001
             print(f"  ! {dev['pid']} failed: {e}")
             continue
-        out = OUT / f"netconf-sub-{dev['pid']}.json"
         out.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
         streamed = sum(1 for e in result["entries"] if e["status"] == "streamed")
         print(f"  wrote {out.name}: {len(result['entries'])} subs, {streamed} streamed")
