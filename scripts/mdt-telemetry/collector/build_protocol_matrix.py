@@ -32,6 +32,7 @@ METHODS = [
     ("netconf-get", "NETCONF get"),
     ("netconf-getconfig", "NETCONF get-config"),
     ("netconf-sub", "NETCONF subscribe"),
+    ("netconf-sub-config", "NETCONF subscribe config"),
     ("gnmi-get", "gNMI Get"),
     ("gnmi-getconfig", "gNMI Get config"),
     ("gnmi-state", "gNMI Get state"),
@@ -46,6 +47,7 @@ METHOD_FILES = {
     "netconf-get": "netconf-get-live-data.json",
     "netconf-getconfig": "netconf-getconfig-live-data.json",
     "netconf-sub": "netconf-sub-live-data.json",
+    "netconf-sub-config": "netconf-sub-config-live-data.json",
     "gnmi-get": "gnmi-get-live-data.json",
     "gnmi-getconfig": "gnmi-getconfig-live-data.json",
     "gnmi-state": "gnmi-state-live-data.json",
@@ -184,6 +186,8 @@ def collect():
 
     # NETCONF subscribe from netconf-sub-<PID>.json
     for f in glob.glob(str(OUT / "netconf-sub-*.json")):
+        if "netconf-sub-config-" in f:
+            continue  # config-subscription files feed the netconf-sub-config method
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]
         for e in doc.get("entries", []):
@@ -191,6 +195,17 @@ def collect():
                 continue
             st = {"streamed": "data", "accepted-nodata": "ok"}.get(e.get("status"), "no")
             put(pid, entry_module(e, p2m, m2p), e.get("category"), "netconf-sub", st, xpath=e.get("xpath"))
+
+    # NETCONF config subscribe (periodic + on-change) from netconf-sub-config-<PID>.json;
+    # max-rank merge collapses both triggers to the best state per (device, module).
+    for f in glob.glob(str(OUT / "netconf-sub-config-*.json")):
+        doc = json.loads(Path(f).read_text(encoding="utf-8"))
+        pid = doc["pid"]
+        for e in doc.get("entries", []):
+            if e.get("status") == "no-namespace":
+                continue
+            st = {"streamed": "data", "accepted-nodata": "ok"}.get(e.get("status"), "no")
+            put(pid, entry_module(e, p2m, m2p), e.get("category"), "netconf-sub-config", st, xpath=e.get("xpath"))
 
     # gNMI get / get-config from gnmi-<PID>.json (excludes gnmi-sub-*)
     for f in glob.glob(str(OUT / "gnmi-C*.json")):

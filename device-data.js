@@ -23,6 +23,7 @@
         { key: 'netconf-get', url: 'netconf-get-live-data.json', label: 'NETCONF get', sub: 'SSH · 830' },
         { key: 'netconf-getconfig', url: 'netconf-getconfig-live-data.json', label: 'NETCONF', sub: 'get-config' },
         { key: 'netconf-sub', url: 'netconf-sub-live-data.json', label: 'NETCONF', sub: 'subscribe' },
+        { key: 'netconf-sub-config', url: 'netconf-sub-config-live-data.json', label: 'NETCONF', sub: 'sub · config' },
         { key: 'gnmi-get', url: 'gnmi-get-live-data.json', label: 'gNMI Get', sub: 'all · 9339' },
         { key: 'gnmi-getconfig', url: 'gnmi-getconfig-live-data.json', label: 'gNMI Get', sub: 'config' },
         { key: 'gnmi-state', url: 'gnmi-state-live-data.json', label: 'gNMI Get', sub: 'state · oper' },
@@ -416,7 +417,7 @@
                    copyBtn('Copy path', function () { return p.path; })])
         ]);
         panel.appendChild(head);
-        if (p.once != null || p.sample != null || p.onchange != null) {
+        if (p.once != null || p.sample != null || p.onchange != null || p.periodic != null) {
             panel.appendChild(subscribeModes(p));
         }
         var body = el('div', { className: 'body' });
@@ -436,9 +437,12 @@
             var cls = st === 'streamed' ? 'ok' : (st === 'accepted-nodata' ? 'warn' : 'no');
             return el('span', { className: 'modebadge mb-' + cls, text: name + ': ' + (st || 'n/a') });
         }
-        return el('div', { className: 'submodes' }, [
-            badge('ONCE', p.once), badge('SAMPLE', p.sample), badge('ON_CHANGE', p.onchange)
-        ]);
+        var kids = [];
+        if (p.periodic != null) kids.push(badge('PERIODIC', p.periodic));
+        if (p.once != null) kids.push(badge('ONCE', p.once));
+        if (p.sample != null) kids.push(badge('SAMPLE', p.sample));
+        if (p.onchange != null) kids.push(badge('ON_CHANGE', p.onchange));
+        return el('div', { className: 'submodes' }, kids);
     }
 
     function renderInstance(s, label) {
