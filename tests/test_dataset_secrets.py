@@ -20,6 +20,7 @@ DATASETS = [
     "netconf-get-live-data.json",
     "netconf-getconfig-live-data.json",
     "netconf-sub-live-data.json",
+    "netconf-sub-config-live-data.json",
     "gnmi-get-live-data.json",
     "gnmi-getconfig-live-data.json",
     "gnmi-state-live-data.json",
