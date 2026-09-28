@@ -118,8 +118,55 @@
         installShortcutHelp();
         installBackToTop();
         installHeadingAnchors();
+        installEnvSwitch();
         installFooter();
         installPwaInstallPrompt();
+    }
+
+    // === Environment switch banner ======================================
+    // Slim, dismissable bar that cross-links the production and staging
+    // deployments so visitors (and reviewers) can hop between them.
+    // Opt-in per page via <body data-env-switch="on"> — kept off elsewhere
+    // so it only shows on the landing page. CSP-safe: static markup only.
+    function installEnvSwitch() {
+        if (!document.body) return;
+        if (document.body.getAttribute('data-env-switch') !== 'on') return;
+        if (document.querySelector('.env-switch-banner')) return;
+
+        var PROD = 'https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/';
+        var STAGING = 'https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger/';
+        var host = window.location.hostname;
+
+        var hereLabel, other, otherLabel;
+        if (host.indexOf('ciscodevnet.github.io') !== -1) {
+            hereLabel = 'production'; other = STAGING; otherLabel = 'staging site';
+        } else if (host.indexOf('jeremycohoe.github.io') !== -1) {
+            hereLabel = 'staging'; other = PROD; otherLabel = 'production site';
+        } else {
+            // Local/dev preview — offer both.
+            hereLabel = 'local preview'; other = PROD; otherLabel = 'production site';
+        }
+
+        var DISMISS_KEY = 'iosxe-env-switch-dismissed';
+        try { if (sessionStorage.getItem(DISMISS_KEY) === '1') return; } catch (_) { /* storage off */ }
+
+        var bar = document.createElement('div');
+        bar.className = 'env-switch-banner';
+        bar.setAttribute('role', 'note');
+        bar.setAttribute('aria-label', 'Environment switcher');
+        bar.innerHTML =
+            '<span class="env-switch-text">' +
+                'You\u2019re on <strong>' + hereLabel + '</strong>. ' +
+                '<a class="env-switch-link" href="' + other + '">' +
+                    'Go to the ' + otherLabel + ' \u2192' +
+                '</a>' +
+            '</span>' +
+            '<button type="button" class="env-switch-close" aria-label="Dismiss environment banner">\u00d7</button>';
+        document.body.insertBefore(bar, document.body.firstChild);
+        bar.querySelector('.env-switch-close').addEventListener('click', function () {
+            try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (_) { /* ignore */ }
+            if (bar.parentNode) bar.parentNode.removeChild(bar);
+        });
     }
 
     // === Heading permalink anchors ======================================

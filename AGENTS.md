@@ -403,6 +403,8 @@ git push prod main      # promote to CiscoDevNet when ready
 ```
 
 - Push to `main` on **either** remote → that remote's GitHub Actions deploys to its own Pages site
+- The working clone's default remote may be named `origin` (aliasing `dev`/jeremycohoe); if `prod` is missing, add it: `git remote add prod https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger.git`
+- Before promoting, verify the direction: `git rev-list --count prod/main..main` (ahead) and `git rev-list --count main..prod/main` (should be 0). If prod is 0-ahead, `git push prod main` is a clean fast-forward; if prod has independent commits, reconcile first — never force-push prod without explicit confirmation
 - Generated artifacts (specs, trees, search index) **are committed** — keeps the deploy reproducible without running Python in CI
 - Don't commit large debugging/exploration files; use `archive/` for completed-phase docs
 - Never `git push --force prod` without explicit user confirmation; prefer `--force-with-lease` and verify the remote SHA you're overwriting
