@@ -34,6 +34,7 @@ END = "<!-- END pwa -->"
 
 # Analytics host allowlisting for the page CSP.
 CLARITY_HOST = "https://*.clarity.ms"
+CLARITY_IMG_HOSTS = "https://*.clarity.ms https://c.bing.com"
 POSTHOG_HOSTS = "https://*.posthog.com https://*.i.posthog.com"
 
 TOP_LEVEL = [
@@ -46,11 +47,11 @@ TOP_LEVEL = [
     "yang-accountability-compare.html",
     "about.html",
     "platform-coverage.html",
+    "device-data.html",
     "404.html",
 ]
 VIEWERS = [
     "swagger-cfg-model/index.html",
-    "swagger-events-model/index.html",
     "swagger-ietf-model/index.html",
     "swagger-mib-model/index.html",
     "swagger-native-config-model/index.html",
@@ -84,31 +85,42 @@ def _block(asset_prefix: str) -> str:
 
 
 def _patch_csp(text: str) -> str:
-    """Allowlist the PostHog hosts next to Clarity in the page CSP. Idempotent:
-    a no-op once PostHog is already present, or when the page has no CSP with
-    the Clarity token."""
-    if "posthog.com" in text:
-        return text
+    """Allowlist the analytics hosts in the page CSP. Idempotent, and a no-op
+    for pages without a CSP carrying the Clarity token."""
     if CLARITY_HOST not in text:
         return text
-    return text.replace(CLARITY_HOST, f"{CLARITY_HOST} {POSTHOG_HOSTS}")
+    if "posthog.com" not in text:
+        text = text.replace(CLARITY_HOST, f"{CLARITY_HOST} {POSTHOG_HOSTS}")
+    # Clarity reports via an image beacon; without img-src it is CSP-blocked.
+    return re.sub(
+        r"img-src 'self' data:(?! https://\*\.clarity\.ms)",
+        f"img-src 'self' data: {CLARITY_IMG_HOSTS}",
+        text,
+    )
 
 
 def _inject(path: Path, block: str) -> bool:
-    text = path.read_text(encoding="utf-8")
+    # newline="" keeps each page's existing CRLF/LF endings intact.
+    with open(path, encoding="utf-8", newline="") as handle:
+        text = handle.read()
     wrapped = f"{BEGIN}{block}\n{END}"
+    eol = "\r\n" if "\r\n" in text else "\n"
+    wrapped = wrapped.replace("\n", eol)
     pattern = re.compile(rf"{re.escape(BEGIN)}.*?{re.escape(END)}", re.S)
     if pattern.search(text):
         new_text = pattern.sub(lambda _m: wrapped, text)
+    elif "assets/js/analytics.js" in text:
+        new_text = text  # hand-wired analytics tags: only the CSP needs patching
     else:
         if "</head>" not in text:
             print(f"  skip {path.relative_to(ROOT)}: no </head>")
             return False
-        new_text = text.replace("</head>", f"{wrapped}\n</head>", 1)
+        new_text = text.replace("</head>", f"{wrapped}{eol}</head>", 1)
     new_text = _patch_csp(new_text)
     if new_text == text:
         return False
-    path.write_text(new_text, encoding="utf-8")
+    with open(path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(new_text)
     return True
 
 
