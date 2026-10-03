@@ -2,8 +2,8 @@
 
 **Date:** October 03, 2026
 **IOS XE Version:** 17.18.1
-**Total YANG Modules:** 1151
-**Modules with OpenAPI Specs:** 666 (57.9%)
+**Total YANG Modules:** 1382
+**Modules with OpenAPI Specs:** 897 (64.9%)
 **Modules with YANG Trees:** 715
 **Modules in Multiple Categories:** 3
 
@@ -32,7 +32,7 @@ This report provides **100% accountability** for every YANG module in the
 | **ietf** | 33 | 21 | 64% |  |
 | **mib** | 149 | 147 | 99% |  |
 | **events** | 41 | 9 | 22% |  |
-| **native** | 155 | 154 | 99% |  |
+| **native** | 386 | 385 | 100% |  |
 | **other** | 30 | 6 | 20% |  |
 | **types** | 63 | 0 | N/A | Excluded by design |
 | **deviation** | 98 | 0 | N/A | Excluded by design |
@@ -658,7 +658,7 @@ This report provides **100% accountability** for every YANG module in the
 | cisco-pw | Other | [Other](swagger-other-model/index.html#spec=cisco-pw) | [🌳](yang-trees/cisco-pw.html) |
 | cisco-smart-license | RPC, Other | [RPC](swagger-rpc-model/index.html#spec=cisco-smart-license) [Other](swagger-other-model/index.html#spec=cisco-smart-license) | [🌳](yang-trees/cisco-smart-license.html) |
 
-### NATIVE (155 modules)
+### NATIVE (386 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -675,6 +675,237 @@ This report provides **100% accountability** for every YANG module in the
 | native-app-hosting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-app-hosting) | - |
 | native-application | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-application) | - |
 | native-arp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-arp) | - |
+| native-aug-aaa | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-aaa) | - |
+| native-aug-access-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-access-list) | - |
+| native-aug-access-session | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-access-session) | - |
+| native-aug-alarm | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-alarm) | - |
+| native-aug-alarm-contact | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-alarm-contact) | - |
+| native-aug-alarm-profile | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-alarm-profile) | - |
+| native-aug-alias | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-alias) | - |
+| native-aug-app-hosting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-app-hosting) | - |
+| native-aug-application | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-application) | - |
+| native-aug-archive | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-archive) | - |
+| native-aug-arp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-arp) | - |
+| native-aug-authentication | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-authentication) | - |
+| native-aug-auto | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-auto) | - |
+| native-aug-autoconf | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-autoconf) | - |
+| native-aug-avb | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-avb) | - |
+| native-aug-avc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-avc) | - |
+| native-aug-banner | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-banner) | - |
+| native-aug-bba-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-bba-group) | - |
+| native-aug-bfd | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-bfd) | - |
+| native-aug-bfd-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-bfd-template) | - |
+| native-aug-boot | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-boot) | - |
+| native-aug-bridge | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-bridge) | - |
+| native-aug-bridge-domain | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-bridge-domain) | - |
+| native-aug-buffers | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-buffers) | - |
+| native-aug-call | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-call) | - |
+| native-aug-call-home | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-call-home) | - |
+| native-aug-call-manager-fallback | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-call-manager-fallback) | - |
+| native-aug-card | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-card) | - |
+| native-aug-ccm-manager | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ccm-manager) | - |
+| native-aug-cdp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-cdp) | - |
+| native-aug-cef | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-cef) | - |
+| native-aug-clns | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-clns) | - |
+| native-aug-clock | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-clock) | - |
+| native-aug-coap | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-coap) | - |
+| native-aug-codec | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-codec) | - |
+| native-aug-control-plane | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-control-plane) | - |
+| native-aug-control-plane-host | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-control-plane-host) | - |
+| native-aug-controller | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-controller) | - |
+| native-aug-credentials | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-credentials) | - |
+| native-aug-crypto-1 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-crypto-1) | - |
+| native-aug-crypto-2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-crypto-2) | - |
+| native-aug-cts | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-cts) | - |
+| native-aug-cwmp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-cwmp) | - |
+| native-aug-dapr | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dapr) | - |
+| native-aug-device | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-device) | - |
+| native-aug-device-sensor | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-device-sensor) | - |
+| native-aug-device-tracking | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-device-tracking) | - |
+| native-aug-diagnostic | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-diagnostic) | - |
+| native-aug-dial-peer | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dial-peer) | - |
+| native-aug-dialer | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dialer) | - |
+| native-aug-dialer-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dialer-list) | - |
+| native-aug-dlr | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dlr) | - |
+| native-aug-domain | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-domain) | - |
+| native-aug-dot1x | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dot1x) | - |
+| native-aug-dsapp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dsapp) | - |
+| native-aug-dspfarm | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dspfarm) | - |
+| native-aug-dying-gasp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-dying-gasp) | - |
+| native-aug-eap | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-eap) | - |
+| native-aug-enable | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-enable) | - |
+| native-aug-energywise | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-energywise) | - |
+| native-aug-esmc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-esmc) | - |
+| native-aug-esmc-synce | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-esmc-synce) | - |
+| native-aug-et-analytics | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-et-analytics) | - |
+| native-aug-ethernet | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ethernet) | - |
+| native-aug-ethernet-internal | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ethernet-internal) | - |
+| native-aug-event | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-event) | - |
+| native-aug-fallback | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-fallback) | - |
+| native-aug-feature | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-feature) | - |
+| native-aug-file | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-file) | - |
+| native-aug-flow | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-flow) | - |
+| native-aug-fqdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-fqdn) | - |
+| native-aug-frame-relay | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-frame-relay) | - |
+| native-aug-gateway | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-gateway) | - |
+| native-aug-geo | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-geo) | - |
+| native-aug-global-address-family | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-global-address-family) | - |
+| native-aug-gnss | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-gnss) | - |
+| native-aug-group-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-group-policy) | - |
+| native-aug-gw-accounting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-gw-accounting) | - |
+| native-aug-http | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-http) | - |
+| native-aug-hw-module | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-hw-module) | - |
+| native-aug-hw-switch | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-hw-switch) | - |
+| native-aug-ida | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ida) | - |
+| native-aug-identity | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-identity) | - |
+| native-aug-ip-1 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ip-1) | - |
+| native-aug-ip-2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ip-2) | - |
+| native-aug-ipc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ipc) | - |
+| native-aug-ipv6 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ipv6) | - |
+| native-aug-irig | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-irig) | - |
+| native-aug-isdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-isdn) | - |
+| native-aug-key | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-key) | - |
+| native-aug-kron | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-kron) | - |
+| native-aug-l2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2) | - |
+| native-aug-l2nat | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2nat) | - |
+| native-aug-l2protocol-tunnel | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2protocol-tunnel) | - |
+| native-aug-l2tp-class | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2tp-class) | - |
+| native-aug-l2vpn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2vpn) | - |
+| native-aug-l2vpn-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l2vpn-config) | - |
+| native-aug-l3nat-iox | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l3nat-iox) | - |
+| native-aug-l3vpn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-l3vpn) | - |
+| native-aug-ldap | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ldap) | - |
+| native-aug-license | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-license) | - |
+| native-aug-line | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-line) | - |
+| native-aug-lldp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-lldp) | - |
+| native-aug-location | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-location) | - |
+| native-aug-logging | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-logging) | - |
+| native-aug-login | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-login) | - |
+| native-aug-mab | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mab) | - |
+| native-aug-mac | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mac) | - |
+| native-aug-mac-address-table | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mac-address-table) | - |
+| native-aug-macro | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-macro) | - |
+| native-aug-maintenance-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-maintenance-template) | - |
+| native-aug-management | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-management) | - |
+| native-aug-md-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-md-list) | - |
+| native-aug-mdns-sd | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mdns-sd) | - |
+| native-aug-media | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-media) | - |
+| native-aug-mgmt-traffic | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mgmt-traffic) | - |
+| native-aug-mka | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mka) | - |
+| native-aug-module | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-module) | - |
+| native-aug-monitor | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-monitor) | - |
+| native-aug-mpls | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mpls) | - |
+| native-aug-mrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mrp) | - |
+| native-aug-multilink | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-multilink) | - |
+| native-aug-mvrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-mvrp) | - |
+| native-aug-named-ordering-route-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-named-ordering-route-map) | - |
+| native-aug-nat64 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-nat64) | - |
+| native-aug-nat66 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-nat66) | - |
+| native-aug-network-clock | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-network-clock) | - |
+| native-aug-network-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-network-policy) | - |
+| native-aug-nhrp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-nhrp) | - |
+| native-aug-ntp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ntp) | - |
+| native-aug-num-exp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-num-exp) | - |
+| native-aug-object-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-object-group) | - |
+| native-aug-openflow | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-openflow) | - |
+| native-aug-otv | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-otv) | - |
+| native-aug-parameter-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-parameter-map) | - |
+| native-aug-parser | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-parser) | - |
+| native-aug-password | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-password) | - |
+| native-aug-performance | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-performance) | - |
+| native-aug-performance-measurement | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-performance-measurement) | - |
+| native-aug-pfr | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-pfr) | - |
+| native-aug-pfr-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-pfr-map) | - |
+| native-aug-platform | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-platform) | - |
+| native-aug-pm-agent | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-pm-agent) | - |
+| native-aug-pnp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-pnp) | - |
+| native-aug-policy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-policy) | - |
+| native-aug-port-channel | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-port-channel) | - |
+| native-aug-power | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-power) | - |
+| native-aug-ppp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ppp) | - |
+| native-aug-privilege | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-privilege) | - |
+| native-aug-process | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-process) | - |
+| native-aug-profinet | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-profinet) | - |
+| native-aug-prp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-prp) | - |
+| native-aug-pseudowire-class | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-pseudowire-class) | - |
+| native-aug-ptp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ptp) | - |
+| native-aug-qos | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-qos) | - |
+| native-aug-qos-overhead-accounting | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-qos-overhead-accounting) | - |
+| native-aug-radius | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-radius) | - |
+| native-aug-radius-server | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-radius-server) | - |
+| native-aug-redun-management | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-redun-management) | - |
+| native-aug-redundancy | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-redundancy) | - |
+| native-aug-relay | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-relay) | - |
+| native-aug-rep | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-rep) | - |
+| native-aug-rmon | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-rmon) | - |
+| native-aug-route-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-route-map) | - |
+| native-aug-route-tag | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-route-tag) | - |
+| native-aug-router-1 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-router-1) | - |
+| native-aug-router-2 | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-router-2) | - |
+| native-aug-sampler | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-sampler) | - |
+| native-aug-scada-gw | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-scada-gw) | - |
+| native-aug-sccp-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-sccp-config) | - |
+| native-aug-sdm | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-sdm) | - |
+| native-aug-security | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-security) | - |
+| native-aug-segment-routing | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-segment-routing) | - |
+| native-aug-service | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service) | - |
+| native-aug-service-export | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-export) | - |
+| native-aug-service-group | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-group) | - |
+| native-aug-service-insertion | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-insertion) | - |
+| native-aug-service-list | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-list) | - |
+| native-aug-service-routing | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-routing) | - |
+| native-aug-service-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-service-template) | - |
+| native-aug-setup | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-setup) | - |
+| native-aug-shell | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-shell) | - |
+| native-aug-sip-ua | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-sip-ua) | - |
+| native-aug-site-manager | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-site-manager) | - |
+| native-aug-snmp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-snmp) | - |
+| native-aug-snmp-server | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-snmp-server) | - |
+| native-aug-spanning-tree | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-spanning-tree) | - |
+| native-aug-stack-mac | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-stack-mac) | - |
+| native-aug-stack-power | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-stack-power) | - |
+| native-aug-stackwise-virtual | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-stackwise-virtual) | - |
+| native-aug-stcapp-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-stcapp-config) | - |
+| native-aug-switch | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-switch) | - |
+| native-aug-switch-global-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-switch-global-config) | - |
+| native-aug-switch-virtual | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-switch-virtual) | - |
+| native-aug-system | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-system) | - |
+| native-aug-table-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-table-map) | - |
+| native-aug-tacacs | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-tacacs) | - |
+| native-aug-tacacs-server | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-tacacs-server) | - |
+| native-aug-template | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-template) | - |
+| native-aug-tftp-server-config | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-tftp-server-config) | - |
+| native-aug-time-range | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-time-range) | - |
+| native-aug-tod-clock | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-tod-clock) | - |
+| native-aug-track | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-track) | - |
+| native-aug-transceivers | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-transceivers) | - |
+| native-aug-transport | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-transport) | - |
+| native-aug-transport-map | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-transport-map) | - |
+| native-aug-trunk | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-trunk) | - |
+| native-aug-uc | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-uc) | - |
+| native-aug-ucse | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-ucse) | - |
+| native-aug-udld | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-udld) | - |
+| native-aug-uplink | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-uplink) | - |
+| native-aug-user-name | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-user-name) | - |
+| native-aug-username | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-username) | - |
+| native-aug-utd | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-utd) | - |
+| native-aug-utd-mt | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-utd-mt) | - |
+| native-aug-utd-st | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-utd-st) | - |
+| native-aug-virtual-service | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-virtual-service) | - |
+| native-aug-vlan | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vlan) | - |
+| native-aug-voice | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-voice) | - |
+| native-aug-voice-card | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-voice-card) | - |
+| native-aug-voice-card-sb | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-voice-card-sb) | - |
+| native-aug-voice-port | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-voice-port) | - |
+| native-aug-vpdn | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vpdn) | - |
+| native-aug-vrf | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vrf) | - |
+| native-aug-vstack | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vstack) | - |
+| native-aug-vtp | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vtp) | - |
+| native-aug-vxlan | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-vxlan) | - |
+| native-aug-wsma | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-wsma) | - |
+| native-aug-xconnect | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-xconnect) | - |
+| native-aug-zone | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-zone) | - |
+| native-aug-zone-pair | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-aug-zone-pair) | - |
 | native-authentication | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-authentication) | - |
 | native-auto | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-auto) | - |
 | native-autoconf | Native Config | [Native Config](swagger-native-config-model/index.html#spec=native-autoconf) | - |
@@ -1040,7 +1271,7 @@ This report provides **100% accountability** for every YANG module in the
 
 ### COMMON (16 modules)
 
-*Common/shared protocol module*
+*Common type definitions and groupings*
 
 <details>
 <summary>Click to expand 16 common modules</summary>
@@ -1337,4 +1568,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-10-03T21:08:57.303357*
+*Report generated: 2026-10-03T21:48:22.553898*

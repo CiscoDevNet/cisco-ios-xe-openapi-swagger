@@ -25,9 +25,13 @@ import argparse
 import os
 import json
 import re
+import sys
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from patch_excluded_reasons import EVENTS_REASON, REASONS  # noqa: E402
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -39,11 +43,8 @@ OUTPUT_JSON = BASE_DIR / "yang_accountability.json"
 SPEC_BASE_DIR = BASE_DIR  # parent of the swagger-*-model dirs
 IOS_XE_VERSION = "17.18.1"
 WRITE_MD = True
-
-# Notification-only modules have no RESTCONF data paths; the hub documents
-# them in the Event Notifications catalog instead of a Swagger spec.
-EVENTS_REASON = ("Notification-only module (no RESTCONF data paths); "
-                 "documented in the Event Notifications catalog (telemetry.html#notifications)")
+# The hub's default release is mirrored to the root yang_accountability.json.
+DEFAULT_RELEASE = json.loads((BASE_DIR / "releases" / "index.json").read_text(encoding="utf-8"))["default"]
 
 
 def configure_paths(version: str | None) -> None:
@@ -64,12 +65,13 @@ def configure_paths(version: str | None) -> None:
         YANG_DIR = BASE_DIR / "references" / "17181-YANG-modules"
     else:
         cand = BASE_DIR / "references" / version
-        if cand.is_dir():
-            YANG_DIR = cand
-        else:
-            # Fall back to legacy YANG tree if the per-release source is
-            # missing (e.g. older 17.x releases share the same YANG set).
-            YANG_DIR = BASE_DIR / "references" / "17181-YANG-modules"
+        if not cand.is_dir():
+            # Falling back to another release's YANG set silently produced wrong data.
+            raise SystemExit(
+                f"missing YANG source {cand}; fetch it first, e.g. "
+                f"python scripts/fetch_yang_release.py --version {version} "
+                f"--yangmodels-path vendor/cisco/xe/<id>")
+        YANG_DIR = cand
     release_root = BASE_DIR / "releases" / version
     release_trees = release_root / "yang-trees"
     if release_trees.is_dir():
@@ -379,7 +381,7 @@ def main():
             "has_spec": has_spec,
             "categories": categories,
             "tree_url": tree_url,
-            "reason_excluded": reason if not has_spec and reason else None,
+            "reason_excluded": (reason or REASONS.get(name)) if not has_spec else None,
         }
         modules.append(module_info)
         classifications[classification].append(module_info)
@@ -521,6 +523,8 @@ def generate_json(modules, classifications, total, with_spec, with_tree, multi_c
     }
 
     OUTPUT_JSON.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8')
+    if IOS_XE_VERSION == DEFAULT_RELEASE and OUTPUT_JSON.parent != BASE_DIR:
+        (BASE_DIR / "yang_accountability.json").write_bytes(OUTPUT_JSON.read_bytes())
 
 
 def generate_markdown(modules, classifications, total, with_spec, with_tree, multi_cat):

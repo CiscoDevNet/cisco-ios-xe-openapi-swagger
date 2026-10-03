@@ -3,7 +3,8 @@
 
 One-shot maintenance script: add `reason_excluded` strings to the small
 remaining set of modules that surface on the accountability page as
-"❌ No spec" without an explanation.
+"❌ No spec" without an explanation. analyze_yang_accountability_v2.py
+applies the same REASONS / EVENTS_REASON when it regenerates the data.
 
 Each entry below was verified by inspecting the YANG source (no augments,
 no top-level containers — only groupings / typedefs / identity catalogues).
@@ -15,13 +16,14 @@ Touches all 6 accountability JSON files (root + 5 per-release copies).
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from analyze_yang_accountability_v2 import EVENTS_REASON  # noqa: E402
+# Notification-only modules have no RESTCONF data paths; the hub documents
+# them in the Event Notifications catalog instead of a Swagger spec.
+EVENTS_REASON = ("Notification-only module (no RESTCONF data paths); "
+                 "documented in the Event Notifications catalog (telemetry.html#notifications)")
 
 REASONS = {
     # Identity / feature catalogues — no data nodes
