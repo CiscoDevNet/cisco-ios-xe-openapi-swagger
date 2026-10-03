@@ -1,11 +1,11 @@
 # YANG Module Accountability Report
 
-**Date:** June 18, 2026
+**Date:** October 03, 2026
 **IOS XE Version:** 17.18.1
-**Total YANG Modules:** 1152
-**Modules with OpenAPI Specs:** 667 (57.9%)
+**Total YANG Modules:** 1151
+**Modules with OpenAPI Specs:** 666 (57.9%)
 **Modules with YANG Trees:** 715
-**Modules in Multiple Categories:** 4
+**Modules in Multiple Categories:** 3
 
 > **Interactive Report:** [View the HTML accountability report](yang-accountability.html) with search, filtering, and clickable links.
 
@@ -30,7 +30,7 @@ This report provides **100% accountability** for every YANG module in the
 | **cfg** | 42 | 39 | 93% |  |
 | **openconfig** | 66 | 41 | 62% |  |
 | **ietf** | 33 | 21 | 64% |  |
-| **mib** | 150 | 148 | 99% |  |
+| **mib** | 149 | 147 | 99% |  |
 | **events** | 41 | 9 | 22% |  |
 | **native** | 155 | 154 | 99% |  |
 | **other** | 30 | 6 | 20% |  |
@@ -458,7 +458,7 @@ This report provides **100% accountability** for every YANG module in the
 | ietf-yang-smiv2 | - | ❌ No spec | - |
 | ietf-yang-structure-ext | IETF | [IETF](swagger-ietf-model/index.html#spec=ietf-yang-structure-ext) | - |
 
-### MIB (150 modules)
+### MIB (149 modules)
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
@@ -611,7 +611,6 @@ This report provides **100% accountability** for every YANG module in the
 | TOKENRING-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=TOKENRING-MIB) | [🌳](yang-trees/TOKENRING-MIB.html) |
 | TUNNEL-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=TUNNEL-MIB) | [🌳](yang-trees/TUNNEL-MIB.html) |
 | UDP-MIB | MIB | [MIB](swagger-mib-model/index.html#spec=UDP-MIB) | [🌳](yang-trees/UDP-MIB.html) |
-| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Other | [Operational](swagger-oper-model/index.html#spec=_paths_index) [Configuration](swagger-cfg-model/index.html#spec=_paths_index) [Native Config](swagger-native-config-model/index.html#spec=_paths_index) [OpenConfig](swagger-openconfig-model/index.html#spec=_paths_index) [IETF](swagger-ietf-model/index.html#spec=_paths_index) [MIB](swagger-mib-model/index.html#spec=_paths_index) [RPC](swagger-rpc-model/index.html#spec=_paths_index) [Other](swagger-other-model/index.html#spec=_paths_index) | - |
 
 ### EVENTS (41 modules)
 
@@ -1316,14 +1315,13 @@ This report provides **100% accountability** for every YANG module in the
 
 ---
 
-## Modules in Multiple Categories (4)
+## Modules in Multiple Categories (3)
 
 These modules appear in more than one swagger category:
 
 | Module | Categories |
 |--------|------------|
 | Cisco-IOS-XE-wireless-access-point-cfg-rpc | Configuration, RPC |
-| _paths_index | Operational, Configuration, Native Config, OpenConfig, IETF, MIB, RPC, Other |
 | cisco-bridge-domain | RPC, Other |
 | cisco-smart-license | RPC, Other |
 
@@ -1339,4 +1337,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-06-18T11:41:24.868659*
+*Report generated: 2026-10-03T21:08:57.303357*

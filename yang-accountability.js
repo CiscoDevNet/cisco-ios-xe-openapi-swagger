@@ -13,11 +13,11 @@
     var visibleRows = PAGE_SIZE;
 
     var CAT_ORDER = ['oper', 'rpc', 'cfg', 'openconfig', 'ietf', 'mib', 'events', 'native', 'other', 'types', 'deviation', 'common', 'native-aug', 'rpc-aug', 'submodule'];
-    var EXCLUDED = new Set(['types', 'deviation', 'common', 'native-aug', 'rpc-aug', 'submodule']);
+    var EXCLUDED = new Set(['events', 'types', 'deviation', 'common', 'native-aug', 'rpc-aug', 'submodule']);
     var CAT_NOTES = {
         oper: 'Operational state data', rpc: 'Remote procedure calls', cfg: 'Configuration modules',
         openconfig: 'OpenConfig standard modules', ietf: 'IETF standard modules', mib: 'SNMP MIB translations',
-        events: 'Event notifications', native: 'Main native module - split into specs', other: 'Miscellaneous modules',
+        events: 'YANG notifications - no RESTCONF paths; see the <a href="telemetry.html#notifications">Event Notifications catalog</a>', native: 'Main native module - split into specs', other: 'Miscellaneous modules',
         types: 'Type definitions only', deviation: 'Modifies other modules', common: 'Infrastructure modules',
         'native-aug': 'Augments native module',
         'rpc-aug': 'Augments main RPC module',

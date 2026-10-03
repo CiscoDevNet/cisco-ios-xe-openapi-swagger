@@ -143,6 +143,12 @@ below are far more representative than the average).
   events collection. They are now deploy-built `.postman_collection.json.zip` files
   (18.6 MB for all 5 releases vs 293 MB of committed JSON) with `{{host}}:{{port}}` URLs,
   collection-level basic auth, deterministic IDs, and schema-valid Postman v2.1 JSON.
+- **YANG Accountability no longer reports false gaps.** 20–36 notification-only modules per
+  release showed as "no spec" with no explanation; all are in the Event Notifications catalog,
+  which they now link to, and the `events` category is shown as excluded instead of 20%
+  coverage. The `_paths_index` helper file is no longer counted as a module (totals −1), and
+  45–51 verified exclusion reasons per release, lost when the data was regenerated in June,
+  were restored.
 - **`scripts/_release_paths.py` committed.** It was hidden by a `scripts/_*.py` gitignore rule,
   breaking 10 generators on fresh clones. Stale artifacts it feeds were refreshed
   (`accountability_compare.json`, older releases' `native-capabilities.json`).
