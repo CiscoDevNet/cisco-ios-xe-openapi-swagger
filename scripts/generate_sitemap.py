@@ -30,7 +30,7 @@ TOP_LEVEL_PAGES = [
     ("about.html", 0.6, "monthly"),
 ]
 VIEWER_DIRS = [
-    "swagger-cfg-model", "swagger-events-model", "swagger-ietf-model",
+    "swagger-cfg-model", "swagger-ietf-model",
     "swagger-mib-model", "swagger-native-config-model",
     "swagger-openconfig-model", "swagger-oper-model",
     "swagger-other-model", "swagger-rpc-model",
@@ -48,10 +48,22 @@ def _entry(loc: str, lastmod: str, changefreq: str, priority: float) -> str:
     )
 
 
+def published_pages() -> list[str]:
+    """Repo-relative HTML files the sitemap publishes (shared with CI page lists)."""
+    pages = [rel or "index.html" for rel, _, _ in TOP_LEVEL_PAGES if (ROOT / (rel or "index.html")).is_file()]
+    pages += [f"{d}/index.html" for d in VIEWER_DIRS if (ROOT / d / "index.html").is_file()]
+    return pages
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--site-url", default=DEFAULT_SITE)
+    p.add_argument("--list-pages", action="store_true",
+                   help="Print the published HTML pages (one per line) and exit")
     args = p.parse_args()
+    if args.list_pages:
+        print("\n".join(published_pages()))
+        return 0
     site = args.site_url.rstrip("/")
     today = dt.date.today().isoformat()
 

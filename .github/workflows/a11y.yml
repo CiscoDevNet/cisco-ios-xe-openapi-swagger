@@ -66,26 +66,34 @@ jobs:
       - name: Install axe-core CLI
         run: npm install --no-save --silent @axe-core/cli@4.10.x
 
+      # The runner image's Chrome drifts ahead of the chromedriver bundled with
+      # @axe-core/cli, so pin a matching Chrome + chromedriver pair explicitly.
+      - name: Set up Chrome + chromedriver
+        id: chrome
+        uses: browser-actions/setup-chrome@48ad923757ca74d66703209fe939badbdf80f2f4 # v2.2.0
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+
       - name: Run axe-core scans
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          CHROMEDRIVER_PATH: ${{ steps.chrome.outputs.chromedriver-path }}
         run: |
           set -e
-          URLS=(
-            "http://localhost:8080/index.html"
-            "http://localhost:8080/code-generator.html"
-            "http://localhost:8080/tree-compare.html"
-            "http://localhost:8080/exports.html"
-            "http://localhost:8080/telemetry.html"
-            "http://localhost:8080/yang-accountability.html"
-            "http://localhost:8080/yang-accountability-compare.html"
-            "http://localhost:8080/404.html"
-            "http://localhost:8080/swagger-cfg-model/index.html"
-          )
+          # Every page the sitemap publishes (top-level pages + all Swagger viewers).
+          mapfile -t PAGES < <(python3 scripts/generate_sitemap.py --list-pages)
+          URLS=()
+          for page in "${PAGES[@]}"; do URLS+=("http://localhost:8080/${page}"); done
+          URLS+=("http://localhost:8080/404.html")
           mkdir -p axe-reports
           failures=0
           for url in "${URLS[@]}"; do
             name=$(echo "$url" | sed 's|^http://localhost:8080/||; s|/|_|g; s|\.html$||')
             echo "::group::axe $url"
             if npx --yes @axe-core/cli "$url" \
+                 --chrome-path "$CHROME_PATH" \
+                 --chromedriver-path "$CHROMEDRIVER_PATH" \
                  --tags wcag2a,wcag2aa,wcag21a,wcag21aa \
                  --exit \
                  --save "axe-reports/${name}.json"; then

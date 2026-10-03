@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -90,6 +91,8 @@ jobs:
           # If a PR already exists for this branch, the push above updated it.
           # Otherwise, open a new one.
           if ! gh pr view "$BRANCH" --json number >/dev/null 2>&1; then
+            gh label create automation --color ededed --description "Opened by a workflow" --force
+            gh label create g6 --color 0e8a16 --description "G-6 count baseline" --force
             gh pr create \
               --base main \
               --head "$BRANCH" \
