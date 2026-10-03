@@ -156,6 +156,13 @@ below are far more representative than the average).
   been counted (17.18.1: 897 of 1,382 modules with specs, previously 666 of 1,151). The
   generator applies the verified exclusion reasons itself, so release builds no longer drop
   them, and it keeps the root copy in sync with the default release.
+- **17.18.1 telemetry annotations restored.** The 17.18.1 oper specs had lost all 61 MDT
+  subscription annotations (`x-mdt-*` xpath, tier, cadence) that the telemetry index lists;
+  they are back, and a test now keeps every release's specs and index in sync. The telemetry
+  indexes now use forward-slash paths and current operation IDs. Both inputs were
+  re-verified against the published
+  [telemetry reference](https://github.com/jeremycohoe/cisco-ios-xe-yang-model-innovations/blob/main/model-driven-telemetry-reference.md)
+  and `MIBS.md`, which reproduce the committed data exactly.
 - **`scripts/_release_paths.py` committed.** It was hidden by a `scripts/_*.py` gitignore rule,
   breaking 10 generators on fresh clones. Stale artifacts it feeds were refreshed
   (`accountability_compare.json`, older releases' `native-capabilities.json`).
