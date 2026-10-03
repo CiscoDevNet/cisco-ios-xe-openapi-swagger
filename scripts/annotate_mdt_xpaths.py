@@ -236,7 +236,7 @@ def annotate(version: str, dry_run: bool) -> int:
     if not dry_run:
         for spec_path, spec in by_spec_writes.items():
             spec_path.write_text(
-                json.dumps(spec, indent=2) + "\n", encoding="utf-8"
+                json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
             )
 
         rp.release_root.mkdir(parents=True, exist_ok=True)
