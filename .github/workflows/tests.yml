@@ -1,15 +1,9 @@
 name: tests
 
 on:
+  # Every push: security/precache/export/harness guards cover HTML, JS, CSS and scripts.
   push:
     branches: [main]
-    paths:
-      - 'swagger-*-model/**'
-      - 'releases/**'
-      - 'tests/**'
-      - 'scripts/normalize_manifests.py'
-      - 'scripts/patch_viewers_version_aware.py'
-      - '.github/workflows/tests.yml'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -23,6 +17,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install pytest
-        run: pip install --no-cache-dir pytest
-      - name: Run manifest schema tests
-        run: python -X utf8 -m pytest tests/ -v
+        run: pip install --no-cache-dir pytest requests
+      - name: Run repo + harness tests
+        run: python -X utf8 -m pytest tests/ scripts/harness/tests/ -v

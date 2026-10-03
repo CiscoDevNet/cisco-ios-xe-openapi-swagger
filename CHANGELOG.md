@@ -149,6 +149,13 @@ below are far more representative than the average).
   unlabeled selects labelled, scroll regions keyboard-focusable — 0 blocking axe findings.
   Color contrast of the legacy brand palette is reported (non-blocking) pending a design call.
 - **Analytics:** Clarity's image beacon was blocked by every page's CSP; allowlisted.
+- **Dark mode:** pages with hardcoded white cards (YANG Accountability, About, Exports) rendered
+  near-white text on white in dark mode; cards, text and stat tiles now follow the dark tokens.
+  Status badges use the shared contrast-safe status colors. Contrast findings across the 21
+  pages: light 697 -> 67, dark 1,089 -> 75 (the remainder is the per-category color system).
+- **CI coverage:** the `tests` workflow now runs repo + harness tests on every push to `main`
+  (it previously ran only `tests/`, and only for spec/release path changes).
+- **Footer build label** was stuck at round 25; now tied to the latest CHANGELOG round by a test.
 - **Viewer banner:** `live-modules.json` now lists all 7 devices / 319 modules (was 6 / 311).
 - **Tests:** smoke S-8 (Device Data + datasets), S-9 (every export download), S-10 (remaining
   pages); security scan auto-covers every published page and its scripts; service-worker
