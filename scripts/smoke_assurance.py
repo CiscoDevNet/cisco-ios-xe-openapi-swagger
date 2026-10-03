@@ -63,6 +63,18 @@ def fetch(url: str) -> tuple[int, str, dict[str, str]]:
         return 0, f"network error: {e}", {}
 
 
+def head_status(url: str) -> int:
+    """HEAD url (no body download); 0 on network error."""
+    req = request.Request(url, method="HEAD", headers={"User-Agent": USER_AGENT})
+    try:
+        with request.urlopen(req, timeout=TIMEOUT) as r:
+            return r.status
+    except error.HTTPError as e:
+        return e.code
+    except (error.URLError, TimeoutError, OSError):
+        return 0
+
+
 def require(cond: bool, detail: str) -> Result | None:
     if cond:
         return None
@@ -268,6 +280,93 @@ def check_app_map(base: str) -> Result:
         return Result("S-7 app-map", "FAIL", f"missing markers: {missing}")
     return Result("S-7 app-map", "PASS", f"{len(body)} bytes, all markers present")
 
+
+DEVICE_DATASETS = [
+    "telemetry-live-data.json", "restconf-live-data.json",
+    "netconf-get-live-data.json", "netconf-getconfig-live-data.json",
+    "netconf-sub-live-data.json", "netconf-sub-config-live-data.json",
+    "gnmi-get-live-data.json", "gnmi-getconfig-live-data.json",
+    "gnmi-state-live-data.json", "gnmi-sub-live-data.json",
+    "protocol-matrix.json",
+]
+
+
+def check_device_data(base: str) -> Result:
+    # S-8: Device Data page + every transport dataset + the protocol matrix.
+    s, body, _ = fetch(f"{base}/device-data.html")
+    if s == 0:
+        return Result("S-8 device-data", "SKIP", body)
+    if s != 200 or "device-data.js" not in body:
+        return Result("S-8 device-data", "FAIL", f"page HTTP {s} or missing device-data.js")
+    if fetch(f"{base}/device-data.js")[0] != 200:
+        return Result("S-8 device-data", "FAIL", "device-data.js not 200")
+    pids: set[str] = set()
+    for name in DEVICE_DATASETS:
+        s2, b2, _ = fetch(f"{base}/{name}")
+        if s2 != 200:
+            return Result("S-8 device-data", "FAIL", f"{name} -> HTTP {s2}")
+        try:
+            doc = json.loads(b2)
+        except json.JSONDecodeError as e:
+            return Result("S-8 device-data", "FAIL", f"{name} invalid JSON: {e}")
+        if name == "protocol-matrix.json" and not doc.get("rows"):
+            return Result("S-8 device-data", "FAIL", "protocol-matrix.json has no rows")
+        pids.update(d.get("pid", "") for d in doc.get("devices", []) if isinstance(d, dict))
+    return Result("S-8 device-data", "PASS",
+                  f"page+JS 200; {len(DEVICE_DATASETS)} datasets valid; {len(pids - {''})} device PIDs")
+
+
+def check_export_downloads(base: str) -> Result:
+    # S-9: every Postman/Bruno download link on exports.html resolves (issue #12).
+    s, b, _ = fetch(f"{base}/releases/index.json")
+    if s == 0:
+        return Result("S-9 export downloads", "SKIP", b)
+    if s != 200:
+        return Result("S-9 export downloads", "FAIL", f"releases/index.json -> HTTP {s}")
+    checked, broken = 0, []
+    for rel in json.loads(b).get("releases", []):
+        prefix = f"{base}/releases/{parse.quote(rel['ver'])}/exports"
+        for kind in ("postman", "bruno"):
+            s2, b2, _ = fetch(f"{prefix}/{kind}-manifest.json")
+            if s2 != 200:
+                broken.append(f"{rel['ver']}/{kind}-manifest.json ({s2})")
+                continue
+            manifest = json.loads(b2)
+            paths = [c["path"] for c in manifest.get("collections", [])]
+            paths += [manifest["environment"]] if manifest.get("environment") else []
+            for path in paths:
+                checked += 1
+                code = head_status(f"{base}/{parse.quote(path)}")
+                if code != 200:
+                    broken.append(f"{path} ({code})")
+    if broken:
+        return Result("S-9 export downloads", "FAIL", f"{len(broken)} broken: {broken[:3]}")
+    return Result("S-9 export downloads", "PASS", f"{checked} download links 200")
+
+
+OTHER_PAGES = {
+    "yang-accountability-compare.html": "accountability_compare.json",
+    "about.html": "about-stats.js",
+    "changelog.html": "Changelog",
+    "exports.html": "Bruno",
+    "tree-compare.html": "tree-compare.js",
+}
+
+
+def check_other_pages(base: str) -> Result:
+    # S-10: remaining published pages load with their key marker; 404 page serves.
+    for page, marker in OTHER_PAGES.items():
+        s, body, _ = fetch(f"{base}/{page}")
+        if s == 0:
+            return Result("S-10 other pages", "SKIP", body)
+        if s != 200 or marker not in body:
+            return Result("S-10 other pages", "FAIL", f"{page}: HTTP {s}, marker {marker!r} present={marker in body}")
+    s, body, _ = fetch(f"{base}/404.html")
+    if s != 200 or "deeplink" not in body.lower():
+        return Result("S-10 other pages", "FAIL", f"404.html: HTTP {s} or missing deep-link handler")
+    return Result("S-10 other pages", "PASS", f"{len(OTHER_PAGES) + 1} pages 200 with markers")
+
+
 CHECKS: list[tuple[str, Callable[[str], Result]]] = [
     ("S-0", check_homepage),
     ("S-1", check_viewer_renders_spec),
@@ -277,6 +376,9 @@ CHECKS: list[tuple[str, Callable[[str], Result]]] = [
     ("S-5", check_code_generator),
     ("S-6", check_telemetry),
     ("S-7", check_app_map),
+    ("S-8", check_device_data),
+    ("S-9", check_export_downloads),
+    ("S-10", check_other_pages),
 ]
 
 
