@@ -149,6 +149,13 @@ below are far more representative than the average).
   coverage. The `_paths_index` helper file is no longer counted as a module (totals −1), and
   45–51 verified exclusion reasons per release, lost when the data was regenerated in June,
   were restored.
+- **Accountability regenerated from the real YANG sources.** Each release now uses its own
+  YangModels/yang folder at the commit pinned in `meta.json`, instead of falling back to the
+  17.18.1 set (the generator now fails if the source is missing). 26.1.1 is unchanged. The
+  17.x reports now count the 204–231 `native-aug-*` specs that shipped in July but had never
+  been counted (17.18.1: 897 of 1,382 modules with specs, previously 666 of 1,151). The
+  generator applies the verified exclusion reasons itself, so release builds no longer drop
+  them, and it keeps the root copy in sync with the default release.
 - **`scripts/_release_paths.py` committed.** It was hidden by a `scripts/_*.py` gitignore rule,
   breaking 10 generators on fresh clones. Stale artifacts it feeds were refreshed
   (`accountability_compare.json`, older releases' `native-capabilities.json`).

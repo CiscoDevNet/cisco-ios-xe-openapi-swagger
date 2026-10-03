@@ -45,3 +45,9 @@ def test_summary_totals_match_modules(path):
     expected = copy.deepcopy(data)
     recompute_totals(expected)
     assert data == expected
+
+
+def test_root_mirrors_default_release():
+    default = json.loads((REPO_ROOT / "releases" / "index.json").read_text(encoding="utf-8"))["default"]
+    root = (REPO_ROOT / "yang_accountability.json").read_bytes()
+    assert root == (REPO_ROOT / "releases" / default / "yang_accountability.json").read_bytes()
