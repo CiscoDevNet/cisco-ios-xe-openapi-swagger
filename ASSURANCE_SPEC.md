@@ -198,6 +198,29 @@ integrated browser — the criteria below remain authoritative.
 - **FAIL if:** page 404s, content drifts from `APP_MAP.md`, or markers
   disappear (would indicate the markdown source was truncated).
 
+### S-8 (added 2026-10-03) — Device Data (cross-transport live data)
+- **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/device-data.html`
+- **PASS criteria:**
+  - Page and `device-data.js` return HTTP 200
+  - All 10 transport datasets (`*-live-data.json`) and `protocol-matrix.json`
+    return 200 and parse as JSON; the matrix has rows
+- **FAIL if:** any dataset 404s / is malformed, or the matrix is empty.
+
+### S-9 (added 2026-10-03) — Export downloads (regression for issue #12)
+- **URL:** every `releases/<ver>/exports/{postman,bruno}-manifest.json`
+- **PASS criteria:** every collection `path` (and the Postman environment)
+  listed in every release's manifests answers HTTP 200 to a HEAD request.
+- **FAIL if:** any download link on `exports.html` 404s. Bruno `.tar.gz`
+  archives are built by the deploy workflow, so a FAIL here on the live site
+  means the deploy-time build did not run.
+
+### S-10 (added 2026-10-03) — Remaining published pages
+- **URL:** `yang-accountability-compare.html`, `about.html`, `changelog.html`,
+  `exports.html`, `tree-compare.html`, `404.html`
+- **PASS criteria:** each returns HTTP 200 and contains its key marker
+  (data source / script / heading); `404.html` carries the deep-link handler.
+- **FAIL if:** any page 404s or loses its marker.
+
 ---
 
 ## 5. Regression checks
@@ -331,6 +354,9 @@ SMOKE (live site):
   S-5 code-generator hub:        [PASS|FAIL|SKIPPED] <observation>
   S-6 telemetry hub:             [PASS|FAIL|SKIPPED] <observation>
   S-7 app-map:                   [PASS|FAIL|SKIPPED] <observation>
+  S-8 device-data:               [PASS|FAIL|SKIPPED] <observation>
+  S-9 export downloads:          [PASS|FAIL|SKIPPED] <observation>
+  S-10 other pages:              [PASS|FAIL|SKIPPED] <observation>
 
 REGRESSION:
   R-1..R-6:                      [PASS|FAIL|N/A per item] <details only for non-PASS>

@@ -49,6 +49,36 @@ SCAN = [
     "swagger-cfg-model/yang-tree-sidebar.js",
 ]
 
+
+def _published_pages_and_scripts() -> list[str]:
+    """Every published page (top-level + viewers) and the first-party JS it loads."""
+    pages = [p.relative_to(REPO).as_posix() for p in REPO.glob("*.html")]
+    pages += [p.relative_to(REPO).as_posix() for p in REPO.glob("swagger-*-model/index.html")]
+    found = set(pages)
+    for page in pages:
+        html = (REPO / page).read_text(encoding="utf-8", errors="ignore")
+        for src in re.findall(r"<script[^>]+src=\"([^\"?#]+)", html):
+            if src.startswith(("http:", "https:", "//")) or "/vendor/" in src:
+                continue
+            script = (REPO / page).parent.joinpath(src).resolve()
+            if script.is_file() and REPO in script.parents:
+                found.add(script.relative_to(REPO).as_posix())
+    return sorted(found)
+
+
+SCAN = sorted(set(SCAN) | set(_published_pages_and_scripts()))
+
+
+def _executable_source(rel: str) -> str:
+    """JS files as-is; for HTML only inline <script> bodies and on* handlers,
+    so docs pages that quote past bugs in <code> prose don't false-positive."""
+    text = (REPO / rel).read_text(encoding="utf-8", errors="ignore")
+    if not rel.endswith(".html"):
+        return text
+    scripts = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", text, re.IGNORECASE | re.DOTALL)
+    handlers = re.findall(r"\son\w+\s*=\s*\"([^\"]*)\"", text, re.IGNORECASE)
+    return "\n".join(scripts + handlers)
+
 # innerHTML / outerHTML / insertAdjacentHTML / document.write fed directly
 # by a URL-fragment or query-string read in the same expression.
 DANGEROUS_SINK = re.compile(
@@ -96,7 +126,7 @@ def test_no_url_to_dom_sink(rel: str) -> None:
     p = REPO / rel
     if not p.is_file():
         pytest.skip(f"{rel} not present")
-    text = p.read_text(encoding="utf-8", errors="ignore")
+    text = _executable_source(rel)
     hits = DANGEROUS_SINK.findall(text)
     assert not hits, (
         f"{rel}: URL-controlled data appears to flow into a DOM-sink "
@@ -109,7 +139,7 @@ def test_no_javascript_url_redirect(rel: str) -> None:
     p = REPO / rel
     if not p.is_file():
         pytest.skip(f"{rel} not present")
-    text = p.read_text(encoding="utf-8", errors="ignore")
+    text = _executable_source(rel)
     # Mask out the round-24 whitelist guard so the pattern doesn't trip
     # on the safe form we ship now.
     masked = re.sub(
