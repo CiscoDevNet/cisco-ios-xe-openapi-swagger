@@ -40,6 +40,11 @@ SPEC_BASE_DIR = BASE_DIR  # parent of the swagger-*-model dirs
 IOS_XE_VERSION = "17.18.1"
 WRITE_MD = True
 
+# Notification-only modules have no RESTCONF data paths; the hub documents
+# them in the Event Notifications catalog instead of a Swagger spec.
+EVENTS_REASON = ("Notification-only module (no RESTCONF data paths); "
+                 "documented in the Event Notifications catalog (telemetry.html#notifications)")
+
 
 def configure_paths(version: str | None) -> None:
     """Resolve the per-release paths and toggle markdown emission.
@@ -111,7 +116,8 @@ def scan_all_specs():
             if not api_path.exists():
                 continue
             for json_file in sorted(api_path.glob("*.json")):
-                if json_file.stem == "manifest" or json_file.stem.startswith("all-"):
+                # _-prefixed files (_paths_index.json) are helper indexes, not modules.
+                if json_file.stem == "manifest" or json_file.stem.startswith(("all-", "_")):
                     continue
                 spec_name = json_file.stem
                 module_specs[spec_name].append({
@@ -190,7 +196,7 @@ def classify_yang_module(filename, content=""):
 
     # Cisco IOS XE events (check before oper)
     if name.startswith("Cisco-IOS-XE-") and "-events" in name:
-        return "events", ""
+        return "events", EVENTS_REASON
     # Cisco IOS XE oper
     if name.startswith("Cisco-IOS-XE-") and "-oper" in name:
         return "oper", ""
@@ -210,7 +216,7 @@ def classify_yang_module(filename, content=""):
         if content and re.search(r'^\s*rpc\s+\w+\s*{', content, re.MULTILINE):
             return "rpc", ""
         if content and re.search(r'^\s*notification\s+', content, re.MULTILINE):
-            return "events", ""
+            return "events", EVENTS_REASON
         return "cfg", ""
 
     # OpenConfig
@@ -238,7 +244,7 @@ def classify_yang_module(filename, content=""):
         if re.search(r'^\s*rpc\s+\w+\s*{', content, re.MULTILINE):
             return "rpc", ""
         if re.search(r'^\s*notification\s+', content, re.MULTILINE):
-            return "events", ""
+            return "events", EVENTS_REASON
         if re.search(r'^\s*typedef\s+', content, re.MULTILINE) and \
            not re.search(r'^\s*container\s+', content, re.MULTILINE):
             return "types", "Contains only type definitions"

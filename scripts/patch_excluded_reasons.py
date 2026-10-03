@@ -7,14 +7,21 @@ remaining set of modules that surface on the accountability page as
 
 Each entry below was verified by inspecting the YANG source (no augments,
 no top-level containers — only groupings / typedefs / identity catalogues).
+Notification-only ("events") modules get the same reason the generator now
+emits, and helper indexes such as `_paths_index` (not modules) are dropped
+with the summary totals recomputed. Idempotent.
 Touches all 6 accountability JSON files (root + 5 per-release copies).
 """
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from analyze_yang_accountability_v2 import EVENTS_REASON  # noqa: E402
 
 REASONS = {
     # Identity / feature catalogues — no data nodes
@@ -90,6 +97,20 @@ ACCOUNTABILITY_FILES = [
 ]
 
 
+def recompute_totals(data: dict) -> None:
+    """Recompute summary fields with the same formulas as the generator."""
+    modules = data["modules"]
+    data["total_modules"] = len(modules)
+    data["modules_with_specs"] = sum(1 for m in modules if m["has_spec"])
+    data["modules_with_trees"] = sum(1 for m in modules if m["tree_url"])
+    data["modules_multi_category"] = sum(1 for m in modules if len(m["categories"]) > 1)
+    for classification, stats in data["categories"].items():
+        members = [m for m in modules if m["classification"] == classification]
+        stats["total"] = len(members)
+        stats["with_specs"] = sum(1 for m in members if m["has_spec"])
+        stats["coverage_pct"] = round(100 * stats["with_specs"] / len(members), 1) if members else 0.0
+
+
 def main() -> int:
     total_patched = 0
     for path in ACCOUNTABILITY_FILES:
@@ -97,15 +118,24 @@ def main() -> int:
             print(f"  skip (missing): {path}")
             continue
         data = json.loads(path.read_text(encoding="utf-8"))
+        helper_entries = [m["name"] for m in data["modules"] if m["name"].startswith("_")]
+        data["modules"] = [m for m in data["modules"] if not m["name"].startswith("_")]
+        recompute_totals(data)
         patched = 0
         for mod in data.get("modules", []):
             name = mod.get("name")
-            if name in REASONS and not mod.get("has_spec") and not mod.get("reason_excluded"):
+            if mod.get("has_spec") or mod.get("reason_excluded"):
+                continue
+            if name in REASONS:
                 mod["reason_excluded"] = REASONS[name]
                 patched += 1
-        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            elif mod.get("classification") == "events":
+                mod["reason_excluded"] = EVENTS_REASON
+                patched += 1
+        # Same serialization as analyze_yang_accountability_v2.py.
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
         total_patched += patched
-        print(f"  {path.relative_to(ROOT)}: patched {patched}")
+        print(f"  {path.relative_to(ROOT)}: patched {patched}, dropped helper entries {helper_entries}")
     print(f"[patch_excluded_reasons] total entries patched: {total_patched}")
     return 0
 
