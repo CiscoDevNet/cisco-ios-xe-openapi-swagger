@@ -42,17 +42,25 @@ TRACE_PATH = HARNESS_DIR / "trace.jsonl"
 GAPS_PATH = HARNESS_DIR / "gaps.txt"
 
 STALL_MS = 15000  # a single GET taking this long is a stall/near-crash
+# mib is collected roots-only (one GET per module root returns the whole flat SNMP
+# table), so it must be reconciled at that granularity or every deep leaf reads as
+# "missing". Other categories are walked deep.
+ROOTS_ONLY_CATEGORIES = {"mib"}
 
 
 def _captured(device_dir: Path) -> dict:
-    """path -> {'category', 'error'} for every capture of a device."""
+    """path -> {'category', 'module', 'error'} for every capture of a device."""
     out = {}
     for cap in device_dir.glob("*/*.json"):
         try:
             r = json.loads(cap.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             continue
-        out[r.get("path")] = {"category": r.get("category"), "error": r.get("error")}
+        out[r.get("path")] = {
+            "category": r.get("category"),
+            "module": r.get("module"),
+            "error": r.get("error"),
+        }
     return out
 
 
@@ -62,6 +70,35 @@ def check_gaps(specs_root: Path, device_dir: Path) -> tuple[dict, list]:
     per_cat = {}
     rerun = []
     for cat in spec_paths.GET_CATEGORIES:
+        if cat in ROOTS_ONLY_CATEGORIES:
+            # mib is one whole-table GET per module; the captured path ("/data/<MIB>")
+            # differs from the spec path ("/data/<MIB>:<container>"), so reconcile by
+            # module name rather than exact path string.
+            universe = {
+                gp.module
+                for gp in spec_paths.enumerate_get_paths(
+                    specs_root, categories=[cat], roots_only=True
+                )
+            }
+            cap_ok, cap_err = set(), set()
+            for c in captured.values():
+                if c.get("category") != cat:
+                    continue
+                (cap_err if c.get("error") else cap_ok).add(c.get("module"))
+            ok = errored = 0
+            for mod in universe:
+                if mod in cap_ok:
+                    ok += 1
+                elif mod in cap_err:
+                    errored += 1
+                    rerun.append((cat, f"/data/{mod}"))
+                else:
+                    rerun.append((cat, f"/data/{mod}"))
+            per_cat[cat] = {
+                "enumerated": len(universe), "ok": ok, "errored": errored,
+                "missing": len(universe) - ok - errored,
+            }
+            continue
         universe = {gp.path for gp in spec_paths.enumerate_get_paths(specs_root, categories=[cat])}
         ok = errored = 0
         for p in universe:

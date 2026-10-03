@@ -198,34 +198,53 @@ def build(version: str):
     }
     (release_dir / "live-examples-index.json").write_text(
         json.dumps(index, indent=2) + "\n", encoding="utf-8")
-
-    # Tiny per-release summary for the viewer discovery banner (module -> pids +
-    # path count). Kept small so the Swagger viewers stay fast; the full index
-    # and the bodies are only fetched by the Live Data page on demand.
-    modules_summary = {
-        m["module"]: {"category": m["category"], "pids": m["pids"], "paths": len(m["paths"])}
-        for m in modules_out
-    }
-    (release_dir / "live-modules.json").write_text(
-        json.dumps({
-            "version": version,
-            "os_version": index["os_version"],
-            "devices": {d["pid"]: d["os_version"] for d in devices},
-            "modules": modules_summary,
-        }, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
+    write_module_summary(release_dir, index)
     return index
+
+
+def module_summary(index: dict) -> dict:
+    """Tiny per-release summary for the viewer discovery banner (module -> pids +
+    path count). Kept small so the Swagger viewers stay fast; the full index and
+    the bodies are only fetched by the Live Data page on demand."""
+    return {
+        "version": index["version"],
+        "os_version": index["os_version"],
+        "devices": {d["pid"]: d["os_version"] for d in index["devices"]},
+        "modules": {
+            m["module"]: {"category": m["category"], "pids": m["pids"], "paths": len(m["paths"])}
+            for m in index["modules"]
+        },
+    }
+
+
+def write_module_summary(release_dir: Path, index: dict) -> dict:
+    summary = module_summary(index)
+    (release_dir / "live-modules.json").write_text(
+        json.dumps(summary, separators=(",", ":")) + "\n", encoding="utf-8")
+    return summary
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     ap.add_argument("--version", required=True)
+    ap.add_argument("--summary-only", action="store_true",
+                    help="Rebuild live-modules.json from the committed index only "
+                         "(no sidecar; leaves the index and live-data/ untouched)")
     args = ap.parse_args()
 
     release_dir = PROJECT_ROOT / "releases" / args.version
     if not release_dir.is_dir():
         print(f"[live-index] no release dir {release_dir}; nothing to do.")
+        return 0
+
+    if args.summary_only:
+        index_path = release_dir / "live-examples-index.json"
+        if not index_path.is_file():
+            print(f"[live-index] no {index_path}; nothing to do.")
+            return 0
+        summary = write_module_summary(release_dir, json.loads(index_path.read_text(encoding="utf-8")))
+        print(f"[live-index] releases/{args.version}/live-modules.json: "
+              f"{len(summary['devices'])} device(s), {len(summary['modules'])} modules")
         return 0
 
     index = build(args.version)
