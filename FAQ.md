@@ -46,7 +46,7 @@ Three entry points, in order of precision:
 2. **Per-category viewers** (`swagger-cfg-model/`, `swagger-oper-model/`,
    `swagger-native-config-model/`, `swagger-ietf-model/`,
    `swagger-openconfig-model/`, `swagger-mib-model/`, `swagger-rpc-model/`,
-   `swagger-events-model/`, `swagger-other-model/`) — each ships a paths-search
+   `swagger-other-model/`) — each ships a paths-search
    box that walks every spec chunk and deep-links into the right operation.
 3. **YANG accountability** — [yang-accountability.html](yang-accountability.html)
    maps every IOS XE YANG module to its category, spec presence, and (when

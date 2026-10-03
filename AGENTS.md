@@ -120,7 +120,6 @@ cisco-ios-xe-openapi-swagger/
 | `swagger-ietf-model/` | ietf | 19 | RFC-compliant IETF models |
 | `swagger-mib-model/` | mib | 149 | SNMP MIB → YANG translations (GET) |
 | `swagger-rpc-model/` | rpc | 59 | RPC/action endpoints (POST `/operations/`) |
-| `swagger-events-model/` | events | 38 | YANG-Push notifications + SNMP traps |
 | `swagger-other-model/` | other | 10 | Standalone / vendor-specific |
 
 Each directory ships an `index.html` with hash-based deep-linking (`#spec=<module-name>`).
@@ -196,13 +195,15 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 
 ### Live Data harness — real captured device data (see DEVICE_DATA_COLLECTION.md)
 
-**What it is:** `scripts/harness/` is a **read-only** RESTCONF GET harness that captures real responses from 6 physical Catalyst devices and serves them on the **Live Data** page ([live-data.html](live-data.html) / [live-data.js](live-data.js)).
+**What it is:** `scripts/harness/` is a **read-only** RESTCONF GET harness that captures real responses from 6 physical Catalyst devices and serves them on the **Device Data** page ([device-data.html](device-data.html) / [device-data.js](device-data.js); the former `live-data.html` was merged into it).
 
 - **Lean-spec architecture:** response bodies are **NOT** injected into the OpenAPI specs (keeps them fast). They are served as per-path files: `releases/<ver>/live-data/<category>/<module>/<sha1[:16]>.json`, indexed by `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies) + a tiny `live-modules.json` (viewer banner).
 - **Rebuild:** `python scripts/refresh_live_data.py --version 26.1.1 [--capture]` — `--capture` re-collects from devices; without it, just rebuilds the index/data-files from the local (gitignored) sidecar `references/live-examples-<ver>.json`.
 - **Completeness check:** `python -X utf8 -m scripts.harness.depth_probe --device <PID> --discover --category oper` answers "does a deeper keyed GET return more than the parent?" (has a circuit breaker + `KNOWN_UNSAFE_MODULES` skip). Full fleet sweep found root GETs are complete; exhaustive per-path GET already captures containers the root omits.
 - **Secrets:** `scripts/harness/redact.py` masks secrets (incl. bare `key`/`md5`, module-prefixed) before anything is written; a test scans published live-data. `inventory.json`, `.env`, `captures/` are **gitignored** — never commit real device creds/captures.
-- **`live-data.html` / `live-data.js` are shared with a PARALLEL telemetry effort.** Stage MY hunks explicitly (use `git add -p`); NEVER `git add -A`. Verify no `telemetry` content is staged.
+- **Stage files explicitly** (`git add <paths>` / `git add -p`); NEVER `git add -A` — device captures and local WIP live in the working tree.
+- **Write path:** `scripts/harness/crud.py` is the ONLY module allowed to send non-GET requests (dry-run by default, refuses devices without `writable: true` in inventory, backs up before apply, `--rollback`). `scripts/harness/device_readiness.py` is a read-only multi-plane probe. Offline safety tests: `scripts/harness/tests/test_crud.py`.
+- **`live-modules.json` drift:** rebuild the viewer-banner summary from the committed index with `python scripts/build_live_examples_index.py --version <ver> --summary-only` (never a full sidecar rebuild just for this — it drops folded collector roots). Guarded by `tests/test_live_modules_consistency.py`.
 
 **Device access + feature enablement (see DEVICE_FEATURE_COVERAGE.md):**
 
@@ -227,7 +228,7 @@ Builders (in `scripts/mdt-telemetry/collector/`, plus `scripts/build_restconf_da
   - **NETCONF config subscription (periodic + on-change).** `netconf_subscribe.py --config-roots --both` probes each config root (categories `native-config`+`cfg`) with BOTH triggers — **periodic** (`<yp:period>`) and **on-change** (`<yp:dampening-period>`) — writing `output/netconf-sub-config-<PID>.json` (each entry `mode`-tagged, kept separate from the full periodic `netconf-sub-<PID>.json`). On IOS-XE 26.1.1 only `/ios:native` accepts **on-change** (all 7 devices — it streams the full running config on sync-on-start); granular `*-cfg` roots reject on-change (`notif-bis:error-no-such-option`) and are covered by **periodic** (7-11 roots/switch, 37 on the C9800). `build_netconf_dataset.build_sub_config()` pivots the two mode-entries per `(pid,xpath)` into ONE path carrying `periodic`+`onchange` status (mirrors gNMI-sub's `once`/`sample`/`onchange`) -> `netconf-sub-config-live-data.json`; `build_protocol_matrix.py` adds a `netconf-sub-config` method. **Glob rule:** the periodic `build_sub()` and the matrix `netconf-sub` loop MUST skip `netconf-sub-config-*` files (`if "netconf-sub-config-" in f: continue`) or the config captures pollute the periodic method/dataset.
 - **Payload redaction:** `redact_payload.py` (masks PEM + XML `<tag>` + JSON `"key"`, strips the module prefix) is folded into the NETCONF/gNMI builders; RESTCONF bodies are redacted before write (harness `redact.py` for walked paths, `redact_payload` for collector roots). `tests/test_dataset_secrets.py` scans the 10 repo-root datasets + `protocol-matrix.json` — run it before committing any rebuilt dataset.
 
-**Ownership boundary:** `telemetry-data.{html,js}`, `telemetry-live-data.json`, `build_telemetry_dataset.py`, and `scripts/mdt-telemetry/docs/` belong to a **parallel telemetry effort** (its own [scripts/mdt-telemetry/docs/AGENTS.md](scripts/mdt-telemetry/docs/AGENTS.md)); it also holds `scripts/harness/*.py` + `releases/<ver>/live-modules.json` dirty. Stage MY files explicitly; **never `git add -A`**.
+**Ownership boundary:** `telemetry-live-data.json` and `scripts/mdt-telemetry/` (incl. its own [scripts/mdt-telemetry/docs/AGENTS.md](scripts/mdt-telemetry/docs/AGENTS.md)) belong to the MDT telemetry effort; the former `telemetry-data.{html,js}` page was merged into `device-data.html`. Stage files explicitly; **never `git add -A`**.
 
 ---
 
