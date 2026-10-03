@@ -131,6 +131,22 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — IOS-XE 26.2.1 (2026-10-03)
+
+- **New release 26.2.1** from YangModels/yang `vendor/cisco/xe/2621` (commit `af8dec84`, published
+  2026-10-02): 953 specs, 243,024 operations, 759 tree pages, Postman/Bruno exports. Listed as
+  newest in the version selector; 26.1.1 stays the default. New in 26.2.1 includes the NGFW and
+  Live Protect families, wireless WAT and Live-Detect, IS-IS operv2, datapath TCAM usage, IIoT
+  power management, config-management RPCs and OpenConfig telemetry; `wireless-rrm-emul-oper`
+  was removed upstream.
+- **Release pipeline fixes found while onboarding it:** the tree step silently produced zero
+  trees when `pyang` was not importable (now aborts); `update_manifests.py` still targeted the
+  pre-`releases/` layout (now takes `--version` and keeps generator-written keys and order);
+  the unfinished CLI-mapping / example overlays no longer fail the build when absent; the
+  viewer patcher keeps CRLF line endings. The VERSIONING.md runbook lists the missing steps.
+- **Accountability comparison deltas now read oldest → newest.** They were computed in
+  newest-first order, so e.g. the 87 modules added in 26.1.1 showed as "removed".
+
 ### Fixed — Downloads, CI, accessibility, and test coverage (round 33, 2026-10-03)
 
 - **Bruno downloads work again ([#12](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues/12)).**

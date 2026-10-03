@@ -27,7 +27,7 @@ jobs:
           echo "=== OpenAPI Spec Validation ==="
           errors=0
           total=0
-          
+
           # Validate all JSON specs are parseable
           for dir in swagger-*-model/api swagger-*-model/api; do
             if [ -d "$dir" ]; then
@@ -41,9 +41,9 @@ jobs:
               done
             fi
           done
-          
+
           echo "Validated $total JSON files, $errors errors"
-          
+
           if [ $errors -gt 0 ]; then
             echo "::error::$errors spec files have invalid JSON"
             exit 1
@@ -54,18 +54,18 @@ jobs:
         run: |
           echo "=== Manifest Validation ==="
           errors=0
-          
+
           for manifest in swagger-*-model/api/manifest.json; do
             [ -f "$manifest" ] || continue
             dir=$(dirname "$manifest")
             model=$(basename $(dirname "$dir"))
-            
+
             # Check manifest module count matches file count.
             # Exclude manifest.json itself and underscore-prefixed helper
             # indexes (_paths_index.json, etc.) that aren't modules.
             declared=$(python3 -c "import json; print(json.load(open('$manifest'))['total_modules'])")
             actual=$(ls "$dir"/*.json 2>/dev/null | grep -v -E '/(manifest\.json|_[^/]+\.json)$' | wc -l)
-            
+
             if [ "$declared" != "$actual" ]; then
               echo "❌ $model: manifest declares $declared modules but found $actual files"
               errors=$((errors + 1))
@@ -73,7 +73,7 @@ jobs:
               echo "✅ $model: $declared modules OK"
             fi
           done
-          
+
           if [ $errors -gt 0 ]; then
             echo "::error::Manifest count mismatches found"
             exit 1
@@ -89,7 +89,7 @@ jobs:
           modules = data['modules']
           stats = data['stats']
           print(f'Search index: {len(modules)} modules, {stats[\"total_endpoints\"]} endpoints')
-          
+
           # Check no exact duplicates (same name+version+category)
           keys = [m['name'] + ':' + m.get('version','v1') + ':' + m.get('category','') for m in modules]
           dupes = [n for n in set(keys) if keys.count(n) > 1]
@@ -114,7 +114,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1"]
+        version: ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1", "26.2.1"]
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -162,17 +162,17 @@ jobs:
         run: |
           # Create a clean deployment directory
           mkdir -p deploy
-          
+
           # Copy only necessary files for the website (exclude heavy references and scripts)
           echo "Copying model directories..."
           cp -r swagger-*-model deploy/ 2>/dev/null || true
-          
+
           echo "Copying YANG trees..."
           cp -r yang-trees deploy/ 2>/dev/null || true
-          
+
           echo "Copying docs..."
           cp -r docs deploy/ 2>/dev/null || true
-          
+
           echo "Copying root files..."
           # Copy root HTML files and config
           cp *.html deploy/ 2>/dev/null || true
@@ -186,7 +186,7 @@ jobs:
           cp robots.txt deploy/ 2>/dev/null || true
           # PWA manifest (.webmanifest is not matched by *.json above)
           cp site.webmanifest deploy/ 2>/dev/null || true
-          
+
           # Copy tools directory (Postman collection, etc.)
           echo "Copying tools..."
           cp -r tools deploy/ 2>/dev/null || true
@@ -337,15 +337,15 @@ jobs:
           find deploy -type f | wc -l
           echo "Top-level deployment contents:"
           ls -lah deploy/
-          
+
       - name: Setup Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: 'deploy'
-          
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

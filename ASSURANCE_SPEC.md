@@ -22,7 +22,7 @@ HTML/JS, no backend). Python generators build the artifacts under
 3. Developers generating client code via [code-generator.html](code-generator.html).
 4. Public web — anyone arriving from a search engine on a deep-link.
 
-**Releases tracked:** `17.9.x`, `17.12.x`, `17.15.x`, `17.18.1`, `26.1.1` (default).
+**Releases tracked:** `17.9.x`, `17.12.x`, `17.15.x`, `17.18.1`, `26.1.1` (default), `26.2.1`.
 
 **Viewer categories (9):** `swagger-oper-model`, `swagger-cfg-model`,
 `swagger-native-config-model`, `swagger-openconfig-model`, `swagger-rpc-model`,

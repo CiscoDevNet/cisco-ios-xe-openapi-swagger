@@ -76,6 +76,10 @@ def main() -> int:
 
     overlay_path = Path(args.overlay)
     if not overlay_path.is_file():
+        if overlay_path == DEFAULT_OVERLAY:
+            # The CLI-mapping overlay is planned but not authored yet.
+            print(f"[cli-map] no overlay at {overlay_path}; nothing to do.")
+            return 0
         sys.stderr.write(f"[cli-map] overlay not found: {overlay_path}\n")
         return 1
     overlay = load_yaml_simple(overlay_path)

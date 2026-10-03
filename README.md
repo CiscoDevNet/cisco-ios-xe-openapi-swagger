@@ -5,7 +5,7 @@
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-1469-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1). The site defaults to the newest release (26.1.1) with **988 OpenAPI specs, 82,856 paths, and 792 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to 26.1.1 with **988 OpenAPI specs, 82,856 paths, and 792 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
@@ -43,7 +43,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs
 | **Modules with specs** | 971 | 66.1% coverage |
 | **Tree Files** | 792 | YANG/MIB visualizations |
 | **Model Types** | 9 | Categories |
-| **Releases covered** | 5 | 17.9.x → 26.1.1 |
+| **Releases covered** | 6 | 17.9.x → 26.2.1 |
 
 For the per-release growth curve (specs/paths/operations across all 5 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
 

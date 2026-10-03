@@ -30,7 +30,7 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 
 ## 1. Project Overview
 
-**What this is:** A static documentation site for **Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1)**, generated from upstream YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime. Per-release artifacts live under `releases/<ver>/`; shared UI lives at the repo root and reads the active release based on the `#ver=` URL hash. See [VERSIONING.md](VERSIONING.md) for the full layout.
+**What this is:** A static documentation site for **Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1)**, generated from upstream YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime. Per-release artifacts live under `releases/<ver>/`; shared UI lives at the repo root and reads the active release based on the `#ver=` URL hash. See [VERSIONING.md](VERSIONING.md) for the full layout.
 
 **What ships:**
 

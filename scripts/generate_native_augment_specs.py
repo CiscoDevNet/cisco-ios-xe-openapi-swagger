@@ -51,7 +51,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASES = ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1"]
+RELEASES = ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1", "26.2.1"]
 _REF_DIR_OVERRIDES = {"17.18.1": "17181-YANG-modules"}
 
 PLACEHOLDERS: Tuple[str, ...] = ("router", "xconnect", "route-tag", "l2vpn-config")
