@@ -479,9 +479,9 @@
             var catsHtml;
             if (module.categories.length === 0) {
                 if (module.reason_excluded) {
-                    catsHtml = '<span style="color:#999;font-size:0.85rem;">' + escapeHtml(module.reason_excluded) + '</span>';
+                    catsHtml = '<span style="color:var(--c-text-subtle);font-size:0.85rem;">' + escapeHtml(module.reason_excluded) + '</span>';
                 } else {
-                    catsHtml = '<span style="color:#999;">\u2014</span>';
+                    catsHtml = '<span style="color:var(--c-text-subtle);">\u2014</span>';
                 }
             } else {
                 catsHtml = module.categories.map(function (c) {
@@ -504,7 +504,7 @@
                 : '<span style="color:#ccc;">\u2014</span>';
 
             return '<tr>' +
-                '<td style="color: #999;">' + (index + 1) + '</td>' +
+                '<td style="color: var(--c-text-subtle);">' + (index + 1) + '</td>' +
                 '<td><strong>' + escapeHtml(module.name) + '</strong></td>' +
                 '<td>' + classBadge + '</td>' +
                 '<td>' + catsHtml + '</td>' +
