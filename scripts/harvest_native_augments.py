@@ -42,7 +42,7 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASES = ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1"]
+RELEASES = ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1", "26.2.1"]
 
 
 def _load_tree_gen():

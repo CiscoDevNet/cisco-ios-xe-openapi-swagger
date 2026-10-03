@@ -112,11 +112,12 @@ def main() -> int:
                 }
         matrix.append(row)
 
-    # Compute deltas (added/removed between consecutive versions in input order)
+    # Deltas between adjacent releases, older -> newer. Input order is
+    # releases/index.json (newest first), so the older release is ordered[i].
     deltas: list[dict] = []
     ordered = list(per_version.keys())
     for i in range(1, len(ordered)):
-        prev, cur = ordered[i - 1], ordered[i]
+        prev, cur = ordered[i], ordered[i - 1]
         added = sorted(set(per_version[cur]) - set(per_version[prev]))
         removed = sorted(set(per_version[prev]) - set(per_version[cur]))
         deltas.append({"from": prev, "to": cur,

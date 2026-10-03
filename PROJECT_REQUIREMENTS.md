@@ -3,7 +3,7 @@
 
 **Version:** 3.0
 **Date:** April 25, 2026
-**IOS-XE Versions Supported:** 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1
+**IOS-XE Versions Supported:** 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1
 **Author:** Jeremy Cohoe (jcohoe@cisco.com)
 **Repository:** [github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger)
 **Live Site:** [ciscodevnet.github.io/cisco-ios-xe-openapi-swagger](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)

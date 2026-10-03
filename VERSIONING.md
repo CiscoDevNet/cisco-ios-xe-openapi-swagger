@@ -8,7 +8,7 @@
 
 ## 1. Goals
 
-1. Host **multiple IOS XE releases** (currently: 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1) under the **same GitHub Pages URL** with no domain change.
+1. Host **multiple IOS XE releases** (currently: 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1) under the **same GitHub Pages URL** with no domain change.
 2. Make adding a new release a **mechanical, scripted operation** — no ad-hoc edits across dozens of files.
 3. Preserve **deep-link backward compatibility** for existing URLs while introducing a new version-aware URL contract.
 4. Enforce **per-release CI gates** so a broken or incomplete release cannot ship.
@@ -21,7 +21,8 @@
 | `17.12.x`   | `vendor/cisco/xe/17121/` | latest in branch | |
 | `17.15.x`   | `vendor/cisco/xe/17151/` | latest in branch | |
 | `17.18.1`   | `vendor/cisco/xe/17181/` | exact            | Existing baseline release |
-| `26.1.1`    | `vendor/cisco/xe/2611/`  | exact            | Newest release |
+| `26.1.1`    | `vendor/cisco/xe/2611/`  | exact            | Default release |
+| `26.2.1`    | `vendor/cisco/xe/2621/`  | exact            | Newest release |
 
 The exact upstream commit SHA used to build each release is pinned in `releases/<ver>/meta.json` (see §5).
 
@@ -163,12 +164,12 @@ For maintainers adding the next IOS XE release (e.g. `26.2.1`):
    python scripts/fetch_yang_release.py --version 26.2.1 --yangmodels-path vendor/cisco/xe/2621
    ```
    Writes `references/26.2.1/` and an initial `releases/26.2.1/meta.json` with the pinned commit SHA.
-2. **Build the release**:
+2. **Build the release** (from a venv with `pyang` installed: the tree step runs `python -m pyang` and aborts if it is missing):
    ```
-   python scripts/build_release.py --version 26.2.1
+   python scripts/build_release.py --version 26.2.1 --skip-exports
    ```
-   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, search index, telemetry index, MIB metadata, native capabilities, and Postman/Bruno exports.
-3. **Register in UI**: prepend the release entry to `releases/index.json`. If it should become the new default, set `default` and flip `default: true` on the entry.
+   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, search index, telemetry index, MIB metadata, and native capabilities. Postman/Bruno archives are built at deploy time; run both export generators once locally to create the tracked `exports/{postman,bruno}-manifest.json`.
+3. **Register in UI**: prepend the release entry to `releases/index.json`, add it to the `validate-releases` matrix in `deploy-pages.yml`, then run `python scripts/patch_viewers_version_aware.py` (refreshes the viewers' version allow-list) and rebuild `release_counts.json` (`--write`), `version-stats.json` and `accountability_compare.json`. If it should become the new default, set `default` and flip `default: true` on the entry.
 4. **Verify locally**: `python scripts/audit_swagger_vs_tree.py --version 26.2.1` and `python scripts/validate_release.py --version 26.2.1` (the validator wraps all CI gates from §9 for local pre-flight).
 5. **Update [CHANGELOG.md](CHANGELOG.md)**: add a row under "Versions Supported".
 6. **Commit and push**: GitHub Actions runs the matrix build for every registered release; deployment is gated on all passing.
@@ -177,7 +178,7 @@ No edits to per-model HTML or shared JS are required to add a release. If a step
 
 ## 9. CI gates (per release)
 
-[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) runs the matrix `[17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1]` and enforces:
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) runs the matrix `[17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1]` and enforces:
 
 1. **JSON validity** — every spec parses.
 2. **Manifest accuracy** — `spec_count` equals `len(specs)` and matches actual file count on disk.

@@ -117,6 +117,13 @@ HELPER_BLOCK_OLD_RE = re.compile(
 )
 
 
+def _write_keeping_eol(p: Path, text: str) -> None:
+    # read_text() normalizes CRLF to "\n"; write it back with the file's original ending.
+    newline = "\r\n" if b"\r\n" in p.read_bytes() else "\n"
+    with p.open("w", encoding="utf-8", newline=newline) as fh:
+        fh.write(text)
+
+
 def patch(p: Path, helper: str) -> bool:
     src = p.read_text(encoding="utf-8")
     orig = src
@@ -167,7 +174,7 @@ def patch(p: Path, helper: str) -> bool:
     )
 
     if src != orig:
-        p.write_text(src, encoding="utf-8")
+        _write_keeping_eol(p, src)
         return True
     return False
 
@@ -191,7 +198,7 @@ def patch_hub_search_ops(default_ver: str) -> bool:
         count=1,
     )
     if new != src:
-        p.write_text(new, encoding="utf-8")
+        _write_keeping_eol(p, new)
         return True
     return False
 

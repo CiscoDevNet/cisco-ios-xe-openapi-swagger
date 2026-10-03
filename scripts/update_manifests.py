@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
 Update all manifest.json files with current path/operation counts.
-Also updates total stats across all files referencing old numbers.
+
+Usage:
+    python scripts/update_manifests.py --version 26.2.1   # releases/<ver>/swagger-*-model/api
+    python scripts/update_manifests.py                    # legacy root swagger-*-model/api
 """
+import argparse
 import json
 import os
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+BASE = ROOT  # set from --version in main()
 
 FOLDERS = [
     'swagger-oper-model', 'swagger-rpc-model', 'swagger-cfg-model',
@@ -26,7 +31,7 @@ EXCLUDE = {
 
 def count_folder(folder_name):
     """Count specs, paths, and ops in a folder."""
-    api_dir = ROOT / folder_name / 'api'
+    api_dir = BASE / folder_name / 'api'
     if not api_dir.is_dir():
         return 0, 0, 0, []
 
@@ -50,20 +55,27 @@ def count_folder(folder_name):
         except Exception as e:
             print(f"  WARNING: Error reading {fn}: {e}")
 
+    specs.sort()  # by module name; filename order puts "x-v2.json" before "x.json"
     return len(specs), total_paths, total_ops, specs
 
 
 def update_manifest(folder_name, spec_count, total_paths, total_ops, modules):
-    """Update or create manifest.json for a folder."""
-    api_dir = ROOT / folder_name / 'api'
+    """Update counts in a folder's manifest.json, keeping generator-written keys."""
+    api_dir = BASE / folder_name / 'api'
     mf_path = api_dir / 'manifest.json'
 
-    manifest = {
+    manifest = {}
+    if mf_path.is_file():
+        manifest = json.loads(mf_path.read_text(encoding='utf-8-sig'))
+    existing = manifest.get("modules")
+    if isinstance(existing, list) and sorted(map(str, existing)) == sorted(modules):
+        modules = existing  # generators choose their own order; keep it
+    manifest.update({
         "total_modules": spec_count,
         "total_paths": total_paths,
         "total_operations": total_ops,
-        "modules": modules
-    }
+        "modules": modules,
+    })
 
     with open(mf_path, 'w', encoding='utf-8') as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
@@ -73,8 +85,17 @@ def update_manifest(folder_name, spec_count, total_paths, total_ops, modules):
 
 
 def main():
+    global BASE
+    parser = argparse.ArgumentParser(description="Update manifest.json counts")
+    parser.add_argument("--version", help="Release under releases/<ver>/ (default: legacy root layout)")
+    args = parser.parse_args()
+    if args.version:
+        BASE = ROOT / "releases" / args.version
+        if not BASE.is_dir():
+            raise SystemExit(f"release not found: {BASE}")
+
     print("=" * 70)
-    print("  Updating all manifests")
+    print(f"  Updating all manifests ({BASE.relative_to(ROOT) if BASE != ROOT else 'root'})")
     print("=" * 70)
 
     grand_specs = 0
@@ -83,6 +104,8 @@ def main():
     folder_stats = {}
 
     for folder in FOLDERS:
+        if not (BASE / folder / 'api').is_dir():
+            continue  # e.g. the retired swagger-events-model
         count, paths, ops, modules = count_folder(folder)
         folder_stats[folder] = (count, paths, ops)
         grand_specs += count

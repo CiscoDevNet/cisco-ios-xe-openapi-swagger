@@ -108,7 +108,7 @@ pre {{ font-size:13px; line-height:1.4; margin:0; color:#333; }}
 <body>
 <div class=\"header\">
   <h1>{module}</h1>
-  <p>YANG tree — IOS XE {version}</p>
+  <p>YANG tree — IOS-XE {version}</p>
 </div>
 <div class=\"nav\">
   <a href=\"../{swagger_dir}/index.html#ver={version}&amp;spec={swagger_dir}/{module}\">📄 OpenAPI Spec</a>
@@ -117,7 +117,7 @@ pre {{ font-size:13px; line-height:1.4; margin:0; color:#333; }}
   <a class=\"alt\" href=\"../../index.html\">🏠 Hub</a>
 </div>
 <div class=\"tree\"><pre>{tree_text}</pre></div>
-<div class=\"footer\">Generated with pyang · IOS XE {version}</div>
+<div class=\"footer\">Generated with pyang · IOS-XE {version}</div>
 </body>
 </html>
 """
@@ -131,7 +131,7 @@ def render_index_html(version: str, modules: list[str]) -> str:
 <html lang=\"en\">
 <head>
 <meta charset=\"UTF-8\">
-<title>YANG Tree Browser — IOS XE {version}</title>
+<title>YANG Tree Browser — IOS-XE {version}</title>
 <style>
 body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f5;padding:20px;margin:0;}}
 .header{{background:linear-gradient(135deg,#049fd9,#0070c9);color:#fff;padding:24px;border-radius:8px;margin-bottom:20px;}}
@@ -145,7 +145,7 @@ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f5;pa
 <body>
 <div class=\"header\">
   <h1>📊 YANG Tree Browser</h1>
-  <p>IOS XE {version} — {len(modules)} modules with tree structure</p>
+  <p>IOS-XE {version} — {len(modules)} modules with tree structure</p>
   <input class=\"search\" id=\"q\" placeholder=\"Filter modules…\" oninput=\"f()\">
 </div>
 <div class=\"grid\" id=\"g\">
@@ -190,6 +190,10 @@ def generate_one(yang_file: Path, out_dir: Path, version: str) -> dict:
 
 
 def generate_for_version(version: str, include_mibs: bool = True) -> int:
+    # Without this, a missing pyang shows up as every module skipped as "empty-tree".
+    if subprocess.run([sys.executable, "-m", "pyang", "--version"], capture_output=True).returncode != 0:
+        sys.stderr.write(f"[trees] pyang is not importable by {sys.executable}; aborting.\n")
+        return 2
     src_dir = PROJECT_ROOT / "references" / version
     if not src_dir.is_dir():
         # Fall back to legacy 17.18.1 layout if user hasn't migrated yet.
