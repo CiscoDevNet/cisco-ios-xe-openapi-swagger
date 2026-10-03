@@ -15,15 +15,23 @@ by adding ``-part-N`` suffix folders and records the split in
 
 Usage:
     python scripts/generate_bruno_collection.py --version 26.1.1 --per-category --max-mb 50
+    python scripts/generate_bruno_collection.py --version 26.1.1 --per-category --archive
+
+``--archive`` replaces each collection folder with a deterministic ``.tar.gz``
+(a browser cannot download a folder; ~245k tiny .bru files also compress far
+better as one solid stream than as a zip). The deploy workflow builds these.
 """
 
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import os
 import re
+import shutil
 import sys
+import tarfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,6 +40,34 @@ from _release_paths import (PROJECT_ROOT, MODEL_CATEGORIES, ReleasePaths)  # typ
 
 METHODS = ("get", "put", "patch", "post", "delete", "head", "options")
 SAFE_NAME_RE = re.compile(r"[^A-Za-z0-9._\-]+")
+# Specs ship servers as https://{device}[:{port}]/restconf or a literal lab IP;
+# Bruno only substitutes {{var}}, so every request uses one variable origin.
+SERVER_ORIGIN_RE = re.compile(r"^https?://[^/]+")
+BRUNO_ORIGIN = "https://{{host}}:{{port}}"
+
+COLLECTION_BRU = """meta {
+  name: %s
+}
+
+auth {
+  mode: basic
+}
+
+auth:basic {
+  username: {{username}}
+  password: {{password}}
+}
+"""
+
+ENVIRONMENT_BRU = """vars {
+  host: 10.0.0.1
+  port: 443
+  username: admin
+}
+vars:secret [
+  password
+]
+"""
 
 
 def safe_name(s: str) -> str:
@@ -91,8 +127,8 @@ def collect_requests_from_spec(spec_path: Path) -> list[dict]:
         if isinstance(s0, dict):
             server = s0.get("url", "") or ""
     if not server:
-        server = "https://{{host}}:{{port}}/restconf/data"
-    server = server.replace("{host}", "{{host}}").replace("{port}", "{{port}}")
+        server = "https://{host}/restconf/data"
+    server = SERVER_ORIGIN_RE.sub(BRUNO_ORIGIN, server, count=1)
 
     out: list[dict] = []
     for path, methods in (spec.get("paths") or {}).items():
@@ -129,18 +165,25 @@ def collect_requests_from_spec(spec_path: Path) -> list[dict]:
     return out
 
 
+def _init_collection_dir(collection_dir: Path, name: str) -> None:
+    collection_dir.mkdir(parents=True, exist_ok=True)
+    meta = {"name": name, "version": "1", "type": "collection"}
+    (collection_dir / "bruno.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    (collection_dir / "collection.bru").write_text(COLLECTION_BRU % name, encoding="utf-8")
+    env_dir = collection_dir / "environments"
+    env_dir.mkdir(exist_ok=True)
+    (env_dir / "IOS-XE.bru").write_text(ENVIRONMENT_BRU, encoding="utf-8")
+
+
 def write_collection(out_dir: Path, version: str, category: str,
                      requests: list[dict], max_bytes: int) -> list[dict]:
     """Write requests into out_dir; auto-split into -part-N if size exceeds cap."""
-    out_dir.mkdir(parents=True, exist_ok=True)
     parts: list[dict] = []
     cur_dir = out_dir
     cur_size = 0
     cur_name = f"IOS-XE-{version}-{category}"
     cur_part = 1
-    cur_meta = {"name": cur_name, "version": "1", "type": "collection"}
-    (cur_dir / "bruno.json").write_text(json.dumps(cur_meta, indent=2),
-                                        encoding="utf-8")
+    _init_collection_dir(cur_dir, cur_name)
 
     seq = 1
     written_in_part = 0
@@ -154,10 +197,7 @@ def write_collection(out_dir: Path, version: str, category: str,
             cur_part += 1
             cur_name = f"IOS-XE-{version}-{category}-part-{cur_part}"
             cur_dir = out_dir.parent / f"{out_dir.name}-part-{cur_part}"
-            cur_dir.mkdir(parents=True, exist_ok=True)
-            cur_meta = {"name": cur_name, "version": "1", "type": "collection"}
-            (cur_dir / "bruno.json").write_text(json.dumps(cur_meta, indent=2),
-                                                encoding="utf-8")
+            _init_collection_dir(cur_dir, cur_name)
             cur_size = 0
             written_in_part = 0
             seq = 1
@@ -186,6 +226,31 @@ def write_collection(out_dir: Path, version: str, category: str,
     return parts
 
 
+def archive_collection(collection_dir: Path) -> Path:
+    """Pack a collection folder into ``<folder>.tar.gz`` and delete the folder.
+
+    Byte-for-byte reproducible: sorted members, zeroed mtimes/owners, and a
+    zeroed gzip header timestamp."""
+    archive = collection_dir.with_name(collection_dir.name + ".tar.gz")
+
+    def normalize(info: tarfile.TarInfo) -> tarfile.TarInfo:
+        info.mtime = 0
+        info.uid = info.gid = 0
+        info.uname = info.gname = ""
+        info.mode = 0o755 if info.isdir() else 0o644
+        return info
+
+    with open(archive, "wb") as raw, \
+            gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0, compresslevel=9) as gz, \
+            tarfile.open(fileobj=gz, mode="w", format=tarfile.PAX_FORMAT) as tar:
+        members = [collection_dir, *sorted(collection_dir.rglob("*"))]
+        for member in members:
+            arcname = member.relative_to(collection_dir.parent).as_posix()
+            tar.add(member, arcname=arcname, recursive=False, filter=normalize)
+    shutil.rmtree(collection_dir)
+    return archive
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     p.add_argument("--version", required=True)
@@ -193,11 +258,15 @@ def main() -> int:
                    help="Emit one collection per model-category (recommended)")
     p.add_argument("--max-mb", type=int, default=50,
                    help="Hard cap per collection in MB (default 50)")
+    p.add_argument("--archive", action="store_true",
+                   help="Replace each collection folder with a downloadable .tar.gz")
     args = p.parse_args()
 
     rp = ReleasePaths(version=args.version, legacy=True)
     max_bytes = args.max_mb * 1024 * 1024
     bruno_root = rp.exports_dir("bruno")
+    if bruno_root.is_dir():
+        shutil.rmtree(bruno_root)  # drop parts/archives left by a previous layout
     bruno_root.mkdir(parents=True, exist_ok=True)
 
     manifest: list[dict] = []
@@ -224,6 +293,14 @@ def main() -> int:
             target = bruno_root / f"IOS-XE-{args.version}-{cat_short}"
             parts = write_collection(target, args.version, cat_short, requests, max_bytes)
             manifest.extend(parts)
+
+    if args.archive:
+        for part in manifest:
+            archive = archive_collection(PROJECT_ROOT / part["path"])
+            part["path"] = archive.relative_to(PROJECT_ROOT).as_posix()
+            part["uncompressed_bytes"] = part["size_bytes"]
+            part["size_bytes"] = archive.stat().st_size
+            part["format"] = "tar.gz"
 
     mpath = rp.exports_dir() / "bruno-manifest.json"
     mpath.parent.mkdir(parents=True, exist_ok=True)
