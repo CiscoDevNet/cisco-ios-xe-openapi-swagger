@@ -15,6 +15,11 @@ export pipeline.
 
 Usage:
     python scripts/generate_postman_v2_collection.py --version 26.1.1 --per-category --max-mb 50
+    python scripts/generate_postman_v2_collection.py --version 26.1.1 --per-category --archive
+
+``--archive`` zips each collection (deterministic; ~45x smaller). The deploy
+workflow builds these, since raw collections for all releases exceed the
+GitHub Pages size limit. Postman imports the JSON after unzipping.
 """
 
 from __future__ import annotations
@@ -22,8 +27,10 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import sys
 import uuid
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,6 +39,19 @@ from _release_paths import (PROJECT_ROOT, MODEL_CATEGORIES, ReleasePaths)  # typ
 
 METHODS = ("get", "put", "patch", "post", "delete", "head", "options")
 SAFE_NAME_RE = re.compile(r"[^A-Za-z0-9._\-\s]+")
+# Spec servers are https://{device}[:{port}]/restconf or a literal lab IP;
+# Postman only substitutes {{var}}, so every request uses one variable origin.
+SERVER_ORIGIN_RE = re.compile(r"^https?://[^/]+")
+POSTMAN_ORIGIN = "https://{{host}}:{{port}}"
+COMPACT = {"separators": (",", ":"), "ensure_ascii": False}
+ID_NAMESPACE = uuid.UUID("6f1c3b9e-2d4a-4e8b-9a51-0c7d2e8f4a10")
+COLLECTION_AUTH = {
+    "type": "basic",
+    "basic": [
+        {"key": "username", "value": "{{username}}", "type": "string"},
+        {"key": "password", "value": "{{password}}", "type": "string"},
+    ],
+}
 
 
 def safe_name(s: str) -> str:
@@ -76,8 +96,8 @@ def build_request_item(spec_module: str, path: str, method: str, op: dict,
     if servers and isinstance(servers[0], dict):
         base = servers[0].get("url", "") or ""
     if not base:
-        base = "https://{{host}}:{{port}}/restconf/data"
-    base = base.replace("{host}", "{{host}}").replace("{port}", "{{port}}")
+        base = "https://{host}/restconf/data"
+    base = SERVER_ORIGIN_RE.sub(POSTMAN_ORIGIN, base, count=1)
     full_url = base.rstrip("/") + path
 
     headers = [
@@ -157,70 +177,73 @@ def write_collection(target_dir: Path, version: str, category: str,
     part = 1
 
     def make_collection() -> dict:
+        name = f"IOS XE {version} — {category}" + (f" (part {part})" if part > 1 else "")
         return {
             "info": {
-                "_postman_id": str(uuid.uuid4()),
-                "name": f"IOS XE {version} — {category}"
-                        + (f" (part {part})" if part > 1 else ""),
+                "_postman_id": str(uuid.uuid5(ID_NAMESPACE, name)),
+                "name": name,
                 "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-                "description": f"Generated {datetime.now(timezone.utc).isoformat()}\n"
-                               f"Source: cisco-ios-xe-openapi-swagger / "
+                "description": f"Source: cisco-ios-xe-openapi-swagger / "
                                f"releases/{version}/swagger-{category}-model/api/",
                 "version": "1.0.0",
             },
+            "auth": COLLECTION_AUTH,
             "item": [],
         }
 
-    coll = make_collection()
-    coll_size = len(json.dumps(coll, indent=2).encode("utf-8"))
-
-    for spec in specs:
-        if spec.name == "manifest.json":
-            continue
-        spec_items = items_for_spec(spec)
-        if not spec_items:
-            continue
-        folder = {"name": spec.stem, "item": spec_items}
-        folder_size = len(json.dumps(folder).encode("utf-8"))
-        if coll_size + folder_size > max_bytes and len(coll["item"]) > 0:
-            # Flush current part
-            out_path = target_dir / (
-                f"IOS-XE-{version}-{category}.postman_collection.json"
-                if part == 1 else
-                f"IOS-XE-{version}-{category}-part-{part}.postman_collection.json"
-            )
-            out_path.write_text(json.dumps(coll, indent=2) + "\n", encoding="utf-8")
-            parts.append({
-                "name": coll["info"]["name"],
-                "path": out_path.relative_to(PROJECT_ROOT).as_posix(),
-                "request_count": sum(len(f.get("item") or []) for f in coll["item"]),
-                "size_bytes": out_path.stat().st_size,
-            })
-            part += 1
-            coll = make_collection()
-            coll_size = len(json.dumps(coll, indent=2).encode("utf-8"))
-        coll["item"].append(folder)
-        coll_size += folder_size
-
-    if coll["item"]:
+    def flush() -> None:
         out_path = target_dir / (
             f"IOS-XE-{version}-{category}.postman_collection.json"
             if part == 1 else
             f"IOS-XE-{version}-{category}-part-{part}.postman_collection.json"
         )
-        out_path.write_text(json.dumps(coll, indent=2) + "\n", encoding="utf-8")
+        out_path.write_text(json.dumps(coll, **COMPACT) + "\n", encoding="utf-8")
         parts.append({
             "name": coll["info"]["name"],
             "path": out_path.relative_to(PROJECT_ROOT).as_posix(),
             "request_count": sum(len(f.get("item") or []) for f in coll["item"]),
             "size_bytes": out_path.stat().st_size,
         })
+
+    coll = make_collection()
+    coll_size = len(json.dumps(coll, **COMPACT).encode("utf-8"))
+
+    for spec in specs:
+        if spec.name == "manifest.json" or spec.name.startswith("_"):
+            continue
+        spec_items = items_for_spec(spec)
+        if not spec_items:
+            continue
+        folder = {"name": spec.stem, "item": spec_items}
+        folder_size = len(json.dumps(folder, **COMPACT).encode("utf-8")) + 1
+        if coll_size + folder_size > max_bytes and len(coll["item"]) > 0:
+            flush()
+            part += 1
+            coll = make_collection()
+            coll_size = len(json.dumps(coll, **COMPACT).encode("utf-8"))
+        coll["item"].append(folder)
+        coll_size += folder_size
+
+    if coll["item"]:
+        flush()
     return parts
+
+
+def archive_collection(json_path: Path) -> Path:
+    """Zip one collection JSON byte-reproducibly and delete the JSON."""
+    archive = json_path.with_name(json_path.name + ".zip")
+    info = zipfile.ZipInfo(json_path.name, date_time=(1980, 1, 1, 0, 0, 0))
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = 0o644 << 16
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr(info, json_path.read_bytes(), compresslevel=9)
+    json_path.unlink()
+    return archive
 
 
 def write_environment(rp: ReleasePaths, version: str) -> Path:
     env = {
-        "id": str(uuid.uuid4()),
+        "id": str(uuid.uuid5(ID_NAMESPACE, f"env-{version}")),
         "name": f"IOS XE {version} (RESTCONF)",
         "values": [
             {"key": "host", "value": "10.0.0.1", "enabled": True},
@@ -242,11 +265,15 @@ def main() -> int:
     p.add_argument("--version", required=True)
     p.add_argument("--per-category", action="store_true")
     p.add_argument("--max-mb", type=int, default=50)
+    p.add_argument("--archive", action="store_true",
+                   help="Zip each collection (the deploy workflow uses this)")
     args = p.parse_args()
 
     rp = ReleasePaths(version=args.version, legacy=True)
     max_bytes = args.max_mb * 1024 * 1024
     target_dir = rp.exports_dir("postman")
+    if target_dir.is_dir():
+        shutil.rmtree(target_dir)  # drop parts/categories left by a previous run
 
     manifest: list[dict] = []
     if args.per_category:
@@ -263,6 +290,14 @@ def main() -> int:
             specs.extend(sorted(rp.spec_dir(cat).glob("*.json")))
         parts = write_collection(target_dir, args.version, "all", specs, max_bytes)
         manifest.extend(parts)
+
+    if args.archive:
+        for part in manifest:
+            archive = archive_collection(PROJECT_ROOT / part["path"])
+            part["path"] = archive.relative_to(PROJECT_ROOT).as_posix()
+            part["uncompressed_bytes"] = part["size_bytes"]
+            part["size_bytes"] = archive.stat().st_size
+            part["format"] = "zip"
 
     env_path = write_environment(rp, args.version)
     manifest_path = rp.exports_dir() / "postman-manifest.json"

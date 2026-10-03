@@ -143,18 +143,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      # Bruno collections are ~245k tiny .bru files per release, too many to
-      # commit; build them as downloadable .tar.gz archives at deploy time.
-      - name: Build Bruno collection archives
+      # Bruno (~245k tiny .bru files) and Postman (~300 MB raw JSON per release)
+      # collections are too big to commit; build them as downloadable archives.
+      - name: Build Postman + Bruno collection archives
         run: |
           set -euo pipefail
           pids=()
           for ver in $(python3 -c "import json; print(' '.join(r['ver'] for r in json.load(open('releases/index.json'))['releases']))"); do
             python3 scripts/generate_bruno_collection.py --version "$ver" --per-category --archive &
             pids+=($!)
+            python3 scripts/generate_postman_v2_collection.py --version "$ver" --per-category --archive &
+            pids+=($!)
           done
           for pid in "${pids[@]}"; do wait "$pid"; done
-          du -sh releases/*/exports/bruno
+          du -sh releases/*/exports/bruno releases/*/exports/postman
 
       - name: Prepare deployment directory
         run: |

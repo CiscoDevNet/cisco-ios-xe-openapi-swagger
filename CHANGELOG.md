@@ -138,6 +138,11 @@ below are far more representative than the average).
   deploy time as reproducible per-category `.tar.gz` archives (13 MB for all 245,767 26.1.1
   requests), use `{{host}}:{{port}}` URLs with collection-level basic auth, and ship an
   `IOS-XE` environment. Request counts now match each release's operations.
+- **Postman downloads rebuilt the same way.** The committed collections were stale (May),
+  hard-coded `{device}`/lab-IP URLs, exceeded the 50 MB cap, and still shipped the retired
+  events collection. They are now deploy-built `.postman_collection.json.zip` files
+  (18.6 MB for all 5 releases vs 293 MB of committed JSON) with `{{host}}:{{port}}` URLs,
+  collection-level basic auth, deterministic IDs, and schema-valid Postman v2.1 JSON.
 - **`scripts/_release_paths.py` committed.** It was hidden by a `scripts/_*.py` gitignore rule,
   breaking 10 generators on fresh clones. Stale artifacts it feeds were refreshed
   (`accountability_compare.json`, older releases' `native-capabilities.json`).

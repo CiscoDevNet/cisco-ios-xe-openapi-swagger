@@ -168,9 +168,9 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER", "--strict"]),
     # 7. Exports
     ("postman",             ["python", str(SCRIPTS / "generate_postman_v2_collection.py"),
-                             "--version", "$VER", "--per-category", "--max-mb", "50"]),
+                             "--version", "$VER", "--per-category", "--max-mb", "50", "--archive"]),
     ("bruno",               ["python", str(SCRIPTS / "generate_bruno_collection.py"),
-                             "--version", "$VER", "--per-category", "--max-mb", "50"]),
+                             "--version", "$VER", "--per-category", "--max-mb", "50", "--archive"]),
 ]
 
 

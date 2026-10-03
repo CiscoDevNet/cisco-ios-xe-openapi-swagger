@@ -252,7 +252,7 @@ def gate_export_sizes(rel: Path, errs: list[str]) -> None:
     for f in exports.rglob("*"):
         if not f.is_file():
             continue
-        if f.suffix.lower() not in {".json", ".bru", ".gz"}:
+        if f.suffix.lower() not in {".json", ".bru", ".gz", ".zip"}:
             continue
         n += 1
         if f.stat().st_size > MAX_EXPORT_BYTES:

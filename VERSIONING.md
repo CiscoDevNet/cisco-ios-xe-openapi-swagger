@@ -52,9 +52,10 @@ cisco-ios-xe-openapi-swagger/
 │   │   ├── mib-metadata.json                   # MIB enrichment data
 │   │   ├── native-capabilities.json            # native config-surface summary
 │   │   └── exports/
-│   │       ├── postman/IOS-XE-17.9.x-<category>.postman_collection.json
-│   │       ├── postman/IOS-XE-17.9.x-environment.postman_environment.json
-│   │       └── bruno/<category>/...
+│   │       ├── postman/IOS-XE-17.9.x-<category>.postman_collection.json.zip   # built at deploy
+│   │       ├── postman/IOS-XE-17.9.x.postman_environment.json                 # built at deploy
+│   │       ├── bruno/IOS-XE-17.9.x-<category>.tar.gz                          # built at deploy
+│   │       └── {postman,bruno}-manifest.json                                  # tracked
 │   ├── 17.12.x/  (same shape)
 │   ├── 17.15.x/  (same shape)
 │   ├── 17.18.1/  (same shape; this is the migration target for current artifacts)

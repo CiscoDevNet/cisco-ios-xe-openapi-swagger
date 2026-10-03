@@ -133,21 +133,22 @@ than exhaustive.
 ### Where are the collections?
 
 [exports.html](exports.html) lists every release that has a populated
-`releases/<ver>/exports/` directory. Per-category Postman v2.1 collections live
-under `releases/<ver>/exports/postman/` and a Postman environment file ships
+`releases/<ver>/exports/` directory. Per-category Postman v2.1 collections (zipped)
+live under `releases/<ver>/exports/postman/` and a Postman environment file ships
 alongside.
 
-Bruno collection bodies are git-ignored to keep the repo size bounded; only
-the `bruno-manifest.json` ships. Regenerate them locally:
+Postman and Bruno collection bodies are git-ignored and built by the deploy
+workflow (the raw JSON for all releases exceeds the GitHub Pages size limit);
+only the `{postman,bruno}-manifest.json` files are tracked. Regenerate locally:
 
 ```bash
-python scripts/generate_bruno_collection.py --version 26.1.1 --per-category --max-mb 50
+python scripts/generate_bruno_collection.py --version 26.1.1 --per-category --archive
 ```
 
 The same script exists for Postman:
 
 ```bash
-python scripts/generate_postman_v2_collection.py --version 26.1.1 --per-category --max-mb 50
+python scripts/generate_postman_v2_collection.py --version 26.1.1 --per-category --archive
 ```
 
 ### Why are collections split per category?
