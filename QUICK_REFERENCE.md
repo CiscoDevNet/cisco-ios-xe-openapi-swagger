@@ -57,11 +57,10 @@
 references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
 ```
 
-**OpenAPI Spec:**
-- **Category:** Events Model
-- **URL:** https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/
-- **Select Module:** Cisco-IOS-XE-ios-events-oper
-- **API Endpoint:** `/data/ios-events-ios-xe-oper:ios-events`
+**Notification Catalog:**
+- **Category:** Notifications (the Events Swagger viewer was retired; event notifications live in the catalog)
+- **URL:** https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/telemetry.html#notifications
+- **Search for:** Cisco-IOS-XE-ios-events-oper
 
 ### All YANG Modules
 All 848 YANG source modules are in:
@@ -85,7 +84,7 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 | **RPC** | 59 specs | 232 RPCs | Actions, commands | Production Ready |
 | **OpenConfig** | 57 specs | 5,920 ops | Vendor-neutral config | Stable |
 | **IETF** | 19 specs | 1,122 ops | Standards-based | Stable |
-| **Events** | 38 specs | 861 paths | Notifications | Stable |
+| **Notifications** | catalog | — | Event notifications (YANG-Push / SNMP traps) | Stable |
 | **MIB** | 149 specs | 12,482 paths | SNMP MIB reference | Reference Only |
 | **Other** | 9 specs | 4,593 ops | Misc/vendor-specific | Variable |
 
@@ -100,7 +99,7 @@ All 9 model types have deep-path specs generated from resolved YANG trees, provi
 | IETF | [Browse IETF](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-ietf-model/index.html) |
 | MIB | [Browse MIB](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-mib-model/index.html) |
 | RPC | [Browse RPC](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-rpc-model/index.html) |
-| Events | [Browse Events](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-events-model/index.html) |
+| Notifications | [Notification Catalog](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/telemetry.html#notifications) |
 | Other | [Browse Other](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/swagger-other-model/index.html) |
 
 ## Tips & Tricks

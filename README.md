@@ -225,7 +225,7 @@ iosxe-1718-yang-swagger/
 ## Contact
 
 - **Issues**: [GitHub Issues](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues)
-- **DevNet**: [Cisco DevNet Community](https://community.cisco.com/t5/networking-developer-community/ct-p/5672j-dev-networking)
+- **DevNet**: [Cisco DevNet](https://developer.cisco.com/)
 - **Author**: Jeremy Cohoe
 
 ---

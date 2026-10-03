@@ -244,6 +244,11 @@ def main() -> int:
     snap = compute_all(args.release)
 
     if args.write:
+        if BASELINE_PATH.is_file():
+            previous = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+            # Keep the old timestamp when counts are identical so --write is a no-op diff.
+            if {**previous, "generated": None} == {**snap, "generated": None}:
+                snap["generated"] = previous.get("generated", snap["generated"])
         BASELINE_PATH.write_text(
             json.dumps(snap, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
