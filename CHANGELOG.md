@@ -131,6 +131,32 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Fixed — Downloads, CI, accessibility, and test coverage (round 33, 2026-10-03)
+
+- **Bruno downloads work again ([#12](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/issues/12)).**
+  Collections were gitignored and linked as folders (not downloadable). They are now built at
+  deploy time as reproducible per-category `.tar.gz` archives (13 MB for all 245,767 26.1.1
+  requests), use `{{host}}:{{port}}` URLs with collection-level basic auth, and ship an
+  `IOS-XE` environment. Request counts now match each release's operations.
+- **`scripts/_release_paths.py` committed.** It was hidden by a `scripts/_*.py` gitignore rule,
+  breaking 10 generators on fresh clones. Stale artifacts it feeds were refreshed
+  (`accountability_compare.json`, older releases' `native-capabilities.json`).
+- **Scheduled CI green again:** htmlhint (single-quoted attribute), axe (Chrome/ChromeDriver
+  mismatch + Ubuntu 24.04 sandbox; now scans all 21 published pages), lychee (unresolvable
+  action pin, removed `--exclude-mail`, fixed broken links), G-6 refresh (missing labels;
+  no more timestamp-only PRs). All GitHub Actions bumped to current SHA-pinned versions.
+- **Accessibility:** theme toggle has an accessible name, shared muted text meets 4.5:1,
+  unlabeled selects labelled, scroll regions keyboard-focusable — 0 blocking axe findings.
+  Color contrast of the legacy brand palette is reported (non-blocking) pending a design call.
+- **Analytics:** Clarity's image beacon was blocked by every page's CSP; allowlisted.
+- **Viewer banner:** `live-modules.json` now lists all 7 devices / 319 modules (was 6 / 311).
+- **Tests:** smoke S-8 (Device Data + datasets), S-9 (every export download), S-10 (remaining
+  pages); security scan auto-covers every published page and its scripts; service-worker
+  precache, export-manifest, live-modules and helper-import guards.
+- **Harness:** gated `crud.py` write path (dry-run default, `writable` guard, backup,
+  rollback) with offline safety tests; read-only `device_readiness.py`; MIB coverage
+  reconciled per module in `verify.py`.
+
 ### Added — Device Data page: unified MDT + RESTCONF browser (round 32, 2026-08-01)
 
 - **One page for all collected device data — [device-data.html](device-data.html).**

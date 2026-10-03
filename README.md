@@ -62,11 +62,10 @@ Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
 
-#### Events (43 specs, 910 paths)
-Event notification modules for YANG-Push telemetry and SNMP trap visualization.
-- **YANG Events:** 40 Cisco-IOS-XE event modules
-- **MIB Notifications:** 88 SNMP trap modules (view-only in Swagger)
-- [Browse Events APIs →](swagger-events-model/)
+#### Event Notifications (Notification Catalog)
+YANG-Push event notifications and SNMP traps, with realistic payloads and consumption guidance.
+The former Events Swagger viewer was retired (its `/streams` endpoints are not callable on a device).
+- [Browse the Notification Catalog →](telemetry.html#notifications)
 
 #### RPC Operations (57 specs, 302 RPCs)
 Remote procedure calls for device actions and commands.
@@ -194,7 +193,6 @@ iosxe-1718-yang-swagger/
 ├── swagger-openconfig-model/           # OpenConfig (57 specs)
 ├── swagger-ietf-model/                 # IETF (19 specs)
 ├── swagger-mib-model/                  # MIB (149 specs)
-├── swagger-events-model/               # Events (38 specs)
 ├── swagger-native-config-model/        # Native (81 specs)
 ├── swagger-other-model/                # Other (9 specs)
 ├── generators/                         # Python YANG parsers
