@@ -127,7 +127,7 @@ body {
 .content h4 { font-size: 1rem; color: var(--accent-dark); }
 .content h1:first-child, .content h2:first-child { margin-top: 0; }
 .content p { margin: 0.6em 0 0.9em; }
-.content a { color: var(--accent); text-decoration: none; }
+.content a { color: var(--accent); text-decoration: underline; }
 .content a:hover { text-decoration: underline; }
 .content ul, .content ol { padding-left: 1.7em; margin: 0.5em 0 1em; }
 .content li { margin-bottom: 0.25em; }
@@ -908,7 +908,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{html.escape(PAGE_TITLE)}</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.clarity.ms https://c.bing.com; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
     <meta name="description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger, architecture, site map">
     <meta name="author" content="Cisco DevNet">

@@ -59,7 +59,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{html.escape(PAGE_TITLE)}</title>
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.clarity.ms https://c.bing.com; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
     <meta name="description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, RESTCONF, NETCONF, changelog, release notes, development history, network automation, swagger">
     <meta name="author" content="Cisco DevNet">

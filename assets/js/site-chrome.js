@@ -82,6 +82,8 @@
         btn.type = 'button';
         btn.className = 'theme-toggle';
         btn.setAttribute('data-theme-toggle', '');
+        btn.setAttribute('aria-label', 'Toggle dark mode');
+        btn.title = 'Toggle dark mode';
         btn.addEventListener('click', toggleTheme);
         document.body.appendChild(btn);
     }
@@ -91,6 +93,9 @@
             // Avoid double-binding: tag once-handled buttons
             if (btn.dataset.themeBound) return;
             btn.dataset.themeBound = '1';
+            if (!btn.getAttribute('aria-label') && !btn.textContent.trim()) {
+                btn.setAttribute('aria-label', 'Toggle dark mode');
+            }
             btn.addEventListener('click', function (e) {
                 // Prevent page-specific handlers from also firing duplicate toggles
                 e.stopImmediatePropagation();
