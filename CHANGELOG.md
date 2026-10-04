@@ -157,6 +157,13 @@ below are far more representative than the average).
   `tests/test_spec_info_version.py` guards it. RPC (YANG revision dates) and MIB/other (`1.0.0`)
   keep their own versioning.
 
+### Fixed — 26.1.1 leftover tree pages (2026-10-04)
+
+- Removed 27 `native-*` tree pages from `releases/26.1.1/yang-trees/` that were copied from the
+  pre-release root layout in June: no 26.1.1 YANG source produces them and no other release has
+  them. 26.1.1 accountability was regenerated (24 phantom "modules" gone: 1,444 tracked, 765 with
+  trees), so the 26.1.1 → 26.2.1 accountability delta shows 5 removed modules instead of 29.
+
 ### Fixed — broken internal links (2026-10-04)
 
 - **Tree pages:** every per-release tree page (`releases/<ver>/yang-trees/*.html`, 4,206 pages)
