@@ -88,6 +88,11 @@ mindmap
         Summary cards
         API growth table
         Deltas (added / removed)
+      release-compare.html
+        Release pair picker (adjacent releases)
+        Modules added / removed / changed + revision notes
+        Resolved schema-node diff (pyang trees, on demand)
+        Per-platform module membership changes
       platform-coverage.html
         Module x platform matrix
         Family color coding
@@ -209,7 +214,17 @@ not repeated below.
   [version-stats.json](version-stats.json).
 - **Scripts**: inline (no external module beyond site-chrome).
 
-### 3.7 [telemetry.html](telemetry.html) — MDT XPath Builder
+### 3.6a [release-compare.html](release-compare.html) — What Changed Between Releases
+- **Route**: `/release-compare.html`
+- **Purpose**: "What changed" for each adjacent release pair: modules added / removed /
+  changed, YANG revision notes, resolved schema-node differences (added and removed
+  subtrees, type / status / key changes) and per-platform module membership. Links each
+  module to its spec viewer and tree at the right release, and to the source-level
+  overview in cisco-ios-xe-yang-model-innovations where one covers the same pair.
+- **Data sources**: `releases/compare/index.json`, `releases/compare/<old>__<new>.json`
+  and on-demand `releases/compare/<old>__<new>/<module>.json`.
+- **Scripts**: [release-compare.js](release-compare.js) (strict CSP, DOM built with textContent).
+- **Deep-link hash**: `#pair=<old>__<new>&status=&category=&q=`.
 - **Route**: `/telemetry.html`
 - **Purpose**: Compute gRPC dial-out `filter xpath` for any (release, category,
   module, OpenAPI path) per the formula in
@@ -518,6 +533,7 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | `releases/<ver>/swagger-<cat>-model/api/_paths_index.json` | scripts/build_paths_index.py (per hub-search-ops.js comment) | hub-search-ops.js |
 | `releases/<ver>/yang_accountability.json` (+ root [yang_accountability.json](yang_accountability.json)) | scripts/build_accountability*.py | yang-accountability.js |
 | [accountability_compare.json](accountability_compare.json) | scripts/build_accountability_compare.py | yang-accountability-compare.html |
+| `releases/compare/*.json` (+ per-module detail folders) | scripts/build_release_compare.py | release-compare.html |
 | [version-stats.json](version-stats.json) | scripts/build_version_stats.py | hub stats, about, version compare |
 | [platform-support-index.json](platform-support-index.json) + `releases/<ver>/platform-support.json` | scripts/build_platform_support.py (inferred) | platform-coverage.js, platform-support.js |
 | [yang-prefix-map.json](yang-prefix-map.json) + per-release variant | generators (inferred) | telemetry.js |

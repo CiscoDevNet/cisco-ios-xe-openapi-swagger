@@ -45,6 +45,7 @@ TOP_LEVEL = [
     "exports.html",
     "yang-accountability.html",
     "yang-accountability-compare.html",
+    "release-compare.html",
     "about.html",
     "platform-coverage.html",
     "device-data.html",

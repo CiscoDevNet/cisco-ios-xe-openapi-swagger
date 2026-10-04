@@ -24,6 +24,7 @@ TOP_LEVEL_PAGES = [
     ("device-data.html", 0.8, "monthly"),
     ("yang-accountability.html", 0.7, "monthly"),
     ("yang-accountability-compare.html", 0.6, "monthly"),
+    ("release-compare.html", 0.7, "monthly"),
     ("platform-coverage.html", 0.7, "monthly"),
     ("app-map.html", 0.6, "monthly"),
     ("changelog.html", 0.6, "monthly"),

@@ -346,6 +346,7 @@ def check_export_downloads(base: str) -> Result:
 
 OTHER_PAGES = {
     "yang-accountability-compare.html": "accountability_compare.json",
+    "release-compare.html": "release-compare.js",
     "about.html": "about-stats.js",
     "changelog.html": "Changelog",
     "exports.html": "Bruno",

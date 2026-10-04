@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.clarity.ms https://c.bing.com; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+<title>What Changed Between Releases — Cisco IOS-XE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+  header.page { background:linear-gradient(135deg,#0d47a1 0%,#1565c0 55%,#00bceb 100%); color:#fff; padding:22px 20px 18px; }
+  header.page .wrap, .nav .wrap, main { max-width:1400px; margin:0 auto; }
+  header.page h1 { margin:0 0 4px; font-size:1.55rem; }
+  header.page p { margin:0; opacity:.92; font-size:.9rem; }
+  .nav { background:var(--card); border-bottom:1px solid var(--border); padding:10px 20px; }
+  .nav .wrap { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .nav a { color:var(--c-brand-600); text-decoration:none; font-weight:500; }
+  main { padding:18px 20px 40px; }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .controls label { font-size:.85rem; color:var(--c-text-muted); display:flex; gap:6px; align-items:center; }
+  .controls select, .controls input { padding:6px 10px; border:1px solid var(--border); border-radius:4px; background:var(--card); color:var(--fg); font:inherit; }
+  .controls input[type=search] { min-width:260px; }
+  .source { font-size:.8rem; color:var(--c-text-muted); margin:0 0 14px; }
+  .source a { color:var(--c-brand-600); }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .stat .num { font-size:1.45rem; font-weight:700; }
+  .stat .lbl { font-size:.78rem; color:var(--c-text-muted); }
+  .stat.added .num { color:var(--c-success); }
+  .stat.removed .num { color:var(--c-danger); }
+  .stat.changed .num { color:var(--c-warning); }
+  h2 { font-size:1.1rem; margin:22px 0 8px; }
+  .note { font-size:.82rem; color:var(--c-text-muted); margin:0 0 10px; }
+  .table-wrap { overflow-x:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:7px 10px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }
+  th { background:var(--card); position:sticky; top:0; z-index:1; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  code, .mono { font-family:var(--font-mono); font-size:.8rem; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:.72rem; font-weight:600; color:#fff; }
+  .badge.added { background:var(--c-success); }
+  .badge.removed { background:var(--c-danger); }
+  .badge.changed { background:var(--c-warning); }
+  .links a { color:var(--c-brand-600); margin-right:8px; font-size:.78rem; white-space:nowrap; }
+  .plus { color:var(--c-success); } .minus { color:var(--c-danger); } .tilde { color:var(--c-warning); }
+  /* Status tokens are tuned for light backgrounds; lighten status text on dark cards (>=4.5:1). */
+  [data-theme="dark"] .plus, body.dark .plus, [data-theme="dark"] .stat.added .num, body.dark .stat.added .num { color:#81c784; }
+  [data-theme="dark"] .minus, body.dark .minus, [data-theme="dark"] .stat.removed .num, body.dark .stat.removed .num { color:#ef9a9a; }
+  [data-theme="dark"] .tilde, body.dark .tilde, [data-theme="dark"] .stat.changed .num, body.dark .stat.changed .num { color:#ffb74d; }
+  button.expand { background:none; border:1px solid var(--border); border-radius:4px; color:var(--fg); cursor:pointer; padding:1px 7px; font:inherit; }
+  tr.detail td { background:var(--c-surface-2, rgba(0,0,0,.03)); }
+  .detail h3 { margin:8px 0 4px; font-size:.85rem; }
+  .detail ul { margin:4px 0 8px 18px; padding:0; }
+  .detail li { margin:2px 0; }
+  .muted { color:var(--c-text-muted); }
+  details.plat summary { cursor:pointer; }
+  .empty { padding:30px; text-align:center; color:var(--c-text-muted); }
+</style>
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site-chrome.js" defer></script>
+<!-- BEGIN seo-meta (managed by scripts/inject_seo_meta.py) -->
+<meta name="description" content="See what changed between Cisco IOS-XE releases: YANG modules added and removed, schema nodes changed, revision notes, and platform support.">
+<meta name="keywords" content="Cisco IOS-XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger">
+<meta name="author" content="Cisco DevNet">
+<meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/release-compare.html">
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cisco IOS-XE OpenAPI &amp; YANG Docs">
+<meta property="og:title" content="What Changed Between Releases — Cisco IOS-XE">
+<meta property="og:description" content="See what changed between Cisco IOS-XE releases: YANG modules added and removed, schema nodes changed, revision notes, and platform support.">
+<meta property="og:url" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/release-compare.html">
+<meta property="og:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What Changed Between Releases — Cisco IOS-XE">
+<meta name="twitter:description" content="See what changed between Cisco IOS-XE releases: YANG modules added and removed, schema nodes changed, revision notes, and platform support.">
+<meta name="twitter:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
+<!-- END seo-meta -->
+<!-- BEGIN pwa (managed by scripts/inject_pwa.py) -->
+<link rel="manifest" href="site.webmanifest">
+<script src="assets/js/analytics-config.js"></script>
+<script src="assets/js/sw-register.js" defer></script>
+<script src="assets/js/analytics.js" defer></script>
+<!-- END pwa -->
+</head>
+<body>
+<header class="page">
+  <div class="wrap">
+    <h1>What Changed Between Releases</h1>
+    <p>Modules added, removed and changed between IOS-XE releases — with resolved schema-node differences from the pyang trees, YANG revision notes, and per-platform module changes.</p>
+  </div>
+</header>
+<nav class="nav" aria-label="Related pages">
+  <div class="wrap">
+    <a href="index.html">&larr; Hub</a>
+    <a href="yang-accountability-compare.html">API growth across releases</a>
+    <a href="tree-compare.html">Tree compare</a>
+  </div>
+</nav>
+<main>
+  <div class="controls">
+    <label for="pairSelect">Releases</label>
+    <select id="pairSelect" aria-label="Release pair"></select>
+    <label for="statusFilter">Change</label>
+    <select id="statusFilter">
+      <option value="">All</option>
+      <option value="added">Added modules</option>
+      <option value="removed">Removed modules</option>
+      <option value="schema">Changed schema</option>
+      <option value="changed">Any changed file</option>
+    </select>
+    <label for="categoryFilter">Category</label>
+    <select id="categoryFilter"><option value="">All</option></select>
+    <input type="search" id="searchBox" placeholder="Filter modules…" aria-label="Filter modules by name">
+  </div>
+  <p class="source" id="sourceLine"></p>
+  <div class="cards" id="cards"></div>
+
+  <h2 id="modulesHeading">Modules</h2>
+  <p class="note">Schema counts compare resolved pyang trees (groupings, augments and submodules applied). Added and removed subtrees are listed by their top node with a count of the nodes below it.</p>
+  <div class="table-wrap" role="region" aria-labelledby="modulesHeading" tabindex="0">
+    <table>
+      <thead><tr><th scope="col"><span class="sr-only">Details</span></th><th scope="col">Module</th><th scope="col">Change</th><th scope="col">Category</th><th scope="col">Revision</th><th scope="col">Schema nodes</th></tr></thead>
+      <tbody id="moduleRows"></tbody>
+    </table>
+  </div>
+
+  <h2 id="platformsHeading">Platforms</h2>
+  <p class="note">Module membership in each platform profile's published YANG library (yang-set) — family-level, not a specific PID or image.</p>
+  <div class="table-wrap" role="region" aria-labelledby="platformsHeading" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Platform</th><th scope="col">Modules</th><th scope="col">Added</th><th scope="col">Removed</th></tr></thead>
+      <tbody id="platformRows"></tbody>
+    </table>
+  </div>
+</main>
+<script src="release-compare.js" defer></script>
+</body>
+</html>
