@@ -37,12 +37,16 @@ import collections
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]
-RELEASE = "26.1.1"
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+from _release_paths import device_data_release  # noqa: E402
+
+RELEASE = device_data_release()
 RELEASE_DIR = REPO_ROOT / "releases" / RELEASE
 INDEX = RELEASE_DIR / "live-examples-index.json"
 DATASET = REPO_ROOT / "restconf-live-data.json"

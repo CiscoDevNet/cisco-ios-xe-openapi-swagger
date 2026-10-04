@@ -22,8 +22,10 @@ authoring, accountability/coverage reports, and per-platform support matrices.
 Key facts:
 
 - **Hosting**: GitHub Pages, scope `/cisco-ios-xe-openapi-swagger/`.
-- **Releases tracked**: `26.1.1` (default), `17.18.1`, `17.15.x`, `17.12.x`, `17.9.x`
-  ([releases/index.json](releases/index.json)).
+- **Releases tracked**: `26.2.1` (default), `26.1.1`, `17.18.1`, `17.15.x`, `17.12.x`, `17.9.x`
+  ([releases/index.json](releases/index.json)). The newest release is the default; device
+  data (Device Data page, viewer "Live device data" panel) belongs to the release the lab
+  devices run, `device_data` in the same file (26.1.1 today).
 - **Top-level pages**: 9 user-facing HTML + 1 404 + 2 redirector stubs + 9 Swagger UI
   viewers (one per model category).
 - **No build system**: vanilla JS, strict CSP, Swagger UI from jsDelivr; data is
@@ -337,7 +339,7 @@ not repeated below.
 Grouped by capability, not by page.
 
 ### 4.1 Multi-release version switching
-- **What**: Single "active release" concept (`26.1.1` default) drives every data
+- **What**: Single "active release" concept (`26.2.1` default) drives every data
   fetch — `?ver=`, `#ver=`, `localStorage['iosxe-active-version']`, or the parent
   hub's `window.__IOSXE_ACTIVE_VERSION__`.
 - **Where**: `#versionSelector` on hub; injected per-viewer dropdown by
@@ -578,7 +580,7 @@ Items flagged **Needs verification** or that fell outside this static read:
    [version-stats.json](version-stats.json) via [about-stats.js](about-stats.js)
    (`data-stat-about` hooks), and [index.html](index.html) hub cards, category
    table, search placeholder, project-summary boxes and "Last Updated" date are
-   all synced to the 26.1.1 default (988 specs / 82,856 paths / 246,677 ops /
+   all synced to the default release (26.2.1: 961 specs / 81,560 paths / 243,024 ops /
    1,469 tracked modules) via `data-stat-*` hydration. Static markup remains only
    as no-JS fallbacks.
 2. **native-augment-accountability.html** — **REMOVED (2026-06-18).** Deleted as

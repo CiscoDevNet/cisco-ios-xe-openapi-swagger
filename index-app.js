@@ -404,7 +404,7 @@
             .then(function (data) {
                 var releases = (data && data.releases) || [];
                 if (!releases.length) {
-                    sel.innerHTML = '<option>26.1.1</option>';
+                    sel.innerHTML = '<option>26.2.1</option>';
                     return;
                 }
                 var hashVer = (location.hash.match(/(?:^|[#&])ver=([^&]+)/) || [])[1];
@@ -455,6 +455,12 @@
         }
         // Expose for other scripts (search.js reads this).
         window.__IOSXE_ACTIVE_VERSION__ = ver;
+        var yangLink = document.getElementById('yangSourceLink');
+        if (yangLink && info && info.yangmodels_path) {
+            yangLink.href = 'https://github.com/YangModels/yang/tree/main/' + info.yangmodels_path;
+            var yangLabel = document.getElementById('yangSourceLabel');
+            if (yangLabel) yangLabel.textContent = 'IOS XE ' + ver + ' YANG modules on GitHub';
+        }
         // Refresh the homepage stats table + cards for the active release.
         applyVersionStats(ver);
         // Rewrite category-card links so the chosen version is preserved when

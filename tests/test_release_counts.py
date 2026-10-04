@@ -108,3 +108,22 @@ def test_default_release_has_minimum_coverage(current: dict) -> None:
     )
     ps_mods = (rel.get("platform_support") or {}).get("modules", 0)
     assert ps_mods >= 800, f"platform-support has {ps_mods} modules (<800)"
+
+
+def test_default_is_newest_release() -> None:
+    """The site default is always the newest active release (VERSIONING.md 8.1)."""
+    idx = json.loads((REPO / "releases" / "index.json").read_text(encoding="utf-8"))
+    active = [r for r in idx["releases"] if r.get("status", "active") == "active"]
+    newest = max(active, key=lambda r: r["date"])["ver"]
+    assert idx["default"] == newest, f"default is {idx['default']} but the newest active release is {newest}"
+    flagged = [r["ver"] for r in idx["releases"] if r.get("default")]
+    assert flagged == [newest], f"'default: true' must be set on {newest} only, found {flagged}"
+
+
+def test_device_data_release_has_captures() -> None:
+    """device_data names the release the lab runs; its live data must exist (VERSIONING.md 8.2)."""
+    idx = json.loads((REPO / "releases" / "index.json").read_text(encoding="utf-8"))
+    device_data = idx.get("device_data")
+    assert device_data in {r["ver"] for r in idx["releases"]}, f"device_data {device_data!r} is not a release"
+    for name in ("live-examples-index.json", "live-modules.json"):
+        assert (REPO / "releases" / device_data / name).is_file(), f"releases/{device_data}/{name} missing"

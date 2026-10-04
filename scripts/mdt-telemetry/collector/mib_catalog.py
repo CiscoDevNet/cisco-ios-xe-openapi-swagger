@@ -12,11 +12,16 @@ community configured on the device (SNMP->MDT bridge).
 from __future__ import annotations
 
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-API = REPO / "releases" / "26.1.1" / "swagger-mib-model" / "api"
+sys.path.insert(0, str(REPO / "scripts"))
+from _release_paths import device_data_release  # noqa: E402
+
+VERSION = device_data_release()
+API = REPO / "releases" / VERSION / "swagger-mib-model" / "api"
 OUT = Path(__file__).resolve().parent / "output" / "mib-nodes.json"
 
 
@@ -62,7 +67,7 @@ def main():
         catalog[mod].append({"xpath": xp, "depth": depth})
 
     out = {
-        "version": "26.1.1",
+        "version": VERSION,
         "total_containers_lists": len(containers_lists),
         "modules": {m: nodes for m, nodes in sorted(catalog.items())},
     }

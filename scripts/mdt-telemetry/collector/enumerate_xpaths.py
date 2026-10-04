@@ -10,9 +10,14 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "scripts"))
+from _release_paths import device_data_release  # noqa: E402
+
+DEVICE_DATA_RELEASE = device_data_release()
 
 CATEGORY_DIRS = {
     "oper": "swagger-oper-model",
@@ -54,7 +59,7 @@ def depth_after_prefix(xp):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="26.1.1")
+    ap.add_argument("--version", default=DEVICE_DATA_RELEASE)
     ap.add_argument("--max-depth", type=int, default=2)
     ap.add_argument("--dump", help="Write candidate xpaths per category as JSON.")
     args = ap.parse_args()

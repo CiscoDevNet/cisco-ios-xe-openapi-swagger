@@ -232,7 +232,7 @@ def load_bundle_xpaths():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--version", default="26.1.1")
+    ap.add_argument("--version", default=DEVICE_DATA_RELEASE)
     ap.add_argument("--depth", type=int, default=1, help="Max xpath depth (1=top level, 2=+2nd level).")
     ap.add_argument("--depth-min", type=int, default=1)
     ap.add_argument("--categories", nargs="+",

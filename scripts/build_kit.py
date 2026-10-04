@@ -130,6 +130,13 @@ def copy_code(kit: Path) -> None:
         for pattern in patterns:
             for source in sorted(source_dir.glob(pattern)):
                 shutil.copy2(source, target_dir / source.name)
+    shutil.copy2(REPO / "scripts" / "_release_paths.py", kit / "scripts" / "_release_paths.py")
+
+
+def write_release_index(kit: Path, release: str) -> None:
+    """A one-release index so the shared release helpers resolve to the kit's release."""
+    index = {"default": release, "device_data": release, "releases": [{"ver": release, "status": "active"}]}
+    (kit / "releases" / "index.json").write_text(json.dumps(index, indent=2) + "\n", encoding="utf-8")
 
 
 def copy_catalogs(kit: Path, release: str) -> None:
@@ -232,6 +239,7 @@ def build(args) -> Path:
     copy_code(kit)
     copy_catalogs(kit, args.release)
     spec_count = copy_specs(kit, args.release)
+    write_release_index(kit, args.release)
     print(f"specs: {spec_count} slim spec files")
     if not args.no_wheels:
         download_wheels(kit, args.python_version, args.platform)
@@ -249,7 +257,7 @@ def build(args) -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--release", default="26.1.1")
+    parser.add_argument("--release", help="Release the devices run (default: releases/index.json device_data)")
     parser.add_argument("--out", default=str(REPO / "dist"))
     parser.add_argument("--telegraf-tarball", help=f"Local telegraf-{TELEGRAF_VERSION}_linux_amd64.tar.gz")
     parser.add_argument("--python-version", help="Target interpreter for wheels, e.g. 3.11 (default: this one)")
@@ -258,6 +266,11 @@ def main() -> int:
     parser.add_argument("--no-telegraf", action="store_true")
     parser.add_argument("--no-archive", action="store_true")
     args = parser.parse_args()
+    if not args.release:
+        sys.path.insert(0, str(REPO / "scripts"))
+        from _release_paths import device_data_release
+
+        args.release = device_data_release()
 
     kit = build(args)
     size = sum(p.stat().st_size for p in kit.rglob("*") if p.is_file())

@@ -73,13 +73,14 @@ def kit_info() -> dict:
 
 
 def default_release() -> str:
+    """The release the devices run (kit build release, else releases/index.json device_data)."""
     release = kit_info().get("release")
     if release:
         return release
     index = REPO / "releases" / "index.json"
     if index.exists():
         data = json.loads(index.read_text(encoding="utf-8"))
-        return data.get("default") or data["releases"][0]["ver"]
+        return data.get("device_data") or data.get("default") or data["releases"][0]["ver"]
     return "26.1.1"
 
 

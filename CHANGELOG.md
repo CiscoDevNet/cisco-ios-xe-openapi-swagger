@@ -131,6 +131,22 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Changed — 26.2.1 is the default release; device data has its own release (2026-10-04)
+
+- **Default:** the site opens on 26.2.1, the newest release, and will always default to the
+  newest active release (`test_default_is_newest_release`; runbook VERSIONING.md 8.1). Root
+  copies (search index, notifications, accountability, version stats, platform-support index)
+  and the viewers' default were regenerated; hub, About and README figures show 26.2.1.
+- **Device data release:** `releases/index.json` gains `"device_data": "26.1.1"`, the release the
+  lab devices run. Device data builders and every collection tool (spec walk, MDT xpaths, MIB
+  catalog, live-data refresh, harness kit) read it via `scripts/_release_paths.py`, replacing
+  about ten hard-coded `26.1.1` values. After the lab moves to 26.2.1, changing this one value and
+  re-collecting moves device data to 26.2.1 (VERSIONING.md 8.2).
+- **Viewers:** on a release without captures (26.2.1 today) the "Live device data" panel shows the
+  26.1.1 captures and says which release they came from, instead of disappearing.
+- Hub "YANG Source Files" card now follows the selected release (it pointed at 17.18.1 while
+  labelled 26.1.1).
+
 ### Fixed — broken internal links (2026-10-04)
 
 - **Tree pages:** every per-release tree page (`releases/<ver>/yang-trees/*.html`, 4,206 pages)

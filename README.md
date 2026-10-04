@@ -1,51 +1,51 @@
 # Cisco IOS XE OpenAPI/Swagger Documentation
 
-[![IOS XE Version](https://img.shields.io/badge/IOS--XE-26.1.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
+[![IOS XE Version](https://img.shields.io/badge/IOS--XE-26.2.1-blue)](https://www.cisco.com/c/en/us/support/ios-nx-os-software/ios-xe-17/tsd-products-support-series-home.html)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.0-green)](https://swagger.io/specification/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-1469-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to 26.1.1 with **988 OpenAPI specs, 82,856 paths, and 792 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to the newest release, 26.2.1, with **961 OpenAPI specs, 81,560 paths, and 758 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
 
 ## Deep-Path Specifications
 
-**Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All 9 model types covered (counts shown for the default 26.1.1 release):
+**Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All model types covered (counts shown for the default 26.2.1 release):
 
-- **Operational:** 216 specs, 22,144 paths (GET-only read endpoints)
-- **Configuration:** 41 specs, 2,559 paths, 10,083 ops (full CRUD)
-- **Native Config:** 409 specs, 50,716 paths, 202,864 ops (full depth CRUD)
-- **OpenConfig:** 43 specs, 778 paths, 2,904 ops (vendor-neutral)
-- **IETF:** 22 specs, 505 paths, 1,664 ops (mixed CRUD + RPC)
+- **Operational:** 221 specs, 22,508 paths (GET-only read endpoints)
+- **Configuration:** 45 specs, 2,449 paths, 9,622 ops (full CRUD)
+- **Native Config:** 412 specs, 49,862 paths, 199,448 ops (full depth CRUD)
+- **OpenConfig:** 44 specs, 1,062 paths, 3,930 ops (vendor-neutral)
+- **IETF:** 21 specs, 419 paths, 1,392 ops (mixed CRUD + RPC)
 - **MIB:** 148 specs, 4,272 paths (GET-only deep paths)
-- **RPC:** 57 specs, 302 RPCs (POST to /operations/)
-- **Events:** 43 specs, 910 paths (notifications + data endpoints)
+- **RPC:** 61 specs, 318 RPCs (POST to /operations/)
+- **Notifications:** 133 modules, 506 notifications (Telemetry & Notifications catalog)
 - **Other:** 9 specs, 670 paths, 1,534 ops (full CRUD)
 
 **Key Features:**
 -  **Comprehensive Docs** - Getting started guide with 15+ examples
 - **53 Logical Categories** - Organized by network engineer workflows
 - **100% Accountability** - Every YANG module mapped and documented
-- **792 Tree Files** - Searchable YANG tree visualizations
+- **758 Tree Files** - Searchable YANG tree visualizations
 
 **[Read Project Summary](docs/PROJECT_SUMMARY.md)** for full details on enhancements.
 
-## Quick Stats (default release: 26.1.1)
+## Quick Stats (default release: 26.2.1)
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 988 | Deep-path specs across all 9 models |
-| **API Paths** | 82,856 | RESTCONF endpoints from resolved YANG trees |
-| **Operations** | 246,677 | Total API operations |
+| **OpenAPI Specs** | 961 | Deep-path specs across the 8 OpenAPI model types |
+| **API Paths** | 81,560 | RESTCONF endpoints from resolved YANG trees |
+| **Operations** | 243,024 | Total API operations |
 | **Tracked Modules** | 1,469 | All tracked units (YANG + MIB + native config bundles) |
-| **Modules with specs** | 971 | 66.1% coverage |
-| **Tree Files** | 792 | YANG/MIB visualizations |
-| **Model Types** | 9 | Categories |
+| **Modules with specs** | 949 | 64.6% coverage |
+| **Tree Files** | 758 | YANG/MIB visualizations |
+| **Model Types** | 8 + notifications | OpenAPI categories plus the notification catalog |
 | **Releases covered** | 6 | 17.9.x → 26.2.1 |
 
-For the per-release growth curve (specs/paths/operations across all 5 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
+For the per-release growth curve (specs/paths/operations across all 6 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
 
 ## Model Categories
 

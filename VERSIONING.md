@@ -76,9 +76,11 @@ The `swagger-*-model/index.html` viewers, `index.html` landing page, accountabil
 
 ```json
 {
-  "default": "26.1.1",
+  "default": "26.2.1",
+  "device_data": "26.1.1",
   "releases": [
-    { "ver": "26.1.1",  "label": "26.1.1 (latest)", "date": "2026-04-01", "default": true },
+    { "ver": "26.2.1",  "label": "26.2.1 (newest)", "date": "2026-10-02", "default": true },
+    { "ver": "26.1.1",  "label": "26.1.1",          "date": "2026-04-01" },
     { "ver": "17.18.1", "label": "17.18.1",         "date": "2026-02-01" },
     { "ver": "17.15.x", "label": "17.15.x",         "date": "2025-09-01" },
     { "ver": "17.12.x", "label": "17.12.x",         "date": "2024-11-01" },
@@ -87,7 +89,9 @@ The `swagger-*-model/index.html` viewers, `index.html` landing page, accountabil
 }
 ```
 
-Order is the order presented in the UI version selector. `default` is the version loaded when no `#ver=` hash is present.
+Order is the order presented in the UI version selector. `default` is the version loaded when no `#ver=` hash is present; it is always the **newest active release** (`tests/test_release_counts.py` enforces this).
+
+`device_data` is the release the lab devices run. Real device data (the Device Data page, the viewers' "Live device data" panel, MDT and harness captures) belongs to that release, independent of `default`. Every device-data tool reads it through `scripts/_release_paths.py:device_data_release()`. A viewer opened on a release without captures shows the `device_data` release's captures, labelled with the release they came from.
 
 ## 5. `releases/<ver>/meta.json` schema
 
@@ -175,6 +179,24 @@ For maintainers adding the next IOS XE release (e.g. `26.2.1`):
 6. **Commit and push**: GitHub Actions runs the matrix build for every registered release; deployment is gated on all passing.
 
 No edits to per-model HTML or shared JS are required to add a release. If a step fails, fix the underlying generator or skip-list — never bypass CI gates.
+
+### 8.1 Make the new release the default (always: newest = default)
+
+1. In `releases/index.json` set `default` to the new release and move `"default": true` to its entry. Leave `device_data` alone.
+2. Regenerate the root copies of the default release: `python scripts/generate_search_index.py`, `python -X utf8 generators/generate_notifications_index.py --version <new>`, copy `releases/<new>/yang_accountability.json` to the root, then `python scripts/build_version_stats.py`, `python scripts/generate_platform_support.py` and `python scripts/patch_viewers_version_aware.py`.
+3. Update the static fallbacks that show the default: `index.html` (`activeVersionLabel`, YANG source card, `version_label` stat), the `index-app.js` fallback option, the `about.html` stat fallbacks, and the README badge and stats.
+4. Run the tests; `test_default_is_newest_release` fails until the default is the newest active release.
+
+### 8.2 After upgrading the lab devices to a new release (device data)
+
+Device data stays on the release the devices ran until it is re-collected:
+
+1. Upgrade the devices, then `scripts/harness/kit.py onboard --all` (dry run) to confirm the APIs are still enabled.
+2. Set `device_data` in `releases/index.json` to the new release. Every device-data tool follows it: specs walked, MDT xpaths, MIB catalog, live-data index, harness kit default.
+3. Regenerate the catalogs for that release: `count_subscribable.py --dump output/subscribable-nodes.json` and `mib_catalog.py` (collector folder).
+4. Collect everything: `kit.py telegraf start`, `kit.py collect` (all methods, all devices; add `--timeout 90 --window 35` for WAN devices), `kit.py coverage` until every device is COMPLETE. Or build a kit with `build_kit.py` and collect where the devices are.
+5. Rebuild: `refresh_live_data.py` (writes `releases/<new>/live-examples-index.json`, `live-modules.json`, `live-data/`), `build_restconf_augment.py --from-ref HEAD`, `build_restconf_dataset.py`, then in the collector folder `build_live_dataset.py`, `build_netconf_dataset.py`, `build_gnmi_dataset.py`, `build_protocol_matrix.py`.
+6. The previous release keeps its `releases/<old>/live-data/` and live examples, so its viewers keep showing what was captured on it.
 
 ## 9. CI gates (per release)
 

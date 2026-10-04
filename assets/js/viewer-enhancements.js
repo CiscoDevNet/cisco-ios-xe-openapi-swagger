@@ -286,6 +286,7 @@
     var _liveIdxPromise = null;       // cached fetch of the release index
     var _liveIdxByModule = null;      // module -> index entry
     var _liveIdxOsByPid = null;       // pid -> os_version
+    var _liveIdxDataVer = '';         // set when showing another release's captures
 
     function attachLiveExamplesPanel() {
         try {
@@ -320,14 +321,32 @@
         return ver;
     }
 
+    function _fetchLiveModules(ver) {
+        return fetch('../releases/' + encodeURIComponent(ver) + '/live-modules.json', { cache: 'default' })
+            .then(function (r) { return r.ok ? r.json() : null; });
+    }
+
     function _loadLiveIndex() {
         if (_liveIdxPromise) return _liveIdxPromise;
         var ver = _liveExActiveVer();
         if (!ver) { _liveIdxPromise = Promise.resolve(null); return _liveIdxPromise; }
         // Tiny per-release summary (module -> pids + path count), NOT the full
-        // index or any bodies, so the viewer stays fast.
-        _liveIdxPromise = fetch('../releases/' + encodeURIComponent(ver) + '/live-modules.json', { cache: 'default' })
-            .then(function (r) { return r.ok ? r.json() : null; })
+        // index or any bodies, so the viewer stays fast. Releases the lab has not
+        // run yet have none: fall back to the release the devices run (index "device_data").
+        _liveIdxPromise = _fetchLiveModules(ver)
+            .then(function (doc) {
+                if (doc) return doc;
+                return fetch('../releases/index.json', { cache: 'default' })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (idx) {
+                        var dataVer = idx && idx.device_data;
+                        if (!dataVer || dataVer === ver) return null;
+                        return _fetchLiveModules(dataVer).then(function (fallback) {
+                            if (fallback) _liveIdxDataVer = dataVer;
+                            return fallback;
+                        });
+                    });
+            })
             .then(function (doc) {
                 _liveIdxByModule = (doc && doc.modules) || {};
                 _liveIdxOsByPid = (doc && doc.devices) || {};
@@ -379,6 +398,14 @@
             + ' \u2014 ' + nPaths + ' path' + (nPaths === 1 ? '' : 's')
             + ' with data for this module.'));
         panel.appendChild(head);
+
+        if (_liveIdxDataVer) {
+            var caveat = document.createElement('div');
+            caveat.style.cssText = 'margin-top:3px;color:#8a5a00;font-size:12px;';
+            caveat.textContent = 'No device data has been captured on ' + _liveExActiveVer()
+                + ' yet; showing data captured on ' + _liveIdxDataVer + '.';
+            panel.appendChild(caveat);
+        }
 
         var note = document.createElement('div');
         note.style.cssText = 'margin-top:3px;color:#486581;font-size:12px;';

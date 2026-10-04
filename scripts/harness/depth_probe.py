@@ -35,11 +35,13 @@ if __package__ in (None, ""):
     from scripts.harness import redact as redaction
     from scripts.harness.collector import KNOWN_UNSAFE_MODULES, CircuitBreaker
     from scripts.harness.request import restconf_get
+    from scripts.harness.spec_paths import spec_release
 else:  # pragma: no cover
     from . import inventory as inv
     from . import redact as redaction
     from .collector import KNOWN_UNSAFE_MODULES, CircuitBreaker
     from .request import restconf_get
+    from .spec_paths import spec_release
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -372,7 +374,7 @@ def discover(device, auth, version, category, max_entries, cap_per_module, modul
 def main(argv=None) -> int:
     global args_version
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
-    ap.add_argument("--version", default="26.1.1")
+    ap.add_argument("--version", default=spec_release())
     ap.add_argument("--device", required=True, help="Device PID or name to probe (single device)")
     ap.add_argument("--discover", action="store_true",
                     help="Scan ALL captured modules for data hidden behind keyed lists (no --parent-path needed)")

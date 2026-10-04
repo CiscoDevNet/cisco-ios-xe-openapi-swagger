@@ -68,10 +68,15 @@ def refresh(version: str, capture: bool) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
-    ap.add_argument("--version", required=True)
+    ap.add_argument("--version", help="Release the captures belong to (default: releases/index.json device_data)")
     ap.add_argument("--capture", action="store_true",
                     help="Re-capture from the devices first (needs inventory + IOSXE_USER/IOSXE_PASS)")
     args = ap.parse_args()
+    if not args.version:
+        sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+        from _release_paths import device_data_release
+
+        args.version = device_data_release()
     return refresh(args.version, args.capture)
 
 
