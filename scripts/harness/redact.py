@@ -50,11 +50,14 @@ _PEM_BLOCK = re.compile(
     re.DOTALL,
 )
 
+# SNMP communities inside CLI text (config history, running-config lines) under any key.
+_CLI_COMMUNITY = re.compile(r"(\b(?:snmp-server community|snmp-community-string)\s+)(?!\*\*\*REDACTED)[^\s\"'<\\]+", re.I)
+
 
 def _redact_string(value: str) -> str:
     if _PEM_BLOCK.search(value):
-        return _PEM_BLOCK.sub(REDACTED, value)
-    return value
+        value = _PEM_BLOCK.sub(REDACTED, value)
+    return _CLI_COMMUNITY.sub(r"\g<1>" + REDACTED, value)
 
 
 def redact(obj: Any) -> Any:

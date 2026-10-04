@@ -45,6 +45,7 @@ HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parents[2]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from _release_paths import device_data_release  # noqa: E402
+from harness.redact import redact  # noqa: E402
 
 RELEASE = device_data_release()
 RELEASE_DIR = REPO_ROOT / "releases" / RELEASE
@@ -119,7 +120,9 @@ def _load_value(rel: str, pid: str, ref: str | None) -> dict:
         shown = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=REPO_ROOT, capture_output=True,
                                text=True, encoding="utf-8", check=True)
         doc = json.loads(shown.stdout)
-    return doc["pids"][pid]    # {os_version, fetched_at, http_status, value}
+    value = dict(doc["pids"][pid])    # {os_version, fetched_at, http_status, value}
+    value["value"] = redact(value.get("value"))
+    return value
 
 
 def main() -> int:

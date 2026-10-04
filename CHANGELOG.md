@@ -131,6 +131,30 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Security — SNMP community and lab password removed from published files (2026-10-04)
+
+- The MDT dataset (`telemetry-live-data.json`) stored device fields unredacted, so the lab SNMP
+  read community was published in cleartext (`snmp_community`, `entLogicalCommunity`). Communities
+  also appeared as CLI text (`snmp-server community X RO`) and as SNMP `community-config` list keys
+  in the NETCONF/gNMI/RESTCONF datasets, which name-based masking cannot see.
+  - `build_live_dataset.py` now redacts like the NETCONF/gNMI builders; `redact_payload.py` and
+    `harness/redact.py` also mask communities in CLI text and community-config names (JSON, XML,
+    JSON-escaped payloads); the RESTCONF reconciler redacts folded values.
+  - `tests/test_dataset_secrets.py` now covers the MDT dataset and every `releases/*/live-data`
+    body, and detects these forms. All 2,790 published device-data files scan clean.
+- Removed the lab device password from three generator docstrings (example credentials).
+
+### Changed — C9300-STACK8-WAN fully collected; duplicate native specs removed (2026-10-04)
+
+- C9300-STACK8-WAN: full MDT run (719 subscriptions; 39 -> 78 MDT paths), SNMP MIB bridge enabled,
+  every GET/subscribe method re-collected over the WAN and the RESTCONF walk extended to the IETF,
+  OpenConfig and other categories (+126 RESTCONF device/path pairs). All 7 devices now report
+  COMPLETE coverage.
+- `native-services-1/2/3.json` removed from 17.9.x, 17.12.x, 17.15.x, 17.18.1 and 26.1.1: every
+  path in them is also in `native-services.json` (26.2.1 never had them). Manifests, path indexes,
+  native capabilities, search, accountability, exports and the 26.1.1 device data were updated;
+  no captured device data was lost (0 device/path pairs dropped).
+
 ### Changed — 26.2.1 is the default release; device data has its own release (2026-10-04)
 
 - **Default:** the site opens on 26.2.1, the newest release, and will always default to the
