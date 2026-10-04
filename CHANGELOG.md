@@ -131,6 +131,29 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — Portable data-collection harness (2026-10-04)
+
+- **`scripts/build_kit.py`** packages a self-contained kit to collect from devices on an
+  isolated network: harness and collector code (same relative layout, so the collectors run
+  unchanged), slim release specs (paths and methods only, 12 MB instead of 600 MB), the root
+  catalogs, an offline wheelhouse pinned to the tested environment, a checksum-verified Telegraf
+  1.40.1 binary, `setup.sh`, a `harness` launcher, a README and `SHA256SUMS`.
+- **`scripts/harness/kit.py`** (the kit's `./harness`): `doctor`, `onboard`, `facts`,
+  `telegraf start|stop|status`, `collect` (RESTCONF, NETCONF get/get-config/subscribe, gNMI
+  Get/Subscribe, MDT and the RESTCONF spec walk, per device), `split-mdt`, `coverage` (the
+  device's own YANG library vs what each method returned; COMPLETE/INCOMPLETE per device) and
+  `bundle` (masks secret values, refuses to build if a secret remains, sha256 per file).
+- **`scripts/harness/onboard.py`** prepares a new device: local AAA (only when the device has
+  none), HTTPS, RESTCONF, NETCONF, secure gNMI on the self-signed trustpoint and, optionally, the
+  SNMP MIB bridge. Dry run by default; `--apply` backs up the running-config, checks a fresh
+  login after enabling AAA (rolls AAA back on failure) and only saves with `--save`.
+- **`scripts/import_harness_bundle.py`** brings a bundle back: it verifies paths, checksums,
+  PIDs and secrets, prints the plan, and with `--apply` moves replaced files to
+  `scripts/harness/import-archive/` and rebuilds the Device Data datasets. It refuses imports
+  that would hold less data than today (for example a `--limit` smoke run) unless
+  `--allow-shrink`.
+- `build_protocol_matrix.py` now picks up devices whose PID does not start with "C".
+
 ### Added — "What Changed Between Releases" page (2026-10-04)
 
 - **New [release-compare.html](release-compare.html)** (hub → More → What Changed). For each

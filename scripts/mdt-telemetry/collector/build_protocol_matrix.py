@@ -164,7 +164,7 @@ def collect():
     # Cisco-IOS-XE-rib-oper, openconfig-macsec, ietf-yang-library, wireless-oper
     # on C9800). Data-only (like the browse dataset's 200-only nature) so the
     # RESTCONF column stays symmetric across devices — no lone ok/no cells.
-    for f in glob.glob(str(OUT / "restconf-C*.json")):
+    for f in glob.glob(str(OUT / "restconf-*.json")):
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]
         for e in doc.get("entries", []):
@@ -174,7 +174,9 @@ def collect():
                 xpath=e.get("xpath"))
 
     # NETCONF get / get-config from raw netconf-<PID>.json
-    for f in glob.glob(str(OUT / "netconf-C*.json")):
+    for f in glob.glob(str(OUT / "netconf-*.json")):
+        if "netconf-sub-" in f:
+            continue  # subscription files are scored below
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]
         for e in doc.get("entries", []):
@@ -208,7 +210,9 @@ def collect():
             put(pid, entry_module(e, p2m, m2p), e.get("category"), "netconf-sub-config", st, xpath=e.get("xpath"))
 
     # gNMI get / get-config from gnmi-<PID>.json (excludes gnmi-sub-*)
-    for f in glob.glob(str(OUT / "gnmi-C*.json")):
+    for f in glob.glob(str(OUT / "gnmi-*.json")):
+        if "gnmi-sub-" in f:
+            continue
         doc = json.loads(Path(f).read_text(encoding="utf-8"))
         pid = doc["pid"]
         for e in doc.get("entries", []):
