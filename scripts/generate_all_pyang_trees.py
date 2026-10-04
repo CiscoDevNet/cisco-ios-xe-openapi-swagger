@@ -83,6 +83,14 @@ def get_swagger_category(module_name: str) -> tuple[str, str]:
     return "swagger-other-model", "Other/Vendor APIs"
 
 
+# Shared theme (dark mode + toggle) for pages under releases/<ver>/yang-trees/.
+THEME_ASSETS = (
+    '<link rel="stylesheet" href="../../../assets/css/site.css">\n'
+    '<link rel="stylesheet" href="../../../assets/css/yang-tree.css">\n'
+    '<script src="../../../assets/js/site-chrome.js" defer></script>'
+)
+
+
 def render_tree_html(module: str, version: str, tree_text: str) -> str:
     """Render a single tree HTML page. Pages live at releases/<ver>/yang-trees/."""
     swagger_dir, swagger_label = get_swagger_category(module)
@@ -111,8 +119,9 @@ body {{ font-family: 'Courier New', monospace; background:#f5f5f5; padding:20px;
 pre {{ font-size:13px; line-height:1.4; margin:0; color:#333; }}
 .footer {{ margin-top:18px; padding:12px; background:#fff; border-radius:8px; text-align:center; font-size:12px; color:#666; }}
 </style>
+{THEME_ASSETS}
 </head>
-<body>
+<body data-footer="off">
 <div class=\"header\">
   <h1>{module}</h1>
   <p>YANG tree — IOS-XE {version}</p>
@@ -148,8 +157,9 @@ body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f5;pa
 .card{{background:#fff;padding:12px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.08)}}
 .card a{{color:#0070c9;text-decoration:none;font-size:13px}}
 </style>
+{THEME_ASSETS}
 </head>
-<body>
+<body data-footer="off">
 <div class=\"header\">
   <h1>📊 YANG Tree Browser</h1>
   <p>IOS-XE {version} — {len(modules)} modules with tree structure</p>
