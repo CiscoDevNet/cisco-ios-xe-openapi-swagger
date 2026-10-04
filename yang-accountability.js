@@ -497,7 +497,7 @@
 
             var specHtml;
             if (module.categories.length === 0) {
-                specHtml = '<span style="color:#ccc;">\u2014</span>';
+                specHtml = '<span style="color:var(--c-text-subtle);">\u2014</span>';
             } else {
                 specHtml = module.categories.map(function (c) {
                     return '<a href="' + escapeHtml(c.spec_url) + '" class="spec-link" title="View in ' + escapeHtml(c.label) + '">' + escapeHtml(c.label) + '</a>';
@@ -507,7 +507,7 @@
             var _treeUrl = _resolveTreeUrl(module.tree_url);
             var treeHtml = _treeUrl
                 ? '<a href="' + escapeHtml(_treeUrl) + '" class="tree-link" title="View YANG Tree">\ud83c\udf33 Tree</a>'
-                : '<span style="color:#ccc;">\u2014</span>';
+                : '<span style="color:var(--c-text-subtle);">\u2014</span>';
 
             return '<tr>' +
                 '<td style="color: var(--c-text-subtle);">' + (index + 1) + '</td>' +

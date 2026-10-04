@@ -10,7 +10,7 @@ Gates implemented (returns non-zero exit on failure):
   2. Manifest accuracy        — manifest.spec_count == on-disk count.
   3. Search-index integrity   — no duplicate module entries.
   4. Tree coverage            — every spec has tree or documented exclusion.
-  5. Spec→tree linkage        — info.x-yang-tree-url resolves on disk.
+  5. Spec→tree linkage        — tree pages behind viewer + accountability links exist.
   6. MDT xpath sanity         — every x-mdt-filter-xpath matches the regex.
   7. Export size cap          — each Postman/Bruno file ≤ 50 MB.
   8. Accountability regression — handled by separate compare script (warned here).
@@ -185,26 +185,43 @@ def gate_tree_coverage(rel: Path, errs: list[str]) -> None:
 
 def gate_spec_tree_links(rel: Path, errs: list[str]) -> None:
     print("\n[gate 5] Spec→tree linkage")
+    # Viewers link a spec to <release>/yang-trees/<module>.html and only show the
+    # button if that page exists, so a "generated" audit entry with no page is a silent gap.
+    tree_dir = rel / "yang-trees"
+    audit_path = rel / "tree_audit.json"
+    if not tree_dir.is_dir() or not audit_path.is_file():
+        print(f"  ! no yang-trees/ or tree_audit.json under {rel.relative_to(PROJECT_ROOT)} — skipping")
+        return
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    generated = {r["module"] for r in audit.get("results", []) if r.get("status") == "generated"}
+
     broken: list[str] = []
-    n = 0
+    specs_checked = 0
     for spec in rel.glob("swagger-*-model/api/*.json"):
-        if not is_spec_file(spec.name):
+        if not is_spec_file(spec.name) or spec.stem not in generated:
             continue
-        try:
-            data = json.loads(spec.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        url = data.get("info", {}).get("x-yang-tree-url")
-        if not url:
-            continue
-        n += 1
-        target = (spec.parent / url).resolve()
-        if not target.is_file():
-            broken.append(f"{spec.name} → {url}")
-    if broken:
+        specs_checked += 1
+        if not (tree_dir / f"{spec.stem}.html").is_file():
+            broken.append(f"{spec.parent.parent.name}/{spec.stem}")
+
+    links_checked = 0
+    accountability = rel / "yang_accountability.json"
+    if accountability.is_file():
+        report = json.loads(accountability.read_text(encoding="utf-8"))
+        for module in report.get("modules", []):
+            url = module.get("tree_url")
+            if not url:
+                continue
+            links_checked += 1
+            if not (rel / url).is_file():
+                broken.append(f"accountability {module.get('name')} → {url}")
+
+    if not specs_checked and not links_checked:
+        fail("no spec→tree links found to check (tree_audit and accountability both empty?)", errs)
+    elif broken:
         fail(f"{len(broken)} broken tree links: {broken[:3]}…", errs)
     else:
-        ok(f"{n} tree links resolve")
+        ok(f"{specs_checked} spec tree pages + {links_checked} accountability tree links resolve")
 
 
 def gate_mdt_xpaths(rel: Path, errs: list[str]) -> None:
