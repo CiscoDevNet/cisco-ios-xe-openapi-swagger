@@ -24,6 +24,9 @@ design intent; the modules below already implement it.
 | Depth probe (does a deeper GET return more?) | `scripts/harness/depth_probe.py` | Built — read-only `--discover` / single-probe; see §4.1 |
 | Tests | `scripts/harness/tests/` | Built (pytest) |
 | Inventory template | `scripts/harness/inventory.example.json` | Committed (6 placeholder devices) |
+| Device onboarding | `scripts/harness/onboard.py` | Built — enables AAA/HTTPS/RESTCONF/NETCONF/gNMI/SNMP where missing; see §14 |
+| Portable kit CLI | `scripts/harness/kit.py` | Built — doctor/facts/telegraf/collect/coverage/bundle; see §14 |
+| Kit builder / bundle importer | `scripts/build_kit.py`, `scripts/import_harness_bundle.py` | Built; see §14 |
 
 **Remaining / to verify on arrival:**
 - Fill `inventory.json` with the 6 real devices and set `IOSXE_USER`/`IOSXE_PASS`.
@@ -580,3 +583,41 @@ do not imply live querying — the site stays static.
   inline script.
 - Add a secret-scan test over any committed spec carrying an `x-cisco-observed`
   example (mirrors §6).
+
+## 14. Portable harness kit (collect on an isolated network, import here)
+
+Use the kit when the devices are not reachable from this repo's host, or to add a new device.
+
+```bash
+# 1. Build (here, with internet): kit folder + tar.gz under dist/
+.venv-harness/bin/python scripts/build_kit.py --release 26.1.1 [--telegraf-tarball telegraf-1.40.1_linux_amd64.tar.gz]
+
+# 2. On the isolated host (no internet needed; Python 3 matching the wheels, linux amd64)
+sha256sum -c SHA256SUMS && ./setup.sh
+#    scripts/harness/inventory.json (name, host, pid) + scripts/harness/.env (IOSXE_USER/IOSXE_PASS, chmod 600)
+./harness doctor
+./harness onboard --all            # plan; then --apply (add --snmp-community for MIB data)
+./harness telegraf start           # MDT receiver :57500 — devices must reach this host
+./harness collect                  # all methods, all devices (smoke: --device X --limit 5)
+./harness coverage                 # COMPLETE / INCOMPLETE per device
+./harness telegraf stop && ./harness bundle
+
+# 3. Back here
+.venv-harness/bin/python scripts/import_harness_bundle.py dist/harness-bundle-<UTC>.tar.gz           # verify + plan
+.venv-harness/bin/python scripts/import_harness_bundle.py dist/harness-bundle-<UTC>.tar.gz --apply   # import + rebuild
+```
+
+- **Complete** means: every module the device's YANG library advertises that holds data (in the
+  root catalog or a non-RPC release spec) was attempted by at least one method, and every
+  method ran. Modules with no data nodes (types, deviations, RPC-only, notification-only) are
+  listed as excluded.
+- **MDT split:** the kit's Telegraf writes one stream; `facts` records each device's hostname
+  (the MDT `source` tag) so `split-mdt` writes `mdt-<PID>.json`. Records from unknown sources
+  are reported and dropped.
+- **Safety:** onboarding never edits existing AAA and does not save unless `--save`. MDT
+  subscriptions are CPU-gated, added in small batches and removed after each one. Raw collector
+  payloads are unmasked on disk, so `bundle` masks secret values, deep-scans every embedded
+  payload and the credential values, and writes nothing if anything remains.
+- **Import:** only known result paths are accepted; replaced files go to
+  `scripts/harness/import-archive/<UTC>/`; legacy MDT files for the same device (for example
+  `mdt-C9300.json`) are superseded; imports that shrink a file need `--allow-shrink`.
