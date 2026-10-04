@@ -333,6 +333,10 @@ def method_command(method: str, device, args, receiver_ip: Optional[str]) -> lis
     }
     if method in scripts:
         script, *extra = scripts[method]
+        if method == "restconf" and args.timeout:
+            extra += ["--timeout", str(args.timeout)]
+        if method.startswith("netconf-sub") and args.window:
+            extra += ["--window", str(args.window)]
         return [sys.executable, str(COLLECTOR / script), "--device", device.name, *extra, *limit]
     if method == "mdt":
         command = [sys.executable, str(COLLECTOR / "collect_fleet.py"), "--apply", "--devices", device.name,
@@ -344,6 +348,8 @@ def method_command(method: str, device, args, receiver_ip: Optional[str]) -> lis
     if method == "restconf-walk":
         command = [sys.executable, str(HARNESS_DIR / "collector.py"), "--device", device.name,
                    "--specs-root", str(REPO / "releases" / args.release)]
+        if args.timeout:
+            command += ["--timeout", str(args.timeout)]
         return command + (["--roots-only"] if args.walk_roots_only else [])
     raise ValueError(method)
 
@@ -352,7 +358,8 @@ def run_logged(command: list[str], log_path: Path, cwd: Path) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as log:
         process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                   text=True, encoding="utf-8", errors="replace")
+                                   text=True, encoding="utf-8", errors="replace",
+                                   env={**os.environ, "PYTHONUNBUFFERED": "1"})
         for line in process.stdout:
             log.write(line)
             print("    " + line.rstrip())
@@ -796,6 +803,9 @@ def build_parser() -> argparse.ArgumentParser:
     collect.add_argument("--receiver-ip", help="IP devices dial for MDT (default: this host's IP toward each)")
     collect.add_argument("--receiver-port", type=int, default=DEFAULT_MDT_PORT)
     collect.add_argument("--walk-roots-only", action="store_true", help="RESTCONF walk: root containers only")
+    collect.add_argument("--timeout", type=int, default=0, help="RESTCONF per-GET timeout (s); e.g. 90 over WAN")
+    collect.add_argument("--window", type=int, default=0,
+                         help="NETCONF subscribe wait (s) for the first update; e.g. 35 over WAN")
     collect.set_defaults(func=cmd_collect)
 
     sub.add_parser("split-mdt").set_defaults(func=cmd_split_mdt)

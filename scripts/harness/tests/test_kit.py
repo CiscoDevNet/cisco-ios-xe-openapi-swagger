@@ -261,7 +261,8 @@ def test_kit_main_routes_onboard_flags(monkeypatch):
 def test_collect_commands_use_device_name(monkeypatch):
     import argparse
 
-    args = argparse.Namespace(limit=3, release="26.1.1", receiver_port=57500, walk_roots_only=True)
+    args = argparse.Namespace(limit=3, release="26.1.1", receiver_port=57500, walk_roots_only=True,
+                              timeout=0, window=0)
     sub_config = kit.method_command("netconf-sub-config", DEVICE, args, "198.51.100.1")
     assert sub_config[1].endswith("netconf_subscribe.py")
     assert sub_config[2:] == ["--device", DEVICE.name, "--config-roots", "--both", "--limit", "3"]
@@ -270,3 +271,9 @@ def test_collect_commands_use_device_name(monkeypatch):
     assert mdt[mdt.index("--per-cat-cap") + 1] == "3"
     walk = kit.method_command("restconf-walk", DEVICE, args, None)
     assert walk[0] == sys.executable and "--roots-only" in walk
+
+    slow = argparse.Namespace(limit=0, release="26.1.1", receiver_port=57500, walk_roots_only=False,
+                              timeout=90, window=35)
+    assert kit.method_command("restconf", DEVICE, slow, None)[-2:] == ["--timeout", "90"]
+    assert kit.method_command("netconf-sub", DEVICE, slow, None)[-2:] == ["--window", "35"]
+    assert kit.method_command("restconf-walk", DEVICE, slow, None)[-2:] == ["--timeout", "90"]
