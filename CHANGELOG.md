@@ -153,6 +153,13 @@ below are far more representative than the average).
   that would hold less data than today (for example a `--limit` smoke run) unless
   `--allow-shrink`.
 - `build_protocol_matrix.py` now picks up devices whose PID does not start with "C".
+- MDT collection ignores a device's own standing subscriptions: Telegraf keeps only harness
+  subscription ids (9xxxxx), and batch idle detection counts only those records.
+- `kit collect --timeout` (RESTCONF) and `--window` (NETCONF subscribe) for devices reached over a
+  WAN; collector logs under `scripts/harness/kit-run/logs/` now show progress while a method runs.
+- `build_restconf_augment.py --from-ref HEAD` keeps the 186 reconciled RESTCONF roots when the
+  live data is rebuilt from new captures (previously a refresh dropped them).
+- C9300-STACK8-WAN: SNMP MIB bridge enabled; full MDT and RESTCONF collection in progress.
 
 ### Added — "What Changed Between Releases" page (2026-10-04)
 
