@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>
+        // GitHub Pages serves this page at the missing URL, so resolve every link from the site root.
+        (function () {
+            var site = '/cisco-ios-xe-openapi-swagger/';
+            var base = document.createElement('base');
+            base.href = window.location.pathname.indexOf(site) === 0 ? site : '/';
+            document.head.appendChild(base);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
@@ -127,12 +136,49 @@
             }, { once: true });
         })();
 
+        // Release-scoped URLs (old tree-page links, pasted deep links): the viewers and
+        // pages live at the site root and take the release from #ver=.
+        var releaseRedirect = (function recoverReleasePath() {
+            try {
+                var site = new URL(document.baseURI).pathname;
+                var path = window.location.pathname;
+                if (path.indexOf(site) !== 0) return false;
+                var match = /^releases\/([^/]+)\/(.+)$/.exec(path.substring(site.length));
+                if (!match) return false;
+                var ver = decodeURIComponent(match[1]);
+                var tail = match[2];
+                var last = tail.split('/').pop();
+                var viewer = /^(swagger-[a-z-]+-model)\//.exec(tail);
+                var hash = (window.location.hash || '').replace(/^#/, '');
+                var target = null;
+                if (viewer && (last === '' || last === 'index.html')) {
+                    if (!/(^|&)ver=/.test(hash)) hash = 'ver=' + encodeURIComponent(ver) + (hash ? '&' + hash : '');
+                    target = viewer[1] + '/index.html#' + hash;
+                } else if (/^yang-trees\/[^/]+$/.test(tail) && last !== 'index.html') {
+                    // A tree page this release does not ship: its release's tree list.
+                    target = 'releases/' + encodeURIComponent(ver) + '/yang-trees/';
+                } else if (/^[A-Za-z0-9_-]+\.html$/.test(last) && last !== 'index.html') {
+                    target = last + window.location.search + window.location.hash;
+                }
+                if (!target) return false;
+                var msg = document.getElementById('redirectMsg');
+                if (msg) {
+                    msg.style.display = 'block';
+                    msg.textContent = 'This page moved \u2014 taking you to the ' + ver + ' version\u2026';
+                }
+                var url = new URL(target, document.baseURI).href;
+                setTimeout(function () { window.location.replace(url); }, 600);
+                return true;
+            } catch (_) { return false; }
+        })();
+
         // Hash-aware routing: if the failed URL carries a #spec=...&op=... or
         // #ver=... fragment, try to route the user to a viewer that can
         // resolve it instead of dropping them on a dead list. Works for
         // typo'd paths like `/swagger-cfg-modle/index.html#spec=foo` or
         // for old/renamed pages where someone pasted a deep link.
         (function recoverDeepLink() {
+            if (releaseRedirect) return;
             try {
                 var raw = (window.location.hash || '').replace(/^#/, '');
                 if (!raw) return;

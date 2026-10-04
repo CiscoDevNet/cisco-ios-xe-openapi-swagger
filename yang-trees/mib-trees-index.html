@@ -9,7 +9,7 @@
 <body>
 <h1>MIB Trees</h1>
 <p id="msg">Redirecting to the current release's MIB tree browser…</p>
-<p><a id="fallback" href="../releases/">Browse releases manually</a> if the redirect does not fire.</p>
+<p><a id="fallback" href="../index.html">Back to the documentation hub</a> if the redirect does not fire.</p>
 <script>
 (function () {
     fetch('../releases/index.json', { cache: 'no-store' })
@@ -17,13 +17,20 @@
         .then(function (data) {
             var def = data && data['default'];
             if (!def) throw new Error('no default version');
-            var target = '../releases/' + encodeURIComponent(def) + '/yang-trees/mib-trees-index.html' + window.location.search + window.location.hash;
-            document.getElementById('fallback').href = target;
-            window.location.replace(target);
+            var base = '../releases/' + encodeURIComponent(def) + '/yang-trees/';
+            var suffix = window.location.search + window.location.hash;
+            // Only some releases ship a MIB-only index; otherwise use the release's full tree list.
+            return fetch(base + 'mib-trees-index.html', { method: 'HEAD' })
+                .then(function (r) { return r.ok ? 'mib-trees-index.html' : ''; }, function () { return ''; })
+                .then(function (page) {
+                    var target = base + page + suffix;
+                    document.getElementById('fallback').href = target;
+                    window.location.replace(target);
+                });
         })
         .catch(function (e) {
             var msg = document.getElementById('msg');
-            if (msg) msg.textContent = 'Could not resolve default release: ' + e.message + '. Pick a release below.';
+            if (msg) msg.textContent = 'Could not resolve default release: ' + e.message + '. Use the hub to pick a release.';
         });
 })();
 </script>

@@ -131,6 +131,26 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Fixed — broken internal links (2026-10-04)
+
+- **Tree pages:** every per-release tree page (`releases/<ver>/yang-trees/*.html`, 4,206 pages)
+  linked one level too shallow, so "OpenAPI Spec", the category link and "Hub" opened
+  `releases/<ver>/swagger-*-model/...` and 404'd. Links now reach the site root; events modules
+  link to the notifications catalog (there is no events viewer). Fixed in
+  `scripts/generate_all_pyang_trees.py` and in the published pages.
+- **404 page:** GitHub Pages serves it at the missing URL, so its own links resolved under that
+  path and also 404'd. Links now resolve from the site root, and release-scoped URLs redirect:
+  `releases/<ver>/swagger-*-model/...` to the viewer with `#ver=<ver>`, a missing tree page to
+  that release's tree list, and `releases/<ver>/<page>.html` to the page.
+- **Changelog / App Map / About / Telemetry:** links to repo files the site does not publish
+  (`scripts/*.py`, `VERSIONING.md`, `CONTRIBUTING.md`, ...) now open on GitHub; the shared
+  Markdown renderer does this automatically.
+- **Tree redirect stubs:** working fallback links; the MIB tree stub falls back to the release's
+  tree list when a release has no MIB-only index.
+- **Guard:** `tests/test_internal_links.py` checks every static link in all 4,237 published pages
+  against the deployed layout. The data-driven tree links (notifications, accountability,
+  release compare; 7,912) were checked as well and all resolve.
+
 ### Added — Portable data-collection harness (2026-10-04)
 
 - **`scripts/build_kit.py`** packages a self-contained kit to collect from devices on an

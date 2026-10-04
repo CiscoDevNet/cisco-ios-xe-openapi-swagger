@@ -247,6 +247,45 @@ INLINE_CODE = re.compile(r"`([^`\n]+)`")
 INLINE_BOLD = re.compile(r"\*\*([^*\n]+)\*\*")
 INLINE_ITALIC = re.compile(r"(?<![*\w])\*([^*\n]+)\*(?!\w)")
 
+GITHUB = "https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger"
+# What .github/workflows/deploy-pages.yml publishes (tests/test_internal_links.py guards drift).
+PUBLISHED_DIRS = {"yang-trees", "docs", "tools", "assets", "releases"}
+PUBLISHED_ROOT_FILES = {"README.md", "FAQ.md", "CHANGELOG.md", "robots.txt", "site.webmanifest", "sitemap.xml"}
+PUBLISHED_ROOT_SUFFIXES = {".html", ".js", ".json"}
+
+
+def is_published(rel: str) -> bool:
+    """True if repo-relative file `rel` is part of the deployed site."""
+    if "/" not in rel:
+        return rel in PUBLISHED_ROOT_FILES or Path(rel).suffix in PUBLISHED_ROOT_SUFFIXES
+    top = rel.split("/", 1)[0]
+    return top in PUBLISHED_DIRS or (top.startswith("swagger-") and top.endswith("-model"))
+
+
+def site_href(href: str) -> str | None:
+    """A link that works on the published site: repo files the site does not ship
+    go to GitHub; targets missing from the repo return None (render as text)."""
+    if re.match(r"^([a-z][a-z0-9+.-]*:|#|//)", href, re.I):
+        return href
+    path, sep, fragment = href.partition("#")
+    path = path.split("?", 1)[0]
+    if not path:
+        return href
+    target = (ROOT / path).resolve()
+    try:
+        rel = target.relative_to(ROOT).as_posix()
+    except ValueError:
+        return None
+    if not target.exists():
+        return None
+    if target.is_dir():
+        if is_published(rel + "/index.html") and (target / "index.html").exists():
+            return href
+        return f"{GITHUB}/tree/main/{rel}"
+    if is_published(rel):
+        return href
+    return f"{GITHUB}/blob/main/{rel}" + (sep + fragment if fragment else "")
+
 
 def _render_inline(text: str) -> str:
     """Apply inline markdown to text that is **not** yet HTML-escaped."""
@@ -276,11 +315,9 @@ def _render_inline(text: str) -> str:
 
     def _link_repl(m: re.Match) -> str:
         label = m.group(1)
-        href = m.group(2)
-        # Resolve workspace-relative paths to GitHub raw view for files that
-        # are not also published to the site (e.g. .py, .md). The site itself
-        # only ships HTML/JS/JSON, so anything else is best-effort linked to
-        # the GitHub source tree.
+        href = site_href(html.unescape(m.group(2)))
+        if href is None:
+            return label
         return f'<a href="{html.escape(href, quote=True)}">{label}</a>'
 
     pre = INLINE_LINK.sub(_link_repl, pre)
@@ -897,7 +934,7 @@ def render(markdown: str) -> str:
 
 def build_page(body_html: str, source_rel: str) -> str:
     nav_html = "".join(
-        f'<a href="{html.escape(href, quote=True)}">{label}</a>'
+        f'<a href="{html.escape(site_href(href) or href, quote=True)}">{label}</a>'
         for label, href in HEADER_NAV
     )
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -943,7 +980,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <main class="container">
         <div class="toolbar">
             <div class="links">
-                <a href="{html.escape(source_rel)}">View source (Markdown)</a>
+                <a href="{html.escape(site_href(source_rel) or source_rel)}">View source (Markdown)</a>
                 <a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/blob/main/{html.escape(source_rel)}">Edit on GitHub</a>
             </div>
             <div>Generated {generated_at} from <code>{html.escape(source_rel)}</code></div>

@@ -20,7 +20,7 @@ from pathlib import Path
 # build_app_map_html lives next to this script; reuse its Markdown renderer
 # and stylesheet rather than duplicating ~400 lines of parser.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_app_map_html import CSS, render  # noqa: E402
+from build_app_map_html import CSS, render, site_href  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "CHANGELOG.md"
@@ -48,7 +48,7 @@ HEADER_NAV = [
 
 def build_page(body_html: str, source_rel: str) -> str:
     nav_html = "".join(
-        f'<a href="{html.escape(href, quote=True)}">{label}</a>'
+        f'<a href="{html.escape(site_href(href) or href, quote=True)}">{label}</a>'
         for label, href in HEADER_NAV
     )
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -94,7 +94,7 @@ def build_page(body_html: str, source_rel: str) -> str:
     <main class="container">
         <div class="toolbar">
             <div class="links">
-                <a href="{html.escape(source_rel)}">View source (Markdown)</a>
+                <a href="{html.escape(site_href(source_rel) or source_rel)}">View source (Markdown)</a>
                 <a href="https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/blob/main/{html.escape(source_rel)}">Edit on GitHub</a>
             </div>
             <div>Generated {generated_at} from <code>{html.escape(source_rel)}</code></div>
