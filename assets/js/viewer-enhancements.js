@@ -331,21 +331,16 @@
         var ver = _liveExActiveVer();
         if (!ver) { _liveIdxPromise = Promise.resolve(null); return _liveIdxPromise; }
         // Tiny per-release summary (module -> pids + path count), NOT the full
-        // index or any bodies, so the viewer stays fast. Releases the lab has not
-        // run yet have none: fall back to the release the devices run (index "device_data").
-        _liveIdxPromise = _fetchLiveModules(ver)
-            .then(function (doc) {
-                if (doc) return doc;
-                return fetch('../releases/index.json', { cache: 'default' })
-                    .then(function (r) { return r.ok ? r.json() : null; })
-                    .then(function (idx) {
-                        var dataVer = idx && idx.device_data;
-                        if (!dataVer || dataVer === ver) return null;
-                        return _fetchLiveModules(dataVer).then(function (fallback) {
-                            if (fallback) _liveIdxDataVer = dataVer;
-                            return fallback;
-                        });
-                    });
+        // index or any bodies, so the viewer stays fast. Only the release the lab
+        // devices run (index "device_data") has captures, so fetch that one directly.
+        _liveIdxPromise = fetch('../releases/index.json', { cache: 'default' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (idx) {
+                var dataVer = (idx && idx.device_data) || ver;
+                return _fetchLiveModules(dataVer).then(function (doc) {
+                    if (doc && dataVer !== ver) _liveIdxDataVer = dataVer;
+                    return doc;
+                });
             })
             .then(function (doc) {
                 _liveIdxByModule = (doc && doc.modules) || {};
@@ -363,10 +358,8 @@
         if (!ui || !ui.parentNode) return null;
         panel = document.createElement('div');
         panel.id = 'iosxe-liveex-panel';
-        panel.style.cssText =
-            'display:none;margin:0 0 12px;padding:10px 14px;border:1px solid #9cc3e0;'
-            + 'border-left:4px solid #1976D2;border-radius:4px;background:#f2f8fd;'
-            + 'font:13px/1.5 system-ui,-apple-system,sans-serif;color:#243b53;';
+        panel.className = 'liveex-panel';
+        panel.style.display = 'none';
         ui.parentNode.insertBefore(panel, ui);
         return panel;
     }
@@ -401,14 +394,14 @@
 
         if (_liveIdxDataVer) {
             var caveat = document.createElement('div');
-            caveat.style.cssText = 'margin-top:3px;color:#8a5a00;font-size:12px;';
+            caveat.className = 'liveex-caveat';
             caveat.textContent = 'No device data has been captured on ' + _liveExActiveVer()
                 + ' yet; showing data captured on ' + _liveIdxDataVer + '.';
             panel.appendChild(caveat);
         }
 
         var note = document.createElement('div');
-        note.style.cssText = 'margin-top:3px;color:#486581;font-size:12px;';
+        note.className = 'liveex-note';
         note.textContent = 'Real device data lives in the Live Data browser — the API spec keeps only the synthetic schema example.';
         panel.appendChild(note);
 
@@ -418,7 +411,7 @@
             + '#module=' + encodeURIComponent(module)
             + (pids[0] ? '&pid=' + encodeURIComponent(pids[0]) : '');
         link.textContent = 'Open in Live Data browser \u2192';
-        link.style.cssText = 'display:inline-block;margin-top:6px;color:#1976D2;font-weight:600;text-decoration:none;';
+        link.className = 'liveex-link';
         panel.appendChild(link);
 
         panel.style.display = 'block';

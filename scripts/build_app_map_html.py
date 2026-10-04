@@ -55,6 +55,23 @@ CSS = """
     --table-head: #f7f7f7;
     --quote: #5f6b7a;
     --quote-bar: #1565C0;
+    --quote-bg: #f7f9fc;
+    --stripe: #fafbfc;
+    --figure-bg: linear-gradient(180deg, #f7faff, #eef3fb);
+}
+[data-theme="dark"] {
+    --panel: #1a2028;
+    --text: #e6edf3;
+    --accent-dark: #90caf9;
+    --code-bg: #232b35;
+    --code-fg: #e6edf3;
+    --table-head: #232b35;
+    --quote: #afbac5;
+    --quote-bar: #42a5f5;
+    --quote-bg: #232b35;
+    --stripe: #1e252e;
+    /* The mindmap PNG has a light background; keep its frame light. */
+    --figure-bg: #eef3fb;
 }
 * { box-sizing: border-box; }
 body {
@@ -137,7 +154,7 @@ body {
     color: var(--quote);
     margin: 1em 0;
     padding: 0.4em 1em;
-    background: #f7f9fc;
+    background: var(--quote-bg);
     border-radius: 0 6px 6px 0;
 }
 .content blockquote p { margin: 0.35em 0; }
@@ -171,7 +188,7 @@ body {
 .content .mindmap-figure {
     margin: 1.2em 0 1.4em;
     padding: 0;
-    background: linear-gradient(180deg, #f7faff, #eef3fb);
+    background: var(--figure-bg);
     border: 1px solid var(--border);
     border-radius: 10px;
     text-align: center;
@@ -190,7 +207,7 @@ body {
     color: var(--muted);
     text-align: center;
     border-top: 1px solid var(--border);
-    background: #ffffff;
+    background: var(--panel);
 }
 .content .mindmap-source {
     margin: 0.2em 0 1.2em;
@@ -220,7 +237,7 @@ body {
     text-align: left;
 }
 .content table thead th { background: var(--table-head); font-weight: 600; }
-.content table tbody tr:nth-child(even) { background: #fafbfc; }
+.content table tbody tr:nth-child(even) { background: var(--stripe); }
 .footer {
     max-width: 980px;
     margin: 0 auto;
@@ -968,6 +985,8 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="twitter:description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="twitter:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
     <style>{CSS}</style>
+    <link rel="stylesheet" href="assets/css/site.css">
+    <script src="assets/js/site-chrome.js" defer></script>
 </head>
 <body>
     <header class="header">
