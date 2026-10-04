@@ -86,6 +86,13 @@ def get_swagger_category(module_name: str) -> tuple[str, str]:
 def render_tree_html(module: str, version: str, tree_text: str) -> str:
     """Render a single tree HTML page. Pages live at releases/<ver>/yang-trees/."""
     swagger_dir, swagger_label = get_swagger_category(module)
+    # Two levels below the site root; events modules have no viewer, only the notifications catalog.
+    if swagger_dir == "swagger-events-model":
+        spec_href = f"../../../telemetry.html?tab=notifications&amp;q={module}"
+        list_href = "../../../telemetry.html?tab=notifications"
+    else:
+        spec_href = f"../../../{swagger_dir}/index.html#ver={version}&amp;spec={swagger_dir}/{module}"
+        list_href = f"../../../{swagger_dir}/index.html#ver={version}"
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
 <head>
@@ -111,10 +118,10 @@ pre {{ font-size:13px; line-height:1.4; margin:0; color:#333; }}
   <p>YANG tree — IOS-XE {version}</p>
 </div>
 <div class=\"nav\">
-  <a href=\"../{swagger_dir}/index.html#ver={version}&amp;spec={swagger_dir}/{module}\">📄 OpenAPI Spec</a>
-  <a class=\"alt\" href=\"../{swagger_dir}/index.html#ver={version}\">📂 {swagger_label}</a>
+  <a href=\"{spec_href}\">📄 OpenAPI Spec</a>
+  <a class=\"alt\" href=\"{list_href}\">📂 {swagger_label}</a>
   <a class=\"alt\" href=\"index.html\">🌳 All Trees ({version})</a>
-  <a class=\"alt\" href=\"../../index.html\">🏠 Hub</a>
+  <a class=\"alt\" href=\"../../../index.html\">🏠 Hub</a>
 </div>
 <div class=\"tree\"><pre>{tree_text}</pre></div>
 <div class=\"footer\">Generated with pyang · IOS-XE {version}</div>
