@@ -127,3 +127,12 @@ def test_device_data_release_has_captures() -> None:
     assert device_data in {r["ver"] for r in idx["releases"]}, f"device_data {device_data!r} is not a release"
     for name in ("live-examples-index.json", "live-modules.json"):
         assert (REPO / "releases" / device_data / name).is_file(), f"releases/{device_data}/{name} missing"
+
+
+def test_every_release_has_prefix_map() -> None:
+    """telemetry.html's XPath builder fetches the prefix map of the selected release (17.18.1 uses the root copy)."""
+    idx = json.loads((REPO / "releases" / "index.json").read_text(encoding="utf-8"))
+    for release in idx["releases"]:
+        ver = release["ver"]
+        path = REPO / "yang-prefix-map.json" if ver == "17.18.1" else REPO / "releases" / ver / "yang-prefix-map.json"
+        assert path.is_file(), f"{path.relative_to(REPO)} missing (scripts/build_yang_prefix_map.py --version {ver})"

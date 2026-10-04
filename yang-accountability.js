@@ -322,6 +322,12 @@
             reportData = await response.json();
             allModules = reportData.modules;
 
+            var generated = new Date(reportData.generated);
+            if (!isNaN(generated)) {
+                document.getElementById('reportGenerated').textContent =
+                    generated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
             document.getElementById('statTotal').textContent = reportData.total_modules;
             document.getElementById('statWithSpec').textContent = reportData.modules_with_specs;
             document.getElementById('statCoverage').textContent = (100 * reportData.modules_with_specs / reportData.total_modules).toFixed(1) + '%';

@@ -82,6 +82,8 @@ def build_page(body_html: str, source_rel: str) -> str:
     <meta name="twitter:description" content="{html.escape(PAGE_DESC, quote=True)}">
     <meta name="twitter:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
     <style>{CSS}</style>
+    <link rel="stylesheet" href="assets/css/site.css">
+    <script src="assets/js/site-chrome.js" defer></script>
 </head>
 <body>
     <header class="header">

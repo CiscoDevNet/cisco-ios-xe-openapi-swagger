@@ -96,6 +96,9 @@ PIPELINE: list[tuple[str, list[str]]] = [
     # event-notification capabilities live in this index / the catalog instead.
     ("notifications-index", ["python", str(GENERATORS / "generate_notifications_index.py"),
                              "--version", "$VER"]),
+    # 2c. Module -> xpath prefix map for the telemetry.html XPath builder.
+    ("prefix-map",          ["python", str(SCRIPTS / "build_yang_prefix_map.py"),
+                             "--version", "$VER"]),
     # 3. Post-processing / enrichment
     # 3a. Make operationIds globally unique per spec (OpenAPI 3.0 requires it).
     # The generators historically derived ids from just the last path
