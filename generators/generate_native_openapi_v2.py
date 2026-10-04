@@ -24,7 +24,8 @@ from _yang_parse import (
 class NativeToOpenAPI:
     """Convert Cisco-IOS-XE-native YANG to OpenAPI 3.0 with proper YANG parsing"""
 
-    def __init__(self, yang_dir: str, output_dir: str):
+    def __init__(self, yang_dir: str, output_dir: str, version: str = '17.18.1'):
+        self.version = version
         self.yang_dir = Path(yang_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -780,7 +781,7 @@ class NativeToOpenAPI:
                               "- PUT: Replace configuration\n"
                               "- PATCH: Merge/update configuration\n"
                               "- DELETE: Remove configuration",
-                'version': '17.18.1'
+                'version': self.version
             },
             'servers': [{
                 'url': 'https://{device}/restconf',
@@ -1070,7 +1071,7 @@ class NativeToOpenAPI:
             'modules': sorted(manifest_modules),
             'generator': 'generate_native_openapi_v2.py',
             'source': 'Cisco-IOS-XE-native.yang',
-            'version': '17.18.1'
+            'version': self.version
         }
         
         manifest_file = self.output_dir / 'manifest.json'
@@ -1089,7 +1090,7 @@ def main():
     from _version_args import resolve_paths
     yang_dir, output_dir, _ver = resolve_paths('native-config')
     
-    converter = NativeToOpenAPI(str(yang_dir), str(output_dir))
+    converter = NativeToOpenAPI(str(yang_dir), str(output_dir), _ver)
     converter.generate_all()
 
 if __name__ == '__main__':
