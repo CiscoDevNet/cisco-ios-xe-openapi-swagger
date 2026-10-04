@@ -30,6 +30,24 @@ MODEL_CATEGORIES = (
 )
 
 
+def _release_index() -> dict:
+    return json.loads(RELEASE_INDEX.read_text(encoding="utf-8"))
+
+
+def default_release() -> str:
+    """The site's default (newest) release."""
+    index = _release_index()
+    return index.get("default") or index["releases"][0]["ver"]
+
+
+def device_data_release() -> str:
+    """The release the lab devices run: device data (live examples, MDT, harness
+    captures) belongs to it, independent of the site default. Change it in
+    releases/index.json after the lab is upgraded and re-collected."""
+    index = _release_index()
+    return index.get("device_data") or default_release()
+
+
 @dataclass(frozen=True)
 class ReleasePaths:
     version: str

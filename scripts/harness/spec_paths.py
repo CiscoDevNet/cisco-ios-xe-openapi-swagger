@@ -5,7 +5,7 @@ categories (oper + mib + cfg + native-config). Each category ships an
 ``api/manifest.json`` (a JSON array of module names) alongside one
 ``api/<module>.json`` OpenAPI 3.0 spec per module.
 
-The default specs root is ``releases/26.1.1/`` (the versioned layout). If that
+The default specs root is ``releases/<device_data>/`` (releases/index.json). If that
 is absent (e.g. a stripped export), pass ``--specs-root`` to point at any
 directory that contains ``swagger-<cat>-model/api/*.json`` (for offline
 validation a flat pre-versioning copy works too).
@@ -22,7 +22,15 @@ from typing import Iterable, Optional
 GET_CATEGORIES = ("oper", "mib", "cfg", "native-config", "openconfig", "ietf", "other")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SPECS_ROOT = REPO_ROOT / "releases" / "26.1.1"
+
+
+def spec_release() -> str:
+    """The release whose specs the harness walks: the one the lab devices run."""
+    index = json.loads((REPO_ROOT / "releases" / "index.json").read_text(encoding="utf-8"))
+    return index.get("device_data") or index.get("default") or index["releases"][0]["ver"]
+
+
+DEFAULT_SPECS_ROOT = REPO_ROOT / "releases" / spec_release()
 
 
 @dataclass(frozen=True)
@@ -147,7 +155,7 @@ def enumerate_get_paths(
 
 
 def resolve_specs_root(specs_root: Optional[str]) -> Path:
-    """Resolve/validate the specs root, defaulting to releases/26.1.1/."""
+    """Resolve/validate the specs root, defaulting to the device-data release."""
     root = Path(specs_root) if specs_root else DEFAULT_SPECS_ROOT
     if not root.is_dir():
         raise SpecsNotFoundError(

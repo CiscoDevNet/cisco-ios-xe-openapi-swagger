@@ -19,8 +19,9 @@ OUTPUT = REPO / "restconf-live-data.json"
 
 
 def default_release() -> str:
+    """Device data belongs to the release the lab runs (releases/index.json "device_data")."""
     idx = json.loads((RELEASES / "index.json").read_text(encoding="utf-8"))
-    return idx.get("default") or idx["releases"][0]["ver"]
+    return idx.get("device_data") or idx.get("default") or idx["releases"][0]["ver"]
 
 
 def main() -> int:

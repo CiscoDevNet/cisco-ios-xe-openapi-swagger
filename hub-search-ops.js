@@ -12,7 +12,7 @@
 (function () {
     'use strict';
 
-    var TARGET_VER = '26.1.1';
+    var TARGET_VER = '26.2.1';
     var CATEGORIES = ['cfg', 'events', 'ietf', 'mib', 'native-config', 'openconfig', 'oper', 'other', 'rpc'];
     var CAT_LABEL = {
         'cfg': 'Config',

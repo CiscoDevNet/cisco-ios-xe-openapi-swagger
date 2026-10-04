@@ -17,7 +17,7 @@ from pathlib import Path
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from enumerate_xpaths import CATEGORY_DIRS, prefix_map, xpath_from_restconf  # noqa: E402
+from enumerate_xpaths import CATEGORY_DIRS, DEVICE_DATA_RELEASE, prefix_map, xpath_from_restconf  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -46,7 +46,7 @@ def parent(xpath: str):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="26.1.1")
+    ap.add_argument("--version", default=DEVICE_DATA_RELEASE)
     ap.add_argument("--dump", help="Write the full container/list node catalog (JSON) here.")
     args = ap.parse_args()
     pmap = prefix_map(args.version)
