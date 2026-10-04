@@ -29,14 +29,23 @@ def test_telegraf_config_points_at_absolute_output(tmp_path):
 def test_split_mdt_routes_by_hostname_and_skips_unknown(tmp_path, monkeypatch):
     monkeypatch.setattr(kit.inv, "load_inventory", lambda: [DEVICE])
     live = tmp_path / "mdt-live.json"
-    records = [{"tags": {"source": "lab-sw1-host", "path": "a:b"}, "fields": {}},
-               {"tags": {"source": "lab-sw1-host", "path": "a:c"}, "fields": {}},
-               {"tags": {"source": "stranger", "path": "a:b"}, "fields": {}}]
+    records = [{"tags": {"source": "lab-sw1-host", "path": "a:b", "subscription": "900001"}, "fields": {}},
+               {"tags": {"source": "lab-sw1-host", "path": "a:c", "subscription": "900002"}, "fields": {}},
+               {"tags": {"source": "lab-sw1-host", "path": "a:d", "subscription": "30002"}, "fields": {}},
+               {"tags": {"source": "stranger", "path": "a:b", "subscription": "900001"}, "fields": {}}]
     live.write_text("\n".join(json.dumps(r) for r in records) + "\n", encoding="utf-8")
     counts = kit.split_mdt(live, tmp_path, facts={"C9300-48P": {"hostname": "lab-sw1-host"}})
     assert counts == {"C9300-48P": 2}
     assert len((tmp_path / "mdt-C9300-48P.json").read_text().splitlines()) == 2
     assert not list(tmp_path.glob("mdt-stranger*"))
+
+
+def test_fleet_idle_counter_ignores_standing_subscriptions(tmp_path):
+    from collect_fleet import count_lines
+
+    live = tmp_path / "mdt-live.json"
+    live.write_text('{"tags":{"subscription":"900004"}}\n{"tags":{"subscription":"30002"}}\n')
+    assert count_lines(live) == 1
 
 
 def test_score_module_prefers_best_state():
