@@ -58,11 +58,16 @@ DEFAULT_RECEIVER_PORT = 57500
 MDT_OUT = OUT_DIR / "mdt-live.json"
 
 
+# Harness subscription ids are 9xxxxx; a device's own standing subscriptions to the
+# same receiver must not keep a batch "busy".
+HARNESS_RECORD = re.compile(r'"subscription":"9\d{5}"')
+
+
 def count_lines(path: Path) -> int:
     if not path.exists():
         return 0
     try:
-        return sum(1 for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip())
+        return sum(1 for ln in path.read_text(encoding="utf-8").splitlines() if HARNESS_RECORD.search(ln))
     except OSError:
         return 0
 

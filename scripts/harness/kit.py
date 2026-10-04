@@ -48,6 +48,7 @@ RUN_DIR = HARNESS_DIR / "kit-run"
 LOG_DIR = RUN_DIR / "logs"
 KIT_INFO = REPO / "KIT.json"
 MDT_LIVE = OUTPUT / "mdt-live.json"
+HARNESS_SUBSCRIPTION = re.compile(r"9\d{5}")  # collect_fleet / recapture / walk ids
 DEFAULT_MDT_PORT = 57500
 BUNDLE_FORMAT = "iosxe-harness-bundle/1"
 
@@ -267,6 +268,9 @@ def telegraf_config(port: int, output_file: Path) -> str:
   files = [{json.dumps(str(output_file))}]
   data_format = "json"
   json_timestamp_units = "1ms"
+  # Harness subscription ids only; devices' own standing subscriptions are dropped.
+  [outputs.file.tagpass]
+    subscription = ["9?????"]
 """
 
 
@@ -422,13 +426,18 @@ def split_mdt(live: Path = MDT_LIVE, out_dir: Path = OUTPUT, facts: Optional[dic
     mapping = source_map(load_facts() if facts is None else facts)
     per_pid: dict[str, list[str]] = {}
     unknown: dict[str, int] = {}
+    foreign = 0
     for line in live.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         try:
-            source = json.loads(line).get("tags", {}).get("source", "")
+            tags = json.loads(line).get("tags", {})
         except json.JSONDecodeError:
             continue
+        if not HARNESS_SUBSCRIPTION.fullmatch(str(tags.get("subscription", ""))):
+            foreign += 1  # the device's own standing subscriptions, not harness data
+            continue
+        source = tags.get("source", "")
         pid = resolve_source(source, mapping)
         if pid is None:
             unknown[source] = unknown.get(source, 0) + 1
@@ -439,6 +448,8 @@ def split_mdt(live: Path = MDT_LIVE, out_dir: Path = OUTPUT, facts: Optional[dic
         print(f"  mdt-{pid}.json: {len(lines)} records")
     for source, count in unknown.items():
         print(f"  ! {count} records from unknown source {source!r} (run facts for that device)")
+    if foreign:
+        print(f"  ignored {foreign} records from non-harness subscriptions")
     return {pid: len(lines) for pid, lines in per_pid.items()}
 
 
@@ -479,12 +490,19 @@ def method_cells(pid: str) -> dict:
     return cells
 
 
+def capture_files(device_name: str) -> list[Path]:
+    """RESTCONF walk captures (GET categories only; skips crud-backups etc.)."""
+    from scripts.harness.spec_paths import GET_CATEGORIES
+
+    device_dir = CAPTURES / device_name
+    return [path for category in GET_CATEGORIES for path in sorted((device_dir / category).glob("*.json"))]
+
+
 def walk_cells(device_name: str) -> dict:
     """module -> data|ok|no from the RESTCONF spec-walk captures (best status per module)."""
     rank = {"data": 3, "ok": 2, "no": 1}
     result: dict[str, str] = {}
-    device_dir = CAPTURES / device_name
-    for path in device_dir.glob("*/*.json") if device_dir.is_dir() else []:
+    for path in capture_files(device_name):
         module = path.name.split("__", 1)[0]
         try:
             status = json.loads(path.read_text(encoding="utf-8")).get("http_status")
@@ -619,9 +637,7 @@ def bundle_sources(devices: list) -> list[Path]:
         files += [OUTPUT / f"{kind}-{pid}.json" for pid in sorted(pids)]
     files = [f for f in files if f.exists()]
     for name in sorted(names):
-        device_dir = CAPTURES / name
-        if device_dir.is_dir():
-            files += sorted(device_dir.glob("*/*.json"))
+        files += capture_files(name)
         report = ONBOARD_OUT / f"{name}-onboard.json"
         if report.exists():
             files.append(report)
