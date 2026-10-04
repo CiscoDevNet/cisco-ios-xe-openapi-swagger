@@ -621,3 +621,11 @@ sha256sum -c SHA256SUMS && ./setup.sh
 - **Import:** only known result paths are accepted; replaced files go to
   `scripts/harness/import-archive/<UTC>/`; legacy MDT files for the same device (for example
   `mdt-C9300.json`) are superseded; imports that shrink a file need `--allow-shrink`.
+- **WAN devices:** add `--timeout 90 --window 35` to `collect`. MDT runs about one batch of 5
+  per minute over a WAN (xpaths with no data wait the full window), so 700 xpaths take hours.
+- **Standing subscriptions:** a device may already stream its own subscriptions to the receiver
+  host. Only harness subscription ids (9xxxxx) are written, counted and split.
+- **Refreshing RESTCONF live data from new captures** (keeps the reconciled roots):
+  `scripts/refresh_live_data.py --version 26.1.1`, then
+  `scripts/mdt-telemetry/collector/build_restconf_augment.py --from-ref HEAD`, then
+  `scripts/build_restconf_dataset.py`.

@@ -101,6 +101,8 @@ Standalone and vendor-specific modules.
 
 ## Recent Improvements
 
+- **What Changed Between Releases** — [release-compare.html](release-compare.html) (hub → More → What Changed) lists, for each adjacent release pair, the YANG modules added, removed and changed, with a per-module tree diff. Built from the pyang trees by [scripts/build_release_compare.py](scripts/build_release_compare.py).
+- **Portable data-collection harness** — [scripts/build_kit.py](scripts/build_kit.py) packages an offline kit (collectors, Telegraf, Python wheels) that onboards devices, collects RESTCONF / NETCONF / gNMI / MDT, reports coverage per device and returns a secret-scanned bundle; [scripts/import_harness_bundle.py](scripts/import_harness_bundle.py) imports it here. See [DEVICE_DATA_COLLECTION.md §14](DEVICE_DATA_COLLECTION.md).
 - **Device Data browser** — [device-data.html](device-data.html) shows *real* data collected from physical Catalyst switches and a 9800 WLC over two transports, chosen with a selector: **Model-Driven Telemetry** (push · gRPC) and **RESTCONF** (pull · GET). One UI for both — per device (PID), model flavor, and path, with the actual streamed keys/values and GET payloads, plus summary charts and copy-to-clipboard. To keep the OpenAPI specs lean, response bodies are **not** injected into the specs; they are served on demand as per-path data files (`releases/<ver>/live-data/<category>/<module>/<hash>.json`), while each spec keeps only its synthetic schema example. An in-viewer banner links to the browser. See [scripts/build_restconf_dataset.py](scripts/build_restconf_dataset.py), [scripts/build_live_examples_index.py](scripts/build_live_examples_index.py), and the [CHANGELOG](CHANGELOG.md).
 - **Realistic write-operation examples** — Every POST/PUT/PATCH body across the spec set ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
@@ -210,6 +212,8 @@ iosxe-1718-yang-swagger/
 - [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) — Architecture decisions, full requirements
 - [QUICK_REFERENCE.md](QUICK_REFERENCE.md) — Known fixes, common APIs, support links
 - [YANG_MODULE_ACCOUNTABILITY.md](YANG_MODULE_ACCOUNTABILITY.md) — Module-by-module coverage
+- [DEVICE_DATA_COLLECTION.md](DEVICE_DATA_COLLECTION.md) — Device data collection harness and portable kit
+- [VERSIONING.md](VERSIONING.md) — Multi-release architecture and the add-a-release runbook
 - [GITHUB_PAGES_DEPLOY.md](GITHUB_PAGES_DEPLOY.md) — Deployment workflow details
 
 ## Resources
