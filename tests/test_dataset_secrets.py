@@ -16,6 +16,7 @@ sys.path.insert(0, str(REPO / "scripts" / "mdt-telemetry" / "collector"))
 from redact_payload import scan_text  # noqa: E402
 
 DATASETS = [
+    "telemetry-live-data.json",
     "restconf-live-data.json",
     "netconf-get-live-data.json",
     "netconf-getconfig-live-data.json",
@@ -39,3 +40,13 @@ def test_repo_root_datasets_have_no_unmasked_secrets():
         if hits:
             problems.append((name, hits[:5]))
     assert not problems, f"unmasked secrets found in repo-root datasets: {problems}"
+
+
+def test_release_live_data_has_no_unmasked_secrets():
+    """Per-path device bodies under releases/*/live-data, including SNMP communities in CLI text."""
+    problems = []
+    for f in sorted(REPO.glob("releases/*/live-data/*/*/*.json")):
+        hits = scan_text(f.read_text(encoding="utf-8"))
+        if hits:
+            problems.append((f.relative_to(REPO).as_posix(), hits[:2]))
+    assert not problems, f"{len(problems)} live-data file(s) with unmasked secrets: {problems[:5]}"

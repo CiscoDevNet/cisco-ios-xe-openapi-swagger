@@ -43,6 +43,24 @@ SECRET = re.compile(
 SECRET_EXACT = {"key", "md5"}
 PEM = re.compile(r"-----BEGIN [^-]+-----.*?-----END [^-]+-----", re.DOTALL)
 
+# Secrets carried as data rather than as a secret-named leaf: SNMP communities in CLI
+# text and as the key (`name`) of community-config list entries.
+CLI_COMMUNITY = re.compile(r"(?P<pre>\b(?:snmp-server community|snmp-community-string)\s+)(?!\*\*\*REDACTED\*\*\*)(?P<val>[^\s\"'<\\]+)", re.I)
+XML_COMMUNITY_NAME = re.compile(
+    r"(?P<pre><community-config\b[^>]*>\s*<name>)(?!\*\*\*REDACTED\*\*\*)(?P<val>[^<]+)(?=</name>)")
+JSON_COMMUNITY_NAME = re.compile(
+    r'(?P<pre>\\?"(?:[A-Za-z0-9-]+:)?community-config\\?"\s*:\s*\[(?:[^\]\[]*?\{[^{}]*?)??\\?"name\\?"\s*:\s*\\?")'
+    r'(?!\*\*\*REDACTED\*\*\*)(?P<val>[^"\\]+)')
+COMMUNITY_LISTS = {"community-config"}
+
+
+def _mask_communities(s: str) -> str:
+    s = CLI_COMMUNITY.sub(lambda m: m.group("pre") + REDACTED, s)
+    s = XML_COMMUNITY_NAME.sub(lambda m: m.group("pre") + REDACTED, s)
+    # Every entry of a JSON community-config list (also inside JSON-escaped payload strings).
+    return re.sub(r'\\?"(?:[A-Za-z0-9-]+:)?community-config\\?"\s*:\s*\[[^\]]*\]',
+                  lambda m: re.sub(r'(\\?"name\\?"\s*:\s*\\?")[^"\\]+', r'\g<1>' + REDACTED, m.group(0)), s)
+
 
 def _leaf(name: str) -> str:
     """Local name: strip a leading YANG module prefix (Module:leaf -> leaf)."""
@@ -89,20 +107,26 @@ def redact_payload(s: Any) -> Any:
     s = PEM.sub(REDACTED, s)
     s = _mask_xml(s)
     s = _mask_json(s)
+    s = _mask_communities(s)
     return s
 
 
-def redact_obj(obj: Any) -> Any:
-    """Deep-mask secrets inside a parsed RESTCONF value (key-based)."""
+def redact_obj(obj: Any, _parent: str = "") -> Any:
+    """Deep-mask secrets inside a parsed RESTCONF value (key-based, plus SNMP community content)."""
     if isinstance(obj, dict):
         out: dict[str, Any] = {}
         for k, v in obj.items():
-            out[k] = REDACTED if isinstance(k, str) and _is_secret_name(k) else redact_obj(v)
+            if isinstance(k, str) and _is_secret_name(k):
+                out[k] = REDACTED
+            elif k == "name" and _leaf(_parent) in COMMUNITY_LISTS and isinstance(v, str):
+                out[k] = REDACTED
+            else:
+                out[k] = redact_obj(v, k if isinstance(k, str) else "")
         return out
     if isinstance(obj, list):
-        return [redact_obj(v) for v in obj]
+        return [redact_obj(v, _parent) for v in obj]
     if isinstance(obj, str):
-        return PEM.sub(REDACTED, obj)
+        return _mask_communities(PEM.sub(REDACTED, obj))
     return obj
 
 
@@ -120,6 +144,9 @@ def scan_text(text: str) -> list[tuple[str, str]]:
     for m in PEM.finditer(text):
         if REDACTED not in m.group(0):
             hits.append(("pem_block", m.group(0)[:80]))
+    for pattern in (CLI_COMMUNITY, XML_COMMUNITY_NAME, JSON_COMMUNITY_NAME):
+        for m in pattern.finditer(text):
+            hits.append(("snmp_community", m.group(0)[-60:]))
     # JSON "key": "value"
     for m in re.finditer(r'"(?P<key>[A-Za-z0-9_.:\-]+)"\s*:\s*"(?P<val>(?:[^"\\]|\\.)*)"', text):
         if _is_secret_name(m.group("key"), exact=False) and m.group("val") not in ("", REDACTED):

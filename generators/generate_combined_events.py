@@ -51,7 +51,7 @@ This unified specification combines all 32 event notification and telemetry modu
 
 **Total Modules:** 32 event/telemetry modules
 **Base URL:** https://10.85.134.65/restconf/data
-**Authentication:** Basic Auth (admin/EN-TME-Cisco123)
+**Authentication:** Basic Auth (<username>/<password>)
 """,
             "version": "17.18.1",
             "contact": {

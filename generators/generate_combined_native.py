@@ -53,7 +53,7 @@ This unified specification provides access to the entire Cisco-IOS-XE-native YAN
 **Device Support:** Catalyst, ASR, CSR, ISR platforms
 
 **RESTCONF Base URL:** https://10.85.134.65/restconf/data/Cisco-IOS-XE-native:native
-**Authentication:** Basic Auth (admin/EN-TME-Cisco123)
+**Authentication:** Basic Auth (<username>/<password>)
 """,
             "version": "17.18.1",
             "contact": {

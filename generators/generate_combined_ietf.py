@@ -43,7 +43,7 @@ All modules implement official IETF RFCs ensuring vendor-neutral, interoperable 
 
 **Total Modules:** 28 IETF standard modules
 **Base URL:** https://10.85.134.65/restconf/data
-**Authentication:** Basic Auth (admin/EN-TME-Cisco123)
+**Authentication:** Basic Auth (<username>/<password>)
 """,
             "version": "17.18.1",
             "contact": {
