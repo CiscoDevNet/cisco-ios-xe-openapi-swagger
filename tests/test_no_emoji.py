@@ -33,6 +33,7 @@ UI_FILES = [
     "tree-compare.html",
     "yang-accountability.html",
     "yang-accountability-compare.html",
+    "release-compare.html",
     "exports.html",
     "telemetry.html",
     "about.html",

@@ -131,6 +131,17 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — "What Changed Between Releases" page (2026-10-04)
+
+- **New [release-compare.html](release-compare.html)** (hub → More → What Changed). For each
+  adjacent release pair it lists modules added, removed and changed with their YANG revision
+  notes, the resolved schema-node differences (from the pyang trees, so groupings, augments and
+  submodules are applied), and per-platform module changes. Each module links to its spec and
+  tree at the right release. For 26.1.1 → 26.2.1 it matches the published source-level overview
+  (+23 / −1 modules, 336 changed files, identical per-platform deltas) and links to it.
+- Built by `scripts/build_release_compare.py` from pinned inputs only. Schema diffs use trees,
+  not the generated specs, because older releases' specs came from earlier generator versions.
+
 ### Added — IOS-XE 26.2.1 (2026-10-03)
 
 - **New release 26.2.1** from YangModels/yang `vendor/cisco/xe/2621` (commit `af8dec84`, published
