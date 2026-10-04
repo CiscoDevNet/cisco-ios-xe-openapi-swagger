@@ -22,12 +22,21 @@ the canonical builder:
 It is idempotent: once the dataset is regenerated from the index the gap is empty
 and a re-run is a no-op. The now-orphaned per-value files are no longer referenced
 by the regenerated dataset and can be deleted.
+
+After a sidecar rebuild (refresh_live_data.py) the per-path files hold only the
+sidecar's devices, so the folded values must come from the last commit:
+
+    python3 scripts/refresh_live_data.py --version 26.1.1
+    python -X utf8 scripts/mdt-telemetry/collector/build_restconf_augment.py --from-ref HEAD
+    python3 scripts/build_restconf_dataset.py
 """
 from __future__ import annotations
 
+import argparse
 import collections
 import hashlib
 import json
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -98,7 +107,21 @@ def _recompute_aggregates(index: dict) -> None:
     }
 
 
+def _load_value(rel: str, pid: str, ref: str | None) -> dict:
+    """The PID's value from the dataset-referenced body file, falling back to `ref`."""
+    path = REPO_ROOT / rel
+    doc = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"pids": {}}
+    if pid not in doc.get("pids", {}) and ref:
+        shown = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=REPO_ROOT, capture_output=True,
+                               text=True, encoding="utf-8", check=True)
+        doc = json.loads(shown.stdout)
+    return doc["pids"][pid]    # {os_version, fetched_at, http_status, value}
+
+
 def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--from-ref", help="git ref to read folded values from when the working tree lacks them")
+    args = ap.parse_args()
     index = json.loads(INDEX.read_text(encoding="utf-8"))
     ds = json.loads(DATASET.read_text(encoding="utf-8"))
 
@@ -121,8 +144,7 @@ def main() -> int:
     added: collections.Counter = collections.Counter()
     for e in sorted(gap, key=lambda x: (x["path"], x["pid"])):
         pid, path = e["pid"], e["path"]
-        vdoc = json.loads((REPO_ROOT / e["file"]).read_text(encoding="utf-8"))
-        val = vdoc["pids"][pid]    # {os_version, fetched_at, http_status, value}
+        val = _load_value(e["file"], pid, args.from_ref)
 
         entry = path2entry.get(path)
         if entry is not None:      # path already indexed (for other PIDs) — add this PID
