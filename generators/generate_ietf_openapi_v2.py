@@ -23,7 +23,8 @@ from _yang_parse import (
 class IETFToOpenAPI:
     """Convert IETF YANG modules to OpenAPI 3.0 with proper YANG parsing"""
 
-    def __init__(self, yang_dir: str, output_dir: str):
+    def __init__(self, yang_dir: str, output_dir: str, version: str = '17.18.1'):
+        self.version = version
         self.yang_dir = Path(yang_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -488,7 +489,7 @@ class IETFToOpenAPI:
             'info': {
                 'title': module_name,
                 'description': f"{description}\n\n**IETF Standard YANG Model**\n**Module:** `{module_name}`\n**Paths:** {len(paths)}",
-                'version': '17.18.1'
+                'version': self.version
             },
             'servers': [{
                 'url': 'https://{device}/restconf',
@@ -724,7 +725,7 @@ def main():
     from _version_args import resolve_paths
     yang_dir, output_dir, _ver = resolve_paths('ietf')
 
-    converter = IETFToOpenAPI(str(yang_dir), str(output_dir))
+    converter = IETFToOpenAPI(str(yang_dir), str(output_dir), _ver)
     converter.generate_all()
 
 if __name__ == '__main__':

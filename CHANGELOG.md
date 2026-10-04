@@ -147,6 +147,16 @@ below are far more representative than the average).
 - Hub "YANG Source Files" card now follows the selected release (it pointed at 17.18.1 while
   labelled 26.1.1).
 
+### Fixed — specs stamped with the wrong release (2026-10-04)
+
+- Every oper, cfg, IETF, OpenConfig and base native spec in 17.9.x, 17.12.x, 17.15.x, 26.1.1 and
+  26.2.1 said `info.version: "17.18.1"` (1,580 specs), so viewers showed the wrong release. The
+  tree generators dropped the version they were given and the openconfig/ietf/native generators
+  hard-coded it; all now stamp the release they build. The committed specs were corrected in
+  place (only `info.version` and the native manifest's `version` changed; verified per file), and
+  `tests/test_spec_info_version.py` guards it. RPC (YANG revision dates) and MIB/other (`1.0.0`)
+  keep their own versioning.
+
 ### Fixed — broken internal links (2026-10-04)
 
 - **Tree pages:** every per-release tree page (`releases/<ver>/yang-trees/*.html`, 4,206 pages)

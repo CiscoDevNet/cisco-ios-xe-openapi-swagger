@@ -479,7 +479,7 @@ def create_spec(title, description, tag, paths, module_name, version='17.18.1'):
 # Main generator
 # ---------------------------------------------------------------------------
 
-def process_tree_file(html_path, output_dir, max_depth=8):
+def process_tree_file(html_path, output_dir, max_depth=8, version='17.18.1'):
     """Process a single oper tree HTML file into one or more specs.
     Returns list of (filename, path_count) tuples."""
     results = []
@@ -520,13 +520,13 @@ def process_tree_file(html_path, output_dir, max_depth=8):
 
         # Use first root name as the primary tag
         primary_tag = root_list[0].name
-        spec = create_spec(title, desc, primary_tag, all_paths, module_name)
+        spec = create_spec(title, desc, primary_tag, all_paths, module_name, version)
 
         # Check size and limit depth if too large
         spec_json = json.dumps(spec, indent=2)
         size_kb = len(spec_json.encode('utf-8')) / 1024
         if size_kb > 2048 and max_depth > 3:
-            return process_tree_file(html_path, output_dir, max_depth=max_depth - 1)
+            return process_tree_file(html_path, output_dir, max_depth=max_depth - 1, version=version)
 
         fname = module_name
         out_path = output_dir / f"{fname}.json"
@@ -580,7 +580,7 @@ def generate_all(version: str = '17.18.1'):
 
     for tf in tree_files:
         try:
-            results = process_tree_file(tf, output_dir)
+            results = process_tree_file(tf, output_dir, version=version)
             for fname, path_count in results:
                 all_generated.append(fname)
                 total_paths += path_count
