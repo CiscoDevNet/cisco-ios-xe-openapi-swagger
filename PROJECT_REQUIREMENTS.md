@@ -148,6 +148,12 @@ This is the official Cisco.com documentation for RESTCONF on IOS-XE 17.18.
 
 ## 3. Module Categories & Classification
 
+> **Historical snapshot (17.18.1, April 2026).** The counts and folder tree below predate the
+> per-release layout (`releases/<ver>/`, see [VERSIONING.md](VERSIONING.md)) and the retirement of
+> the Events viewer (notifications now live in the Telemetry & Notifications catalog). Current
+> per-release counts are in [version-stats.json](version-stats.json) and
+> [release_counts.json](release_counts.json).
+
 ### Swagger-ized Categories (672 modules with specs)
 
 | Category | Swagger Folder | Specs | Paths | Operations | Description |
@@ -173,8 +179,8 @@ This is the official Cisco.com documentation for RESTCONF on IOS-XE 17.18.
 | **Infrastructure** (`tailf-*.yang`, `cisco-semver.yang`) | ~8 | Build/version infrastructure |
 | **Deprecated** | ~5 | Marked obsolete in YANG |
 
-**Total YANG Modules:** 848  
-**With Specs:** 672 (79.2% of total, 100% of data-bearing modules)  
+**Total YANG Modules:** 848
+**With Specs:** 672 (79.2% of total, 100% of data-bearing modules)
 **Excluded:** 176 (all non-data-bearing)
 
 ### Module Accountability

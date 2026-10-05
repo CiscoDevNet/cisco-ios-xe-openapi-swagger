@@ -14,17 +14,35 @@ selector (see [VERSIONING.md](VERSIONING.md) for the architecture).
 
 | Version | YangModels path | Status | Notes |
 |---------|-----------------|--------|-------|
-| 26.1.1  | `vendor/cisco/xe/2611`  | active **(default)** | Newest release; site default |
+| 26.2.1  | `vendor/cisco/xe/2621`  | active **(default)** | Newest release; site default |
+| 26.1.1  | `vendor/cisco/xe/2611`  | active | Release the lab devices run: source of Device Data (`device_data`) |
 | 17.18.1 | `vendor/cisco/xe/17181` | active | Baseline for legacy in-place artifacts |
 | 17.15.x | `vendor/cisco/xe/17151` | active | |
 | 17.12.x | `vendor/cisco/xe/17121` | active | |
 | 17.9.x  | `vendor/cisco/xe/1791`  | active | Oldest supported release |
 
-Tree-module counts are monotonic across versions: 620 / 637 / 683 / 715 / 742 (17.9.x → 26.1.1).
+Generated tree modules grow with every release: 620 / 637 / 683 / 715 / 742 / 758 (17.9.x → 26.2.1).
+26.1.1 also keeps 24 hand-made tree pages from its original layout (766 pages in total).
 
 Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8](VERSIONING.md#8-adding-a-new-release--runbook).
 
 ---
+
+## What's New in 26.2.1
+
+- **26.2.1 is the default release** (953 specs, 81,560 paths, 243,024 operations, 758 tree
+  pages). New families include NGFW and Live Protect, wireless WAT and Live-Detect, IS-IS operv2,
+  datapath TCAM usage, IIoT power management, config-management RPCs and OpenConfig telemetry.
+- **What Changed Between Releases** ([release-compare.html](release-compare.html)): modules
+  added, removed and changed per release pair, with YANG revision notes and schema-node diffs.
+- **Device data from 7 lab platforms** (26.1.1 captures, shown on 26.2.1 with a note): MDT,
+  RESTCONF, NETCONF get/get-config/subscribe and gNMI Get/Subscribe, all secret-masked.
+- **Portable data-collection harness** (`scripts/build_kit.py`): collect the same datasets
+  from devices on an isolated network and import them back.
+- **Dark mode everywhere**, including the ~4,200 YANG tree pages, with text and buttons at
+  WCAG AA contrast in both themes.
+- **No broken links**: tree pages, the 404 page and generated docs were fixed, and CI checks
+  every link in every published page.
 
 ## What's New in 26.1.1
 
@@ -63,9 +81,9 @@ not a timesheet. Refresh or re-tune the numbers anytime with:
 
     python -X utf8 scripts/estimate_dev_hours.py --by day
 
-**Totals (as of 2026-07-28):** 480 commits across 67 sessions, roughly
-**147 hours** of active development between 2026-02-01 and 2026-07-28
-(~0.83 h/day averaged over the 178-day span; work is bursty, so per-day rows
+**Totals (as of 2026-10-04):** 593 commits across 88 sessions, roughly
+**201 hours** of active development between 2026-02-01 and 2026-10-04
+(~0.82 h/day averaged over the 246-day span; work is bursty, so per-day rows
 below are far more representative than the average).
 
 ### By month
@@ -77,7 +95,10 @@ below are far more representative than the average).
 | 2026-04 | 69      | 21.7 |
 | 2026-05 | 69      | 26.1 |
 | 2026-06 | 82      | 29.6 |
-| 2026-07 | 12      | 4.1  |
+| 2026-07 | 47      | 18.7 |
+| 2026-08 | 38      | 15.9 |
+| 2026-09 | 9       | 6.5  |
+| 2026-10 | 31      | 16.1 |
 
 ### By active day
 
@@ -125,11 +146,74 @@ below are far more representative than the average).
 | 2026-07-13 | 3       | 1.2  |
 | 2026-07-14 | 1       | 0.5  |
 | 2026-07-17 | 1       | 0.5  |
-| 2026-07-28 | 5       | 1.3  |
+| 2026-07-28 | 7       | 2.3  |
+| 2026-07-30 | 19      | 6.3  |
+| 2026-07-31 | 14      | 7.0  |
+| 2026-08-01 | 11      | 2.9  |
+| 2026-08-02 | 12      | 4.5  |
+| 2026-08-04 | 4       | 3.6  |
+| 2026-08-13 | 5       | 2.0  |
+| 2026-08-31 | 6       | 2.2  |
+| 2026-09-01 | 6       | 5.0  |
+| 2026-09-02 | 1       | 0.5  |
+| 2026-09-03 | 1       | 0.5  |
+| 2026-09-28 | 1       | 0.5  |
+| 2026-10-03 | 16      | 6.3  |
+| 2026-10-04 | 15      | 9.1  |
 
 ---
 
 ## [Unreleased]
+
+### Fixed — release validation gate 5 and remaining text contrast (2026-10-04)
+
+- **Gate 5 (spec → tree linkage)** in `scripts/validate_release.py` read `info.x-yang-tree-url`,
+  which no spec has, so it always passed without checking anything. It now checks the links
+  people follow: the tree page behind every viewer "View YANG Tree" button (each spec whose tree
+  was generated) and every accountability `tree_url`, about 1,000-1,300 links per release.
+  `tests/test_validate_release_gate5.py` proves it fails on a missing page or broken link.
+- **Text contrast:** viewer sidebar module labels, stat values, tree arrows, path counts and
+  RPC/MIB names, accountability coverage percentages and placeholders, and the Platform Coverage
+  "not supported" marker now reach WCAG AA (4.5:1) in both themes.
+
+### Changed — dark mode for YANG tree pages; WCAG AA buttons and chips (2026-10-04)
+
+- **Tree pages:** all ~4,200 per-release tree pages and tree lists follow the site theme and have
+  the dark/light toggle. `scripts/generate_all_pyang_trees.py` adds `site.css`, the new
+  `assets/css/yang-tree.css` and `site-chrome.js` (footer injection off); all 6 releases were
+  regenerated (only the theme lines changed) and the 24 hand-made 26.1.1 pages were patched.
+- **Buttons and chips:** new `--c-brand-fill` colour (#1565c0 light / #1976d2 dark) for every
+  white-text fill, so dark mode no longer puts white text on #42a5f5. Category chips and badges
+  (hub, 404, Device Data, viewers, Telemetry) were darkened to 4.5:1 or better while keeping their
+  hues; Swagger UI method badges, version badge and Authorize button too. The Device Data "All"
+  chip was white on white when selected.
+
+### Security — no external Swagger validator call (2026-10-04)
+
+- The viewers set `validatorUrl: null`. Swagger UI otherwise loads a badge from
+  validator.swagger.io, sending it each spec's URL; the site's CSP blocked it, which showed up as
+  a console error.
+
+### Fixed — 26.2.1 runtime 404s; dark mode gaps; stale content (2026-10-04)
+
+- **404s after 26.2.1 became the default:** the telemetry XPath builder requested
+  `releases/26.2.1/yang-prefix-map.json`, which was never built (`build_release.py` now runs
+  `build_yang_prefix_map.py`; a test requires a prefix map for every release), and the viewers
+  probed `releases/26.2.1/live-modules.json` before falling back (they now read the `device_data`
+  release directly).
+- **Dark mode:** App Map, Changelog and Platform Coverage gained dark mode and the toggle; fixed
+  the white quick-nav bar (Code Generator, Accountability), unreadable example boxes, the Ctrl+K
+  hint, About page pills and code, and light panels in the viewers (platform badges, live device
+  data, base URL).
+- **Content:** About lists 26.2.1 as the default; the accountability header reads its generated
+  date from the data; the hub "last updated" line is current.
+- Verified in a headless browser across 28 pages in both themes: no failed requests, no console
+  errors, no unreadable text.
+
+### In progress — C9300-STACK8-WAN deep MDT walk (2026-10-04)
+
+- Per-xpath MDT walk of every model family (`walk_all.py --mib`) on the Stack over the WAN, in
+  addition to the top-level run. Its records will be added to the MDT dataset when it completes.
 
 ### Security — SNMP community and lab password removed from published files (2026-10-04)
 

@@ -5,7 +5,7 @@
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-1469-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to the newest release, 26.2.1, with **961 OpenAPI specs, 81,560 paths, and 758 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to the newest release, 26.2.1, with **953 OpenAPI specs, 81,560 paths, and 758 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
@@ -14,15 +14,15 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs
 
 **Tree-based generators** produce full-depth RESTCONF paths from resolved YANG trees. All model types covered (counts shown for the default 26.2.1 release):
 
-- **Operational:** 221 specs, 22,508 paths (GET-only read endpoints)
-- **Configuration:** 45 specs, 2,449 paths, 9,622 ops (full CRUD)
-- **Native Config:** 412 specs, 49,862 paths, 199,448 ops (full depth CRUD)
-- **OpenConfig:** 44 specs, 1,062 paths, 3,930 ops (vendor-neutral)
-- **IETF:** 21 specs, 419 paths, 1,392 ops (mixed CRUD + RPC)
-- **MIB:** 148 specs, 4,272 paths (GET-only deep paths)
-- **RPC:** 61 specs, 318 RPCs (POST to /operations/)
+- **Operational:** 220 specs, 22,508 paths (GET-only read endpoints)
+- **Configuration:** 44 specs, 2,449 paths, 9,622 ops (full CRUD)
+- **Native Config:** 411 specs, 49,862 paths, 199,448 ops (full depth CRUD)
+- **OpenConfig:** 43 specs, 1,062 paths, 3,930 ops (vendor-neutral)
+- **IETF:** 20 specs, 419 paths, 1,392 ops (mixed CRUD + RPC)
+- **MIB:** 147 specs, 4,272 paths (GET-only deep paths)
+- **RPC:** 60 specs, 318 RPCs (POST to /operations/)
 - **Notifications:** 133 modules, 506 notifications (Telemetry & Notifications catalog)
-- **Other:** 9 specs, 670 paths, 1,534 ops (full CRUD)
+- **Other:** 8 specs, 670 paths, 1,534 ops (full CRUD)
 
 **Key Features:**
 -  **Comprehensive Docs** - Getting started guide with 15+ examples
@@ -36,7 +36,7 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs
 
 | Metric | Count | Description |
 |--------|-------|-------------|
-| **OpenAPI Specs** | 961 | Deep-path specs across the 8 OpenAPI model types |
+| **OpenAPI Specs** | 953 | Deep-path specs across the 8 OpenAPI model types |
 | **API Paths** | 81,560 | RESTCONF endpoints from resolved YANG trees |
 | **Operations** | 243,024 | Total API operations |
 | **Tracked Modules** | 1,469 | All tracked units (YANG + MIB + native config bundles) |
@@ -51,13 +51,13 @@ For the per-release growth curve (specs/paths/operations across all 6 releases),
 
 ### Primary Models (Categorized & Organized)
 
-#### Native Configuration (409 specs, 50,716 paths, 202,864 operations)
+#### Native Configuration (411 specs, 49,862 paths, 199,448 operations)
 Full CLI-equivalent configuration organized by network domain.
 - **Categories:** Top-level leafs, containers, IP, IPv6, Router, Crypto, AAA, Line, VRF, Platform & System, Protocols, Security & Access, Switching L2, QoS, Monitor, License, Service, Other, App & Services, L2 Discovery, Routing & Multicast, Security Services, Platform & Diagnostics, WAN & Legacy, Industrial & IoT, Misc Extensions
 - **Operations:** GET, PUT, PATCH, DELETE with complete YANG examples
 - [Browse Native Config APIs →](swagger-native-config-model/)
 
-#### Operational Data (216 specs, 22,144 paths)
+#### Operational Data (220 specs, 22,508 paths)
 Real-time device state and statistics. Read-only GET operations.
 - **Categories:** interfaces, routing, platform, memory, qos, wireless, vpn, security, switching, environment, processes, sdwan, mpls, services, other
 - [Browse Operational APIs →](swagger-oper-model/)
@@ -67,43 +67,46 @@ YANG-Push event notifications and SNMP traps, with realistic payloads and consum
 The former Events Swagger viewer was retired (its `/streams` endpoints are not callable on a device).
 - [Browse the Notification Catalog →](telemetry.html#notifications)
 
-#### RPC Operations (57 specs, 302 RPCs)
+#### RPC Operations (60 specs, 318 RPCs)
 Remote procedure calls for device actions and commands.
-- **Cisco RPCs:** 51 modules for device operations
-- **IETF/Tailf:** 7 modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query, and others)
+- **Cisco RPCs** for device operations (including the 26.2.1 config-management RPCs)
+- **IETF/Tailf** modules (ietf-event-notifications, tailf-netconf-extensions, tailf-netconf-query, and others)
 - [Browse RPC APIs →](swagger-rpc-model/)
 
 ### Standard Models (Original Structure)
 
-#### Configuration (41 specs, 2,559 paths)
+#### Configuration (44 specs, 2,449 paths)
 Device configuration with full CRUD operations.
 - MDT subscriptions, gNMI config, wireless settings
 - [Browse Config APIs →](swagger-cfg-model/)
 
-#### OpenConfig (43 specs, 778 paths)
+#### OpenConfig (43 specs, 1,062 paths)
 Vendor-neutral network configuration standards.
 - Interfaces, BGP, OSPF, LLDP, MPLS, VLANs (no RPCs)
 - [Browse OpenConfig APIs →](swagger-openconfig-model/)
 
-#### IETF Standards (22 specs, 505 paths)
+#### IETF Standards (20 specs, 419 paths)
 RFC-compliant IETF YANG models.
 - ietf-interfaces, ietf-routing, ietf-netconf
 - [Browse IETF APIs →](swagger-ietf-model/)
 
-#### MIB Translations (148 specs, 4,272 paths)
+#### MIB Translations (147 specs, 4,272 paths)
 SNMP MIB modules with YANG tree visualizations.
 - IF-MIB, CISCO-PROCESS-MIB, OSPF-MIB, Entity MIBs
 - [Browse MIB APIs →](swagger-mib-model/)
 
-#### Other Models (9 specs, 670 paths)
+#### Other Models (8 specs, 670 paths)
 Standalone and vendor-specific modules.
 - [Browse Other APIs →](swagger-other-model/)
 
 ## Recent Improvements
 
+- **Dark mode everywhere, WCAG AA contrast** — every page, including the ~4,200 YANG tree pages, follows the dark/light toggle; text and white-on-colour buttons meet 4.5:1 in both themes (tokens in [assets/css/site.css](assets/css/site.css)).
+- **Link integrity** — tree pages, the 404 page and generated docs were fixed; [tests/test_internal_links.py](tests/test_internal_links.py) checks every static link in every published page, and release validation gate 5 checks every viewer and accountability tree link.
+- **26.2.1 is the default release** — the site always opens on the newest release; device data comes from the release the lab runs (`device_data` in [releases/index.json](releases/index.json), 26.1.1 today). See [VERSIONING.md §8.1–8.2](VERSIONING.md).
 - **What Changed Between Releases** — [release-compare.html](release-compare.html) (hub → More → What Changed) lists, for each adjacent release pair, the YANG modules added, removed and changed, with a per-module tree diff. Built from the pyang trees by [scripts/build_release_compare.py](scripts/build_release_compare.py).
 - **Portable data-collection harness** — [scripts/build_kit.py](scripts/build_kit.py) packages an offline kit (collectors, Telegraf, Python wheels) that onboards devices, collects RESTCONF / NETCONF / gNMI / MDT, reports coverage per device and returns a secret-scanned bundle; [scripts/import_harness_bundle.py](scripts/import_harness_bundle.py) imports it here. See [DEVICE_DATA_COLLECTION.md §14](DEVICE_DATA_COLLECTION.md).
-- **Device Data browser** — [device-data.html](device-data.html) shows *real* data collected from physical Catalyst switches and a 9800 WLC over two transports, chosen with a selector: **Model-Driven Telemetry** (push · gRPC) and **RESTCONF** (pull · GET). One UI for both — per device (PID), model flavor, and path, with the actual streamed keys/values and GET payloads, plus summary charts and copy-to-clipboard. To keep the OpenAPI specs lean, response bodies are **not** injected into the specs; they are served on demand as per-path data files (`releases/<ver>/live-data/<category>/<module>/<hash>.json`), while each spec keeps only its synthetic schema example. An in-viewer banner links to the browser. See [scripts/build_restconf_dataset.py](scripts/build_restconf_dataset.py), [scripts/build_live_examples_index.py](scripts/build_live_examples_index.py), and the [CHANGELOG](CHANGELOG.md).
+- **Device Data browser** — [device-data.html](device-data.html) shows *real* data collected from 7 lab platforms (Catalyst 9200/9300/9400/9500/9600, a 9300 8-member stack and a 9800 WLC) over every transport, chosen with a selector: **Model-Driven Telemetry** (push · gRPC), **RESTCONF** (GET), **NETCONF** (get, get-config, subscribe) and **gNMI** (Get, Subscribe). Secrets (keys, passwords, SNMP communities) are masked before publishing. One UI for all of them — per device (PID), model flavor, and path, with the actual streamed keys/values and GET payloads, plus summary charts and copy-to-clipboard. To keep the OpenAPI specs lean, response bodies are **not** injected into the specs; they are served on demand as per-path data files (`releases/<ver>/live-data/<category>/<module>/<hash>.json`), while each spec keeps only its synthetic schema example. An in-viewer banner links to the browser. See [scripts/build_restconf_dataset.py](scripts/build_restconf_dataset.py), [scripts/build_live_examples_index.py](scripts/build_live_examples_index.py), and the [CHANGELOG](CHANGELOG.md).
 - **Realistic write-operation examples** — Every POST/PUT/PATCH body across the spec set ships with a complete, RFC 7951–compliant payload. No more empty `{}` placeholders. See [scripts/enrich_v2_specs.py](scripts/enrich_v2_specs.py) and the [CHANGELOG](CHANGELOG.md).
 - **Deep-link URLs** — Sharing a search result, module, or spec URL now opens the right view. Hash patterns: `#search=<q>`, `#module=<name>`, `#spec=<model>/<name>`.
 - **CSP-hardened frontend** — All inline JS extracted to external files; `script-src 'self' cdn.jsdelivr.net`.
@@ -128,8 +131,8 @@ python -m http.server 8000
 
 ### Use the OpenAPI Specs
 ```bash
-# Download a specific spec (replace 26.1.1 with the release you want)
-curl -O https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/releases/26.1.1/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
+# Download a specific spec (replace 26.2.1 with the release you want)
+curl -O https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/releases/26.2.1/swagger-oper-model/api/Cisco-IOS-XE-interfaces-oper.json
 
 # Generate Python client
 openapi-generator-cli generate -i Cisco-IOS-XE-interfaces-oper.json -g python -o ./python-client
@@ -158,48 +161,43 @@ print(response.json())
 ## Development
 
 ### Prerequisites
-- Python 3.8+
-- pyang (`pip install pyang`)
+- Python 3.12 with pyang 2.7 (the repo uses `.venv-harness/`)
+- YANG sources for the release under `references/<ver>/` (see [VERSIONING.md §8](VERSIONING.md))
 
-### Regenerate Specifications
+### Regenerate a Release
 ```bash
-cd generators
+# Trees, all spec categories, notifications, prefix map, enrichment, search,
+# accountability and exports for one release
+python scripts/build_release.py --version 26.2.1
 
-# Run all generators
-python generate_oper_openapi_v2.py
-python generate_rpc_openapi_v2.py
-python generate_cfg_openapi_v2.py
-python generate_openconfig_openapi_v2.py
-python generate_ietf_openapi_v2.py
-python generate_mib_openapi_v2.py
-python generate_events_openapi.py
-python generate_native_openapi_v2.py
-python generate_other_openapi_v2.py
+# Resume or re-run selected steps
+python scripts/build_release.py --version 26.2.1 --only trees,prefix-map
 
-# Validate quality
-cd ..
-python scripts/validate_quality.py
+# Release gates (JSON, manifests, search index, tree coverage + links, MDT xpaths, export sizes)
+python scripts/validate_release.py --version 26.2.1
 
-# Generate accountability report
-python scripts/analyze_yang_accountability.py
+# Tests (CI runs the same)
+python -m pytest tests scripts/harness/tests
 ```
 
 ## Project Structure
 
 ```
-iosxe-1718-yang-swagger/
-├── index.html                          # Main landing page
-├── swagger-oper-model/                 # Operational (205 specs)
-├── swagger-rpc-model/                  # RPC (59 specs)
-├── swagger-cfg-model/                  # Config (39 specs)
-├── swagger-openconfig-model/           # OpenConfig (57 specs)
-├── swagger-ietf-model/                 # IETF (19 specs)
-├── swagger-mib-model/                  # MIB (149 specs)
-├── swagger-native-config-model/        # Native (81 specs)
-├── swagger-other-model/                # Other (9 specs)
-├── generators/                         # Python YANG parsers
-├── scripts/                            # Validation/analysis tools
-└── references/17181-YANG-modules/      # 848 YANG sources
+cisco-ios-xe-openapi-swagger/
+├── index.html, *.html                  # Hub and tool pages (Device Data, Telemetry, What Changed, ...)
+├── swagger-<category>-model/           # 8 Swagger UI viewers (specs are read from releases/<ver>/)
+├── releases/
+│   ├── index.json                      # Releases, default (26.2.1) and device_data (26.1.1)
+│   ├── <ver>/swagger-*-model/api/      # OpenAPI specs per release
+│   ├── <ver>/yang-trees/               # pyang tree pages per release
+│   ├── <ver>/live-data/                # Captured device responses (device_data release)
+│   └── compare/                        # Release-to-release differences
+├── assets/                             # Shared CSS (site, viewer, tree-page themes), JS, vendored Swagger UI
+├── generators/                         # Spec generators (YANG trees → OpenAPI)
+├── scripts/                            # Release pipeline, validation, device-data builders
+├── scripts/harness/                    # Device data collection harness and portable kit
+├── tests/                              # pytest suite (links, secrets, release data, generators)
+└── references/<ver>/                   # YANG sources per release (not published)
 ```
 
 ## Documentation
@@ -232,4 +230,4 @@ iosxe-1718-yang-swagger/
 
 ---
 
-**Last Updated**: March 2026 | **IOS XE Version**: 17.18.1 | **OpenAPI**: 3.0.0
+**Last Updated**: October 2026 | **Default IOS XE release**: 26.2.1 (6 releases, 17.9.x to 26.2.1) | **OpenAPI**: 3.0.0

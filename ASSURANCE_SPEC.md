@@ -24,10 +24,10 @@ HTML/JS, no backend). Python generators build the artifacts under
 
 **Releases tracked:** `17.9.x`, `17.12.x`, `17.15.x`, `17.18.1`, `26.1.1`, `26.2.1` (default).
 
-**Viewer categories (9):** `swagger-oper-model`, `swagger-cfg-model`,
+**Viewer categories (8):** `swagger-oper-model`, `swagger-cfg-model`,
 `swagger-native-config-model`, `swagger-openconfig-model`, `swagger-rpc-model`,
-`swagger-ietf-model`, `swagger-mib-model`, `swagger-events-model`,
-`swagger-other-model`.
+`swagger-ietf-model`, `swagger-mib-model`, `swagger-other-model`. Event notifications live in
+the Telemetry & Notifications catalog (the events viewer was retired).
 
 **Hub pages:** [index.html](index.html), [platform-coverage.html](platform-coverage.html),
 [yang-accountability.html](yang-accountability.html), [telemetry.html](telemetry.html),
@@ -52,7 +52,7 @@ a FAIL, regardless of what else passes.**
 | INV-3 | Per-release artifact counts (modules / paths / ops) match each viewer's `manifest.json` | `scripts/validate_release.py` |
 | INV-4 | No YANG module silently disappears between releases without explanation | Regression check R-3 |
 | INV-5 | CSP stays strict — no `'unsafe-inline'` or new remote `script-src` on hub pages | `tests/test_security_regressions.py` |
-| INV-6 | Default release stays `26.1.1` unless an explicit task changes it | Regression check R-1 |
+| INV-6 | Default release is the newest active release (26.2.1); `device_data` names the release with captures (26.1.1) | `tests/test_release_counts.py` + regression check R-1 |
 | INV-7 | `service-worker.js` `CACHE_VERSION` bumps whenever a cached asset changes | Regression check R-2 |
 | INV-8 | localStorage keys (`theme`, recents, favorites) keep their existing shape | Regression check R-4 |
 
@@ -229,7 +229,7 @@ Run these whenever you touch the corresponding area.
 
 | ID | Trigger | Check | Command |
 |---|---|---|---|
-| R-1 | Any HTML/JS edit to a hub page | Confirm default release still `26.1.1` | `grep -rn "26\.1\.1\|17\.18\.1" releases/index.json platform-support-index.json` and visually confirm `default:"26.1.1"` |
+| R-1 | Any HTML/JS edit to a hub page | Confirm default release is still the newest (`26.2.1`) | `grep -n '"default"\|"device_data"' releases/index.json` and run `pytest tests/test_release_counts.py` |
 | R-2 | Any edit to a file cached by SW | Bump `CACHE_VERSION` in `service-worker.js` line 16 | `grep -n "CACHE_VERSION" service-worker.js` — version string must differ from `main` HEAD |
 | R-3 | Any change to generators or `releases/` | Module count parity across releases | `python -X utf8 scripts/audit_swagger_vs_tree.py` and inspect deltas — any module that **disappears without appearing in `NATIVE-AUGMENT-AUDIT.md` or release notes is a FAIL** |
 | R-4 | Any JS edit to `index-app.js`, `recent-favorites.js`, `assets/js/site-chrome.js` | localStorage shape unchanged | Manually load deployed site, set theme to dark, add a favorite, reload — both must persist |

@@ -4,17 +4,18 @@
 
 This project has successfully created a professional, organized, and developer-friendly documentation hub for Cisco IOS-XE RESTCONF APIs. Through multiple comprehensive phases, we've achieved:
 
-- **945 OpenAPI specifications** across 9 model categories with deep-path coverage (default release: 26.1.1; the project tracks 5 releases from 17.9.x through 26.1.1 — see [version-stats.json](../version-stats.json) for per-release counts)
-- **37,072 API paths** organized and documented from resolved YANG trees
-- **63,541 API operations** with production examples
+- **953 OpenAPI specifications** across 8 model viewers with deep-path coverage (default release: 26.2.1; the project tracks 6 releases from 17.9.x through 26.2.1 — see [version-stats.json](../version-stats.json) for per-release counts)
+- **81,560 API paths** organized and documented from resolved YANG trees
+- **243,024 API operations** with production examples
 - **53 logical categories** for easy navigation
 - **6 curated quick-start collections** for common workflows
 
-### Deep-Path Specifications (All 9 Models, default release 26.1.1)
+### Deep-Path Specifications (8 viewers, default release 26.2.1)
 Tree-based generators produce full-depth RESTCONF paths from resolved YANG trees:
-- Operational: 216 specs, 22,144 paths | Config: 41 specs, 10,083 ops | Native: 29 specs, 19,728 ops
-- OpenConfig: 43 specs, 2,904 ops | IETF: 22 specs, 1,664 ops | MIB: 148 specs, 4,272 paths
-- RPC: 57 specs, 302 RPCs | Events: 43 specs, 910 paths | Other: 9 specs, 1,534 ops
+- Operational: 220 specs, 22,508 paths | Config: 44 specs, 9,622 ops | Native: 411 specs, 199,448 ops
+- OpenConfig: 43 specs, 3,930 ops | IETF: 20 specs, 1,392 ops | MIB: 147 specs, 4,272 paths
+- RPC: 60 specs, 318 RPCs | Other: 8 specs, 1,534 ops
+- Event notifications are catalogued on the Telemetry & Notifications page (the events viewer was retired)
 
 ---
 
@@ -27,8 +28,8 @@ Tree-based generators produce full-depth RESTCONF paths from resolved YANG trees
 | 6 | Events & RPC Models | ✅ Complete | 21 files |
 | 7 | UI & Documentation | ✅ Complete | 3 new, 1 modified |
 
-**Total Duration:** Multi-week effort  
-**Total Files Delivered:** 672 OpenAPI specs + tools and documentation  
+**Total Duration:** Multi-week effort
+**Total Files Delivered:** 672 OpenAPI specs + tools and documentation
 **Git Commits:** 15+ commits to main branch
 
 ---
@@ -85,7 +86,7 @@ Tree-based generators produce full-depth RESTCONF paths from resolved YANG trees
 1. **Quick-Starts** (orange gradient)
    - 6 curated collections prominently featured
    - Direct links to Swagger UI
-   
+
 2. **Developer Tools** (green gradient)
    - Code generator link
    - Getting started guide link
@@ -153,16 +154,16 @@ swagger-native-config-model/api/
    - Use case explanations
    - Module list included
    - Example scenarios
-   
+
 2. **Production Examples:**
    - Realistic interface names (GigabitEthernet1/0/1)
    - Actual IP addresses (10.x, 192.168.x)
    - Complete configuration snippets
-   
+
 3. **Server URLs:**
    - 4 environment options (production, staging, lab, localhost)
    - Port 443 (HTTPS)
-   
+
 4. **Proper Metadata:**
    - OpenAPI 3.0.0 compliant
    - Version numbers
@@ -184,7 +185,7 @@ swagger-native-config-model/api/
 | analyze_rpc.py | Analyze RPC categorization | 160 | Statistics |
 | analyze_yang_accountability.py | Track YANG module coverage | 200 | Coverage report |
 
-**Total Automation:** 1,766 lines of Python  
+**Total Automation:** 1,766 lines of Python
 **Reusability:** All scripts documented and reusable for future updates
 
 ---
@@ -453,13 +454,16 @@ Note: Native Config covers 139 of 163 native augment modules.
 
 ## Conclusion
 
+> **Phase 1 snapshot (17.18.1).** The figures below record the first phase. Current per-release
+> counts are at the top of this file and in [version-stats.json](../version-stats.json).
+
 This project has created a professional, organized, and developer-friendly documentation hub for 672 Cisco IOS-XE RESTCONF OpenAPI specifications. Through careful categorization, automation, and tooling, we've achieved:
 
-✅ **672 OpenAPI specifications** across 9 model categories  
-✅ **53 logical categories** aligned with network engineer workflows  
-✅ **6 quick-start collections** for immediate productivity  
-✅ **Interactive code generator** saving 97% of development time  
-✅ **Comprehensive documentation** with 15+ working examples  
+✅ **672 OpenAPI specifications** across 9 model categories
+✅ **53 logical categories** aligned with network engineer workflows
+✅ **6 quick-start collections** for immediate productivity
+✅ **Interactive code generator** saving 97% of development time
+✅ **Comprehensive documentation** with 15+ working examples
 ✅ **Professional UI** showcasing all models and guiding users
 
 **Key Metrics:**
@@ -477,14 +481,17 @@ This project has created a professional, organized, and developer-friendly docum
 
 ---
 
-**Project Completion Date:** December 2024  
-**Repository:** github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger  
-**Documentation Hub:** Live on GitHub Pages  
+**Project Completion Date:** December 2024
+**Repository:** github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger
+**Documentation Hub:** Live on GitHub Pages
 **Maintainer:** Jeremy Cohoe (jcohoe@cisco.com)
 
 ---
 
 ## Appendix: Project File Structure
+
+> **Phase 1 layout.** Specs now live per release under `releases/<ver>/swagger-*-model/api/`
+> and the events viewer was retired; see [VERSIONING.md](../VERSIONING.md) for the current layout.
 
 ```
 iosxe-1718-yang-swagger/

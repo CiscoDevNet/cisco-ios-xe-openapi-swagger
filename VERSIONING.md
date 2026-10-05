@@ -41,17 +41,19 @@ cisco-ios-xe-openapi-swagger/
 │   │   ├── swagger-native-config-model/api/*.json
 │   │   ├── swagger-oper-model/api/*.json
 │   │   ├── swagger-rpc-model/api/*.json
-│   │   ├── swagger-events-model/api/*.json
 │   │   ├── swagger-ietf-model/api/*.json
 │   │   ├── swagger-openconfig-model/api/*.json
 │   │   ├── swagger-mib-model/api/*.json
 │   │   ├── swagger-other-model/api/*.json
-│   │   ├── yang-trees/*.html                   # pyang tree HTML, one per module
+│   │   ├── yang-trees/*.html                   # pyang tree HTML, one per module (themed: site.css + yang-tree.css)
+│   │   ├── tree_audit.json                     # per-module tree result (generated / skip reason)
 │   │   ├── search-index.json                   # Fuse.js index for this release
 │   │   ├── yang_accountability.json            # accountability report (machine-readable)
 │   │   ├── telemetry-index.json                # MDT xpath index (oper specs only)
 │   │   ├── mib-metadata.json                   # MIB enrichment data
 │   │   ├── native-capabilities.json            # native config-surface summary
+│   │   ├── yang-prefix-map.json                # module -> xpath prefix (telemetry XPath builder)
+│   │   ├── notifications.json                  # notification catalog
 │   │   └── exports/
 │   │       ├── postman/IOS-XE-17.9.x-<category>.postman_collection.json.zip   # built at deploy
 │   │       ├── postman/IOS-XE-17.9.x.postman_environment.json                 # built at deploy
@@ -60,13 +62,16 @@ cisco-ios-xe-openapi-swagger/
 │   ├── 17.12.x/  (same shape)
 │   ├── 17.15.x/  (same shape)
 │   ├── 17.18.1/  (same shape; this is the migration target for current artifacts)
-│   └── 26.1.1/   (same shape)
+│   ├── 26.1.1/   (same shape + live-data/, live-examples-index.json, live-modules.json: device data)
+│   ├── 26.2.1/   (same shape)
+│   └── compare/  # release-to-release differences (build_release_compare.py)
 ├── references/
 │   ├── 17.9.x/   # raw YANG modules (excluded from deploy/)
 │   ├── 17.12.x/
 │   ├── 17.15.x/
 │   ├── 17.18.1/
-│   └── 26.1.1/
+│   ├── 26.1.1/
+│   └── 26.2.1/
 └── (shared UI: index.html, *.js, swagger-*-model/index.html, etc.)
 ```
 
@@ -172,7 +177,7 @@ For maintainers adding the next IOS XE release (e.g. `26.2.1`):
    ```
    python scripts/build_release.py --version 26.2.1 --skip-exports
    ```
-   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, search index, telemetry index, MIB metadata, and native capabilities. Postman/Bruno archives are built at deploy time; run both export generators once locally to create the tracked `exports/{postman,bruno}-manifest.json`.
+   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, search index, telemetry index, MIB metadata, native capabilities and the XPath prefix map. Postman/Bruno archives are built at deploy time; run both export generators once locally to create the tracked `exports/{postman,bruno}-manifest.json`.
 3. **Register in UI**: prepend the release entry to `releases/index.json`, add it to the `validate-releases` matrix in `deploy-pages.yml`, then run `python scripts/patch_viewers_version_aware.py` (refreshes the viewers' version allow-list), `python scripts/generate_platform_support.py` (needs the release's `yang-set-*.xml` under `references/yang/vendor/cisco/xe/<id>/`) and rebuild `release_counts.json` (`--write`), `version-stats.json`, `accountability_compare.json` and the release comparisons (`python scripts/build_release_compare.py`). If it should become the new default, set `default` and flip `default: true` on the entry.
 4. **Verify locally**: `python scripts/audit_swagger_vs_tree.py --version 26.2.1` and `python scripts/validate_release.py --version 26.2.1` (the validator wraps all CI gates from §9 for local pre-flight).
 5. **Update [CHANGELOG.md](CHANGELOG.md)**: add a row under "Versions Supported".
@@ -184,7 +189,7 @@ No edits to per-model HTML or shared JS are required to add a release. If a step
 
 1. In `releases/index.json` set `default` to the new release and move `"default": true` to its entry. Leave `device_data` alone.
 2. Regenerate the root copies of the default release: `python scripts/generate_search_index.py`, `python -X utf8 generators/generate_notifications_index.py --version <new>`, copy `releases/<new>/yang_accountability.json` to the root, then `python scripts/build_version_stats.py`, `python scripts/generate_platform_support.py` and `python scripts/patch_viewers_version_aware.py`.
-3. Update the static fallbacks that show the default: `index.html` (`activeVersionLabel`, YANG source card, `version_label` stat), the `index-app.js` fallback option, the `about.html` stat fallbacks, and the README badge and stats.
+3. Update the static fallbacks that show the default: `index.html` (`activeVersionLabel`, YANG source card, `version_label` stat), the `index-app.js` fallback option, the `about.html` stat fallbacks and release table, `yang-accountability.html` header version, and the README badge and stats.
 4. Run the tests; `test_default_is_newest_release` fails until the default is the newest active release.
 
 ### 8.2 After upgrading the lab devices to a new release (device data)
@@ -206,7 +211,7 @@ Device data stays on the release the devices ran until it is re-collected:
 2. **Manifest accuracy** — `spec_count` equals `len(specs)` and matches actual file count on disk.
 3. **Search-index integrity** — no duplicate module entries within a release.
 4. **Tree coverage** — every spec has either a `tree_url` resolving to a real file or an entry in the release's accountability `excluded_modules` list with a reason (`types-only`, `deviation`, `augment`, `submodule`, `rpc-augment`, `framework`).
-5. **Spec→tree linkage** — every spec's `info.x-yang-tree-url` points to an existing file.
+5. **Spec→tree linkage** — every spec whose tree was generated (`tree_audit.json`) has its `yang-trees/<module>.html` page (the viewers' "View YANG Tree" link), and every accountability `tree_url` resolves.
 6. **MDT xpath sanity** (oper model only) — every operation marked `x-mdt-filter-xpath` matches the `^/[a-z0-9-]+:[A-Za-z0-9/_\-\[\]'=]+$` shape from [MDT_XPATH_SPEC.md](MDT_XPATH_SPEC.md).
 7. **Export size cap** — every Postman/Bruno collection ≤ 50 MB; auto-split parts must be referenced from an exports manifest.
 8. **Accountability regression guard** — total `with_specs` for the new release must be ≥ 95% of the prior release's count, unless the maintainer adds an entry to `releases/<ver>/known_removals.json` justifying the drop (e.g. upstream module retirement).

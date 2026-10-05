@@ -63,7 +63,7 @@ def _scan_category(spec_dir: Path) -> dict:
         return {"specs": 0, "paths": 0, "operations": 0}
     specs = paths = ops = 0
     for f in sorted(spec_dir.glob("*.json")):
-        if f.name == "manifest.json":
+        if f.name == "manifest.json" or f.name.startswith("_"):
             continue
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
@@ -136,7 +136,7 @@ def _telemetry_xpaths(rp: ReleasePaths) -> int:
             continue
         is_mib = (cat == "swagger-mib-model")
         for f in sorted(spec_dir.glob("*.json")):
-            if f.name == "manifest.json":
+            if f.name == "manifest.json" or f.name.startswith("_"):
                 continue
             try:
                 data = json.loads(f.read_text(encoding="utf-8"))
