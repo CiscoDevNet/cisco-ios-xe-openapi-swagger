@@ -8,8 +8,8 @@ This site is deployed automatically using **GitHub Actions**. Every push to main
 
 1. **Push to main branch** - triggers GitHub Actions
 2. **Workflow prepares deploy directory** - copies only website-relevant files
-3. **Uploads artifact** - uses ctions/upload-pages-artifact
-4. **Deploys to Pages** - uses ctions/deploy-pages
+3. **Uploads artifact** - uses `actions/upload-pages-artifact`
+4. **Deploys to Pages** - uses `actions/deploy-pages`
 
 No manual setup required. Just push and it deploys.
 
@@ -17,23 +17,24 @@ No manual setup required. Just push and it deploys.
 
 | Included | Description |
 |----------|-------------|
-| swagger-*-model/ | All 9 model directories (HTML + JSON specs) |
-| yang-trees/ | 768 YANG/MIB tree visualizations |
+| releases/ | Per-release specs, YANG tree pages (~4,200), search indexes, device data, exports (Postman/Bruno archives are built during the deploy) |
+| swagger-*-model/ | The 8 model viewers (HTML; specs are read from `releases/<ver>/`) |
+| yang-trees/ | Redirect stubs to the default release's tree pages |
 | docs/ | Getting Started guide, Project Summary |
-| 	ools/ | Postman collection and environment |
-| *.html | Landing page, 404, code generator, tree compare, accountability |
+| tools/ | Postman collection and environment |
+| assets/ | Shared CSS (site, viewer, tree-page themes), JS, icons, vendored Swagger UI |
+| *.html | Hub and tool pages, 404, App Map, Changelog |
 | *.js | Search engine, recent favorites |
-| *.json | Search index, YANG accountability data |
+| *.json | Search index, YANG accountability data, device datasets |
 | README.md | Repository documentation |
 | .nojekyll | Disables Jekyll processing |
 
 | Excluded | Reason |
 |----------|--------|
-| 
-eferences/ | 848 YANG source modules (heavy, not needed for site) |
+| references/ | YANG source modules (heavy, not needed for site) |
 | generators/ | Python YANG parsers (dev tools only) |
 | scripts/ | Validation/analysis tools (dev tools only) |
-| rchive/ | Completed TODO/phase tracking docs |
+| archive/ | Completed TODO/phase tracking docs |
 | .github/ | Workflow configs (not site content) |
 
 ### First-Time Setup
@@ -46,16 +47,16 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 
 **Live URL:** https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/
 
-## Statistics
+## Statistics (default release 26.2.1)
 
 | Metric | Count |
 |--------|-------|
-| OpenAPI Specifications | 747 |
-| API Paths | 34,694 |
-| API Operations | 58,001 |
-| YANG Tree Files | 768 |
-| Model Types | 9 |
-| IOS XE Version | 17.18.1 |
+| OpenAPI Specifications | 953 |
+| API Paths | 81,560 |
+| API Operations | 243,024 |
+| YANG Tree Files | 758 (about 4,200 across all releases) |
+| Model Types | 8 viewers + notification catalog |
+| IOS XE Releases | 6 (17.9.x to 26.2.1) |
 
 ## Custom Domain (Optional)
 
@@ -68,6 +69,6 @@ eferences/ | 848 YANG source modules (heavy, not needed for site) |
 - **Pages don't load?** Check Settings > Pages shows "GitHub Actions" as source
 - **Stale content?** Check Actions tab for failed workflow runs
 - **404 errors?** Ensure paths are relative (not starting with /)
-- **Large deploy?** Workflow has 15-minute timeout; should complete in about 2 minutes
+- **Large deploy?** The workflow builds Postman/Bruno archives and validates every release before deploying; expect about 12 minutes
 
-Last updated: March 27, 2026
+Last updated: October 5, 2026

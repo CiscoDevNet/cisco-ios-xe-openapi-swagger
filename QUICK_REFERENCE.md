@@ -63,30 +63,32 @@ references/17181-YANG-modules/Cisco-IOS-XE-ios-events-oper.yang
 - **Search for:** Cisco-IOS-XE-ios-events-oper
 
 ### All YANG Modules
-All 848 YANG source modules are in:
+The 17.18.1 YANG sources (848 modules) are committed in:
 ```
 references/17181-YANG-modules/
 ```
-The accountability report tracks 1,103 total modules (848 YANG + 255 spec-only MIB/Native).
+Other releases build from [YangModels/yang](https://github.com/YangModels/yang) `vendor/cisco/xe/<id>`
+(for example `2621` for 26.2.1, pinned in `releases/<ver>/meta.json`). The 26.2.1 accountability
+report tracks 1,469 modules (YANG modules plus MIB and native config bundles).
 
 **Browse on GitHub:**  
 https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger/tree/main/references/17181-YANG-modules
 
 ## API Categories Summary
 
-All 9 model types have deep-path specs generated from resolved YANG trees, providing full-depth RESTCONF paths with production-realistic examples.
+All 8 model viewers have deep-path specs generated from resolved YANG trees, providing full-depth RESTCONF paths with production-realistic examples. Counts are for the default 26.2.1 release.
 
 | Category | Specs | Paths/Ops | Use Case | Quality |
 |----------|-------|-----------|----------|---------|
-| **Operational** | 205 specs | 20,159 paths | Monitoring, state data | Production Ready |
-| **Native Config** | 81 specs | 13,452 ops | Full device config | Production Ready |
-| **Configuration** | 39 specs | 9,452 ops | Feature config | Production Ready |
-| **RPC** | 59 specs | 232 RPCs | Actions, commands | Production Ready |
-| **OpenConfig** | 57 specs | 5,920 ops | Vendor-neutral config | Stable |
-| **IETF** | 19 specs | 1,122 ops | Standards-based | Stable |
+| **Operational** | 220 specs | 22,508 paths | Monitoring, state data | Production Ready |
+| **Native Config** | 411 specs | 199,448 ops | Full device config | Production Ready |
+| **Configuration** | 44 specs | 9,622 ops | Feature config | Production Ready |
+| **RPC** | 60 specs | 318 RPCs | Actions, commands | Production Ready |
+| **OpenConfig** | 43 specs | 3,930 ops | Vendor-neutral config | Stable |
+| **IETF** | 20 specs | 1,392 ops | Standards-based | Stable |
 | **Notifications** | catalog | — | Event notifications (YANG-Push / SNMP traps) | Stable |
-| **MIB** | 149 specs | 12,482 paths | SNMP MIB reference | Reference Only |
-| **Other** | 9 specs | 4,593 ops | Misc/vendor-specific | Variable |
+| **MIB** | 147 specs | 4,272 paths | SNMP MIB reference | Reference Only |
+| **Other** | 8 specs | 1,534 ops | Misc/vendor-specific | Variable |
 
 ### Quick Links
 

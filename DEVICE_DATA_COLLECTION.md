@@ -1,13 +1,33 @@
 # Device Data Collection — Catalyst 9000 RESTCONF (Track B)
 
-Self-contained context for continuing on the VM that can reach the 6 Catalyst
-9000 switches. Keep this file at the repo root. This is the sole context carrier
-— the web-app session's chat memory does not travel with the SCP.
+Self-contained context for the lab VM that reaches the 7 Catalyst 9000 lab devices (six
+switches/WLC on the lab subnet plus an 8-member C9300 stack over the WAN). Keep this file at
+the repo root.
 
-## 0. Current status (2026-07-30)
-The GET-phase harness is BUILT and lives under `scripts/harness/`. This section
-supersedes any "to build" wording later in the doc — those sections describe the
-design intent; the modules below already implement it.
+## 0. Current status (2026-10-04)
+
+**Fleet:** C9200, C9300-24UX, C9400, C9500, C9600, C9800 (WLC) and C9300-STACK8-WAN, all on
+IOS XE 26.1.1 — the `device_data` release in `releases/index.json` (§14, VERSIONING.md 8.2).
+Every device is collected with every method (RESTCONF walk, NETCONF get / get-config /
+subscribe periodic + on-change, gNMI Get / Subscribe, MDT dial-out, SNMP MIB bridge) and
+`kit.py coverage` reports **COMPLETE** for all 7.
+
+**Published:** the Device Data page datasets (`*-live-data.json`, `protocol-matrix.json`) and
+`releases/26.1.1/live-data/`. Every builder masks secrets (keys, passwords, SNMP communities
+in values, CLI text and `community-config` list names); `tests/test_dataset_secrets.py` scans
+all of them.
+
+**In progress:** a per-xpath MDT walk of every model family on C9300-STACK8-WAN
+(`walk_all.py --device C9300-STACK8-WAN --mib`, §14) on top of its top-level MDT run. When it
+finishes, rebuild the MDT dataset (`build_live_dataset.py`, `build_protocol_matrix.py`) and
+re-run the secret tests.
+
+**Next:** after the lab upgrades to 26.2.1, follow VERSIONING.md 8.2 to re-collect on 26.2.1.
+### Harness components
+
+The GET-phase harness lives under `scripts/harness/`; the MDT, NETCONF and gNMI collectors
+under `scripts/mdt-telemetry/collector/`. Sections 1–13 below record the original design;
+where they say "to build", the modules below implement it.
 
 | Component | File | State |
 |---|---|---|
@@ -28,11 +48,7 @@ design intent; the modules below already implement it.
 | Portable kit CLI | `scripts/harness/kit.py` | Built — doctor/facts/telegraf/collect/coverage/bundle; see §14 |
 | Kit builder / bundle importer | `scripts/build_kit.py`, `scripts/import_harness_bundle.py` | Built; see §14 |
 
-**Remaining / to verify on arrival:**
-- Fill `inventory.json` with the 6 real devices and set `IOSXE_USER`/`IOSXE_PASS`.
-- Run `--preflight`, then `--pilot`, then scale (see §9 run guide).
-- Confirm no real capture has been committed (all under gitignored `captures/`).
-- Phase 4 (web-app injection) is **SHIPPED** (see §11.0); Phase 5 (CRUD) is still design-only.
+Phase 4 (web-app representation) is shipped (§11); Phase 5 (CRUD) is design-only (§7).
 
 ## 1. What we're building
 A dev-only Python harness (Track B) that connects to 6 real Catalyst 9000
@@ -629,3 +645,13 @@ sha256sum -c SHA256SUMS && ./setup.sh
   `scripts/refresh_live_data.py --version 26.1.1`, then
   `scripts/mdt-telemetry/collector/build_restconf_augment.py --from-ref HEAD`, then
   `scripts/build_restconf_dataset.py`.
+- **Deep MDT walk (one xpath at a time, every nested container):** the batch MDT run covers
+  module roots; for per-container coverage run, with a Telegraf receiver writing
+  `output/mdt-<device>.json` (harness subscription ids only):
+  `scripts/mdt-telemetry/collector/walk_all.py --device <name> --mib`. It walks openconfig,
+  ietf, other, cfg, MIB, oper and native-config in that order, checkpoints per flavor
+  (`output/walk-<device>-<flavor>.json`) and resumes where it stopped. Over a WAN it takes
+  well over 11 hours. Then rebuild with `build_live_dataset.py` and `build_protocol_matrix.py`.
+- **Secret masking:** every published dataset is masked at build time (`redact_payload.py`,
+  `harness/redact.py`), including SNMP communities in CLI text and `community-config` list
+  names; `tests/test_dataset_secrets.py` must pass before committing device data.

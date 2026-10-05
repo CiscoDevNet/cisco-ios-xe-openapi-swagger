@@ -34,9 +34,9 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 
 **What ships:**
 
-- 945 OpenAPI 3.0 specs in the default 26.1.1 release (`releases/26.1.1/swagger-*-model/api/*.json`); 785–945 across the five tracked releases (the older releases grew substantially once the deep native augment specs were backfilled). See [version-stats.json](version-stats.json) for per-release counts.
-- 765 YANG tree HTML visualizations per release (`releases/<ver>/yang-trees/`)
-- 6 vanilla-JS pages (index, code generator, tree compare, accountability, plus 9 model index pages)
+- 953 OpenAPI 3.0 specs in the default 26.2.1 release (`releases/26.2.1/swagger-*-model/api/*.json`); 774–953 across the six tracked releases. See [version-stats.json](version-stats.json) for per-release counts. The default is always the newest release; device data comes from `device_data` in [releases/index.json](releases/index.json) (26.1.1, the release the lab runs).
+- 620–758 YANG tree HTML pages per release (`releases/<ver>/yang-trees/`, ~4,200 total)
+- Vanilla-JS pages (hub, code generator, tree compare, accountability, device data, telemetry, release compare, exports, ...) plus 8 Swagger UI model viewers
 - A per-release search index (`releases/<ver>/search-index.json`) consumed by Fuse.js fuzzy search
 
 **What this is NOT:**
@@ -81,13 +81,12 @@ cisco-ios-xe-openapi-swagger/
 ├── search-index.json           # Fuse.js search source (~780 modules)
 ├── yang_accountability.json    # Module-by-module coverage data
 │
-├── swagger-{type}-model/       # 9 model categories (see §4)
-│   ├── index.html           # Model browser with deep-linking
-│   ├── api/*.json           # OpenAPI specs (deep paths)
-│   └── api/*.json              # Legacy v1 specs (kept as fallback)
+├── swagger-{type}-model/       # 8 model viewers (see §4); specs are read from releases/<ver>/
+│   └── index.html           # Model browser with deep-linking
 │
-├── yang-trees/                 # 768 generated YANG/MIB tree HTML files
-├── references/17181-YANG-modules/  # 848 source YANG files (excluded from Pages deploy)
+├── releases/<ver>/             # Per-release specs, yang-trees/, search index, accountability, exports
+├── yang-trees/                 # Redirect stubs to the default release's tree pages
+├── references/<ver>/           # YANG sources per release (excluded from Pages deploy)
 │
 ├── generators/                 # 27 Python YANG → OpenAPI generators
 │   ├── generate_{type}_from_tree.py     # Tree-based deep-path generators
@@ -109,18 +108,21 @@ cisco-ios-xe-openapi-swagger/
 
 ---
 
-## 4. The 9 Model Categories
+## 4. The 8 Model Viewers
+
+Spec counts are for the default 26.2.1 release. Event notifications are not a viewer: they are
+catalogued on the Telemetry & Notifications page (the events viewer was retired).
 
 | Directory | Type | Specs | Purpose |
 |---|---|---|---|
-| `swagger-oper-model/` | operational | 205 | Read-only state/statistics (GET) |
-| `swagger-cfg-model/` | configuration | 39 | Feature config (full CRUD) |
-| `swagger-native-config-model/` | native | 159 | Full CLI-equivalent config (full CRUD). Composed of one spec per top-level functional area plus 8 augment-resolved router protocol buckets (bgp/eigrp/isis/lisp/lisp-list/nhrp/ospf/rip), augment-resolved placeholder specs, root-augment specs for sibling-module additions (kron, maintenance-template, voice/switch/aaa subtrees, …), and a completeness-sweep safety net — see [§6 Native YANG augments & placeholders](#native-yang-augments--placeholders-critical). |
-| `swagger-openconfig-model/` | openconfig | 57 | Vendor-neutral standards |
-| `swagger-ietf-model/` | ietf | 19 | RFC-compliant IETF models |
-| `swagger-mib-model/` | mib | 149 | SNMP MIB → YANG translations (GET) |
-| `swagger-rpc-model/` | rpc | 59 | RPC/action endpoints (POST `/operations/`) |
-| `swagger-other-model/` | other | 10 | Standalone / vendor-specific |
+| `swagger-oper-model/` | operational | 220 | Read-only state/statistics (GET) |
+| `swagger-cfg-model/` | configuration | 44 | Feature config (full CRUD) |
+| `swagger-native-config-model/` | native | 411 | Full CLI-equivalent config (full CRUD). Composed of one spec per top-level functional area plus 8 augment-resolved router protocol buckets (bgp/eigrp/isis/lisp/lisp-list/nhrp/ospf/rip), augment-resolved placeholder specs, root-augment specs for sibling-module additions (kron, maintenance-template, voice/switch/aaa subtrees, …), the deep `native-aug-*` specs, and a completeness-sweep safety net — see [§6 Native YANG augments & placeholders](#native-yang-augments--placeholders-critical). |
+| `swagger-openconfig-model/` | openconfig | 43 | Vendor-neutral standards |
+| `swagger-ietf-model/` | ietf | 20 | RFC-compliant IETF models |
+| `swagger-mib-model/` | mib | 147 | SNMP MIB → YANG translations (GET) |
+| `swagger-rpc-model/` | rpc | 60 | RPC/action endpoints (POST `/operations/`) |
+| `swagger-other-model/` | other | 8 | Standalone / vendor-specific |
 
 Each directory ships an `index.html` with hash-based deep-linking (`#spec=<module-name>`).
 
@@ -169,13 +171,12 @@ After adding a new release or rebuilding manifests/viewers, run:
 # Normalize all manifest.json files (default + per-release) to the schema viewers expect.
 python scripts/normalize_manifests.py
 
-# Re-patch all 9 swagger-*-model/index.html viewers with version-aware helpers
+# Re-patch all 8 swagger-*-model/index.html viewers with version-aware helpers
 # (reads default + active-versions allow-list from releases/index.json).
 python scripts/patch_viewers_version_aware.py
 
-# Build the YANG module -> prefix map per release. Required by the
-# Module XPath Builder in telemetry.html. Re-run whenever YANG sources
-# change for any release.
+# Build the YANG module -> prefix map per release (build_release.py runs it as the
+# "prefix-map" step). Required by the Module XPath Builder in telemetry.html.
 python scripts/build_yang_prefix_map.py
 
 # Local schema unit tests (also runs in CI via .github/workflows/tests.yml).
@@ -195,7 +196,7 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 
 ### Live Data harness — real captured device data (see DEVICE_DATA_COLLECTION.md)
 
-**What it is:** `scripts/harness/` is a **read-only** RESTCONF GET harness that captures real responses from 6 physical Catalyst devices and serves them on the **Device Data** page ([device-data.html](device-data.html) / [device-data.js](device-data.js); the former `live-data.html` was merged into it).
+**What it is:** `scripts/harness/` is a **read-only** RESTCONF GET harness that captures real responses from 7 lab devices (C9200, C9300-24UX, C9400, C9500, C9600, the C9300-STACK8-WAN 8-member stack and a C9800 WLC); the MDT/NETCONF/gNMI collectors live in `scripts/mdt-telemetry/collector/`. Results are served on the **Device Data** page ([device-data.html](device-data.html) / [device-data.js](device-data.js); the former `live-data.html` was merged into it). All builders mask secrets (keys, passwords, SNMP communities in values, CLI text and list names) and `tests/test_dataset_secrets.py` scans every published dataset.
 
 - **Lean-spec architecture:** response bodies are **NOT** injected into the OpenAPI specs (keeps them fast). They are served as per-path files: `releases/<ver>/live-data/<category>/<module>/<sha1[:16]>.json`, indexed by `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies) + a tiny `live-modules.json` (viewer banner).
 - **Rebuild:** `python scripts/refresh_live_data.py --version 26.1.1 [--capture]` — `--capture` re-collects from devices; without it, just rebuilds the index/data-files from the local (gitignored) sidecar `references/live-examples-<ver>.json`.
@@ -362,6 +363,22 @@ When improving coverage:
 - Adding new third-party scripts requires updating the CSP `meta` tag
 - All pages must work without JS for basic content (progressive enhancement)
 
+### Theming, contrast and links
+
+- **Dark mode** is applied by [assets/js/site-chrome.js](assets/js/site-chrome.js) (`data-theme`
+  on `<html>` + `body.dark`). Colour tokens live in [assets/css/site.css](assets/css/site.css);
+  viewer rules in [assets/css/viewer.css](assets/css/viewer.css); tree pages in
+  [assets/css/yang-tree.css](assets/css/yang-tree.css). New light surfaces need a dark rule.
+- **Contrast:** text and white-on-colour fills must reach 4.5:1 in both themes. Use
+  `var(--c-brand-fill)` for any background under white text — never `var(--accent)` /
+  `--c-brand-600`, which are #42a5f5 in dark mode (white text on it is 2.65:1).
+- **Tree pages** are generated by `scripts/generate_all_pyang_trees.py` (`THEME_ASSETS`, body
+  `data-footer="off"` because the injected site footer uses root-relative links). Tree pages
+  sit three levels deep: root links are `../../../`.
+- **Links:** `tests/test_internal_links.py` crawls every published page; release gate 5 checks
+  each viewer and accountability tree link. Viewers set `validatorUrl: null` (no external
+  validator badge).
+
 ### No emoji in UI or docs
 
 This is a developer-facing technical reference, not a marketing site. Decorative
@@ -523,7 +540,11 @@ Current automated coverage (run as part of G-1):
 - `tests/test_security_regressions.py` — catches CSP / XSS / open-redirect regressions on hub pages
 - `tests/test_manifest_schema.py` — informational; 6 pre-existing failures are tracked as baseline
 - `tests/test_assurance_spec_complete.py` — fails if `ASSURANCE_SPEC.md` references a file/script that no longer exists (spec-rot guard)
-- `tests/test_release_counts.py` — fails on **silent regression in API count, operation count, or module count** vs the checked-in `release_counts.json` baseline. Refresh the baseline only on intentional drops: `python -X utf8 scripts/release_counts.py --write`
+- `tests/test_release_counts.py` — fails on **silent regression in API count, operation count, or module count** vs the checked-in `release_counts.json` baseline. Refresh the baseline only on intentional drops: `python -X utf8 scripts/release_counts.py --write`. Also checks the default is the newest release, the `device_data` release has captures, and every release has a prefix map.
+- `tests/test_internal_links.py` — every static link in every published page resolves in the deployed layout
+- `tests/test_dataset_secrets.py` — no secrets (keys, passwords, SNMP communities) in any published device dataset
+- `tests/test_spec_info_version.py` — each spec's `info.version` names its own release
+- `tests/test_validate_release_gate5.py` — release gate 5 fails on a missing tree page or broken accountability tree link
 
 Local smoke runner:
 
@@ -571,4 +592,4 @@ When making changes that affect generated artifacts:
 
 ---
 
-*Last updated: 2026-06-01 — Closes the native-root-augment gap (kron/mmode + 111 other sibling-module children) and adds a completeness sweep for any top-level native container the v2 generator silently drops. Coverage guard now verifies 233–264 children per release across all 5 releases.*
+*Last updated: 2026-10-04 — 26.2.1 default with `device_data` release, 8 viewers, dark mode on every page (tree pages included), WCAG AA contrast tokens, link and secret guards, release gate 5 rewritten.*
