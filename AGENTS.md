@@ -70,6 +70,9 @@ Update this list when an item is answered or finished; move answers to "Settled"
 - Release comparison lives in the webapp (`release-compare.html`), not a separate static file.
 - Bruno download (issue #12): fixed with CI-built archives; issue closed 2026-10-03.
 - Dark mode on every page and WCAG AA contrast: done (memory/frontend/0003, 0004).
+- Deep MDT is config-driven: capture the running config (`config_get.py`), walk configured
+  native/cfg xpaths until matched (streamed or rejected), oper by fleet history; do not walk
+  unconfigured features (`kit.py walk`, memory/device-harness/0006).
 
 **Housekeeping**
 - Pushes use a classic PAT (`repo` scope, at most 90 days, created about 2026-10-02): expect 403s

@@ -36,7 +36,7 @@ MAX_FILE_BYTES = 512 * 1024 * 1024
 
 NAME = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 OUTPUT_RE = re.compile(rf"^scripts/mdt-telemetry/collector/output/"
-                       rf"(?P<kind>restconf|netconf|netconf-sub|netconf-sub-config|gnmi|gnmi-sub|mdt|facts|coverage)"
+                       rf"(?P<kind>config|restconf|netconf|netconf-sub|netconf-sub-config|gnmi|gnmi-sub|mdt|facts|coverage)"
                        rf"-(?P<pid>{NAME})\.json$")
 ALLOWED = [
     OUTPUT_RE,
@@ -61,8 +61,8 @@ def output_kind(relative: str) -> tuple[str, str] | None:
     if not match:
         return None
     name = PurePosixPath(relative).stem
-    for kind in ("netconf-sub-config", "netconf-sub", "gnmi-sub", "restconf", "netconf", "gnmi", "mdt", "facts",
-                 "coverage"):
+    for kind in ("netconf-sub-config", "netconf-sub", "gnmi-sub", "config", "restconf", "netconf", "gnmi", "mdt",
+                 "facts", "coverage"):
         if name.startswith(kind + "-"):
             return kind, name[len(kind) + 1:]
     return None
