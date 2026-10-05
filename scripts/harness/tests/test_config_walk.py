@@ -106,3 +106,16 @@ def test_importer_accepts_config_files():
     assert importer.output_kind("scripts/mdt-telemetry/collector/output/config-C9300-48P.json") == (
         "config", "C9300-48P")
     assert "config" in kit.METHODS and kit.METHODS[0] == "config"
+
+
+def test_split_mdt_merges_without_losing_earlier_records(tmp_path, monkeypatch):
+    monkeypatch.setattr(kit.inv, "load_inventory", lambda: [])
+    earlier = json.dumps({"tags": {"source": "sw1", "path": "deep:walk", "subscription": "900001"}})
+    target = tmp_path / "mdt-PID1.json"
+    target.write_text(earlier + "\n", encoding="utf-8")
+    fresh = json.dumps({"tags": {"source": "sw1", "path": "a:b", "subscription": "900002"}})
+    live = tmp_path / "mdt-live.json"
+    live.write_text(f"{fresh}\n{fresh}\n", encoding="utf-8")
+    for _ in range(2):
+        kit.split_mdt(live, tmp_path, facts={"PID1": {"hostname": "sw1"}})
+    assert target.read_text(encoding="utf-8").splitlines() == [earlier, fresh]

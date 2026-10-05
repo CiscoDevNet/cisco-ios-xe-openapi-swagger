@@ -359,7 +359,7 @@ def method_command(method: str, device, args, receiver_ip: Optional[str]) -> lis
 
 def run_logged(command: list[str], log_path: Path, cwd: Path) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(log_path, "w", encoding="utf-8") as log:
+    with open(log_path, "w", encoding="utf-8", buffering=1) as log:
         process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                    text=True, encoding="utf-8", errors="replace",
                                    env={**os.environ, "PYTHONUNBUFFERED": "1"})
@@ -429,7 +429,7 @@ def resolve_source(source: str, mapping: dict) -> Optional[str]:
 
 
 def split_mdt(live: Path = MDT_LIVE, out_dir: Path = OUTPUT, facts: Optional[dict] = None) -> dict:
-    """Rewrite mdt-<PID>.json from the full receiver stream (idempotent)."""
+    """Merge the receiver stream into mdt-<PID>.json, appending only new records (idempotent)."""
     if not live.exists():
         print("  no MDT stream captured yet")
         return {}
@@ -454,8 +454,14 @@ def split_mdt(live: Path = MDT_LIVE, out_dir: Path = OUTPUT, facts: Optional[dic
             continue
         per_pid.setdefault(pid, []).append(line)
     for pid, lines in per_pid.items():
-        (out_dir / f"mdt-{pid}.json").write_text("\n".join(lines) + "\n", encoding="utf-8")
-        print(f"  mdt-{pid}.json: {len(lines)} records")
+        # Merge, never overwrite: earlier runs (e.g. a deep walk) may have written records the stream lacks.
+        target = out_dir / f"mdt-{pid}.json"
+        existing = set(target.read_text(encoding="utf-8").splitlines()) if target.exists() else set()
+        new_lines = [line for line in dict.fromkeys(lines) if line not in existing]
+        if new_lines:
+            with open(target, "a", encoding="utf-8") as handle:
+                handle.write("\n".join(new_lines) + "\n")
+        print(f"  mdt-{pid}.json: {len(new_lines)} new of {len(lines)} records")
     for source, count in unknown.items():
         print(f"  ! {count} records from unknown source {source!r} (run facts for that device)")
     if foreign:

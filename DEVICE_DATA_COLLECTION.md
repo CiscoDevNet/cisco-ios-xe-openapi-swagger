@@ -17,10 +17,8 @@ subscribe periodic + on-change, gNMI Get / Subscribe, MDT dial-out, SNMP MIB bri
 in values, CLI text and `community-config` list names); `tests/test_dataset_secrets.py` scans
 all of them.
 
-**In progress:** a per-xpath MDT walk on C9300-STACK8-WAN on top of its top-level MDT run:
-openconfig, ietf, other, cfg and MIB in full; oper and native-config on pruned catalogs (§14).
-When it finishes, rebuild the MDT dataset (`build_live_dataset.py`, `build_protocol_matrix.py`) and
-re-run the secret tests.
+**MDT depth:** every device also had a per-xpath MDT walk (one subscription per nested
+container); the Stack's (2026-10-05) used pruned catalogs over the WAN (§14).
 
 **Next:** after the lab upgrades to 26.2.1, follow VERSIONING.md 8.2 to re-collect on 26.2.1.
 ### Harness components
