@@ -26,6 +26,54 @@ When making non-trivial changes, the following documents are authoritative. Upda
 
 If a request conflicts with these docs, prefer updating the doc first (with rationale) and then code.
 
+### 0.1 Open items and settled questions (handoff, as of 2026-10-05)
+
+Update this list when an item is answered or finished; move answers to "Settled".
+
+**In progress**
+- **C9300-STACK8-WAN deep MDT walk** (`walk_all.py --device C9300-STACK8-WAN --mib`, started
+  2026-10-04 on the lab VM; log `/tmp/stack-deepwalk.log`, resumable checkpoints
+  `scripts/mdt-telemetry/collector/output/walk-C9300-STACK8-WAN-*.json`). When it finishes:
+  `build_live_dataset.py`, `build_protocol_matrix.py`, `pytest tests/test_dataset_secrets.py`,
+  commit, promote, and remove the "In progress" notes in CHANGELOG.md and
+  DEVICE_DATA_COLLECTION.md §0.
+
+**Waiting on the user (not answered yet)**
+1. **Lab upgrade to 26.2.1**, then re-collect per VERSIONING.md 8.2. The user mentioned "8 or so
+   lab devices"; the inventory has 7 (six on the lab subnet + the 8-member stack). Confirm
+   whether an eighth device should be onboarded (`kit.py onboard`).
+2. **Stack standing MDT subscriptions** (ids 30002, 50023, 60007, ... streaming to this VM): keep
+   or remove? Harness traffic is already filtered (memory/telemetry/0001).
+3. **Feature enablement** (DEVICE_FEATURE_COVERAGE.md): ~626 modules return no data because the
+   feature isn't configured. Offered several times, never answered. Needs a topology check first
+   (data-plane links between devices, not just management).
+4. **Older-release-only specs** `native-aug-tftp-server-config` and `ietf-netconf-monitoring`
+   (in 17.9.x\u201326.1.1, not 26.2.1): remove for consistency or regenerate?
+5. **23 empty tree pages** (`empty-tree` in `tree_audit.json`): hide them, or show a "no data
+   nodes" note?
+6. **24 hand-made 26.1.1 tree pages** (June layout, not regenerated): keep or retire?
+
+**Deferred by the user**
+- Native example overlay and CLI mappings (`references/native-example-overlay.yaml`,
+  `native-cli-mappings.yaml` were never committed): "later".
+- Site size (~3 GB vs the documented 1 GB Pages limit): "not concerned at this time".
+
+**Settled (do not reopen)**
+- Default release is always the newest (26.2.1 now); device data follows `device_data`.
+- Lab password and SNMP community in public data/history: not a concern; no rotation or history
+  rewrite (memory/device-harness/0005). Masking of published data stays mandatory.
+- Agents may change running-config and `write memory` on all lab devices.
+- Harness: plain venv folder, Telegraf as MDT receiver, `onboard` may enable AAA/APIs/SNMP.
+- Duplicate `native-services-1/2/3` specs: removed from all releases.
+- Release comparison lives in the webapp (`release-compare.html`), not a separate static file.
+- Bruno download (issue #12): fixed with CI-built archives; issue closed 2026-10-03.
+- Dark mode on every page and WCAG AA contrast: done (memory/frontend/0003, 0004).
+
+**Housekeeping**
+- Pushes use a classic PAT (`repo` scope, at most 90 days, created about 2026-10-02): expect 403s
+  around year end; renew it in `~/.git-credentials` (memory/deploy/0001).
+- Cosmetic: the App Map mindmap image keeps a light frame in dark mode.
+
 ---
 
 ## 1. Project Overview

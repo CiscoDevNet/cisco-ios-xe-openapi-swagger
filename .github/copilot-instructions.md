@@ -1,9 +1,10 @@
 # Copilot / AI agent instructions
 
 **Read [AGENTS.md](../AGENTS.md) first** — it is the authoritative agent guide
-(source-of-truth docs, the 9 model categories, conventions, safety, dev/prod
+(source-of-truth docs, the 8 model viewers, conventions, safety, dev/prod
 deploy, corp-proxy rule). Do not duplicate its content; update it when behavior
-changes.
+changes. **AGENTS.md §0.1** lists open items, questions waiting on the user, and
+settled decisions — check it before proposing work, and update it when an item closes.
 
 ## Decision ledger — [memory/](../memory/)
 Before changing a webapp component, **read `memory/<component>/*.md`** — the
