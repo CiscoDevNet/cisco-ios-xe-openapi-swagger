@@ -17,9 +17,9 @@ subscribe periodic + on-change, gNMI Get / Subscribe, MDT dial-out, SNMP MIB bri
 in values, CLI text and `community-config` list names); `tests/test_dataset_secrets.py` scans
 all of them.
 
-**In progress:** a per-xpath MDT walk of every model family on C9300-STACK8-WAN
-(`walk_all.py --device C9300-STACK8-WAN --mib`, §14) on top of its top-level MDT run. When it
-finishes, rebuild the MDT dataset (`build_live_dataset.py`, `build_protocol_matrix.py`) and
+**In progress:** a per-xpath MDT walk on C9300-STACK8-WAN on top of its top-level MDT run:
+openconfig, ietf, other, cfg and MIB in full; oper and native-config on pruned catalogs (§14).
+When it finishes, rebuild the MDT dataset (`build_live_dataset.py`, `build_protocol_matrix.py`) and
 re-run the secret tests.
 
 **Next:** after the lab upgrades to 26.2.1, follow VERSIONING.md 8.2 to re-collect on 26.2.1.
@@ -651,7 +651,14 @@ sha256sum -c SHA256SUMS && ./setup.sh
   `scripts/mdt-telemetry/collector/walk_all.py --device <name> --mib`. It walks openconfig,
   ietf, other, cfg, MIB, oper and native-config in that order, checkpoints per flavor
   (`output/walk-<device>-<flavor>.json`) and resumes where it stopped. Over a WAN it takes
-  well over 11 hours. Then rebuild with `build_live_dataset.py` and `build_protocol_matrix.py`.
+  days (native-config alone is 14,659 xpaths). Then rebuild with `build_live_dataset.py` and
+  `build_protocol_matrix.py`.
+- **Pruned walk (WAN or new devices):** `prune_walk_catalog.py --device <name> --flavor
+  oper|native-config --out <catalog>` keeps only xpaths that streamed on another walked device or
+  (native-config) whose container exists in the device's running config, and drops xpaths invalid
+  on every device; pass the result to `walk_xpaths.py --catalog`. Checked by leaving each walked
+  device out: ~820 of 3,198 oper and ~145 of 14,659 native-config xpaths kept, with 94–100% of the
+  xpaths that streamed (switches; the C9800's wireless-only modules are the exception).
 - **Secret masking:** every published dataset is masked at build time (`redact_payload.py`,
   `harness/redact.py`), including SNMP communities in CLI text and `community-config` list
   names; `tests/test_dataset_secrets.py` must pass before committing device data.

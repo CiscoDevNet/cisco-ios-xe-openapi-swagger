@@ -31,12 +31,14 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 Update this list when an item is answered or finished; move answers to "Settled".
 
 **In progress**
-- **C9300-STACK8-WAN deep MDT walk** (`walk_all.py --device C9300-STACK8-WAN --mib`, started
-  2026-10-04 on the lab VM; log `/tmp/stack-deepwalk.log`, resumable checkpoints
-  `scripts/mdt-telemetry/collector/output/walk-C9300-STACK8-WAN-*.json`). When it finishes:
-  `build_live_dataset.py`, `build_protocol_matrix.py`, `pytest tests/test_dataset_secrets.py`,
+- **C9300-STACK8-WAN deep MDT walk**: openconfig, ietf, other, cfg and MIB were walked in full
+  (2026-10-04). On 2026-10-05 the rest switched to pruned catalogs (`prune_walk_catalog.py`: 827
+  oper + 145 native-config xpaths instead of ~16,900) via `/tmp/stack-deepwalk-pruned.sh`, log
+  `/tmp/stack-deepwalk-pruned.log`, resumable checkpoints
+  `scripts/mdt-telemetry/collector/output/walk-C9300-STACK8-WAN-*.json`; about 3 hours. When it
+  finishes: `build_live_dataset.py`, `build_protocol_matrix.py`, `pytest tests/test_dataset_secrets.py`,
   commit, promote, and remove the "In progress" notes in CHANGELOG.md and
-  DEVICE_DATA_COLLECTION.md §0.
+  DEVICE_DATA_COLLECTION.md §0. A full (unpruned) walk can still run later; it skips walked xpaths.
 
 **Waiting on the user (not answered yet)**
 1. **Lab upgrade to 26.2.1**, then re-collect per VERSIONING.md 8.2. The user mentioned "8 or so
