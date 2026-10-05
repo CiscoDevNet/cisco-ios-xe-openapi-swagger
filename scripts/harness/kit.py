@@ -10,6 +10,7 @@ same relative layout, so the proven collectors run unchanged.
     facts                   record hostname, version, and YANG library modules per device (NETCONF)
     telegraf start|stop|status   local MDT gRPC dial-out receiver (bin/telegraf or telegraf on PATH)
     collect                 run every collector per device, then split MDT and score coverage
+    walk                    config-driven per-xpath MDT walk: configured native/cfg xpaths until matched
     split-mdt               split output/mdt-live.json into mdt-<PID>.json by device hostname
     coverage                checklist: device-advertised data modules vs what each method returned
     bundle                  redact, secret-scan, checksum, and pack results for import_harness_bundle.py
@@ -52,10 +53,10 @@ HARNESS_SUBSCRIPTION = re.compile(r"9\d{5}")  # collect_fleet / recapture / walk
 DEFAULT_MDT_PORT = 57500
 BUNDLE_FORMAT = "iosxe-harness-bundle/1"
 
-# Order matters: gnmi-sub reuses gnmi-<PID>.json; the long spec walk runs last.
-METHODS = ["restconf", "netconf", "gnmi", "gnmi-sub", "netconf-sub", "netconf-sub-config", "mdt",
+# Order matters: config first (what is configured); gnmi-sub reuses gnmi-<PID>.json; the long spec walk runs last.
+METHODS = ["config", "restconf", "netconf", "gnmi", "gnmi-sub", "netconf-sub", "netconf-sub-config", "mdt",
            "restconf-walk"]
-RAW_KINDS = ("restconf", "netconf", "netconf-sub", "netconf-sub-config", "gnmi", "gnmi-sub", "mdt")
+RAW_KINDS = ("config", "restconf", "netconf", "netconf-sub", "netconf-sub-config", "gnmi", "gnmi-sub", "mdt")
 REQUIRED_MODULES = ("requests", "ncclient", "netmiko", "pygnmi", "yaml")
 DEVICE_PORTS = {"ssh": 22, "restconf": 443, "netconf": 830, "gnmi": 9339}
 
@@ -328,6 +329,7 @@ def cmd_telegraf(args) -> int:
 def method_command(method: str, device, args, receiver_ip: Optional[str]) -> list[str]:
     limit = ["--limit", str(args.limit)] if args.limit else []
     scripts = {
+        "config": ["config_get.py"],
         "restconf": ["restconf_get.py"], "netconf": ["netconf_get.py"], "gnmi": ["gnmi_get.py"],
         "gnmi-sub": ["gnmi_subscribe.py"], "netconf-sub": ["netconf_subscribe.py"],
         "netconf-sub-config": ["netconf_subscribe.py", "--config-roots", "--both"],
@@ -464,6 +466,101 @@ def split_mdt(live: Path = MDT_LIVE, out_dir: Path = OUTPUT, facts: Optional[dic
 def cmd_split_mdt(args) -> int:
     split_mdt()
     return 0
+
+
+# --------------------------------------------------------------------------- walk
+
+def walk_state_path(pid: str, flavor: str, retry: bool = False) -> Path:
+    return OUTPUT / f"walk-{pid}-{flavor}{'-retry' if retry else ''}.json"
+
+
+def walk_results(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))["results"] if path.exists() else {}
+
+
+def walk_command(device, flavor: str, catalog: Path, state: Path, window: int, args, receiver_ip: str) -> list[str]:
+    return [sys.executable, str(COLLECTOR / "walk_xpaths.py"), "--device", device.name, "--category", flavor,
+            "--catalog", str(catalog), "--state", str(state), "--capture-file", str(MDT_LIVE),
+            "--receiver-ip", receiver_ip, "--receiver-port", str(args.receiver_port),
+            "--window", str(window), "--idle", "3", "--pace", "0", "--apply"]
+
+
+def config_match(configured: list[str], results: dict, retry: dict) -> dict:
+    """Configured xpaths by walk outcome; a retry result replaces the first one.
+
+    `invalid` means the device rejects the subscription, so the xpath is resolved (it cannot
+    stream); `silent` and `unresolved` (crashed, error, not walked yet) are the gaps.
+    """
+    buckets: dict[str, list[str]] = {"streamed": [], "invalid": [], "silent": [], "unresolved": []}
+    for xpath in configured:
+        status = (retry.get(xpath) or results.get(xpath) or {}).get("status")
+        buckets[status if status in ("streamed", "invalid", "silent") else "unresolved"].append(xpath)
+    resolved = len(buckets["streamed"]) + len(buckets["invalid"])
+    return {"configured": len(configured), "resolved": resolved,
+            "matched_pct": round(100 * resolved / len(configured), 1) if configured else 100.0, **buckets}
+
+
+def walk_flavor(device, flavor: str, args, receiver_ip: str) -> Optional[dict]:
+    """Walk one flavor's pruned catalog; for config flavors, retry silent configured xpaths and
+    return the config match."""
+    import prune_walk_catalog as prune
+
+    nodes = prune.keep(flavor, device.pid, prune.catalog_nodes(flavor), set())
+    catalog = RUN_DIR / f"catalog-{device.pid}-{flavor}.json"
+    prune.write_catalog(nodes, catalog)
+    state = walk_state_path(device.pid, flavor)
+    print(f"  --- walk {flavor}: {len(nodes)} xpaths (pruned catalog {catalog.name})")
+    run_logged(walk_command(device, flavor, catalog, state, args.window, args, receiver_ip),
+               LOG_DIR / f"walk-{flavor}-{device.pid}.log", COLLECTOR)
+    if flavor not in prune.CONFIG_FLAVORS:
+        return None
+
+    tree = prune.config_root(device.pid)
+    configured = [node["xpath"] for node in nodes if prune.configured(tree, node["xpath"])]
+    results = walk_results(state)
+    retry_state = walk_state_path(device.pid, flavor, retry=True)
+    silent = {xpath for xpath in configured if results.get(xpath, {}).get("status") == "silent"}
+    if silent and args.retry_window:
+        retry_catalog = RUN_DIR / f"catalog-{device.pid}-{flavor}-retry.json"
+        prune.write_catalog([node for node in nodes if node["xpath"] in silent], retry_catalog)
+        print(f"  --- retry {len(silent)} configured-but-silent {flavor} xpaths, window {args.retry_window}s")
+        run_logged(walk_command(device, flavor, retry_catalog, retry_state, args.retry_window, args, receiver_ip),
+                   LOG_DIR / f"walk-{flavor}-retry-{device.pid}.log", COLLECTOR)
+    return config_match(configured, results, walk_results(retry_state))
+
+
+def cmd_walk(args) -> int:
+    devices = select_devices(args.devices)
+    if not devices:
+        print("ERROR: no matching devices in inventory", file=sys.stderr)
+        return 2
+    if not telegraf_pid():
+        print("ERROR: telegraf is not running (kit.py telegraf start)", file=sys.stderr)
+        return 2
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
+    gaps = 0
+    for device in devices:
+        print(f"\n######## {device.name} ({device.pid}, {device.host})")
+        if args.refresh_config or not (OUTPUT / f"config-{device.pid}.json").exists():
+            command = [sys.executable, str(COLLECTOR / "config_get.py"), "--device", device.name]
+            if run_logged(command, LOG_DIR / f"config-{device.pid}.log", COLLECTOR):
+                print("  ! running-config capture failed; skipping this device")
+                gaps += 1
+                continue
+        receiver_ip = args.receiver_ip or local_ip_toward(device.host)
+        report = {"pid": device.pid, "name": device.name, "generated": utc_now(), "flavors": {}}
+        for flavor in args.flavors:
+            match = walk_flavor(device, flavor, args, receiver_ip)
+            if match is None:
+                continue
+            report["flavors"][flavor] = match
+            print(f"  {flavor} config match: {match['resolved']}/{match['configured']} ({match['matched_pct']}%) "
+                  f"streamed={len(match['streamed'])} invalid={len(match['invalid'])} "
+                  f"silent={len(match['silent'])} unresolved={len(match['unresolved'])}")
+            gaps += 1 if match["silent"] or match["unresolved"] else 0
+        (OUTPUT / f"match-{device.pid}.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
+    split_mdt()
+    return 0 if not gaps else 1
 
 
 # --------------------------------------------------------------------------- coverage
@@ -612,7 +709,7 @@ def device_record(device, facts: dict) -> dict:
 
 def redact_document(relative: str, text: str) -> str:
     """Mask secret values in raw payloads (collector files keep them unmasked)."""
-    from redact_payload import redact_obj, redact_value
+    from redact_payload import mask_cli, redact_obj, redact_value
 
     if MDT_FILE_RE.search(relative):
         lines = []
@@ -634,6 +731,9 @@ def redact_document(relative: str, text: str) -> str:
                     entry[field] = redact_value(entry[field])
         if "response" in document:
             document["response"] = redact_obj(document["response"])
+        if "show_run" in document:  # config-<PID>.json (config_get.py masks too; this is the backstop)
+            document["show_run"] = mask_cli(document["show_run"])
+            document["restconf_json"] = redact_obj(document.get("restconf_json") or {})
     return json.dumps(document, ensure_ascii=False)
 
 
@@ -810,6 +910,17 @@ def build_parser() -> argparse.ArgumentParser:
     collect.set_defaults(func=cmd_collect)
 
     sub.add_parser("split-mdt").set_defaults(func=cmd_split_mdt)
+
+    walk = with_devices(sub.add_parser("walk", help="Config-driven per-xpath MDT walk (resumable)"))
+    walk.add_argument("--flavors", nargs="+", choices=["native-config", "cfg", "oper"],
+                      default=["native-config", "cfg", "oper"])
+    walk.add_argument("--window", type=int, default=10, help="Seconds to wait for data per xpath")
+    walk.add_argument("--retry-window", type=int, default=60,
+                      help="Longer wait for configured xpaths that stayed silent (0 = no retry)")
+    walk.add_argument("--refresh-config", action="store_true", help="Re-capture the running config first")
+    walk.add_argument("--receiver-ip", help="IP devices dial for MDT (default: this host's IP toward each)")
+    walk.add_argument("--receiver-port", type=int, default=DEFAULT_MDT_PORT)
+    walk.set_defaults(func=cmd_walk)
 
     coverage = with_devices(sub.add_parser("coverage"))
     coverage.add_argument("--release")

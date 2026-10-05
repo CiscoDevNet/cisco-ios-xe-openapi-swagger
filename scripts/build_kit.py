@@ -94,6 +94,14 @@ never touches existing AAA, verifies a fresh login after enabling AAA, and does 
 MDT subscriptions are added in small CPU-gated batches and removed after each batch.
 Re-run `collect --device X --methods <method>` to fill any gap coverage reports.
 
+Optional, deeper MDT: subscribe one xpath at a time, driven by the device's running config
+(`show running-config | format restconf-json`), so unconfigured features are not walked:
+
+    ./harness walk --device <name>                   # config-<PID>.json, then native-config, cfg, oper
+
+It prints how many configured xpaths streamed, were rejected, or stayed silent (silent ones
+are retried with a longer window). Re-run to resume.
+
 ## 5. Bundle and bring back
 
     ./harness bundle                                 # dist/harness-bundle-<UTC>.tar.gz
@@ -150,6 +158,18 @@ def copy_catalogs(kit: Path, release: str) -> None:
                              f"(count_subscribable.py --version {release} --dump / mib_catalog.py)")
         shutil.copy2(source, target / name)
     shutil.copy2(REPO / "yang-prefix-map.json", kit / "yang-prefix-map.json")
+
+
+def copy_fleet_history(kit: Path) -> None:
+    """Which MDT xpaths streamed / were rejected on the lab fleet, so `harness walk` can prune."""
+    sys.path.insert(0, str(COLLECTOR))
+    import prune_walk_catalog as prune
+
+    target = kit / COLLECTOR.relative_to(REPO) / "output"
+    for flavor in prune.FLAVORS:
+        history = prune.fleet_history(flavor)
+        (target / f"fleet-walk-{flavor}.json").write_text(json.dumps(history), encoding="utf-8")
+        print(f"fleet walk history ({flavor}): {len(history['devices'])} device(s)")
 
 
 def copy_specs(kit: Path, release: str) -> int:
@@ -238,6 +258,7 @@ def build(args) -> Path:
     kit.mkdir(parents=True)
     copy_code(kit)
     copy_catalogs(kit, args.release)
+    copy_fleet_history(kit)
     spec_count = copy_specs(kit, args.release)
     write_release_index(kit, args.release)
     print(f"specs: {spec_count} slim spec files")

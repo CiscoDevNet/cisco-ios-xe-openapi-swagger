@@ -165,6 +165,18 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — config-driven MDT walk in the harness (2026-10-05)
+
+- **Running config first:** new `scripts/mdt-telemetry/collector/config_get.py` captures
+  `show running-config` and `show running-config | format restconf-json` over SSH
+  (`output/config-<PID>.json`, secrets masked by the new `redact_payload.mask_cli`). It is the
+  first `kit.py collect` method and is included in bundles and imports.
+- **`kit.py walk`:** walks only what is configured (native-config and every `*-cfg` model in the
+  restconf-json) plus xpaths proven on other devices, re-tries configured-but-silent xpaths with
+  a longer window, and reports the match per device (`output/match-<PID>.json`). Leave-one-out
+  over six devices kept 299/300 streaming native-config xpaths from 192–270 of 14,659, and
+  101/101 cfg. Kits ship the fleet walk history so they can prune too.
+
 ### Fixed — release validation gate 5 and remaining text contrast (2026-10-04)
 
 - **Gate 5 (spec → tree linkage)** in `scripts/validate_release.py` read `info.x-yang-tree-url`,

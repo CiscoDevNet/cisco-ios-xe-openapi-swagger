@@ -52,6 +52,18 @@ JSON_COMMUNITY_NAME = re.compile(
     r'(?P<pre>\\?"(?:[A-Za-z0-9-]+:)?community-config\\?"\s*:\s*\[(?:[^\]\[]*?\{[^{}]*?)??\\?"name\\?"\s*:\s*\\?")'
     r'(?!\*\*\*REDACTED\*\*\*)(?P<val>[^"\\]+)')
 COMMUNITY_LISTS = {"community-config"}
+# CLI config lines: the token after a secret keyword (and an optional encryption-type digit).
+CLI_SECRET = re.compile(
+    r"(?P<pre>\b(?:secret|password|key-string|pre-shared-key|authentication-key|message-digest-key"
+    r"(?:\s+\d+\s+md5)?|key|md5|community)\s+(?:[0-9]\s+)?)(?!\*\*\*REDACTED\*\*\*)(?P<val>\S+)",
+    re.I)
+
+
+def mask_cli(text: str) -> str:
+    """Mask secret values in IOS XE CLI config text (show running-config)."""
+    text = PEM.sub(REDACTED, text)
+    text = CLI_COMMUNITY.sub(lambda m: m.group("pre") + REDACTED, text)
+    return "\n".join(CLI_SECRET.sub(lambda m: m.group("pre") + REDACTED, line) for line in text.splitlines())
 
 
 def _mask_communities(s: str) -> str:

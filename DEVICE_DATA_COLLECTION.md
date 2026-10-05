@@ -615,6 +615,7 @@ sha256sum -c SHA256SUMS && ./setup.sh
 ./harness onboard --all            # plan; then --apply (add --snmp-community for MIB data)
 ./harness telegraf start           # MDT receiver :57500 — devices must reach this host
 ./harness collect                  # all methods, all devices (smoke: --device X --limit 5)
+./harness walk                     # optional deep MDT: configured native/cfg + fleet-proven oper xpaths
 ./harness coverage                 # COMPLETE / INCOMPLETE per device
 ./harness telegraf stop && ./harness bundle
 
@@ -653,12 +654,20 @@ sha256sum -c SHA256SUMS && ./setup.sh
   (`output/walk-<device>-<flavor>.json`) and resumes where it stopped. Over a WAN it takes
   days (native-config alone is 14,659 xpaths). Then rebuild with `build_live_dataset.py` and
   `build_protocol_matrix.py`.
-- **Pruned walk (WAN or new devices):** `prune_walk_catalog.py --device <name> --flavor
-  oper|native-config --out <catalog>` keeps only xpaths that streamed on another walked device or
-  (native-config) whose container exists in the device's running config, and drops xpaths invalid
-  on every device; pass the result to `walk_xpaths.py --catalog`. Checked by leaving each walked
-  device out: ~820 of 3,198 oper and ~145 of 14,659 native-config xpaths kept, with 94–100% of the
-  xpaths that streamed (switches; the C9800's wireless-only modules are the exception).
+- **Running config first (`config` method):** `config_get.py` captures `show running-config`
+  and `show running-config | format restconf-json` over SSH into `output/config-<PID>.json`
+  (secrets masked; bundled). It tells the walk what is configured.
+- **Config-driven walk (`kit.py walk`, WAN or new devices):** builds a pruned catalog per flavor
+  with `prune_walk_catalog.py` and walks it with `walk_xpaths.py`. native-config and cfg keep
+  every xpath whose container is in the restconf-json, plus xpaths that streamed on another
+  walked device; oper (runtime state, not config) keeps only xpaths that streamed elsewhere.
+  Configured xpaths that stay silent are walked again with `--retry-window` (60 s). Each device
+  gets `output/match-<PID>.json`: configured xpaths that streamed, were rejected by the device
+  (`invalid`, cannot stream), stayed silent, or are unwalked; matched = streamed + invalid.
+  Leave-one-out check over six devices: native-config kept 192–270 of 14,659 xpaths and 299/300
+  of those that streamed; cfg 77–127 of 522 and 101/101; oper ~820 of 3,198 and 94–100% on
+  switches (C9800 39%: wireless-only modules). Kits ship the fleet history as
+  `fleet-walk-<flavor>.json`. Why: memory/device-harness/0006.
 - **Secret masking:** every published dataset is masked at build time (`redact_payload.py`,
   `harness/redact.py`), including SNMP communities in CLI text and `community-config` list
   names; `tests/test_dataset_secrets.py` must pass before committing device data.
