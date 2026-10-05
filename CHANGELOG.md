@@ -222,14 +222,14 @@ below are far more representative than the average).
 - Verified in a headless browser across 28 pages in both themes: no failed requests, no console
   errors, no unreadable text.
 
-### In progress — C9300-STACK8-WAN deep MDT walk (2026-10-04)
+### Added — C9300-STACK8-WAN deep MDT walk (2026-10-05)
 
 - Per-xpath MDT walk on the Stack over the WAN, in addition to the top-level run: openconfig,
   ietf, other, cfg and MIB in full; oper and native-config on catalogs pruned by the new
   `scripts/mdt-telemetry/collector/prune_walk_catalog.py` (972 of ~16,900 xpaths: those that
   streamed on another device or exist in the Stack's running config; 94–100% of streaming xpaths
-  kept in leave-one-out checks), cutting about two days to about three hours. Its records will be
-  added to the MDT dataset when it completes.
+  kept in leave-one-out checks), cutting about two days to about three hours. The Stack's MDT
+  paths went from 78 to 586 (the MDT dataset now has 4,293 paths across the 7 devices).
 
 ### Security — SNMP community and lab password removed from published files (2026-10-04)
 
