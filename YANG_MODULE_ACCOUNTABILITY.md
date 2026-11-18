@@ -1,9 +1,9 @@
 # YANG Module Accountability Report
 
-**Date:** October 04, 2026
+**Date:** November 18, 2026
 **IOS XE Version:** 17.18.1
 **Total YANG Modules:** 1379
-**Modules with OpenAPI Specs:** 894 (64.8%)
+**Modules with OpenAPI Specs:** 872 (63.2%)
 **Modules with YANG Trees:** 715
 **Modules in Multiple Categories:** 3
 
@@ -28,7 +28,7 @@ This report provides **100% accountability** for every YANG module in the
 | **oper** | 200 | 199 | 100% |  |
 | **rpc** | 47 | 47 | 100% |  |
 | **cfg** | 42 | 39 | 93% |  |
-| **openconfig** | 66 | 41 | 62% |  |
+| **openconfig** | 66 | 19 | 29% |  |
 | **ietf** | 33 | 21 | 64% |  |
 | **mib** | 149 | 147 | 99% |  |
 | **events** | 41 | 9 | 22% |  |
@@ -353,36 +353,36 @@ This report provides **100% accountability** for every YANG module in the
 
 | Module | Categories | Spec Links | Tree |
 |--------|------------|------------|------|
-| openconfig-aaa | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-aaa) | - |
+| openconfig-aaa | - | ❌ No spec | - |
 | openconfig-access-points | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-access-points) | [🌳](yang-trees/openconfig-access-points.html) |
 | openconfig-acl | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-acl) | [🌳](yang-trees/openconfig-acl.html) |
-| openconfig-aft | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-aft) | - |
+| openconfig-aft | - | ❌ No spec | - |
 | openconfig-aft-network-instance | - | ❌ No spec | [🌳](yang-trees/openconfig-aft-network-instance.html) |
-| openconfig-alarms | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-alarms) | [🌳](yang-trees/openconfig-alarms.html) |
+| openconfig-alarms | - | ❌ No spec | [🌳](yang-trees/openconfig-alarms.html) |
 | openconfig-ap-manager | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-ap-manager) | [🌳](yang-trees/openconfig-ap-manager.html) |
 | openconfig-bfd | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-bfd) | [🌳](yang-trees/openconfig-bfd.html) |
-| openconfig-bgp | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-bgp) | - |
+| openconfig-bgp | - | ❌ No spec | - |
 | openconfig-bgp-policy | - | ❌ No spec | [🌳](yang-trees/openconfig-bgp-policy.html) |
 | openconfig-ethernet-segments | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-ethernet-segments) | [🌳](yang-trees/openconfig-ethernet-segments.html) |
-| openconfig-evpn | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-evpn) | - |
+| openconfig-evpn | - | ❌ No spec | - |
 | openconfig-extensions | - | ❌ No spec | - |
 | openconfig-if-aggregate | - | ❌ No spec | [🌳](yang-trees/openconfig-if-aggregate.html) |
-| openconfig-if-ethernet | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-if-ethernet) | [🌳](yang-trees/openconfig-if-ethernet.html) |
+| openconfig-if-ethernet | - | ❌ No spec | [🌳](yang-trees/openconfig-if-ethernet.html) |
 | openconfig-if-ip | - | ❌ No spec | [🌳](yang-trees/openconfig-if-ip.html) |
 | openconfig-if-ip-ext | - | ❌ No spec | [🌳](yang-trees/openconfig-if-ip-ext.html) |
 | openconfig-if-poe | - | ❌ No spec | [🌳](yang-trees/openconfig-if-poe.html) |
-| openconfig-igmp | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-igmp) | - |
+| openconfig-igmp | - | ❌ No spec | - |
 | openconfig-interfaces | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-interfaces) | [🌳](yang-trees/openconfig-interfaces.html) |
-| openconfig-isis | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-isis) | - |
+| openconfig-isis | - | ❌ No spec | - |
 | openconfig-isis-policy | - | ❌ No spec | [🌳](yang-trees/openconfig-isis-policy.html) |
 | openconfig-keychain | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-keychain) | [🌳](yang-trees/openconfig-keychain.html) |
 | openconfig-lacp | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-lacp) | [🌳](yang-trees/openconfig-lacp.html) |
-| openconfig-license | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-license) | - |
+| openconfig-license | - | ❌ No spec | - |
 | openconfig-lldp | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-lldp) | [🌳](yang-trees/openconfig-lldp.html) |
-| openconfig-local-routing | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-local-routing) | [🌳](yang-trees/openconfig-local-routing.html) |
+| openconfig-local-routing | - | ❌ No spec | [🌳](yang-trees/openconfig-local-routing.html) |
 | openconfig-macsec | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-macsec) | [🌳](yang-trees/openconfig-macsec.html) |
 | openconfig-messages | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-messages) | [🌳](yang-trees/openconfig-messages.html) |
-| openconfig-mpls | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-mpls) | [🌳](yang-trees/openconfig-mpls.html) |
+| openconfig-mpls | - | ❌ No spec | [🌳](yang-trees/openconfig-mpls.html) |
 | openconfig-mpls-ldp | - | ❌ No spec | - |
 | openconfig-mpls-rsvp | - | ❌ No spec | - |
 | openconfig-mpls-sr | - | ❌ No spec | - |
@@ -391,31 +391,31 @@ This report provides **100% accountability** for every YANG module in the
 | openconfig-network-instance-policy | - | ❌ No spec | [🌳](yang-trees/openconfig-network-instance-policy.html) |
 | openconfig-openflow | - | ❌ No spec | [🌳](yang-trees/openconfig-openflow.html) |
 | openconfig-ospf-policy | - | ❌ No spec | [🌳](yang-trees/openconfig-ospf-policy.html) |
-| openconfig-ospfv2 | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-ospfv2) | - |
-| openconfig-packet-match | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-packet-match) | - |
-| openconfig-pcep | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-pcep) | - |
+| openconfig-ospfv2 | - | ❌ No spec | - |
+| openconfig-packet-match | - | ❌ No spec | - |
+| openconfig-pcep | - | ❌ No spec | - |
 | openconfig-pf-srte | - | ❌ No spec | [🌳](yang-trees/openconfig-pf-srte.html) |
-| openconfig-pim | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-pim) | - |
+| openconfig-pim | - | ❌ No spec | - |
 | openconfig-platform | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-platform) | [🌳](yang-trees/openconfig-platform.html) |
 | openconfig-platform-cpu | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-cpu.html) |
 | openconfig-platform-fan | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-fan.html) |
 | openconfig-platform-linecard | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-linecard.html) |
 | openconfig-platform-port | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-port.html) |
 | openconfig-platform-psu | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-psu.html) |
-| openconfig-platform-transceiver | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-platform-transceiver) | [🌳](yang-trees/openconfig-platform-transceiver.html) |
-| openconfig-policy-forwarding | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-policy-forwarding) | - |
-| openconfig-procmon | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-procmon) | - |
+| openconfig-platform-transceiver | - | ❌ No spec | [🌳](yang-trees/openconfig-platform-transceiver.html) |
+| openconfig-policy-forwarding | - | ❌ No spec | - |
+| openconfig-procmon | - | ❌ No spec | - |
 | openconfig-programming-errors | - | ❌ No spec | [🌳](yang-trees/openconfig-programming-errors.html) |
-| openconfig-rib-bgp | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-rib-bgp) | - |
+| openconfig-rib-bgp | - | ❌ No spec | - |
 | openconfig-rib-bgp-ext | - | ❌ No spec | [🌳](yang-trees/openconfig-rib-bgp-ext.html) |
 | openconfig-route-summary | - | ❌ No spec | [🌳](yang-trees/openconfig-route-summary.html) |
 | openconfig-routing-policy | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-routing-policy) | [🌳](yang-trees/openconfig-routing-policy.html) |
-| openconfig-segment-routing | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-segment-routing) | - |
+| openconfig-segment-routing | - | ❌ No spec | - |
 | openconfig-spanning-tree | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-spanning-tree) | [🌳](yang-trees/openconfig-spanning-tree.html) |
 | openconfig-system | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-system) | [🌳](yang-trees/openconfig-system.html) |
 | openconfig-system-grpc | - | ❌ No spec | [🌳](yang-trees/openconfig-system-grpc.html) |
-| openconfig-system-logging | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-system-logging) | - |
-| openconfig-system-terminal | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-system-terminal) | - |
+| openconfig-system-logging | - | ❌ No spec | - |
+| openconfig-system-terminal | - | ❌ No spec | - |
 | openconfig-vlan | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-vlan) | [🌳](yang-trees/openconfig-vlan.html) |
 | openconfig-wifi-mac | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-wifi-mac) | [🌳](yang-trees/openconfig-wifi-mac.html) |
 | openconfig-wifi-phy | OpenConfig | [OpenConfig](swagger-openconfig-model/index.html#spec=openconfig-wifi-phy) | [🌳](yang-trees/openconfig-wifi-phy.html) |
@@ -1565,4 +1565,4 @@ These modules appear in more than one swagger category:
 | **native-aug** | Augments Cisco-IOS-XE-native — content is included in Native Config specs |
 | **rpc-aug** | Augments Cisco-IOS-XE-rpc — content is included in the main RPC spec |
 
-*Report generated: 2026-10-04T17:33:38.876549*
+*Report generated: 2026-11-18T22:11:13.280370*

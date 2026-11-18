@@ -87,6 +87,9 @@ REASONS = {
     # Modules seen only in pre-17.18 trains
     "ietf-restconf-monitoring-ann": "RESTCONF monitoring annotation module; no data nodes",
     "openconfig-rib-bgp": "Augments openconfig-network-instance + groupings only; no standalone tree",
+    # Removed on IOS XE by `deviate not-supported` (cisco-xe-openconfig-*-deviation)
+    "openconfig-mpls": "Not supported on IOS XE: removed by cisco-xe-openconfig-mpls-deviation",
+    "openconfig-segment-routing": "Not supported on IOS XE: removed by cisco-xe-openconfig-segment-routing-deviation",
 }
 
 ACCOUNTABILITY_FILES = [

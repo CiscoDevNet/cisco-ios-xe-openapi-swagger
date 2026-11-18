@@ -31,9 +31,8 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 Update this list when an item is answered or finished; move answers to "Settled".
 
 **In progress**
-- None. gNMI OpenConfig expansion (memory/device-harness/0007) landed 2026-11-18.
-- OpenConfig specs miss augmented nodes (openconfig-interfaces: 14 spec paths vs 142 schema
-  containers); a pyang-based generator is the next change.
+- None. gNMI OpenConfig expansion (memory/device-harness/0007) and the pyang-based OpenConfig specs
+  (memory/versioning/0004) landed 2026-11-18.
 - Open finding: on C9300-STACK8-WAN, gNMI Subscribe ONCE returns empty updates for paths where Get
   returns data (74 streamed vs 292 Get paths); a gNMI restart did not help. Not investigated further.
 
@@ -66,6 +65,8 @@ Update this list when an item is answered or finished; move answers to "Settled"
   ignore the C9200L if it's being problematic"). Its other methods are unaffected.
 - "Data" means at least one leaf value: gNMI `{}` updates and NETCONF empty skeletons are
   "empty" (memory/device-harness/0007).
+- OpenConfig specs: one per module with top-level data, generated from pyang with augments; no
+  specs for grouping/augment-only modules (memory/versioning/0004).
 - Hosted releases: 26.2.1, 26.1.1, 17.18.1. 17.9.x / 17.12.x / 17.15.x were retired 2026-11-17
   (VERSIONING.md 8.3 is the retirement runbook).
 - Deprecated / obsolete elements are shown on `deprecations.html`, including obsolete ones, top-most
@@ -576,7 +577,7 @@ Earlier versions had `{"Cisco-IOS-XE-native:vlan": {}}` examples that broke devi
 
 ### Shared YANG parser — all v2 generators (fixed 2026-06-15, expanded 2026-06-16)
 
-All active v2 generators — `generate_native_openapi_v2.py`, `generate_openconfig_openapi_v2.py`, `generate_ietf_openapi_v2.py`, `generate_mib_openapi_v2.py`, `generate_other_openapi_v2.py`, `generate_rpc_openapi_v2.py` — import the shared helper module [generators/_yang_parse.py](generators/_yang_parse.py). Never re-implement these primitives inline.
+All active v2 generators — `generate_native_openapi_v2.py`, `generate_ietf_openapi_v2.py`, `generate_mib_openapi_v2.py`, `generate_other_openapi_v2.py`, `generate_rpc_openapi_v2.py` — import the shared helper module [generators/_yang_parse.py](generators/_yang_parse.py). Never re-implement these primitives inline. OpenConfig is the exception: `generate_openconfig_from_yang.py` uses pyang through [generators/_openconfig_schema.py](generators/_openconfig_schema.py), shared with the gNMI node catalog, because only a resolved schema has the augments.
 
 Public API exposed by `_yang_parse.py`:
 

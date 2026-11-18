@@ -316,6 +316,17 @@ def build_spec_url(folder, api_dir, spec_name):
     return f"{folder}/index.html#spec={spec_name}"
 
 
+def openconfig_host_reasons() -> dict[str, str]:
+    """Augment/grouping-only OpenConfig modules -> where their nodes are documented (OpenConfig manifest)."""
+    manifest = SPEC_BASE_DIR / "swagger-openconfig-model" / "api" / "manifest.json"
+    if not manifest.exists():
+        return {}
+    hosts = json.loads(manifest.read_text(encoding="utf-8")).get("augment_only_modules") or {}
+    return {name: "No top-level data; its nodes are in the " + ", ".join(f"{h}" for h in specs)
+                  + (" spec" if len(specs) == 1 else " specs")
+            for name, specs in hosts.items()}
+
+
 def main():
     print("=" * 60)
     print("YANG Module Accountability Analyzer v2")
@@ -324,6 +335,7 @@ def main():
     # 1. Scan all specs in all api/ and api/ folders
     print("\nScanning all OpenAPI spec files...")
     module_specs = scan_all_specs()
+    oc_reasons = openconfig_host_reasons()
     print(f"  Found {len(module_specs)} unique spec names across all folders")
 
     # 2. Scan tree files
@@ -381,7 +393,7 @@ def main():
             "has_spec": has_spec,
             "categories": categories,
             "tree_url": tree_url,
-            "reason_excluded": (reason or REASONS.get(name)) if not has_spec else None,
+            "reason_excluded": (reason or REASONS.get(name) or oc_reasons.get(name)) if not has_spec else None,
         }
         modules.append(module_info)
         classifications[classification].append(module_info)

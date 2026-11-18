@@ -2,16 +2,26 @@
   "openapi": "3.0.0",
   "info": {
     "title": "openconfig-messages",
-    "description": "This module defines configuration and operational state data\n    related to Syslog messages that a device may generate.\n\n    These messages are historically obtained through the Syslog\n    transport, however this module allows for obtaining them through\n    an alternative transport, such as a Subscribe operation over an\n    RPC.\n\n    This module does not usurp traditional syslog servers, which may\n    still be configured through the\n    /yang/system/openconfig-system.yang model, rather it provies the\n    Operator with an alternative method of consuming messages.\n\n**Module:** `openconfig-messages`\n**Paths:** 3",
-    "version": "26.1.1"
+    "description": "This module defines configuration and operational state data related to Syslog messages that a device may generate. These messages are historically obtained through the Syslog transport, however this module allows for obtaining them through an alternative transport, such as a Subscribe operation over an RPC. This module does not usurp traditional syslog servers, which may still be configured through the /yang/system/openconfig-system.yang model, rather it provies the Operator with an alternative method of consuming messages.\n\n**Module:** `openconfig-messages`\n**Root nodes:** messages\n**Paths:** 9 | **Operations:** 24\n\nGET/PUT/PATCH/DELETE for config nodes, GET-only for state (config false) nodes.",
+    "version": "26.1.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "openconfig-messages",
+    "x-model-type": "openconfig",
+    "x-augmented-by": []
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -23,24 +33,204 @@
         "description": "Top-level container for Syslog messages.",
         "operationId": "get-root",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-messages:messages": {
-                      "$ref": "#/components/schemas/openconfig-messages-messages"
+                      "type": "object",
+                      "properties": {
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "severity": {
+                              "type": "string",
+                              "enum": [
+                                "EMERGENCY",
+                                "ALERT",
+                                "CRITICAL",
+                                "ERROR",
+                                "WARNING",
+                                "NOTICE",
+                                "INFORMATIONAL",
+                                "DEBUG"
+                              ],
+                              "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                              "example": "informational"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "severity": {
+                              "type": "string",
+                              "enum": [
+                                "EMERGENCY",
+                                "ALERT",
+                                "CRITICAL",
+                                "ERROR",
+                                "WARNING",
+                                "NOTICE",
+                                "INFORMATIONAL",
+                                "DEBUG"
+                              ],
+                              "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                              "example": "informational"
+                            },
+                            "message": {
+                              "type": "object",
+                              "properties": {
+                                "msg": {
+                                  "type": "string",
+                                  "description": "Message payload. If other leafs within this container not supported, this leaf MAY include the entire message, inclding pri, procid, app-name etc..",
+                                  "example": "configured-value"
+                                },
+                                "priority": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 255,
+                                  "description": "The Priority value (PRIVAL) represents both the Facility and Severity.",
+                                  "example": 100
+                                },
+                                "app-name": {
+                                  "type": "string",
+                                  "description": "The APP-NAME field SHOULD identify the device or application that originated the message.",
+                                  "example": "example-1"
+                                },
+                                "procid": {
+                                  "type": "string",
+                                  "description": "PROCID is a value that is included in the message, having no interoperable meaning, except that a change in the value indicates there has been a discontinuity in syslog reporting.",
+                                  "example": "1"
+                                },
+                                "msgid": {
+                                  "type": "string",
+                                  "description": "The MSGID SHOULD identify the type of message. For example, a firewall might use the MSGID 'TCPIN' for incoming TCP traffic and the MSGID 'TCPOUT' for outgoing TCP traffic.",
+                                  "example": "1"
+                                }
+                              },
+                              "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        },
+                        "debug-entries": {
+                          "type": "object",
+                          "properties": {
+                            "debug-service": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "service": {
+                                    "type": "string",
+                                    "description": "Reference to the debug-enable service key.",
+                                    "example": "configured-value"
+                                  },
+                                  "config": {
+                                    "type": "object",
+                                    "properties": {
+                                      "service": {
+                                        "type": "string",
+                                        "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                        "example": "configured-value"
+                                      },
+                                      "enabled": {
+                                        "type": "boolean",
+                                        "description": "Enable and disable debugging.",
+                                        "example": true
+                                      }
+                                    },
+                                    "example": "configured-value"
+                                  },
+                                  "state": {
+                                    "type": "object",
+                                    "properties": {
+                                      "service": {
+                                        "type": "string",
+                                        "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                        "example": "configured-value"
+                                      },
+                                      "enabled": {
+                                        "type": "boolean",
+                                        "description": "Enable and disable debugging.",
+                                        "example": true
+                                      }
+                                    },
+                                    "example": "active",
+                                    "description": "Current operational state"
+                                  }
+                                },
+                                "required": [
+                                  "service"
+                                ],
+                                "example": "configured-value"
+                              },
+                              "example": "configured-value"
+                            }
+                          },
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:messages": {
+                    "config": {
+                      "severity": "EMERGENCY"
+                    },
+                    "state": {
+                      "severity": "EMERGENCY",
+                      "message": {
+                        "msg": "configured-value",
+                        "priority": 100,
+                        "app-name": "CCV-ONPREM",
+                        "procid": "1",
+                        "msgid": "1"
+                      }
+                    },
+                    "debug-entries": {
+                      "debug-service": [
+                        {
+                          "service": "mgcp",
+                          "config": {
+                            "enabled": true,
+                            "description": "Configured via RESTCONF"
+                          },
+                          "state": {
+                            "enabled": true,
+                            "admin-status": "UP",
+                            "oper-status": "UP"
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -48,11 +238,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace messages",
-        "description": "Create or replace Top-level container for Syslog messages.",
+        "summary": "Replace messages",
+        "description": "Top-level container for Syslog messages.",
         "operationId": "put-root",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -62,10 +252,179 @@
                 "type": "object",
                 "properties": {
                   "openconfig-messages:messages": {
-                    "$ref": "#/components/schemas/openconfig-messages-messages"
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "EMERGENCY",
+                              "ALERT",
+                              "CRITICAL",
+                              "ERROR",
+                              "WARNING",
+                              "NOTICE",
+                              "INFORMATIONAL",
+                              "DEBUG"
+                            ],
+                            "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                            "example": "informational"
+                          }
+                        },
+                        "example": "configured-value"
+                      },
+                      "state": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "EMERGENCY",
+                              "ALERT",
+                              "CRITICAL",
+                              "ERROR",
+                              "WARNING",
+                              "NOTICE",
+                              "INFORMATIONAL",
+                              "DEBUG"
+                            ],
+                            "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                            "example": "informational"
+                          },
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "msg": {
+                                "type": "string",
+                                "description": "Message payload. If other leafs within this container not supported, this leaf MAY include the entire message, inclding pri, procid, app-name etc..",
+                                "example": "configured-value"
+                              },
+                              "priority": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 255,
+                                "description": "The Priority value (PRIVAL) represents both the Facility and Severity.",
+                                "example": 100
+                              },
+                              "app-name": {
+                                "type": "string",
+                                "description": "The APP-NAME field SHOULD identify the device or application that originated the message.",
+                                "example": "example-1"
+                              },
+                              "procid": {
+                                "type": "string",
+                                "description": "PROCID is a value that is included in the message, having no interoperable meaning, except that a change in the value indicates there has been a discontinuity in syslog reporting.",
+                                "example": "1"
+                              },
+                              "msgid": {
+                                "type": "string",
+                                "description": "The MSGID SHOULD identify the type of message. For example, a firewall might use the MSGID 'TCPIN' for incoming TCP traffic and the MSGID 'TCPOUT' for outgoing TCP traffic.",
+                                "example": "1"
+                              }
+                            },
+                            "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                          }
+                        },
+                        "example": "active",
+                        "description": "Current operational state"
+                      },
+                      "debug-entries": {
+                        "type": "object",
+                        "properties": {
+                          "debug-service": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Reference to the debug-enable service key.",
+                                  "example": "configured-value"
+                                },
+                                "config": {
+                                  "type": "object",
+                                  "properties": {
+                                    "service": {
+                                      "type": "string",
+                                      "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                      "example": "configured-value"
+                                    },
+                                    "enabled": {
+                                      "type": "boolean",
+                                      "description": "Enable and disable debugging.",
+                                      "example": true
+                                    }
+                                  },
+                                  "example": "configured-value"
+                                },
+                                "state": {
+                                  "type": "object",
+                                  "properties": {
+                                    "service": {
+                                      "type": "string",
+                                      "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                      "example": "configured-value"
+                                    },
+                                    "enabled": {
+                                      "type": "boolean",
+                                      "description": "Enable and disable debugging.",
+                                      "example": true
+                                    }
+                                  },
+                                  "example": "active",
+                                  "description": "Current operational state"
+                                }
+                              },
+                              "required": [
+                                "service"
+                              ],
+                              "example": "configured-value"
+                            },
+                            "example": "configured-value"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:messages": {
+                  "config": {
+                    "severity": "EMERGENCY"
+                  },
+                  "state": {
+                    "severity": "EMERGENCY",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "CCV-ONPREM",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  },
+                  "debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "mgcp",
+                        "config": {
+                          "enabled": true,
+                          "description": "Configured via RESTCONF"
+                        },
+                        "state": {
+                          "enabled": true,
+                          "admin-status": "UP",
+                          "oper-status": "UP"
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -78,16 +437,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "patch": {
-        "summary": "Modify messages",
-        "description": "Partially modify Top-level container for Syslog messages.",
+        "summary": "Update messages",
+        "description": "Top-level container for Syslog messages.",
         "operationId": "patch-root",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -97,10 +456,179 @@
                 "type": "object",
                 "properties": {
                   "openconfig-messages:messages": {
-                    "$ref": "#/components/schemas/openconfig-messages-messages"
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "EMERGENCY",
+                              "ALERT",
+                              "CRITICAL",
+                              "ERROR",
+                              "WARNING",
+                              "NOTICE",
+                              "INFORMATIONAL",
+                              "DEBUG"
+                            ],
+                            "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                            "example": "informational"
+                          }
+                        },
+                        "example": "configured-value"
+                      },
+                      "state": {
+                        "type": "object",
+                        "properties": {
+                          "severity": {
+                            "type": "string",
+                            "enum": [
+                              "EMERGENCY",
+                              "ALERT",
+                              "CRITICAL",
+                              "ERROR",
+                              "WARNING",
+                              "NOTICE",
+                              "INFORMATIONAL",
+                              "DEBUG"
+                            ],
+                            "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                            "example": "informational"
+                          },
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "msg": {
+                                "type": "string",
+                                "description": "Message payload. If other leafs within this container not supported, this leaf MAY include the entire message, inclding pri, procid, app-name etc..",
+                                "example": "configured-value"
+                              },
+                              "priority": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 255,
+                                "description": "The Priority value (PRIVAL) represents both the Facility and Severity.",
+                                "example": 100
+                              },
+                              "app-name": {
+                                "type": "string",
+                                "description": "The APP-NAME field SHOULD identify the device or application that originated the message.",
+                                "example": "example-1"
+                              },
+                              "procid": {
+                                "type": "string",
+                                "description": "PROCID is a value that is included in the message, having no interoperable meaning, except that a change in the value indicates there has been a discontinuity in syslog reporting.",
+                                "example": "1"
+                              },
+                              "msgid": {
+                                "type": "string",
+                                "description": "The MSGID SHOULD identify the type of message. For example, a firewall might use the MSGID 'TCPIN' for incoming TCP traffic and the MSGID 'TCPOUT' for outgoing TCP traffic.",
+                                "example": "1"
+                              }
+                            },
+                            "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                          }
+                        },
+                        "example": "active",
+                        "description": "Current operational state"
+                      },
+                      "debug-entries": {
+                        "type": "object",
+                        "properties": {
+                          "debug-service": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Reference to the debug-enable service key.",
+                                  "example": "configured-value"
+                                },
+                                "config": {
+                                  "type": "object",
+                                  "properties": {
+                                    "service": {
+                                      "type": "string",
+                                      "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                      "example": "configured-value"
+                                    },
+                                    "enabled": {
+                                      "type": "boolean",
+                                      "description": "Enable and disable debugging.",
+                                      "example": true
+                                    }
+                                  },
+                                  "example": "configured-value"
+                                },
+                                "state": {
+                                  "type": "object",
+                                  "properties": {
+                                    "service": {
+                                      "type": "string",
+                                      "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                      "example": "configured-value"
+                                    },
+                                    "enabled": {
+                                      "type": "boolean",
+                                      "description": "Enable and disable debugging.",
+                                      "example": true
+                                    }
+                                  },
+                                  "example": "active",
+                                  "description": "Current operational state"
+                                }
+                              },
+                              "required": [
+                                "service"
+                              ],
+                              "example": "configured-value"
+                            },
+                            "example": "configured-value"
+                          }
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:messages": {
+                  "config": {
+                    "severity": "EMERGENCY"
+                  },
+                  "state": {
+                    "severity": "EMERGENCY",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "CCV-ONPREM",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  },
+                  "debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "mgcp",
+                        "config": {
+                          "enabled": true,
+                          "description": "Configured via RESTCONF"
+                        },
+                        "state": {
+                          "enabled": true,
+                          "admin-status": "UP",
+                          "oper-status": "UP"
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -110,16 +638,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "delete": {
         "summary": "Delete messages",
-        "description": "Delete Top-level container for Syslog messages.",
+        "description": "Top-level container for Syslog messages.",
         "operationId": "delete-root",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -137,24 +665,58 @@
         "description": "Configuration data for Syslog messages.",
         "operationId": "get-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-messages:config": {
-                      "$ref": "#/components/schemas/openconfig-messages-config"
+                      "type": "object",
+                      "properties": {
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "EMERGENCY",
+                            "ALERT",
+                            "CRITICAL",
+                            "ERROR",
+                            "WARNING",
+                            "NOTICE",
+                            "INFORMATIONAL",
+                            "DEBUG"
+                          ],
+                          "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                          "example": "informational"
+                        }
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:config": {
+                    "severity": "EMERGENCY"
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -162,11 +724,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace config",
-        "description": "Create or replace Configuration data for Syslog messages.",
+        "summary": "Replace config",
+        "description": "Configuration data for Syslog messages.",
         "operationId": "put-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -176,10 +738,33 @@
                 "type": "object",
                 "properties": {
                   "openconfig-messages:config": {
-                    "$ref": "#/components/schemas/openconfig-messages-config"
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "EMERGENCY",
+                          "ALERT",
+                          "CRITICAL",
+                          "ERROR",
+                          "WARNING",
+                          "NOTICE",
+                          "INFORMATIONAL",
+                          "DEBUG"
+                        ],
+                        "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                        "example": "informational"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "severity": "EMERGENCY"
+                }
               }
             }
           }
@@ -192,16 +777,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "patch": {
-        "summary": "Modify config",
-        "description": "Partially modify Configuration data for Syslog messages.",
+        "summary": "Update config",
+        "description": "Configuration data for Syslog messages.",
         "operationId": "patch-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -211,10 +796,33 @@
                 "type": "object",
                 "properties": {
                   "openconfig-messages:config": {
-                    "$ref": "#/components/schemas/openconfig-messages-config"
+                    "type": "object",
+                    "properties": {
+                      "severity": {
+                        "type": "string",
+                        "enum": [
+                          "EMERGENCY",
+                          "ALERT",
+                          "CRITICAL",
+                          "ERROR",
+                          "WARNING",
+                          "NOTICE",
+                          "INFORMATIONAL",
+                          "DEBUG"
+                        ],
+                        "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                        "example": "informational"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "severity": "EMERGENCY"
+                }
               }
             }
           }
@@ -224,16 +832,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "delete": {
         "summary": "Delete config",
-        "description": "Delete Configuration data for Syslog messages.",
+        "description": "Configuration data for Syslog messages.",
         "operationId": "delete-config",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -251,25 +859,293 @@
         "description": "Operational state data for a Syslog messages.",
         "operationId": "get-state",
         "tags": [
-          "openconfig-messages"
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-messages:state": {
-                      "$ref": "#/components/schemas/openconfig-messages-state"
+                      "type": "object",
+                      "properties": {
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "EMERGENCY",
+                            "ALERT",
+                            "CRITICAL",
+                            "ERROR",
+                            "WARNING",
+                            "NOTICE",
+                            "INFORMATIONAL",
+                            "DEBUG"
+                          ],
+                          "description": "Specifies that only messages of the given severity (or greater severity) are sent over the RPC. This is analogous to differentiating which severity is to be sent to legacy Syslog servers, as opposed to local buffer or files.",
+                          "example": "informational"
+                        },
+                        "message": {
+                          "type": "object",
+                          "properties": {
+                            "msg": {
+                              "type": "string",
+                              "description": "Message payload. If other leafs within this container not supported, this leaf MAY include the entire message, inclding pri, procid, app-name etc..",
+                              "example": "configured-value"
+                            },
+                            "priority": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 255,
+                              "description": "The Priority value (PRIVAL) represents both the Facility and Severity.",
+                              "example": 100
+                            },
+                            "app-name": {
+                              "type": "string",
+                              "description": "The APP-NAME field SHOULD identify the device or application that originated the message.",
+                              "example": "example-1"
+                            },
+                            "procid": {
+                              "type": "string",
+                              "description": "PROCID is a value that is included in the message, having no interoperable meaning, except that a change in the value indicates there has been a discontinuity in syslog reporting.",
+                              "example": "1"
+                            },
+                            "msgid": {
+                              "type": "string",
+                              "description": "The MSGID SHOULD identify the type of message. For example, a firewall might use the MSGID 'TCPIN' for incoming TCP traffic and the MSGID 'TCPOUT' for outgoing TCP traffic.",
+                              "example": "1"
+                            }
+                          },
+                          "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                        }
+                      },
+                      "example": "active"
                     }
                   },
                   "example": "active",
                   "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-messages:state": {
+                    "severity": "EMERGENCY",
+                    "message": {
+                      "msg": "configured-value",
+                      "priority": 100,
+                      "app-name": "CCV-ONPREM",
+                      "procid": "1",
+                      "msgid": "1"
+                    }
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/openconfig-messages:messages/state/message": {
+      "get": {
+        "summary": "Get message",
+        "description": "Syslog messages the client is Subscribing to. This is all messages currently configured to be sent according to syslog-severity.",
+        "operationId": "get-state-message",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:message": {
+                      "type": "object",
+                      "properties": {
+                        "msg": {
+                          "type": "string",
+                          "description": "Message payload. If other leafs within this container not supported, this leaf MAY include the entire message, inclding pri, procid, app-name etc..",
+                          "example": "configured-value"
+                        },
+                        "priority": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 255,
+                          "description": "The Priority value (PRIVAL) represents both the Facility and Severity.",
+                          "example": 100
+                        },
+                        "app-name": {
+                          "type": "string",
+                          "description": "The APP-NAME field SHOULD identify the device or application that originated the message.",
+                          "example": "example-1"
+                        },
+                        "procid": {
+                          "type": "string",
+                          "description": "PROCID is a value that is included in the message, having no interoperable meaning, except that a change in the value indicates there has been a discontinuity in syslog reporting.",
+                          "example": "1"
+                        },
+                        "msgid": {
+                          "type": "string",
+                          "description": "The MSGID SHOULD identify the type of message. For example, a firewall might use the MSGID 'TCPIN' for incoming TCP traffic and the MSGID 'TCPOUT' for outgoing TCP traffic.",
+                          "example": "1"
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "Interface GigabitEthernet1/0/1 changed state to up"
+                },
+                "example": {
+                  "openconfig-messages:message": {
+                    "msg": "configured-value",
+                    "priority": 100,
+                    "app-name": "CCV-ONPREM",
+                    "procid": "1",
+                    "msgid": "1"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries": {
+      "get": {
+        "summary": "Get debug-entries",
+        "description": "Enclosing container for list of debugs to enable.",
+        "operationId": "get-debug-entries",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:debug-entries": {
+                      "type": "object",
+                      "properties": {
+                        "debug-service": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "description": "Reference to the debug-enable service key.",
+                                "example": "configured-value"
+                              },
+                              "config": {
+                                "type": "object",
+                                "properties": {
+                                  "service": {
+                                    "type": "string",
+                                    "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                    "example": "configured-value"
+                                  },
+                                  "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable and disable debugging.",
+                                    "example": true
+                                  }
+                                },
+                                "example": "configured-value"
+                              },
+                              "state": {
+                                "type": "object",
+                                "properties": {
+                                  "service": {
+                                    "type": "string",
+                                    "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                    "example": "configured-value"
+                                  },
+                                  "enabled": {
+                                    "type": "boolean",
+                                    "description": "Enable and disable debugging.",
+                                    "example": true
+                                  }
+                                },
+                                "example": "active",
+                                "description": "Current operational state"
+                              }
+                            },
+                            "required": [
+                              "service"
+                            ],
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:debug-entries": {
+                    "debug-service": [
+                      {
+                        "service": "mgcp",
+                        "config": {
+                          "service": "mgcp",
+                          "enabled": true
+                        },
+                        "state": {
+                          "service": "mgcp",
+                          "enabled": true
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -277,11 +1153,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace state",
-        "description": "Create or replace Operational state data for a Syslog messages.",
-        "operationId": "put-state",
+        "summary": "Replace debug-entries",
+        "description": "Enclosing container for list of debugs to enable.",
+        "operationId": "put-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -290,12 +1166,82 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "openconfig-messages:state": {
-                    "$ref": "#/components/schemas/openconfig-messages-state"
+                  "openconfig-messages:debug-entries": {
+                    "type": "object",
+                    "properties": {
+                      "debug-service": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Reference to the debug-enable service key.",
+                              "example": "configured-value"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Enable and disable debugging.",
+                                  "example": true
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Enable and disable debugging.",
+                                  "example": true
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "service"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
-                "example": "active",
-                "description": "Current operational state"
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-entries": {
+                  "debug-service": [
+                    {
+                      "service": "mgcp",
+                      "config": {
+                        "service": "mgcp",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "mgcp",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -308,16 +1254,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "patch": {
-        "summary": "Modify state",
-        "description": "Partially modify Operational state data for a Syslog messages.",
-        "operationId": "patch-state",
+        "summary": "Update debug-entries",
+        "description": "Enclosing container for list of debugs to enable.",
+        "operationId": "patch-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "requestBody": {
           "required": true,
@@ -326,12 +1272,82 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "openconfig-messages:state": {
-                    "$ref": "#/components/schemas/openconfig-messages-state"
+                  "openconfig-messages:debug-entries": {
+                    "type": "object",
+                    "properties": {
+                      "debug-service": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Reference to the debug-enable service key.",
+                              "example": "configured-value"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Enable and disable debugging.",
+                                  "example": true
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "service": {
+                                  "type": "string",
+                                  "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                  "example": "configured-value"
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Enable and disable debugging.",
+                                  "example": true
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "service"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
-                "example": "active",
-                "description": "Current operational state"
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-entries": {
+                  "debug-service": [
+                    {
+                      "service": "mgcp",
+                      "config": {
+                        "service": "mgcp",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "mgcp",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -341,16 +1357,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "delete": {
-        "summary": "Delete state",
-        "description": "Delete Operational state data for a Syslog messages.",
-        "operationId": "delete-state",
+        "summary": "Delete debug-entries",
+        "description": "Enclosing container for list of debugs to enable.",
+        "operationId": "delete-debug-entries",
         "tags": [
-          "openconfig-messages"
+          "messages"
         ],
         "responses": {
           "204": {
@@ -361,191 +1377,802 @@
           }
         }
       }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service": {
+      "get": {
+        "summary": "Get debug-service (all entries)",
+        "description": "List of debugging entries.",
+        "operationId": "get-debug-entries-debug-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:debug-service": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "service": {
+                            "type": "string",
+                            "description": "Reference to the debug-enable service key.",
+                            "example": "configured-value"
+                          },
+                          "config": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Enable and disable debugging.",
+                                "example": true
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Enable and disable debugging.",
+                                "example": true
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "service"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:debug-service": [
+                    {
+                      "service": "mgcp",
+                      "config": {
+                        "service": "mgcp",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "mgcp",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service={service}": {
+      "get": {
+        "summary": "Get debug-service",
+        "description": "List of debugging entries.",
+        "operationId": "get-debug-entries-debug-service-by-service",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:debug-service": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "service": {
+                            "type": "string",
+                            "description": "Reference to the debug-enable service key.",
+                            "example": "configured-value"
+                          },
+                          "config": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Enable and disable debugging.",
+                                "example": true
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "service": {
+                                "type": "string",
+                                "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                                "example": "configured-value"
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Enable and disable debugging.",
+                                "example": true
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "service"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "maxItems": 1,
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:debug-service": [
+                    {
+                      "service": "mgcp",
+                      "config": {
+                        "service": "mgcp",
+                        "enabled": true
+                      },
+                      "state": {
+                        "service": "mgcp",
+                        "enabled": true
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace debug-service",
+        "description": "List of debugging entries.",
+        "operationId": "put-debug-entries-debug-service-by-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "openconfig-messages:debug-service": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "description": "Reference to the debug-enable service key.",
+                          "example": "configured-value"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "description": "Enable and disable debugging.",
+                              "example": true
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "description": "Enable and disable debugging.",
+                              "example": true
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "required": [
+                        "service"
+                      ],
+                      "example": "configured-value"
+                    },
+                    "maxItems": 1,
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-service": [
+                  {
+                    "service": "mgcp",
+                    "config": {
+                      "service": "mgcp",
+                      "enabled": true
+                    },
+                    "state": {
+                      "service": "mgcp",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update debug-service",
+        "description": "List of debugging entries.",
+        "operationId": "patch-debug-entries-debug-service-by-service",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "openconfig-messages:debug-service": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "description": "Reference to the debug-enable service key.",
+                          "example": "configured-value"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "description": "Enable and disable debugging.",
+                              "example": true
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "service": {
+                              "type": "string",
+                              "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                              "example": "configured-value"
+                            },
+                            "enabled": {
+                              "type": "boolean",
+                              "description": "Enable and disable debugging.",
+                              "example": true
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "required": [
+                        "service"
+                      ],
+                      "example": "configured-value"
+                    },
+                    "maxItems": 1,
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:debug-service": [
+                  {
+                    "service": "mgcp",
+                    "config": {
+                      "service": "mgcp",
+                      "enabled": true
+                    },
+                    "state": {
+                      "service": "mgcp",
+                      "enabled": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete debug-service",
+        "description": "List of debugging entries.",
+        "operationId": "delete-debug-entries-debug-service-by-service",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service={service}/config": {
+      "get": {
+        "summary": "Get config",
+        "description": "Configuration data for debug service entries.",
+        "operationId": "get-debug-entries-debug-service-by-service-config",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:config": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Enable and disable debugging.",
+                          "example": true
+                        }
+                      },
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-messages:config": {
+                    "service": "mgcp",
+                    "enabled": true
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace config",
+        "description": "Configuration data for debug service entries.",
+        "operationId": "put-debug-entries-debug-service-by-service-config",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "openconfig-messages:config": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string",
+                        "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                        "example": "configured-value"
+                      },
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "Enable and disable debugging.",
+                        "example": true
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "service": "mgcp",
+                  "enabled": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update config",
+        "description": "Configuration data for debug service entries.",
+        "operationId": "patch-debug-entries-debug-service-by-service-config",
+        "tags": [
+          "messages"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "openconfig-messages:config": {
+                    "type": "object",
+                    "properties": {
+                      "service": {
+                        "type": "string",
+                        "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                        "example": "configured-value"
+                      },
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "Enable and disable debugging.",
+                        "example": true
+                      }
+                    },
+                    "example": "configured-value"
+                  }
+                },
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-messages:config": {
+                  "service": "mgcp",
+                  "enabled": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete config",
+        "description": "Configuration data for debug service entries.",
+        "operationId": "delete-debug-entries-debug-service-by-service-config",
+        "tags": [
+          "messages"
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/data/openconfig-messages:messages/debug-entries/debug-service={service}/state": {
+      "get": {
+        "summary": "Get state",
+        "description": "Operational state data for enabled debugs.",
+        "operationId": "get-debug-entries-debug-service-by-service-state",
+        "tags": [
+          "messages"
+        ],
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "description": "Key `service` of list `debug-service`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-messages:state": {
+                      "type": "object",
+                      "properties": {
+                        "service": {
+                          "type": "string",
+                          "description": "Enumeration of all services which can have debugging enabled. Vendors are to augment this base identity with their platform or OS specific debug options.",
+                          "example": "configured-value"
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Enable and disable debugging.",
+                          "example": true
+                        }
+                      },
+                      "example": "active"
+                    }
+                  },
+                  "example": "active",
+                  "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-messages:state": {
+                    "service": "mgcp",
+                    "enabled": true
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Resource not found"
+          }
+        }
+      }
     }
   },
   "components": {
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "openconfig-messages-messages": {
-        "type": "object",
-        "properties": {
-          "debug-entries": {
-            "type": "object",
-            "properties": {
-              "debug-service": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "service": {
-                      "type": "string",
-                      "description": "Reference to the debug-enable service key.",
-                      "example": "configured-value"
-                    },
-                    "config": {
-                      "type": "object",
-                      "properties": {
-                        "service": {
-                          "type": "string",
-                          "description": "Enumeration of all services which can have debugging enabled.\n        Vendors are to augment this base identity with their platform\n        or OS specific debug options.",
-                          "example": "configured-value"
-                        },
-                        "enabled": {
-                          "type": "boolean",
-                          "description": "Enable and disable debugging.",
-                          "example": true
-                        }
-                      },
-                      "description": "Configuration data for debug service entries.",
-                      "example": "configured-value"
-                    },
-                    "state": {
-                      "type": "object",
-                      "properties": {
-                        "service": {
-                          "type": "string",
-                          "description": "Enumeration of all services which can have debugging enabled.\n        Vendors are to augment this base identity with their platform\n        or OS specific debug options.",
-                          "example": "configured-value"
-                        },
-                        "enabled": {
-                          "type": "boolean",
-                          "description": "Enable and disable debugging.",
-                          "example": true
-                        }
-                      },
-                      "description": "Operational state data for enabled debugs.",
-                      "example": "active"
-                    }
-                  },
-                  "example": "configured-value"
-                },
-                "example": "configured-value"
-              }
-            },
-            "description": "Enclosing container for list of debugs to enable.",
-            "example": "configured-value"
-          },
-          "config": {
-            "type": "object",
-            "properties": {
-              "severity": {
-                "type": "string",
-                "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files.",
-                "example": "informational"
-              }
-            },
-            "description": "Configuration data for Syslog messages.",
-            "example": "configured-value"
-          },
-          "state": {
-            "type": "object",
-            "properties": {
-              "severity": {
-                "type": "string",
-                "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files.",
-                "example": "informational"
-              },
-              "message": {
-                "type": "object",
-                "properties": {
-                  "msg": {
-                    "type": "string",
-                    "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc..",
-                    "example": "configured-value"
-                  },
-                  "priority": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 255,
-                    "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity.",
-                    "example": 100
-                  },
-                  "app-name": {
-                    "type": "string",
-                    "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message.",
-                    "example": "example-1"
-                  },
-                  "procid": {
-                    "type": "string",
-                    "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting.",
-                    "example": "1"
-                  },
-                  "msgid": {
-                    "type": "string",
-                    "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic.",
-                    "example": "1"
-                  }
-                },
-                "description": "Syslog messages the client is Subscribing to. This is all\n        messages currently configured to be sent according to\n        syslog-severity.",
-                "example": "Interface GigabitEthernet1/0/1 changed state to up"
-              }
-            },
-            "description": "Operational state data for a Syslog messages.",
-            "example": "active"
-          }
-        },
-        "example": "configured-value"
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       },
-      "openconfig-messages-config": {
-        "type": "object",
-        "properties": {
-          "severity": {
-            "type": "string",
-            "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files.",
-            "example": "informational"
-          }
-        },
-        "example": "configured-value"
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       },
-      "openconfig-messages-state": {
-        "type": "object",
-        "properties": {
-          "severity": {
-            "type": "string",
-            "description": "Specifies that only messages of the given severity (or\n        greater severity) are sent over the RPC.\n\n        This is analogous to differentiating which severity is to be\n        sent to legacy Syslog servers, as opposed to local buffer or\n        files.",
-            "example": "informational"
-          },
-          "message": {
-            "type": "object",
-            "properties": {
-              "msg": {
-                "type": "string",
-                "description": "Message payload. If other leafs within this container not\n          supported, this leaf MAY include the entire message,\n          inclding pri, procid, app-name etc..",
-                "example": "configured-value"
-              },
-              "priority": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 255,
-                "description": "The Priority value (PRIVAL) represents both the\n          Facility and Severity.",
-                "example": 100
-              },
-              "app-name": {
-                "type": "string",
-                "description": "The APP-NAME field SHOULD identify the device or\n          application that originated the message.",
-                "example": "example-1"
-              },
-              "procid": {
-                "type": "string",
-                "description": "PROCID is a value that is included in the message, having\n          no interoperable meaning, except that a change in the value\n          indicates there has been a discontinuity in syslog\n          reporting.",
-                "example": "1"
-              },
-              "msgid": {
-                "type": "string",
-                "description": "The MSGID SHOULD identify the type of message. For\n          example, a firewall might use the MSGID 'TCPIN' for\n          incoming TCP traffic and the MSGID 'TCPOUT' for outgoing\n          TCP traffic.",
-                "example": "1"
-              }
-            },
-            "description": "Syslog messages the client is Subscribing to. This is all\n        messages currently configured to be sent according to\n        syslog-severity.",
-            "example": "Interface GigabitEthernet1/0/1 changed state to up"
-          }
-        },
-        "example": "active"
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
@@ -556,8 +2183,8 @@
   ],
   "tags": [
     {
-      "name": "openconfig-messages",
-      "description": "This module defines configuration and operational state data\n    related to Syslog messages that a device may generate.\n\n    These messages are historically obtained through the Syslog\n    transport, however this module allows for obtaining them through\n    an alternative transport, such as a Subscribe operation over an\n    RPC.\n\n    This module does not usurp traditional syslog servers, which may\n    still be configured through the\n    /yang/system/openconfig-system.yang model, rather it provies the\n    Operator with an alternative method of consuming messages."
+      "name": "messages",
+      "description": "Top-level container for Syslog messages."
     }
   ]
 }

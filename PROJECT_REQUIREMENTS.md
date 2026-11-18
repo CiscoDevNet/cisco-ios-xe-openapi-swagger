@@ -428,7 +428,7 @@ cisco-ios-xe-openapi-swagger/
 │   ├── generate_rpc_openapi_v2.py      # RPC model generator
 │   ├── generate_events_openapi.py      # Events model generator
 │   ├── generate_native_openapi_v2.py   # Native config generator
-│   ├── generate_openconfig_openapi_v2.py
+│   ├── generate_openconfig_from_yang.py  # OpenConfig (pyang schema: augments + deviations)
 │   ├── generate_ietf_openapi_v2.py
 │   ├── generate_mib_openapi_v2.py
 │   ├── generate_other_openapi_v2.py
@@ -591,7 +591,7 @@ Per-category OpenAPI generators that parse YANG files and produce spec JSON:
 | `generate_rpc_openapi_v2.py` | 58 specs | RPC/action modules |
 | `generate_events_openapi.py` | 128 specs | Event notification modules |
 | `generate_native_openapi_v2.py` | 27 specs | Native config categories |
-| `generate_openconfig_openapi_v2.py` | 42 specs | OpenConfig modules |
+| `generate_openconfig_from_yang.py` | 21 specs | OpenConfig modules with top-level data (augments included) |
 | `generate_ietf_openapi_v2.py` | 21 specs | IETF/IANA modules |
 | `generate_mib_openapi_v2.py` | 147 specs | MIB translation modules |
 | `generate_other_openapi_v2.py` | 10 specs | Miscellaneous modules |
@@ -673,7 +673,7 @@ cd generators
 python generate_oper_openapi_v2.py
 python generate_rpc_openapi_v2.py
 python generate_cfg_openapi_v2.py
-python generate_openconfig_openapi_v2.py
+python generate_openconfig_from_yang.py
 python generate_ietf_openapi_v2.py
 python generate_mib_openapi_v2.py
 python generate_events_openapi.py
