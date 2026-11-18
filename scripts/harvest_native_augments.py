@@ -42,7 +42,7 @@ from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent
-RELEASES = ["17.9.x", "17.12.x", "17.15.x", "17.18.1", "26.1.1", "26.2.1"]
+RELEASES = ["17.18.1", "26.1.1", "26.2.1"]
 
 
 def _load_tree_gen():
@@ -182,9 +182,11 @@ def _marker_col(line: str) -> Optional[int]:
     return m.start() if m else None
 
 
-def harvest_augments(gen, version: str, include_interface: bool):
+def harvest_augments(gen, version: str, include_interface: bool,
+                     origins: Optional[list] = None):
     """Return list of (target_tuple, [child TreeNode,...]) for every native
-    augment across all module tree HTMLs in the release."""
+    augment across all module tree HTMLs in the release. When `origins` is
+    given, the augmenting module name for each result is appended to it."""
     TreeNode = gen.TreeNode
     tree_dir = ROOT / "releases" / version / "yang-trees"
     results: list[tuple[tuple[str, ...], list]] = []
@@ -234,6 +236,8 @@ def harvest_augments(gen, version: str, include_interface: bool):
                     pass  # skip interface-targeting augments
                 else:
                     results.append((target, block_root.children))
+                    if origins is not None:
+                        origins.append(name)
             i = j
     return results, files_scanned
 

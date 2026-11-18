@@ -3,7 +3,8 @@
 enrich_mib_metadata.py — Per-MIB metadata enrichment.
 
 For every MIB YANG module in the active release, derives lightweight metadata
-(OID prefix, table/scalar counts, indexes, deprecated counts, RFC/Cisco source)
+(OID prefix, table/scalar counts, indexes, deprecated / obsolete status counts,
+RFC/Cisco source)
 and joins it with the platform applicability + functional category data parsed
 from MIBS.md by parse_mibs_md.py.
 
@@ -26,7 +27,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _release_paths import PROJECT_ROOT, ReleasePaths  # type: ignore  # noqa: E402
+from _release_paths import LEGACY_VERSION, PROJECT_ROOT, ReleasePaths  # type: ignore  # noqa: E402
+from _yang_status import status_counts  # type: ignore  # noqa: E402
 
 # Heuristic: a "MIB YANG" module is one whose source file ends in -MIB.yang or
 # matches typical SMIv2-converted naming.
@@ -34,7 +36,6 @@ RE_OID_PREFIX = re.compile(r"smiv2:oid\s+\"([0-9.]+)\"")
 RE_TABLE = re.compile(r"^\s*list\s+", re.MULTILINE)
 RE_LEAF = re.compile(r"^\s*leaf\s+([A-Za-z][A-Za-z0-9_\-]*)", re.MULTILINE)
 RE_KEY = re.compile(r"^\s*key\s+\"([^\"]+)\"", re.MULTILINE)
-RE_DEPRECATED = re.compile(r"status\s+(deprecated|obsolete)", re.IGNORECASE)
 RE_REVISION = re.compile(r"revision\s+\"([\d\-]+)\"", re.IGNORECASE)
 RE_ORGANIZATION = re.compile(r"organization\s+\"([^\"]+)\"", re.IGNORECASE)
 
@@ -57,7 +58,7 @@ def extract_metadata(yang_path: Path) -> dict:
     for k in RE_KEY.finditer(text):
         for tok in k.group(1).split():
             keys.add(tok.strip())
-    deprecated_count = len(RE_DEPRECATED.findall(text))
+    statuses = status_counts(text)
     rev = RE_REVISION.search(text)
     org = RE_ORGANIZATION.search(text)
     rfc_match = re.search(r"\bRFC\s*\d{3,5}\b", text)
@@ -68,7 +69,8 @@ def extract_metadata(yang_path: Path) -> dict:
         "leaf_count": leaves,
         "scalar_count": max(0, leaves - tables),
         "indexes": sorted(keys),
-        "deprecated_object_count": deprecated_count,
+        "deprecated_count": statuses["deprecated"],
+        "obsolete_count": statuses["obsolete"],
         "latest_revision": rev.group(1) if rev else "",
         "organization": (org.group(1) if org else "").strip().splitlines()[0] if org else "",
         "rfc_reference": rfc_match.group(0) if rfc_match else "",
@@ -80,7 +82,7 @@ def main() -> int:
     p.add_argument("--version", required=True)
     args = p.parse_args()
 
-    rp = ReleasePaths(version=args.version, legacy=True)
+    rp = ReleasePaths(version=args.version, legacy=args.version == LEGACY_VERSION)
     yang_dir = rp.yang_source_dir()
     if not yang_dir.is_dir():
         sys.stderr.write(f"[mib-meta] no YANG sources for {args.version}: {yang_dir}\n")

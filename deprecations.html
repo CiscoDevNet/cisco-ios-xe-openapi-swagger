@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.clarity.ms https://c.bing.com; connect-src 'self' https://*.clarity.ms https://*.posthog.com https://*.i.posthog.com;">
+<title>Deprecated &amp; Obsolete YANG Elements — Cisco IOS-XE</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<style>
+  header.page { background:linear-gradient(135deg,#6d4c41 0%,#bf360c 55%,#ff8f00 100%); color:#fff; padding:22px 20px 18px; }
+  header.page .wrap, .nav .wrap, main { max-width:1400px; margin:0 auto; }
+  header.page h1 { margin:0 0 4px; font-size:1.55rem; }
+  header.page p { margin:0; opacity:.92; font-size:.9rem; }
+  .nav { background:var(--card); border-bottom:1px solid var(--border); padding:10px 20px; }
+  .nav .wrap { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  .nav a { color:var(--c-brand-600); text-decoration:none; font-weight:500; }
+  main { padding:18px 20px 40px; }
+  .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .controls label { font-size:.85rem; color:var(--c-text-muted); display:flex; gap:6px; align-items:center; }
+  .controls select, .controls input[type=search] { padding:6px 10px; border:1px solid var(--border); border-radius:4px; background:var(--card); color:var(--fg); font:inherit; }
+  .controls input[type=search] { min-width:240px; }
+  .controls a.download { color:var(--c-brand-600); font-size:.85rem; }
+  .source { font-size:.8rem; color:var(--c-text-muted); margin:0 0 14px; }
+  .source .ok { color:var(--c-success); font-weight:600; }
+  .source .fail { color:var(--c-danger); font-weight:600; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:8px; }
+  .stat { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .stat .num { font-size:1.45rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .lbl { font-size:.78rem; color:var(--c-text-muted); }
+  .stat.deprecated .num { color:var(--c-warning); }
+  .stat.obsolete .num { color:var(--c-danger); }
+  h2 { font-size:1.1rem; margin:22px 0 8px; }
+  .note { font-size:.82rem; color:var(--c-text-muted); margin:0 0 10px; max-width:1100px; }
+  details.explain { font-size:.84rem; margin:6px 0 14px; max-width:1100px; }
+  details.explain summary { cursor:pointer; color:var(--c-brand-600); }
+  details.explain dl { margin:8px 0 0 4px; }
+  details.explain dt { font-weight:600; margin-top:6px; }
+  details.explain dd { margin:2px 0 0 14px; color:var(--c-text-muted); }
+  .table-wrap { overflow-x:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:7px 10px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }
+  th { background:var(--card); position:sticky; top:0; z-index:1; }
+  th.group { text-align:center; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  code, .mono { font-family:var(--font-mono); font-size:.8rem; }
+  td.path code { word-break:break-all; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:.72rem; font-weight:600; color:#fff; white-space:nowrap; }
+  .badge.deprecated { background:var(--c-warning); }
+  .badge.obsolete { background:var(--c-danger); }
+  .badge.current { background:var(--c-text-muted); }
+  .badge.change { background:var(--c-brand-fill); }
+  .badge.removed, .badge.now-current, .badge.relaxed { background:var(--c-success); }
+  .links a { color:var(--c-brand-600); margin-right:8px; font-size:.78rem; white-space:nowrap; }
+  .dep { color:var(--c-warning); } .obs { color:var(--c-danger); }
+  [data-theme="dark"] .dep, body.dark .dep, [data-theme="dark"] .stat.deprecated .num, body.dark .stat.deprecated .num { color:#ffb74d; }
+  [data-theme="dark"] .obs, body.dark .obs, [data-theme="dark"] .stat.obsolete .num, body.dark .stat.obsolete .num { color:#ef9a9a; }
+  button.expand { background:none; border:1px solid var(--border); border-radius:4px; color:var(--fg); cursor:pointer; padding:1px 7px; font:inherit; }
+  button.link { background:none; border:0; padding:0; color:var(--c-brand-600); cursor:pointer; font:inherit; text-decoration:underline; }
+  button.more { margin:8px 0; background:var(--c-brand-fill); color:#fff; border:0; border-radius:4px; padding:5px 12px; cursor:pointer; font:inherit; font-size:.82rem; }
+  tr.detail > td { background:var(--c-surface-2, rgba(0,0,0,.03)); }
+  tr.clickable { cursor:pointer; }
+  tr.clickable:hover td { background:var(--c-surface-2, rgba(0,0,0,.03)); }
+  tr.selected td { box-shadow:inset 3px 0 0 var(--c-brand-fill); }
+  .detail h3 { margin:10px 0 6px; font-size:.9rem; }
+  .detail .controls { margin:6px 0; }
+  .muted { color:var(--c-text-muted); }
+  .empty { padding:24px; text-align:center; color:var(--c-text-muted); }
+  .desc { color:var(--c-text-muted); font-size:.78rem; }
+</style>
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site-chrome.js" defer></script>
+<!-- BEGIN seo-meta (managed by scripts/inject_seo_meta.py) -->
+<meta name="description" content="Every deprecated and obsolete YANG element in a Cisco IOS XE release, by category and module, with what changed since the previous release.">
+<meta name="keywords" content="Cisco IOS XE, YANG, OpenAPI, RESTCONF, NETCONF, network automation, model-driven telemetry, programmability, swagger">
+<meta name="author" content="Cisco DevNet">
+<meta name="theme-color" content="#1565c0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0d12" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/deprecations.html">
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="alternate icon" type="image/x-icon" href="assets/icons/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cisco IOS XE OpenAPI &amp; YANG Docs">
+<meta property="og:title" content="Deprecated &amp; Obsolete YANG Elements — Cisco IOS-XE">
+<meta property="og:description" content="Every deprecated and obsolete YANG element in a Cisco IOS XE release, by category and module, with what changed since the previous release.">
+<meta property="og:url" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/deprecations.html">
+<meta property="og:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Deprecated &amp; Obsolete YANG Elements — Cisco IOS-XE">
+<meta name="twitter:description" content="Every deprecated and obsolete YANG element in a Cisco IOS XE release, by category and module, with what changed since the previous release.">
+<meta name="twitter:image" content="https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/assets/icons/og-image.png">
+<!-- END seo-meta -->
+<!-- BEGIN pwa (managed by scripts/inject_pwa.py) -->
+<link rel="manifest" href="site.webmanifest">
+<script src="assets/js/analytics-config.js"></script>
+<script src="assets/js/sw-register.js" defer></script>
+<script src="assets/js/analytics.js" defer></script>
+<!-- END pwa -->
+</head>
+<body>
+<header class="page">
+  <div class="wrap">
+    <h1>Deprecated &amp; Obsolete YANG Elements</h1>
+    <p>Every <code>status deprecated</code> and <code>status obsolete</code> in a release's YANG models — by category and module, down to the schema path, with what changed since the previous release.</p>
+  </div>
+</header>
+<nav class="nav" aria-label="Related pages">
+  <div class="wrap">
+    <a href="index.html">&larr; Hub</a>
+    <a href="release-compare.html">What changed between releases</a>
+    <a href="yang-accountability.html">YANG report</a>
+  </div>
+</nav>
+<main>
+  <div class="controls">
+    <label for="releaseSelect">Release</label>
+    <select id="releaseSelect"></select>
+    <label for="statusFilter">Status</label>
+    <select id="statusFilter">
+      <option value="">Deprecated + obsolete</option>
+      <option value="deprecated">Deprecated</option>
+      <option value="obsolete">Obsolete</option>
+    </select>
+    <label for="categoryFilter">Category</label>
+    <select id="categoryFilter"><option value="">All</option></select>
+    <input type="search" id="searchBox" placeholder="Filter modules…" aria-label="Filter modules by name">
+    <label><input type="checkbox" id="changedOnly"> Changed since previous release</label>
+    <a class="download" id="csvLink" href="#" download>Download CSV</a>
+  </div>
+  <p class="source" id="sourceLine"></p>
+  <div class="cards" id="cards"></div>
+  <details class="explain">
+    <summary>How these numbers are counted</summary>
+    <dl>
+      <dt>Statements</dt>
+      <dd>Each <code>status deprecated|obsolete</code> line in the release's YANG files. A grouping counts once even when it is reused in many places.</dd>
+      <dt>Top-most nodes</dt>
+      <dd>Schema nodes (containers, lists, leafs, RPCs, notifications, choices, cases) where the status starts: the node is flagged but its parent is not. Flagged subtrees are counted once, at their top. This is the closest measure of "things to stop using".</dd>
+      <dt>All affected nodes</dt>
+      <dd>Every schema node whose effective status is deprecated or obsolete — its own <code>status</code>, or inherited from a parent, the <code>uses</code>/grouping that instantiated it, or the <code>augment</code> that added it. Groupings, augments and submodules are resolved by pyang, so a reused grouping is counted at each place it appears.</dd>
+      <dt>Definitions and other statements</dt>
+      <dd>Status on typedefs, identities, enum values, bits, groupings, features, <code>uses</code>/<code>augment</code> statements and SMIv2 aliases. They are not schema nodes; they are listed in each module's details.</dd>
+      <dt>Accuracy checks</dt>
+      <dd>Every status statement is found twice — by an independent tokenizer and by pyang's parser — and the two must agree exactly. Each one is then traced to the resolved schema tree or classified (definition, grouping never used, deviation module). Per-platform deviation modules are parsed but not applied, so nodes removed by a single platform's deviations still appear.</dd>
+      <dt>Changes since the previous release</dt>
+      <dd>Statements are matched by module, keyword, parent context and name (line numbers shift between releases). <em>Newly</em> means the statement existed before without that status; <em>added</em> means it is new and already flagged; <em>now current</em> means its own status line was dropped — it may still inherit a status from a parent. Node changes compare effective status by schema path; a <em>new instance</em> is a new copy of an already-flagged definition, for example a grouping reused under a new interface type.</dd>
+    </dl>
+  </details>
+
+  <h2 id="categoriesHeading">By category</h2>
+  <p class="note">Select a row to filter the modules below.</p>
+  <div class="table-wrap" role="region" aria-labelledby="categoriesHeading" tabindex="0">
+    <table>
+      <thead>
+        <tr><th scope="col" rowspan="2">Category</th><th scope="col" rowspan="2" class="num">Modules</th><th scope="colgroup" colspan="3" class="group">Deprecated</th><th scope="colgroup" colspan="3" class="group">Obsolete</th></tr>
+        <tr><th scope="col" class="num">Statements</th><th scope="col" class="num">Top-most nodes</th><th scope="col" class="num">All nodes</th><th scope="col" class="num">Statements</th><th scope="col" class="num">Top-most nodes</th><th scope="col" class="num">All nodes</th></tr>
+      </thead>
+      <tbody id="categoryRows"></tbody>
+    </table>
+  </div>
+
+  <h2 id="modulesHeading">Modules</h2>
+  <div class="controls">
+    <label for="sortSelect">Sort</label>
+    <select id="sortSelect">
+      <option value="nodes">Most affected nodes</option>
+      <option value="top">Most top-most nodes</option>
+      <option value="statements">Most statements</option>
+      <option value="changes">Most changes</option>
+      <option value="name">Name</option>
+    </select>
+    <span class="note" id="moduleCount"></span>
+  </div>
+  <div class="table-wrap" role="region" aria-labelledby="modulesHeading" tabindex="0">
+    <table>
+      <thead>
+        <tr><th scope="col"><span class="sr-only">Details</span></th><th scope="col">Module</th><th scope="col">Category</th><th scope="col" class="num">Deprecated<br>stmts / top / all</th><th scope="col" class="num">Obsolete<br>stmts / top / all</th><th scope="col">Changes</th></tr>
+      </thead>
+      <tbody id="moduleRows"></tbody>
+    </table>
+  </div>
+
+  <h2 id="changesHeading">Changes since the previous release</h2>
+  <p class="note" id="changesNote"></p>
+  <div class="controls" id="changesControls">
+    <label for="changeView">Show</label>
+    <select id="changeView">
+      <option value="statement">Status statements</option>
+      <option value="node">Schema nodes</option>
+    </select>
+    <label for="changeType">Change</label>
+    <select id="changeType"><option value="">All</option></select>
+    <label><input type="checkbox" id="hideInstances" checked> Hide new instances of already-flagged definitions</label>
+  </div>
+  <div class="table-wrap" role="region" aria-labelledby="changesHeading" tabindex="0">
+    <table>
+      <thead id="changeHead"></thead>
+      <tbody id="changeRows"></tbody>
+    </table>
+  </div>
+  <div id="changeMore"></div>
+</main>
+<script src="deprecations.js" defer></script>
+</body>
+</html>

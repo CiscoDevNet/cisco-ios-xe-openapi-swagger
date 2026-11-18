@@ -16,12 +16,10 @@ selector (see [VERSIONING.md](VERSIONING.md) for the architecture).
 |---------|-----------------|--------|-------|
 | 26.2.1  | `vendor/cisco/xe/2621`  | active **(default)** | Newest release; site default |
 | 26.1.1  | `vendor/cisco/xe/2611`  | active | Release the lab devices run: source of Device Data (`device_data`) |
-| 17.18.1 | `vendor/cisco/xe/17181` | active | Baseline for legacy in-place artifacts |
-| 17.15.x | `vendor/cisco/xe/17151` | active | |
-| 17.12.x | `vendor/cisco/xe/17121` | active | |
-| 17.9.x  | `vendor/cisco/xe/1791`  | active | Oldest supported release |
+| 17.18.1 | `vendor/cisco/xe/17181` | active | Oldest supported release |
 
-Generated tree modules grow with every release: 620 / 637 / 683 / 715 / 742 / 758 (17.9.x → 26.2.1).
+Generated tree modules grow with every release: 715 / 742 / 758 (17.18.1 → 26.2.1).
+Releases 17.9.x, 17.12.x and 17.15.x were retired in November 2026 (see Unreleased).
 26.1.1 also keeps 24 hand-made tree pages from its original layout (766 pages in total).
 
 Adding additional patches/minors is the mechanical runbook in [VERSIONING.md §8](VERSIONING.md#8-adding-a-new-release--runbook).
@@ -164,6 +162,46 @@ below are far more representative than the average).
 ---
 
 ## [Unreleased]
+
+### Added — deprecated & obsolete YANG elements page (2026-11-17)
+
+- **[deprecations.html](deprecations.html)** (hub → More → Deprecations): every
+  `status deprecated` / `status obsolete` in a release's YANG sources — totals, by category, by
+  module and, per module, the flagged schema paths (top-most by default) plus non-node
+  statements (typedefs, identities, enums, groupings, uses/augment, SMIv2 aliases). Shows what
+  changed since the previous release and offers a CSV download. 26.2.1: 1,667 deprecated and
+  9,274 obsolete statements; 1,806 / 6,188 top-most flagged schema nodes; 9,899 / 69,740
+  schema nodes affected including inheritance.
+- **`scripts/build_deprecations.py`** (new `deprecations` step in `build_release.py`) writes
+  `releases/<ver>/deprecations/` (`index.json`, per-module `modules/*.json`, `changes.json`,
+  `deprecations.csv`). It fails unless an independent tokenizer and pyang's parser find the
+  same status statements and every statement is traced to the resolved schema tree (groupings,
+  augments and submodules applied) or classified; `--verify-trees` also matches the per-module
+    `x` / `o` markers of `pyang -f tree` (all three releases: 0 modules differ). Changes are tracked per statement (matched by module,
+  keyword, context and name), and node-level changes separate real status changes from new
+  copies of already-flagged groupings (for example under new interface types).
+- **MIB viewer "MIB Details" card fixed:** it was never shown (the loader was not called and
+  read the wrong key). It now appears for every MIB and shows deprecated and obsolete counts
+  separately, linking to the new page. `mib-metadata.json` replaces `deprecated_object_count`
+  (deprecated + obsolete combined, by regex) with `deprecated_count` and `obsolete_count`
+  from the shared status tokenizer (`scripts/_yang_status.py`).
+
+### Removed — retired releases 17.9.x, 17.12.x and 17.15.x (2026-11-17)
+
+- **Three releases hosted:** 26.2.1 (default), 26.1.1 (`device_data`) and 17.18.1. The
+  17.9.x, 17.12.x and 17.15.x entries are gone from `releases/index.json`, so every release
+  selector, the viewers' baked `__IOSXE_ALLOWED_VERS__` allow-list and the `validate-releases`
+  CI matrix list only the three kept releases.
+- **Deleted:** `releases/17.9.x/`, `releases/17.12.x/`, `releases/17.15.x/` (about 4,400
+  tracked files), their `references/<ver>/` YANG sources, and the compare pairs
+  `17.9.x__17.12.x`, `17.12.x__17.15.x` and `17.15.x__17.18.1`. They stay in git history;
+  `scripts/fetch_yang_release.py` can re-fetch the YANG.
+- **Regenerated:** viewer allow-lists, `releases/compare/index.json`
+  (new `build_release_compare.py --index-only`), `version-stats.json`,
+  `accountability_compare.json`, `platform-support-index.json` (`generate_platform_support.py`
+  now keeps a release whose committed data was built elsewhere) and `release_counts.json`.
+- **Docs:** README, VERSIONING (new §8.3 retirement runbook), APP_MAP, PROJECT_REQUIREMENTS,
+  ASSURANCE_SPEC, FAQ, about page and the landing page now describe three releases.
 
 ### Added — config-driven MDT walk in the harness (2026-10-05)
 

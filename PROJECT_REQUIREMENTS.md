@@ -3,7 +3,7 @@
 
 **Version:** 3.0
 **Date:** April 25, 2026
-**IOS-XE Versions Supported:** 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1
+**IOS-XE Versions Supported:** 17.18.1, 26.1.1, 26.2.1
 **Author:** Jeremy Cohoe (jcohoe@cisco.com)
 **Repository:** [github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger](https://github.com/CiscoDevNet/cisco-ios-xe-openapi-swagger)
 **Live Site:** [ciscodevnet.github.io/cisco-ios-xe-openapi-swagger](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
@@ -232,13 +232,10 @@ Three generation phases plus a fatal guard, all wired into `scripts/build_releas
 
 ### Native augment coverage (post-fix)
 
-All 5 releases pass the fatal coverage guard with zero missing children:
+Every hosted release passes the fatal coverage guard with zero missing children:
 
 | Release | /native children | Native specs | Paths | Operations |
 |---|---:|---:|---:|---:|
-| 17.9.x  | 233 / 233 | 129 | 9,059  | 36,236 |
-| 17.12.x | 237 / 237 | 133 | 9,169  | 36,676 |
-| 17.15.x | 256 / 256 | 152 | 9,635  | 38,540 |
 | 17.18.1 | 258 / 258 | 153 | 9,871  | 39,484 |
 | 26.1.1  | 264 / 264 | 159 | 10,417 | 41,668 |
 
@@ -786,7 +783,7 @@ This section captures the requirements added in the April 2026 expansion. The de
 
 ### 16.1 Versions
 
-The site simultaneously serves five IOS-XE releases under the same GitHub Pages URL: **17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1**. The version selector at the top of every page switches all per-release data (specs, trees, search, accountability, exports). Folder layout, URL contract, and the runbook for adding additional releases are defined in [VERSIONING.md](VERSIONING.md).
+The site simultaneously serves three IOS-XE releases under the same GitHub Pages URL: **17.18.1, 26.1.1, 26.2.1** (17.9.x, 17.12.x and 17.15.x were retired in November 2026). The version selector at the top of every page switches all per-release data (specs, trees, search, accountability, exports). Folder layout, URL contract, and the runbook for adding additional releases are defined in [VERSIONING.md](VERSIONING.md).
 
 **Requirement:** Adding a new IOS-XE release must be a mechanical operation (fetch → build → register → push), not a code change.
 
@@ -814,7 +811,7 @@ The native config model (the largest and most complex YANG module in the source 
 
 ### 16.6 MIB YANG detail surfacing
 
-Each MIB YANG module ships enriched metadata in `releases/<ver>/mib-metadata.json` (OID prefix, table/scalar counts, indexes, deprecated objects, RFC/Cisco source, platform applicability joined from [../MIBS.md](../MIBS.md)). The MIB viewer renders this in a side card alongside the active spec and links to the matching pyang tree. Platform applicability comes from the structured parse of `MIBS.md` (no manual duplication).
+Each MIB YANG module ships enriched metadata in `releases/<ver>/mib-metadata.json` (OID prefix, table/scalar counts, indexes, deprecated and obsolete status counts, RFC/Cisco source, platform applicability joined from [../MIBS.md](../MIBS.md)). The MIB viewer renders this in its "MIB Details" card alongside the active spec, links to the matching pyang tree, and links MIBs with flagged objects to [deprecations.html](deprecations.html). Platform applicability comes from the structured parse of `MIBS.md` (no manual duplication).
 
 ### 16.7 Postman + Bruno exports
 

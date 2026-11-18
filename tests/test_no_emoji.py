@@ -34,6 +34,7 @@ UI_FILES = [
     "yang-accountability.html",
     "yang-accountability-compare.html",
     "release-compare.html",
+    "deprecations.html",
     "exports.html",
     "telemetry.html",
     "about.html",

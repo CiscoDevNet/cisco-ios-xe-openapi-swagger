@@ -46,6 +46,7 @@ TOP_LEVEL = [
     "yang-accountability.html",
     "yang-accountability-compare.html",
     "release-compare.html",
+    "deprecations.html",
     "about.html",
     "platform-coverage.html",
     "device-data.html",
