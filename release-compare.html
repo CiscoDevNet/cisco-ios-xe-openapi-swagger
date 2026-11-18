@@ -53,6 +53,18 @@
   .muted { color:var(--c-text-muted); }
   details.plat summary { cursor:pointer; }
   .empty { padding:30px; text-align:center; color:var(--c-text-muted); }
+  .history-bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px; padding:10px 12px; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  .history-bar label { font-size:.85rem; font-weight:600; }
+  .history-bar input { padding:6px 10px; border:1px solid var(--border); border-radius:4px; background:var(--card); color:var(--fg); font:inherit; min-width:340px; }
+  .history-bar button, .history button.action { background:var(--c-brand-fill); color:#fff; border:0; border-radius:4px; padding:6px 12px; cursor:pointer; font:inherit; font-size:.85rem; }
+  .history-bar button.secondary { background:none; color:var(--fg); border:1px solid var(--border); }
+  section.history { margin-bottom:26px; padding-bottom:6px; border-bottom:2px solid var(--border); }
+  section.history h2 { margin-top:4px; }
+  .badge.unchanged { background:var(--c-text-muted); }
+  .badge.absent { background:none; color:var(--c-text-muted); border:1px dashed var(--border); }
+  .badge.baseline { background:var(--c-brand-fill); }
+  tr.absent td { color:var(--c-text-muted); }
+  .links button.link { background:none; border:0; padding:0; color:var(--c-brand-600); cursor:pointer; font:inherit; font-size:.78rem; margin-right:8px; text-decoration:underline; }
 </style>
 <link rel="stylesheet" href="assets/css/site.css">
 <script src="assets/js/site-chrome.js" defer></script>
@@ -101,6 +113,30 @@
   </div>
 </nav>
 <main>
+  <form class="history-bar" id="historyForm" role="search">
+    <label for="historyInput">Module history</label>
+    <input type="search" id="historyInput" list="historyModules" placeholder="e.g. Cisco-IOS-XE-bgp-oper" autocomplete="off" aria-describedby="historyHint">
+    <datalist id="historyModules"></datalist>
+    <button type="submit">Show history</button>
+    <span class="note" id="historyHint">One module across every release: what changed since the last release and since the oldest.</span>
+  </form>
+
+  <section class="history" id="historySection" hidden aria-labelledby="historyHeading">
+    <h2 id="historyHeading">Module history</h2>
+    <p class="source" id="historyMeta"></p>
+    <div class="cards" id="historyCards"></div>
+    <div class="table-wrap" role="region" aria-labelledby="historyHeading" tabindex="0">
+      <table>
+        <thead><tr><th scope="col"><span class="sr-only">Details</span></th><th scope="col">Release</th><th scope="col">Change</th><th scope="col">Revision</th><th scope="col">Schema nodes</th><th scope="col">Node changes</th></tr></thead>
+        <tbody id="historyRows"></tbody>
+      </table>
+    </div>
+    <h2 id="netHeading">Net change since first release</h2>
+    <p class="note">Combines every release step: a node added in one release and removed in a later one cancels out. Subtrees are matched by their top path.</p>
+    <div id="historyNet"></div>
+    <p><button type="button" class="action" id="historyClose">Close history</button></p>
+  </section>
+
   <div class="controls">
     <label for="pairSelect">Releases</label>
     <select id="pairSelect" aria-label="Release pair"></select>

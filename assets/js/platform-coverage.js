@@ -7,7 +7,10 @@
     var matrixWrap = document.getElementById('matrixWrap');
     var matrix = document.getElementById('matrix');
     var summary = document.getElementById('summary');
+    var countsPanel = document.getElementById('countsPanel');
+    var countsTable = document.getElementById('countsTable');
     var current = null;
+    var counts = null;
 
     function setStatus(msg, err) {
         status.textContent = msg;
@@ -18,6 +21,7 @@
 
     function loadRelease(ver) {
         setStatus('Loading platform-support.json for ' + ver + '…');
+        loadCounts(ver);
         return fetch('releases/' + encodeURIComponent(ver) + '/platform-support.json',
                      { cache: 'default' })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -30,6 +34,72 @@
             .catch(function (e) {
                 setStatus('Failed to load platform-support.json for ' + ver + ': ' + e.message, true);
             });
+    }
+
+    function loadCounts(ver) {
+        counts = null;
+        countsPanel.hidden = true;
+        fetch('releases/' + encodeURIComponent(ver) + '/platform-api-counts.json', { cache: 'no-cache' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (doc) {
+                if (!doc || doc.release !== sel.value) return;
+                counts = doc;
+                renderCounts();
+            })
+            .catch(function () { /* optional panel */ });
+    }
+
+    function cell(tag, text, className) {
+        var c = document.createElement(tag);
+        if (className) c.className = className;
+        c.textContent = text;
+        return c;
+    }
+
+    function renderCounts() {
+        if (!counts) return;
+        var all = counts.all;
+        var cats = Object.keys(all.by_category).sort();
+        var picked = platSel.value || '';
+        var thead = document.createElement('thead');
+        var hr = document.createElement('tr');
+        ['Platform', 'Family', 'YANG modules', 'Paths', 'Operations'].concat(cats).forEach(function (h) {
+            hr.appendChild(cell('th', h));
+        });
+        thead.appendChild(hr);
+        var tbody = document.createElement('tbody');
+
+        function numCell(n, total) {
+            var td = cell('td', n.toLocaleString());
+            if (total) td.appendChild(cell('span', Math.round(100 * n / total) + '%', 'pct'));
+            return td;
+        }
+        function addRow(label, family, modules, row, className) {
+            var tr = document.createElement('tr');
+            if (className) tr.className = className;
+            tr.appendChild(cell('td', label));
+            tr.appendChild(cell('td', family));
+            tr.appendChild(cell('td', modules === null ? '—' : modules.toLocaleString()));
+            tr.appendChild(numCell(row.paths, row === all ? 0 : all.paths));
+            tr.appendChild(numCell(row.operations, row === all ? 0 : all.operations));
+            cats.forEach(function (c) {
+                tr.appendChild(cell('td', ((row.by_category[c] || {}).paths || 0).toLocaleString()));
+            });
+            tbody.appendChild(tr);
+        }
+
+        addRow('All IOS XE', '', null, all, 'all');
+        counts.platforms.forEach(function (p) {
+            addRow(p.id + ' — ' + p.label, p.family, p.modules, p, p.id === picked ? 'picked' : '');
+        });
+        countsTable.replaceChildren(thead, tbody);
+        var un = counts.unmapped || { specs: [] };
+        document.getElementById('countsNote').textContent =
+            'Unique RESTCONF paths and operations (release ' + counts.release + ') whose YANG module is in each ' +
+            'platform\'s published yang-set. Native config paths also require the module that augments them. ' +
+            'Per-category columns are paths. Deviations are not applied.' +
+            (un.specs.length ? ' Not in any yang-set, so not counted per platform: ' + un.specs.join(', ') + '.' : '');
+        countsPanel.hidden = false;
     }
 
     function populatePlatformFilter(doc) {
@@ -126,6 +196,7 @@
                 sel.addEventListener('change', function () { loadRelease(sel.value); });
                 filter.addEventListener('input', render);
                 platSel.addEventListener('change', render);
+                platSel.addEventListener('change', renderCounts);
                 document.getElementById('exportBtn').addEventListener('click', exportCsv);
                 loadRelease(sel.value);
             })
