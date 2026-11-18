@@ -31,7 +31,7 @@ Use these for any slide or claim. Round at will but don't invent.
 | OpenAPI 2.0 specs (9 viewer categories) | 668 |
 | Largest viewer (oper) | 206 specs |
 | Largest exported Postman collection | 10,083 requests (IOS-XE 26.1.1 cfg) |
-| Release trains tracked | 5 — 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1 |
+| Release trains tracked | 3 — 17.18.1, 26.1.1, 26.2.1 (17.9.x, 17.12.x and 17.15.x retired Nov 2026) |
 | Site URL | https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/ |
 
 **Headline tile for slide 14:** `668 specs · 5 releases · 25 rounds · ~17 weeks · 187 tests · 379 commits`
@@ -131,7 +131,7 @@ Screenshot of the index page with the 9 category tiles called out.
 
 1. Land on hub → point out 9 viewer categories + global search box.
 2. Type `interface` in the global search → fuzzy matches across all 668 specs.
-3. Click into `swagger-native-config-model` → show release switcher (17.9 / 17.12 / 17.15 / 17.18 / 26.1).
+3. Click into `swagger-native-config-model` → show release switcher (17.18 / 26.1 / 26.2).
 4. Highlight: YANG Accountability, Tree Compare, Telemetry, Code Generator, Exports, Recent/Favorites.
 5. Mention PWA: works offline on the plane after first visit.
 
@@ -168,9 +168,9 @@ YANG model  ─►  OpenAPI spec  ─►  Try-it-out  ─►  curl / Postman / B
 
 **Demo 3 — Cat 9300 hardware sandbox (5 min, live)**
 
-1. Same viewer, same URI — show that the OpenAPI is **release-pinned**, so switching to 17.12.x changes the schema visibly (fields that don't exist yet in 17.9, are deprecated in 26.1).
+1. Same viewer, same URI — show that the OpenAPI is **release-pinned**, so switching to 17.18.1 changes the schema visibly (fields that don't exist yet in 17.18, are deprecated in 26.2).
 2. Run the same curl against the C9300 reservable sandbox.
-3. Show **Tree Compare**: pick `Cisco-IOS-XE-native` between 17.15 and 26.1.1, point at the diff.
+3. Show **Tree Compare**: pick `Cisco-IOS-XE-native` between 17.18.1 and 26.2.1, point at the diff.
 
 *Speaker note:* the "same call, different release, see the schema move" beat sells the "this is a reference, not a snapshot" message. ~2 min on it.
 
@@ -316,7 +316,7 @@ Cisco-IOS-XE-native:native/interface/GigabitEthernet=1/description \
 
 DEMO 3 — Cat 9300 reservable
   Reserve before session at developer.cisco.com/site/sandbox/.
-  Same payload, swap base URL. Switch the viewer to 17.12.x to show
+  Same payload, swap base URL. Switch the viewer to 17.18.1 to show
   schema drift between IOS-XE versions.
 
 If the live sandbox is flaky:
@@ -335,7 +335,7 @@ If the live sandbox is flaky:
    → The specs are generated from the same pyang trees Cisco publishes per release. They're a reference, not a discovery probe. For absolute truth, point your client at the device's own `restconf/data/ietf-yang-library:modules-state`.
 
 2. **"How often is it updated?"**
-   → Every IOS-XE release. The generator runs on the YANG tarball. The 5-release set on the site today covers ~2 years of trains.
+   → Every IOS-XE release. The generator runs on the YANG tarball. The 3-release set on the site today covers 17.18.1 through 26.2.1.
 
 3. **"Why OpenAPI 2.0 and not 3.0/3.1?"**
    → Swagger UI + Postman + Bruno round-trip on 2.0 with zero friction. 3.0 features (callbacks, anyOf, etc.) don't map well to YANG anyway. Pragmatism wins.

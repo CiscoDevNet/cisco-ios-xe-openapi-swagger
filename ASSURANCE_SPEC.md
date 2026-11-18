@@ -22,7 +22,7 @@ HTML/JS, no backend). Python generators build the artifacts under
 3. Developers generating client code via [code-generator.html](code-generator.html).
 4. Public web — anyone arriving from a search engine on a deep-link.
 
-**Releases tracked:** `17.9.x`, `17.12.x`, `17.15.x`, `17.18.1`, `26.1.1`, `26.2.1` (default).
+**Releases tracked:** `17.18.1`, `26.1.1`, `26.2.1` (default).
 
 **Viewer categories (8):** `swagger-oper-model`, `swagger-cfg-model`,
 `swagger-native-config-model`, `swagger-openconfig-model`, `swagger-rpc-model`,
@@ -158,7 +158,7 @@ integrated browser — the criteria below remain authoritative.
 ### S-4 (regression — added 2026-06-02) — platform-coverage matrix
 - **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/platform-coverage.html`
 - **PASS criteria:**
-  - Release dropdown populated with all 5 releases (26.1.1 selected)
+  - Release dropdown populated with all 3 releases (26.1.1 selected)
   - Summary line shows `1006 of 1006 modules · 10 platforms · release 26.1.1`
   - Matrix table renders with ≥ 100 visible rows
 - **FAIL if:** stuck on "Loading…" (likely CSP-blocked inline script; fix
@@ -248,7 +248,7 @@ Run these whenever you touch the corresponding area.
 | D-1 | Manifest `total_modules` equals actual `.json` file count (excluding `manifest.json` + `_*.json`) | `python -X utf8 scripts/validate_release.py --version <v>` for each touched release | Exit 0, no `❌` lines |
 | D-2 | Every viewer's `manifest.json` is parseable JSON | `python -X utf8 -c "import json,glob; [json.load(open(f, encoding='utf-8')) for f in glob.glob('releases/*/swagger-*-model/api/manifest.json')]"` | No exception |
 | D-3 | `search-index.json` contains every module from every manifest | `python -X utf8 scripts/audit_swagger_vs_tree.py` (full audit). Native-only spot check: `python -X utf8 scripts/check_native_coverage.py` | No "missing in search-index" warnings |
-| D-4 | `platform-support-index.json` lists all 5 releases and points at a default that exists | `Invoke-WebRequest .../platform-support-index.json \| ConvertFrom-Json` — assert `releases.Count -eq 5` and `releases -contains default` | Both true |
+| D-4 | `platform-support-index.json` lists all 3 releases and points at a default that exists | `Invoke-WebRequest .../platform-support-index.json \| ConvertFrom-Json` — assert `releases.Count -eq 3` and `releases -contains default` | Both true |
 | D-5 | No duplicate operation IDs within any spec | `python -X utf8 scripts/audit_opid_duplicates.py` | Empty report |
 | D-6 | Per-release `platform-support.json` parses and has > 800 modules each | `Get-ChildItem releases/*/platform-support.json \| % { (Get-Content $_ -Raw \| ConvertFrom-Json).modules.PSObject.Properties.Count }` | All ≥ 800 |
 | D-7 | No emoji / no UTF-8 mojibake reintroduced | Part of G-1 | — |

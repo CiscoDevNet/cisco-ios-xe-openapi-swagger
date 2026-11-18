@@ -52,8 +52,8 @@ Three entry points, in order of precision:
    maps every IOS XE YANG module to its category, spec presence, and (when
    excluded) the documented reason.
 
-Use the version selector in the top nav to switch between 17.9.x, 17.12.x,
-17.15.x, 17.18.1 and 26.1.1.
+Use the version selector in the top nav to switch between 26.2.1, 26.1.1
+and 17.18.1.
 
 ### How do I validate config on a real device?
 

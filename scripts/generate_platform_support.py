@@ -211,6 +211,11 @@ def main():
         ver = rel["ver"]
         doc = build_for_release(rel)
         if doc is None:
+            # Keep releases whose committed platform-support.json was built elsewhere
+            # (their yang-set files are not in the local references/ checkout).
+            if os.path.isfile(os.path.join(RELEASES, ver, "platform-support.json")):
+                print(f"  {ver}: keeping existing platform-support.json")
+                out_releases.append(ver)
             continue
         out_dir = os.path.join(RELEASES, ver)
         os.makedirs(out_dir, exist_ok=True)

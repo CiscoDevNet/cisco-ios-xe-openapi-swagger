@@ -229,7 +229,7 @@ def build():
                 "train through a fully automated build pipeline."
             ),
             "bullets": [
-                "Single source of truth for 26.1.1, 17.18.1, 17.15.x, 17.12.x, 17.9.x",
+                "Single source of truth for 26.2.1, 26.1.1, 17.18.1",
                 "Direct fit for DevNet, TAC enablement, and SE pre-sales demos",
                 "Built entirely with open tooling — easy to fork & extend",
             ],

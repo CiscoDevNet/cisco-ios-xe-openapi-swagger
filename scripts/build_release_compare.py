@@ -18,6 +18,7 @@ versions, so a spec diff would report generator drift as YANG changes.
 Usage:
     python scripts/build_release_compare.py                 # all adjacent pairs
     python scripts/build_release_compare.py --old 26.1.1 --new 26.2.1
+    python scripts/build_release_compare.py --index-only    # after retiring a release
 """
 from __future__ import annotations
 
@@ -273,10 +274,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     parser.add_argument("--old")
     parser.add_argument("--new")
+    parser.add_argument("--index-only", action="store_true",
+                        help="only rebuild compare/index.json from the pair files on disk")
     args = parser.parse_args()
 
     versions = [r["ver"] for r in load_json(RELEASES / "index.json").get("releases", [])]
-    if args.old or args.new:
+    if args.index_only:
+        pairs = []
+    elif args.old or args.new:
         if not (args.old and args.new):
             parser.error("--old and --new go together")
         pairs = [(args.old, args.new)]

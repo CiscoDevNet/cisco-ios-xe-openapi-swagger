@@ -84,16 +84,13 @@ REASONS = {
     "openconfig-system-grpc": "Augments openconfig-system + identity registry; no standalone tree",
     # Read-only stats module without -oper suffix (data accessible via paired -oper spec)
     "Cisco-IOS-XE-qfp-stats": "Read-only counters; data exposed via Cisco-IOS-XE-qfp-stats-oper spec",
-    # 17.9.x-only modules
+    # Modules seen only in pre-17.18 trains
     "ietf-restconf-monitoring-ann": "RESTCONF monitoring annotation module; no data nodes",
     "openconfig-rib-bgp": "Augments openconfig-network-instance + groupings only; no standalone tree",
 }
 
 ACCOUNTABILITY_FILES = [
     ROOT / "yang_accountability.json",
-    ROOT / "releases" / "17.9.x" / "yang_accountability.json",
-    ROOT / "releases" / "17.12.x" / "yang_accountability.json",
-    ROOT / "releases" / "17.15.x" / "yang_accountability.json",
     ROOT / "releases" / "17.18.1" / "yang_accountability.json",
     ROOT / "releases" / "26.1.1" / "yang_accountability.json",
 ]

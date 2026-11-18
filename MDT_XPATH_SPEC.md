@@ -104,7 +104,7 @@ The annotation pipeline (`scripts/annotate_mdt_xpaths.py`) joins three inputs:
 2. **The OpenAPI spec for that module** — locates the operation whose path most closely matches the YANG container path, and writes the extensions onto that operation.
 3. **The pyang tree** (`releases/<ver>/yang-trees/<module>.html`) — used as a fallback to confirm the prefix and that the container exists in the source YANG; if the tree disagrees with the reference doc, the build emits a warning and skips the annotation rather than emitting a wrong xpath.
 
-If a feature in `telemetry-reference.md` references a module not present in the active release (e.g. a 26.1.1-only module annotating into a 17.9.x build), the annotator records it in the per-release `telemetry-skipped.json` with reason `module-not-in-release`. This is allowed and not a CI failure.
+If a feature in `telemetry-reference.md` references a module not present in the active release (e.g. a 26.1.1-only module annotating into a 17.18.1 build), the annotator records it in the per-release `telemetry-skipped.json` with reason `module-not-in-release`. This is allowed and not a CI failure.
 
 ## 6. UI surfaces
 

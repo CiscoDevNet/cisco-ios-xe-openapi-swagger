@@ -2,13 +2,13 @@
 """
 fetch_yang_release.py — Fetch a Cisco IOS XE YANG release from YangModels/yang.
 
-Pulls the YANG modules for a single IOS XE release (e.g. 17.9.x → vendor/cisco/xe/1791/)
+Pulls the YANG modules for a single IOS XE release (e.g. 26.2.1 → vendor/cisco/xe/2621/)
 into ``references/<version>/`` using ``git`` so the upstream commit SHA can be pinned in
 ``releases/<version>/meta.json``.
 
 Usage:
     python scripts/fetch_yang_release.py --version 26.1.1 --yangmodels-path vendor/cisco/xe/2611
-    python scripts/fetch_yang_release.py --version 17.9.x --yangmodels-path vendor/cisco/xe/1791
+    python scripts/fetch_yang_release.py --version 26.2.1 --yangmodels-path vendor/cisco/xe/2621
 
 This script is idempotent: re-running updates the local copy and re-pins the commit SHA.
 
@@ -54,7 +54,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.strip().splitlines()[0])
     parser.add_argument(
         "--version", required=True,
-        help="Release tag used in folder names (e.g. 26.1.1, 17.9.x)",
+        help="Release tag used in folder names (e.g. 26.2.1, 17.18.1)",
     )
     parser.add_argument(
         "--yangmodels-path", required=True,

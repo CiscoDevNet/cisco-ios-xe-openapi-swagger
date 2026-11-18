@@ -4,7 +4,7 @@
 
 This project has successfully created a professional, organized, and developer-friendly documentation hub for Cisco IOS-XE RESTCONF APIs. Through multiple comprehensive phases, we've achieved:
 
-- **953 OpenAPI specifications** across 8 model viewers with deep-path coverage (default release: 26.2.1; the project tracks 6 releases from 17.9.x through 26.2.1 — see [version-stats.json](../version-stats.json) for per-release counts)
+- **953 OpenAPI specifications** across 8 model viewers with deep-path coverage (default release: 26.2.1; the project tracks 3 releases from 17.18.1 through 26.2.1 — see [version-stats.json](../version-stats.json) for per-release counts)
 - **81,560 API paths** organized and documented from resolved YANG trees
 - **243,024 API operations** with production examples
 - **53 logical categories** for easy navigation
