@@ -26,7 +26,7 @@ When making non-trivial changes, the following documents are authoritative. Upda
 
 If a request conflicts with these docs, prefer updating the doc first (with rationale) and then code.
 
-### 0.1 Open items and settled questions (handoff, as of 2026-10-05)
+### 0.1 Open items and settled questions (handoff, as of 2026-11-18)
 
 Update this list when an item is answered or finished; move answers to "Settled".
 
@@ -48,6 +48,9 @@ Update this list when an item is answered or finished; move answers to "Settled"
 5. **23 empty tree pages** (`empty-tree` in `tree_audit.json`): hide them, or show a "no data
    nodes" note?
 6. **24 hand-made 26.1.1 tree pages** (June layout, not regenerated): keep or retire?
+7. **Deprecation follow-ups** (offered 2026-11-18): a "Deprecations" link in every Swagger
+   viewer (only the MIB card links today), and marking flagged operations/fields
+   `deprecated: true` in the generated OpenAPI specs so Swagger UI greys them out.
 
 **Deferred by the user**
 - Native example overlay and CLI mappings (`references/native-example-overlay.yaml`,
@@ -55,6 +58,11 @@ Update this list when an item is answered or finished; move answers to "Settled"
 - Site size (~3 GB vs the documented 1 GB Pages limit): "not concerned at this time".
 
 **Settled (do not reopen)**
+- Hosted releases: 26.2.1, 26.1.1, 17.18.1. 17.9.x / 17.12.x / 17.15.x were retired 2026-11-17
+  (VERSIONING.md 8.3 is the retirement runbook).
+- Deprecated / obsolete elements are shown on `deprecations.html`, including obsolete ones, top-most
+  nodes by default. Counts must come from `scripts/build_deprecations.py`, never from grep
+  (memory/versioning/0003).
 - Default release is always the newest (26.2.1 now); device data follows `device_data`.
 - Lab password and SNMP community in public data/history: not a concern; no rotation or history
   rewrite (memory/device-harness/0005). Masking of published data stays mandatory.
@@ -83,7 +91,7 @@ Update this list when an item is answered or finished; move answers to "Settled"
 
 - 953 OpenAPI 3.0 specs in the default 26.2.1 release (`releases/26.2.1/swagger-*-model/api/*.json`); 897–953 across the three tracked releases. See [version-stats.json](version-stats.json) for per-release counts. The default is always the newest release; device data comes from `device_data` in [releases/index.json](releases/index.json) (26.1.1, the release the lab runs).
 - 620–758 YANG tree HTML pages per release (`releases/<ver>/yang-trees/`, ~4,200 total)
-- Vanilla-JS pages (hub, code generator, tree compare, accountability, device data, telemetry, release compare, exports, ...) plus 8 Swagger UI model viewers
+- Vanilla-JS pages (hub, code generator, tree compare, accountability, device data, telemetry, release compare, deprecations, exports, ...) plus 8 Swagger UI model viewers
 - A per-release search index (`releases/<ver>/search-index.json`) consumed by Fuse.js fuzzy search
 
 **What this is NOT:**
@@ -116,6 +124,8 @@ cisco-ios-xe-openapi-swagger/
 ├── code-generator.html         # Snippet generator (Python/curl/Go/etc.)
 ├── tree-compare.html           # YANG tree diff tool
 ├── yang-accountability.html    # Module coverage report
+├── release-compare.html        # What changed between releases (+ release-compare.js)
+├── deprecations.html           # Deprecated / obsolete YANG census (+ deprecations.js)
 ├── 404.html                    # GitHub Pages 404 fallback
 │
 ├── index-app.js                # Main page controller
@@ -131,7 +141,7 @@ cisco-ios-xe-openapi-swagger/
 ├── swagger-{type}-model/       # 8 model viewers (see §4); specs are read from releases/<ver>/
 │   └── index.html           # Model browser with deep-linking
 │
-├── releases/<ver>/             # Per-release specs, yang-trees/, search index, accountability, exports
+├── releases/<ver>/             # Per-release specs, yang-trees/, search index, accountability, deprecations/, exports
 ├── yang-trees/                 # Redirect stubs to the default release's tree pages
 ├── references/<ver>/           # YANG sources per release (excluded from Pages deploy)
 │
@@ -208,7 +218,7 @@ python generate_native_openapi_v2.py --version 26.1.1
 # etc.
 ```
 
-Post-processing scripts (`scripts/enrich_v2_specs.py`, `scripts/add_yang_github_links.py`, `scripts/annotate_mdt_xpaths.py`, `scripts/enrich_mib_metadata.py`, `scripts/build_native_capabilities.py`, `scripts/generate_search_index.py`, `scripts/generate_all_pyang_trees.py`, `scripts/generate_postman_collection.py`, `scripts/generate_bruno_collection.py`) all take `--version` and are run by `build_release.py`. Run them individually only when iterating on that step.
+Post-processing scripts (`scripts/enrich_v2_specs.py`, `scripts/add_yang_github_links.py`, `scripts/annotate_mdt_xpaths.py`, `scripts/enrich_mib_metadata.py`, `scripts/build_native_capabilities.py`, `scripts/build_deprecations.py`, `scripts/generate_search_index.py`, `scripts/generate_all_pyang_trees.py`, `scripts/generate_postman_collection.py`, `scripts/generate_bruno_collection.py`) all take `--version` and are run by `build_release.py`. Run them individually only when iterating on that step.
 
 ### Site-wide post-build steps
 
@@ -505,6 +515,19 @@ This rebuilds `search-index.json` from the `swagger-*-model/api/manifest.json` f
 
 The main `index.html` reads `#search=`, `#module=`, `#spec=` from the URL hash via `handleDeepLink()` in [search.js](search.js). Module pages read `#spec=<name>` via `checkHash()` in their `index.html`.
 
+### "Refresh the deprecation census" (deprecations.html)
+
+```powershell
+# Oldest release first: each release's change list reads the previous release's census.
+python scripts/build_deprecations.py --version 17.18.1
+python scripts/build_deprecations.py --version 26.1.1
+python scripts/build_deprecations.py --version 26.2.1 --summary
+# Optional, ~30 min per release: cross-check x/o markers against `pyang -f tree` per module.
+python scripts/build_deprecations.py --version 26.2.1 --verify-trees
+```
+
+The script exits non-zero unless the tokenizer and pyang's parser agree and every status statement is reconciled; never hand-edit `releases/<ver>/deprecations/`. It needs the release's YANG sources in `references/<ver>/` (gitignored; `scripts/fetch_yang_release.py` with the pinned commit from `meta.json`). Afterwards re-run `scripts/enrich_mib_metadata.py --version <ver>` if MIB sources changed (`tests/test_deprecations.py` checks both agree).
+
 ### "Validate write-operation examples against C9KV"
 
 ```powershell
@@ -589,10 +612,11 @@ Current automated coverage (run as part of G-1):
 - `tests/test_dataset_secrets.py` — no secrets (keys, passwords, SNMP communities) in any published device dataset
 - `tests/test_spec_info_version.py` — each spec's `info.version` names its own release
 - `tests/test_validate_release_gate5.py` — release gate 5 fails on a missing tree page or broken accountability tree link
+- `tests/test_deprecations.py` — status inheritance and change-classification rules on small modules, plus consistency of the published `releases/<ver>/deprecations/` data and `mib-metadata.json` counts (needs `pyang`; CI installs `pyang==2.7.1`)
 
 Local smoke runner:
 
-- `python -X utf8 scripts/smoke_assurance.py` — hits the live deployed site and runs S-1..S-6 from the assurance spec using only the Python stdlib (no browser, no Playwright). Pass `--base http://localhost:8000` to test a local `python -m http.server` instance, or `--only S-1,S-4` to scope. Exit codes: `0` = all PASS, `1` = at least one FAIL, `2` = no FAILs but SKIP.
+- `python -X utf8 scripts/smoke_assurance.py` — hits the live deployed site and runs S-0..S-10 from the assurance spec using only the Python stdlib (no browser, no Playwright). Pass `--base https://jeremycohoe.github.io/cisco-ios-xe-openapi-swagger` for staging or `--base http://localhost:8000` for a local `python -m http.server` instance, or `--only S-1,S-4` to scope. Exit codes: `0` = all PASS, `1` = at least one FAIL, `2` = no FAILs but SKIP. Run it on staging before every prod push (memory/deploy/0001).
 - `python -X utf8 scripts/smoke_live.py` — deeper, Playwright-based variant retained for browser-only assertions. Requires `pip install playwright; playwright install chromium`.
 
 Deeper, slower validation:
@@ -636,4 +660,4 @@ When making changes that affect generated artifacts:
 
 ---
 
-*Last updated: 2026-10-04 — 26.2.1 default with `device_data` release, 8 viewers, dark mode on every page (tree pages included), WCAG AA contrast tokens, link and secret guards, release gate 5 rewritten.*
+*Last updated: 2026-11-18 — three hosted releases (17.9.x / 17.12.x / 17.15.x retired), deprecations census page, MIB Details card fixed; previously: 26.2.1 default with `device_data` release, 8 viewers, dark mode on every page, WCAG AA contrast tokens, link and secret guards.*

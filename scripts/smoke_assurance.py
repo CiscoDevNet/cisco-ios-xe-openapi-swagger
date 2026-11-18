@@ -203,9 +203,13 @@ def check_platform_coverage(base: str) -> Result:
     except json.JSONDecodeError as e:
         return Result("S-4 platform-coverage matrix", "FAIL", f"index JSON invalid: {e}")
     releases = idx.get("releases", [])
-    if len(releases) < 5:
+    s_rel, b_rel, _ = fetch(f"{base}/releases/index.json")
+    if s_rel != 200:
+        return Result("S-4 platform-coverage matrix", "FAIL", f"releases/index.json -> HTTP {s_rel}")
+    hosted = {r["ver"] for r in json.loads(b_rel).get("releases", [])}
+    if not hosted or not hosted <= set(releases):
         return Result("S-4 platform-coverage matrix", "FAIL",
-                      f"index lists {len(releases)} releases, expected \u22655")
+                      f"index lists {sorted(releases)}, missing hosted {sorted(hosted - set(releases))}")
     if idx.get("default") not in releases:
         return Result("S-4 platform-coverage matrix", "FAIL",
                       f"default={idx.get('default')} not present in releases={releases}")
