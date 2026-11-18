@@ -50,3 +50,29 @@ def test_release_live_data_has_no_unmasked_secrets():
         if hits:
             problems.append((f.relative_to(REPO).as_posix(), hits[:2]))
     assert not problems, f"{len(problems)} live-data file(s) with unmasked secrets: {problems[:5]}"
+
+
+def test_release_gnmi_data_has_no_unmasked_secrets():
+    """Full gNMI response bodies under releases/*/gnmi-data (build_gnmi_dataset.py)."""
+    problems = []
+    for f in sorted(REPO.glob("releases/*/gnmi-data/*/*.json")):
+        hits = scan_text(f.read_text(encoding="utf-8"))
+        if hits:
+            problems.append((f.relative_to(REPO).as_posix(), hits[:2]))
+    assert not problems, f"{len(problems)} gnmi-data file(s) with unmasked secrets: {problems[:5]}"
+
+
+def test_gnmi_dataset_file_refs_exist():
+    """Every gNMI dataset row with data points at a published payload file."""
+    import json
+
+    missing = []
+    for name in ("gnmi-get-live-data.json", "gnmi-getconfig-live-data.json",
+                 "gnmi-state-live-data.json", "gnmi-sub-live-data.json"):
+        f = REPO / name
+        if not f.exists():
+            continue
+        for row in json.loads(f.read_text(encoding="utf-8")).get("paths", []):
+            if row.get("status") == "data" and not (REPO / row.get("file", "")).is_file():
+                missing.append((name, row.get("pid"), row.get("path")))
+    assert not missing, f"{len(missing)} gNMI rows without a payload file: {missing[:5]}"

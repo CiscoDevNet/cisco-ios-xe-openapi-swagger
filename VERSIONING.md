@@ -189,10 +189,10 @@ Device data stays on the release the devices ran until it is re-collected:
 
 1. Upgrade the devices, then `scripts/harness/kit.py onboard --all` (dry run) to confirm the APIs are still enabled.
 2. Set `device_data` in `releases/index.json` to the new release. Every device-data tool follows it: specs walked, MDT xpaths, MIB catalog, live-data index, harness kit default.
-3. Regenerate the catalogs for that release: `count_subscribable.py --dump output/subscribable-nodes.json` and `mib_catalog.py` (collector folder).
+3. Regenerate the catalogs for that release: `count_subscribable.py --dump output/subscribable-nodes.json`, `mib_catalog.py` and `gnmi_oc_catalog.py` (collector folder; the last needs pyang, `.venv-harness`).
 4. Collect everything: `kit.py telegraf start`, `kit.py collect` (all methods, all devices; add `--timeout 90 --window 35` for WAN devices), `kit.py coverage` until every device is COMPLETE. Or build a kit with `build_kit.py` and collect where the devices are.
 5. Rebuild: `refresh_live_data.py` (writes `releases/<new>/live-examples-index.json`, `live-modules.json`, `live-data/`), `build_restconf_augment.py --from-ref HEAD`, `build_restconf_dataset.py`, then in the collector folder `build_live_dataset.py`, `build_netconf_dataset.py`, `build_gnmi_dataset.py`, `build_protocol_matrix.py`.
-6. The previous release keeps its `releases/<old>/live-data/` and live examples, so its viewers keep showing what was captured on it.
+6. The previous release keeps its `releases/<old>/live-data/`, `gnmi-data/` and live examples, so its viewers keep showing what was captured on it.
 
 ### 8.3 Retiring a release
 

@@ -4,7 +4,7 @@ Self-contained context for the lab VM that reaches the 7 Catalyst 9000 lab devic
 switches/WLC on the lab subnet plus an 8-member C9300 stack over the WAN). Keep this file at
 the repo root.
 
-## 0. Current status (2026-10-04)
+## 0. Current status (2026-11-18)
 
 **Fleet:** C9200, C9300-24UX, C9400, C9500, C9600, C9800 (WLC) and C9300-STACK8-WAN, all on
 IOS XE 26.1.1 — the `device_data` release in `releases/index.json` (§14, VERSIONING.md 8.2).
@@ -12,15 +12,24 @@ Every device is collected with every method (RESTCONF walk, NETCONF get / get-co
 subscribe periodic + on-change, gNMI Get / Subscribe, MDT dial-out, SNMP MIB bridge) and
 `kit.py coverage` reports **COMPLETE** for all 7.
 
-**Published:** the Device Data page datasets (`*-live-data.json`, `protocol-matrix.json`) and
-`releases/26.1.1/live-data/`. Every builder masks secrets (keys, passwords, SNMP communities
+**Published:** the Device Data page datasets (`*-live-data.json`, `protocol-matrix.json`),
+`releases/26.1.1/live-data/` (RESTCONF bodies) and `releases/26.1.1/gnmi-data/` (full gNMI
+bodies). Every builder masks secrets (keys, passwords, SNMP communities
 in values, CLI text and `community-config` list names); `tests/test_dataset_secrets.py` scans
 all of them.
 
 **MDT depth:** every device also had a per-xpath MDT walk (one subscription per nested
 container); the Stack's (2026-10-05) used pruned catalogs over the WAN (§14).
 
-**Next:** after the lab upgrades to 26.2.1, follow VERSIONING.md 8.2 to re-collect on 26.2.1.
+**gNMI depth (2026-11-18):** gNMI Get and Subscribe now walk every OpenConfig container from
+the YANG schema (`gnmi_oc_catalog.py`, 1,696 nodes) below each parent that returned data, and
+publish full payloads. "Data" means a leaf value: IOS XE answers unpopulated nodes with `{}`
+(gNMI) or an empty XML skeleton (NETCONF). Never send `/notif-bis:streams` over gNMI: it
+crashes gnmib. The C9200L is excluded from gNMI (gnmib crashes; user decision). Details:
+memory/device-harness/0007.
+
+**Next:** after the lab upgrades to 26.2.1, follow VERSIONING.md 8.2 to re-collect on 26.2.1
+(also run `gnmi_oc_catalog.py --version 26.2.1`).
 ### Harness components
 
 The GET-phase harness lives under `scripts/harness/`; the MDT, NETCONF and gNMI collectors
@@ -45,6 +54,8 @@ where they say "to build", the modules below implement it.
 | Device onboarding | `scripts/harness/onboard.py` | Built — enables AAA/HTTPS/RESTCONF/NETCONF/gNMI/SNMP where missing; see §14 |
 | Portable kit CLI | `scripts/harness/kit.py` | Built — doctor/facts/telegraf/collect/coverage/bundle; see §14 |
 | Kit builder / bundle importer | `scripts/build_kit.py`, `scripts/import_harness_bundle.py` | Built; see §14 |
+| OpenConfig node catalog (gNMI) | `scripts/mdt-telemetry/collector/gnmi_oc_catalog.py` | Built — pyang schema walk -> `output/openconfig-nodes.json` |
+| gNMI Get / Subscribe | `scripts/mdt-telemetry/collector/gnmi_get.py`, `gnmi_subscribe.py` | Built — roots + nested OpenConfig, reconnect, `--resume`, `--skip` |
 
 Phase 4 (web-app representation) is shipped (§11); Phase 5 (CRUD) is design-only (§7).
 

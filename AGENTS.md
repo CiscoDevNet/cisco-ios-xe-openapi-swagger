@@ -31,15 +31,17 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 Update this list when an item is answered or finished; move answers to "Settled".
 
 **In progress**
-- None. The C9300-STACK8-WAN deep MDT walk finished 2026-10-05 (pruned catalogs; Stack MDT paths
-  78 -> 586). A full (unpruned) walk can still run later; it skips walked xpaths.
+- None. gNMI OpenConfig expansion (memory/device-harness/0007) landed 2026-11-18.
+- OpenConfig specs miss augmented nodes (openconfig-interfaces: 14 spec paths vs 142 schema
+  containers); a pyang-based generator is the next change.
+- Open finding: on C9300-STACK8-WAN, gNMI Subscribe ONCE returns empty updates for paths where Get
+  returns data (74 streamed vs 292 Get paths); a gNMI restart did not help. Not investigated further.
 
 **Waiting on the user (not answered yet)**
 1. **Lab upgrade to 26.2.1**, then re-collect per VERSIONING.md 8.2. The user mentioned "8 or so
    lab devices"; the inventory has 7 (six on the lab subnet + the 8-member stack). Confirm
    whether an eighth device should be onboarded (`kit.py onboard`).
-2. **Stack standing MDT subscriptions** (ids 30002, 50023, 60007, ... streaming to this VM): keep
-   or remove? Harness traffic is already filtered (memory/telemetry/0001).
+2. *(Answered 2026-11-18, see Settled: Stack standing MDT subscriptions removed.)*
 3. **Feature enablement** (DEVICE_FEATURE_COVERAGE.md): ~626 modules return no data because the
    feature isn't configured. Offered several times, never answered. Needs a topology check first
    (data-plane links between devices, not just management).
@@ -58,6 +60,12 @@ Update this list when an item is answered or finished; move answers to "Settled"
 - Site size (~3 GB vs the documented 1 GB Pages limit): "not concerned at this time".
 
 **Settled (do not reopen)**
+- Stack standing MDT subscriptions (30001–60029, 65 total, streaming to this VM): removed and
+  saved 2026-11-18 at the user's request. Harness subscriptions use ids 900000+.
+- C9200L is excluded from gNMI collection (gnmib crashes under load; user 2026-11-18: "just
+  ignore the C9200L if it's being problematic"). Its other methods are unaffected.
+- "Data" means at least one leaf value: gNMI `{}` updates and NETCONF empty skeletons are
+  "empty" (memory/device-harness/0007).
 - Hosted releases: 26.2.1, 26.1.1, 17.18.1. 17.9.x / 17.12.x / 17.15.x were retired 2026-11-17
   (VERSIONING.md 8.3 is the retirement runbook).
 - Deprecated / obsolete elements are shown on `deprecations.html`, including obsolete ones, top-most

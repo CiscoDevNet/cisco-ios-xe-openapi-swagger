@@ -163,6 +163,31 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — gNMI OpenConfig expansion and full gNMI payloads on Device Data (2026-11-18)
+
+- **OpenConfig over gNMI, nested:** `gnmi_oc_catalog.py` lists every OpenConfig container from
+  the schema (1,696 nodes on 26.1.1); `gnmi_get.py` and `gnmi_subscribe.py` probe each one
+  below a parent that returned data. Paths with data per device (Get, all):
+  C9300-24UX 404, C9500 355, C9400 334, C9600 300, C9300-STACK8-WAN 292, C9800 257 (was
+  75–86 each, with no OpenConfig at all); openconfig-interfaces alone 38–49 per device.
+- **Fixed the gNMI collector:** a Get of `/notif-bis:streams` crashed gnmib on every device and
+  the collector recorded every later root (all OpenConfig included) as an error. It now never
+  sends known crash roots, reconnects with backoff, stops and saves when the server stays down
+  (`--resume`, `--skip`).
+- **"Data" means a leaf value:** IOS XE answers unpopulated nodes with `{}` (gNMI) or an empty
+  XML skeleton (NETCONF); these were counted as data. gNMI get-config cells in the protocol
+  matrix drop 516 -> 123 and NETCONF get / get-config lose 29 / 12 rows: those were empty.
+- **Full payloads:** gNMI bodies are no longer cut at 40 KB. They are published once per path
+  under `releases/26.1.1/gnmi-data/<method>/` and loaded on selection; a Get config/state body
+  identical to Get all (timestamps aside) shares that file (1,406 rows).
+- **Device Data page:** nested rows are indented and a **Level** filter switches between module
+  roots and nested containers; gNMI rows have **Copy gNMI path**.
+- **Lab:** C9300-24UX gNMI login restored; the Stack's 65 standing MDT subscriptions removed.
+  The C9200L is excluded from gNMI (gnmib crashes under load). On the Stack, Subscribe ONCE
+  returns empty updates where Get has data (74 streamed paths), even after a gNMI restart.
+- Tests: `tests/test_gnmi_collection.py`; `test_dataset_secrets.py` scans `gnmi-data/` and
+  checks every gNMI row's file. Decision record: `memory/device-harness/0007`.
+
 ### Added — deprecated & obsolete YANG elements page (2026-11-17)
 
 - **[deprecations.html](deprecations.html)** (hub → More → Deprecations): every
