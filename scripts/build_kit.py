@@ -28,7 +28,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 HARNESS = REPO / "scripts" / "harness"
 COLLECTOR = REPO / "scripts" / "mdt-telemetry" / "collector"
-CATALOG_FILES = ("subscribable-nodes.json", "mib-nodes.json")
+CATALOG_FILES = ("subscribable-nodes.json", "mib-nodes.json", "openconfig-nodes.json")
 
 REQUIREMENTS = ["requests==2.34.2", "ncclient==0.7.1", "netmiko==4.7.0", "pygnmi==0.8.15", "PyYAML==6.0.3"]
 TELEGRAF_VERSION = "1.40.1"
@@ -155,7 +155,8 @@ def copy_catalogs(kit: Path, release: str) -> None:
         version = json.loads(source.read_text(encoding="utf-8")).get("version")
         if version != release:
             raise SystemExit(f"{source.name} is for {version}, not {release}; regenerate it first "
-                             f"(count_subscribable.py --version {release} --dump / mib_catalog.py)")
+                             f"(count_subscribable.py --version {release} --dump / mib_catalog.py / "
+                             f"gnmi_oc_catalog.py --version {release})")
         shutil.copy2(source, target / name)
     shutil.copy2(REPO / "yang-prefix-map.json", kit / "yang-prefix-map.json")
 

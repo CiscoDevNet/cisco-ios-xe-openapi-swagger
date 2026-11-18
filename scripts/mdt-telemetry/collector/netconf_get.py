@@ -155,13 +155,21 @@ def do_filtered(conn, op, container, ns):
     return str(reply)
 
 
+def xml_has_data(xml: str) -> bool:
+    """True when <data> holds a leaf value. IOS XE answers unpopulated models with an empty
+    container skeleton (<cloudm-config></cloudm-config>); a self-closing element is an
+    'empty'-type leaf (<shutdown/>), which is real data."""
+    body = xml.split("<data>", 1)[-1].rsplit("</data>", 1)[0] if "<data>" in xml else ""
+    return bool(re.search(r">[^<]*[^<\s][^<]*</", body) or re.search(r"<[\w:.-]+(?:\s[^>]*)?/>", body))
+
+
 def classify(op, container, ns, conn):
     try:
         xml = do_filtered(conn, op, container, ns)
     except RPCError as e:  # device-level per-path error (e.g. unsupported) — not a session drop
         return {"op": op, "status": "rpc-error", "bytes": 0, "error": str(e)[:200], "payload": ""}
     # Transport/session errors propagate to the caller's reconnect handler.
-    has_data = f"<{container}" in xml
+    has_data = f"<{container}" in xml and xml_has_data(xml)
     return {
         "op": op,
         "status": "data" if has_data else "empty",

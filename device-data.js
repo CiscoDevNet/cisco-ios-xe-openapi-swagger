@@ -6,6 +6,8 @@
  *   - RESTCONF (pull): restconf-live-data.json, built by
  *     build_restconf_dataset.py from the release's live-examples index; the
  *     actual GET payloads are fetched lazily per path on selection.
+ *   - NETCONF / gNMI: per-method datasets; NETCONF payloads are inline, gNMI
+ *     payloads live in releases/<ver>/gnmi-data/ and are fetched like RESTCONF.
  *
  * Renders device (PID) tabs, a model-flavor filter, a path list, summary
  * tiles + charts, and a per-path detail (streamed keys/values for MDT, the
@@ -39,7 +41,7 @@
         cfg: '#00BCD4', ietf: '#FF5722', other: '#757575', mib: '#9C27B0', wireless: '#E91E63', rpc: '#795548'
     };
 
-    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', matrixGaps: false, matrixCat: 'all', jump: null,
+    var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', level: 'all', matrixGaps: false, matrixCat: 'all', jump: null,
         matrixPivot: 'methods', matrixMethod: null, matrixInconsistent: false, matrixIndex: null, matrixClass: null };
     var charts = {};
     var payloadCache = {};
@@ -93,6 +95,8 @@
         if (state.q && haystack(p).indexOf(state.q) === -1) return false;
         if (state.dataFilter === 'data' && isNoData(p)) return false;
         if (state.dataFilter === 'nodata' && !isNoData(p)) return false;
+        if (state.level === 'roots' && p.depth > 1) return false;
+        if (state.level === 'nested' && !(p.depth > 1)) return false;
         return true;
     }
     // Lazily build a lowercase search string per path covering the xpath plus
@@ -173,8 +177,9 @@
     }
     function pathRow(p, dim) {
         var key = p.pid + '|' + p.path;
+        var depthClass = p.depth > 1 ? ' d' + Math.min(p.depth, 6) : '';
         return el('div', {
-            className: 'prow' + (state.sel === key ? ' sel' : '') + (dim ? ' nodata' : ''),
+            className: 'prow' + depthClass + (state.sel === key ? ' sel' : '') + (dim ? ' nodata' : ''),
             onclick: function () { state.sel = key; renderList(); renderDetail(); }
         }, [
             el('span', { className: 'catdot ' + catClass(p.category), title: p.category }),
@@ -195,7 +200,7 @@
         var p = (state.data.paths || []).filter(function (x) { return x.pid + '|' + x.path === state.sel; })[0];
         if (!p) { panel.appendChild(el('div', { className: 'placeholder', text: 'Not found.' })); return; }
 
-        if (state.transport === 'restconf' && p.file) { renderRestconfDetail(panel, p); return; }
+        if (p.file) { renderFileDetail(panel, p); return; }
         if (typeof p.payload === 'string') { renderInlineDetail(panel, p); return; }
 
         var samples = p.samples || [];
@@ -361,22 +366,31 @@
         if (last < str.length) pre.appendChild(document.createTextNode(str.slice(last)));
     }
 
-    // ---------- RESTCONF detail (lazy payload fetch) ----------
-    function renderRestconfDetail(panel, p) {
+    // ---------- file-backed detail (RESTCONF, gNMI): lazy payload fetch ----------
+    function renderFileDetail(panel, p) {
+        var statusText = state.transport === 'restconf'
+            ? 'HTTP ' + (p.status == null ? '?' : p.status) : (p.status || '');
         var metaBits = (CAT_LABEL[p.category] || p.category) + ' · ' + p.pid
-            + ' · HTTP ' + (p.status == null ? '?' : p.status) + ' · ' + fmtBytes(p.bytes);
+            + (statusText ? ' · ' + statusText : '') + ' · ' + fmtBytes(p.bytes);
+        var pathButtons = [copyBtn('Copy path', function () { return p.path; })];
+        if (p.gnmi_path) pathButtons.push(copyBtn('Copy gNMI path', function () { return p.gnmi_path; }));
         var head = el('div', { className: 'dhead' }, [
             el('div', { className: 'dpath', text: p.path }),
             el('div', { className: 'dmeta', text: metaBits }),
-            el('div', { className: 'dbtns' }, [copyBtn('Copy path', function () { return p.path; })])
+            el('div', { className: 'dbtns' }, pathButtons)
         ]);
         panel.appendChild(head);
+        if (p.once != null || p.sample != null || p.onchange != null) panel.appendChild(subscribeModes(p));
+        if (p.same_as === 'gnmi-get') {
+            panel.appendChild(el('div', { className: 'nodatanote',
+                text: 'Same response as gNMI Get datatype=all for this device (only the reply timestamp differs), so the stored body is shared.' }));
+        }
         var body = el('div', { className: 'body' });
         var pre = el('pre', { className: 'codebox', text: 'Loading payload…' });
         body.appendChild(pre);
         panel.appendChild(body);
         var btns = head.querySelector('.dbtns');
-        fetchRestconfPayload(p).then(function (value) {
+        fetchFilePayload(p).then(function (value) {
             var text = JSON.stringify(value, null, 2);
             highlightInto(pre, text, 'json');
             btns.insertBefore(copyBtn('Copy payload', function () { return text; }), btns.firstChild);
@@ -384,7 +398,7 @@
             pre.textContent = 'Could not load payload: ' + ((err && err.message) || err);
         });
     }
-    function fetchRestconfPayload(p) {
+    function fetchFilePayload(p) {
         var cacheKey = p.file + '#' + p.pid;
         if (payloadCache[cacheKey]) return Promise.resolve(payloadCache[cacheKey]);
         return fetch(p.file)
@@ -601,6 +615,13 @@
             updateSummary();
             renderTopChart();
         });
+        var levelSel = $('levelFilter');
+        if (levelSel) levelSel.addEventListener('change', function () {
+            state.level = levelSel.value;
+            renderList();
+            updateSummary();
+            renderTopChart();
+        });
         var mg = $('matrixGaps');
         if (mg) mg.addEventListener('change', function () {
             state.matrixGaps = mg.checked;
@@ -668,6 +689,10 @@
         state.data = state.datasets[key];
         state.cat = 'all'; state.q = ''; state.sel = null;
         var sb = $('searchBox'); if (sb) sb.value = '';
+        var hasNested = (state.data.paths || []).some(function (p) { return p.depth > 1; });
+        var levelLbl = $('levelFilterLbl');
+        if (levelLbl) levelLbl.hidden = !hasNested;
+        if (!hasNested) { state.level = 'all'; var ls = $('levelFilter'); if (ls) ls.value = 'all'; }
         var jump = state.jump; state.jump = null;
         var d0 = (state.data.devices || [])[0];
         state.pid = (jump && jump.pid && (state.data.devices || []).some(function (x) { return x.pid === jump.pid; }))
@@ -694,6 +719,8 @@
             state.sel = match.pid + '|' + match.path;
             state.dataFilter = 'all';
             var df = $('dataFilter'); if (df) df.value = 'all';
+            state.level = 'all';
+            var lf = $('levelFilter'); if (lf) lf.value = 'all';
             renderList(); renderDetail();
             var selRow = $('browser').querySelector('.prow.sel');
             if (selRow && selRow.scrollIntoView) selRow.scrollIntoView({ block: 'center' });
