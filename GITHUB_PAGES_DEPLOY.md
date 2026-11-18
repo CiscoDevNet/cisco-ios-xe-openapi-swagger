@@ -54,9 +54,9 @@ No manual setup required. Just push and it deploys.
 | OpenAPI Specifications | 953 |
 | API Paths | 81,560 |
 | API Operations | 243,024 |
-| YANG Tree Files | 758 (about 4,200 across all releases) |
+| YANG Tree Files | 758 (about 2,200 across all releases) |
 | Model Types | 8 viewers + notification catalog |
-| IOS XE Releases | 6 (17.9.x to 26.2.1) |
+| IOS XE Releases | 3 (17.18.1 to 26.2.1) |
 
 ## Custom Domain (Optional)
 

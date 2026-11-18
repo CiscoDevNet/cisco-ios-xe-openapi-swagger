@@ -44,7 +44,7 @@ Update this list when an item is answered or finished; move answers to "Settled"
    feature isn't configured. Offered several times, never answered. Needs a topology check first
    (data-plane links between devices, not just management).
 4. **Older-release-only specs** `native-aug-tftp-server-config` and `ietf-netconf-monitoring`
-   (in 17.9.x\u201326.1.1, not 26.2.1): remove for consistency or regenerate?
+   (in 17.18.1\u201326.1.1, not 26.2.1): remove for consistency or regenerate?
 5. **23 empty tree pages** (`empty-tree` in `tree_audit.json`): hide them, or show a "no data
    nodes" note?
 6. **24 hand-made 26.1.1 tree pages** (June layout, not regenerated): keep or retire?
@@ -77,11 +77,11 @@ Update this list when an item is answered or finished; move answers to "Settled"
 
 ## 1. Project Overview
 
-**What this is:** A static documentation site for **Cisco IOS-XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1)**, generated from upstream YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime. Per-release artifacts live under `releases/<ver>/`; shared UI lives at the repo root and reads the active release based on the `#ver=` URL hash. See [VERSIONING.md](VERSIONING.md) for the full layout.
+**What this is:** A static documentation site for **Cisco IOS-XE RESTCONF APIs across multiple releases (17.18.1, 26.1.1, 26.2.1)**, generated from upstream YANG modules. Hosted on GitHub Pages — no backend, no build step at runtime. Per-release artifacts live under `releases/<ver>/`; shared UI lives at the repo root and reads the active release based on the `#ver=` URL hash. See [VERSIONING.md](VERSIONING.md) for the full layout.
 
 **What ships:**
 
-- 953 OpenAPI 3.0 specs in the default 26.2.1 release (`releases/26.2.1/swagger-*-model/api/*.json`); 774–953 across the six tracked releases. See [version-stats.json](version-stats.json) for per-release counts. The default is always the newest release; device data comes from `device_data` in [releases/index.json](releases/index.json) (26.1.1, the release the lab runs).
+- 953 OpenAPI 3.0 specs in the default 26.2.1 release (`releases/26.2.1/swagger-*-model/api/*.json`); 897–953 across the three tracked releases. See [version-stats.json](version-stats.json) for per-release counts. The default is always the newest release; device data comes from `device_data` in [releases/index.json](releases/index.json) (26.1.1, the release the lab runs).
 - 620–758 YANG tree HTML pages per release (`releases/<ver>/yang-trees/`, ~4,200 total)
 - Vanilla-JS pages (hub, code generator, tree compare, accountability, device data, telemetry, release compare, exports, ...) plus 8 Swagger UI model viewers
 - A per-release search index (`releases/<ver>/search-index.json`) consumed by Fuse.js fuzzy search
@@ -299,7 +299,7 @@ All `requestBody` and `responses['200'].content['application/yang-data+json']` p
   "properties": { "Cisco-IOS-XE-native:hostname": { "type": "string" } } }
 ```
 
-Swagger UI's "Try it out" pre-fills the body from the **schema**, not the media-type-level `example`, so a bare `{"type":"string"}` leaves the editor blank and the request fails on the device. The 8 `generate_*_from_tree.py` generators (cfg, events, ietf, mib, native, openconfig, oper, other) wrap the schema with `wrapper_key = "<module>:<node>"` immediately after computing the inner schema, and `scripts/wrap_body_schemas.py` (invoked from `build_release.py` after `apply_example_overlay`) enforces the invariant across the legacy v2 generators (`generate_*_openapi_v2.py`) and every release by deriving the wrap key from the URL path when no namespaced example is present. The live invariant is "0 PUT/PATCH/POST bodies whose schema is not `{type:object, properties:{<module>:<leaf>: ...}}`" across all 5 releases and all 9 viewers (currently 0 / 97,208).
+Swagger UI's "Try it out" pre-fills the body from the **schema**, not the media-type-level `example`, so a bare `{"type":"string"}` leaves the editor blank and the request fails on the device. The 8 `generate_*_from_tree.py` generators (cfg, events, ietf, mib, native, openconfig, oper, other) wrap the schema with `wrapper_key = "<module>:<node>"` immediately after computing the inner schema, and `scripts/wrap_body_schemas.py` (invoked from `build_release.py` after `apply_example_overlay`) enforces the invariant across the legacy v2 generators (`generate_*_openapi_v2.py`) and every release by deriving the wrap key from the URL path when no namespaced example is present. The live invariant is "0 PUT/PATCH/POST bodies whose schema is not `{type:object, properties:{<module>:<leaf>: ...}}`" across every hosted release and all 9 viewers (currently 0 / 97,208).
 
 ### Native YANG augments & placeholders (CRITICAL)
 
@@ -334,13 +334,10 @@ Augment bodies typically reference `uses <grouping-name>;` instead of inlining t
 
 **Completeness sweep:** A final pass in `generate_native_augment_specs.py` (`_parse_native_top_children` + `_covered_top_names`) emits a `native-<child>.json` for any top-level container declared in `Cisco-IOS-XE-native.yang` itself that the v2 generator silently dropped (historical examples: `dot1x`, `identity`, `login`, `object-group`, `password`, `scada-gw`, `zone`, `zone-pair`). This is the safety net that makes the coverage guard achievable for every release.
 
-**Coverage today (post-fix, all 5 releases):**
+**Coverage today (post-fix):**
 
 | Release | Top-level /native children | Native spec files | Total paths | Operations |
 |---|---:|---:|---:|---:|
-| 17.9.x  | 233 / 233 ✅ | 129 | 9,059  | 36,236 |
-| 17.12.x | 237 / 237 ✅ | 133 | 9,169  | 36,676 |
-| 17.15.x | 256 / 256 ✅ | 152 | 9,635  | 38,540 |
 | 17.18.1 | 258 / 258 ✅ | 153 | 9,871  | 39,484 |
 | 26.1.1  | 264 / 264 ✅ | 159 | 10,417 | 41,668 |
 
@@ -372,7 +369,7 @@ Example values for generated specs come from a layered lookup in `example_for_ty
 2. **YANG-derived defaults / enums** — all 9 `generate_*_from_tree.py` generators call `yang_value_index.lookup_example(name)` (built once per process from `references/17181-YANG-modules/*.yang`). The index scans every `leaf` and `typedef`, records `default "X";` statements and `enum X;` lists, and **only returns a value when every YANG leaf with that name agrees** (unanimous default or unanimous first enum). Conflicting same-name leaves return `None` so we never substitute a wrong default into an unrelated path.
 3. **Type-based fallback** — `string → "example"`, `boolean → true`, `uint* → 1`, `enumeration → "default"`, `union → "auto"`, `empty → null` (presence). Used when neither override nor YANG index resolves the name.
 
-The current state of generated example bodies after this pipeline, **per release surface** (request + response examples across all 8 viewers; the same counts apply to each of the 5 tracked releases once that release is re-built):
+The current state of generated example bodies after this pipeline, **per release surface** (request + response examples across all 8 viewers; the same counts apply to each tracked release once that release is re-built):
 
 | Viewer | Example bodies | Generic `"example"` placeholder |
 |--------|---------------:|--------------------------------:|
@@ -386,9 +383,9 @@ The current state of generated example bodies after this pipeline, **per release
 | other          |  3,520 | 39.5% |
 | **Total**      | **61,091** | **37.0%** |
 
-> Scope caveat: example-data realism counts above are for the **top-level (default 26.1.1) viewer surface**. The four other tracked releases (`releases/17.9.x/`, `releases/17.12.x/`, `releases/17.15.x/`, `releases/17.18.1/`) carry roughly comparable example-body volumes per release. Of the 9 from-tree generators, 7 (`native`, `ietf`, `mib`, `openconfig`, `events`, `other`, `rpc`) hardcode the top-level `yang-trees/` input path and only re-emit examples for the default surface; only `cfg` and `oper` accept `--version` and re-emit per-release. To roll the same example-data layering across all 5 releases, re-run `scripts/build_release.py --version <ver>` for each release rather than the individual generators.
+> Scope caveat: example-data realism counts above are for the **top-level (default 26.1.1) viewer surface**. The other tracked releases (`releases/17.18.1/`, `releases/26.2.1/`) carry roughly comparable example-body volumes per release. Of the 9 from-tree generators, 7 (`native`, `ietf`, `mib`, `openconfig`, `events`, `other`, `rpc`) hardcode the top-level `yang-trees/` input path and only re-emit examples for the default surface; only `cfg` and `oper` accept `--version` and re-emit per-release. To roll the same example-data layering across every release, re-run `scripts/build_release.py --version <ver>` for each release rather than the individual generators.
 >
-> **Wire-correctness (schema wrap) is enforced across all 5 releases**, however: the `scripts/wrap_body_schemas.py` post-processor runs as part of every `build_release.py` invocation (and can be run ad-hoc with `--all-releases`). It walks every `application/yang-data+json` requestBody and response, and wraps any unwrapped schema (and synthesises a wrapper for bare-scalar / list / empty-dict / multi-key-non-namespaced examples) under the RESTCONF-namespaced key derived from the URL path. After the post-processor: **0 / 97,208 PUT/PATCH/POST bodies remain unwrapped across all 5 releases and all 9 viewers** (audit: any body where `schema.type != "object"` or no `properties` key contains `":"`).
+> **Wire-correctness (schema wrap) is enforced across every hosted release**, however: the `scripts/wrap_body_schemas.py` post-processor runs as part of every `build_release.py` invocation (and can be run ad-hoc with `--all-releases`). It walks every `application/yang-data+json` requestBody and response, and wraps any unwrapped schema (and synthesises a wrapper for bare-scalar / list / empty-dict / multi-key-non-namespaced examples) under the RESTCONF-namespaced key derived from the URL path. After the post-processor: **0 / 97,208 PUT/PATCH/POST bodies remain unwrapped across every hosted release and all 9 viewers** (audit: any body where `schema.type != "object"` or no `properties` key contains `":"`).
 
 When improving coverage:
 - **Prefer extending the YANG index** (it benefits all 9 generators at once) over per-generator overrides.

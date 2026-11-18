@@ -20,6 +20,6 @@ Inline a dark stylesheet per page (4,200 copies to maintain); make site-chrome d
 the footer (more JS for a footer the pages already have).
 
 ## Consequences
-Template changes need all 6 releases regenerated (~25 minutes); output is otherwise identical,
+Template changes need every release regenerated (~25 minutes); output is otherwise identical,
 and `tree_audit.json` changes only in timestamp/order (restore it). The legacy 26.1.1 pages are
 not regenerated, so patch them by hand or retire them.

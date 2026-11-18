@@ -1,7 +1,7 @@
 ﻿"""Quick Playwright smoke test of the live GH Pages site.
 
 Verifies:
-  - both active versions (17.18.1, 17.9.x) appear in the version dropdown
+  - active versions (26.2.1, 17.18.1) appear in the version dropdown
   - per version: opening the MIB viewer, clicking a module, hash becomes #spec=<m>
   - clicking an operation updates hash to include &op=<id>
   - reloading that exact URL auto-expands the operation row
@@ -35,12 +35,12 @@ async def run():
         )
         print("Dropdown:", labels)
         active = [l["value"] for l in labels if not l["disabled"]]
-        rows.append(("versions visible (17.18.1, 17.9.x)",
+        rows.append(("versions visible (26.2.1, 17.18.1)",
                      ",".join(active),
-                     "PASS" if {"17.18.1", "17.9.x"}.issubset(set(active)) else "FAIL"))
+                     "PASS" if {"26.2.1", "17.18.1"}.issubset(set(active)) else "FAIL"))
 
         all_garbled = []
-        for ver in ["17.18.1", "17.9.x"]:
+        for ver in ["26.2.1", "17.18.1"]:
             page2 = await ctx.new_page()
             mib_url = BASE + "swagger-mib-model/index.html#ver=" + ver
             await page2.goto(mib_url, wait_until="domcontentloaded")

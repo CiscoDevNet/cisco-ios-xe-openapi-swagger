@@ -33,7 +33,7 @@ implementation. "I want to author MDT subscriptions faster" is a problem;
 ### Scope hints
 
 - Page(s) affected: <!-- e.g. yang-accountability.html, all viewer pages -->
-- Release(s) affected: <!-- e.g. 26.1.1 only, all 5 releases -->
+- Release(s) affected: <!-- e.g. 26.1.1 only, all 3 releases -->
 - Would this be a new page, a new tool, or an enhancement to an existing one?
 - Should it apply to non-Cisco models (OpenConfig / IETF / MIB) as well?
 
