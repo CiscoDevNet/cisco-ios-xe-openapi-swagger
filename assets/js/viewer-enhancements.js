@@ -159,6 +159,7 @@
         attachSlashFocus();
         attachOperationTracking();
         attachTreeViewTracking();
+        attachHistoryLink();
         attachTryItOutTracking();
         attachNotificationsPanel();
         attachLiveExamplesPanel();
@@ -488,6 +489,35 @@
                     } catch (_) { /* noop */ }
                 } catch (_) { /* noop */ }
             }, true);
+        } catch (_) { /* noop */ }
+    }
+
+    // ---------- (4c2) module history link next to "View YANG Tree" -------
+    // Curated native-* bundles are not YANG modules, so they get no link.
+    function attachHistoryLink() {
+        try {
+            var tree = document.getElementById('treeLink');
+            if (!tree) return;
+            var link = document.createElement('a');
+            link.id = 'historyLink';
+            link.textContent = 'Changes across releases';
+            link.title = 'How this YANG module changed since the last release and since the oldest tracked release';
+            link.style.cssText = 'display:none; padding:6px 14px; border-radius:4px; font-size:12px; ' +
+                'background:#5e35b1; color:#fff; text-decoration:none; font-weight:500; margin-left:6px;';
+            tree.after(link);
+            var update = function () {
+                var m = (location.hash || '').match(/[#&]spec=([^&]+)/);
+                var spec = m ? decodeURIComponent(m[1]) : '';
+                if (!/^[A-Za-z0-9._-]+$/.test(spec) || /^native-/.test(spec)) {
+                    link.style.display = 'none';
+                    return;
+                }
+                link.href = '../release-compare.html#module=' + encodeURIComponent(spec);
+                link.style.display = 'inline-block';
+            };
+            window.addEventListener('hashchange', update);
+            new MutationObserver(update).observe(tree, { attributes: true, attributeFilter: ['href'] });
+            update();
         } catch (_) { /* noop */ }
     }
 
