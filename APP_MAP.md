@@ -22,7 +22,7 @@ authoring, accountability/coverage reports, and per-platform support matrices.
 Key facts:
 
 - **Hosting**: GitHub Pages, scope `/cisco-ios-xe-openapi-swagger/`.
-- **Releases tracked**: `26.2.1` (default), `26.1.1`, `17.18.1`, `17.15.x`, `17.12.x`, `17.9.x`
+- **Releases tracked**: `26.2.1` (default), `26.1.1`, `17.18.1` (17.9.x, 17.12.x and 17.15.x were retired)
   ([releases/index.json](releases/index.json)). The newest release is the default; device
   data (Device Data page, viewer "Live device data" panel) belongs to the release the lab
   devices run, `device_data` in the same file (26.1.1 today).
@@ -95,6 +95,10 @@ mindmap
         Modules added / removed / changed + revision notes
         Resolved schema-node diff (pyang trees, on demand)
         Per-platform module membership changes
+      deprecations.html
+        Deprecated / obsolete census per release
+        By category and module, down to schema paths
+        Changes since the previous release
       platform-coverage.html
         Module x platform matrix
         Family color coding
@@ -227,6 +231,26 @@ not repeated below.
   and on-demand `releases/compare/<old>__<new>/<module>.json`.
 - **Scripts**: [release-compare.js](release-compare.js) (strict CSP, DOM built with textContent).
 - **Deep-link hash**: `#pair=<old>__<new>&status=&category=&q=`.
+
+### 3.6b [deprecations.html](deprecations.html) — Deprecated & Obsolete YANG Elements
+- **Route**: `/deprecations.html`
+- **Purpose**: Every `status deprecated` / `status obsolete` in a release's YANG
+  sources: totals, by category, by module, and per module the flagged schema
+  nodes (top-most by default, optionally every marked node) and the statements
+  that are not schema nodes (typedefs, identities, enums, groupings, uses /
+  augment, SMIv2 aliases). Shows status changes since the previous release at
+  statement level (newly / added / escalated / removed) and node level (with
+  new instances of already-flagged definitions separated out). CSV download.
+- **Data sources**: `releases/<ver>/deprecations/index.json`, on-demand
+  `releases/<ver>/deprecations/modules/<module>.json` and `changes.json`;
+  `releases/<ver>/deprecations/deprecations.csv` for download.
+- **Scripts**: [deprecations.js](deprecations.js) (strict CSP, DOM built with textContent).
+- **Deep-link hash**: `#ver=&status=&category=&q=&changed=1&module=&view=node&change=`.
+- **Accuracy**: [scripts/build_deprecations.py](scripts/build_deprecations.py) fails
+  unless an independent tokenizer and pyang's parser find the same status statements
+  and every one is traced to the resolved schema tree or classified;
+  `--verify-trees` also matches `pyang -f tree` `x` / `o` markers per module.
+  The MIB viewer's "MIB Details" card links here for MIBs with flagged objects.
 - **Route**: `/telemetry.html`
 - **Purpose**: Compute gRPC dial-out `filter xpath` for any (release, category,
   module, OpenAPI path) per the formula in
@@ -555,6 +579,7 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | `releases/<ver>/yang_accountability.json` (+ root [yang_accountability.json](yang_accountability.json)) | scripts/build_accountability*.py | yang-accountability.js |
 | [accountability_compare.json](accountability_compare.json) | scripts/build_accountability_compare.py | yang-accountability-compare.html |
 | `releases/compare/*.json` (+ per-module detail folders) | scripts/build_release_compare.py | release-compare.html |
+| `releases/<ver>/deprecations/` (index, per-module shards, changes, CSV) | scripts/build_deprecations.py | deprecations.html |
 | [version-stats.json](version-stats.json) | scripts/build_version_stats.py | hub stats, about, version compare |
 | [platform-support-index.json](platform-support-index.json) + `releases/<ver>/platform-support.json` | scripts/build_platform_support.py (inferred) | platform-coverage.js, platform-support.js |
 | [yang-prefix-map.json](yang-prefix-map.json) + per-release variant | generators (inferred) | telemetry.js |
@@ -564,7 +589,7 @@ All "APIs" are static JSON fetched over HTTP — no backend.
 | [restconf-live-data.json](restconf-live-data.json) | scripts/build_restconf_dataset.py | device-data.js (RESTCONF transport) |
 | `releases/<ver>/native-capabilities.json` | scripts/build_native_capabilities.py | swagger-native-config-model/capabilities.html |
 | `releases/<ver>/telemetry-index.json`, `telemetry-skipped.json` | inferred from filenames; presumed telemetry pipeline | telemetry.js / build inputs |
-| `releases/<ver>/mib-metadata.json`, `mib-platform-matrix.json` | inferred | MIB viewer side cards |
+| `releases/<ver>/mib-metadata.json`, `mib-platform-matrix.json` | scripts/enrich_mib_metadata.py, scripts/parse_mibs_md.py | MIB viewer "MIB Details" card |
 | `releases/<ver>/path_depth_audit.json`, `tree_audit.json` | inferred QA artifacts | not directly bound to UI |
 | `releases/<ver>/exports/postman/*.json`, `exports/bruno/**` | scripts/build_release.py | hub download card → exports.html (per-release, split <50 MB) |
 

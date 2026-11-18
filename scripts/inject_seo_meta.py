@@ -29,7 +29,7 @@ END = "<!-- END seo-meta -->"
 TOP_LEVEL: dict[str, tuple[str | None, str]] = {
     "index.html": (
         None,
-        "Browse and search 608 Cisco IOS XE OpenAPI specs across 5 releases. "
+        "Browse and search 608 Cisco IOS XE OpenAPI specs across 3 releases. "
         "Deep-link to any RESTCONF endpoint, generate client code, and "
         "download Postman or Bruno collections.",
     ),
@@ -66,6 +66,11 @@ TOP_LEVEL: dict[str, tuple[str | None, str]] = {
         None,
         "See what changed between Cisco IOS XE releases: YANG modules added and "
         "removed, schema nodes changed, revision notes, and platform support.",
+    ),
+    "deprecations.html": (
+        None,
+        "Every deprecated and obsolete YANG element in a Cisco IOS XE release, by "
+        "category and module, with what changed since the previous release.",
     ),
     # app-map.html intentionally omitted: its full SEO block is baked by
     # scripts/build_app_map_html.py (the page is regenerated from APP_MAP.md

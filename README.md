@@ -5,7 +5,7 @@
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)
 [![Modules](https://img.shields.io/badge/Modules-1469-brightgreen)](docs/PROJECT_SUMMARY.md)
 
-Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1). The site defaults to the newest release, 26.2.1, with **953 OpenAPI specs, 81,560 paths, and 758 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
+Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs across multiple releases (17.18.1, 26.1.1, 26.2.1). The site defaults to the newest release, 26.2.1, with **953 OpenAPI specs, 81,560 paths, and 758 tree files**. See the [API growth across releases](yang-accountability-compare.html) view for per-release counts.
 
 **[View Live Documentation](https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/)**
  **[Getting Started Guide](docs/GETTING_STARTED.md)**
@@ -43,9 +43,9 @@ Comprehensive OpenAPI 3.0 / Swagger documentation for Cisco IOS XE RESTCONF APIs
 | **Modules with specs** | 949 | 64.6% coverage |
 | **Tree Files** | 758 | YANG/MIB visualizations |
 | **Model Types** | 8 + notifications | OpenAPI categories plus the notification catalog |
-| **Releases covered** | 6 | 17.9.x → 26.2.1 |
+| **Releases covered** | 3 | 17.18.1 → 26.2.1 |
 
-For the per-release growth curve (specs/paths/operations across all 6 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
+For the per-release growth curve (specs/paths/operations across all 3 releases), see [yang-accountability-compare.html](yang-accountability-compare.html) on the live site or `version-stats.json` in this repo.
 
 ## Model Categories
 
@@ -101,6 +101,7 @@ Standalone and vendor-specific modules.
 
 ## Recent Improvements
 
+- **Deprecated & obsolete elements** — [deprecations.html](deprecations.html) (hub → More → Deprecations) lists every `status deprecated` / `status obsolete` in a release's YANG models by category and module, down to the schema path, with what changed since the previous release and a CSV download. Built by [scripts/build_deprecations.py](scripts/build_deprecations.py), which cross-checks an independent tokenizer against pyang's parser and traces every statement to the resolved schema tree (`--verify-trees` also matches `pyang -f tree` markers per module).
 - **Dark mode everywhere, WCAG AA contrast** — every page, including the ~4,200 YANG tree pages, follows the dark/light toggle; text and white-on-colour buttons meet 4.5:1 in both themes (tokens in [assets/css/site.css](assets/css/site.css)).
 - **Link integrity** — tree pages, the 404 page and generated docs were fixed; [tests/test_internal_links.py](tests/test_internal_links.py) checks every static link in every published page, and release validation gate 5 checks every viewer and accountability tree link.
 - **26.2.1 is the default release** — the site always opens on the newest release; device data comes from the release the lab runs (`device_data` in [releases/index.json](releases/index.json), 26.1.1 today). See [VERSIONING.md §8.1–8.2](VERSIONING.md).
@@ -230,4 +231,4 @@ cisco-ios-xe-openapi-swagger/
 
 ---
 
-**Last Updated**: October 2026 | **Default IOS XE release**: 26.2.1 (6 releases, 17.9.x to 26.2.1) | **OpenAPI**: 3.0.0
+**Last Updated**: October 2026 | **Default IOS XE release**: 26.2.1 (3 releases, 17.18.1 to 26.2.1) | **OpenAPI**: 3.0.0

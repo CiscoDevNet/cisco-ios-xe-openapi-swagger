@@ -13,7 +13,7 @@
 // not match the current name.
 // ---------------------------------------------------------------------
 
-const CACHE_VERSION = 'v116-2026.10.05a';
+const CACHE_VERSION = 'v118-2026.11.17a';
 const RUNTIME_CACHE = 'iosxe-runtime-' + CACHE_VERSION;
 const PRECACHE      = 'iosxe-precache-' + CACHE_VERSION;
 
@@ -43,6 +43,8 @@ const PRECACHE_URLS = [
   'yang-accountability-compare.html',
   'release-compare.html',
   'release-compare.js',
+  'deprecations.html',
+  'deprecations.js',
   'platform-coverage.html',
   'assets/js/platform-coverage.js',
   'notifications.js',

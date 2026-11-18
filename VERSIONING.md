@@ -8,7 +8,7 @@
 
 ## 1. Goals
 
-1. Host **multiple IOS XE releases** (currently: 17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1) under the **same GitHub Pages URL** with no domain change.
+1. Host **multiple IOS XE releases** (currently: 17.18.1, 26.1.1, 26.2.1) under the **same GitHub Pages URL** with no domain change.
 2. Make adding a new release a **mechanical, scripted operation** — no ad-hoc edits across dozens of files.
 3. Preserve **deep-link backward compatibility** for existing URLs while introducing a new version-aware URL contract.
 4. Enforce **per-release CI gates** so a broken or incomplete release cannot ship.
@@ -17,14 +17,13 @@
 
 | Release Tag | YangModels Path | Patch Pin | Notes |
 |-------------|-----------------|-----------|-------|
-| `17.9.x`    | `vendor/cisco/xe/1791/`  | latest in branch | Older release; some modules may emit pyang warnings |
-| `17.12.x`   | `vendor/cisco/xe/17121/` | latest in branch | |
-| `17.15.x`   | `vendor/cisco/xe/17151/` | latest in branch | |
-| `17.18.1`   | `vendor/cisco/xe/17181/` | exact            | Existing baseline release |
-| `26.1.1`    | `vendor/cisco/xe/2611/`  | exact            | Default release |
+| `17.18.1`   | `vendor/cisco/xe/17181/` | exact            | Oldest hosted release |
+| `26.1.1`    | `vendor/cisco/xe/2611/`  | exact            | Device-data release (`device_data`) |
 | `26.2.1`    | `vendor/cisco/xe/2621/`  | exact            | Newest release |
 
 The exact upstream commit SHA used to build each release is pinned in `releases/<ver>/meta.json` (see §5).
+
+**Retired releases:** `17.9.x`, `17.12.x` and `17.15.x` were retired in November 2026. Their `releases/<ver>/` trees, `references/<ver>/` YANG sources and every compare pair that touched them were removed (see §8.3). They remain in git history, and `scripts/fetch_yang_release.py` can re-fetch their YANG if a train ever needs to come back.
 
 ## 3. Folder layout
 
@@ -34,7 +33,7 @@ All per-release artifacts live under a new top-level `releases/` directory:
 cisco-ios-xe-openapi-swagger/
 ├── releases/
 │   ├── index.json                              # list of releases consumed by UI
-│   ├── 17.9.x/
+│   ├── 26.2.1/
 │   │   ├── meta.json                           # release metadata (see §5)
 │   │   ├── manifests/                          # per-model manifest.json + accountability.json
 │   │   ├── swagger-cfg-model/api/*.json     # OpenAPI specs
@@ -51,25 +50,20 @@ cisco-ios-xe-openapi-swagger/
 │   │   ├── yang_accountability.json            # accountability report (machine-readable)
 │   │   ├── telemetry-index.json                # MDT xpath index (oper specs only)
 │   │   ├── mib-metadata.json                   # MIB enrichment data
+│   │   ├── deprecations/                       # deprecated/obsolete census (build_deprecations.py): index.json, modules/*.json, changes.json, deprecations.csv
 │   │   ├── native-capabilities.json            # native config-surface summary
 │   │   ├── yang-prefix-map.json                # module -> xpath prefix (telemetry XPath builder)
 │   │   ├── notifications.json                  # notification catalog
 │   │   └── exports/
-│   │       ├── postman/IOS-XE-17.9.x-<category>.postman_collection.json.zip   # built at deploy
-│   │       ├── postman/IOS-XE-17.9.x.postman_environment.json                 # built at deploy
-│   │       ├── bruno/IOS-XE-17.9.x-<category>.tar.gz                          # built at deploy
+│   │       ├── postman/IOS-XE-26.2.1-<category>.postman_collection.json.zip   # built at deploy
+│   │       ├── postman/IOS-XE-26.2.1.postman_environment.json                 # built at deploy
+│   │       ├── bruno/IOS-XE-26.2.1-<category>.tar.gz                          # built at deploy
 │   │       └── {postman,bruno}-manifest.json                                  # tracked
-│   ├── 17.12.x/  (same shape)
-│   ├── 17.15.x/  (same shape)
-│   ├── 17.18.1/  (same shape; this is the migration target for current artifacts)
 │   ├── 26.1.1/   (same shape + live-data/, live-examples-index.json, live-modules.json: device data)
-│   ├── 26.2.1/   (same shape)
+│   ├── 17.18.1/  (same shape)
 │   └── compare/  # release-to-release differences (build_release_compare.py)
 ├── references/
-│   ├── 17.9.x/   # raw YANG modules (excluded from deploy/)
-│   ├── 17.12.x/
-│   ├── 17.15.x/
-│   ├── 17.18.1/
+│   ├── 17181-YANG-modules/   # raw YANG modules for 17.18.1 (excluded from deploy/)
 │   ├── 26.1.1/
 │   └── 26.2.1/
 └── (shared UI: index.html, *.js, swagger-*-model/index.html, etc.)
@@ -86,10 +80,7 @@ The `swagger-*-model/index.html` viewers, `index.html` landing page, accountabil
   "releases": [
     { "ver": "26.2.1",  "label": "26.2.1 (newest)", "date": "2026-10-02", "default": true },
     { "ver": "26.1.1",  "label": "26.1.1",          "date": "2026-04-01" },
-    { "ver": "17.18.1", "label": "17.18.1",         "date": "2026-02-01" },
-    { "ver": "17.15.x", "label": "17.15.x",         "date": "2025-09-01" },
-    { "ver": "17.12.x", "label": "17.12.x",         "date": "2024-11-01" },
-    { "ver": "17.9.x",  "label": "17.9.x",          "date": "2023-08-01" }
+    { "ver": "17.18.1", "label": "17.18.1",         "date": "2026-02-01" }
   ]
 }
 ```
@@ -177,7 +168,7 @@ For maintainers adding the next IOS XE release (e.g. `26.2.1`):
    ```
    python scripts/build_release.py --version 26.2.1 --skip-exports
    ```
-   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, search index, telemetry index, MIB metadata, native capabilities and the XPath prefix map. Postman/Bruno archives are built at deploy time; run both export generators once locally to create the tracked `exports/{postman,bruno}-manifest.json`.
+   Generates all OpenAPI specs, pyang trees, manifests, accountability JSON, deprecation census (`releases/<ver>/deprecations/`, compared against the newest registered release), search index, telemetry index, MIB metadata, native capabilities and the XPath prefix map. Postman/Bruno archives are built at deploy time; run both export generators once locally to create the tracked `exports/{postman,bruno}-manifest.json`.
 3. **Register in UI**: prepend the release entry to `releases/index.json`, add it to the `validate-releases` matrix in `deploy-pages.yml`, then run `python scripts/patch_viewers_version_aware.py` (refreshes the viewers' version allow-list), `python scripts/generate_platform_support.py` (needs the release's `yang-set-*.xml` under `references/yang/vendor/cisco/xe/<id>/`) and rebuild `release_counts.json` (`--write`), `version-stats.json`, `accountability_compare.json` and the release comparisons (`python scripts/build_release_compare.py`). If it should become the new default, set `default` and flip `default: true` on the entry.
 4. **Verify locally**: `python scripts/audit_swagger_vs_tree.py --version 26.2.1` and `python scripts/validate_release.py --version 26.2.1` (the validator wraps all CI gates from §9 for local pre-flight).
 5. **Update [CHANGELOG.md](CHANGELOG.md)**: add a row under "Versions Supported".
@@ -203,9 +194,16 @@ Device data stays on the release the devices ran until it is re-collected:
 5. Rebuild: `refresh_live_data.py` (writes `releases/<new>/live-examples-index.json`, `live-modules.json`, `live-data/`), `build_restconf_augment.py --from-ref HEAD`, `build_restconf_dataset.py`, then in the collector folder `build_live_dataset.py`, `build_netconf_dataset.py`, `build_gnmi_dataset.py`, `build_protocol_matrix.py`.
 6. The previous release keeps its `releases/<old>/live-data/` and live examples, so its viewers keep showing what was captured on it.
 
+### 8.3 Retiring a release
+
+1. Remove its entry from `releases/index.json` (never the `default` or `device_data` release) and from the `validate-releases` matrix in `deploy-pages.yml`.
+2. `git rm -r releases/<ver>`, delete `references/<ver>/`, and delete every `releases/compare/*<ver>*` pair.
+3. Re-run `python scripts/patch_viewers_version_aware.py`, `python scripts/build_release_compare.py --index-only` (rebuilds `releases/compare/index.json` from the remaining pair files; run it without the flag, or with `--old/--new`, to add a bridging pair), `python scripts/build_version_stats.py`, `python scripts/build_accountability_compare.py`, `python scripts/generate_platform_support.py`, `python -X utf8 scripts/release_counts.py --write` and `python scripts/generate_sitemap.py`. If the retired release was the oldest, re-run `python scripts/build_deprecations.py --version <new oldest>` so its census no longer lists changes against the retired release.
+4. Drop the release from the hard-coded `RELEASES` lists in the native-augment scripts, update the docs that list the hosted releases, and add a CHANGELOG entry.
+
 ## 9. CI gates (per release)
 
-[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) runs the matrix `[17.9.x, 17.12.x, 17.15.x, 17.18.1, 26.1.1, 26.2.1]` and enforces:
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) runs the matrix `[17.18.1, 26.1.1, 26.2.1]` and enforces:
 
 1. **JSON validity** — every spec parses.
 2. **Manifest accuracy** — `spec_count` equals `len(specs)` and matches actual file count on disk.
@@ -220,7 +218,7 @@ A failure in any gate fails the deploy. Bypass requires editing `known_removals.
 
 ## 10. Out-of-scope (this phase)
 
-- Pre-17.9 releases.
+- Releases older than 17.18.1 (17.9.x, 17.12.x and 17.15.x were retired; see §2).
 - Synthesizing intermediate patch levels per-version (we pin one patch per minor train).
-- Cross-release "diff" UX beyond the 5-version matrix in the accountability comparison page.
+- Cross-release "diff" UX beyond the per-release matrix in the accountability comparison page.
 - Backend services for live device probing.

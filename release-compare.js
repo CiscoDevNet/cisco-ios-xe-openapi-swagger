@@ -6,7 +6,7 @@
     'use strict';
 
     var SAFE_NAME = /^[A-Za-z0-9._-]+$/;
-    var state = { pairs: [], data: null, pair: null, detailCache: {} };
+    var state = { pairs: [], data: null, pair: null, detailCache: {}, pairCache: {}, history: null, presence: null };
 
     function el(tag, attrs, text) {
         var node = document.createElement(tag);
@@ -37,6 +37,7 @@
         if (status) params.status = status;
         if (category) params.category = category;
         if (query) params.q = query;
+        if (state.history) params.module = state.history;
         var hash = Object.keys(params).map(function (k) {
             return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
         }).join('&');
@@ -162,6 +163,11 @@
             if (m.has_tree && SAFE_NAME.test(m.name)) {
                 links.appendChild(el('a', { href: 'releases/' + encodeURIComponent(ver) + '/yang-trees/' + m.name + '.html' }, 'Tree'));
             }
+            if (SAFE_NAME.test(m.name)) {
+                var hist = el('button', { type: 'button', className: 'link' }, 'History');
+                hist.addEventListener('click', function () { showHistory(m.name); });
+                links.appendChild(hist);
+            }
             if (links.childNodes.length) nameCell.appendChild(links);
             tr.appendChild(nameCell);
 
@@ -207,7 +213,16 @@
         return li;
     }
 
-    function fillDetail(cell, m) {
+    function getDetail(pairId, name) {
+        var key = pairId + '/' + name;
+        if (state.detailCache[key]) return Promise.resolve(state.detailCache[key]);
+        return fetchJson('releases/compare/' + encodeURIComponent(pairId) + '/' + name + '.json').then(function (detail) {
+            state.detailCache[key] = detail;
+            return detail;
+        });
+    }
+
+    function fillDetail(cell, m, pairId) {
         cell.replaceChildren();
         (m.revision_notes || []).forEach(function (r) {
             var p = el('p');
@@ -220,14 +235,9 @@
             return;
         }
         if (!SAFE_NAME.test(m.name)) return;
-        var key = state.pair + '/' + m.name;
         var loading = el('p', { className: 'muted' }, 'Loading schema changes…');
         cell.appendChild(loading);
-        var cached = state.detailCache[key];
-        var promise = cached ? Promise.resolve(cached)
-            : fetchJson('releases/compare/' + encodeURIComponent(state.pair) + '/' + m.name + '.json');
-        promise.then(function (detail) {
-            state.detailCache[key] = detail;
+        getDetail(pairId || state.pair, m.name).then(function (detail) {
             loading.remove();
             cell.appendChild(nodeList('Added', detail.added, subtreeItem));
             cell.appendChild(nodeList('Removed', detail.removed, subtreeItem));
@@ -237,7 +247,7 @@
         });
     }
 
-    function toggleDetail(tr, button, m) {
+    function toggleDetail(tr, button, m, pairId, colspan) {
         var next = tr.nextElementSibling;
         if (next && next.classList.contains('detail')) {
             next.remove();
@@ -246,12 +256,12 @@
             return;
         }
         var detailRow = el('tr', { className: 'detail' });
-        var cell = el('td', { colspan: '6', className: 'detail' });
+        var cell = el('td', { colspan: String(colspan || 6), className: 'detail' });
         detailRow.appendChild(cell);
         tr.after(detailRow);
         button.textContent = '−';
         button.setAttribute('aria-expanded', 'true');
-        fillDetail(cell, m);
+        fillDetail(cell, m, pairId);
     }
 
     function moduleListDetails(names, label) {
@@ -285,11 +295,20 @@
         }
     }
 
+    function getPair(entry) {
+        var id = entry.old + '__' + entry.new;
+        if (state.pairCache[id]) return Promise.resolve(state.pairCache[id]);
+        return fetchJson('releases/compare/' + encodeURIComponent(entry.file)).then(function (data) {
+            state.pairCache[id] = data;
+            return data;
+        });
+    }
+
     function loadPair(pairId) {
         var entry = state.pairs.filter(function (p) { return p.old + '__' + p.new === pairId; })[0] || state.pairs[0];
         state.pair = entry.old + '__' + entry.new;
         document.getElementById('pairSelect').value = state.pair;
-        return fetchJson('releases/compare/' + encodeURIComponent(entry.file)).then(function (data) {
+        return getPair(entry).then(function (data) {
             state.data = data;
             populateCategories();
             renderCards();
@@ -297,6 +316,221 @@
             renderPlatforms();
             writeHash();
         });
+    }
+
+    // ---------- Module history: one module across every release pair ----------
+
+    function chronologicalPairs() {
+        return state.pairs.slice().reverse();
+    }
+
+    function loadPresence() {
+        if (state.presence) return Promise.resolve(state.presence);
+        return fetchJson('accountability_compare.json').then(function (doc) {
+            var map = {};
+            (doc.matrix || []).forEach(function (row) { map[row.module] = row.by_version || {}; });
+            state.presence = map;
+            var list = document.getElementById('historyModules');
+            var frag = document.createDocumentFragment();
+            Object.keys(map).sort().forEach(function (name) { frag.appendChild(el('option', { value: name })); });
+            list.replaceChildren(frag);
+            return map;
+        });
+    }
+
+    function buildTimeline(name, pairData) {
+        var pairs = chronologicalPairs();
+        var presence = (state.presence || {})[name] || null;
+        var present = function (ver) { return presence && presence[ver] ? !!presence[ver].present : null; };
+        var rows = [];
+        var first = pairs[0].old;
+        rows.push({ ver: first, pairId: null, entry: null, present: present(first) });
+        pairs.forEach(function (p, i) {
+            var entry = (pairData[i].modules || []).filter(function (m) { return m.name === name; })[0] || null;
+            rows.push({ ver: p.new, pairId: p.old + '__' + p.new, entry: entry, present: present(p.new) });
+        });
+        // Fill gaps the presence matrix doesn't cover from the change events themselves.
+        rows.forEach(function (r, i) {
+            if (r.present !== null) return;
+            var next = rows[i + 1] && rows[i + 1].entry;
+            if (r.entry) r.present = r.entry.status !== 'removed';
+            else if (next) r.present = next.status !== 'added';
+            else r.present = i > 0 ? rows[i - 1].present : false;
+        });
+        // Node counts are only recorded on changes; carry them across unchanged releases.
+        var nodes = rows.map(function (r, i) {
+            if (r.entry && r.entry.nodes_after !== undefined && r.entry.status !== 'removed') return r.entry.nodes_after;
+            var next = rows[i + 1] && rows[i + 1].entry;
+            if (next && next.nodes_before !== undefined && next.status !== 'added') return next.nodes_before;
+            return null;
+        });
+        for (var i = 1; i < rows.length; i++) if (nodes[i] === null && rows[i].present && !rows[i].entry) nodes[i] = nodes[i - 1];
+        for (var j = rows.length - 2; j >= 0; j--) if (nodes[j] === null && rows[j].present && !(rows[j + 1].entry)) nodes[j] = nodes[j + 1];
+        rows.forEach(function (r, k) {
+            r.nodes = r.present ? nodes[k] : null;
+            var next = rows[k + 1] && rows[k + 1].entry;
+            if (!r.present) r.revision = null;
+            else if (r.entry) r.revision = r.entry.revision_after || r.entry.revision_before || null;
+            else if (next && next.status !== 'added') r.revision = next.revision_before || null;
+            else r.revision = k > 0 ? rows[k - 1].revision : null;
+            if (k === 0) r.status = r.present ? 'baseline' : 'absent';
+            else if (r.entry) r.status = r.entry.status;
+            else r.status = r.present ? (rows[k - 1].present ? 'unchanged' : 'added') : 'absent';
+        });
+        return rows;
+    }
+
+    function historyCards(name, rows) {
+        var host = document.getElementById('historyCards');
+        host.replaceChildren();
+        var latest = rows[rows.length - 1];
+        var firstSeen = rows.filter(function (r) { return r.present; })[0];
+        var added = 0, removed = 0, changed = 0, revisions = 0;
+        rows.forEach(function (r) {
+            if (!r.entry) return;
+            var c = r.entry.schema_counts || {};
+            added += c.added || 0; removed += c.removed || 0; changed += c.changed || 0;
+            revisions += (r.entry.revision_notes || []).length;
+        });
+        var nodeVals = rows.filter(function (r) { return r.nodes !== null && r.nodes !== undefined; });
+        var lastStep = latest.entry
+            ? latest.entry.status + (latest.entry.schema_counts ? ' (+' + (latest.entry.schema_counts.added || 0) + ' / −' + (latest.entry.schema_counts.removed || 0) + ')' : '')
+            : latest.status;
+        [
+            ['changed', lastStep, 'since ' + rows[rows.length - 2].ver],
+            ['', firstSeen ? firstSeen.ver : '—', firstSeen && firstSeen === rows[0] ? 'present since (oldest tracked)' : 'first release'],
+            ['', nodeVals.length ? nodeVals[0].nodes + ' → ' + nodeVals[nodeVals.length - 1].nodes : '—', 'schema nodes (first → latest)'],
+            ['added', '+' + added, 'node changes added, all time'],
+            ['removed', '−' + removed, 'node changes removed, all time'],
+            ['changed', revisions, 'YANG revisions recorded']
+        ].forEach(function (c) {
+            var card = el('div', { className: 'stat ' + c[0] });
+            card.appendChild(el('div', { className: 'num' }, c[1]));
+            card.appendChild(el('div', { className: 'lbl' }, c[2]));
+            host.appendChild(card);
+        });
+    }
+
+    function historyRows(name, rows) {
+        var tbody = document.getElementById('historyRows');
+        tbody.replaceChildren();
+        rows.slice().reverse().forEach(function (r) {
+            var tr = el('tr', r.status === 'absent' ? { className: 'absent' } : null);
+            var toggleCell = el('td');
+            if (r.entry && (r.entry.schema_counts || (r.entry.revision_notes || []).length)) {
+                var toggle = el('button', { type: 'button', className: 'expand', 'aria-expanded': 'false',
+                    'aria-label': 'Show changes in ' + r.ver }, '+');
+                toggle.addEventListener('click', function () { toggleDetail(tr, toggle, r.entry, r.pairId, 6); });
+                toggleCell.appendChild(toggle);
+            }
+            tr.appendChild(toggleCell);
+            var verCell = el('td');
+            verCell.appendChild(el('strong', null, r.ver));
+            if (r.present && SAFE_NAME.test(name) && SAFE_NAME.test(r.ver) && (!r.entry || r.entry.has_tree !== false)) {
+                var links = el('div', { className: 'links' });
+                links.appendChild(el('a', { href: 'releases/' + encodeURIComponent(r.ver) + '/yang-trees/' + name + '.html' }, 'Tree'));
+                (r.entry && r.entry.specs || []).forEach(function (spec) {
+                    var a = specLink(spec, r.ver);
+                    if (a) links.appendChild(a);
+                });
+                verCell.appendChild(links);
+            }
+            tr.appendChild(verCell);
+            var statusCell = el('td');
+            var labels = { baseline: 'present', absent: 'not present' };
+            statusCell.appendChild(el('span', { className: 'badge ' + r.status }, labels[r.status] || r.status));
+            tr.appendChild(statusCell);
+            tr.appendChild(el('td', { className: 'mono' }, r.revision || '—'));
+            tr.appendChild(el('td', { className: 'num' }, r.nodes === null || r.nodes === undefined ? '—' : r.nodes.toLocaleString()));
+            tr.appendChild(r.entry ? schemaCell(r.entry) : el('td', { className: 'num muted' }, '—'));
+            tbody.appendChild(tr);
+        });
+    }
+
+    function netChange(name, rows) {
+        var host = document.getElementById('historyNet');
+        host.replaceChildren(el('p', { className: 'muted' }, 'Loading every release step…'));
+        var steps = rows.filter(function (r) { return r.entry && r.entry.schema_counts; });
+        if (!steps.length) {
+            host.replaceChildren(el('p', { className: 'muted' }, 'No schema-node changes recorded for this module in any release.'));
+            return;
+        }
+        Promise.all(steps.map(function (r) { return getDetail(r.pairId, name); })).then(function (details) {
+            var added = new Map(), removed = new Map(), changed = new Map();
+            details.forEach(function (d) {
+                (d.added || []).forEach(function (a) {
+                    if (removed.has(a.path)) removed.delete(a.path); else added.set(a.path, a);
+                });
+                (d.removed || []).forEach(function (x) {
+                    if (added.has(x.path)) added.delete(x.path); else removed.set(x.path, x);
+                });
+                (d.changed || []).forEach(function (c) {
+                    if (added.has(c.path)) return;
+                    var prev = changed.get(c.path);
+                    var merged = { path: c.path, changes: {} };
+                    var keys = Object.keys(c.changes).concat(prev ? Object.keys(prev.changes) : []);
+                    keys.forEach(function (k) {
+                        var before = prev && prev.changes[k] ? prev.changes[k][0] : (c.changes[k] || [])[0];
+                        var after = c.changes[k] ? c.changes[k][1] : prev.changes[k][1];
+                        if (before !== after) merged.changes[k] = [before, after];
+                    });
+                    if (Object.keys(merged.changes).length) changed.set(c.path, merged); else changed.delete(c.path);
+                });
+            });
+            host.replaceChildren();
+            var span = rows.filter(function (r) { return r.present; });
+            host.appendChild(el('p', { className: 'muted' }, span.length
+                ? span[0].ver + ' → ' + span[span.length - 1].ver + ' across ' + details.length + ' release step(s) with schema changes.'
+                : ''));
+            host.appendChild(nodeList('Added', Array.from(added.values()), subtreeItem));
+            host.appendChild(nodeList('Removed', Array.from(removed.values()), subtreeItem));
+            host.appendChild(nodeList('Changed', Array.from(changed.values()), changedItem));
+            if (!added.size && !removed.size && !changed.size) host.appendChild(el('p', { className: 'muted' }, 'Changes cancel out: no net schema difference.'));
+        }).catch(function (err) {
+            host.replaceChildren(el('p', { className: 'muted' }, 'Could not load details: ' + err.message));
+        });
+    }
+
+    function showHistory(name) {
+        name = String(name || '').trim();
+        if (!SAFE_NAME.test(name) || !state.pairs.length) return;
+        var section = document.getElementById('historySection');
+        document.getElementById('historyInput').value = name;
+        document.getElementById('historyHeading').textContent = 'Module history: ' + name;
+        document.getElementById('historyMeta').textContent = 'Loading…';
+        document.getElementById('historyCards').replaceChildren();
+        document.getElementById('historyRows').replaceChildren();
+        var netHost = document.getElementById('historyNet');
+        var netBtn = el('button', { type: 'button', className: 'action' }, 'Compute net change');
+        netHost.replaceChildren(netBtn);
+        section.hidden = false;
+        state.history = name;
+        writeHash();
+        var pairs = chronologicalPairs();
+        Promise.all([Promise.all(pairs.map(getPair)), loadPresence().catch(function () { return null; })])
+            .then(function (res) {
+                if (state.history !== name) return;
+                var rows = buildTimeline(name, res[0]);
+                if (!rows.some(function (r) { return r.present || r.entry; })) {
+                    netHost.replaceChildren();
+                    document.getElementById('historyMeta').textContent = 'No module named ' + name
+                        + ' in any release ' + pairs[0].old + ' → ' + pairs[pairs.length - 1].new + '.';
+                    return;
+                }
+                document.getElementById('historyMeta').textContent = 'Releases ' + pairs[0].old + ' → '
+                    + pairs[pairs.length - 1].new + ' (newest first). Expand a release to see what changed in it.';
+                historyCards(name, rows);
+                historyRows(name, rows);
+                netBtn.addEventListener('click', function () { netChange(name, rows); });
+                section.scrollIntoView({ block: 'start' });
+            })
+            .catch(function (err) { document.getElementById('historyMeta').textContent = 'Could not load history: ' + err.message; });
+    }
+
+    function closeHistory() {
+        state.history = null;
+        document.getElementById('historySection').hidden = true;
+        writeHash();
     }
 
     function showError(message) {
@@ -317,6 +551,14 @@
         });
         if (hash.status) document.getElementById('statusFilter').value = hash.status;
         if (hash.q) document.getElementById('searchBox').value = hash.q;
+        document.getElementById('historyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            showHistory(document.getElementById('historyInput').value);
+        });
+        document.getElementById('historyInput').addEventListener('focus', function () {
+            loadPresence().catch(function () { /* datalist is optional */ });
+        }, { once: true });
+        document.getElementById('historyClose').addEventListener('click', closeHistory);
 
         fetchJson('releases/compare/index.json').then(function (index) {
             state.pairs = (index.pairs || []).filter(function (p) {
@@ -333,6 +575,7 @@
                 document.getElementById('categoryFilter').value = hash.category;
                 renderModules();
             }
+            if (hash.module) showHistory(hash.module);
         }).catch(function (err) { showError(err.message); });
     }
 

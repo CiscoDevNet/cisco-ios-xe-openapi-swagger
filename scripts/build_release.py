@@ -157,11 +157,20 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER"]),
     ("accountability",      ["python", str(SCRIPTS / "analyze_yang_accountability_v2.py"),
                              "--version", "$VER"]),
+    # Deprecated / obsolete census (deprecations.html). Reads the accountability
+    # classification above and the previous release's census for the change
+    # list, so build older releases first. Fails if any status statement cannot
+    # be reconciled.
+    ("deprecations",        ["python", str(SCRIPTS / "build_deprecations.py"),
+                             "--version", "$VER"]),
     ("search-index",        ["python", str(SCRIPTS / "generate_search_index.py"),
                              "--version", "$VER"]),
     # Per-category cross-chunk operation index for the viewer search box and
     # the hub-level global operation search. Built for every active release.
     ("paths-index",         ["python", str(SCRIPTS / "build_paths_index.py"),
+                             "--version", "$VER"]),
+    # Unique API paths/operations per platform yang-set (platform-coverage.html).
+    ("platform-api-counts", ["python", str(SCRIPTS / "build_platform_api_counts.py"),
                              "--version", "$VER"]),
     # Path-depth audit: writes <release>/path_depth_audit.json. Strict mode
     # blocks the build if any category drops below MIN_MAX_DEPTH (now that

@@ -162,7 +162,7 @@
     // patch time. Re-run scripts/patch_viewers_version_aware.py after editing
     // releases/index.json to refresh these.
     var __IOSXE_DEFAULT_VER__ = '26.2.1';
-    var __IOSXE_ALLOWED_VERS__ = ["26.2.1", "26.1.1", "17.18.1", "17.15.x", "17.12.x", "17.9.x"];
+    var __IOSXE_ALLOWED_VERS__ = ["26.2.1", "26.1.1", "17.18.1"];
     function __activeVer() {
         // Priority: ?ver= query > #ver= hash > localStorage > parent window.
         // Always returns a valid version from the allow-list (falls back to
@@ -318,30 +318,21 @@
             }).catch(() => { treeLink.style.display = 'none'; });
         }
         if (window.__PlatformSupport) { window.__PlatformSupport.renderBadges(document.getElementById("platformBadges"), fname); }
+        loadMibMetadata(fname);
     }
 
     // === MIB metadata side card ===
-    // Joins releases/<ver>/mib-metadata.json (OID prefix, table/leaf counts,
-    // organization, RFC ref, platform applicability matrix from MIBS.md). Falls
-    // back gracefully when the file is missing.
-    let _mibMetaPromise = null;
-    function loadMibMetaIndex() {
-        if (_mibMetaPromise) return _mibMetaPromise;
-        const ver = (window.parent && window.parent.__IOSXE_ACTIVE_VERSION__) ||
-                    window.__IOSXE_ACTIVE_VERSION__;
-        const candidates = [];
-        if (ver) candidates.push('../releases/' + encodeURIComponent(ver) + '/mib-metadata.json');
-        candidates.push('../mib-metadata.json');
-        _mibMetaPromise = (async () => {
-            for (const url of candidates) {
-                try {
-                    const r = await fetch(url, { cache: 'no-store' });
-                    if (r.ok) return { data: await r.json(), source: url };
-                } catch (_) { /* try next */ }
-            }
-            return null;
-        })();
-        return _mibMetaPromise;
+    // Joins releases/<ver>/mib-metadata.json (built by scripts/enrich_mib_metadata.py:
+    // OID prefix, table/leaf counts, deprecated/obsolete counts, organization, RFC
+    // ref, platform applicability from MIBS.md). Hidden when the file or entry is missing.
+    const _mibMetaCache = {};
+    function loadMibMetaIndex(ver) {
+        if (!_mibMetaCache[ver]) {
+            _mibMetaCache[ver] = fetch('../releases/' + encodeURIComponent(ver) + '/mib-metadata.json')
+                .then(r => (r.ok ? r.json() : null))
+                .catch(() => null);
+        }
+        return _mibMetaCache[ver];
     }
 
     async function loadMibMetadata(fname) {
@@ -349,49 +340,62 @@
         const card = document.getElementById('mibCard');
         const body = document.getElementById('mibCardBody');
         const src = document.getElementById('mibCardSource');
-        if (toggle) toggle.style.display = 'none';
-        if (card) card.style.display = 'none';
-        const idx = await loadMibMetaIndex();
-        if (!idx || !idx.data || !Array.isArray(idx.data.modules)) return;
+        toggle.style.display = 'none';
+        card.style.display = 'none';
+        const ver = __activeVer();
+        const data = await loadMibMetaIndex(ver);
+        if (currentModule !== fname || !data || !Array.isArray(data.mibs)) return;
         const stem = fname.replace(/\.json$/i, '').toLowerCase();
-        const entry = idx.data.modules.find(m => {
-            const n = (m.name || m.module || '').toLowerCase();
-            return n === stem || stem.includes(n) || n.includes(stem);
-        });
+        const entry = data.mibs.find(m => String(m.name || '').toLowerCase() === stem);
         if (!entry) return;
         toggle.style.display = 'inline-block';
-        if (src) src.textContent = 'source: ' + idx.source.split('/').pop();
+        src.textContent = 'source: releases/' + ver + '/mib-metadata.json';
+        body.replaceChildren(
+            kv('Module', entry.name),
+            kv('OID prefix', entry.oid_prefix || '—'),
+            kv('Tables / scalars / leafs', (entry.table_count || 0) + ' / ' + (entry.scalar_count || 0) + ' / ' + (entry.leaf_count || 0)),
+            kv('Indexes', (entry.indexes || []).join(', ') || '—'),
+            deprecationRow(entry, ver),
+            kv('Latest revision', entry.latest_revision || '—'),
+            kv('Organization', entry.organization || '—'),
+            kv('RFC reference', entry.rfc_reference || '—'),
+            kv('Functional category', entry.functional_category || '—')
+        );
         const platformList = entry.platforms || [];
-        body.innerHTML =
-            kv('Module', entry.name || entry.module)
-            + kv('OID prefix', entry.oid_prefix || '—')
-            + kv('Tables / scalars / leafs',
-                 (entry.table_count || 0) + ' / '
-                 + (entry.scalar_count || 0) + ' / '
-                 + (entry.leaf_count || 0))
-            + kv('Indexes', (entry.indexes || []).join(', ') || '—')
-            + kv('Deprecated objects', String(entry.deprecated_object_count || 0))
-            + kv('Latest revision', entry.latest_revision || '—')
-            + kv('Organization', entry.organization || '—')
-            + kv('RFC reference', entry.rfc_reference || '—')
-            + kv('Functional category',
-                 (entry.functional_category && entry.functional_category.category) || '—')
-            + (platformList.length
-                ? kvHtml('Platforms (' + platformList.length + ')',
-                     platformList.map(p =>
-                       '<span style="display:inline-block;padding:1px 7px;margin:0 4px 4px 0;'
-                       + 'background:#ede7f6;border-radius:8px;font-size:.72rem;">'
-                       + escapeHtml(p) + '</span>').join(''))
-                : '');
+        if (platformList.length) {
+            const chips = platformList.map(p => {
+                const chip = document.createElement('span');
+                chip.style.cssText = 'display:inline-block;padding:1px 7px;margin:0 4px 4px 0;background:#ede7f6;color:#4a148c;border-radius:8px;font-size:.72rem;';
+                chip.textContent = p;
+                return chip;
+            });
+            body.appendChild(kv('Platforms (' + platformList.length + ')', chips));
+        }
     }
 
-    function kv(k, v) {
-        return '<div style="margin:4px 0;"><span style="color:#6A1B9A;font-weight:500;">'
-             + escapeHtml(k) + ':</span> ' + escapeHtml(String(v == null ? '' : v)) + '</div>';
+    function deprecationRow(entry, ver) {
+        const dep = entry.deprecated_count || 0, obs = entry.obsolete_count || 0;
+        const parts = [dep + ' deprecated, ' + obs + ' obsolete'];
+        if (dep + obs && /^[A-Za-z0-9._-]+$/.test(entry.name)) {
+            const a = document.createElement('a');
+            a.href = '../deprecations.html#ver=' + encodeURIComponent(ver) + '&module=' + encodeURIComponent(entry.name);
+            a.textContent = 'details';
+            parts.push(' (', a, ')');
+        }
+        return kv('Status statements', parts);
     }
-    function kvHtml(k, htmlValue) {
-        return '<div style="margin:4px 0;"><span style="color:#6A1B9A;font-weight:500;">'
-             + escapeHtml(k) + ':</span> ' + (htmlValue || '') + '</div>';
+
+    function kv(label, value) {
+        const row = document.createElement('div');
+        row.style.margin = '4px 0';
+        const k = document.createElement('span');
+        k.style.cssText = 'color:#6A1B9A;font-weight:500;';
+        k.textContent = label + ': ';
+        row.appendChild(k);
+        (Array.isArray(value) ? value : [value]).forEach(v => {
+            row.append(v instanceof Node ? v : String(v == null ? '' : v));
+        });
+        return row;
     }
 
     function toggleMibCard() {
