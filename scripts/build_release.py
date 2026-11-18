@@ -78,7 +78,7 @@ PIPELINE: list[tuple[str, list[str]]] = [
                              "--version", "$VER",
                              "--interface-mode", "representative",
                              "--max-depth", "5"]),
-    ("openconfig-specs",    ["python", str(GENERATORS / "generate_openconfig_openapi_v2.py"),
+    ("openconfig-specs",    ["python", str(GENERATORS / "generate_openconfig_from_yang.py"),
                              "--version", "$VER"]),
     ("ietf-specs",          ["python", str(GENERATORS / "generate_ietf_openapi_v2.py"),
                              "--version", "$VER"]),

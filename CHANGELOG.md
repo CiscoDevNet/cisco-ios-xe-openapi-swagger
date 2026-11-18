@@ -163,6 +163,25 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Changed — OpenConfig specs generated from the resolved YANG schema (2026-11-18)
+
+- **New generator** `generators/generate_openconfig_from_yang.py` (pyang, shared loader
+  `generators/_openconfig_schema.py`) replaces the regex-based `generate_openconfig_openapi_v2.py`.
+  Augments and Cisco IOS XE deviations are applied, so the specs now cover the real tree:
+  openconfig-interfaces 14 -> 156 paths (ethernet, subinterfaces, IPv4/IPv6, aggregation),
+  openconfig-system 3 -> 126, openconfig-network-instance 394 -> 896. 26.2.1: 21 specs,
+  1,892 paths, 4,532 operations; all pass OpenAPI validation (19 of the old 43 did not).
+- **Only modules with top-level data get a spec** (21 / 20 / 19 for 26.2.1 / 26.1.1 /
+  17.18.1). The 22 grouping/augment-only specs (openconfig-bgp, -isis, -aaa, -if-ethernet, ...)
+  are removed: their `/data/<module>:...` paths do not exist on a device. Their nodes appear
+  under the spec they augment, with RFC 8040 module-qualified segments, and the accountability
+  page names that spec as the reason (MPLS and segment routing: removed by Cisco deviations).
+- List items carry all keys as declared path parameters; `config false` nodes are GET-only.
+- Regenerated per release: OpenConfig specs, accountability, search index, paths index,
+  platform API counts, path-depth audit, export manifests; `release_counts.json`,
+  `version-stats.json` and `accountability_compare.json` rebaselined; deprecations
+  `spec_url` for openconfig-evpn. Decision record: `memory/versioning/0004`.
+
 ### Added — gNMI OpenConfig expansion and full gNMI payloads on Device Data (2026-11-18)
 
 - **OpenConfig over gNMI, nested:** `gnmi_oc_catalog.py` lists every OpenConfig container from

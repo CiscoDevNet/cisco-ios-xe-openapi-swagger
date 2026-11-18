@@ -2,16 +2,26 @@
   "openapi": "3.0.0",
   "info": {
     "title": "openconfig-ap-manager",
-    "description": "This module defines the top level configuration and state data for a\n    system which manages Access Points.\n\n**Module:** `openconfig-ap-manager`\n**Paths:** 11",
-    "version": "26.1.1"
+    "description": "This module defines the top level configuration and state data for a system which manages Access Points.\n\n**Module:** `openconfig-ap-manager`\n**Root nodes:** provision-aps, joined-aps\n**Paths:** 9 | **Operations:** 21\n\nGET/PUT/PATCH/DELETE for config nodes, GET-only for state (config false) nodes.",
+    "version": "26.1.1",
+    "contact": {
+      "name": "Cisco IOS-XE RESTCONF API",
+      "url": "https://developer.cisco.com/iosxe/"
+    },
+    "x-yang-module": "openconfig-ap-manager",
+    "x-model-type": "openconfig",
+    "x-augmented-by": []
   },
   "servers": [
     {
-      "url": "https://{device}/restconf",
+      "url": "https://{device}:{port}/restconf",
+      "description": "IOS-XE Device RESTCONF API",
       "variables": {
         "device": {
-          "default": "devnetsandboxiosxec9k.cisco.com",
-          "description": "Device IP or hostname"
+          "default": "devnetsandboxiosxec9k.cisco.com"
+        },
+        "port": {
+          "default": "443"
         }
       }
     }
@@ -21,26 +31,120 @@
       "get": {
         "summary": "Get provision-aps",
         "description": "Top most container for assigning hostnames to APs.",
-        "operationId": "get-root-3",
+        "operationId": "get-root-2",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:provision-aps": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-provision-aps"
+                      "type": "object",
+                      "properties": {
+                        "provision-ap": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "config": {
+                                "type": "object",
+                                "properties": {
+                                  "mac": {
+                                    "type": "string",
+                                    "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                    "example": "00:1a:2b:3c:4d:5e"
+                                  },
+                                  "hostname": {
+                                    "type": "string",
+                                    "description": "Hostname of the Access Point.",
+                                    "example": "Router1"
+                                  },
+                                  "country-code": {
+                                    "type": "string",
+                                    "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                    "example": "10"
+                                  }
+                                },
+                                "example": "configured-value"
+                              },
+                              "state": {
+                                "type": "object",
+                                "properties": {
+                                  "mac": {
+                                    "type": "string",
+                                    "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                    "example": "00:1a:2b:3c:4d:5e"
+                                  },
+                                  "hostname": {
+                                    "type": "string",
+                                    "description": "Hostname of the Access Point.",
+                                    "example": "Router1"
+                                  },
+                                  "country-code": {
+                                    "type": "string",
+                                    "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                    "example": "10"
+                                  }
+                                },
+                                "example": "active",
+                                "description": "Current operational state"
+                              }
+                            },
+                            "required": [
+                              "mac"
+                            ],
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-ap-manager:provision-aps": {
+                    "provision-ap": [
+                      {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "config": {
+                          "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                          "hostname": "Router1",
+                          "country-code": "unconfigured"
+                        },
+                        "state": {
+                          "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                          "hostname": "Router1",
+                          "country-code": "unconfigured"
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -48,11 +152,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace provision-aps",
-        "description": "Create or replace Top most container for assigning hostnames to APs.",
+        "summary": "Replace provision-aps",
+        "description": "Top most container for assigning hostnames to APs.",
         "operationId": "put-root-2",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -62,10 +166,93 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:provision-aps": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-aps"
+                    "type": "object",
+                    "properties": {
+                      "provision-ap": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "country-code": {
+                                  "type": "string",
+                                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                  "example": "10"
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "country-code": {
+                                  "type": "string",
+                                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                  "example": "10"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "mac"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:provision-aps": {
+                  "provision-ap": [
+                    {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "config": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      },
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -78,16 +265,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "patch": {
-        "summary": "Modify provision-aps",
-        "description": "Partially modify Top most container for assigning hostnames to APs.",
+        "summary": "Update provision-aps",
+        "description": "Top most container for assigning hostnames to APs.",
         "operationId": "patch-root-2",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -97,10 +284,93 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:provision-aps": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-aps"
+                    "type": "object",
+                    "properties": {
+                      "provision-ap": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "config": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "country-code": {
+                                  "type": "string",
+                                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                  "example": "10"
+                                }
+                              },
+                              "example": "configured-value"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "country-code": {
+                                  "type": "string",
+                                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                  "example": "10"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "mac"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:provision-aps": {
+                  "provision-ap": [
+                    {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "config": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      },
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -110,247 +380,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "delete": {
         "summary": "Delete provision-aps",
-        "description": "Delete Top most container for assigning hostnames to APs.",
+        "description": "Top most container for assigning hostnames to APs.",
         "operationId": "delete-root-2",
         "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/openconfig-ap-manager:provision-aps/config": {
-      "get": {
-        "summary": "Get config",
-        "description": "Config container for assigning hostnames to APs.",
-        "operationId": "get-config-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "openconfig-ap-manager:config": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-config"
-                    }
-                  },
-                  "example": "configured-value"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace config",
-        "description": "Create or replace Config container for assigning hostnames to APs.",
-        "operationId": "put-config-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
-                  }
-                },
-                "example": "configured-value"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify config",
-        "description": "Partially modify Config container for assigning hostnames to APs.",
-        "operationId": "patch-config-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
-                  }
-                },
-                "example": "configured-value"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete config",
-        "description": "Delete Config container for assigning hostnames to APs.",
-        "operationId": "delete-config-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
-      }
-    },
-    "/data/openconfig-ap-manager:provision-aps/state": {
-      "get": {
-        "summary": "Get state",
-        "description": "State container for assigning hostnames to APs.",
-        "operationId": "get-state-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "openconfig-ap-manager:state": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                    }
-                  },
-                  "example": "active",
-                  "description": "Current operational state"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace state",
-        "description": "Create or replace State container for assigning hostnames to APs.",
-        "operationId": "put-state-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify state",
-        "description": "Partially modify State container for assigning hostnames to APs.",
-        "operationId": "patch-state-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete state",
-        "description": "Delete State container for assigning hostnames to APs.",
-        "operationId": "delete-state-2",
-        "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "responses": {
           "204": {
@@ -364,91 +403,241 @@
     },
     "/data/openconfig-ap-manager:provision-aps/provision-ap": {
       "get": {
-        "summary": "Get provision-ap",
-        "description": "List of MAC addresses that will have hostnames assigned. (collection)",
+        "summary": "Get provision-ap (all entries)",
+        "description": "List of MAC addresses that will have hostnames assigned.",
         "operationId": "get-provision-ap",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:provision-ap": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap"
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "mac": {
+                            "type": "string",
+                            "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                            "example": "00:1a:2b:3c:4d:5e"
+                          },
+                          "config": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "country-code": {
+                                "type": "string",
+                                "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                "example": "10"
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "country-code": {
+                                "type": "string",
+                                "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                "example": "10"
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "mac"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-ap-manager:provision-ap": [
+                    {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "config": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      },
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      }
+                    }
+                  ]
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add provision-ap entry",
-        "description": "Add a new entry to List of MAC addresses that will have hostnames assigned. (collection)",
-        "operationId": "post-provision-ap",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap"
-                  }
-                },
-                "example": "configured-value"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
           }
         }
       }
     },
     "/data/openconfig-ap-manager:provision-aps/provision-ap={mac}": {
       "get": {
-        "summary": "Get provision-ap-item",
+        "summary": "Get provision-ap",
         "description": "List of MAC addresses that will have hostnames assigned.",
         "operationId": "get-provision-ap-by-mac",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
+        ],
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:provision-ap": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "mac": {
+                            "type": "string",
+                            "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                            "example": "00:1a:2b:3c:4d:5e"
+                          },
+                          "config": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "country-code": {
+                                "type": "string",
+                                "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                "example": "10"
+                              }
+                            },
+                            "example": "configured-value"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "country-code": {
+                                "type": "string",
+                                "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                                "example": "10"
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "mac"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "maxItems": 1,
+                      "example": "configured-value"
                     }
                   },
                   "example": "00:1a:2b:3c:4d:5e"
+                },
+                "example": {
+                  "openconfig-ap-manager:provision-ap": [
+                    {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "config": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      },
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "country-code": "unconfigured"
+                      }
+                    }
+                  ]
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -456,11 +645,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace provision-ap-item",
-        "description": "Create or replace List of MAC addresses that will have hostnames assigned.",
+        "summary": "Replace provision-ap",
+        "description": "List of MAC addresses that will have hostnames assigned.",
         "operationId": "put-provision-ap-by-mac",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -470,10 +659,86 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "mac": {
+                          "type": "string",
+                          "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                          "example": "00:1a:2b:3c:4d:5e"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "hostname": {
+                              "type": "string",
+                              "description": "Hostname of the Access Point.",
+                              "example": "Router1"
+                            },
+                            "country-code": {
+                              "type": "string",
+                              "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                              "example": "10"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "hostname": {
+                              "type": "string",
+                              "description": "Hostname of the Access Point.",
+                              "example": "Router1"
+                            },
+                            "country-code": {
+                              "type": "string",
+                              "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                              "example": "10"
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "required": [
+                        "mac"
+                      ],
+                      "example": "configured-value"
+                    },
+                    "maxItems": 1,
+                    "example": "configured-value"
                   }
                 },
                 "example": "00:1a:2b:3c:4d:5e"
+              },
+              "example": {
+                "openconfig-ap-manager:provision-ap": [
+                  {
+                    "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                    "config": {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "hostname": "Router1",
+                      "country-code": "unconfigured"
+                    },
+                    "state": {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "hostname": "Router1",
+                      "country-code": "unconfigured"
+                    }
+                  }
+                ]
               }
             }
           }
@@ -486,16 +751,27 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       },
       "patch": {
-        "summary": "Modify provision-ap-item",
-        "description": "Partially modify List of MAC addresses that will have hostnames assigned.",
+        "summary": "Update provision-ap",
+        "description": "List of MAC addresses that will have hostnames assigned.",
         "operationId": "patch-provision-ap-by-mac",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -505,10 +781,86 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "mac": {
+                          "type": "string",
+                          "description": "Reference to the MAC address list key. This leaf is a reference only and not to be configured.",
+                          "example": "00:1a:2b:3c:4d:5e"
+                        },
+                        "config": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "hostname": {
+                              "type": "string",
+                              "description": "Hostname of the Access Point.",
+                              "example": "Router1"
+                            },
+                            "country-code": {
+                              "type": "string",
+                              "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                              "example": "10"
+                            }
+                          },
+                          "example": "configured-value"
+                        },
+                        "state": {
+                          "type": "object",
+                          "properties": {
+                            "mac": {
+                              "type": "string",
+                              "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                              "example": "00:1a:2b:3c:4d:5e"
+                            },
+                            "hostname": {
+                              "type": "string",
+                              "description": "Hostname of the Access Point.",
+                              "example": "Router1"
+                            },
+                            "country-code": {
+                              "type": "string",
+                              "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                              "example": "10"
+                            }
+                          },
+                          "example": "active",
+                          "description": "Current operational state"
+                        }
+                      },
+                      "required": [
+                        "mac"
+                      ],
+                      "example": "configured-value"
+                    },
+                    "maxItems": 1,
+                    "example": "configured-value"
                   }
                 },
                 "example": "00:1a:2b:3c:4d:5e"
+              },
+              "example": {
+                "openconfig-ap-manager:provision-ap": [
+                  {
+                    "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                    "config": {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "hostname": "Router1",
+                      "country-code": "unconfigured"
+                    },
+                    "state": {
+                      "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                      "hostname": "Router1",
+                      "country-code": "unconfigured"
+                    }
+                  }
+                ]
               }
             }
           }
@@ -518,16 +870,27 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       },
       "delete": {
-        "summary": "Delete provision-ap-item",
-        "description": "Delete List of MAC addresses that will have hostnames assigned.",
+        "summary": "Delete provision-ap",
+        "description": "List of MAC addresses that will have hostnames assigned.",
         "operationId": "delete-provision-ap-by-mac",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "responses": {
           "204": {
@@ -536,33 +899,89 @@
           "404": {
             "description": "Not found"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
-    "/data/openconfig-ap-manager:provision-aps/provision-ap/config": {
+    "/data/openconfig-ap-manager:provision-aps/provision-ap={mac}/config": {
       "get": {
         "summary": "Get config",
         "description": "Config container for assigning hostnames to APs.",
-        "operationId": "get-provision-ap-config",
+        "operationId": "get-provision-ap-by-mac-config",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
+        ],
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:config": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-config"
+                      "type": "object",
+                      "properties": {
+                        "mac": {
+                          "type": "string",
+                          "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                          "example": "00:1a:2b:3c:4d:5e"
+                        },
+                        "hostname": {
+                          "type": "string",
+                          "description": "Hostname of the Access Point.",
+                          "example": "Router1"
+                        },
+                        "country-code": {
+                          "type": "string",
+                          "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                          "example": "10"
+                        }
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-ap-manager:config": {
+                    "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                    "hostname": "Router1",
+                    "country-code": "unconfigured"
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -570,11 +989,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace config",
-        "description": "Create or replace Config container for assigning hostnames to APs.",
-        "operationId": "put-provision-ap-config",
+        "summary": "Replace config",
+        "description": "Config container for assigning hostnames to APs.",
+        "operationId": "put-provision-ap-by-mac-config",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -584,10 +1003,35 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
+                    "type": "object",
+                    "properties": {
+                      "mac": {
+                        "type": "string",
+                        "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                        "example": "00:1a:2b:3c:4d:5e"
+                      },
+                      "hostname": {
+                        "type": "string",
+                        "description": "Hostname of the Access Point.",
+                        "example": "Router1"
+                      },
+                      "country-code": {
+                        "type": "string",
+                        "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                        "example": "10"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:config": {
+                  "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                  "hostname": "Router1",
+                  "country-code": "unconfigured"
+                }
               }
             }
           }
@@ -600,16 +1044,27 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       },
       "patch": {
-        "summary": "Modify config",
-        "description": "Partially modify Config container for assigning hostnames to APs.",
-        "operationId": "patch-provision-ap-config",
+        "summary": "Update config",
+        "description": "Config container for assigning hostnames to APs.",
+        "operationId": "patch-provision-ap-by-mac-config",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "requestBody": {
           "required": true,
@@ -619,10 +1074,35 @@
                 "type": "object",
                 "properties": {
                   "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
+                    "type": "object",
+                    "properties": {
+                      "mac": {
+                        "type": "string",
+                        "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                        "example": "00:1a:2b:3c:4d:5e"
+                      },
+                      "hostname": {
+                        "type": "string",
+                        "description": "Hostname of the Access Point.",
+                        "example": "Router1"
+                      },
+                      "country-code": {
+                        "type": "string",
+                        "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                        "example": "10"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
                 "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:config": {
+                  "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                  "hostname": "Router1",
+                  "country-code": "unconfigured"
+                }
               }
             }
           }
@@ -632,16 +1112,27 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       },
       "delete": {
         "summary": "Delete config",
-        "description": "Delete Config container for assigning hostnames to APs.",
-        "operationId": "delete-provision-ap-config",
+        "description": "Config container for assigning hostnames to APs.",
+        "operationId": "delete-provision-ap-by-mac-config",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
         ],
         "responses": {
           "204": {
@@ -650,213 +1141,238 @@
           "404": {
             "description": "Not found"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
-    "/data/openconfig-ap-manager:provision-aps/provision-ap/state": {
+    "/data/openconfig-ap-manager:provision-aps/provision-ap={mac}/state": {
       "get": {
         "summary": "Get state",
         "description": "State container for assigning hostnames to APs.",
-        "operationId": "get-provision-ap-state",
+        "operationId": "get-provision-ap-by-mac-state",
         "tags": [
-          "openconfig-ap-manager"
+          "provision-aps"
+        ],
+        "parameters": [
+          {
+            "name": "mac",
+            "in": "path",
+            "required": true,
+            "description": "Key `mac` of list `provision-ap`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:state": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-state"
+                      "type": "object",
+                      "properties": {
+                        "mac": {
+                          "type": "string",
+                          "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                          "example": "00:1a:2b:3c:4d:5e"
+                        },
+                        "hostname": {
+                          "type": "string",
+                          "description": "Hostname of the Access Point.",
+                          "example": "Router1"
+                        },
+                        "country-code": {
+                          "type": "string",
+                          "description": "Country code where the AP operates in ISO 3166-1 alpha-2 format.",
+                          "example": "10"
+                        }
+                      },
+                      "example": "active"
                     }
                   },
                   "example": "active",
                   "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-ap-manager:state": {
+                    "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                    "hostname": "Router1",
+                    "country-code": "unconfigured"
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
         }
-      },
-      "put": {
-        "summary": "Create or replace state",
-        "description": "Create or replace State container for assigning hostnames to APs.",
-        "operationId": "put-provision-ap-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify state",
-        "description": "Partially modify State container for assigning hostnames to APs.",
-        "operationId": "patch-provision-ap-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete state",
-        "description": "Delete State container for assigning hostnames to APs.",
-        "operationId": "delete-provision-ap-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
-          }
-        }
       }
     },
-    "/data/openconfig-ap-manager:provision-ap": {
+    "/data/openconfig-ap-manager:joined-aps": {
       "get": {
-        "summary": "Get provision-ap",
-        "description": "List of MAC addresses that will have hostnames assigned. (collection)",
+        "summary": "Get joined-aps",
+        "description": "Top most container for joined-aps.",
         "operationId": "get-root",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "openconfig-ap-manager:provision-ap": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap"
+                    "openconfig-ap-manager:joined-aps": {
+                      "type": "object",
+                      "properties": {
+                        "joined-ap": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "hostname": {
+                                "type": "string",
+                                "description": "Reference to the MAC address list key.",
+                                "example": "Router1"
+                              },
+                              "state": {
+                                "type": "object",
+                                "properties": {
+                                  "mac": {
+                                    "type": "string",
+                                    "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                    "example": "00:1a:2b:3c:4d:5e"
+                                  },
+                                  "hostname": {
+                                    "type": "string",
+                                    "description": "Hostname of the Access Point.",
+                                    "example": "Router1"
+                                  },
+                                  "opstate": {
+                                    "type": "string",
+                                    "description": "The current operational state of the AP.",
+                                    "example": "active"
+                                  },
+                                  "uptime": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 4294967295,
+                                    "description": "Seconds this AP has been in the op-state of 'UP'.",
+                                    "example": 651780
+                                  },
+                                  "enabled": {
+                                    "type": "boolean",
+                                    "description": "Wheather the AP is enabled or disabled.",
+                                    "example": true
+                                  },
+                                  "serial": {
+                                    "type": "string",
+                                    "description": "Serial number of the Access Point.",
+                                    "example": "FOC2145L0QS"
+                                  },
+                                  "model": {
+                                    "type": "string",
+                                    "description": "Model number of the Access Point.",
+                                    "example": "C9300-48P"
+                                  },
+                                  "ipv4": {
+                                    "type": "string",
+                                    "description": "The IPv4 address of the Access Point.",
+                                    "example": "configured-value"
+                                  },
+                                  "ipv6": {
+                                    "type": "string",
+                                    "description": "The IPv6 address of the Access Point.",
+                                    "example": "2001:db8::1"
+                                  },
+                                  "power-source": {
+                                    "type": "string",
+                                    "enum": [
+                                      "AT",
+                                      "AF",
+                                      "PLUG"
+                                    ],
+                                    "description": "Enumerate how the AP is being powered.",
+                                    "example": "configured-value"
+                                  }
+                                },
+                                "example": "active",
+                                "description": "Current operational state"
+                              }
+                            },
+                            "required": [
+                              "hostname"
+                            ],
+                            "example": "configured-value"
+                          },
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found"
-          }
-        }
-      },
-      "post": {
-        "summary": "Add provision-ap entry",
-        "description": "Add a new entry to List of MAC addresses that will have hostnames assigned. (collection)",
-        "operationId": "post-root",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap"
-                  }
                 },
-                "example": "configured-value"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      }
-    },
-    "/data/openconfig-ap-manager:provision-ap={mac}": {
-      "get": {
-        "summary": "Get provision-ap-item",
-        "description": "List of MAC addresses that will have hostnames assigned.",
-        "operationId": "get-root-2",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/yang-data+json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "openconfig-ap-manager:provision-ap": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
-                    }
-                  },
-                  "example": "00:1a:2b:3c:4d:5e"
+                "example": {
+                  "openconfig-ap-manager:joined-aps": {
+                    "joined-ap": [
+                      {
+                        "hostname": "Router1",
+                        "state": {
+                          "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                          "hostname": "Router1",
+                          "opstate": "active",
+                          "uptime": 651780,
+                          "enabled": true,
+                          "serial": "FOC2145L0QS",
+                          "model": "C9300-48P",
+                          "ipv4": "configured-value",
+                          "ipv6": "2001:db8::1",
+                          "power-source": "AT"
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
@@ -864,11 +1380,11 @@
         }
       },
       "put": {
-        "summary": "Create or replace provision-ap-item",
-        "description": "Create or replace List of MAC addresses that will have hostnames assigned.",
+        "summary": "Replace joined-aps",
+        "description": "Top most container for joined-aps.",
         "operationId": "put-root",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
         ],
         "requestBody": {
           "required": true,
@@ -877,11 +1393,117 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
+                  "openconfig-ap-manager:joined-aps": {
+                    "type": "object",
+                    "properties": {
+                      "joined-ap": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "hostname": {
+                              "type": "string",
+                              "description": "Reference to the MAC address list key.",
+                              "example": "Router1"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "opstate": {
+                                  "type": "string",
+                                  "description": "The current operational state of the AP.",
+                                  "example": "active"
+                                },
+                                "uptime": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 4294967295,
+                                  "description": "Seconds this AP has been in the op-state of 'UP'.",
+                                  "example": 651780
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Wheather the AP is enabled or disabled.",
+                                  "example": true
+                                },
+                                "serial": {
+                                  "type": "string",
+                                  "description": "Serial number of the Access Point.",
+                                  "example": "FOC2145L0QS"
+                                },
+                                "model": {
+                                  "type": "string",
+                                  "description": "Model number of the Access Point.",
+                                  "example": "C9300-48P"
+                                },
+                                "ipv4": {
+                                  "type": "string",
+                                  "description": "The IPv4 address of the Access Point.",
+                                  "example": "configured-value"
+                                },
+                                "ipv6": {
+                                  "type": "string",
+                                  "description": "The IPv6 address of the Access Point.",
+                                  "example": "2001:db8::1"
+                                },
+                                "power-source": {
+                                  "type": "string",
+                                  "enum": [
+                                    "AT",
+                                    "AF",
+                                    "PLUG"
+                                  ],
+                                  "description": "Enumerate how the AP is being powered.",
+                                  "example": "configured-value"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "hostname"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
-                "example": "00:1a:2b:3c:4d:5e"
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:joined-aps": {
+                  "joined-ap": [
+                    {
+                      "hostname": "Router1",
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "opstate": "active",
+                        "uptime": 651780,
+                        "enabled": true,
+                        "serial": "FOC2145L0QS",
+                        "model": "C9300-48P",
+                        "ipv4": 4,
+                        "ipv6": 12,
+                        "power-source": "AT"
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -894,16 +1516,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "patch": {
-        "summary": "Modify provision-ap-item",
-        "description": "Partially modify List of MAC addresses that will have hostnames assigned.",
+        "summary": "Update joined-aps",
+        "description": "Top most container for joined-aps.",
         "operationId": "patch-root",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
         ],
         "requestBody": {
           "required": true,
@@ -912,11 +1534,117 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "openconfig-ap-manager:provision-ap": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-provision-ap-item"
+                  "openconfig-ap-manager:joined-aps": {
+                    "type": "object",
+                    "properties": {
+                      "joined-ap": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "hostname": {
+                              "type": "string",
+                              "description": "Reference to the MAC address list key.",
+                              "example": "Router1"
+                            },
+                            "state": {
+                              "type": "object",
+                              "properties": {
+                                "mac": {
+                                  "type": "string",
+                                  "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                  "example": "00:1a:2b:3c:4d:5e"
+                                },
+                                "hostname": {
+                                  "type": "string",
+                                  "description": "Hostname of the Access Point.",
+                                  "example": "Router1"
+                                },
+                                "opstate": {
+                                  "type": "string",
+                                  "description": "The current operational state of the AP.",
+                                  "example": "active"
+                                },
+                                "uptime": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 4294967295,
+                                  "description": "Seconds this AP has been in the op-state of 'UP'.",
+                                  "example": 651780
+                                },
+                                "enabled": {
+                                  "type": "boolean",
+                                  "description": "Wheather the AP is enabled or disabled.",
+                                  "example": true
+                                },
+                                "serial": {
+                                  "type": "string",
+                                  "description": "Serial number of the Access Point.",
+                                  "example": "FOC2145L0QS"
+                                },
+                                "model": {
+                                  "type": "string",
+                                  "description": "Model number of the Access Point.",
+                                  "example": "C9300-48P"
+                                },
+                                "ipv4": {
+                                  "type": "string",
+                                  "description": "The IPv4 address of the Access Point.",
+                                  "example": "configured-value"
+                                },
+                                "ipv6": {
+                                  "type": "string",
+                                  "description": "The IPv6 address of the Access Point.",
+                                  "example": "2001:db8::1"
+                                },
+                                "power-source": {
+                                  "type": "string",
+                                  "enum": [
+                                    "AT",
+                                    "AF",
+                                    "PLUG"
+                                  ],
+                                  "description": "Enumerate how the AP is being powered.",
+                                  "example": "configured-value"
+                                }
+                              },
+                              "example": "active",
+                              "description": "Current operational state"
+                            }
+                          },
+                          "required": [
+                            "hostname"
+                          ],
+                          "example": "configured-value"
+                        },
+                        "example": "configured-value"
+                      }
+                    },
+                    "example": "configured-value"
                   }
                 },
-                "example": "00:1a:2b:3c:4d:5e"
+                "example": "configured-value"
+              },
+              "example": {
+                "openconfig-ap-manager:joined-aps": {
+                  "joined-ap": [
+                    {
+                      "hostname": "Router1",
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "opstate": "active",
+                        "uptime": 651780,
+                        "enabled": true,
+                        "serial": "FOC2145L0QS",
+                        "model": "C9300-48P",
+                        "ipv4": 4,
+                        "ipv6": 12,
+                        "power-source": "AT"
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -926,16 +1654,16 @@
             "description": "Updated"
           },
           "400": {
-            "description": "Bad request"
+            "description": "Invalid input"
           }
         }
       },
       "delete": {
-        "summary": "Delete provision-ap-item",
-        "description": "Delete List of MAC addresses that will have hostnames assigned.",
+        "summary": "Delete joined-aps",
+        "description": "Top most container for joined-aps.",
         "operationId": "delete-root",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
         ],
         "responses": {
           "204": {
@@ -947,233 +1675,418 @@
         }
       }
     },
-    "/data/openconfig-ap-manager:provision-ap/config": {
+    "/data/openconfig-ap-manager:joined-aps/joined-ap": {
       "get": {
-        "summary": "Get config",
-        "description": "Config container for assigning hostnames to APs.",
-        "operationId": "get-config",
+        "summary": "Get joined-ap (all entries)",
+        "description": "List of access points that have joined the controller.",
+        "operationId": "get-joined-ap",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "openconfig-ap-manager:config": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-config"
+                    "openconfig-ap-manager:joined-ap": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "hostname": {
+                            "type": "string",
+                            "description": "Reference to the MAC address list key.",
+                            "example": "Router1"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "opstate": {
+                                "type": "string",
+                                "description": "The current operational state of the AP.",
+                                "example": "active"
+                              },
+                              "uptime": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Seconds this AP has been in the op-state of 'UP'.",
+                                "example": 651780
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Wheather the AP is enabled or disabled.",
+                                "example": true
+                              },
+                              "serial": {
+                                "type": "string",
+                                "description": "Serial number of the Access Point.",
+                                "example": "FOC2145L0QS"
+                              },
+                              "model": {
+                                "type": "string",
+                                "description": "Model number of the Access Point.",
+                                "example": "C9300-48P"
+                              },
+                              "ipv4": {
+                                "type": "string",
+                                "description": "The IPv4 address of the Access Point.",
+                                "example": "configured-value"
+                              },
+                              "ipv6": {
+                                "type": "string",
+                                "description": "The IPv6 address of the Access Point.",
+                                "example": "2001:db8::1"
+                              },
+                              "power-source": {
+                                "type": "string",
+                                "enum": [
+                                  "AT",
+                                  "AF",
+                                  "PLUG"
+                                ],
+                                "description": "Enumerate how the AP is being powered.",
+                                "example": "configured-value"
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "hostname"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "example": "configured-value"
                     }
                   },
                   "example": "configured-value"
+                },
+                "example": {
+                  "openconfig-ap-manager:joined-ap": [
+                    {
+                      "hostname": "Router1",
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "opstate": "active",
+                        "uptime": 651780,
+                        "enabled": true,
+                        "serial": "FOC2145L0QS",
+                        "model": "C9300-48P",
+                        "ipv4": "configured-value",
+                        "ipv6": "2001:db8::1",
+                        "power-source": "AT"
+                      }
+                    }
+                  ]
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Resource not found"
           }
         }
-      },
-      "put": {
-        "summary": "Create or replace config",
-        "description": "Create or replace Config container for assigning hostnames to APs.",
-        "operationId": "put-config",
+      }
+    },
+    "/data/openconfig-ap-manager:joined-aps/joined-ap={hostname}": {
+      "get": {
+        "summary": "Get joined-ap",
+        "description": "List of access points that have joined the controller.",
+        "operationId": "get-joined-ap-by-hostname",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
-                  }
+        "parameters": [
+          {
+            "name": "hostname",
+            "in": "path",
+            "required": true,
+            "description": "Key `hostname` of list `joined-ap`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/yang-data+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "openconfig-ap-manager:joined-ap": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "hostname": {
+                            "type": "string",
+                            "description": "Reference to the MAC address list key.",
+                            "example": "Router1"
+                          },
+                          "state": {
+                            "type": "object",
+                            "properties": {
+                              "mac": {
+                                "type": "string",
+                                "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                                "example": "00:1a:2b:3c:4d:5e"
+                              },
+                              "hostname": {
+                                "type": "string",
+                                "description": "Hostname of the Access Point.",
+                                "example": "Router1"
+                              },
+                              "opstate": {
+                                "type": "string",
+                                "description": "The current operational state of the AP.",
+                                "example": "active"
+                              },
+                              "uptime": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295,
+                                "description": "Seconds this AP has been in the op-state of 'UP'.",
+                                "example": 651780
+                              },
+                              "enabled": {
+                                "type": "boolean",
+                                "description": "Wheather the AP is enabled or disabled.",
+                                "example": true
+                              },
+                              "serial": {
+                                "type": "string",
+                                "description": "Serial number of the Access Point.",
+                                "example": "FOC2145L0QS"
+                              },
+                              "model": {
+                                "type": "string",
+                                "description": "Model number of the Access Point.",
+                                "example": "C9300-48P"
+                              },
+                              "ipv4": {
+                                "type": "string",
+                                "description": "The IPv4 address of the Access Point.",
+                                "example": "configured-value"
+                              },
+                              "ipv6": {
+                                "type": "string",
+                                "description": "The IPv6 address of the Access Point.",
+                                "example": "2001:db8::1"
+                              },
+                              "power-source": {
+                                "type": "string",
+                                "enum": [
+                                  "AT",
+                                  "AF",
+                                  "PLUG"
+                                ],
+                                "description": "Enumerate how the AP is being powered.",
+                                "example": "configured-value"
+                              }
+                            },
+                            "example": "active",
+                            "description": "Current operational state"
+                          }
+                        },
+                        "required": [
+                          "hostname"
+                        ],
+                        "example": "configured-value"
+                      },
+                      "maxItems": 1,
+                      "example": "configured-value"
+                    }
+                  },
+                  "example": "example-1"
                 },
-                "example": "configured-value"
+                "example": {
+                  "openconfig-ap-manager:joined-ap": [
+                    {
+                      "hostname": "Router1",
+                      "state": {
+                        "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                        "hostname": "Router1",
+                        "opstate": "active",
+                        "uptime": 651780,
+                        "enabled": true,
+                        "serial": "FOC2145L0QS",
+                        "model": "C9300-48P",
+                        "ipv4": "configured-value",
+                        "ipv6": "2001:db8::1",
+                        "power-source": "AT"
+                      }
+                    }
+                  ]
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
           },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify config",
-        "description": "Partially modify Config container for assigning hostnames to APs.",
-        "operationId": "patch-config",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:config": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-config"
-                  }
-                },
-                "example": "configured-value"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete config",
-        "description": "Delete Config container for assigning hostnames to APs.",
-        "operationId": "delete-config",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
-            "description": "Not found"
+            "description": "Resource not found"
           }
         }
       }
     },
-    "/data/openconfig-ap-manager:provision-ap/state": {
+    "/data/openconfig-ap-manager:joined-aps/joined-ap={hostname}/state": {
       "get": {
         "summary": "Get state",
-        "description": "State container for assigning hostnames to APs.",
-        "operationId": "get-state",
+        "description": "State container for Joined APs.",
+        "operationId": "get-joined-ap-by-hostname-state",
         "tags": [
-          "openconfig-ap-manager"
+          "joined-aps"
+        ],
+        "parameters": [
+          {
+            "name": "hostname",
+            "in": "path",
+            "required": true,
+            "description": "Key `hostname` of list `joined-ap`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/accept"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response",
             "content": {
               "application/yang-data+json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "openconfig-ap-manager:state": {
-                      "$ref": "#/components/schemas/openconfig-ap-manager-state"
+                      "type": "object",
+                      "properties": {
+                        "mac": {
+                          "type": "string",
+                          "description": "MAC address of the AP primary Ethernet interface. If AP has multiple Ethernet interfaces, this would be the MAC printed on the unit label and referenced within the management system. Vendors MUST reject attempts to configure this leaf.",
+                          "example": "00:1a:2b:3c:4d:5e"
+                        },
+                        "hostname": {
+                          "type": "string",
+                          "description": "Hostname of the Access Point.",
+                          "example": "Router1"
+                        },
+                        "opstate": {
+                          "type": "string",
+                          "description": "The current operational state of the AP.",
+                          "example": "active"
+                        },
+                        "uptime": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 4294967295,
+                          "description": "Seconds this AP has been in the op-state of 'UP'.",
+                          "example": 651780
+                        },
+                        "enabled": {
+                          "type": "boolean",
+                          "description": "Wheather the AP is enabled or disabled.",
+                          "example": true
+                        },
+                        "serial": {
+                          "type": "string",
+                          "description": "Serial number of the Access Point.",
+                          "example": "FOC2145L0QS"
+                        },
+                        "model": {
+                          "type": "string",
+                          "description": "Model number of the Access Point.",
+                          "example": "C9300-48P"
+                        },
+                        "ipv4": {
+                          "type": "string",
+                          "description": "The IPv4 address of the Access Point.",
+                          "example": "configured-value"
+                        },
+                        "ipv6": {
+                          "type": "string",
+                          "description": "The IPv6 address of the Access Point.",
+                          "example": "2001:db8::1"
+                        },
+                        "power-source": {
+                          "type": "string",
+                          "enum": [
+                            "AT",
+                            "AF",
+                            "PLUG"
+                          ],
+                          "description": "Enumerate how the AP is being powered.",
+                          "example": "configured-value"
+                        }
+                      },
+                      "example": "active"
                     }
                   },
                   "example": "active",
                   "description": "Current operational state"
+                },
+                "example": {
+                  "openconfig-ap-manager:state": {
+                    "mac": "hmac-sha2-256,hmac-sha1,hmac-sha2-512",
+                    "hostname": "Router1",
+                    "opstate": "active",
+                    "uptime": 651780,
+                    "enabled": true,
+                    "serial": "FOC2145L0QS",
+                    "model": "C9300-48P",
+                    "ipv4": "configured-value",
+                    "ipv6": "2001:db8::1",
+                    "power-source": "AT"
+                  }
                 }
               }
             }
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Resource not found"
-          }
-        }
-      },
-      "put": {
-        "summary": "Create or replace state",
-        "description": "Create or replace State container for assigning hostnames to APs.",
-        "operationId": "put-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Modify state",
-        "description": "Partially modify State container for assigning hostnames to APs.",
-        "operationId": "patch-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/yang-data+json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "openconfig-ap-manager:state": {
-                    "$ref": "#/components/schemas/openconfig-ap-manager-state"
-                  }
-                },
-                "example": "active",
-                "description": "Current operational state"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Bad request"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete state",
-        "description": "Delete State container for assigning hostnames to APs.",
-        "operationId": "delete-state",
-        "tags": [
-          "openconfig-ap-manager"
-        ],
-        "responses": {
-          "204": {
-            "description": "Deleted"
-          },
-          "404": {
-            "description": "Not found"
           }
         }
       }
@@ -1183,238 +2096,37 @@
     "securitySchemes": {
       "basicAuth": {
         "type": "http",
-        "scheme": "basic"
+        "scheme": "basic",
+        "description": "RESTCONF basic authentication (RFC 8040)"
       }
     },
-    "schemas": {
-      "openconfig-ap-manager-provision-aps": {
-        "type": "object",
-        "properties": {
-          "provision-ap": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "mac": {
-                  "type": "string",
-                  "description": "Reference to the MAC address list key. This leaf is a reference\n          only and not to be configured.",
-                  "example": "00:1a:2b:3c:4d:5e"
-                },
-                "config": {
-                  "type": "object",
-                  "properties": {
-                    "mac": {
-                      "type": "string",
-                      "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                      "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                      "example": "00:1a:2b:3c:4d:5e"
-                    },
-                    "hostname": {
-                      "type": "string",
-                      "description": "Hostname of the Access Point.",
-                      "example": "Router1"
-                    },
-                    "country-code": {
-                      "type": "string",
-                      "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                      "example": "10"
-                    }
-                  },
-                  "description": "Config container for assigning hostnames to APs.",
-                  "example": "configured-value"
-                },
-                "state": {
-                  "type": "object",
-                  "properties": {
-                    "mac": {
-                      "type": "string",
-                      "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                      "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                      "example": "00:1a:2b:3c:4d:5e"
-                    },
-                    "hostname": {
-                      "type": "string",
-                      "description": "Hostname of the Access Point.",
-                      "example": "Router1"
-                    },
-                    "country-code": {
-                      "type": "string",
-                      "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                      "example": "10"
-                    }
-                  },
-                  "description": "State container for assigning hostnames to APs.",
-                  "example": "active"
-                }
-              },
-              "example": "configured-value"
-            },
-            "example": "configured-value"
-          }
-        },
-        "example": "configured-value"
+    "parameters": {
+      "content-type": {
+        "name": "Content-Type",
+        "in": "header",
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       },
-      "openconfig-ap-manager-config": {
-        "type": "object",
-        "properties": {
-          "mac": {
-            "type": "string",
-            "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-            "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-            "example": "00:1a:2b:3c:4d:5e"
-          },
-          "hostname": {
-            "type": "string",
-            "description": "Hostname of the Access Point.",
-            "example": "Router1"
-          },
-          "country-code": {
-            "type": "string",
-            "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-            "example": "10"
-          }
-        },
-        "example": "configured-value"
+      "accept": {
+        "name": "Accept",
+        "in": "header",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "default": "application/yang-data+json"
+        }
       },
-      "openconfig-ap-manager-state": {
-        "type": "object",
-        "properties": {
-          "mac": {
-            "type": "string",
-            "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-            "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-            "example": "00:1a:2b:3c:4d:5e"
-          },
-          "hostname": {
-            "type": "string",
-            "description": "Hostname of the Access Point.",
-            "example": "Router1"
-          },
-          "country-code": {
-            "type": "string",
-            "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-            "example": "10"
-          }
-        },
-        "example": "active"
-      },
-      "openconfig-ap-manager-provision-ap": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "mac": {
-              "type": "string",
-              "description": "Reference to the MAC address list key. This leaf is a reference\n          only and not to be configured.",
-              "example": "00:1a:2b:3c:4d:5e"
-            },
-            "config": {
-              "type": "object",
-              "properties": {
-                "mac": {
-                  "type": "string",
-                  "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                  "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                  "example": "00:1a:2b:3c:4d:5e"
-                },
-                "hostname": {
-                  "type": "string",
-                  "description": "Hostname of the Access Point.",
-                  "example": "Router1"
-                },
-                "country-code": {
-                  "type": "string",
-                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                  "example": "10"
-                }
-              },
-              "description": "Config container for assigning hostnames to APs.",
-              "example": "configured-value"
-            },
-            "state": {
-              "type": "object",
-              "properties": {
-                "mac": {
-                  "type": "string",
-                  "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                  "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                  "example": "00:1a:2b:3c:4d:5e"
-                },
-                "hostname": {
-                  "type": "string",
-                  "description": "Hostname of the Access Point.",
-                  "example": "Router1"
-                },
-                "country-code": {
-                  "type": "string",
-                  "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                  "example": "10"
-                }
-              },
-              "description": "State container for assigning hostnames to APs.",
-              "example": "active"
-            }
-          },
-          "example": "configured-value"
-        },
-        "example": "configured-value"
-      },
-      "openconfig-ap-manager-provision-ap-item": {
-        "type": "object",
-        "properties": {
-          "mac": {
-            "type": "string",
-            "description": "Reference to the MAC address list key. This leaf is a reference\n          only and not to be configured.",
-            "example": "00:1a:2b:3c:4d:5e"
-          },
-          "config": {
-            "type": "object",
-            "properties": {
-              "mac": {
-                "type": "string",
-                "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                "example": "00:1a:2b:3c:4d:5e"
-              },
-              "hostname": {
-                "type": "string",
-                "description": "Hostname of the Access Point.",
-                "example": "Router1"
-              },
-              "country-code": {
-                "type": "string",
-                "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                "example": "10"
-              }
-            },
-            "description": "Config container for assigning hostnames to APs.",
-            "example": "configured-value"
-          },
-          "state": {
-            "type": "object",
-            "properties": {
-              "mac": {
-                "type": "string",
-                "pattern": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
-                "description": "MAC address of the AP primary Ethernet interface. If AP\n        has multiple Ethernet interfaces, this would be the MAC printed\n        on the unit label and referenced within the management system.\n        Vendors MUST reject attempts to configure this leaf.",
-                "example": "00:1a:2b:3c:4d:5e"
-              },
-              "hostname": {
-                "type": "string",
-                "description": "Hostname of the Access Point.",
-                "example": "Router1"
-              },
-              "country-code": {
-                "type": "string",
-                "description": "Country code where the AP operates in ISO 3166-1 alpha-2\n        format.",
-                "example": "10"
-              }
-            },
-            "description": "State container for assigning hostnames to APs.",
-            "example": "active"
-          }
-        },
-        "example": "configured-value"
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "required": false,
+        "description": "Limit response depth",
+        "schema": {
+          "type": "string",
+          "default": "unbounded"
+        }
       }
     }
   },
@@ -1425,8 +2137,12 @@
   ],
   "tags": [
     {
-      "name": "openconfig-ap-manager",
-      "description": "This module defines the top level configuration and state data for a\n    system which manages Access Points."
+      "name": "provision-aps",
+      "description": "Top most container for assigning hostnames to APs."
+    },
+    {
+      "name": "joined-aps",
+      "description": "Top most container for joined-aps."
     }
   ]
 }
