@@ -26,7 +26,7 @@ Key facts:
   ([releases/index.json](releases/index.json)). The newest release is the default; device
   data (Device Data page, viewer "Live device data" panel) belongs to the release the lab
   devices run, `device_data` in the same file (26.1.1 today).
-- **Top-level pages**: 13 user-facing HTML + 1 404 + 2 redirector stubs + 8 Swagger UI
+- **Top-level pages**: 14 user-facing HTML + 1 404 + 2 redirector stubs + 8 Swagger UI
   viewers (one per model category; the events viewer was retired).
 - **No build system**: vanilla JS, strict CSP, Swagger UI from jsDelivr; data is
   generated offline by Python scripts under `generators/` and `scripts/`.
@@ -659,9 +659,12 @@ Items flagged **Needs verification** or that fell outside this static read:
    **RESOLVED (2026-06-16).** `scripts/patch_viewers_version_aware.py` now
    re-stamps the constant from `releases/index.json`'s `default`, so it advances
    automatically with the default release.
-10. **MIB-specific UI** — references to `mib-metadata.json` and
-    `mib-platform-matrix.json` suggest extra side cards in the MIB viewer not
-    fully captured here.
+10. **MIB-specific UI** — **RESOLVED (2026-11-17).** The MIB viewer has one
+    "MIB Details" card fed by `releases/<ver>/mib-metadata.json` (OID prefix,
+    counts, indexes, deprecated / obsolete counts, platforms from
+    `mib-platform-matrix.json`); it links flagged MIBs to
+    [deprecations.html](deprecations.html). It was dead code (never called)
+    until then.
 11. **Documentation drift** — `PROJECT_REQUIREMENTS.md`, `QUICK_REFERENCE.md`,
     `ASSURANCE_SPEC.md`, `MDT_XPATH_SPEC.md`, `VERSIONING.md`,
     `GITHUB_PAGES_DEPLOY.md`, `YANG_MODULE_ACCOUNTABILITY.md`,

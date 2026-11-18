@@ -126,6 +126,17 @@ banner that deep-links into the browser. Coverage is a snapshot — not every pa
 is captured, and it is read-only sample data, so treat it as illustrative rather
 than exhaustive.
 
+### Which YANG nodes are deprecated or obsolete?
+
+[deprecations.html](deprecations.html) (hub → More → Deprecations) lists every
+`status deprecated` and `status obsolete` in a release's YANG models: totals, by
+category and module, and per module the exact schema paths, with what changed since
+the previous release and a CSV download. "Top-most nodes" counts a flagged subtree
+once, at its top; "all nodes" includes everything that inherits the status. In the
+MIB viewer, the **MIB Details** card shows each MIB's deprecated and obsolete counts
+and links to the same page. The Swagger viewers themselves do not mark deprecated
+operations yet.
+
 ---
 
 ## Postman / Bruno exports

@@ -158,7 +158,7 @@ integrated browser — the criteria below remain authoritative.
 ### S-4 (regression — added 2026-06-02) — platform-coverage matrix
 - **URL:** `https://ciscodevnet.github.io/cisco-ios-xe-openapi-swagger/platform-coverage.html`
 - **PASS criteria:**
-  - Release dropdown populated with all 3 releases (26.1.1 selected)
+  - Release dropdown populated with every release in `releases/index.json` (26.2.1 selected)
   - Summary line shows `1006 of 1006 modules · 10 platforms · release 26.1.1`
   - Matrix table renders with ≥ 100 visible rows
 - **FAIL if:** stuck on "Loading…" (likely CSP-blocked inline script; fix
@@ -215,8 +215,8 @@ integrated browser — the criteria below remain authoritative.
   means the deploy-time build did not run.
 
 ### S-10 (added 2026-10-03) — Remaining published pages
-- **URL:** `yang-accountability-compare.html`, `about.html`, `changelog.html`,
-  `exports.html`, `tree-compare.html`, `404.html`
+- **URL:** `yang-accountability-compare.html`, `release-compare.html`, `deprecations.html`,
+  `about.html`, `changelog.html`, `exports.html`, `tree-compare.html`, `404.html`
 - **PASS criteria:** each returns HTTP 200 and contains its key marker
   (data source / script / heading); `404.html` carries the deep-link handler.
 - **FAIL if:** any page 404s or loses its marker.

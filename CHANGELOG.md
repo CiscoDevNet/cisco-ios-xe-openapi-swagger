@@ -185,6 +185,10 @@ below are far more representative than the average).
   separately, linking to the new page. `mib-metadata.json` replaces `deprecated_object_count`
   (deprecated + obsolete combined, by regex) with `deprecated_count` and `obsolete_count`
   from the shared status tokenizer (`scripts/_yang_status.py`).
+- **CI and smoke:** the `tests` workflow installs `pyang==2.7.1` for the census tests; smoke check
+  S-4 now compares against `releases/index.json` instead of expecting at least 5 releases, and S-10
+  lists the release-compare and deprecations pages. AGENTS.md, APP_MAP.md and a decision record
+  (`memory/versioning/0003`) describe the census.
 
 ### Removed — retired releases 17.9.x, 17.12.x and 17.15.x (2026-11-17)
 
