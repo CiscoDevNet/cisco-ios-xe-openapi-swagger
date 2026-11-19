@@ -163,6 +163,23 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Added — shareable links on Device Data (2026-11-19)
+
+- The URL now follows the view: method, device, selected path, list filters (flavor, search,
+  Show, Level, Sort) and the coverage matrix (pivot, method, flavor, gaps, inconsistent). Opening
+  the link restores it, and so does editing the URL. Selections replace the URL rather than adding
+  history entries, like the other pages. The tab title names the selected device and path.
+- **Copy link** (shortcut `L`) and **Copy short link**. Short links stay readable and are resolved
+  in the browser, no external shortener:
+  `device-data.html#go=gnmi-sub/C9400/interfaces-ios-xe-oper:interfaces`. The path part is the YANG
+  prefix plus the fewest trailing segments that identify it for that method
+  (`oc-if:interface/state/counters`), so the same code works on every device tab; a device
+  without that path opens with the search prefilled.
+- **Fixed:** the Swagger viewers' "Open in Live Data browser" link (`#module=&pid=`) was ignored and
+  always opened MDT; it now opens RESTCONF on that device with the module's root path selected.
+- `tests/test_device_data_links.py`: every path of every method dataset round-trips through its
+  short code (needs Node; skipped otherwise).
+
 ### Fixed — gNMI Subscribe SAMPLE no longer reported as empty on large paths (2026-11-19)
 
 - The SAMPLE probe waited 4 s for the first update; large subtrees such as `openconfig:/interfaces`

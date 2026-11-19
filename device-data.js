@@ -42,6 +42,7 @@
     };
 
     var state = { transport: 'mdt', datasets: {}, data: null, pid: '', cat: 'all', q: '', sel: null, sort: 'cat', matrix: false, dataFilter: 'all', level: 'all', matrixGaps: false, matrixCat: 'all', jump: null,
+        pendingView: null, pendingMatrix: false,
         matrixPivot: 'methods', matrixMethod: null, matrixInconsistent: false, matrixIndex: null, matrixClass: null };
     var charts = {};
     var payloadCache = {};
@@ -157,6 +158,7 @@
 
     // ---------- path list ----------
     function renderList() {
+        syncHash();
         var wrap = $('browser');
         clear(wrap);
         var rows = devicePaths(state.pid).filter(matches);
@@ -603,6 +605,211 @@
         });
     }
 
+    // ---------- shareable links (URL hash) ----------
+    // Full link: #method=&device=&path=&cat=&q=&show=&level=&sort=&view=matrix&pivot=&mmethod=&mcat=&gaps=&odd=
+    // Short link: #go=<method alias>/<device>/<yang prefix>:<shortest unique path suffix>
+    var SHORT_METHODS = {
+        'mdt': 'mdt', 'restconf': 'restconf', 'netconf-get': 'nc-get', 'netconf-getconfig': 'nc-config',
+        'netconf-sub': 'nc-sub', 'netconf-sub-config': 'nc-sub-config', 'gnmi-get': 'gnmi-get',
+        'gnmi-getconfig': 'gnmi-config', 'gnmi-state': 'gnmi-state', 'gnmi-sub': 'gnmi-sub'
+    };
+    function methodFromAlias(alias) {
+        var found = null;
+        Object.keys(SHORT_METHODS).forEach(function (key) {
+            if (key === alias || SHORT_METHODS[key] === alias) found = key;
+        });
+        return found;
+    }
+    // "/oc-if:interfaces/interface" -> { prefix: 'oc-if', segs: ['interfaces','interface'] };
+    // RESTCONF "/data/" and MDT's missing leading slash are both tolerated.
+    function splitPath(path) {
+        var body = String(path || '').replace(/^\/(data\/)?/, '');
+        var colon = body.indexOf(':');
+        var slash = body.indexOf('/');
+        if (colon < 0 || (slash >= 0 && slash < colon)) return { prefix: '', segs: body.split('/').filter(Boolean) };
+        return { prefix: body.slice(0, colon), segs: body.slice(colon + 1).split('/').filter(Boolean) };
+    }
+    function endsWith(segs, suffix) {
+        if (suffix.length > segs.length) return false;
+        for (var i = 1; i <= suffix.length; i++) {
+            if (segs[segs.length - i] !== suffix[suffix.length - i]) return false;
+        }
+        return true;
+    }
+    var prefixIndexCache = typeof WeakMap === 'function' ? new WeakMap() : null;
+    function prefixIndex(paths) {
+        var cached = prefixIndexCache && prefixIndexCache.get(paths);
+        if (cached) return cached;
+        var index = {}, seen = {};
+        paths.forEach(function (p) {
+            if (seen[p.path]) return;
+            seen[p.path] = true;
+            var parts = splitPath(p.path);
+            (index[parts.prefix] || (index[parts.prefix] = [])).push({ path: p.path, segs: parts.segs });
+        });
+        if (prefixIndexCache) prefixIndexCache.set(paths, index);
+        return index;
+    }
+    // Shortest trailing run of segments that identifies the path among all of the method's
+    // paths (every device), so one code works on any device tab.
+    function shortCode(paths, path) {
+        var target = splitPath(path);
+        var peers = (prefixIndex(paths)[target.prefix] || []).filter(function (x) { return x.path !== path; });
+        for (var k = 1; k <= target.segs.length; k++) {
+            var suffix = target.segs.slice(target.segs.length - k);
+            if (!peers.some(function (x) { return endsWith(x.segs, suffix); })) {
+                return target.prefix + ':' + suffix.join('/');
+            }
+        }
+        return target.prefix + ':' + target.segs.join('/');
+    }
+    function resolveShort(paths, pid, code) {
+        var parts = splitPath(code);
+        var candidates = (prefixIndex(paths.filter(function (p) { return p.pid === pid; }))[parts.prefix] || [])
+            .filter(function (x) { return endsWith(x.segs, parts.segs); });
+        if (!candidates.length) return null;
+        var exact = candidates.filter(function (x) { return x.segs.length === parts.segs.length; })[0];
+        if (exact) return exact.path;
+        candidates.sort(function (a, b) { return a.segs.length - b.segs.length || a.path.length - b.path.length; });
+        return candidates[0].path;
+    }
+    window.__DeviceDataLinks = { splitPath: splitPath, shortCode: shortCode, resolveShort: resolveShort,
+        methodFromAlias: methodFromAlias, SHORT_METHODS: SHORT_METHODS };
+
+    function readHash() {
+        var out = {};
+        (location.hash || '').replace(/^#/, '').split('&').forEach(function (part) {
+            var i = part.indexOf('=');
+            if (i <= 0) return;
+            try { out[decodeURIComponent(part.slice(0, i))] = decodeURIComponent(part.slice(i + 1)); }
+            catch (_) { /* ignore malformed */ }
+        });
+        return out;
+    }
+    // Keep ':' and '/' readable in links; everything else is percent-encoded.
+    function encodeReadable(value) {
+        return encodeURIComponent(value).replace(/%2F/gi, '/').replace(/%3A/gi, ':');
+    }
+    function selectedPath() {
+        if (!state.sel) return '';
+        return state.sel.slice(state.sel.indexOf('|') + 1);
+    }
+    function currentLinkParams() {
+        var search = $('searchBox');
+        var params = { method: state.transport, device: state.pid, path: selectedPath() };
+        if (state.cat !== 'all') params.cat = state.cat;
+        if (search && search.value.trim()) params.q = search.value.trim();
+        if (state.dataFilter !== 'all') params.show = state.dataFilter;
+        if (state.level !== 'all') params.level = state.level;
+        if (state.sort !== 'cat') params.sort = state.sort;
+        if (state.matrix) {
+            params.view = 'matrix';
+            if (state.matrixPivot !== 'methods') params.pivot = state.matrixPivot;
+            if (state.matrixPivot === 'devices' && state.matrixMethod) params.mmethod = state.matrixMethod;
+            if (state.matrixCat !== 'all') params.mcat = state.matrixCat;
+            if (state.matrixGaps) params.gaps = '1';
+            if (state.matrixInconsistent) params.odd = '1';
+        }
+        return params;
+    }
+    function syncHash() {
+        if (!state.data || !window.history || !history.replaceState) return;
+        var params = currentLinkParams();
+        var hash = Object.keys(params).filter(function (k) { return params[k]; })
+            .map(function (k) { return k + '=' + encodeReadable(params[k]); }).join('&');
+        var next = location.pathname + location.search + (hash ? '#' + hash : '');
+        var path = selectedPath();
+        document.title = (path ? state.pid + ' · ' + path.split('/').pop() + ' — ' : '') + BASE_TITLE;
+        if (next === location.pathname + location.search + location.hash) return;
+        // Browsers rate-limit history updates (fast typing in the search box); the next render retries.
+        try { history.replaceState(null, '', next); } catch (_) { /* throttled */ }
+    }
+    var BASE_TITLE = document.title;
+    function shortLink() {
+        if (!state.data) return location.href;
+        var link = 'go=' + encodeReadable(SHORT_METHODS[state.transport] || state.transport) + '/' + encodeReadable(state.pid);
+        var path = selectedPath();
+        if (path) link += '/' + encodeReadable(shortCode(state.data.paths || [], path));
+        return location.origin + location.pathname + location.search + '#' + link;
+    }
+    // Restore a full or short link: pick the method, then the device/path once its dataset loads.
+    function restoreFromHash(isInitial) {
+        var h = readHash();
+        var method = null;
+        state.jump = null;
+        state.pendingView = null;
+        state.pendingMatrix = false;
+        if (h.go) {
+            var parts = h.go.split('/');
+            method = methodFromAlias(parts[0]);
+            if (method) state.jump = { pid: parts[1] || '', code: parts.slice(2).join('/'), link: true };
+        } else if (h.module) {
+            // "Open in Live Data browser" from the Swagger viewers: #module=<yang module>&pid=<device>
+            method = 'restconf';
+            state.jump = { pid: h.pid || '', module: h.module, link: true };
+        } else if (h.method && transportDef(h.method)) {
+            method = h.method;
+            state.jump = { pid: h.device || '', path: h.path || '', link: true };
+            state.pendingView = { cat: h.cat, q: h.q, show: h.show, level: h.level, sort: h.sort };
+            state.pendingMatrix = h.view === 'matrix';
+            state.matrixPivot = h.pivot === 'devices' ? 'devices' : 'methods';
+            state.matrixMethod = h.mmethod || null;
+            state.matrixCat = h.mcat || 'all';
+            state.matrixGaps = h.gaps === '1';
+            state.matrixInconsistent = h.odd === '1';
+            var mg = $('matrixGaps'); if (mg) mg.checked = state.matrixGaps;
+            var mi = $('matrixInconsistent'); if (mi) mi.checked = state.matrixInconsistent;
+        }
+        if (!method) {
+            if (isInitial) loadTransport(TRANSPORTS[0].key, true);
+            return;
+        }
+        loadTransport(method, isInitial);
+    }
+    // Apply link filters after activateTransport() resets them for the new dataset.
+    function applyView(view) {
+        function setSelect(id, value, allowed) {
+            if (allowed.indexOf(value) === -1) return null;
+            var node = $(id); if (node) node.value = value;
+            return value;
+        }
+        if (view.cat && (state.data.categories || []).some(function (c) { return c.category === view.cat; })) {
+            state.cat = view.cat;
+        }
+        if (view.q) {
+            state.q = view.q.toLowerCase();
+            var sb = $('searchBox'); if (sb) sb.value = view.q;
+        }
+        state.dataFilter = setSelect('dataFilter', view.show, ['data', 'nodata']) || 'all';
+        state.sort = setSelect('sortBy', view.sort, ['size', 'path']) || 'cat';
+        var levelLbl = $('levelFilterLbl');
+        state.level = (levelLbl && !levelLbl.hidden && setSelect('levelFilter', view.level, ['roots', 'nested'])) || 'all';
+    }
+    function copyLink(btn) {
+        syncHash();
+        copyText(location.href, btn, 'Copy link');
+        track('full');
+    }
+    function copyShortLink(btn) {
+        copyText(shortLink(), btn, 'Copy short link');
+        track('short');
+    }
+    function track(kind) {
+        if (typeof window.__iosxeTrack !== 'function') return;
+        window.__iosxeTrack('device_data_link_copied', { kind: kind, method: state.transport, pid: state.pid,
+            path: selectedPath(), view: state.matrix ? 'matrix' : 'browse' });
+    }
+    function registerShortcuts() {
+        var SH = window.__SHORTCUTS = window.__SHORTCUTS || [];
+        SH.push({ keys: 'L', label: 'Copy a link to this view' });
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            var t = e.target || {};
+            if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || '')) return;
+            if (e.key === 'l' || e.key === 'L') { e.preventDefault(); copyLink($('copyLinkBtn')); }
+        });
+    }
+
     function init() {
         var search = $('searchBox');
         search.addEventListener('input', function () {
@@ -650,7 +857,13 @@
         buildTransportBar();
         var mt = $('matrixToggle');
         if (mt) mt.addEventListener('click', toggleMatrix);
-        loadTransport(TRANSPORTS[0].key, true);
+        var linkBtn = $('copyLinkBtn');
+        if (linkBtn) linkBtn.addEventListener('click', function () { copyLink(linkBtn); });
+        var shortBtn = $('copyShortLinkBtn');
+        if (shortBtn) shortBtn.addEventListener('click', function () { copyShortLink(shortBtn); });
+        registerShortcuts();
+        window.addEventListener('hashchange', function () { restoreFromHash(false); });
+        restoreFromHash(true);
     }
 
     function fetchJson(url) {
@@ -701,6 +914,8 @@
         var levelLbl = $('levelFilterLbl');
         if (levelLbl) levelLbl.hidden = !hasNested;
         if (!hasNested) { state.level = 'all'; var ls = $('levelFilter'); if (ls) ls.value = 'all'; }
+        var view = state.pendingView; state.pendingView = null;
+        if (view) applyView(view);
         var jump = state.jump; state.jump = null;
         var d0 = (state.data.devices || [])[0];
         state.pid = (jump && jump.pid && (state.data.devices || []).some(function (x) { return x.pid === jump.pid; }))
@@ -710,6 +925,7 @@
         renderSummary();
         render();
         if (jump) applyJump(jump);
+        if (state.pendingMatrix) { state.pendingMatrix = false; setMatrix(true); }
     }
     // Open the example payload for a module behind a matrix cell.
     function jumpToPayload(methodKey, xpath, pid) {
@@ -718,6 +934,7 @@
         loadTransport(methodKey, false);
     }
     function applyJump(jump) {
+        if (jump.link) { applyLinkJump(jump); return; }
         var term = jump.xpath || '';
         var container = term.split('/').pop().split(':').pop();
         var paths = devicePaths(state.pid);
@@ -737,6 +954,30 @@
             var sb = $('searchBox'); if (sb) sb.value = container;
             renderList(); updateSummary();
         }
+    }
+
+    // A shared link names an exact path (or a short code); keep its filters and fall back to a search.
+    function applyLinkJump(jump) {
+        var paths = devicePaths(state.pid);
+        var path = jump.code ? resolveShort(state.data.paths || [], state.pid, jump.code) : jump.path;
+        if (jump.module) {
+            var roots = paths.filter(function (p) { return splitPath(p.path).prefix === jump.module; })
+                .sort(function (a, b) { return a.path.length - b.path.length; });
+            path = roots.length ? roots[0].path : '';
+        }
+        if (path && paths.some(function (p) { return p.path === path; })) {
+            state.sel = state.pid + '|' + path;
+            renderList(); renderDetail();
+            var selRow = $('browser').querySelector('.prow.sel');
+            if (selRow && selRow.scrollIntoView) selRow.scrollIntoView({ block: 'center' });
+            return;
+        }
+        var wanted = jump.module || jump.code || jump.path || '';
+        var container = jump.module || wanted.split('/').pop().split(':').pop().split('=')[0];
+        if (!container) return;
+        state.q = container.toLowerCase();
+        var sb = $('searchBox'); if (sb) sb.value = container;
+        renderList(); updateSummary();
     }
 
     // ---------- comparison / coverage view ----------
@@ -779,7 +1020,7 @@
         });
         var mt = $('matrixToggle'); if (mt) mt.classList.toggle('active', on);
         if (on) { renderMatrix(); }
-        else { var db = $('deviceBar'); if (db) db.style.display = ''; }
+        else { var db = $('deviceBar'); if (db) db.style.display = ''; syncHash(); }
     }
     function toggleMatrix() { setMatrix(!state.matrix); }
 
@@ -803,6 +1044,7 @@
     }
 
     function renderMatrix() {
+        syncHash();
         var host = $('matrixWrap'); clear(host);
         if (!state.matrixData) {
             host.appendChild(el('div', { className: 'placeholder', text: 'Loading comparison matrix\u2026' }));
