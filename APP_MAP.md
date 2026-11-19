@@ -299,6 +299,10 @@ not repeated below.
   (Chart.js), and a per-path detail. MDT shows the streamed list **keys** and
   every captured instance's leaf values; RESTCONF lazily fetches and
   pretty-prints the GET response payload. Copy payload / Copy path on each detail.
+- **Share links**: the URL hash always mirrors the view (`#method=&device=&path=` plus
+  filters and matrix state); **Copy link** (shortcut `L`) and **Copy short link**
+  (`#go=<method>/<device>/<yang-prefix>:<shortest unique path suffix>`, resolved in the
+  browser, e.g. `#go=gnmi-sub/C9400/oc-if:interface/state/counters`).
 - **Data sources**: [telemetry-live-data.json](telemetry-live-data.json) (MDT,
   built by `scripts/mdt-telemetry/collector/build_live_dataset.py`) and
   [restconf-live-data.json](restconf-live-data.json) (RESTCONF index, built by
