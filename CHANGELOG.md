@@ -163,6 +163,17 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Fixed — gNMI Subscribe SAMPLE no longer reported as empty on large paths (2026-11-19)
+
+- The SAMPLE probe waited 4 s for the first update; large subtrees such as `openconfig:/interfaces`
+  (164 KB) and `openconfig:/components` take longer, so they showed `SAMPLE: accepted-nodata`
+  although the device streams them. The window is now 60 s (it returns on the first data), and
+  `gnmi_subscribe.py --resample` re-probes SAMPLE on paths where gNMI Get has data. Re-probed on
+  the five LAN devices: 47 of 51 now stream; the other 4 (`.../ipv4/neighbors/neighbor` on C9500
+  and C9600) are rejected by the device. SAMPLE only counts messages that carry values.
+- Device Data: hovering an ONCE / SAMPLE / ON_CHANGE badge explains the status.
+- Found while checking the Stack: C9300-STACK8-WAN runs IOS XE 26.2.1, not 26.1.1 (AGENTS.md 0.1).
+
 ### Changed — OpenConfig specs generated from the resolved YANG schema (2026-11-18)
 
 - **New generator** `generators/generate_openconfig_from_yang.py` (pyang, shared loader
