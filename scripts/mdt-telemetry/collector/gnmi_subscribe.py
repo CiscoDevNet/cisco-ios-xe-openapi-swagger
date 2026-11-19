@@ -29,6 +29,8 @@ from pygnmi.client import gNMIclient
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "output"
 SAMPLE_NS = 60_000_000_000  # 60s sample interval (dial-out style: first update is immediate)
+# Large subtrees (openconfig interfaces/components) take well over 4 s to build the first sample.
+SAMPLE_WINDOW = 60
 
 
 def _client(dev, env):
@@ -75,7 +77,7 @@ def probe_stream(gc, path, mode, window=4):
         try:
             for resp in gc.subscribe_stream(subscribe=sub):
                 r = resp if isinstance(resp, dict) else dict(resp)
-                if "update" in r:
+                if _once_has_data([r]):
                     out["st"] = "streamed"
                     return
         except Exception:  # noqa: BLE001
@@ -87,7 +89,7 @@ def probe_stream(gc, path, mode, window=4):
     return out["st"]
 
 
-def _probe_root(gc, path, timeout=20):
+def _probe_root(gc, path, timeout=SAMPLE_WINDOW + 40):
     """Run ONCE, then SAMPLE + ON_CHANGE (only where ONCE streamed data) in a worker
     thread with a hard timeout so one unresponsive path can't stall the fleet.
     Returns a dict, or None on timeout (caller must reset the client)."""
@@ -98,7 +100,7 @@ def _probe_root(gc, path, timeout=20):
             once_st, nbytes, payload = probe_once(gc, path)
             result.update(once=once_st, bytes=nbytes, payload=payload)
             if once_st == "streamed":
-                result["sample"] = probe_stream(gc, path, "sample")
+                result["sample"] = probe_stream(gc, path, "sample", window=SAMPLE_WINDOW)
                 result["onchange"] = probe_stream(gc, path, "on_change")
             else:  # empty/rejected/unsupported -> the stream modes match ONCE
                 result["sample"] = once_st
@@ -209,15 +211,55 @@ def collect_device(dev, env, targets, limit, out_path=None, supported=None):
     return {"pid": dev["pid"], "host": dev["host"], "entries": entries}
 
 
+def resample_device(dev, env, window):
+    """Re-probe SAMPLE, independent of ONCE, on every path where gNMI Get returned data but SAMPLE
+    did not stream (the 4 s window is too short for large subtrees). Updates gnmi-sub-<PID>.json."""
+    sub_file = OUT / f"gnmi-sub-{dev['pid']}.json"
+    get_doc = json.loads((OUT / f"gnmi-{dev['pid']}.json").read_text(encoding="utf-8"))
+    get_data = {e["gnmi_path"] for e in get_doc["entries"] if e.get("op") == "all" and e.get("status") == "data"}
+    doc = json.loads(sub_file.read_text(encoding="utf-8"))
+    todo = [e for e in doc["entries"] if e.get("gnmi_path") in get_data and e.get("sample") != "streamed"]
+    print(f"  {dev['pid']}: re-probing SAMPLE on {len(todo)} paths ({window}s window)", flush=True)
+    gc = _client(dev, env)
+    changed = 0
+    for i, entry in enumerate(todo, 1):
+        status = probe_stream(gc, entry["gnmi_path"], "sample", window=window)
+        if status != entry.get("sample"):
+            changed += 1
+        entry["sample"] = status
+        if i % 5 == 0 or status == "rejected":
+            try:
+                gc.close()  # releases abandoned stream subscriptions
+            except Exception:  # noqa: BLE001
+                pass
+            gc = _client(dev, env)
+            sub_file.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+            print(f"    ...{i}/{len(todo)} ({changed} changed)", flush=True)
+    try:
+        gc.close()
+    except Exception:  # noqa: BLE001
+        pass
+    sub_file.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+    streamed = sum(1 for e in todo if e["sample"] == "streamed")
+    print(f"  {dev['pid']}: SAMPLE now streams on {streamed}/{len(todo)} re-probed paths", flush=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--device")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--resample", action="store_true",
+                    help="only re-probe SAMPLE where Get has data but SAMPLE did not stream")
+    ap.add_argument("--window", type=int, default=SAMPLE_WINDOW, help="SAMPLE wait in seconds for --resample")
     args = ap.parse_args()
     env = load_env()
     if not args.all and not args.device:
         raise SystemExit("Specify --device <pid> or --all")
+    if args.resample:
+        for dev in load_devices([args.device] if args.device else None):
+            resample_device(dev, env, args.window)
+        return 0
     targets = build_targets(load_roots(), load_openconfig_nodes())  # same set as gNMI Get so gaps are visible
     for dev in load_devices([args.device] if args.device else None):
         print(f"\n=== gNMI Subscribe {dev['pid']} ({dev['host']}) ===")

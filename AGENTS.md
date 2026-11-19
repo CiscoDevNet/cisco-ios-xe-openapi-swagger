@@ -33,8 +33,10 @@ Update this list when an item is answered or finished; move answers to "Settled"
 **In progress**
 - None. gNMI OpenConfig expansion (memory/device-harness/0007) and the pyang-based OpenConfig specs
   (memory/versioning/0004) landed 2026-11-18.
-- Open finding: on C9300-STACK8-WAN, gNMI Subscribe ONCE returns empty updates for paths where Get
-  returns data (74 streamed vs 292 Get paths); a gNMI restart did not help. Not investigated further.
+- Open finding: on C9300-STACK8-WAN, gNMI Subscribe ONCE and SAMPLE return empty updates for paths
+  where Get returns data (74 ONCE streamed vs 292 Get paths); a gNMI restart did not help.
+  **The Stack runs IOS XE 26.2.1** (checked 2026-11-19; the other six run 26.1.1), yet its data is
+  published under `device_data` 26.1.1. User 2026-11-19: leave it as is until the lab moves to 26.2.1.
 
 **Waiting on the user (not answered yet)**
 1. **Lab upgrade to 26.2.1**, then re-collect per VERSIONING.md 8.2. The user mentioned "8 or so

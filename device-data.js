@@ -446,10 +446,18 @@
         }
         panel.appendChild(body);
     }
+    var MODE_STATUS_HELP = {
+        'streamed': 'The device accepted this subscription mode and sent data.',
+        'accepted-nodata': 'The device accepted this subscription mode but sent no data within the probe window (often nothing configured, or no change for ON_CHANGE).',
+        'rejected': 'The device rejected this subscription mode for this path.',
+        'timeout': 'The probe timed out before the device answered.',
+        'unsupported': 'Not served over this protocol.'
+    };
     function subscribeModes(p) {
         function badge(name, st) {
             var cls = st === 'streamed' ? 'ok' : (st === 'accepted-nodata' ? 'warn' : 'no');
-            return el('span', { className: 'modebadge mb-' + cls, text: name + ': ' + (st || 'n/a') });
+            return el('span', { className: 'modebadge mb-' + cls, text: name + ': ' + (st || 'n/a'),
+                title: MODE_STATUS_HELP[st] || '' });
         }
         var kids = [];
         if (p.periodic != null) kids.push(badge('PERIODIC', p.periodic));
