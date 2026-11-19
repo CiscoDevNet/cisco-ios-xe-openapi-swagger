@@ -54,6 +54,10 @@ Update this list when an item is answered or finished; move answers to "Settled"
 7. **Deprecation follow-ups** (offered 2026-11-18): a "Deprecations" link in every Swagger
    viewer (only the MIB card links today), and marking flagged operations/fields
    `deprecated: true` in the generated OpenAPI specs so Swagger UI greys them out.
+8. **Example request bodies** (found 2026-11-19): write examples in the generated specs use
+   placeholders (`"name": "example-1"`, `"type": "default"`) a device would reject on PUT. Shared
+   by the cfg/native/OpenConfig generators (`generate_cfg_from_tree.example_for_type`). Live device
+   values (gNMI/RESTCONF captures) could seed realistic examples.
 
 **Deferred by the user**
 - Native example overlay and CLI mappings (`references/native-example-overlay.yaml`,
