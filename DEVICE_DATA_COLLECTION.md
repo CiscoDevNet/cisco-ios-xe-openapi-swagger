@@ -188,11 +188,16 @@ Optional: a small offline HTML/JSON report to browse results.
 
 ## 6. Sanitization / safety (repo is PUBLIC - CiscoDevNet)
 - Raw captures stay LOCAL and GITIGNORED. Nothing device-real is committed until scrubbed + reviewed.
-- Redaction level chosen: LIGHT (strip obvious secrets/keys - passwords, community strings,
-  certs, private keys, tokens). IPs/serials/MACs/hostnames kept (lab data) UNLESS the data
-  classification says otherwise (confirm before committing anything).
-- Add a tests/ secret-scan guard over any committed scrubbed capture (regex for
-  BEGIN PRIVATE KEY, password/secret fields, SNMP community, etc.).
+- Redaction (revised 2026-11-21 after GitGuardian incident 3498322, memory/device-harness/0008):
+  strip every secret — passwords and secrets of any encryption type (0/5/6/7/8/9), crypt
+  hashes, keys, PSKs, SNMP communities and SNMPv3 auth/priv, certs/private keys, tokens —
+  plus usernames tied to credentials (local users, AP management users, SNMPv3 users), by
+  leaf name, by value pattern and in CLI text, with the fixed token `***REDACTED***`.
+  IPs/serials/MACs/hostnames are kept (lab data). One shared rule set:
+  `scripts/mdt-telemetry/collector/redact_payload.py`.
+- Secret gates: `tests/test_dataset_secrets.py` (published device data, including payloads
+  embedded as strings) and `tests/test_repo_secrets.py` (every tracked text file: crypt
+  hashes, private keys, typed CLI secrets, and hashes of previously leaked values).
 - Creds only from env/gitignored files; never in outputs.
 - GET-only guard enforced in code for this phase.
 
@@ -677,6 +682,7 @@ sha256sum -c SHA256SUMS && ./setup.sh
   of those that streamed; cfg 77–127 of 522 and 101/101; oper ~820 of 3,198 and 94–100% on
   switches (C9800 39%: wireless-only modules). Kits ship the fleet history as
   `fleet-walk-<flavor>.json`. Why: memory/device-harness/0006.
-- **Secret masking:** every published dataset is masked at build time (`redact_payload.py`,
-  `harness/redact.py`), including SNMP communities in CLI text and `community-config` list
-  names; `tests/test_dataset_secrets.py` must pass before committing device data.
+- **Secret masking:** every published dataset is masked at build time with the shared rules
+  (`redact_payload.py`, used by `harness/redact.py`), re-scrubbed by
+  `scripts/scrub_published_data.py`, and gated by `tests/test_dataset_secrets.py` and
+  `tests/test_repo_secrets.py` (§6), which must pass before committing device data.

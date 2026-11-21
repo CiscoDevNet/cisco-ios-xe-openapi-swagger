@@ -163,6 +163,25 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Security — credentials removed from published data and history (2026-11-21)
+
+- **GitGuardian incident 3498322** (username/password in an old `netconf-getconfig-live-data.json`):
+  a full review found past commits had published lab credentials (plaintext, type 7, type 9 and
+  type 5 hashes, the TACACS+ key, SNMP communities). All were rotated; both repositories'
+  history was rewritten to remove them; clones made before 2026-11-21 must be re-cloned.
+- **One shared redaction rule set** (`scripts/mdt-telemetry/collector/redact_payload.py`, now
+  also behind `scripts/harness/redact.py`): normalised leaf names (telemetry path-joined keys,
+  `_` names, module prefixes), secret containers (`password/text`, `key/key`, `user-mgmt/*`),
+  crypt hashes, PEM blocks, more CLI forms (NTP, SNMPv3 auth/priv, SNMP hosts, WPA PSK, IKE,
+  type 6 master key, HSRP) and usernames tied to credentials, all as `***REDACTED***`.
+- **`scripts/scrub_published_data.py`** re-scrubs every published device-data file (25 files
+  changed: credential usernames and one TACACS+ key). The embedded coverage report and real
+  values in test fixtures were removed; example passwords became `<password>`.
+- **Gates:** `tests/test_dataset_secrets.py` decodes payloads embedded as strings and checks
+  every published file is fully scrubbed; new `tests/test_repo_secrets.py` scans every tracked
+  text file (crypt hashes, private keys, typed CLI secrets, SHA-256 of leaked values);
+  `tests/test_redaction_rules.py` pins each rule. Decision: memory/device-harness/0008.
+
 ### Added — shareable links on Device Data (2026-11-19)
 
 - The URL now follows the view: method, device, selected path, list filters (flavor, search,

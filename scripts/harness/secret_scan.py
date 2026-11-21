@@ -7,7 +7,14 @@ files) and reusable as a pre-commit check.
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
+
+_COLLECTOR = Path(__file__).resolve().parents[1] / "mdt-telemetry" / "collector"
+if str(_COLLECTOR) not in sys.path:
+    sys.path.insert(0, str(_COLLECTOR))
+
+import redact_payload as _rules  # noqa: E402
 
 # (label, pattern) pairs. Patterns intentionally target real secret material,
 # not lab identifiers (IPs/MACs/serials/hostnames are allowed per §6).
@@ -28,11 +35,16 @@ _PATTERNS: list[tuple[str, re.Pattern]] = [
 
 
 def find_secrets(text: str) -> list[tuple[str, str]]:
-    """Return a list of (label, matched_snippet) for any secret found in ``text``."""
+    """Return (label, snippet-or-location) for any secret found in ``text``.
+
+    The regexes above catch obvious leaves; the shared redaction rules
+    (redact_payload.scan_text) add path-joined, nested, CLI and crypt-hash forms.
+    """
     hits: list[tuple[str, str]] = []
     for label, pat in _PATTERNS:
         for m in pat.finditer(text):
             hits.append((label, m.group(0)[:80]))
+    hits.extend(_rules.scan_text(text))
     return hits
 
 

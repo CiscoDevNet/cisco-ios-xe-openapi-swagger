@@ -320,7 +320,7 @@ class RPCYANGToOpenAPIConverter:
             if 'user' in name_lower or 'username' in name_lower:
                 return "admin"
             if 'password' in name_lower or 'secret' in name_lower:
-                return "***REDACTED***!"
+                return "<password>"
             
             # Hostname
             if 'host' in name_lower:

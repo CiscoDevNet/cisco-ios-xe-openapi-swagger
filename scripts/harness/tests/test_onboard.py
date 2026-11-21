@@ -9,7 +9,7 @@ service internal
 aaa new-model
 aaa authentication login default local
 aaa authorization exec default local
-username harness privilege 15 secret 9 $9$abc
+username harness privilege 15 secret 9 $9$FAKEfakeFAKEfake$FAKEhashFAKEhash
 crypto pki trustpoint TP-self-signed-123
 ip http authentication local
 ip http secure-server
@@ -35,14 +35,14 @@ def by_name(steps):
 
 
 def test_ready_device_needs_nothing():
-    steps = by_name(plan(READY, "harness", "pw", snmp_community="ro-comm"))
+    steps = by_name(plan(READY, "harness", "FAKEpw", snmp_community="ro-comm"))
     assert {n: s.status for n, s in steps.items()} == {
         "aaa": "ok", "https": "ok", "restconf": "ok", "netconf": "ok", "gnmi": "ok", "snmp": "ok"}
 
 
 def test_fresh_device_gets_full_plan_with_user_before_aaa():
-    steps = by_name(plan(FRESH, "harness", "pw"))
-    assert steps["aaa"].lines[0] == "username harness privilege 15 secret 0 pw"
+    steps = by_name(plan(FRESH, "harness", "FAKEpw"))
+    assert steps["aaa"].lines[0] == "username harness privilege 15 secret 0 FAKEpw"
     assert steps["aaa"].lines[1:] == ["aaa new-model", "aaa authentication login default local",
                                       "aaa authorization exec default local"]
     assert steps["https"].lines == ["ip http secure-server", "ip http authentication local"]
@@ -53,7 +53,7 @@ def test_fresh_device_gets_full_plan_with_user_before_aaa():
 
 def test_existing_tacacs_aaa_is_never_modified():
     config = "aaa new-model\naaa authentication login default group tacacs+ local\n"
-    steps = by_name(plan(config, "harness", "pw"))
+    steps = by_name(plan(config, "harness", "FAKEpw"))
     assert steps["aaa"].status == "manual" and not steps["aaa"].lines
     assert "aaa authorization exec default" in steps["aaa"].note
     assert steps["https"].lines == ["ip http secure-server", "ip http authentication aaa"]
@@ -62,7 +62,7 @@ def test_existing_tacacs_aaa_is_never_modified():
 def test_existing_complete_tacacs_aaa_uses_aaa_http_auth():
     config = ("aaa new-model\naaa authentication login default group tacacs+ local\n"
               "aaa authorization exec default group tacacs+ local\n")
-    steps = by_name(plan(config, "harness", "pw"))
+    steps = by_name(plan(config, "harness", "FAKEpw"))
     assert steps["aaa"].status == "ok"
     assert "ip http authentication aaa" in steps["https"].lines
     assert "user" not in steps
@@ -70,25 +70,25 @@ def test_existing_complete_tacacs_aaa_uses_aaa_http_auth():
 
 def test_local_aaa_without_harness_user_is_flagged():
     config = "aaa new-model\naaa authentication login default local\naaa authorization exec default local\n"
-    steps = by_name(plan(config, "harness", "pw"))
+    steps = by_name(plan(config, "harness", "FAKEpw"))
     assert steps["user"].status == "manual"
 
 
 def test_existing_trustpoint_used_for_gnmi():
     config = READY.replace("gnxi secure-server\n", "")
-    steps = by_name(plan(config, "harness", "pw"))
+    steps = by_name(plan(config, "harness", "FAKEpw"))
     assert "gnxi secure-trustpoint TP-self-signed-123" in steps["gnmi"].lines
     assert "service internal" not in steps["gnmi"].lines
 
 
 def test_snmp_bridge_adds_only_missing_lines():
     config = READY.replace("snmp ifmib ifindex persist\n", "")
-    steps = by_name(plan(config, "harness", "pw", snmp_community="ro-comm"))
+    steps = by_name(plan(config, "harness", "FAKEpw", snmp_community="ro-comm"))
     assert steps["snmp"].lines == ["snmp ifmib ifindex persist"]
 
 
 def test_mask_hides_secrets():
-    assert mask("username harness privilege 15 secret 0 pw") == "username harness privilege 15 secret 0 <masked>"
+    assert mask("username harness privilege 15 secret 0 FAKEpw") == "username harness privilege 15 secret 0 <masked>"
     assert mask("snmp-server community ro-comm RO") == "snmp-server community <masked> RO"
     assert mask("netconf-yang cisco-ia snmp-community-string ro-comm") == \
         "netconf-yang cisco-ia snmp-community-string <masked>"
@@ -125,7 +125,7 @@ def _run(monkeypatch, tmp_path, config, login_ok=True, apply=True, save=False):
     monkeypatch.setattr(onboard, "_login_ok", lambda dev, auth: login_ok)
     monkeypatch.setattr(onboard, "_wait_ready", lambda dev, seconds=120: {"restconf:443": True})
     dev = inv.Device(name="lab", host="192.0.2.1")
-    report = onboard.onboard_device(dev, ("harness", "pw"), apply, save, None, None, tmp_path)
+    report = onboard.onboard_device(dev, ("harness", "FAKEpw"), apply, save, None, None, tmp_path)
     return conn, report
 
 
@@ -138,9 +138,9 @@ def test_dry_run_pushes_nothing(monkeypatch, tmp_path):
 def test_apply_backs_up_then_pushes_in_order(monkeypatch, tmp_path):
     conn, report = _run(monkeypatch, tmp_path, FRESH + "crypto pki trustpoint TP-self-signed-9\n", save=True)
     assert (tmp_path / report["backup"].split("/")[-1]).read_text() .startswith("hostname NEW")
-    assert [p[0] for p in conn.pushed][:2] == ["username harness privilege 15 secret 0 pw", "ip http secure-server"]
+    assert [p[0] for p in conn.pushed][:2] == ["username harness privilege 15 secret 0 FAKEpw", "ip http secure-server"]
     assert any("gnxi secure-trustpoint TP-self-signed-9" in p for p in conn.pushed)
-    assert conn.saved and "pw" not in str(report["applied"])
+    assert conn.saved and "FAKEpw" not in str(report["applied"])
 
 
 def test_aaa_lockout_is_rolled_back(monkeypatch, tmp_path):

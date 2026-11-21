@@ -161,7 +161,7 @@ def test_redaction_masks_secrets_keeps_lab_ids():
         "hostname": "sw1",
         "mgmt-ip": "10.1.1.1",
         "mac": "00:11:22:33:44:55",
-        "password": "***REDACTED***",
+        "password": "FAKEpass123",
         "snmp": {"community": "public"},
         "cert": "-----BEGIN CERTIFICATE-----abc-----END CERTIFICATE-----",
     }
@@ -185,7 +185,7 @@ def test_redaction_masks_bare_auth_keys_incl_module_prefix():
     # radius/tacacs server "key" and routing-auth "md5" have leaf names that do
     # NOT contain "password"/"secret"; RESTCONF also module-qualifies them.
     payload = {
-        "Cisco-IOS-XE-aaa:key": "***REDACTED***",       # tacacs key (prefixed)
+        "Cisco-IOS-XE-aaa:key": "FAKE7KEY0000",       # tacacs key (prefixed)
         "key": {"encryption": "7", "key": "0812"},    # whole container is suspect
         "md5": "0300abcd",                            # ospf/bgp message digest
         "key-id": 7,                                  # benign -> kept
@@ -193,18 +193,18 @@ def test_redaction_masks_bare_auth_keys_incl_module_prefix():
     }
     out = redact.redact(payload)
     assert out["Cisco-IOS-XE-aaa:key"] == redact.REDACTED
-    # a container named "key" is fully redacted (all content is suspect)
-    assert out["key"] == redact.REDACTED
+    # a container named "key": the secret leaf is masked, the encryption type is kept
+    assert out["key"] == {"encryption": "7", "key": redact.REDACTED}
     assert out["md5"] == redact.REDACTED
     assert out["key-id"] == 7                          # kept
     assert out["public-key"] == "AAAA"                # kept
 
 
 def test_secret_scan_flags_bare_auth_key():
-    dirty = json.dumps({"Cisco-IOS-XE-aaa:key": "***REDACTED***"})
+    dirty = json.dumps({"Cisco-IOS-XE-aaa:key": "FAKE7KEY0000"})
     assert secret_scan.find_secrets(dirty)
     assert not secret_scan.find_secrets('{"key-id": 7, "public-key": "AAAA"}')
-    clean = json.dumps(redact.redact({"Cisco-IOS-XE-aaa:key": "***REDACTED***"}))
+    clean = json.dumps(redact.redact({"Cisco-IOS-XE-aaa:key": "FAKE7KEY0000"}))
     assert not secret_scan.find_secrets(clean)
 
 
@@ -572,7 +572,7 @@ def test_build_live_index_writes_per_path_files_and_redacts(tmp_path, monkeypatc
                     "os_version": version,
                     "fetched_at": "2026-01-01T00:00:00Z",
                     "http_status": 200,
-                    "value": {"Cisco-IOS-XE-aaa:key": "***REDACTED***"},
+                    "value": {"Cisco-IOS-XE-aaa:key": "FAKE7KEY0000"},
                 },
             },
         }],

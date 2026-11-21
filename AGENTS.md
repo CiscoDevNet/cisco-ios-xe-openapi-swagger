@@ -31,7 +31,7 @@ If a request conflicts with these docs, prefer updating the doc first (with rati
 Update this list when an item is answered or finished; move answers to "Settled".
 
 **In progress**
-- None. gNMI OpenConfig expansion (memory/device-harness/0007) and the pyang-based OpenConfig specs
+- None. gNMI OpenConfig expansion (memory/device-harness/0008) and the pyang-based OpenConfig specs
   (memory/versioning/0004) landed 2026-11-18.
 - Open finding: on C9300-STACK8-WAN, gNMI Subscribe ONCE and SAMPLE return empty updates for paths
   where Get returns data (74 ONCE streamed vs 292 Get paths); a gNMI restart did not help.
@@ -70,7 +70,7 @@ Update this list when an item is answered or finished; move answers to "Settled"
 - C9200L is excluded from gNMI collection (gnmib crashes under load; user 2026-11-18: "just
   ignore the C9200L if it's being problematic"). Its other methods are unaffected.
 - "Data" means at least one leaf value: gNMI `{}` updates and NETCONF empty skeletons are
-  "empty" (memory/device-harness/0007).
+  "empty" (memory/device-harness/0008).
 - OpenConfig specs: one per module with top-level data, generated from pyang with augments; no
   specs for grouping/augment-only modules (memory/versioning/0004).
 - Hosted releases: 26.2.1, 26.1.1, 17.18.1. 17.9.x / 17.12.x / 17.15.x were retired 2026-11-17
@@ -79,8 +79,10 @@ Update this list when an item is answered or finished; move answers to "Settled"
   nodes by default. Counts must come from `scripts/build_deprecations.py`, never from grep
   (memory/versioning/0003).
 - Default release is always the newest (26.2.1 now); device data follows `device_data`.
-- Lab password and SNMP community in public data/history: not a concern; no rotation or history
-  rewrite (memory/device-harness/0005). Masking of published data stays mandatory.
+- Published device data must contain no secrets, hashes or credential usernames; a 2026-11-21
+  GitGuardian incident (3498322) reversed the earlier "lab credentials are not sensitive" call:
+  credentials were rotated and both repos' history was rewritten (memory/device-harness/0008).
+  Any new leak = rotate first, then scrub HEAD and history.
 - Agents may change running-config and `write memory` on all lab devices.
 - Harness: plain venv folder, Telegraf as MDT receiver, `onboard` may enable AAA/APIs/SNMP.
 - Duplicate `native-services-1/2/3` specs: removed from all releases.
@@ -263,7 +265,7 @@ python scripts/smoke_live.py --base-url https://example.com/staging
 ### Validate examples against a live device
 
 ```powershell
-python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --password ***REDACTED*** --patch-only --dry-run
+python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --password <password> --patch-only --dry-run
 ```
 
 ### Live Data harness — real captured device data (see DEVICE_DATA_COLLECTION.md)
@@ -273,14 +275,14 @@ python scripts/validate_examples_c9kv.py --host 10.1.1.1 --username admin --pass
 - **Lean-spec architecture:** response bodies are **NOT** injected into the OpenAPI specs (keeps them fast). They are served as per-path files: `releases/<ver>/live-data/<category>/<module>/<sha1[:16]>.json`, indexed by `releases/<ver>/live-examples-index.json` (nav + coverage, no bodies) + a tiny `live-modules.json` (viewer banner).
 - **Rebuild:** `python scripts/refresh_live_data.py --version 26.1.1 [--capture]` — `--capture` re-collects from devices; without it, just rebuilds the index/data-files from the local (gitignored) sidecar `references/live-examples-<ver>.json`.
 - **Completeness check:** `python -X utf8 -m scripts.harness.depth_probe --device <PID> --discover --category oper` answers "does a deeper keyed GET return more than the parent?" (has a circuit breaker + `KNOWN_UNSAFE_MODULES` skip). Full fleet sweep found root GETs are complete; exhaustive per-path GET already captures containers the root omits.
-- **Secrets:** `scripts/harness/redact.py` masks secrets (incl. bare `key`/`md5`, module-prefixed) before anything is written; a test scans published live-data. `inventory.json`, `.env`, `captures/` are **gitignored** — never commit real device creds/captures.
+- **Secrets:** one rule set, `scripts/mdt-telemetry/collector/redact_payload.py`, used by `scripts/harness/redact.py` (capture time), every dataset builder, and `scripts/scrub_published_data.py` (publish-time re-scrub of all device data; `--check` in CI). It masks secret leaves (module-prefixed, telemetry path-joined, `_` names, nested `password/text`), crypt hashes ($1$/$5$/$6$/$8$/$9$/$14$), CLI secrets of every type, SNMP communities and credential usernames with the fixed `***REDACTED***`. `tests/test_dataset_secrets.py` scans the datasets and `tests/test_repo_secrets.py` every tracked text file. `inventory.json`, `.env`, `captures/` are **gitignored** — never commit real device creds/captures, and never paste device output into docs, tests or fixtures (use `FAKE` values).
 - **Stage files explicitly** (`git add <paths>` / `git add -p`); NEVER `git add -A` — device captures and local WIP live in the working tree.
 - **Write path:** `scripts/harness/crud.py` is the ONLY module allowed to send non-GET requests (dry-run by default, refuses devices without `writable: true` in inventory, backs up before apply, `--rollback`). `scripts/harness/device_readiness.py` is a read-only multi-plane probe. Offline safety tests: `scripts/harness/tests/test_crud.py`.
 - **`live-modules.json` drift:** rebuild the viewer-banner summary from the committed index with `python scripts/build_live_examples_index.py --version <ver> --summary-only` (never a full sidecar rebuild just for this — it drops folded collector roots). Guarded by `tests/test_live_modules_consistency.py`.
 
 **Device access + feature enablement (see DEVICE_FEATURE_COVERAGE.md):**
 
-- **6 collection devices (all creds in `.env`, admin/admin lab):** `.70` C9300-24UX (hub) · `.71` C9400 · `.72` C9200L · `.75` C9600 · `.83` C9840 WLC · `.95` C9500. The rest of the rack (TOR `.65`, vnc2-leaf/spine/border, c9350, consoles) is **not ours** — many are Meraki-managed / a **live EVPN fabric**; NEVER CLI-configure them.
+- **6 collection devices (all creds in the gitignored `.env`; never write credentials in docs):** `.70` C9300-24UX (hub) · `.71` C9400 · `.72` C9200L · `.75` C9600 · `.83` C9840 WLC · `.95` C9500. The rest of the rack (TOR `.65`, vnc2-leaf/spine/border, c9350, consoles) is **not ours** — many are Meraki-managed / a **live EVPN fabric**; NEVER CLI-configure them.
 - **~626 of 937 modules return 404 = unconfigured features.** To collect more, enable features on the 6 (DEVICE_FEATURE_COVERAGE.md is the multi-pass plan). Phase 0 (SNMP→MIB bridge) + Phase 1 routing (OSPF fleet-wide; ISIS/EIGRP/BGP on the 4 switches) are **applied + saved**; live-data not yet re-collected.
 - **Platform limits (verified):** **C9200L** has no routing/loopback; **C9840 WLC** is **OSPF-only** (rejects `router isis/eigrp/bgp`) and its CLI is netmiko-hostile — use an interactive `sshpass ssh` (legacy KEX/host-key algos) for it.
 - **Management is shared-fate:** the C9300 hub bridges the `10.85.134.0/24` mgmt for C9500/C9600; the `/24` also hosts the TOR + both console servers. **Breaking the mgmt VLAN/hub-mgmt-ports = no remote recovery.** Keep feature config on **loopbacks/leaf ports**; console lines are in the VNC2 Lab Matrix ("Serial Port" col, e.g. C9840=2019).
@@ -299,7 +301,7 @@ Builders (in `scripts/mdt-telemetry/collector/`, plus `scripts/build_restconf_da
   - **File-scheme rule (do not reintroduce the old bug):** per-path body files are named `sha1(PATH)`, **never** `sha1(value)`. The index path-entry carries a single `file` for all PIDs, so a value-hash (one-file-per-value) layout cannot represent a path whose devices return different bodies — the flatten would collapse them onto one file.
 - **NETCONF / gNMI** datasets are built by `build_netconf_dataset.py` / `build_gnmi_dataset.py` from the **gitignored** OUT captures (`output/{netconf,gnmi}-<PID>.json`), inlining each body capped at 40K.
   - **NETCONF config subscription (periodic + on-change).** `netconf_subscribe.py --config-roots --both` probes each config root (categories `native-config`+`cfg`) with BOTH triggers — **periodic** (`<yp:period>`) and **on-change** (`<yp:dampening-period>`) — writing `output/netconf-sub-config-<PID>.json` (each entry `mode`-tagged, kept separate from the full periodic `netconf-sub-<PID>.json`). On IOS-XE 26.1.1 only `/ios:native` accepts **on-change** (all 7 devices — it streams the full running config on sync-on-start); granular `*-cfg` roots reject on-change (`notif-bis:error-no-such-option`) and are covered by **periodic** (7-11 roots/switch, 37 on the C9800). `build_netconf_dataset.build_sub_config()` pivots the two mode-entries per `(pid,xpath)` into ONE path carrying `periodic`+`onchange` status (mirrors gNMI-sub's `once`/`sample`/`onchange`) -> `netconf-sub-config-live-data.json`; `build_protocol_matrix.py` adds a `netconf-sub-config` method. **Glob rule:** the periodic `build_sub()` and the matrix `netconf-sub` loop MUST skip `netconf-sub-config-*` files (`if "netconf-sub-config-" in f: continue`) or the config captures pollute the periodic method/dataset.
-- **Payload redaction:** `redact_payload.py` (masks PEM + XML `<tag>` + JSON `"key"`, strips the module prefix) is folded into the NETCONF/gNMI builders; RESTCONF bodies are redacted before write (harness `redact.py` for walked paths, `redact_payload` for collector roots). `tests/test_dataset_secrets.py` scans the 10 repo-root datasets + `protocol-matrix.json` — run it before committing any rebuilt dataset.
+- **Payload redaction:** `redact_payload.py` (the shared rule set above) is folded into the NETCONF/gNMI/MDT builders; RESTCONF bodies are redacted before write. Run `python scripts/scrub_published_data.py` and `tests/test_dataset_secrets.py` before committing any rebuilt dataset.
 
 **Ownership boundary:** `telemetry-live-data.json` and `scripts/mdt-telemetry/` (incl. its own [scripts/mdt-telemetry/docs/AGENTS.md](scripts/mdt-telemetry/docs/AGENTS.md)) belong to the MDT telemetry effort; the former `telemetry-data.{html,js}` page was merged into `device-data.html`. Stage files explicitly; **never `git add -A`**.
 

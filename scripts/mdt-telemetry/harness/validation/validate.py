@@ -10,10 +10,10 @@ Connects to a Catalyst 9300 via RESTCONF to:
 5. Generate a validation report
 
 Usage:
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED***
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sub 1001
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --check-only
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sample-only
+  python validate.py --host 10.1.1.1 --user admin --pass <password>
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --sub 1001
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --check-only
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --sample-only
 
 Requirements:
   pip install requests pyyaml urllib3
@@ -426,19 +426,19 @@ def main():
         epilog="""
 Examples:
   # Validate all subscriptions (push + check + sample)
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED***
+  python validate.py --host 10.1.1.1 --user admin --pass <password>
 
   # Validate specific subscriptions only
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sub 1001 1007 1005
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --sub 1001 1007 1005
 
   # Only check subscription state (no push, no data sample)
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --check-only
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --check-only
 
   # Only sample operational data (no push, no state check)
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sample-only
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --sample-only
 
   # Override receiver IP/port
-  python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --receiver-ip 10.1.1.3 --receiver-port 57500
+  python validate.py --host 10.1.1.1 --user admin --pass <password> --receiver-ip 10.1.1.3 --receiver-port 57500
         """,
     )
     parser.add_argument("--host", required=True, help="Switch IP or hostname")

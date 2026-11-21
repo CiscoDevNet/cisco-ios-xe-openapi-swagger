@@ -1,6 +1,6 @@
 # 0005 — Mask secrets by content; lab credentials are not treated as sensitive
 
-- Status: accepted
+- Status: superseded-by 0008
 - Date: 2026-10-04
 - Component: device-harness
 - Commit/PR: 276c221e1

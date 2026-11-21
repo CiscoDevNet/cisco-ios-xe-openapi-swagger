@@ -39,16 +39,16 @@ python generate_ios_config.py --receiver-ip 10.1.1.3 --out c9300-mdt.cfg
 
 ```bash
 # Full validation: push subscriptions, check state, sample data
-python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED***
+python validate.py --host 10.1.1.1 --user admin --pass <password>
 
 # Just sample operational data (don't push subscriptions)
-python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sample-only
+python validate.py --host 10.1.1.1 --user admin --pass <password> --sample-only
 
 # Just check subscription state (already pushed)
-python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --check-only
+python validate.py --host 10.1.1.1 --user admin --pass <password> --check-only
 
 # Validate specific subscriptions only
-python validate.py --host 10.1.1.1 --user admin --pass ***REDACTED*** --sub 1001 1005 1007
+python validate.py --host 10.1.1.1 --user admin --pass <password> --sub 1001 1005 1007
 ```
 
 ### 3. Generate a summary report

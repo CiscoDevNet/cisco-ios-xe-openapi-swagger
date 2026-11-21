@@ -24,9 +24,9 @@ up more models, so a re-collection captures the most data for every API.
 - Already enabled (verified): the **SNMP → RESTCONF MIB bridge**, which unlocked
   the `swagger-mib-model` data. Applied per device via netmiko:
   ```
-  snmp-server community ***REDACTED*** RO
+  snmp-server community <community> RO
   snmp ifmib ifindex persist
-  netconf-yang cisco-ia snmp-community-string ***REDACTED***
+  netconf-yang cisco-ia snmp-community-string <community>
   ```
 
 ## Two buckets of uncaptured modules

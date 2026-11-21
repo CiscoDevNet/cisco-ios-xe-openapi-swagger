@@ -76,3 +76,12 @@ def test_gnmi_dataset_file_refs_exist():
             if row.get("status") == "data" and not (REPO / row.get("file", "")).is_file():
                 missing.append((name, row.get("pid"), row.get("path")))
     assert not missing, f"{len(missing)} gNMI rows without a payload file: {missing[:5]}"
+
+
+def test_published_device_data_is_fully_scrubbed():
+    """Every file scripts/scrub_published_data.py covers is already scrubbed (it would change nothing)."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    import scrub_published_data as scrub  # noqa: E402
+
+    dirty = [f.relative_to(REPO).as_posix() for f in scrub.published_files() if scrub.scrub(f, check=True)]
+    assert not dirty, f"run python scripts/scrub_published_data.py: {dirty[:10]}"
