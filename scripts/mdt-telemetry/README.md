@@ -24,7 +24,7 @@ Catalyst 9300  ──gRPC dial-out──▶  OTel Collector  ──HEC──▶ 
 
 | Folder | Contents |
 |--------|----------|
-| `captures/` | 55 real telemetry capture files (`.txt`) from two live C9300 switches, plus an index (`README.md`). Authoritative source for exact metric field names and dimensions. |
+| `captures/` | Local only, gitignored: raw telemetry capture files (`.txt`) from two live C9300 switches plus an index. Raw device captures are never committed (memory/device-harness/0008). |
 | `harness/validation/` | The core harness. `subscriptions.yaml` (single source of truth), `validate.py` (RESTCONF validator), `generate_ios_config.py` (IOS XE CLI generator), `report.py`, and prior run output under `results/`. |
 | `harness/device-scripts/` | Device-facing helpers: `run_cli_commands.py` (SSH show-command collector), `insert_cli_output.py`, `generate_cli_reference.py`, and a sample `cli-outputs.json`. |
 | `config/` | `collector-config.yaml` (OTel pipeline) and `splunk-dashboard.xml` (58-panel dashboard). |
@@ -48,7 +48,7 @@ Catalyst 9300  ──gRPC dial-out──▶  OTel Collector  ──HEC──▶ 
 - **66 subscriptions defined** in `harness/validation/subscriptions.yaml`.
 - **55 produced data** on the two reference switches; **10 were silent** because
   the underlying feature was not configured (no SFPs, no MPLS/LISP/VXLAN/EVPN,
-  fixed chassis, etc.). See `captures/README.md` for the silent list and reasons.
+  fixed chassis, etc.). The silent list and reasons are in the local `captures/README.md`.
 - Reference switches: `cat9300x-pod10a` / `cat9300-pod10b`, IOS XE 26.01.1.
 
 ## Resume the work (new environment)
@@ -103,7 +103,7 @@ Catalyst 9300  ──gRPC dial-out──▶  OTel Collector  ──HEC──▶ 
   ```
 - The `validate.py` / `generate_ios_config.py` tools take `--host/--user/--pass`
   flags; do not hardcode credentials.
-- `captures/`, `docs/`, and `harness/validation/results/` contain the reference
+- `docs/` and `harness/validation/results/` contain the reference
   lab's **hostnames and captured operational data** (neighbor names, MACs, IPs).
   These are lab identifiers, not secrets, but scrub them if this bundle leaves a
   trusted environment.
