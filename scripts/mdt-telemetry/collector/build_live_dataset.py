@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from redact_payload import redact_obj  # noqa: E402
+from redact_payload import redact_list_keys, redact_obj  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
@@ -131,7 +131,8 @@ def main():
             sig = (tuple(sorted(rkeys.items())) if rkeys
                    else ("_leaf_" + "|".join(sorted(rfields.keys())),))
             # Mask secret-named values (SNMP communities, keys) before anything is stored.
-            rkeys, rfields = redact_obj(rkeys), redact_obj(rfields)
+            # Keys are judged against the list path (native/username -> name is a username).
+            rkeys, rfields = redact_list_keys(rkeys, path), redact_obj(rfields)
             seen = sig_seen.setdefault(key, set())
             if sig not in seen:
                 seen.add(sig)

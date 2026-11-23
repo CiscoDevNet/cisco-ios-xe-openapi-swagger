@@ -33,3 +33,19 @@ Every clone and fork made before 2026-11-21 still holds the old history: re-clon
 from an old clone. GitHub Support must purge cached views and unreachable commits. New leaks:
 rotate first, then scrub HEAD and rewrite history. Never paste device output into docs, tests
 or fixtures; use values containing `FAKE`.
+
+## Follow-up (2026-11-24)
+An independent audit of the published data after the rewrite found the lab username still in
+MIB columns (`ccmHistoryEventTerminalUser`, `ccmCTIDWhoChanged`, `casnUserId`,
+`cSipCfgAaaUsername`), OpenConfig `admin-username`, NACM `rule-list` names, mdt-oper-v2
+`mdt-connections/peer-id` (the dial-in session user) and telemetry list
+keys (`keys` / `samples[].keys` of `native/username*` rows, where the parent is the word `keys`,
+not the list). Rules added: `USERNAME_SUFFIX` (…username / …userid / …terminaluser /
+…whochanged), `rule-list` in `USERNAME_LISTS`, `USERNAME_IN_CONTEXT` (peer-id),
+`p-user` / `p-pass` (MDT proxy credentials), and `redact_list_keys(keys, path)`, which
+judges list keys by the row `path`. List keys are identifiers, so keys under password /
+credential containers (line `first`, AP `wtp_mac`) stay visible. 28 files re-scrubbed.
+Checked and kept: `*-pem` fields are public SUDI / CA certificates (no private keys); values
+shaped like type 7 are serial numbers, MD5 fingerprints and boot-integrity hashes.
+Generally: when adding a dataset, check new username-bearing leaves against the lab user
+(compare in code, never print), and add a `FAKE` test to `tests/test_redaction_rules.py`.

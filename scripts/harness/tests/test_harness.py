@@ -8,6 +8,7 @@ or:
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -228,10 +229,16 @@ def test_no_secrets_in_committed_json_artifacts():
     # legitimately contains the secret regex literals. Scan only JSON artifacts
     # that could be committed; gitignored inventory.json/secrets are excluded.
     harness_dir = REPO_ROOT / "scripts" / "harness"
-    for path in harness_dir.rglob("*.json"):
-        rel = path.relative_to(harness_dir).as_posix()
-        if rel.startswith("captures/") or rel == "inventory.json" or rel.startswith("secrets"):
+    candidates = [p for p in harness_dir.rglob("*.json")
+                  if not p.relative_to(harness_dir).as_posix().startswith(("captures/", "secrets"))
+                  and p.name != "inventory.json"]
+    # Gitignored local files (raw capture-index.json) can never be committed.
+    ignored = subprocess.run(["git", "check-ignore", "--stdin"], cwd=REPO_ROOT, capture_output=True, text=True,
+                             input="\n".join(str(p) for p in candidates)).stdout.splitlines()
+    for path in candidates:
+        if str(path) in ignored:
             continue
+        rel = path.relative_to(harness_dir).as_posix()
         hits = secret_scan.scan_file(path)
         assert not hits, f"secret-like content in {rel}: {hits}"
 

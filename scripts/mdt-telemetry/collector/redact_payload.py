@@ -14,7 +14,9 @@ with the fixed token ``***REDACTED***`` (nothing derived from the secret) when:
     ``user-mgmt/*``), so ``{"password": {"enctype": "7", "text": "..."}}`` is
     masked while ``enctype`` is kept;
   * its leaf name is a username tied to credentials (username, user-name,
-    ``username/name`` list keys, AP management users, SNMPv3 users);
+    ``username/name`` list keys, AP management users, SNMPv3 users, MIB columns
+    such as ccmHistoryEventTerminalUser / casnUserId, and telemetry rows whose
+    ``keys`` belong to a username or NACM rule-list ``path``);
   * its value is a Cisco crypt hash ($1$, $5$, $6$, $8$, $9$, $14$) or a PEM block;
   * it is the secret / username argument of an IOS XE CLI line (type 0/5/6/7/8/9
     passwords and secrets, keys, NTP / SNMPv3 / WPA / IKE / type-6 master keys,
@@ -54,7 +56,7 @@ SECRET = re.compile(
 )
 # Short leaves that are secrets only as an exact name (substring matching would
 # mask key-id, keyword, public-key, keychain-name ...).
-SECRET_EXACT = {"key", "md5", "pwd", "key-0", "key-6", "key-7", "ak-0", "ak-6", "ak-7"}
+SECRET_EXACT = {"key", "md5", "pwd", "p-pass", "key-0", "key-6", "key-7", "ak-0", "ak-6", "ak-7"}
 # Containers whose leaf children are all secret material, except the type leaves.
 SECRET_CONTAINERS = {
     "password", "secret", "key", "md5", "key-string", "authentication-key", "message-digest-key",
@@ -67,8 +69,14 @@ TYPE_LEAVES = {
     "password-encryption", "privilege", "id", "key-id", "index",
 }
 # Usernames tied to credentials (user asked for these to be published as REDACTED too).
-USERNAME_LEAVES = {"username", "user-name", "login-name", "mgmt-user", "ap-mgmt-user", "dot1x-username"}
-USERNAME_LISTS = {"username", "user", "users", "mgmtuser", "user-mgmt", "local-user"}
+USERNAME_LEAVES = {"username", "user-name", "login-name", "mgmt-user", "ap-mgmt-user", "dot1x-username", "p-user"}
+# (leaf, parent) pairs: mdt-oper-v2 connections name the NETCONF / gNMI session's user as peer-id.
+USERNAME_IN_CONTEXT = {("peer-id", "mdt-connections")}
+# NACM rule-lists are named after the user they grant access to on the lab devices.
+USERNAME_LISTS = {"username", "user", "users", "mgmtuser", "user-mgmt", "local-user", "rule-list"}
+# MIB / camelCase leaves (normalised to lowercase) that hold the logged-in user:
+# ccmHistoryEventTerminalUser, ccmCTIDWhoChanged, casnUserId, cSipCfgAaaUsername, admin-username.
+USERNAME_SUFFIX = re.compile(r"(?:user-?name|user-?id|terminal-?user|who-?changed)$")
 
 # ------------------------------------------------------------------ value patterns
 PEM = re.compile(r"-----BEGIN [^-]+-----.*?-----END [^-]+-----", re.DOTALL)
@@ -175,7 +183,8 @@ def _is_username(name: str, parent: str, value: Any) -> bool:
     if not isinstance(value, str) or not re.search(r"[A-Za-z]", value) or value == REDACTED:
         return False
     leaf, up = _split(name, parent)
-    return leaf in USERNAME_LEAVES or (leaf == "name" and up in USERNAME_LISTS)
+    return (leaf in USERNAME_LEAVES or bool(USERNAME_SUFFIX.search(leaf)) or (leaf, up) in USERNAME_IN_CONTEXT
+            or (leaf == "name" and up in USERNAME_LISTS))
 
 
 # ------------------------------------------------------------------ structured data
@@ -212,14 +221,51 @@ def _mask_member(key: str, parent: str, v: Any) -> bool:
     return key == "name" and _leaf(parent) in COMMUNITY_LISTS and isinstance(v, str)
 
 
-def redact_obj(obj: Any, _parent: str = "") -> Any:
+def _row_path(obj: dict, inherited: str) -> str:
+    """Telemetry dataset rows keep list keys in ``keys`` / ``samples[].keys`` next to the
+    list's ``path``; that path, not the word "keys", decides which keys are usernames."""
+    path = obj.get("path")
+    if isinstance(path, str) and ("keys" in obj or "samples" in obj):
+        return path
+    return inherited
+
+
+def _mask_list_key(key: str, path: str, v: Any) -> bool:
+    """Should list key ``key: v`` of the telemetry list at ``path`` be REDACTED?
+
+    List keys are identifiers (line numbers, AP MACs) even under password / credential
+    containers; only secret-named keys, usernames and the ``name`` of a username,
+    NACM rule-list or SNMP community list are masked.
+    """
+    if not isinstance(v, str) or not re.search(r"[A-Za-z]", v) or v == REDACTED:
+        return False
+    leaf, lists = _leaf(key), set(_segments(path))
+    if SECRET.search(leaf) or leaf in SECRET_EXACT or _is_username(key, "", v):
+        return True
+    return leaf == "name" and bool(lists & (USERNAME_LISTS | COMMUNITY_LISTS))
+
+
+def redact_list_keys(keys: dict, path: str) -> dict:
+    """Mask the list keys (telemetry tags) of one record of the list at ``path``."""
+    return {k: (REDACTED if _mask_list_key(k, path, v) else redact_obj(v)) for k, v in keys.items()}
+
+
+def redact_obj(obj: Any, _parent: str = "", _row: str = "") -> Any:
     """Deep-mask a parsed RESTCONF / telemetry value; strings are scrubbed by content."""
     if isinstance(obj, dict):
-        return {k: (REDACTED if _mask_member(k if isinstance(k, str) else "", _parent, v)
-                    else redact_obj(v, k if isinstance(k, str) else ""))
-                for k, v in obj.items()}
+        row = _row_path(obj, _row)
+        out = {}
+        for k, v in obj.items():
+            name = k if isinstance(k, str) else ""
+            if name == "keys" and row and isinstance(v, dict):
+                out[k] = redact_list_keys(v, row)
+            elif _mask_member(name, _parent, v):
+                out[k] = REDACTED
+            else:
+                out[k] = redact_obj(v, name, row if name == "samples" else "")
+        return out
     if isinstance(obj, list):
-        return [redact_obj(v, _parent) for v in obj]
+        return [redact_obj(v, _parent, _row) for v in obj]
     if isinstance(obj, str):
         return redact_payload(obj)
     return obj
@@ -360,17 +406,21 @@ def _exact_identifier(name: str, value: Any) -> bool:
             and re.fullmatch(r"[a-z]+(?:-[a-z]+)*", value) is not None)
 
 
-def _scan_obj(orig: Any, path: str, hits: list[tuple[str, str]], parent: str = "") -> None:
+def _scan_obj(orig: Any, path: str, hits: list[tuple[str, str]], parent: str = "", row: str = "") -> None:
     if isinstance(orig, dict):
+        row = _row_path(orig, row)
         for k, v in orig.items():
             loc = f"{path}/{k}"
-            if _mask_member(k if isinstance(k, str) else "", parent, v):
+            name = k if isinstance(k, str) else ""
+            if name == "keys" and row and isinstance(v, dict):
+                hits.extend(("secret_leaf", f"{loc}/{kk}") for kk, kv in v.items() if _mask_list_key(kk, row, kv))
+            elif _mask_member(name, parent, v):
                 hits.append(("secret_leaf", loc))
             else:
-                _scan_obj(v, loc, hits, k if isinstance(k, str) else "")
+                _scan_obj(v, loc, hits, name, row if name == "samples" else "")
     elif isinstance(orig, list):
         for i, v in enumerate(orig):
-            _scan_obj(v, f"{path}[{i}]", hits, parent)
+            _scan_obj(v, f"{path}[{i}]", hits, parent, row)
     elif isinstance(orig, str) and redact_payload(orig) != orig:
         hits.append(("embedded_secret", path))
 

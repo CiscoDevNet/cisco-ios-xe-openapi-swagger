@@ -163,6 +163,20 @@ below are far more representative than the average).
 
 ## [Unreleased]
 
+### Security — remaining credential usernames redacted (2026-11-24)
+
+- An audit after the history rewrite found the lab username still published in MIB columns
+  (`ccmHistoryEventTerminalUser`, `ccmCTIDWhoChanged`, `casnUserId`, `cSipCfgAaaUsername`),
+  OpenConfig `admin-username`, NACM `rule-list` names, the MDT dial-in session user
+  (`mdt-connections/peer-id`) and MDT telemetry list keys of `native/username*` rows. No
+  passwords, keys or hashes were found.
+- `redact_payload.py`: username suffix rule for MIB / camelCase leaves, `rule-list` as a
+  username list, `mdt-connections/peer-id` and the MDT proxy credentials `p-user` / `p-pass`,
+  and `redact_list_keys()` so telemetry `keys` are judged by their row `path`
+  (line numbers and AP MACs under credential containers stay visible). 28 published files
+  re-scrubbed; new cases in `tests/test_redaction_rules.py`. The harness JSON gate now skips
+  gitignored local files.
+
 ### Security — credentials removed from published data and history (2026-11-21)
 
 - **GitGuardian incident 3498322** (username/password in an old `netconf-getconfig-live-data.json`):
